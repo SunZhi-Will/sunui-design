@@ -1,0 +1,40 @@
+{
+    "name": "@sun-ui/filter-grid",
+    "version": "1.0.0",
+    "description": "FilterGrid component from sun-ui",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf dist",
+        "dev": "tsc -w",
+        "pack": "npm pack",
+        "prepublishOnly": "npm run clean && npm run build"
+    },
+    "keywords": [
+        "nextjs",
+        "react",
+        "ui",
+        "filter-grid"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "peerDependencies": {
+        "next": ">=12.0.0",
+        "react": ">=16.8.0",
+        "react-dom": ">=16.8.0"
+    },
+    "dependencies": {
+        "framer-motion": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.0.0",
+        "typescript": "^5.0.0",
+        "rimraf": "^5.0.0"
+    }
+}

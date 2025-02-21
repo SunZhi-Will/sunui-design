@@ -1,0 +1,53 @@
+{
+  "name": "@sun-ui/social-button",
+  "version": "1.0.0",
+  "description": "SocialButton component from sun-ui",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dev": "tsc -w",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run clean && npm run build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "ui",
+    "social-button"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "framer-motion": "^10.0.0"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.4",
+    "@storybook/addon-essentials": "^8.5.8",
+    "@storybook/addon-interactions": "^8.5.8",
+    "@storybook/addon-onboarding": "^8.5.8",
+    "@storybook/blocks": "^8.5.8",
+    "@storybook/react": "^8.5.8",
+    "@storybook/react-vite": "^8.5.8",
+    "@storybook/test": "^8.5.8",
+    "@types/react": "^18.0.0",
+    "jiti": "^2.4.2",
+    "rimraf": "^5.0.0",
+    "storybook": "^8.5.8",
+    "tsx": "^4.19.3",
+    "typescript": "^5.0.0"
+  }
+}
