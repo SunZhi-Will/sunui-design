@@ -1,6 +1,6 @@
 {
     "name": "sunui-filter-grid",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "FilterGrid component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
