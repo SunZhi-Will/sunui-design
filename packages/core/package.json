@@ -1,6 +1,6 @@
 {
     "name": "sunui",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Sun UI component library",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,12 +21,12 @@
         "react-dom": ">=16.8.0"
     },
     "dependencies": {
-        "sunui-filter-grid": "0.0.6",
-        "sunui-floating-button": "0.0.6",
-        "sunui-gradient-background": "0.0.6",
-        "sunui-social-button": "0.0.6",
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
+        "sunui-filter-grid": "0.0.7",
+        "sunui-floating-button": "0.0.7",
+        "sunui-gradient-background": "0.0.7",
+        "sunui-social-button": "0.0.7",
         "tailwindcss": "^3.4.1"
     },
     "devDependencies": {
