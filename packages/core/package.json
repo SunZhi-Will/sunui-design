@@ -1,5 +1,5 @@
 {
-    "name": "sun-ui",
+    "name": "@sun-ui/core",
     "version": "0.0.2",
     "description": "Sun UI component library",
     "main": "dist/index.js",
@@ -33,7 +33,7 @@
         "@types/react": "^18.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "00727a63fccfcdd572254cf566d7de522a5d35e1",
+    "gitHead": "933a98184bfda8964e617547bb772e54a3f1f142",
     "publishConfig": {
         "access": "public"
     }
