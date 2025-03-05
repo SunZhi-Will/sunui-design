@@ -1,6 +1,6 @@
 {
     "name": "@sun-ui/floating-button",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "FloatingButton component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

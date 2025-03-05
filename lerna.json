@@ -1,4 +1,17 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "npmClient": "npm",
+  "command": {
+    "version": {
+      "exact": true
+    },
+    "publish": {
+      "npmClient": "npm",
+      "allowBranch": [
+        "master"
+      ],
+      "registry": "https://registry.npmjs.org/"
+    }
+  }
 }

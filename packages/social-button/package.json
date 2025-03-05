@@ -1,6 +1,6 @@
 {
   "name": "@sun-ui/social-button",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "SocialButton component from sun-ui",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
