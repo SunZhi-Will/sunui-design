@@ -1,5 +1,5 @@
 {
-    "name": "sunui",
+    "name": "sunui-core",
     "version": "0.0.7",
     "description": "Sun UI component library",
     "main": "dist/index.js",
@@ -33,7 +33,7 @@
         "@types/react": "^18.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "acacbf54cb9553f6ea56cbc4390065c4117ae036",
+    "gitHead": "53386940c094c3fb01d820df77626cf45b1be701",
     "publishConfig": {
         "access": "public"
     }
