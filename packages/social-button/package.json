@@ -1,6 +1,6 @@
 {
   "name": "sunui-social-button",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "SocialButton component from sun-ui",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -50,7 +50,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5.0.0"
   },
-  "gitHead": "53386940c094c3fb01d820df77626cf45b1be701",
+  "gitHead": "ca90f077d9547c50821d38d247cfbad0429ca6ba",
   "publishConfig": {
     "access": "public"
   }
