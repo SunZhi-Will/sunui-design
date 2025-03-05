@@ -21,10 +21,10 @@
         "react-dom": ">=16.8.0"
     },
     "dependencies": {
-        "@sunui/filter-grid": "0.0.6",
-        "@sunui/floating-button": "0.0.6",
-        "@sunui/gradient-background": "0.0.6",
-        "@sunui/social-button": "0.0.6",
+        "sunui-filter-grid": "0.0.6",
+        "sunui-floating-button": "0.0.6",
+        "sunui-gradient-background": "0.0.6",
+        "sunui-social-button": "0.0.6",
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
         "tailwindcss": "^3.4.1"
@@ -33,7 +33,7 @@
         "@types/react": "^18.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "5cb0c8c8ef2ee3a6850c6bd495e425c0202ea74f",
+    "gitHead": "acacbf54cb9553f6ea56cbc4390065c4117ae036",
     "publishConfig": {
         "access": "public"
     }
