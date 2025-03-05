@@ -171,31 +171,9 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     };
 
     return (
-        <div className={`fixed ${positionClasses[position]} z-50 transition-all duration-500
+        <div className={`fixed ${positionClasses[position]} z-[140] transition-all duration-500
             ${show ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}
             ${className}`}>
-            <motion.button
-                onClick={handleToggle}
-                className={`w-12 h-12 rounded-full flex items-center justify-center
-                    bg-gradient-to-r from-blue-600/90 to-blue-800/90 
-                    shadow-lg hover:shadow-blue-500/50 transition-all duration-300
-                    relative z-50 text-white ${buttonClassName}`}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-            >
-                <motion.svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    animate={{ rotate: isMenuOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-                </motion.svg>
-            </motion.button>
-
             <AnimatePresence mode="wait">
                 {isMenuOpen && (
                     <motion.div
@@ -206,7 +184,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                             duration: 0.3,
                             ease: "easeInOut"
                         }}
-                        className={`absolute inset-0 ${variant === 'vertical' ? 'flex justify-center' : ''}`}
+                        className="absolute inset-0"
                     >
                         <motion.div
                             initial="closed"
@@ -216,10 +194,10 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                 open: { transition: { staggerChildren: 0.05 } },
                                 closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
                             }}
+                            className={variant === 'vertical' ? 'flex justify-center' : ''}
                         >
                             {renderChildren().map((child) =>
                                 React.isValidElement(child) ? (
-
                                     <motion.div
                                         className='flex justify-center'
                                         key={child.key}
@@ -244,6 +222,28 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <div className="relative">
+                <SocialButton
+                    isMainButton
+                    isOpen={isMenuOpen}
+                    icon={
+                        <motion.svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            animate={{ rotate: isMenuOpen ? 180 : 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                        </motion.svg>
+                    }
+                    className="from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"
+                    onClick={handleToggle}
+                />
+            </div>
         </div>
     );
 }; 

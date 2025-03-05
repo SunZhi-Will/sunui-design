@@ -44,14 +44,14 @@ export var defaultThemes = {
         title: "from-emerald-200 to-emerald-400"
     },
     purple: {
-        container: "\n            bg-gradient-to-br from-pink-700/70 to-rose-800/80\n            border-pink-500/40\n            group-hover:border-pink-400/60\n            group-hover:shadow-[0_0_20px_rgba(244,114,182,0.3)]\n        ",
-        hover: "bg-pink-600/50",
-        text: "text-pink-50",
+        container: "\n            bg-gradient-to-br from-pink-600/20 to-pink-900/40\n            border-pink-500/20\n            group-hover:border-pink-400/50\n            group-hover:shadow-[0_0_20px_rgba(244,114,182,0.3)]\n        ",
+        hover: "bg-pink-500/10",
+        text: "text-white",
         image: "brightness-125 contrast-125",
         button: {
-            active: "bg-pink-400 text-pink-950 shadow-sm",
-            inactive: "bg-pink-700/80 text-pink-50 hover:bg-pink-600/80"
+            active: "bg-pink-500 text-white shadow-sm",
+            inactive: "bg-pink-400/30 text-white hover:bg-pink-400/40"
         },
-        title: "from-pink-300 to-pink-100"
+        title: "from-pink-200 to-pink-400"
     }
 };

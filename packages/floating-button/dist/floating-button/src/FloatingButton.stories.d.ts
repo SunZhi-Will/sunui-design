@@ -6,6 +6,7 @@ type Story = StoryObj<typeof FloatingButton>;
 export declare const Default: Story;
 export declare const Vertical: Story;
 export declare const Grid: Story;
-export declare const WithChildren: Story;
 export declare const Controlled: Story;
 export declare const CustomChildren: Story;
+export declare const GridStyle: Story;
+export declare const MultipleButtons: Story;

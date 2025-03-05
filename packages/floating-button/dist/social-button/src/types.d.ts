@@ -1,7 +1,7 @@
 import React from 'react';
 export interface SocialButtonProps {
-    href: string;
-    icon: string | React.ReactNode;
+    href?: string;
+    icon: React.ReactNode;
     className?: string;
     iconClassName?: string;
     position?: {
@@ -12,4 +12,7 @@ export interface SocialButtonProps {
     title?: string;
     titleDisplay?: 'always' | 'hover' | 'none';
     titlePosition?: 'top' | 'right' | 'bottom' | 'left';
+    onClick?: () => void;
+    isMainButton?: boolean;
+    isOpen?: boolean;
 }

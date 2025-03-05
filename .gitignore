@@ -36,3 +36,14 @@ yarn-error.log*
 next-env.d.ts
 
 *storybook.log
+
+# Lerna
+lerna-debug.log
+
+# Build outputs
+packages/*/dist/
+packages/*/*.tgz
+
+# Cache
+.cache/
+.next/
