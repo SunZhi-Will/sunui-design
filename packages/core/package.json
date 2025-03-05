@@ -1,6 +1,6 @@
 {
     "name": "sunui-core",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "description": "Sun UI component library",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -13,8 +13,8 @@
         "react",
         "ui"
     ],
-    "author": "Your Name",
-    "license": "MIT",
+    "author": "Sunzhi",
+    "license": "Apache-2.0",
     "peerDependencies": {
         "next": ">=12.0.0",
         "react": ">=16.8.0",
@@ -23,10 +23,10 @@
     "dependencies": {
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
-        "sunui-filter-grid": "0.0.10",
-        "sunui-floating-button": "0.0.10",
-        "sunui-gradient-background": "0.0.10",
-        "sunui-social-button": "0.0.10",
+        "sunui-filter-grid": "0.0.11",
+        "sunui-floating-button": "0.0.11",
+        "sunui-gradient-background": "0.0.11",
+        "sunui-social-button": "0.0.11",
         "tailwindcss": "^3.4.1"
     },
     "devDependencies": {

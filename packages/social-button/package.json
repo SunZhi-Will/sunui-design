@@ -1,6 +1,6 @@
 {
   "name": "sunui-social-button",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "SocialButton component from sun-ui",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,8 +24,8 @@
     "ui",
     "social-button"
   ],
-  "author": "Your Name",
-  "license": "MIT",
+  "author": "Sunzhi",
+  "license": "Apache-2.0",
   "peerDependencies": {
     "next": ">=12.0.0",
     "react": ">=16.8.0",
