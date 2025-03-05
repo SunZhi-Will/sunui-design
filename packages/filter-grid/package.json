@@ -1,6 +1,6 @@
 {
     "name": "@sun-ui/filter-grid",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "FilterGrid component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
