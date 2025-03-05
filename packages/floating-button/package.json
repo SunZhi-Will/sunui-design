@@ -30,7 +30,7 @@
         "react-dom": ">=16.8.0"
     },
     "dependencies": {
-        "@sun-ui/social-button": "^0.0.1",
+        "@sun-ui/social-button": "0.0.1",
         "framer-motion": "^11.0.0"
     },
     "devDependencies": {
