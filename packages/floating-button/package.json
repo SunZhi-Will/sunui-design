@@ -1,6 +1,6 @@
 {
     "name": "sunui-floating-button",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "description": "FloatingButton component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -31,14 +31,14 @@
     },
     "dependencies": {
         "framer-motion": "^11.0.0",
-        "sunui-social-button": "0.0.17"
+        "sunui-social-button": "0.0.18"
     },
     "devDependencies": {
         "@types/react": "^18.0.0",
         "rimraf": "^5.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "f8c0f333119eefda42f5732e02038979f0ab1a3c",
+    "gitHead": "6df3976b0d60d836420952aacdf793571dd11293",
     "publishConfig": {
         "access": "public"
     }

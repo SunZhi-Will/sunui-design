@@ -1,6 +1,6 @@
 {
     "name": "sunui-filter-grid",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "description": "FilterGrid component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
         "rimraf": "^5.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "f8c0f333119eefda42f5732e02038979f0ab1a3c",
+    "gitHead": "6df3976b0d60d836420952aacdf793571dd11293",
     "publishConfig": {
         "access": "public"
     }
