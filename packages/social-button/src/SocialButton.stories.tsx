@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { SocialButton } from './SocialButton';
+import React from 'react';
 
 const meta: Meta<typeof SocialButton> = {
     title: 'Components/SocialButton',
@@ -48,38 +49,52 @@ export const Default: Story = {
 // 標題位置展示
 export const TitlePositions: Story = {
     render: () => (
-        <div className="relative w-[300px] h-[300px] bg-gray-100/30 rounded-lg p-4">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="grid grid-cols-3 gap-20">
-                    <SocialButton
-                        href="#"
-                        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
-                        position={{ x: 0, y: 0 }}
-                        className="from-purple-600/90 to-indigo-800/90"
-                        iconClassName="[filter:invert(1)]"
-                        title="上方提示"
-                        titleDisplay="always"
-                        titlePosition="top"
-                    />
-                    <SocialButton
-                        href="#"
-                        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
-                        position={{ x: 0, y: 0 }}
-                        className="from-blue-600/90 to-blue-800/90"
-                        title="右方提示"
-                        titleDisplay="always"
-                        titlePosition="right"
-                    />
-                    <SocialButton
-                        href="#"
-                        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
-                        position={{ x: 0, y: 0 }}
-                        className="from-blue-400/90 to-blue-500/90"
-                        title="下方提示"
-                        titleDisplay="always"
-                        titlePosition="bottom"
-                    />
-                </div>
+        <div className="relative w-[200px] h-[200px] bg-gray-100/30 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-10">
+                {/* 右上角 */}
+                <SocialButton
+                    href="#"
+                    icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                    position={{ x: 0, y: 0 }}
+                    className="from-purple-600/90 to-indigo-800/90"
+                    iconClassName="[filter:invert(1)]"
+                    title="左上角"
+                    titleDisplay="always"
+                    titlePosition="top"
+                />
+
+                {/* 左上角 */}
+                <SocialButton
+                    href="#"
+                    icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+                    position={{ x: 100, y: 0 }}
+                    className="from-blue-600/90 to-blue-800/90"
+                    title="右上角"
+                    titleDisplay="always"
+                    titlePosition="right"
+                />
+
+                {/* 左下角 */}
+                <SocialButton
+                    href="#"
+                    icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
+                    position={{ x: 0, y: 100 }}
+                    className="from-white/90 to-white/90"
+                    title="左下角"
+                    titleDisplay="always"
+                    titlePosition="left"
+                />
+
+                {/* 右下角 */}
+                <SocialButton
+                    href="#"
+                    icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
+                    position={{ x: 100, y: 100 }}
+                    className="from-blue-600/90 to-blue-700/90"
+                    title="右下角"
+                    titleDisplay="always"
+                    titlePosition="bottom"
+                />
             </div>
         </div>
     )
@@ -197,4 +212,4 @@ export const GridLayout: Story = {
             </div>
         </div>
     )
-}; 
+};

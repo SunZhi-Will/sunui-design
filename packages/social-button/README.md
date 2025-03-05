@@ -1,44 +1,43 @@
-# sunui-social-button
+# SocialButton
 
-A collection of stylish social media buttons for React applications.
+A button component for social media links with tooltip and gradient effects.
+
+## Features
+
+- Custom icon support (image URL or React element)
+- Customizable button and icon styles
+- Tooltip support
+- Tooltip display modes: always, hover, none
+- Tooltip positions: top, right, bottom, left
+- Gradient background effects
 
 ## Installation
 
 ```bash
 npm install sunui-social-button
+# or
+yarn add sunui-social-button
+# or
+pnpm add sunui-social-button
 ```
-
-## Features
-
-- 🎯 TypeScript support
-- 🎨 Modern and clean design
-- 📱 Responsive and mobile-friendly
-- 🌈 Multiple social platforms supported
-- ⚡ Built-in hover animations
-- 🔧 Customizable styles and icons
 
 ## Usage
 
-```jsx
+```tsx
 import { SocialButton } from 'sunui-social-button';
 
-function App() {
-  return (
-    <div>
-      <SocialButton
-        platform="twitter"
-        url="https://twitter.com/yourusername"
-        size="medium"
-        variant="filled"
-      />
-      <SocialButton
-        platform="github"
-        url="https://github.com/yourusername"
-        size="medium"
-        variant="outlined"
-      />
-    </div>
-  );
+export default function App() {
+    return (
+        <SocialButton
+            href="https://github.com/username"
+            icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+            className="from-purple-600/90 to-indigo-800/90"
+            iconClassName="[filter:invert(1)]"
+            title="GitHub"
+            titleDisplay="hover"
+            titlePosition="bottom"
+        />
+    );
 }
 ```
 
@@ -46,24 +45,25 @@ function App() {
 
 | Prop | Type | Description |
 |------|------|-------------|
-| platform | `'twitter' \| 'facebook' \| 'github' \| 'linkedin' \| 'instagram'` | Social media platform |
-| url | `string` | Link to social media profile |
-| size | `'small' \| 'medium' \| 'large'` | Button size |
-| variant | `'filled' \| 'outlined' \| 'text'` | Button style variant |
-| color | `string` | Custom button color |
-| iconOnly | `boolean` | Show only icon without text |
-| className | `string` | Additional CSS classes |
-
-## Supported Platforms
-
-- Twitter (X)
-- Facebook
-- GitHub
-- LinkedIn
-- Instagram
-
-Each platform comes with its official brand color and icon.
+| href | string | Button's link address |
+| icon | string \| ReactElement | Button's icon (URL or React element) |
+| position | { x: number, y: number } | Button's position |
+| className | string | Custom button styles |
+| iconClassName | string | Custom icon styles |
+| title | string | Button's tooltip text |
+| titleDisplay | 'always' \| 'hover' \| 'none' | Tooltip display mode |
+| titlePosition | 'top' \| 'right' \| 'bottom' \| 'left' | Tooltip position |
 
 ## License
 
-MIT 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 

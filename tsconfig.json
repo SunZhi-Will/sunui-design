@@ -21,10 +21,10 @@
       "@/*": [
         "./src/*"
       ],
-      "@sun-ui/social-button": [
+      "sunui-social-button": [
         "packages/social-button/src"
       ],
-      "@sun-ui/social-button/*": [
+      "sunui-social-button/*": [
         "packages/social-button/src/*"
       ],
       "@storybook/nextjs": [

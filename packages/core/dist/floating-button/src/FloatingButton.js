@@ -12,7 +12,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SocialButton } from '@sun-ui/social-button';
+import { SocialButton } from 'sunui-social-button';
 export var FloatingButton = function (_a) {
     var _b = _a.show, show = _b === void 0 ? true : _b, controlledIsOpen = _a.isOpen, onOpenChange = _a.onOpenChange, _c = _a.defaultOpen, defaultOpen = _c === void 0 ? false : _c, children = _a.children, _d = _a.className, className = _d === void 0 ? '' : _d, _e = _a.buttonClassName, buttonClassName = _e === void 0 ? '' : _e, _f = _a.position, position = _f === void 0 ? 'bottom-right' : _f, _g = _a.buttons, buttons = _g === void 0 ? [] : _g, _h = _a.variant, variant = _h === void 0 ? 'petal' : _h;
     var _j = useState(defaultOpen), uncontrolledIsOpen = _j[0], setUncontrolledIsOpen = _j[1];

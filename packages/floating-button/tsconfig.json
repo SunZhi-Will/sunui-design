@@ -16,16 +16,17 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "react",
-        "incremental": true,
         "declaration": true,
+        "declarationDir": "./dist",
         "outDir": "./dist",
+        "composite": true,
         "baseUrl": "../../",
         "paths": {
-            "@sun-ui/social-button": [
-                "packages/social-button/src"
+            "sunui-social-button": [
+                "packages/social-button/dist"
             ],
-            "@sun-ui/social-button/*": [
-                "packages/social-button/src/*"
+            "sunui-social-button/*": [
+                "packages/social-button/dist/*"
             ]
         }
     },
@@ -34,6 +35,11 @@
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+    ],
+    "references": [
+        {
+            "path": "../social-button"
+        }
     ]
 }

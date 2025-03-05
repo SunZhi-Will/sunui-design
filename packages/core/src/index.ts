@@ -1,4 +1,4 @@
-export { FloatingButton } from '@sun-ui/floating-button';
-export { SocialButton } from '@sun-ui/social-button';
-export { GradientBackground } from '@sun-ui/gradient-background';
-export { FilterGrid } from '@sun-ui/filter-grid'; 
+export { FloatingButton } from 'sunui-floating-button';
+export { SocialButton } from 'sunui-social-button';
+export { GradientBackground } from 'sunui-gradient-background';
+export { FilterGrid } from 'sunui-filter-grid'; 

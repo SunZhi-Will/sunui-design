@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SocialButton, SocialButtonProps } from '@sun-ui/social-button';
+import { SocialButton, SocialButtonProps } from 'sunui-social-button';
 import type { FloatingButtonProps } from './types';
 
 export const FloatingButton: React.FC<FloatingButtonProps> = ({

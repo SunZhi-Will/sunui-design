@@ -1,44 +1,58 @@
-# sunui-filter-grid
+# FilterGrid
 
-A flexible and responsive grid layout component with filtering capabilities.
+A grid component for displaying skills or categorized content.
+
+## Features
+
+- Multiple themes: light, dark, blue, green, purple
+- Multiple shapes: hexagon, square, circle
+- Customizable categories and skills
+- Icon support
+- Responsive design
 
 ## Installation
 
 ```bash
 npm install sunui-filter-grid
+# or
+yarn add sunui-filter-grid
+# or
+pnpm add sunui-filter-grid
 ```
-
-## Features
-
-- 🎯 TypeScript support
-- 📱 Responsive grid layout
-- 🔍 Built-in filtering functionality
-- 🎨 Customizable styling
-- 🌈 TailwindCSS integration
 
 ## Usage
 
-```jsx
+```tsx
 import { FilterGrid } from 'sunui-filter-grid';
 
-function App() {
-  const items = [
-    { id: 1, category: 'tech', title: 'Item 1' },
-    { id: 2, category: 'design', title: 'Item 2' },
-    // ...more items
-  ];
+const techStacks = [
+    {
+        category: "Programming",
+        skills: [
+            { name: 'C#', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg' },
+            { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
+            { name: 'JavaScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' }
+        ]
+    },
+    // ... more categories
+];
 
-  return (
-    <FilterGrid
-      items={items}
-      filterKey="category"
-      renderItem={(item) => (
-        <div key={item.id}>
-          {item.title}
-        </div>
-      )}
-    />
-  );
+const translations = {
+    title: "Skills",
+    categories: {
+        all: "All"
+    }
+};
+
+export default function App() {
+    return (
+        <FilterGrid
+            techStacks={techStacks}
+            translations={translations}
+            theme="light"
+            shape="hexagon"
+        />
+    );
 }
 ```
 
@@ -46,12 +60,21 @@ function App() {
 
 | Prop | Type | Description |
 |------|------|-------------|
-| items | `Array<any>` | Array of items to display in the grid |
-| filterKey | `string` | Key to use for filtering items |
-| renderItem | `(item: any) => ReactNode` | Function to render each item |
-| columns | `number` | Number of columns (default: 3) |
-| gap | `number` | Gap between items in pixels (default: 16) |
+| techStacks | TechStack[] | Array of skill categories and their items |
+| translations | FilterGridTranslations | Text translations for the component |
+| theme | 'light' \| 'dark' \| 'blue' \| 'green' \| 'purple' | Visual theme |
+| shape | 'hexagon' \| 'square' \| 'circle' | Shape of the skill items |
 
 ## License
 
-MIT 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 

@@ -20,8 +20,8 @@ const config: StorybookConfig = {
     if (config.resolve) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@sun-ui/social-button': '../packages/social-button/src',
-        '@sun-ui/floating-button': '../packages/floating-button/src',
+        'sunui-social-button': '../packages/social-button/src',
+        'sunui-floating-button': '../packages/floating-button/src',
       };
     }
     return config;
