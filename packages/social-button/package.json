@@ -1,6 +1,6 @@
 {
   "name": "@sun-ui/social-button",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "SocialButton component from sun-ui",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -49,5 +49,9 @@
     "storybook": "^8.5.8",
     "tsx": "^4.19.3",
     "typescript": "^5.0.0"
+  },
+  "gitHead": "00727a63fccfcdd572254cf566d7de522a5d35e1",
+  "publishConfig": {
+    "access": "public"
   }
 }
