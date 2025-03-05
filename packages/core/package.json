@@ -1,6 +1,6 @@
 {
     "name": "@sun-ui/core",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Sun UI component library",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,10 +21,10 @@
         "react-dom": ">=16.8.0"
     },
     "dependencies": {
-        "@sun-ui/filter-grid": "0.0.3",
-        "@sun-ui/floating-button": "0.0.3",
-        "@sun-ui/gradient-background": "0.0.3",
-        "@sun-ui/social-button": "0.0.3",
+        "@sun-ui/filter-grid": "0.0.4",
+        "@sun-ui/floating-button": "0.0.4",
+        "@sun-ui/gradient-background": "0.0.4",
+        "@sun-ui/social-button": "0.0.4",
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
         "tailwindcss": "^3.4.1"
@@ -33,7 +33,7 @@
         "@types/react": "^18.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "933a98184bfda8964e617547bb772e54a3f1f142",
+    "gitHead": "be2724828f2868b2abe623852250337023800330",
     "publishConfig": {
         "access": "public"
     }
