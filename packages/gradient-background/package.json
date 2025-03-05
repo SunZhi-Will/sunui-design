@@ -1,6 +1,6 @@
 {
     "name": "@sun-ui/gradient-background",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "GradientBackground component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     },
     "devDependencies": {
         "@types/react": "^18.0.0",
-        "typescript": "^5.0.0",
-        "rimraf": "^5.0.0"
+        "rimraf": "^5.0.0",
+        "typescript": "^5.0.0"
     }
 }
