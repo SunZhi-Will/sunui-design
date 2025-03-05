@@ -50,7 +50,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5.0.0"
   },
-  "gitHead": "65ccb70a38d9ac167eab63b62991b72334945850",
+  "gitHead": "5cb0c8c8ef2ee3a6850c6bd495e425c0202ea74f",
   "publishConfig": {
     "access": "public"
   }
