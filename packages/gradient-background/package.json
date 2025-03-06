@@ -1,6 +1,6 @@
 {
     "name": "sunui-gradient-background",
-    "version": "0.0.20",
+    "version": "0.0.21",
     "description": "GradientBackground component from sun-ui",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
         "rimraf": "^5.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "40241ae4680b19c453c86bd196c2c2484563cf17",
+    "gitHead": "3b97fa72bd734627295046429f5106c8f0c75427",
     "publishConfig": {
         "access": "public"
     }
