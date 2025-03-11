@@ -1,5 +1,5 @@
 import React from 'react';
-import { SocialButtonProps } from 'sunui-social-button';
+import { SocialButtonProps } from '@sunui-design/social';
 
 export type SocialButtonConfig = Omit<SocialButtonProps, 'position' | 'variant'>;
 

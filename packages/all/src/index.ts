@@ -1,5 +1,5 @@
-export * from 'sunui-core';
-export { FloatingButton } from 'sunui-floating-button';
-export { SocialButton } from 'sunui-social-button';
-export { GradientBackground } from 'sunui-gradient-background';
-export { FilterGrid } from 'sunui-filter-grid'; 
+export * from '@sunui-design/core';
+export { FloatingButton } from '@sunui-design/floating';
+export { SocialButton } from '@sunui-design/social';
+export { GradientBackground } from '@sunui-design/gradient';
+export { FilterGrid } from '@sunui-design/filter'; 

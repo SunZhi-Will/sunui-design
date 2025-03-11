@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FloatingButton } from './FloatingButton';
-import { SocialButton } from 'sunui-social-button';
+import { SocialButton } from '@sunui-design/social';
 
 const meta: Meta<typeof FloatingButton> = {
     title: 'Components/FloatingButton',
