@@ -1,5 +1,5 @@
 {
-  "name": "sunui",
+  "name": "sunui-design",
   "version": "0.1.0",
   "private": true,
   "workspaces": [
@@ -13,12 +13,19 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "pack": "lerna run pack --stream",
-    "pack:all": "node scripts/pack-all.js"
+    "pack:all": "node scripts/pack-all.js",
+    "publish": "lerna publish --no-private --force-publish"
   },
   "dependencies": {
     "next": "14.2.24",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "framer-motion": "^11.0.0",
+    "@sunui-design/core": "^0.0.21",
+    "@sunui-design/social": "^0.0.22",
+    "@sunui-design/floating": "^0.0.24",
+    "@sunui-design/gradient": "^0.0.21",
+    "@sunui-design/filter": "^0.0.21"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.4",
@@ -41,6 +48,7 @@
     "postcss": "^8",
     "storybook": "^8.5.8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "autoprefixer": "^10.4.17"
   }
 }

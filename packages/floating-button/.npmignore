@@ -1,8 +1,8 @@
 # Source files
-src/**/*.stories.tsx
-src/**/*.stories.ts
-src/**/*.test.tsx
-src/**/*.test.ts
+*.stories.tsx
+*.stories.ts
+*.test.tsx
+*.test.ts
 
 # Development configs
 .storybook

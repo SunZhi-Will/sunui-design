@@ -1,7 +1,7 @@
 {
-    "name": "@sunui-design/gradient",
-    "version": "0.0.21",
-    "description": "Beautiful gradient background effects for SunUI Design",
+    "name": "@sunui-design/react",
+    "version": "0.0.1",
+    "description": "A modern React UI library with elegant design and smooth animations",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -10,35 +10,37 @@
         "LICENSE"
     ],
     "scripts": {
-        "build": "tsc",
-        "clean": "rimraf dist",
+        "build": "tsc --build --verbose --force",
+        "clean": "rimraf dist tsconfig.tsbuildinfo",
         "dev": "tsc -w",
         "pack": "npm pack",
-        "prepublishOnly": "npm run clean && npm run build"
+        "prepublishOnly": "npm run clean && npm run build",
+        "publish:same": "npm publish --no-git-tag-version --force"
     },
     "keywords": [
         "nextjs",
         "react",
-        "ui",
-        "gradient-background"
+        "ui"
     ],
     "author": "Sunzhi",
     "license": "Apache-2.0",
+    "dependencies": {
+        "@sunui-design/core": "^0.0.1",
+        "@sunui-design/floating": "^0.0.24",
+        "@sunui-design/social": "^0.0.22",
+        "@sunui-design/gradient": "^0.0.1",
+        "@sunui-design/filter": "^0.0.1"
+    },
     "peerDependencies": {
         "next": ">=12.0.0",
         "react": ">=16.8.0",
         "react-dom": ">=16.8.0"
-    },
-    "dependencies": {
-        "framer-motion": "^10.0.0",
-        "@sunui-design/core": "^0.0.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.0",
         "rimraf": "^5.0.0",
         "typescript": "^5.0.0"
     },
-    "gitHead": "3b97fa72bd734627295046429f5106c8f0c75427",
     "publishConfig": {
         "access": "public"
     }

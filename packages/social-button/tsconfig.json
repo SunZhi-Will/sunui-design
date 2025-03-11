@@ -17,16 +17,18 @@
         "isolatedModules": true,
         "jsx": "react",
         "declaration": true,
-        "declarationDir": "./dist",
         "outDir": "./dist",
         "rootDir": "./src",
-        "composite": true
+        "composite": true,
+        "incremental": true
     },
     "include": [
         "src/**/*"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "**/*.stories.tsx",
+        "**/*.test.tsx"
     ]
 }

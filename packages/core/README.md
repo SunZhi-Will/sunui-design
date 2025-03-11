@@ -56,4 +56,4 @@ For detailed documentation of each component, please check their individual pack
 
 ## License
 
-MIT 
+Apache-2.0

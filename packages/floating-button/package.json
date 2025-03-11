@@ -1,7 +1,7 @@
 {
-    "name": "sunui-floating-button",
-    "version": "0.0.21",
-    "description": "FloatingButton component from sun-ui",
+    "name": "@sunui-design/floating",
+    "version": "0.0.24",
+    "description": "Animated floating action button component for SunUI Design",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -10,11 +10,12 @@
         "LICENSE"
     ],
     "scripts": {
-        "build": "tsc --build",
-        "clean": "rimraf dist",
+        "build": "tsc --build --verbose --force",
+        "clean": "rimraf dist tsconfig.tsbuildinfo",
         "dev": "tsc -w",
         "pack": "npm pack",
-        "prepublishOnly": "npm run clean && npm run build"
+        "prepublishOnly": "npm run clean && npm run build",
+        "publish:same": "npm publish --no-git-tag-version --force"
     },
     "keywords": [
         "nextjs",
@@ -31,7 +32,8 @@
     },
     "dependencies": {
         "framer-motion": "^11.0.0",
-        "sunui-social-button": "^0.0.10"
+        "@sunui-design/social": "^0.0.22",
+        "@sunui-design/core": "^0.0.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.0",

@@ -1,7 +1,7 @@
 {
-    "name": "sunui-filter-grid",
+    "name": "@sunui-design/filter",
     "version": "0.0.21",
-    "description": "FilterGrid component from sun-ui",
+    "description": "Advanced grid filtering system for SunUI Design",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -30,7 +30,8 @@
         "react-dom": ">=16.8.0"
     },
     "dependencies": {
-        "framer-motion": "^10.0.0"
+        "framer-motion": "^10.0.0",
+        "@sunui-design/core": "^0.0.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.0",

@@ -1,7 +1,7 @@
 {
-    "name": "sunui-core",
+    "name": "@sunui-design/core",
     "version": "0.0.21",
-    "description": "Sun UI component library",
+    "description": "Core utilities and base components for SunUI Design",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -23,10 +23,6 @@
     "dependencies": {
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
-        "sunui-filter-grid": "0.0.21",
-        "sunui-floating-button": "0.0.21",
-        "sunui-gradient-background": "0.0.21",
-        "sunui-social-button": "0.0.21",
         "tailwindcss": "^3.4.1"
     },
     "devDependencies": {

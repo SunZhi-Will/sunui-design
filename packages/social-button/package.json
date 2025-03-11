@@ -1,7 +1,7 @@
 {
-  "name": "sunui-social-button",
-  "version": "0.0.21",
-  "description": "SocialButton component from sun-ui",
+  "name": "@sunui-design/social",
+  "version": "0.0.22",
+  "description": "Social media integration buttons for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -10,13 +10,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "clean": "rimraf dist",
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "publish:same": "npm publish --no-git-tag-version --force"
   },
   "keywords": [
     "nextjs",
@@ -32,22 +31,12 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "framer-motion": "^10.0.0"
+    "framer-motion": "^11.0.0",
+    "@sunui-design/core": "^0.0.1"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^3.2.4",
-    "@storybook/addon-essentials": "^8.5.8",
-    "@storybook/addon-interactions": "^8.5.8",
-    "@storybook/addon-onboarding": "^8.5.8",
-    "@storybook/blocks": "^8.5.8",
-    "@storybook/react": "^8.5.8",
-    "@storybook/react-vite": "^8.5.8",
-    "@storybook/test": "^8.5.8",
     "@types/react": "^18.0.0",
-    "jiti": "^2.4.2",
     "rimraf": "^5.0.0",
-    "storybook": "^8.5.8",
-    "tsx": "^4.19.3",
     "typescript": "^5.0.0"
   },
   "gitHead": "3b97fa72bd734627295046429f5106c8f0c75427",
