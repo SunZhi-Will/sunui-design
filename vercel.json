@@ -1,24 +1,5 @@
 {
     "buildCommand": "npm install && npx lerna bootstrap && npm run build-storybook",
     "outputDirectory": "storybook-static",
-    "installCommand": "npm install",
-    "builds": [
-        {
-            "src": "storybook-static/**",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "/storybook-static/$1"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/.*",
-            "dest": "/storybook-static/index.html"
-        }
-    ]
+    "installCommand": "npm install"
 }
