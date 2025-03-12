@@ -1,36 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { SocialButton } from './SocialButton';
 import React from 'react';
+import { SocialButtonProps } from './types';
 
-const meta: Meta<typeof SocialButton> = {
+const meta = {
     title: 'Components/SocialButton',
     component: SocialButton,
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],
-    argTypes: {
-        href: { control: 'text', description: '按鈕的連結地址' },
-        icon: { control: 'text', description: '按鈕的圖標，可以是圖片 URL 或 React 元素' },
-        position: { control: 'object', description: '按鈕的位置 {x, y}' },
-        className: { control: 'text', description: '自定義按鈕樣式' },
-        iconClassName: { control: 'text', description: '自定義圖標樣式' },
-        title: { control: 'text', description: '按鈕的提示文字' },
-        titleDisplay: {
-            control: 'select',
-            options: ['always', 'hover', 'none'],
-            description: '提示文字的顯示方式'
-        },
-        titlePosition: {
-            control: 'select',
-            options: ['top', 'right', 'bottom', 'left'],
-            description: '提示文字的位置'
-        }
-    }
-};
+} as Meta<SocialButtonProps>;
 
 export default meta;
-type Story = StoryObj<typeof SocialButton>;
+type Story = StoryObj<SocialButtonProps>;
 
 // 基本示例
 export const Default: Story = {

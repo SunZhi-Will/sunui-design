@@ -1,6 +1,7 @@
+'use client'
+
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { SocialButtonProps } from './types';
 
 export const SocialButton: React.FC<SocialButtonProps> = ({
@@ -51,7 +52,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
     const buttonContent = (
         <>
             {typeof icon === 'string' ? (
-                <Image src={icon} alt={title || ""} width={20} height={20} className={iconClassName} />
+                <img src={icon} alt={title || ""} width={20} height={20} className={iconClassName} />
             ) : (
                 icon
             )}

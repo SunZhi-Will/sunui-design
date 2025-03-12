@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterGrid } from './FilterGrid';
-import { FilterGridTranslations, TechStack } from './types';
+import { FilterGridProps, FilterGridTranslations, TechStack } from './types';
 
 const defaultTranslations: FilterGridTranslations = {
     title: "技能展示",
@@ -15,11 +15,10 @@ const meta = {
     parameters: {
         layout: 'centered',
     },
-    tags: ['autodocs'],
-} satisfies Meta<typeof FilterGrid>;
+} as Meta<FilterGridProps>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<FilterGridProps>;
 
 const sampleTechStacks: TechStack[] = [
     {

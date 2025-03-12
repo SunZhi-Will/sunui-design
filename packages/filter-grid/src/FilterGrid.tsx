@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import React, { useState } from 'react';
-import Image from "next/image";
-import { getThemeClasses, getShapeClasses } from './utils';
+import { getThemeClasses } from './utils';
 import type { FilterGridProps } from './types';
 
 interface GridItemProps {
@@ -64,7 +63,7 @@ const GridItem = React.memo<GridItemProps>(({
                 }}
             >
                 <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-10 transition-opacity" />
-                <Image
+                <img
                     src={icon}
                     alt={name}
                     width={48}

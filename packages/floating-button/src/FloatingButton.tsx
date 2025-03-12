@@ -197,26 +197,24 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                             className={variant === 'vertical' ? 'flex justify-center' : ''}
                         >
                             {renderChildren().map((child) =>
-                                React.isValidElement(child) ? (
-                                    <motion.div
-                                        className='flex justify-center'
-                                        key={child.key}
-                                        variants={{
-                                            open: {
-                                                opacity: 1,
-                                                scale: 1,
-                                                transition: { type: "spring", stiffness: 300, damping: 24 }
-                                            },
-                                            closed: {
-                                                opacity: 0,
-                                                scale: 0,
-                                                transition: { duration: 0.2 }
-                                            }
-                                        }}
-                                    >
-                                        {child}
-                                    </motion.div>
-                                ) : null
+                                <motion.div
+                                    className='flex justify-center'
+                                    key={child.key}
+                                    variants={{
+                                        open: {
+                                            opacity: 1,
+                                            scale: 1,
+                                            transition: { type: "spring", stiffness: 300, damping: 24 }
+                                        },
+                                        closed: {
+                                            opacity: 0,
+                                            scale: 0,
+                                            transition: { duration: 0.2 }
+                                        }
+                                    }}
+                                >
+                                    <div>{React.isValidElement(child) && child}</div>
+                                </motion.div>
                             )}
                         </motion.div>
                     </motion.div>

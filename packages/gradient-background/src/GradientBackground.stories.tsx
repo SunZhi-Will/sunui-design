@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { GradientBackground } from './GradientBackground';
+import { GradientBackgroundProps } from './types';
 
-const meta: Meta<typeof GradientBackground> = {
+const meta = {
     title: 'Components/GradientBackground',
     component: GradientBackground,
     parameters: {
         layout: 'fullscreen',
     },
-    tags: ['autodocs'],
-};
+} as Meta<GradientBackgroundProps>;
 
 export default meta;
-type Story = StoryObj<typeof GradientBackground>;
+type Story = StoryObj<GradientBackgroundProps>;
 
 export const Default: Story = {
     args: {

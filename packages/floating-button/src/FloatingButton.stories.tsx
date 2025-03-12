@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FloatingButton } from './FloatingButton';
 import { SocialButton } from '@sunui-design/social';
+import { FloatingButtonProps } from './types';
 
-const meta: Meta<typeof FloatingButton> = {
+const meta = {
     title: 'Components/FloatingButton',
     component: FloatingButton,
     parameters: {
@@ -62,10 +63,10 @@ const meta: Meta<typeof FloatingButton> = {
             defaultValue: 'petal'
         }
     }
-};
+} as Meta<typeof FloatingButton>;
 
 export default meta;
-type Story = StoryObj<typeof FloatingButton>;
+type Story = StoryObj<FloatingButtonProps>;
 
 const socialButtons = [
     {
