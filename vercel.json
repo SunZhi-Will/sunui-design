@@ -1,5 +1,4 @@
 {
-    "buildCommand": "npm install && npm run build-storybook",
-    "outputDirectory": "storybook-static",
-    "installCommand": "npm install --legacy-peer-deps"
+    "buildCommand": "npm run install-deps && npm run build-storybook",
+    "outputDirectory": "storybook-static"
 }
