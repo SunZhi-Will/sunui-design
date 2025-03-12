@@ -62,7 +62,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
                     ${titleDisplay === 'always'
                         ? 'opacity-100 pointer-events-auto'
                         : 'opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto'}
-                    transition-opacity duration-200 z-[200]`}>
+                    transition-opacity duration-200 z-[2000]`}>
                     <div className={getTitleArrow()} />
                     {title}
                 </div>
@@ -76,7 +76,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
         bg-gradient-to-r ${className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"}
         shadow-lg transition-all duration-300
         text-white relative group
-        hover:z-[145]
+        hover:z-[1500]
     `;
 
     const motionProps = {
@@ -86,13 +86,6 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
         whileHover: { scale: 1.1 },
         whileTap: { scale: 0.9 },
         transition: { duration: 0.1, ease: [1, 1, 1, 1] }
-    };
-
-    // 根據位置計算 z-index，位置越前面 z-index 越大
-    const getZIndex = () => {
-        if (!position) return 140;
-        // 計算方式：基礎值 140 減去 x 和 y 的位置值（除以 100 來降低差距）
-        return 140 - (position.x / 100 + position.y / 100);
     };
 
     if (isMainButton) {
@@ -108,7 +101,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
     }
 
     return (
-        <motion.div className={`absolute`} style={{ zIndex: getZIndex() }}>
+        <motion.div className="absolute">
             <motion.a
                 href={href}
                 target="_blank"

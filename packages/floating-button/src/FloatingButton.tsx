@@ -36,11 +36,11 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     };
 
     const calculatePosition = (index: number, total: number) => {
-        const baseRadius = 60;
+        const baseRadius = 28;
         const baseButtonCount = 3;
 
         if (variant === 'grid') {
-            const spacing = 50;
+            const spacing = 26;
             const itemsPerRow = Math.ceil(Math.sqrt(total));
 
             const now = index + 1;
@@ -80,19 +80,15 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
         }
 
         if (variant === 'vertical') {
-            const spacing = 50;
+            const spacing = 26;
             switch (position) {
                 case 'bottom-right':
                 case 'bottom-left':
-                    return {
-                        x: position.includes('right') ? 0 : 0,
-                        y: -spacing * (index + 1)
-                    };
                 case 'top-right':
                 case 'top-left':
                     return {
-                        x: position.includes('right') ? 0 : 0,
-                        y: spacing * (index + 1) + 10
+                        x: 0,
+                        y: -spacing * (index + 1)
                     };
                 default:
                     return { x: 0, y: 0 };
@@ -194,34 +190,56 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                 open: { transition: { staggerChildren: 0.05 } },
                                 closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
                             }}
-                            className={variant === 'vertical' ? 'flex justify-center' : ''}
+                            className="relative flex justify-center"
                         >
-                            {renderChildren().map((child) =>
-                                <motion.div
-                                    className='flex justify-center'
-                                    key={child.key}
-                                    variants={{
-                                        open: {
-                                            opacity: 1,
-                                            scale: 1,
-                                            transition: { type: "spring", stiffness: 300, damping: 24 }
-                                        },
-                                        closed: {
-                                            opacity: 0,
-                                            scale: 0,
-                                            transition: { duration: 0.2 }
-                                        }
-                                    }}
-                                >
-                                    <div>{React.isValidElement(child) && child}</div>
-                                </motion.div>
-                            )}
+                            {renderChildren().map((child, index) => {
+                                if (!React.isValidElement(child)) return null;
+                                const position = (child as React.ReactElement<SocialButtonProps>).props.position;
+
+                                return (
+                                    <motion.div
+                                        className='absolute flex items-center justify-center'
+                                        style={{
+                                            transform: `translate(${position?.x}px, ${position?.y}px)`,
+                                            width: '48px',
+                                            height: '48px',
+                                            pointerEvents: 'auto',
+                                            zIndex: variant === 'vertical' ? 1000 - index : 10
+                                        }}
+                                        key={child.key}
+                                        variants={{
+                                            open: {
+                                                opacity: 1,
+                                                scale: 1,
+                                                x: position?.x || 0,
+                                                y: position?.y || 0,
+                                                transition: { type: "spring", stiffness: 300, damping: 24 }
+                                            },
+                                            closed: {
+                                                opacity: 0,
+                                                scale: 0,
+                                                x: 0,
+                                                y: 0,
+                                                transition: { duration: 0.2 }
+                                            }
+                                        }}
+                                    >
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            {React.cloneElement(child as React.ReactElement<SocialButtonProps>, {
+                                                position: (child as React.ReactElement<SocialButtonProps>).props.position,
+                                                variant: (child as React.ReactElement<SocialButtonProps>).props.variant,
+                                                className: `${(child as React.ReactElement<SocialButtonProps>).props.className || ''} cursor-pointer`
+                                            })}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <div className="relative">
+            <div className="relative" style={{ zIndex: variant === 'vertical' ? 2000 : 'auto' }}>
                 <SocialButton
                     isMainButton
                     isOpen={isMenuOpen}
