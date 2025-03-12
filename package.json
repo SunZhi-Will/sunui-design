@@ -15,7 +15,8 @@
     "pack": "lerna run pack --stream",
     "pack:all": "node scripts/pack-all.js",
     "publish": "lerna publish --no-private --force-publish",
-    "vercel-build": "npm install && lerna bootstrap && next build"
+    "vercel-build": "npm install && lerna bootstrap && next build",
+    "build:packages": "cd packages/core && npm run build && cd ../floating-button && npm run build && cd ../social && npm run build && cd ../gradient-background && npm run build && cd ../filter-grid && npm run build && cd ../.."
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
