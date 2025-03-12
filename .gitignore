@@ -42,7 +42,10 @@ lerna-debug.log
 
 # Build outputs
 packages/*/dist/
+packages/*/node_modules/
 packages/*/*.tgz
+
+storybook-static/
 
 # Cache
 .cache/
