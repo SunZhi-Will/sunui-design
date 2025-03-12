@@ -1,6 +1,6 @@
 {
     "name": "@sunui-design/react",
-    "version": "0.0.1",
+    "version": "0.0.22",
     "description": "A modern React UI library with elegant design and smooth animations",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -25,11 +25,11 @@
     "author": "Sunzhi",
     "license": "Apache-2.0",
     "dependencies": {
-        "@sunui-design/core": "^0.0.21",
-        "@sunui-design/floating": "^0.0.24",
-        "@sunui-design/social": "^0.0.22",
-        "@sunui-design/gradient": "^0.0.21",
-        "@sunui-design/filter": "^0.0.21"
+        "@sunui-design/core": "0.0.22",
+        "@sunui-design/filter": "0.0.22",
+        "@sunui-design/floating": "0.0.22",
+        "@sunui-design/gradient": "0.0.22",
+        "@sunui-design/social": "0.0.22"
     },
     "peerDependencies": {
         "next": ">=12.0.0",
