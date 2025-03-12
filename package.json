@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build --quiet",
     "pack": "lerna run pack --stream",
     "pack:all": "node scripts/pack-all.js",
     "publish": "lerna publish --no-private --force-publish"
