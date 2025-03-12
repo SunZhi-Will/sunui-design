@@ -1,5 +1,4 @@
 {
-    "version": 2,
     "buildCommand": "npm install && npx lerna bootstrap && npm run build-storybook",
     "outputDirectory": "storybook-static",
     "installCommand": "npm install",
