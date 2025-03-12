@@ -8,5 +8,18 @@
             "src": "storybook-static/**",
             "use": "@vercel/static"
         }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/storybook-static/$1"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/.*",
+            "dest": "/storybook-static/index.html"
+        }
     ]
 }
