@@ -101,12 +101,12 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
     }
 
     return (
-        <motion.div className="absolute">
+        <motion.div>
             <motion.a
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={buttonClassName}
+                className={`absolute ${buttonClassName}`}
                 onClick={onClick}
                 {...motionProps}
             >
