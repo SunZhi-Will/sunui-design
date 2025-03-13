@@ -1,7 +1,7 @@
 {
-    "name": "@sunui-design/filter",
+    "name": "@sunui-design/side-panel",
     "version": "0.0.31",
-    "description": "Advanced grid filtering system for SunUI Design",
+    "description": "Side panel component for SunUI Design",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -10,8 +10,8 @@
         "LICENSE"
     ],
     "scripts": {
-        "build": "tsc",
-        "clean": "rimraf dist",
+        "build": "tsc --build --verbose --force",
+        "clean": "rimraf dist tsconfig.tsbuildinfo",
         "dev": "tsc -w",
         "pack": "npm pack",
         "prepublishOnly": "npm run clean && npm run build"
@@ -20,7 +20,7 @@
         "nextjs",
         "react",
         "ui",
-        "filter-grid"
+        "side-panel"
     ],
     "author": "Sunzhi",
     "license": "Apache-2.0",
@@ -31,14 +31,13 @@
     },
     "dependencies": {
         "@sunui-design/core": "0.0.31",
-        "framer-motion": "^12.4.12"
+        "react-icons": "^5.0.1"
     },
     "devDependencies": {
         "@types/react": "^19.0.10",
         "rimraf": "^6.0.1",
         "typescript": "^5.8.2"
     },
-    "gitHead": "12ba926d997303ec9a6c753eced4493e03f50caa",
     "publishConfig": {
         "access": "public"
     }
