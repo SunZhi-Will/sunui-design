@@ -66,6 +66,7 @@ export default function App() {
 | buttonClassName | string | Custom button styles |
 | variant | 'petal' \| 'vertical' \| 'grid' | Button expansion mode |
 | buttons | SocialButtonProps[] | Array of button configurations |
+| showToggleButton | boolean | Control whether to show the toggle button |
 
 ## License
 

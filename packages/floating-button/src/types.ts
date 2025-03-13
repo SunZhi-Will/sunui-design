@@ -1,7 +1,12 @@
 import React from 'react';
 import { SocialButtonProps } from '@sunui-design/social';
 
-export type SocialButtonConfig = Omit<SocialButtonProps, 'position' | 'variant'>;
+export type SocialMediaType = 'facebook' | 'github' | 'instagram' | 'linkedin' | 'twitter';
+
+export type SocialButtonConfig = (Omit<SocialButtonProps, 'position' | 'variant' | 'icon'> & {
+    type?: SocialMediaType;
+    icon?: React.ReactNode;
+});
 
 export interface FloatingButtonProps {
     show?: boolean;
@@ -14,4 +19,5 @@ export interface FloatingButtonProps {
     position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
     buttons?: SocialButtonConfig[];
     variant?: 'petal' | 'vertical' | 'grid';
+    showToggleButton?: boolean;
 } 

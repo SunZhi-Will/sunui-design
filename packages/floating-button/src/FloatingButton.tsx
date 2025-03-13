@@ -4,6 +4,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SocialButton, SocialButtonProps } from '@sunui-design/social';
 import type { FloatingButtonProps } from './types';
+import { FacebookIcon, GithubIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from './icons';
+
+const socialIcons = {
+    facebook: FacebookIcon,
+    github: GithubIcon,
+    instagram: InstagramIcon,
+    linkedin: LinkedinIcon,
+    twitter: TwitterIcon
+};
 
 export const FloatingButton: React.FC<FloatingButtonProps> = ({
     show = true,
@@ -15,7 +24,8 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     buttonClassName = '',
     position = 'bottom-right',
     buttons = [],
-    variant = 'petal'
+    variant = 'petal',
+    showToggleButton = true
 }) => {
     const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(defaultOpen);
     const isMenuOpen = controlledIsOpen !== undefined ? controlledIsOpen : uncontrolledIsOpen;
@@ -36,11 +46,11 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     };
 
     const calculatePosition = (index: number, total: number) => {
-        const baseRadius = 28;
+        const baseRadius = 56;
         const baseButtonCount = 3;
 
         if (variant === 'grid') {
-            const spacing = 26;
+            const spacing = 56;
             const itemsPerRow = Math.ceil(Math.sqrt(total));
 
             const now = index + 1;
@@ -80,27 +90,33 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
         }
 
         if (variant === 'vertical') {
-            const spacing = 26;
+            const spacing = 56;
             switch (position) {
                 case 'bottom-right':
                 case 'bottom-left':
+                    return {
+                        x: 0,
+                        y: -spacing * (index + 1)
+                    };
                 case 'top-right':
                 case 'top-left':
                     return {
                         x: 0,
-                        y: -spacing * (index + 1)
+                        y: spacing * (index + 1)
                     };
                 default:
                     return { x: 0, y: 0 };
             }
         }
 
+        // 花瓣模式的新計算方法
         let currentIndex = index;
         let layer = 0;
         let buttonsInPreviousLayers = 0;
 
+        // 計算當前按鈕所在的層數和之前的按鈕數量
         while (currentIndex >= 0) {
-            const buttonsInThisLayer = baseButtonCount + (layer * 2);
+            const buttonsInThisLayer = Math.min(3 + (layer * 2), total - buttonsInPreviousLayers);
             if (currentIndex < buttonsInThisLayer) {
                 break;
             }
@@ -109,31 +125,36 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
             layer++;
         }
 
-        const buttonsInThisLayer = baseButtonCount + (layer * 2);
+        // 計算當前層的按鈕數量和角度
+        const buttonsInThisLayer = Math.min(3 + (layer * 2), total - buttonsInPreviousLayers);
         const indexInLayer = index - buttonsInPreviousLayers;
         const radius = baseRadius * (layer + 1);
-        const angleOffset = (Math.PI / 2) * (indexInLayer / (buttonsInThisLayer - 1));
+
+        // 計算展開角度，根據按鈕數量調整
+        const maxAngle = Math.PI / 2; // 90度展開範圍
+        const angleStep = maxAngle / (buttonsInThisLayer - 1 || 1);
+        const angle = angleStep * indexInLayer;
 
         switch (position) {
             case 'bottom-right':
                 return {
-                    x: -radius * Math.cos(angleOffset),
-                    y: -radius * Math.sin(angleOffset)
+                    x: -radius * Math.cos(angle),
+                    y: -radius * Math.sin(angle)
                 };
             case 'bottom-left':
                 return {
-                    x: radius * Math.cos(angleOffset),
-                    y: -radius * Math.sin(angleOffset)
+                    x: radius * Math.cos(angle),
+                    y: -radius * Math.sin(angle)
                 };
             case 'top-right':
                 return {
-                    x: -radius * Math.cos(angleOffset),
-                    y: radius * Math.sin(angleOffset)
+                    x: -radius * Math.cos(angle),
+                    y: radius * Math.sin(angle)
                 };
             case 'top-left':
                 return {
-                    x: radius * Math.cos(angleOffset),
-                    y: radius * Math.sin(angleOffset)
+                    x: radius * Math.cos(angle),
+                    y: radius * Math.sin(angle)
                 };
             default:
                 return { x: 0, y: 0 };
@@ -142,15 +163,18 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
 
     const renderChildren = () => {
         if (!children) {
-            return buttons.map((button, index) => (
-                <SocialButton
-                    key={button.href}
-                    {...button}
-                    className={button.className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"}
-                    position={calculatePosition(index, buttons.length)}
-                    variant={variant}
-                />
-            )) as React.ReactElement[];
+            return buttons.map((button, index) => {
+                const IconComponent = button.type ? socialIcons[button.type] : undefined;
+                return (
+                    <SocialButton
+                        key={button.href}
+                        {...button}
+                        icon={IconComponent ? <IconComponent /> : button.icon}
+                        className={button.className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"}
+                        variant={variant}
+                    />
+                );
+            }) as React.ReactElement[];
         }
 
         return React.Children.map(children, (child, index) => {
@@ -158,7 +182,6 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                 return React.cloneElement(child, {
                     ...child.props,
                     key: index,
-                    position: calculatePosition(index, React.Children.count(children)),
                     variant
                 });
             }
@@ -172,94 +195,85 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
             ${className}`}>
             <AnimatePresence mode="wait">
                 {isMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{
-                            duration: 0.3,
-                            ease: "easeInOut"
-                        }}
-                        className="absolute inset-0"
-                    >
-                        <motion.div
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            variants={{
-                                open: { transition: { staggerChildren: 0.05 } },
-                                closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-                            }}
-                            className="relative flex justify-center"
-                        >
-                            {renderChildren().map((child, index) => {
-                                if (!React.isValidElement(child)) return null;
-                                const position = (child as React.ReactElement<SocialButtonProps>).props.position;
+                    <div className="absolute" style={!showToggleButton ? {
+                        [position.includes('right') ? 'right' : 'left']: '0px',
+                        [position.includes('bottom') ? 'bottom' : 'top']: '0px'
+                    } : { inset: 0 }}>
+                        {renderChildren().map((child, index) => {
+                            if (!React.isValidElement(child)) return null;
+                            const pos = calculatePosition(index, renderChildren().length);
 
-                                return (
-                                    <motion.div
-                                        className='absolute flex items-center justify-center'
-                                        style={{
-                                            transform: `translate(${position?.x}px, ${position?.y}px)`,
-                                            width: '48px',
-                                            height: '48px',
-                                            pointerEvents: 'auto',
-                                            zIndex: variant === 'vertical' ? 1000 - index : 10
-                                        }}
-                                        key={child.key}
-                                        variants={{
-                                            open: {
-                                                opacity: 1,
-                                                scale: 1,
-                                                x: position?.x || 0,
-                                                y: position?.y || 0,
-                                                transition: { type: "spring", stiffness: 300, damping: 24 }
-                                            },
-                                            closed: {
-                                                opacity: 0,
-                                                scale: 0,
-                                                x: 0,
-                                                y: 0,
-                                                transition: { duration: 0.2 }
-                                            }
-                                        }}
-                                    >
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            {React.cloneElement(child as React.ReactElement<SocialButtonProps>, {
-                                                position: (child as React.ReactElement<SocialButtonProps>).props.position,
-                                                variant: (child as React.ReactElement<SocialButtonProps>).props.variant,
-                                                className: `${(child as React.ReactElement<SocialButtonProps>).props.className || ''} cursor-pointer`
-                                            })}
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </motion.div>
-                    </motion.div>
+                            return (
+                                <motion.div
+                                    className='absolute'
+                                    style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        pointerEvents: 'auto',
+                                        zIndex: variant === 'vertical' ? 1000 - index : 10,
+                                        transform: 'translate(-50%, -50%)'
+                                    }}
+                                    key={child.key}
+                                    initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                                    animate={{
+                                        opacity: 1,
+                                        scale: 1,
+                                        x: pos.x,
+                                        y: pos.y,
+                                        transition: {
+                                            type: "spring",
+                                            stiffness: 300,
+                                            damping: 24,
+                                            delay: index * 0.05
+                                        }
+                                    }}
+                                    exit={{
+                                        opacity: 0,
+                                        scale: 0,
+                                        x: 0,
+                                        y: 0,
+                                        transition: {
+                                            duration: 0.2,
+                                            delay: (renderChildren().length - index - 1) * 0.05
+                                        }
+                                    }}
+                                >
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        {React.cloneElement(child as React.ReactElement<SocialButtonProps>, {
+                                            variant: (child as React.ReactElement<SocialButtonProps>).props.variant,
+                                            className: `${(child as React.ReactElement<SocialButtonProps>).props.className || ''} cursor-pointer`
+                                        })}
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
                 )}
             </AnimatePresence>
 
-            <div className="relative" style={{ zIndex: variant === 'vertical' ? 2000 : 'auto' }}>
-                <SocialButton
-                    isMainButton
-                    isOpen={isMenuOpen}
-                    icon={
-                        <motion.svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            animate={{ rotate: isMenuOpen ? 180 : 0 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-                        </motion.svg>
-                    }
-                    className="from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"
-                    onClick={handleToggle}
-                />
-            </div>
+            {showToggleButton && (
+                <div className="relative" style={{ zIndex: variant === 'vertical' ? 2000 : 'auto' }}>
+                    <SocialButton
+                        isMainButton
+                        isOpen={isMenuOpen}
+                        icon={
+                            <motion.svg
+                                className="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                animate={{ rotate: isMenuOpen ? 180 : 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                    d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                            </motion.svg>
+                        }
+                        className="from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"
+                        onClick={handleToggle}
+                    />
+                </div>
+            )}
         </div>
     );
 }; 
