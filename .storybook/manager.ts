@@ -4,7 +4,7 @@ import { create } from '@storybook/theming/create';
 const theme = create({
   base: 'light',
   brandTitle: 'SunUI Design',
-  brandUrl: 'https://github.com/sunzhi-will/sunui',
+  brandUrl: 'https://github.com/sunzhi-will/',
   brandImage: '/sunui-title-logo.png',
   brandTarget: '_self',
 
