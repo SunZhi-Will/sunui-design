@@ -15,14 +15,6 @@ export interface ThemeConfig {
     title: string;
 }
 
-export interface TechStack {
-    category: string;
-    skills: {
-        name: string;
-        icon: string;
-    }[];
-}
-
 export interface FilterGridStyleProps {
     container?: string;
     item?: string;
@@ -36,19 +28,43 @@ export interface FilterGridStyleProps {
 
 export interface FilterGridTranslations {
     title?: string;
-    categories: {
+    categories?: {
         all: string;
     };
 }
 
 export interface FilterGridProps {
-    techStacks: TechStack[];
-    translations: FilterGridTranslations;
+    children: React.ReactNode;
+    translations?: FilterGridTranslations;
     className?: string;
     showTitle?: boolean;
+    showCategories?: boolean;
     theme?: Theme;
     shape?: Shape;
     styles?: FilterGridStyleProps;
     width?: number;
     height?: number;
+    categories?: string[];
+    loading?: boolean;
+    itemsPerPage?: number;
+    loadingItemCount?: number;
+    loadMore?: () => void;
+    usePagination?: boolean;
+    currentPage?: number;
+    totalPages?: number;
+    onPageChange?: (page: number) => void;
+}
+
+export interface GridItemProps {
+    name: string;
+    icon: string;
+    category?: string;
+    delay?: number;
+    theme?: Theme;
+    shape?: Shape;
+    styles?: FilterGridStyleProps;
+    width?: number;
+    height?: number;
+    onClick?: (name: string, category?: string) => void;
+    showName?: boolean;
 } 

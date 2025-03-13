@@ -6,7 +6,7 @@ A grid component for displaying skills or categorized content.
 
 - Multiple themes: light, dark, blue, green, purple
 - Multiple shapes: hexagon, square, circle
-- Customizable categories and skills
+- Customizable categories and items
 - Icon support
 - Responsive design
 
@@ -23,18 +23,12 @@ pnpm add sunui-filter-grid
 ## Usage
 
 ```tsx
-import { FilterGrid } from 'sunui-filter-grid';
+import { FilterGrid, GridItem } from 'sunui-filter-grid';
 
-const techStacks = [
-    {
-        category: "Programming",
-        skills: [
-            { name: 'C#', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg' },
-            { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
-            { name: 'JavaScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' }
-        ]
-    },
-    // ... more categories
+const items = [
+    { name: 'React', icon: 'path/to/react-icon.svg', category: 'Framework' },
+    { name: 'TypeScript', icon: 'path/to/ts-icon.svg', category: 'Language' },
+    // ... more items
 ];
 
 const translations = {
@@ -47,23 +41,44 @@ const translations = {
 export default function App() {
     return (
         <FilterGrid
-            techStacks={techStacks}
             translations={translations}
             theme="light"
             shape="hexagon"
-        />
+        >
+            {items.map(item => (
+                <GridItem
+                    key={item.name}
+                    {...item}
+                />
+            ))}
+        </FilterGrid>
     );
 }
 ```
 
 ## Props
 
+### FilterGrid Props
+
+| Prop | Type | Description | Default |
+|------|------|-------------|---------|
+| children | ReactNode | GridItem components to display | - |
+| translations | FilterGridTranslations | Text translations for the component | {} |
+| theme | 'light' \| 'dark' \| 'blue' \| 'green' \| 'purple' | Visual theme | 'light' |
+| shape | 'hexagon' \| 'square' \| 'circle' | Shape of the items | 'hexagon' |
+| showTitle | boolean | Whether to show the title | true |
+| showCategories | boolean | Whether to show category filters | true |
+| categories | string[] | Custom category order/filter | [] |
+| width | number | Item width in pixels | 120 |
+| height | number | Item height in pixels | 138 |
+
+### GridItem Props
+
 | Prop | Type | Description |
 |------|------|-------------|
-| techStacks | TechStack[] | Array of skill categories and their items |
-| translations | FilterGridTranslations | Text translations for the component |
-| theme | 'light' \| 'dark' \| 'blue' \| 'green' \| 'purple' | Visual theme |
-| shape | 'hexagon' \| 'square' \| 'circle' | Shape of the skill items |
+| name | string | Display name |
+| icon | string | Icon URL |
+| category | string | Category for filtering |
 
 ## License
 

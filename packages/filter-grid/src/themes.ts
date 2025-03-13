@@ -19,7 +19,7 @@ export const defaultThemes: Record<Theme, ThemeConfig> = {
     },
     dark: {
         container: `
-            bg-gradient-to-br from-slate-700/20 to-slate-900/40
+            bg-gradient-to-br from-slate-700/40 to-slate-900/60
             border-slate-500/20
             group-hover:border-slate-400/50
             group-hover:shadow-[0_0_20px_rgba(148,163,184,0.3)]

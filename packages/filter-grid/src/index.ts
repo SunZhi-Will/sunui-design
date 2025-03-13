@@ -1,2 +1,3 @@
 export { FilterGrid } from './FilterGrid';
-export * from './types'; 
+export { GridItem } from './GridItem';
+export type { FilterGridProps, GridItemProps, Theme, Shape, FilterGridStyleProps, FilterGridTranslations } from './types'; 
