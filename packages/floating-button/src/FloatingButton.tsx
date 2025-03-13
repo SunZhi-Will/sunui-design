@@ -195,13 +195,26 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
             ${className}`}>
             <AnimatePresence mode="wait">
                 {isMenuOpen && (
-                    <div className="absolute" style={!showToggleButton ? {
-                        [position.includes('right') ? 'right' : 'left']: '0px',
-                        [position.includes('bottom') ? 'bottom' : 'top']: '0px'
-                    } : { inset: 0 }}>
+                    <div className="absolute" style={{ inset: 0 }}>
                         {renderChildren().map((child, index) => {
                             if (!React.isValidElement(child)) return null;
-                            const pos = calculatePosition(index, renderChildren().length);
+
+                            let pos;
+                            if (!showToggleButton) {
+                                if (index === 0) {
+                                    // 第一個按鈕在展開位置
+                                    pos = { x: -24, y: -24 };
+                                } else {
+                                    // 其他按鈕從第一個位置開始依序排列
+                                    const basePos = calculatePosition(index - 1, renderChildren().length - 1);
+                                    pos = {
+                                        x: basePos.x - 24,
+                                        y: basePos.y - 24
+                                    };
+                                }
+                            } else {
+                                pos = calculatePosition(index, renderChildren().length);
+                            }
 
                             return (
                                 <motion.div
