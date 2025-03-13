@@ -10,22 +10,25 @@ A floating button component that can expand to display multiple child buttons.
 - Customizable positions: bottom-right, bottom-left, top-right, top-left
 - Custom child buttons support
 - Gradient background and shadow effects
+- No Toggle Button mode support
 
 ## Installation
 
 ```bash
-npm install sunui-floating-button
+npm install @sunui-design/floating-button
 # or
-yarn add sunui-floating-button
+yarn add @sunui-design/floating-button
 # or
-pnpm add sunui-floating-button
+pnpm add @sunui-design/floating-button
 ```
 
 ## Usage
 
+### Basic Usage
+
 ```tsx
-import { FloatingButton } from 'sunui-floating-button';
-import { SocialButton } from 'sunui-social-button';
+import { FloatingButton } from '@sunui-design/floating-button';
+import { SocialButton } from '@sunui-design/social';
 
 const socialButtons = [
     {
@@ -53,6 +56,23 @@ export default function App() {
 }
 ```
 
+### No Toggle Button Mode
+
+```tsx
+<FloatingButton
+    buttons={socialButtons}
+    position="bottom-right"
+    variant="petal"
+    showToggleButton={false}
+    defaultOpen={true}
+/>
+```
+
+In No Toggle Button mode:
+- The first button will be positioned at the original toggle button location
+- Subsequent buttons will expand sequentially from the first button's position
+- The button group will be automatically expanded (recommended to set `defaultOpen={true}`)
+
 ## Props
 
 | Prop | Type | Description |
@@ -66,7 +86,7 @@ export default function App() {
 | buttonClassName | string | Custom button styles |
 | variant | 'petal' \| 'vertical' \| 'grid' | Button expansion mode |
 | buttons | SocialButtonProps[] | Array of button configurations |
-| showToggleButton | boolean | Control whether to show the toggle button |
+| showToggleButton | boolean | Whether to show the toggle button. When set to false, enables No Toggle Button mode |
 
 ## License
 

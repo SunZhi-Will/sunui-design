@@ -10,21 +10,26 @@ A button component for social media links with tooltip and gradient effects.
 - Tooltip display modes: always, hover, none
 - Tooltip positions: top, right, bottom, left
 - Gradient background effects
+- Main button mode support
+- Animation effects
+- Multiple layout modes: petal, vertical, grid
 
 ## Installation
 
 ```bash
-npm install sunui-social-button
+npm install @sunui-design/social
 # or
-yarn add sunui-social-button
+yarn add @sunui-design/social
 # or
-pnpm add sunui-social-button
+pnpm add @sunui-design/social
 ```
 
 ## Usage
 
+### Basic Usage
+
 ```tsx
-import { SocialButton } from 'sunui-social-button';
+import { SocialButton } from '@sunui-design/social';
 
 export default function App() {
     return (
@@ -41,18 +46,82 @@ export default function App() {
 }
 ```
 
+### Using SVG Icons
+
+```tsx
+<SocialButton
+    href="https://twitter.com"
+    icon={
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+        </svg>
+    }
+    className="from-blue-400/90 to-blue-500/90"
+    title="Twitter"
+    titleDisplay="hover"
+/>
+```
+
+### Main Button Usage
+
+```tsx
+const [isOpen, setIsOpen] = useState(false);
+
+<SocialButton
+    isMainButton
+    isOpen={isOpen}
+    icon={
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+        </svg>
+    }
+    className="from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"
+    onClick={() => setIsOpen(!isOpen)}
+/>
+```
+
 ## Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| href | string | Button's link address |
-| icon | string \| ReactElement | Button's icon (URL or React element) |
-| position | { x: number, y: number } | Button's position |
-| className | string | Custom button styles |
-| iconClassName | string | Custom icon styles |
-| title | string | Button's tooltip text |
-| titleDisplay | 'always' \| 'hover' \| 'none' | Tooltip display mode |
-| titlePosition | 'top' \| 'right' \| 'bottom' \| 'left' | Tooltip position |
+| Prop | Type | Description | Default |
+|------|------|-------------|---------|
+| href | string | Button's link address | - |
+| icon | string \| ReactNode | Button's icon (URL or React element) | - |
+| position | { x: number, y: number } | Button's position | - |
+| className | string | Custom button styles | - |
+| iconClassName | string | Custom icon styles | - |
+| title | string | Button's tooltip text | - |
+| titleDisplay | 'always' \| 'hover' \| 'none' | Tooltip display mode | 'none' |
+| titlePosition | 'top' \| 'right' \| 'bottom' \| 'left' | Tooltip position | 'bottom' |
+| isMainButton | boolean | Whether this is a main button (toggle button) | false |
+| isOpen | boolean | Control main button's open state | - |
+| onClick | () => void | Click event handler | - |
+| variant | 'petal' \| 'vertical' \| 'grid' | Button layout variant when used in FloatingButton | - |
+
+## Layout Examples
+
+### Grid Layout
+
+```tsx
+<div className="grid grid-cols-3 gap-8">
+    <SocialButton
+        href="https://github.com"
+        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+        className="from-purple-600/90 to-indigo-800/90"
+        iconClassName="[filter:invert(1)]"
+        title="GitHub"
+        titleDisplay="hover"
+    />
+    <SocialButton
+        href="https://linkedin.com"
+        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+        className="from-blue-600/90 to-blue-800/90"
+        title="LinkedIn"
+        titleDisplay="hover"
+    />
+    {/* Add more buttons... */}
+</div>
+```
 
 ## License
 

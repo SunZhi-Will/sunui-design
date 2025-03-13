@@ -1,59 +1,117 @@
-# sunui-core
+# @sunui-design/core
 
-A modern React UI component library built with Next.js and TailwindCSS.
+Core styles and utilities for Sun UI Design components.
+
+## Features
+
+- 🎨 Base styles and CSS variables
+- 🌈 TailwindCSS integration
+- 🔧 Customizable design tokens
+- 📱 Responsive utilities
+- ⚡ Lightweight and optimized
+- 🎯 TypeScript support
 
 ## Installation
 
 ```bash
-npm install sunui-core
+npm install @sunui-design/core
+# or
+yarn add @sunui-design/core
+# or
+pnpm add @sunui-design/core
 ```
-
-## Features
-
-- 🎨 Modern and beautiful UI components
-- 📱 Fully responsive
-- 🎯 TypeScript support
-- ⚡ Lightweight and performant
-- 🔧 Easy to customize
-- 🌈 Built with TailwindCSS
-
-## Available Components
-
-- `FilterGrid`: A grid layout with filtering capabilities
-- `FloatingButton`: An animated floating action button
-- `GradientBackground`: Beautiful gradient background effects
-- `SocialButton`: Social media styled buttons
 
 ## Usage
 
-```jsx
-import { FilterGrid, FloatingButton, GradientBackground, SocialButton } from 'sunui-core';
+```tsx
+// Import base styles in your app's entry point
+import '@sunui-design/core/styles/base.css';
+```
 
-// Use components in your app
-function App() {
-  return (
-    <div>
-      <GradientBackground>
-        <FilterGrid>
-          {/* Your content */}
-        </FilterGrid>
-        <FloatingButton />
-        <SocialButton type="twitter" />
-      </GradientBackground>
-    </div>
-  );
+## Design Tokens
+
+The core package provides CSS variables for consistent styling across components:
+
+```css
+:root {
+  --sun-ui-primary: #3b82f6;
+  --sun-ui-secondary: #6b7280;
+  --sun-ui-success: #22c55e;
+  --sun-ui-danger: #ef4444;
+  --sun-ui-warning: #f59e0b;
+  --sun-ui-info: #3b82f6;
+
+  --sun-ui-transition-duration: 0.3s;
+  --sun-ui-border-radius: 0.375rem;
+  --sun-ui-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 ```
 
-## Documentation
+## Utility Classes
 
-For detailed documentation of each component, please check their individual packages:
+### Button Base
 
-- [sunui-filter-grid](https://www.npmjs.com/package/sunui-filter-grid)
-- [sunui-floating-button](https://www.npmjs.com/package/sunui-floating-button)
-- [sunui-gradient-background](https://www.npmjs.com/package/sunui-gradient-background)
-- [sunui-social-button](https://www.npmjs.com/package/sunui-social-button)
+```css
+.sun-ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: var(--sun-ui-border-radius);
+  transition: all var(--sun-ui-transition-duration) ease-in-out;
+  cursor: pointer;
+}
+```
+
+### Floating Elements
+
+```css
+.sun-ui-floating {
+  position: fixed;
+  box-shadow: var(--sun-ui-shadow);
+  z-index: 50;
+}
+```
+
+### Animations
+
+```css
+@keyframes sun-ui-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sun-ui-scale-in {
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
+}
+```
+
+## TailwindCSS Configuration
+
+If you're using TailwindCSS, you can extend your configuration:
+
+```ts
+// tailwind.config.ts
+import { withSunUI } from '@sunui-design/core';
+
+export default withSunUI({
+  // Your Tailwind configuration
+});
+```
 
 ## License
 
-Apache-2.0
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
