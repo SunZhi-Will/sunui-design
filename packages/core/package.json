@@ -31,7 +31,7 @@
         "@types/react": "^19.0.10",
         "typescript": "^5.8.2"
     },
-    "gitHead": "ebcdaf9f5c8a28ef0863ad46a0e0a75a67de6196",
+    "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
     "publishConfig": {
         "access": "public"
     }

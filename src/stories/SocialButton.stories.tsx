@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SocialButton } from './SocialButton';
-import React from 'react';
-import { SocialButtonProps } from './types';
+import { SocialButton } from '@sunui-design/social';
+import type { SocialButtonProps } from '@sunui-design/social';
+
+const EnhancedSocialButton = SocialButton as any;
 
 const meta = {
     title: 'Components/SocialButton',
@@ -34,7 +35,7 @@ export const TitlePositions: Story = {
         <div className="relative w-[200px] h-[200px] bg-gray-100/30 rounded-lg p-4">
             <div className="grid grid-cols-2 gap-8">
                 {/* 右上角 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
                     position={{ x: 0, y: 0 }}
@@ -46,7 +47,7 @@ export const TitlePositions: Story = {
                 />
 
                 {/* 左上角 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
                     position={{ x: 48, y: 0 }}
@@ -57,7 +58,7 @@ export const TitlePositions: Story = {
                 />
 
                 {/* 左下角 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
                     position={{ x: 0, y: 48 }}
@@ -68,7 +69,7 @@ export const TitlePositions: Story = {
                 />
 
                 {/* 右下角 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
                     position={{ x: 48, y: 48 }}
@@ -88,7 +89,7 @@ export const GridLayout: Story = {
         <div className="relative w-[300px] h-[300px] bg-gray-100/30 rounded-lg p-4">
             <div className="grid grid-cols-3 gap-8">
                 {/* 第一行 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://github.com"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
                     position={{ x: 0, y: 0 }}
@@ -97,7 +98,7 @@ export const GridLayout: Story = {
                     title="GitHub"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://linkedin.com"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
                     position={{ x: 48, y: 0 }}
@@ -105,7 +106,7 @@ export const GridLayout: Story = {
                     title="LinkedIn"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://twitter.com"
                     icon={
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -119,7 +120,7 @@ export const GridLayout: Story = {
                 />
 
                 {/* 第二行 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://facebook.com"
                     icon={
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -131,7 +132,7 @@ export const GridLayout: Story = {
                     title="Facebook"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://instagram.com"
                     icon={
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -143,7 +144,7 @@ export const GridLayout: Story = {
                     title="Instagram"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="mailto:example@mail.com"
                     icon={
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +159,7 @@ export const GridLayout: Story = {
                 />
 
                 {/* 第三行 */}
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://youtube.com"
                     icon={
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -170,7 +171,7 @@ export const GridLayout: Story = {
                     title="YouTube"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://discord.com"
                     icon={
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -182,7 +183,7 @@ export const GridLayout: Story = {
                     title="Discord"
                     titleDisplay="hover"
                 />
-                <SocialButton
+                <EnhancedSocialButton
                     href="https://github.com"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
                     position={{ x: 96, y: 96 }}

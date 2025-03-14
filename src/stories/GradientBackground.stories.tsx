@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { GradientBackground } from './GradientBackground';
-import { GradientBackgroundProps } from './types';
+import { GradientBackground } from '@sunui-design/gradient';
+import type { GradientBackgroundProps } from '@sunui-design/gradient';
 
 const meta = {
     title: 'Components/GradientBackground',

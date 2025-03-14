@@ -1,8 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { FilterGrid } from './FilterGrid';
-import { GridItem } from './GridItem';
-import type { FilterGridProps } from './types';
+import { FilterGrid, GridItem } from '@sunui-design/filter';
+import type { FilterGridProps } from '@sunui-design/filter';
+
+const EnhancedFilterGrid = FilterGrid as any;
+const EnhancedGridItem = GridItem as any;
 
 const defaultTranslations = {
     title: "Skills",
@@ -81,7 +83,6 @@ const InfiniteScrollExample = () => {
 
     const handleLoadMore = useCallback(async () => {
         setLoading(true);
-        // 模擬 API 請求延遲
         await new Promise(resolve => setTimeout(resolve, 1500));
         const newItems = generateMoreItems(items.length, 6);
         setItems(prev => [...prev, ...newItems]);
@@ -89,7 +90,7 @@ const InfiniteScrollExample = () => {
     }, [items.length]);
 
     return (
-        <FilterGrid
+        <EnhancedFilterGrid
             translations={defaultTranslations}
             theme="light"
             shape="hexagon"
@@ -98,12 +99,12 @@ const InfiniteScrollExample = () => {
             loadingItemCount={3}
         >
             {items.map((item) => (
-                <GridItem
+                <EnhancedGridItem
                     key={item.name}
                     {...item}
                 />
             ))}
-        </FilterGrid>
+        </EnhancedFilterGrid>
     );
 };
 
@@ -113,7 +114,7 @@ const PaginationExample = () => {
     const totalPages = Math.ceil(sampleItems.length / itemsPerPage);
 
     return (
-        <FilterGrid
+        <EnhancedFilterGrid
             translations={defaultTranslations}
             theme="light"
             shape="hexagon"
@@ -124,12 +125,12 @@ const PaginationExample = () => {
             onPageChange={setCurrentPage}
         >
             {sampleItems.map((item) => (
-                <GridItem
+                <EnhancedGridItem
                     key={item.name}
                     {...item}
                 />
             ))}
-        </FilterGrid>
+        </EnhancedFilterGrid>
     );
 };
 
@@ -139,7 +140,7 @@ export const Primary: Story = {
         theme: 'light',
         shape: 'hexagon',
         children: sampleItems.map((item) => (
-            <GridItem
+            <EnhancedGridItem
                 key={item.name}
                 {...item}
             />
@@ -240,10 +241,10 @@ export const WithClickHandler: Story = {
     args: {
         ...Primary.args,
         children: sampleItems.map((item) => (
-            <GridItem
+            <EnhancedGridItem
                 key={item.name}
                 {...item}
-                onClick={(name, category) => {
+                onClick={(name: string, category: string) => {
                     alert(`Clicked: ${name} (${category})`);
                 }}
             />
@@ -278,7 +279,7 @@ export const IconOnly: Story = {
     args: {
         ...Primary.args,
         children: sampleItems.map((item) => (
-            <GridItem
+            <EnhancedGridItem
                 key={item.name}
                 {...item}
                 showName={false}

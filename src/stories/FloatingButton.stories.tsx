@@ -1,7 +1,9 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { FloatingButton } from './FloatingButton';
-import type { FloatingButtonProps } from './types';
+import { FloatingButton } from '@sunui-design/floating';
+import type { FloatingButtonProps } from '@sunui-design/floating';
+
+const EnhancedFloatingButton = FloatingButton as any;
 
 const meta = {
     title: 'Components/FloatingButton',
@@ -116,22 +118,22 @@ export const NoToggleButton: Story = {
 export const Positions: Story = {
     render: () => (
         <div>
-            <FloatingButton
+            <EnhancedFloatingButton
                 buttons={socialButtons.slice(0, 3)}
                 position="top-left"
                 variant="petal"
             />
-            <FloatingButton
+            <EnhancedFloatingButton
                 buttons={socialButtons.slice(0, 3)}
                 position="top-right"
                 variant="petal"
             />
-            <FloatingButton
+            <EnhancedFloatingButton
                 buttons={socialButtons.slice(0, 3)}
                 position="bottom-left"
                 variant="petal"
             />
-            <FloatingButton
+            <EnhancedFloatingButton
                 buttons={socialButtons.slice(0, 3)}
                 position="bottom-right"
                 variant="petal"
