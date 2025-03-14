@@ -26,9 +26,11 @@
     "@sunui-design/gradient": "^0.0.30",
     "@sunui-design/side-panel": "^0.0.30",
     "@sunui-design/social": "^0.0.30",
+    "@types/pdfjs-dist": "^2.10.378",
     "@types/postcss-load-config": "^3.0.1",
     "framer-motion": "^11.0.0",
     "next": "14.2.24",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18",
     "react-dom": "^18"
   },

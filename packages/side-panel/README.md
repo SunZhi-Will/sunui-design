@@ -1,35 +1,35 @@
 # @sunui-design/side-panel
 
-一個現代化的側邊面板 React 組件，提供流暢的動畫效果和豐富的自定義選項。
+A modern side panel React component with smooth animations and rich customization options.
 
-## 特點
+## Features
 
-- 🎯 支持左側和右側顯示
-- 🎨 完全可自定義的樣式
-- 🔄 流暢的過渡動畫
-- 📱 響應式設計
-- 🎮 可控制的開關按鈕
-- 🔧 TypeScript 支持
-- 🎁 零依賴（除了 React）
+- 🎯 Support for left and right positioning
+- 🎨 Fully customizable styling
+- 🔄 Smooth transition animations
+- 📱 Responsive design
+- 🎮 Controllable toggle button
+- 🔧 TypeScript support
+- 🎁 Zero dependencies (except React)
 
-## 安裝
+## Installation
 
-使用 npm：
+Using npm:
 ```bash
 npm install @sunui-design/side-panel
 ```
 
-使用 yarn：
+Using yarn:
 ```bash
 yarn add @sunui-design/side-panel
 ```
 
-使用 pnpm：
+Using pnpm:
 ```bash
 pnpm add @sunui-design/side-panel
 ```
 
-## 使用方法
+## Usage
 
 ```tsx
 import { SidePanel } from '@sunui-design/side-panel';
@@ -42,10 +42,10 @@ function App() {
     <SidePanel
       isOpen={isOpen}
       onToggle={() => setIsOpen(!isOpen)}
-      title="側邊面板"
+      title="Side Panel"
       position="left"
     >
-      <div>您的內容在這裡</div>
+      <div>Your content here</div>
     </SidePanel>
   );
 }
@@ -53,30 +53,30 @@ function App() {
 
 ## Props
 
-| 屬性名 | 類型 | 默認值 | 描述 |
-|--------|------|--------|------|
-| isOpen | boolean | - | 控制面板是否打開 |
-| onToggle | () => void | - | 切換面板狀態的回調函數 |
-| title | string | - | 面板標題 |
-| position | 'left' \| 'right' | 'left' | 面板顯示位置 |
-| children | ReactNode | - | 面板內容 |
-| className | string | '' | 自定義面板類名 |
-| toggleButtonClassName | string | '' | 自定義切換按鈕類名 |
-| closeButtonClassName | string | '' | 自定義關閉按鈕類名 |
-| headerClassName | string | '' | 自定義標題欄類名 |
-| contentClassName | string | '' | 自定義內容區類名 |
-| showToggleButton | boolean | true | 是否顯示切換按鈕 |
-| showCloseButton | boolean | true | 是否顯示關閉按鈕 |
-| width | string | '270px' | 面板寬度 |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| isOpen | boolean | - | Controls whether the panel is open |
+| onToggle | () => void | - | Callback function for toggling panel state |
+| title | string | - | Panel title |
+| position | 'left' \| 'right' | 'left' | Panel display position |
+| children | ReactNode | - | Panel content |
+| className | string | '' | Custom panel class name |
+| toggleButtonClassName | string | '' | Custom toggle button class name |
+| closeButtonClassName | string | '' | Custom close button class name |
+| headerClassName | string | '' | Custom header class name |
+| contentClassName | string | '' | Custom content area class name |
+| showToggleButton | boolean | true | Whether to show the toggle button |
+| showCloseButton | boolean | true | Whether to show the close button |
+| width | string | '270px' | Panel width |
 
-## 樣式自定義
+## Style Customization
 
-組件使用 TailwindCSS 進行樣式設計，您可以通過以下方式自定義樣式：
+The component uses TailwindCSS for styling. You can customize the styles in the following ways:
 
-1. 使用提供的 className props 覆蓋默認樣式
-2. 在您的 CSS 中使用更高優先級的選擇器
+1. Override default styles using the provided className props
+2. Use higher specificity selectors in your CSS
 
-例如：
+For example:
 
 ```tsx
 <SidePanel
@@ -85,12 +85,12 @@ function App() {
   contentClassName="p-6"
   toggleButtonClassName="bg-secondary-500"
   closeButtonClassName="text-white"
-  // ...其他 props
+  // ...other props
 >
-  {/* 您的內容 */}
+  {/* Your content */}
 </SidePanel>
 ```
 
-## 許可證
+## License
 
 Apache License 2.0 
