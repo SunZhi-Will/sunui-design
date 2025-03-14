@@ -16,7 +16,7 @@ const meta = {
     argTypes: {
         theme: {
             control: 'select',
-            options: ['violet', 'cyan', 'custom'],
+            options: ['orange', 'violet', 'cyan', 'custom'],
             description: '元件主題顏色'
         },
         accept: {
@@ -51,18 +51,33 @@ export const Basic: Story = {
         onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
         onFileUpload: async (files: File[]) => {
             console.log('上傳檔案中:', files);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         },
         accept: 'image/*,application/pdf',
         multiple: true,
         maxSize: 5 * 1024 * 1024, // 5MB
-        theme: 'violet',
+        theme: 'orange',
         className: 'w-96'
     },
     parameters: {
         docs: {
             description: {
-                story: '最基本的檔案上傳功能，支援拖放和點擊上傳。'
+                story: '最基本的檔案上傳功能，支援拖放和點擊上傳。預設使用橘色主題。'
+            }
+        }
+    }
+};
+
+// 紫色主題
+export const VioletTheme: Story = {
+    args: {
+        ...Basic.args,
+        theme: 'violet'
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: '使用紫色主題的上傳元件。'
             }
         }
     }
@@ -89,12 +104,12 @@ export const SingleFile: Story = {
         onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
         onFileUpload: async (files: File[]) => {
             console.log('上傳檔案中:', files);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         },
         multiple: false,
         accept: 'image/*',
         maxSize: 2 * 1024 * 1024, // 2MB
-        theme: 'violet',
+        theme: 'orange',
         className: 'w-96',
         showProgress: true
     },
@@ -113,14 +128,14 @@ export const FullFeatured: Story = {
         onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
         onFileUpload: async (files: File[]) => {
             console.log('上傳檔案中:', files);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         },
         multiple: true,
         accept: 'image/*,application/pdf,.doc,.docx,.xls,.xlsx',
         maxSize: 10 * 1024 * 1024, // 10MB
         showPreview: true,
         showProgress: true,
-        theme: 'violet',
+        theme: 'orange',
         className: 'w-[600px]',
         previewGridClassName: 'mt-4',
         onRemovePreview: (index: number) => {

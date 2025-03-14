@@ -1,23 +1,23 @@
-# FileUpload
+# @sunui-design/file-upload
 
-A modern file upload component with drag and drop support and rich animation effects.
+A modern, animated file upload component for React applications with rich preview support and smooth animations.
 
-## Features
+## ✨ Features
 
-- 🎯 Drag and drop support
-- 📊 Upload progress indication
-- 🔍 File type validation
-- 📏 File size limits
-- 🎨 Customizable styling
-- 📱 Responsive design
-- ⚡ Smooth animations
-- 🌈 Multiple file upload
-- 🎭 Modern design
-- 💫 Rich animation effects
+- 🎨 Beautiful animations powered by Framer Motion
+- 📸 Rich file preview support (images, PDFs, and documents)
+- 🎯 Intuitive drag and drop interface
+- 📊 Real-time upload progress indicator
+- 🎨 Multiple built-in themes (violet, cyan, orange)
+- 🔒 Advanced file type and size validation
+- 📱 Fully responsive design
+- 🎭 Highly customizable appearance
+- 🌈 Gradient background effects
+- ⚡ Smooth transitions and animations
 - 🚨 Elegant error handling
-- 🖼️ Gradient background effects
+- 💫 Rich animation effects
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install @sunui-design/file-upload
@@ -27,91 +27,163 @@ yarn add @sunui-design/file-upload
 pnpm add @sunui-design/file-upload
 ```
 
-## Basic Usage
+## 🚀 Basic Usage
 
 ```tsx
 import { FileUpload } from '@sunui-design/file-upload';
 
-export default function App() {
-    const handleFileSelect = (files: File[]) => {
-        console.log('Selected files:', files);
-    };
+function App() {
+  const handleFileSelect = (files: File[]) => {
+    console.log('Selected files:', files);
+  };
 
-    const handleFileUpload = async (files: File[]) => {
-        const formData = new FormData();
-        files.forEach(file => formData.append('files', file));
-        
-        await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-    };
+  const handleFileUpload = async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+    
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      // Handle response
+    } catch (error) {
+      // Handle error
+    }
+  };
 
-    return (
-        <FileUpload
-            onFileSelect={handleFileSelect}
-            onFileUpload={handleFileUpload}
-            accept="image/*,application/pdf"
-            multiple
-            maxSize={5 * 1024 * 1024} // 5MB
-            className="w-full max-w-md mx-auto"
-            dragActiveClassName="border-violet-500"
-            showProgress={true}
-        />
-    );
+  return (
+    <FileUpload
+      onFileSelect={handleFileSelect}
+      onFileUpload={handleFileUpload}
+      accept="image/*,application/pdf"
+      multiple
+      maxSize={5 * 1024 * 1024} // 5MB
+      showPreview={true}
+      showProgress={true}
+      theme="orange"
+      placeholder="Drop files here or click to upload"
+      description="Supported formats: Images, PDF"
+    />
+  );
 }
 ```
 
-## Custom Appearance
+## 🎨 Themes
+
+The component comes with three beautiful built-in themes:
+
+- 🟣 **Violet** - Modern and elegant
+- 🔵 **Cyan** - Fresh and professional
+- 🟠 **Orange** - Warm and energetic (default)
 
 ```tsx
-<FileUpload
-    onFileSelect={handleFileSelect}
-    className="bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 backdrop-blur-sm border border-white/20 rounded-xl p-8"
-    dragActiveClassName="scale-[1.02] border-violet-500/50 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10"
->
-    <div className="text-center">
-        <svg className="mx-auto h-12 w-12 text-violet-500" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <p className="mt-1 text-lg font-medium bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-transparent">
-            Click or drag files here to upload
-        </p>
-    </div>
-</FileUpload>
+<FileUpload theme="violet" />
+<FileUpload theme="cyan" />
+<FileUpload theme="orange" />
 ```
 
-## Props
+## 📋 Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| onFileSelect | (files: File[]) => void | Callback when files are selected | - |
-| onFileUpload | (files: File[]) => Promise<void> | Callback for handling file upload | - |
-| accept | string | Accepted file types | undefined |
-| multiple | boolean | Allow multiple file selection | false |
-| maxSize | number | Maximum file size in bytes | undefined |
-| className | string | Container class name | '' |
-| dragActiveClassName | string | Class name when drag is active | '' |
-| children | React.ReactNode | Custom content | undefined |
-| showProgress | boolean | Whether to show progress bar | true |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| onFileSelect | `(files: File[]) => void` | - | Callback when files are selected |
+| onFileUpload | `(files: File[]) => Promise<void>` | - | Callback to handle file upload |
+| accept | `string` | - | Accepted file types (e.g., "image/*,.pdf") |
+| multiple | `boolean` | `false` | Allow multiple file selection |
+| maxSize | `number` | - | Maximum file size in bytes |
+| showPreview | `boolean` | `true` | Show file previews |
+| showProgress | `boolean` | `true` | Show upload progress |
+| theme | `'violet' \| 'cyan' \| 'orange'` | `'orange'` | Component theme |
+| placeholder | `string` | `'Drop files here or click to upload'` | Upload area placeholder text |
+| description | `string` | - | Additional description text |
+| className | `string` | - | Additional CSS classes |
+| previewGridClassName | `string` | - | Additional CSS classes for preview grid |
+| onRemovePreview | `(index: number) => void` | - | Callback when a preview is removed |
 
-## Style Customization
+## 🖼️ Preview Support
 
-The component uses TailwindCSS for styling. You can customize the styles in the following ways:
+The component provides rich preview support for various file types:
 
-1. Override default styles using the provided className props
-2. Use higher specificity selectors in your CSS
+- **Images**
+  - Supports all common image formats (jpg, png, gif, etc.)
+  - Displays actual image previews
+  - Maintains aspect ratio
+  - Optimized for performance
 
-For example:
+- **PDFs**
+  - Generates preview of the first page
+  - Uses PDF.js for rendering
+  - High-quality preview generation
+
+- **Other Files**
+  - Shows appropriate file type icons
+  - Displays file name and size
+  - Supports custom icon mapping
+
+## 🎯 Advanced Usage
+
+### Custom Styling
 
 ```tsx
 <FileUpload
-    className="bg-gradient-to-br from-blue-500/5 to-purple-500/5"
-    dragActiveClassName="border-blue-500"
-    // ...other props
+  className="bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5"
+  previewGridClassName="gap-4"
+  dragActiveClassName="border-violet-500/50"
+  theme="violet"
 />
 ```
 
-## License
+### File Validation
 
-Apache License 2.0 
+```tsx
+<FileUpload
+  accept="image/*,application/pdf,.doc,.docx"
+  maxSize={10 * 1024 * 1024} // 10MB
+  onFileSelect={(files) => {
+    // Additional validation logic
+  }}
+/>
+```
+
+### Custom Preview Handling
+
+```tsx
+<FileUpload
+  showPreview={true}
+  onRemovePreview={(index) => {
+    // Handle preview removal
+  }}
+/>
+```
+
+## 🛠️ Development
+
+```bash
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+
+# Run tests
+yarn test
+
+# Build for production
+yarn build
+
+# Run Storybook
+yarn storybook
+```
+
+## 📚 Examples
+
+Check out our [Storybook](https://your-storybook-url.com) for more examples and live demos.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [contributing guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+[Apache License 2.0](LICENSE) © [SunUI Design] 

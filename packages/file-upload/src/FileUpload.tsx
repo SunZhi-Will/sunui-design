@@ -1,6 +1,10 @@
 import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as pdfjsLib from 'pdfjs-dist';
+import { UploadIcon } from './UploadIcon';
+import { DragPrompt } from './DragPrompt';
+import { UploadProgress } from './UploadProgress';
+import { PreviewGrid } from './PreviewGrid';
 
 // 設置 PDF.js worker
 if (typeof window !== 'undefined') {
@@ -30,10 +34,12 @@ export interface FileUploadProps {
     dragActiveClassName?: string;
     children?: React.ReactNode;
     showProgress?: boolean;
-    theme?: 'violet' | 'cyan' | 'custom';
+    theme?: 'violet' | 'cyan' | 'orange' | 'custom';
     showPreview?: boolean;
     previewGridClassName?: string;
     onRemovePreview?: (index: number) => void;
+    placeholder?: string;
+    description?: string;
 }
 
 export const FileUpload = (props: FileUploadProps): JSX.Element => {
@@ -47,10 +53,12 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         dragActiveClassName = '',
         children,
         showProgress = true,
-        theme = 'violet',
+        theme = 'orange',
         showPreview = true,
         previewGridClassName = '',
         onRemovePreview,
+        placeholder = 'Drop files here or click to upload',
+        description,
     } = props;
 
     // 狀態管理
@@ -59,6 +67,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [previews, setPreviews] = useState<FilePreview[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const [uploadComplete, setUploadComplete] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // 主題顏色配置
@@ -77,6 +87,13 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
             bg: 'cyan-100',
             border: 'cyan-300',
         },
+        orange: {
+            primary: 'orange',
+            secondary: 'amber',
+            text: 'orange-600',
+            bg: 'orange-100',
+            border: 'orange-300',
+        },
         custom: {
             primary: 'violet',
             secondary: 'fuchsia',
@@ -89,11 +106,13 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const colors = themeColors[theme];
 
     // 樣式配置
-    const baseClassName = useMemo(() => `min-h-[240px] ${theme === 'violet'
+    const baseClassName = useMemo(() => `min-h-[200px] ${theme === 'violet'
         ? 'bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 border-violet-300 hover:border-violet-500/50'
         : theme === 'cyan'
             ? 'bg-gradient-to-br from-cyan-500/5 to-sky-500/5 border-cyan-300 hover:border-cyan-500/50'
-            : 'bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 border-violet-300 hover:border-violet-500/50'
+            : theme === 'orange'
+                ? 'bg-gradient-to-br from-orange-500/5 to-amber-500/5 border-orange-300 hover:border-orange-500/50'
+                : 'bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 border-violet-300 hover:border-violet-500/50'
         } backdrop-blur-sm border-2 border-dashed rounded-xl p-8 transition-all duration-300 hover:shadow-lg`, [theme]);
 
     const defaultClassName = `w-full ${baseClassName}`;
@@ -102,7 +121,9 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         ? 'border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
         : theme === 'cyan'
             ? 'border-cyan-500 bg-gradient-to-br from-cyan-500/10 to-sky-500/10'
-            : 'border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
+            : theme === 'orange'
+                ? 'border-orange-500 bg-gradient-to-br from-orange-500/10 to-amber-500/10'
+                : 'border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
         } shadow-xl`, [theme]);
 
     // 檔案處理相關函數
@@ -110,7 +131,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         setError(null);
         return files.filter(file => {
             if (maxSize && file.size > maxSize) {
-                setError(`檔案 ${file.name} 超過大小限制 ${Math.round(maxSize / 1024 / 1024)}MB`);
+                setError(`File ${file.name} exceeds size limit of ${Math.round(maxSize / 1024 / 1024)}MB`);
                 return false;
             }
             if (accept) {
@@ -126,7 +147,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                 });
 
                 if (!isAccepted) {
-                    setError(`檔案 ${file.name} 類型不支援`);
+                    setError(`File type ${file.name} is not supported`);
                     return false;
                 }
             }
@@ -147,8 +168,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const simulateProgress = useCallback(async () => {
         setIsUploading(true);
         setUploadProgress(0);
-        for (let i = 0; i <= 100; i += 5) {
-            await new Promise(resolve => setTimeout(resolve, 50));
+        for (let i = 0; i <= 100; i += 10) {
+            await new Promise(resolve => setTimeout(resolve, 30));
             setUploadProgress(i);
         }
     }, []);
@@ -244,25 +265,33 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     };
 
     const handleFileUploadProcess = useCallback(async (files: File[]) => {
-        if (showPreview) {
-            await handlePreview(files);
-        }
+        await handlePreview(files);
         onFileSelect?.(files);
         if (onFileUpload) {
             await simulateProgress();
             try {
                 await onFileUpload(files);
                 setUploadProgress(100);
+                setUploadedFiles(files);
+                setUploadComplete(true);
                 setTimeout(() => {
                     setIsUploading(false);
-                    setUploadProgress(0);
-                }, 1000);
+                }, 300);
             } catch (error) {
-                setError('上傳失敗，請重試。');
+                setError('Upload failed. Please try again.');
                 setIsUploading(false);
+                setUploadComplete(false);
             }
         }
-    }, [onFileSelect, onFileUpload, showPreview, handlePreview, simulateProgress]);
+    }, [onFileSelect, onFileUpload, handlePreview, simulateProgress]);
+
+    const resetUpload = useCallback(() => {
+        setUploadedFiles([]);
+        setUploadComplete(false);
+        setUploadProgress(0);
+        setPreviews([]);
+        setError(null);
+    }, []);
 
     const handleDrop = useCallback(async (e: React.DragEvent) => {
         e.preventDefault();
@@ -288,11 +317,12 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         }
     }, [validateFiles, handleFileUploadProcess]);
 
-    const getFileIcon = (type: string) => {
+    const getFileIcon = (type: string, isPreview = true) => {
+        const iconSize = isPreview ? "w-12 h-12" : "w-6 h-6";
         if (type.startsWith('image/')) return null;
         if (type.includes('pdf')) {
             return (
-                <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg className={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 13h6m-3-3v6" />
                 </svg>
@@ -300,236 +330,344 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         }
         if (type.includes('word') || type.includes('document')) {
             return (
-                <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg className={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6" />
                 </svg>
             );
         }
         return (
-            <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg className={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
         );
     };
 
     const removePreview = useCallback((index: number) => {
-        setPreviews(prev => prev.filter((_, i) => i !== index));
+        setPreviews(prev => {
+            const newPreviews = prev.filter((_, i) => i !== index);
+            if (newPreviews.length === 0) {
+                // 當移除所有檔案時，重置所有狀態
+                setUploadedFiles([]);
+                setUploadComplete(false);
+                setUploadProgress(0);
+                setError(null);
+            }
+            return newPreviews;
+        });
         onRemovePreview?.(index);
     }, [onRemovePreview]);
 
+    const renderUploadedFiles = () => (
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center w-full h-full min-h-[200px]"
+        >
+            <div className={`p-4 rounded-lg bg-${colors.primary}-50 w-full max-w-[300px] border border-${colors.primary}-100`}>
+                {uploadedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center mb-2 last:mb-0 p-2 hover:bg-${colors.primary}-100/50 rounded-lg transition-colors">
+                        <div className={`text-${colors.primary}-500 flex-shrink-0 w-8 h-8`}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </div>
+                        <div className="ml-3 flex-1 min-w-0">
+                            <p className={`text-sm font-medium text-${colors.text} truncate group-hover:text-${colors.primary}-700`}>
+                                {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                {(file.size / 1024).toFixed(1)} KB • Upload successful
+                            </p>
+                        </div>
+                        <div className={`text-${colors.primary}-500 flex-shrink-0`}>
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <motion.button
+                onClick={resetUpload}
+                className={`mt-4 px-4 py-2 text-sm bg-${colors.primary}-50 text-${colors.primary}-600 hover:bg-${colors.primary}-100 rounded-lg transition-colors flex items-center gap-2`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m0-16l-4 4m4-4l4 4" />
+                </svg>
+                Upload New File
+            </motion.button>
+        </motion.div>
+    );
+
     const defaultContent = (
         <motion.div
-            className="text-center"
+            className="text-center h-full flex flex-col items-center justify-center min-h-[160px] relative"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
         >
-            <motion.div
-                className="relative w-20 h-20 mx-auto mb-4"
-                animate={isUploading ? {
-                    y: [-4, -16, -4],
-                    transition: {
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }
-                } : {
-                    y: [0, -4, 0],
-                    transition: {
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }
-                }}
-            >
-                <motion.div
-                    className={`absolute inset-0 bg-gradient-to-r from-${colors.primary}-500 to-${colors.secondary}-500 rounded-full opacity-20 blur-xl`}
-                    animate={isUploading ? {
-                        scale: [1, 1.5, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                        y: [-4, -16, -4],
-                        transition: {
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }
-                    } : {
-                        scale: [1, 1.2, 1],
-                        opacity: [0.1, 0.2, 0.1],
-                        y: [0, -4, 0],
-                        transition: {
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }
-                    }}
-                />
-                <motion.svg
-                    className={`relative w-full h-full ${theme === 'violet' ? 'text-violet-500' : 'text-cyan-500'}`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    initial={false}
-                    animate={isUploading ? {
-                        y: [-2, -8, -2],
-                        transition: {
-                            duration: 0.6,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }
-                    } : {
-                        y: 0
-                    }}
-                >
-                    {/* 速度線條 */}
-                    {isUploading && (
-                        <>
-                            {[4, 8, 12, 16, 20].map((x, index) => (
-                                <motion.line
-                                    key={x}
-                                    x1={x} y1="8" x2={x} y2="12"
-                                    strokeLinecap="round"
-                                    strokeWidth={1}
-                                    initial={{ opacity: 0, y: 0 }}
-                                    animate={{
-                                        opacity: [0, 0.6, 0],
-                                        y: [0, 12],
-                                        transition: {
-                                            duration: 0.5,
-                                            repeat: Infinity,
-                                            ease: "easeInOut",
-                                            delay: index * 0.08
-                                        }
-                                    }}
-                                />
-                            ))}
-                        </>
-                    )}
-                    {/* 主箭頭 */}
-                    <motion.path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={isUploading ? 3 : 2}
-                        d="M12 20V4m-7 7l7-7l7 7"
-                        initial={{ pathLength: 0, opacity: 1 }}
-                        animate={isUploading ? {
-                            pathLength: 1,
-                            opacity: 1,
-                            transition: {
-                                duration: 0.3
-                            }
-                        } : {
-                            pathLength: 1,
-                            opacity: 1,
-                            transition: {
-                                duration: 0.5
-                            }
-                        }}
-                    />
-                </motion.svg>
-            </motion.div>
-
-            <AnimatePresence mode="wait">
-                {isUploading ? (
+            {showPreview && uploadComplete ? renderUploadedFiles() : (
+                <>
                     <motion.div
-                        key="uploading"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        className={`absolute inset-0 pointer-events-none ${isDragActive ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
                     >
-                        <p className={`text-lg font-medium ${theme === 'violet' ? 'text-violet-600' : 'text-cyan-600'
-                            }`}>Uploading...</p>
-                        {showProgress && (
-                            <>
-                                <div className={`mt-4 relative h-2 ${theme === 'violet' ? 'bg-violet-100' : 'bg-cyan-100'
-                                    } rounded-full overflow-hidden`}>
-                                    <motion.div
-                                        className={`absolute left-0 top-0 h-full ${theme === 'violet'
-                                            ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500'
-                                            : 'bg-gradient-to-r from-cyan-500 to-sky-500'
-                                            }`}
-                                        initial={{ width: 0 }}
-                                        animate={{
-                                            width: `${uploadProgress}%`,
-                                            transition: {
-                                                duration: 0.3,
-                                                ease: "easeOut"
-                                            }
-                                        }}
-                                    >
-                                        <motion.div
-                                            className="absolute inset-0 bg-white/20"
-                                            animate={{
-                                                x: ['-100%', '100%'],
-                                                transition: {
-                                                    duration: 1,
-                                                    repeat: Infinity,
-                                                    ease: "linear"
-                                                }
-                                            }}
-                                        />
-                                    </motion.div>
-                                </div>
-                                <motion.p
-                                    className={`mt-2 text-sm ${theme === 'violet' ? 'text-violet-500' : 'text-cyan-500'
-                                        }`}
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{
-                                        scale: 1,
-                                        opacity: 1,
+                        <div className={`absolute inset-2 border-2 border-${colors.primary}-500 border-dashed rounded-lg flex items-center justify-center`}>
+                            <div className={`px-6 py-4 bg-${colors.primary}-50 rounded-lg shadow-sm`}>
+                                <p className={`text-${colors.primary}-600 font-medium`}>Release to upload files</p>
+                            </div>
+                        </div>
+                    </motion.div>
+                    <AnimatePresence>
+                        {(!previews.length || isDragActive) && (
+                            <motion.div
+                                className="flex flex-col items-center"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                            >
+                                <motion.div
+                                    className="relative w-20 h-20 mb-4"
+                                    animate={isUploading ? {
+                                        y: [-4, -16, -4],
                                         transition: {
-                                            type: "spring",
-                                            stiffness: 500,
-                                            damping: 25
+                                            duration: 0.6,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
+                                        }
+                                    } : {
+                                        y: [-2, -6, -2],
+                                        transition: {
+                                            duration: 1.5,
+                                            repeat: Infinity,
+                                            ease: "easeInOut"
                                         }
                                     }}
                                 >
-                                    {uploadProgress}%
-                                </motion.p>
-                            </>
-                        )}
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="idle"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                    >
-                        <motion.p
-                            className={`text-lg font-medium ${theme === 'violet'
-                                ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500'
-                                : 'bg-gradient-to-r from-cyan-500 to-sky-500'
-                                } bg-clip-text text-transparent`}
-                            animate={{
-                                opacity: [0.5, 1, 0.5],
-                                scale: [0.98, 1, 0.98]
-                            }}
-                            transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                        >
-                            Drop files here or click to upload
-                        </motion.p>
-                        {accept && (
-                            <p className="mt-2 text-sm text-gray-500">
-                                Supports {accept.split(',').map(type => type.replace('/*', '')).join(', ')} files
-                            </p>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                                    <motion.div
+                                        className={`absolute inset-0 bg-gradient-to-r from-${colors.primary}-500 to-${colors.secondary}-500 rounded-full opacity-20 blur-xl`}
+                                        animate={isUploading ? {
+                                            opacity: [0.2, 0.4, 0.2],
+                                            y: [-4, -16, -4],
+                                            transition: {
+                                                duration: 0.6,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }
+                                        } : {
+                                            opacity: [0.1, 0.2, 0.1],
+                                            y: [-2, -6, -2],
+                                            transition: {
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }
+                                        }}
+                                    />
+                                    <motion.svg
+                                        className={`relative w-full h-full ${theme === 'violet' ? 'text-violet-500' : theme === 'cyan' ? 'text-cyan-500' : 'text-orange-500'}`}
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        animate={isUploading ? {
+                                            y: [-2, -8, -2],
+                                            transition: {
+                                                duration: 0.4,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }
+                                        } : {
+                                            y: [-1, -3, -1],
+                                            transition: {
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }
+                                        }}
+                                    >
+                                        {isUploading && (
+                                            <>
+                                                {[4, 8, 12, 16, 20].map((x, index) => (
+                                                    <motion.line
+                                                        key={x}
+                                                        x1={x} y1="8" x2={x} y2="12"
+                                                        strokeLinecap="round"
+                                                        strokeWidth={1}
+                                                        initial={{ opacity: 0, y: 0 }}
+                                                        animate={{
+                                                            opacity: [0, 0.6, 0],
+                                                            y: [0, 12],
+                                                            transition: {
+                                                                duration: 0.5,
+                                                                repeat: Infinity,
+                                                                ease: "easeInOut",
+                                                                delay: index * 0.08
+                                                            }
+                                                        }}
+                                                    />
+                                                ))}
+                                            </>
+                                        )}
+                                        <motion.path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={isUploading ? 3 : 2}
+                                            d="M12 20V4m-7 7l7-7l7 7"
+                                        />
+                                    </motion.svg>
+                                </motion.div>
 
+                                <AnimatePresence mode="wait">
+                                    {isUploading ? (
+                                        <motion.div
+                                            key="uploading"
+                                            className="w-[300px]"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                        >
+                                            <p className={`text-lg font-medium ${theme === 'violet' ? 'text-violet-600' : theme === 'cyan' ? 'text-cyan-600' : 'text-orange-600'}`}>
+                                                Uploading...
+                                            </p>
+                                            {showProgress && (
+                                                <>
+                                                    <div className={`mt-4 relative h-2 ${theme === 'violet' ? 'bg-violet-100' : theme === 'cyan' ? 'bg-cyan-100' : 'bg-orange-100'} rounded-full overflow-hidden`}>
+                                                        <motion.div
+                                                            className={`absolute left-0 top-0 h-full ${theme === 'violet'
+                                                                ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500'
+                                                                : theme === 'cyan'
+                                                                    ? 'bg-gradient-to-r from-cyan-500 to-sky-500'
+                                                                    : 'bg-gradient-to-r from-orange-500 to-amber-500'
+                                                                }`}
+                                                            initial={{ width: 0 }}
+                                                            animate={{
+                                                                width: `${uploadProgress}%`
+                                                            }}
+                                                            transition={{
+                                                                duration: 0.15,
+                                                                ease: "linear"
+                                                            }}
+                                                        >
+                                                            <motion.div
+                                                                className="absolute inset-0 bg-white/20"
+                                                                animate={{
+                                                                    x: ['-100%', '100%'],
+                                                                    transition: {
+                                                                        duration: 1,
+                                                                        repeat: Infinity,
+                                                                        ease: "linear"
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </motion.div>
+                                                    </div>
+                                                    <motion.p
+                                                        className={`mt-2 text-sm ${theme === 'violet' ? 'text-violet-500' : theme === 'cyan' ? 'text-cyan-500' : 'text-orange-500'}`}
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ duration: 0.2 }}
+                                                    >
+                                                        {uploadProgress}%
+                                                    </motion.p>
+                                                </>
+                                            )}
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="idle"
+                                            className="w-[300px]"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                        >
+                                            <motion.p
+                                                className={`text-lg font-medium ${theme === 'violet'
+                                                    ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500'
+                                                    : theme === 'cyan'
+                                                        ? 'bg-gradient-to-r from-cyan-500 to-sky-500'
+                                                        : 'bg-gradient-to-r from-orange-500 to-amber-500'
+                                                    } bg-clip-text text-transparent`}
+                                                animate={{
+                                                    opacity: [0.5, 1, 0.5]
+                                                }}
+                                                transition={{
+                                                    duration: 2,
+                                                    repeat: Infinity,
+                                                    ease: "easeInOut"
+                                                }}
+                                            >
+                                                {placeholder}
+                                            </motion.p>
+                                            {(accept || description) && (
+                                                <p className="mt-2 text-sm text-gray-500">
+                                                    {description || (accept && `Supported file types: ${accept.split(',').map(type => type.replace('/*', '')).join(', ')}`)}
+                                                </p>
+                                            )}
+                                            {maxSize && (
+                                                <p className="mt-1 text-sm text-gray-500">
+                                                    Maximum file size: {(maxSize / 1024 / 1024).toFixed(0)} MB
+                                                </p>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </>
+            )}
             {error && (
-                <motion.p
-                    className="mt-4 text-sm text-red-500 bg-red-50 p-2 rounded-lg"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                <motion.div
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[300px]"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
                 >
-                    ⚠️ {error}
-                </motion.p>
+                    <div className="flex items-center gap-2 bg-red-50 border border-red-100 shadow-sm text-red-600 p-4 rounded-xl backdrop-blur-sm">
+                        <div className="flex-shrink-0">
+                            <motion.svg
+                                className="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <motion.path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: 1 }}
+                                    transition={{ duration: 0.3, delay: 0.2 }}
+                                />
+                            </motion.svg>
+                        </div>
+                        <motion.p
+                            className="text-sm flex-1 font-medium"
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.15 }}
+                        >
+                            {error}
+                        </motion.p>
+                        <motion.button
+                            onClick={() => setError(null)}
+                            className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </motion.button>
+                    </div>
+                </motion.div>
             )}
         </motion.div>
     );
@@ -555,65 +693,33 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     multiple={multiple}
                 />
 
-                <div className="cursor-pointer flex items-center justify-center min-h-[200px]" onClick={() => inputRef.current?.click()}>
-                    {children || defaultContent}
+                <div className="cursor-pointer flex flex-col items-start justify-start h-full min-h-[200px] relative" onClick={() => inputRef.current?.click()}>
+                    {previews.length > 0 && (
+                        <PreviewGrid
+                            previews={previews}
+                            showPreview={showPreview}
+                            previewGridClassName={previewGridClassName}
+                            colors={colors}
+                            getFileIcon={getFileIcon}
+                            removePreview={removePreview}
+                        />
+                    )}
+
+                    <AnimatePresence>
+                        {isUploading && (
+                            <UploadProgress
+                                isUploading={isUploading}
+                                uploadProgress={uploadProgress}
+                                showProgress={showProgress}
+                                theme={theme}
+                                colors={colors}
+                            />
+                        )}
+                    </AnimatePresence>
+
+                    {(!previews.length) && !isUploading && (children || defaultContent)}
                 </div>
             </motion.div>
-
-            {showPreview && previews.length > 0 && (
-                <motion.div
-                    className={`w-full max-w-[600px] mt-4 grid grid-cols-3 gap-4 ${previewGridClassName}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                >
-                    {previews.map((preview, index) => (
-                        <motion.div
-                            key={index}
-                            className="relative group aspect-square rounded-lg overflow-hidden shadow-lg"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.2 }}
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            {(preview.type?.startsWith('image/') || preview.type === 'application/pdf') && preview.url ? (
-                                <div className="w-full h-full bg-gray-50 p-2">
-                                    <img
-                                        src={preview.url}
-                                        alt={preview.name}
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 p-4">
-                                    <div className={`text-${colors.primary}-500`}>
-                                        {getFileIcon(preview.type || '')}
-                                    </div>
-                                    <p className="mt-2 text-sm text-gray-600 text-center line-clamp-2">
-                                        {preview.name}
-                                    </p>
-                                </div>
-                            )}
-                            <motion.div
-                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                initial={false}
-                            >
-                                <motion.button
-                                    onClick={() => removePreview(index)}
-                                    className={`p-2 bg-${colors.primary}-500 rounded-full text-white hover:bg-${colors.primary}-600 transform hover:scale-110 transition-transform`}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </motion.button>
-                            </motion.div>
-                        </motion.div>
-                    ))}
-                </motion.div>
-            )}
         </div>
     );
 }; 
