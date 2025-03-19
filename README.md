@@ -1,9 +1,9 @@
 <div align="center">
   <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
   <p align="center">
-    <b>A modern React UI component library built with Next.js and TailwindCSS</b>
+    <b>A modern React UI component library with beautiful animations</b>
     <br />
-    <i>Beautiful animations and customizable components</i>
+    <i>Built with React, TailwindCSS, and TypeScript</i>
   </p>
   <p align="center">
     <a href="https://www.npmjs.com/package/@sunui-design/all">
@@ -28,7 +28,7 @@
 
 # Sun UI Design
 
-A modern React UI component library built with Next.js and TailwindCSS, featuring beautiful animations and customizable components.
+A modern React UI component library featuring beautiful animations and customizable components. Built with React, TailwindCSS, and TypeScript, it's perfect for any React project.
 
 ## Features
 
@@ -40,6 +40,7 @@ A modern React UI component library built with Next.js and TailwindCSS, featurin
 - 🔧 Easy to customize
 - 📦 Tree-shakeable exports
 - 🎁 Available as individual packages or all-in-one bundle
+- 🔌 Works with any React project (Next.js, Create React App, Vite, etc.)
 
 ## Components
 
