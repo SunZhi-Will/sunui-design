@@ -1,28 +1,28 @@
-## 描述
-請描述這個 PR 的內容和目的。
+## Description
+Please describe the content and purpose of this PR.
 
-## 相關 Issue
-- 關聯的 Issue: #(issue 號碼)
+## Related Issue
+- Related Issue: #(issue number)
 
-## 變更類型
-請選擇一個：
-- [ ] 新功能 (非破壞性更改)
-- [ ] Bug 修復 (非破壞性更改)
-- [ ] 重大更改 (破壞性更改)
-- [ ] 文檔更新
+## Type of Change
+Please select one:
+- [ ] New feature (non-breaking change)
+- [ ] Bug fix (non-breaking change)
+- [ ] Breaking change
+- [ ] Documentation update
 
-## 測試
-- [ ] 單元測試已更新
-- [ ] 整合測試已更新
-- [ ] 手動測試已完成
+## Testing
+- [ ] Unit tests updated
+- [ ] Integration tests updated
+- [ ] Manual testing completed
 
-## 檢查清單
-- [ ] 代碼遵循專案的代碼風格
-- [ ] 所有測試通過
-- [ ] 文檔已更新
-- [ ] 變更日誌已更新
-- [ ] 沒有引入新的依賴
-- [ ] 沒有破壞性更改
+## Checklist
+- [ ] Code follows project code style
+- [ ] All tests pass
+- [ ] Documentation updated
+- [ ] Changelog updated
+- [ ] No new dependencies added
+- [ ] No breaking changes
 
-## 其他信息
-添加任何其他相關信息。 
+## Additional Information
+Add any additional information here. 

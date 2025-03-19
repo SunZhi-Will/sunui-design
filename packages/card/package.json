@@ -9,6 +9,7 @@
     "files": [
         "dist/**"
     ],
+    "license": "MIT",
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",

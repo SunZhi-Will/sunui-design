@@ -2,11 +2,3 @@
 
 # 默認所有者
 * @SunZhi-Will
-
-# 特定目錄的所有者
-/packages/core/* @SunZhi-Will
-/packages/social-button/* @SunZhi-Will
-/packages/filter-grid/* @SunZhi-Will
-/packages/file-upload/* @SunZhi-Will
-/packages/card/* @SunZhi-Will
-/packages/floating-button/* @SunZhi-Will 

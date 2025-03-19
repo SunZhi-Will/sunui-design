@@ -1,26 +1,26 @@
-# 貢獻指南
+# Contributing Guide
 
-感謝您對 SunUI Design 的興趣！我們歡迎社區貢獻，但為了確保代碼質量和安全性，請遵循以下指南：
+Thank you for your interest in SunUI Design! We welcome community contributions, but to ensure code quality and security, please follow these guidelines:
 
-## 開發流程
+## Development Process
 
-1. Fork 本專案
-2. 創建您的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟一個 Pull Request
+1. Fork this project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 代碼規範
+## Code Standards
 
-- 使用 TypeScript 進行開發
-- 遵循現有的代碼風格
-- 確保所有測試通過
-- 更新相關文檔
-- 添加適當的註釋
+- Use TypeScript for development
+- Follow existing code style
+- Ensure all tests pass
+- Update relevant documentation
+- Add appropriate comments
 
-## 提交規範
+## Commit Convention
 
-提交信息應遵循以下格式：
+Commit messages should follow this format:
 ```
 <type>(<scope>): <subject>
 
@@ -29,46 +29,46 @@
 <footer>
 ```
 
-類型（type）：
-- feat: 新功能
-- fix: 修復
-- docs: 文檔更新
-- style: 代碼格式（不影響代碼運行的變動）
-- refactor: 重構
-- test: 測試相關
-- chore: 構建過程或輔助工具的變動
+Types:
+- feat: New feature
+- fix: Bug fix
+- docs: Documentation update
+- style: Code style changes (no code changes)
+- refactor: Code refactoring
+- test: Test related
+- chore: Build process or auxiliary tool changes
 
-## 安全性考慮
+## Security Considerations
 
-- 不要包含敏感信息
-- 確保所有依賴包都是最新的安全版本
-- 遵循安全最佳實踐
+- Do not include sensitive information
+- Ensure all dependencies are up to date and secure
+- Follow security best practices
 
-## 審核流程
+## Review Process
 
-1. 所有提交都會經過代碼審核
-2. 需要至少一個維護者的批准
-3. 確保所有 CI 檢查通過
-4. 解決所有審核意見
+1. All submissions will be reviewed
+2. Requires at least one maintainer's approval
+3. All CI checks must pass
+4. Address all review comments
 
-## 發布流程
+## Release Process
 
-- 只有維護者可以發布新版本
-- 版本號遵循語義化版本控制
-- 發布前需要更新 CHANGELOG.md
+- Only maintainers can release new versions
+- Version numbers follow semantic versioning
+- CHANGELOG.md must be updated before release
 
-## 問題報告
+## Issue Reporting
 
-如果您發現了問題，請：
-1. 檢查是否已經有相關的 issue
-2. 提供詳細的問題描述
-3. 提供重現步驟
-4. 附上相關的錯誤信息
+If you find an issue, please:
+1. Check if there's an existing issue
+2. Provide a detailed description
+3. Include steps to reproduce
+4. Attach relevant error messages
 
-## 聯繫方式
+## Contact
 
-如有任何問題，請通過以下方式聯繫：
-- 開啟 issue
-- 發送郵件至 [您的郵箱]
+For any questions, please contact:
+- Open an issue
+- Send email to [Your Email]
 
-感謝您的貢獻！ 
+Thank you for contributing! 

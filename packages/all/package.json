@@ -23,7 +23,7 @@
         "ui"
     ],
     "author": "Sunzhi",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "dependencies": {
         "@sunui-design/core": "0.0.32",
         "@sunui-design/filter": "0.0.32",

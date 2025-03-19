@@ -23,7 +23,7 @@
         "filter-grid"
     ],
     "author": "Sunzhi",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "peerDependencies": {
         "next": ">=12.0.0",
         "react": ">=16.8.0",

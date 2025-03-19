@@ -1,3 +1,43 @@
+# @sunui-design/card
+
+A modern card component for SunUI Design with smooth animations and customizable styles.
+
+## Features
+
+- 🎨 Customizable card styles
+- 🌈 Smooth animations
+- 📱 Responsive design
+- ⚡ Lightweight
+- 🎯 TypeScript support
+
+## Installation
+
+```bash
+npm install @sunui-design/card
+# or
+yarn add @sunui-design/card
+# or
+pnpm add @sunui-design/card
+```
+
+## Usage
+
+```tsx
+import { Card } from '@sunui-design/card';
+
+export default function MyComponent() {
+  return (
+    <Card>
+      <Card.Header>Card Title</Card.Header>
+      <Card.Body>Card content goes here</Card.Body>
+      <Card.Footer>Card footer</Card.Footer>
+    </Card>
+  );
+}
+```
+
+## License
+
 MIT License
 
 Copyright (c) 2024 SunUI Design

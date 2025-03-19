@@ -1,32 +1,32 @@
 ---
-name: Bug 報告
-about: 創建一個報告以幫助我們改進
+name: Bug Report
+about: Create a report to help us improve
 title: '[BUG] '
 labels: bug
 assignees: ''
 
 ---
 
-**描述問題**
-簡潔地描述這個 bug 是什麼。
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-**重現步驟**
-重現該行為的步驟：
-1. 前往 '...'
-2. 點擊 '....'
-3. 滾動到 '....'
-4. 看到錯誤
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-**預期行為**
-描述您期望發生的情況。
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-**截圖**
-如果適用，添加截圖以幫助解釋您的問題。
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-**環境信息：**
- - 操作系統：[例如 Windows 10]
- - 瀏覽器：[例如 Chrome 120]
- - 版本：[例如 0.1.0]
+**Environment:**
+ - OS: [e.g. Windows 10]
+ - Browser: [e.g. Chrome 120]
+ - Version: [e.g. 0.1.0]
 
-**其他信息**
-添加關於這個問題的任何其他信息。 
+**Additional context**
+Add any other context about the problem here. 
