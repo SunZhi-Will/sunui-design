@@ -1,0 +1,51 @@
+name: Automated Workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # 自動標籤
+      - name: Auto Label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = ['needs-review'];
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: labels
+            });
+      
+      # 自動指派審核者
+      - name: Auto Assign
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.addAssignees({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              assignees: ['SunZhi-Will']
+            });
+      
+      # 檢查 PR 描述
+      - name: Check PR Description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            if (!body || body.length < 50) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '⚠️ 請提供更詳細的 PR 描述'
+              });
+            } 
