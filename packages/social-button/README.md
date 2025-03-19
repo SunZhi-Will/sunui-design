@@ -62,6 +62,81 @@ export default function App() {
 />
 ```
 
+### Grid Layout
+
+```tsx
+<div className="grid grid-cols-3 gap-8">
+    <SocialButton
+        href="https://github.com"
+        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+        className="from-purple-600/90 to-indigo-800/90"
+        iconClassName="[filter:invert(1)]"
+        title="GitHub"
+        titleDisplay="hover"
+    />
+    <SocialButton
+        href="https://linkedin.com"
+        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+        className="from-blue-600/90 to-blue-800/90"
+        title="LinkedIn"
+        titleDisplay="hover"
+    />
+    <SocialButton
+        href="https://twitter.com"
+        icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
+        className="from-blue-400/90 to-blue-500/90"
+        title="Twitter"
+        titleDisplay="hover"
+    />
+</div>
+```
+
+### Different Positions
+
+```tsx
+<div className="relative w-[200px] h-[200px] bg-gray-100/30 rounded-lg p-4">
+    <div className="grid grid-cols-2 gap-8">
+        <SocialButton
+            href="#"
+            icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+            position={{ x: 0, y: 0 }}
+            className="from-purple-600/90 to-indigo-800/90"
+            iconClassName="[filter:invert(1)]"
+            title="左上角"
+            titleDisplay="always"
+            titlePosition="top"
+        />
+        <SocialButton
+            href="#"
+            icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
+            position={{ x: 48, y: 0 }}
+            className="from-blue-600/90 to-blue-800/90"
+            title="右上角"
+            titleDisplay="always"
+            titlePosition="right"
+        />
+        <SocialButton
+            href="#"
+            icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
+            position={{ x: 0, y: 48 }}
+            className="from-blue-400/90 to-blue-500/90"
+            title="左下角"
+            titleDisplay="always"
+            titlePosition="left"
+        />
+        <SocialButton
+            href="#"
+            icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
+            position={{ x: 48, y: 48 }}
+            className="from-blue-600/90 to-blue-700/90"
+            title="右下角"
+            titleDisplay="always"
+            titlePosition="bottom"
+        />
+    </div>
+</div>
+```
+
 ### Main Button Usage
 
 ```tsx

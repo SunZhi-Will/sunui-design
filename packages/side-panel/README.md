@@ -31,23 +31,150 @@ pnpm add @sunui-design/side-panel
 
 ## Usage
 
+### Basic Usage
+
 ```tsx
 import { SidePanel } from '@sunui-design/side-panel';
 import { useState } from 'react';
 
 function App() {
-  const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <SidePanel
-      isOpen={isOpen}
-      onToggle={() => setIsOpen(!isOpen)}
-      title="Side Panel"
-      position="left"
-    >
-      <div>Your content here</div>
-    </SidePanel>
-  );
+    return (
+        <SidePanel
+            isOpen={isOpen}
+            onToggle={() => setIsOpen(!isOpen)}
+            title="Side Panel"
+        >
+            <div className="space-y-4">
+                <p className="text-gray-800">This is the side panel content.</p>
+                <p className="text-gray-800">You can place any content here.</p>
+            </div>
+        </SidePanel>
+    );
+}
+```
+
+### Different Positions
+
+```tsx
+function App() {
+    const [leftIsOpen, setLeftIsOpen] = useState(false);
+    const [rightIsOpen, setRightIsOpen] = useState(false);
+
+    return (
+        <div>
+            <SidePanel
+                isOpen={leftIsOpen}
+                onToggle={() => setLeftIsOpen(!leftIsOpen)}
+                title="Left Panel"
+                position="left"
+            >
+                <div className="space-y-4">
+                    <p className="text-gray-800">This is the left panel.</p>
+                    <p className="text-gray-800">Typically used for navigation menus.</p>
+                </div>
+            </SidePanel>
+
+            <SidePanel
+                isOpen={rightIsOpen}
+                onToggle={() => setRightIsOpen(!rightIsOpen)}
+                title="Right Panel"
+                position="right"
+            >
+                <div className="space-y-4">
+                    <p className="text-gray-800">This is the right panel.</p>
+                    <p className="text-gray-800">Typically used for details or settings.</p>
+                </div>
+            </SidePanel>
+        </div>
+    );
+}
+```
+
+### Custom Styles
+
+```tsx
+function App() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <SidePanel
+            isOpen={isOpen}
+            onToggle={() => setIsOpen(!isOpen)}
+            title="Custom Style Panel"
+            className="bg-blue-50"
+            headerClassName="bg-blue-500 text-white"
+            contentClassName="p-6"
+            width="320px"
+        >
+            <div className="space-y-4">
+                <p className="text-blue-800">This is a panel with custom styles.</p>
+                <p className="text-blue-600">You can customize all parts of the panel.</p>
+            </div>
+        </SidePanel>
+    );
+}
+```
+
+### No Buttons
+
+```tsx
+function App() {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+        <SidePanel
+            isOpen={isOpen}
+            onToggle={() => setIsOpen(!isOpen)}
+            title="No Buttons Panel"
+            showToggleButton={false}
+            showCloseButton={false}
+        >
+            <div className="space-y-4">
+                <p className="text-gray-800">This panel has no toggle or close buttons.</p>
+                <p className="text-gray-800">Suitable for programmatically controlled scenarios.</p>
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    {isOpen ? 'Close Panel' : 'Open Panel'}
+                </button>
+            </div>
+        </SidePanel>
+    );
+}
+```
+
+### With Navigation
+
+```tsx
+function App() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <SidePanel
+            isOpen={isOpen}
+            onToggle={() => setIsOpen(!isOpen)}
+            title="Navigation Panel"
+            className="bg-gray-50"
+        >
+            <nav className="space-y-2">
+                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                    Home
+                </a>
+                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                    About Us
+                </a>
+                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                    Services
+                </a>
+                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                    Contact
+                </a>
+            </nav>
+        </SidePanel>
+    );
 }
 ```
 

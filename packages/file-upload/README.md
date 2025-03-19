@@ -157,6 +157,83 @@ The component provides rich preview support for various file types:
 />
 ```
 
+### Single File Upload
+
+```tsx
+<FileUpload
+    onFileSelect={(files) => console.log('Selected files:', files)}
+    onFileUpload={async (files) => {
+        console.log('Uploading files:', files);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }}
+    multiple={false}
+    accept="image/*"
+    maxSize={2 * 1024 * 1024} // 2MB
+    theme="orange"
+    className="w-96"
+    showProgress={true}
+/>
+```
+
+### Document Upload
+
+```tsx
+<FileUpload
+    onFileSelect={(files) => console.log('Selected files:', files)}
+    onFileUpload={async (files) => {
+        console.log('Uploading files:', files);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }}
+    accept=".doc,.docx,.pdf,.txt"
+    maxSize={10 * 1024 * 1024} // 10MB
+    theme="violet"
+    placeholder="Drop documents here or click to upload"
+    description="Supported formats: DOC, DOCX, PDF, TXT"
+/>
+```
+
+### Full Featured Example
+
+```tsx
+<FileUpload
+    onFileSelect={(files) => console.log('Selected files:', files)}
+    onFileUpload={async (files) => {
+        console.log('Uploading files:', files);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }}
+    multiple={true}
+    accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+    maxSize={10 * 1024 * 1024} // 10MB
+    showPreview={true}
+    showProgress={true}
+    theme="orange"
+    className="w-[600px]"
+    previewGridClassName="mt-4"
+    onRemovePreview={(index) => {
+        console.log(`Removed preview item ${index}`);
+    }}
+/>
+```
+
+### Custom Styling
+
+```tsx
+<FileUpload
+    onFileSelect={(files) => console.log('Selected files:', files)}
+    onFileUpload={async (files) => {
+        console.log('Uploading files:', files);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }}
+    accept="image/*"
+    multiple={true}
+    maxSize={5 * 1024 * 1024} // 5MB
+    theme="cyan"
+    className="w-96 bg-gradient-to-br from-cyan-500/5 to-blue-500/5"
+    previewGridClassName="gap-4"
+    dragActiveClassName="border-cyan-500/50"
+/>
+```
+
 ## 🛠️ Development
 
 ```bash

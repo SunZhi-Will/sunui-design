@@ -45,22 +45,41 @@ export default function App() {
 }
 ```
 
-### Purple Theme
+### Ocean Theme
 
 ```tsx
 <GradientBackground
-    fromColor="#4c1d95"
-    viaColor="#6d28d9"
-    toColor="#2e1065"
-    glowFromColor="#c084fc"
-    glowViaColor="#a855f7"
-    gridColor="#8b5cf6"
-    gridSize={{ width: 20, height: 30 }}
+    fromColor="#0c4a6e"
+    viaColor="#0369a1"
+    toColor="#082f49"
+    glowFromColor="#38bdf8"
+    glowViaColor="#0ea5e9"
+    gridColor="#0284c7"
+    gridSize={{ width: 16, height: 28 }}
     animationDuration={8}
+    animationScale={[1, 1.2, 1]}
+    animationOpacity={[0.3, 0.1, 0.3]}
 />
 ```
 
-### Fast Animation with Custom Effects
+### Sunset Theme
+
+```tsx
+<GradientBackground
+    fromColor="#7c2d12"
+    viaColor="#9a3412"
+    toColor="#431407"
+    glowFromColor="#fb923c"
+    glowViaColor="#f97316"
+    gridColor="#ea580c"
+    gridSize={{ width: 20, height: 30 }}
+    animationDuration={6}
+    animationScale={[1, 1.4, 1]}
+    animationOpacity={[0.4, 0.15, 0.4]}
+/>
+```
+
+### Forest Theme
 
 ```tsx
 <GradientBackground
@@ -70,7 +89,24 @@ export default function App() {
     glowFromColor="#34d399"
     glowViaColor="#10b981"
     gridColor="#059669"
-    gridSize={{ width: 16, height: 28 }}
+    gridSize={{ width: 18, height: 26 }}
+    animationDuration={10}
+    animationScale={[1, 1.3, 1]}
+    animationOpacity={[0.35, 0.12, 0.35]}
+/>
+```
+
+### Custom Animation
+
+```tsx
+<GradientBackground
+    fromColor="#4c1d95"
+    viaColor="#6d28d9"
+    toColor="#2e1065"
+    glowFromColor="#c084fc"
+    glowViaColor="#a855f7"
+    gridColor="#8b5cf6"
+    gridSize={{ width: 14, height: 24 }}
     animationDuration={4}
     animationScale={[1, 1.5, 1]}
     animationOpacity={[0.4, 0.1, 0.4]}

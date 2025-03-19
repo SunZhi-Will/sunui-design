@@ -21,11 +21,11 @@ A grid component for displaying skills or categorized content with filtering, pa
 ## Installation
 
 ```bash
-npm install @sunui-design/social
+npm install @sunui-design/filter
 # or
-yarn add @sunui-design/social
+yarn add @sunui-design/filter
 # or
-pnpm add @sunui-design/social
+pnpm add @sunui-design/filter
 ```
 
 ## Usage
@@ -33,18 +33,28 @@ pnpm add @sunui-design/social
 ### Basic Usage
 
 ```tsx
-import { FilterGrid, GridItem } from '@sunui-design/social';
+import { FilterGrid, GridItem } from '@sunui-design/filter';
 
 const items = [
-    { name: 'React', icon: 'path/to/react-icon.svg', category: 'Framework' },
-    { name: 'TypeScript', icon: 'path/to/ts-icon.svg', category: 'Language' },
-    // ... more items
+    { name: 'React', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', category: 'Framework' },
+    { name: 'TypeScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', category: 'Language' },
+    { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg', category: 'Language' },
+    { name: 'JavaScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg', category: 'Language' },
+    { name: 'Next.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg', category: 'Framework' },
+    { name: 'Vue.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg', category: 'Framework' },
+    { name: 'Tailwind CSS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', category: 'Framework' },
+    { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg', category: 'Tools' },
+    { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg', category: 'Tools' },
+    { name: 'VS Code', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg', category: 'Tools' }
 ];
 
 const translations = {
-    title: "Skills",
+    title: "Tech Stack",
     categories: {
-        all: "All"
+        all: "All",
+        Framework: "Frameworks",
+        Language: "Programming Languages",
+        Tools: "Tools"
     }
 };
 

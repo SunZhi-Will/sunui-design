@@ -1,4 +1,4 @@
-# @sunui-design/all
+# @sunui-design/react
 
 All-in-one package for Sun UI Design components.
 
@@ -14,11 +14,11 @@ All-in-one package for Sun UI Design components.
 ## Installation
 
 ```bash
-npm install @sunui-design/all
+npm install @sunui-design/react
 # or
-yarn add @sunui-design/all
+yarn add @sunui-design/react
 # or
-pnpm add @sunui-design/all
+pnpm add @sunui-design/react
 ```
 
 ## Available Components
@@ -38,7 +38,7 @@ import {
   FloatingButton,
   GradientBackground,
   SocialButton
-} from '@sunui-design/all';
+} from '@sunui-design/react';
 
 export default function App() {
   return (
