@@ -12,13 +12,13 @@ type Story = StoryObj<typeof Card>;
 
 export const Default: Story = {
     args: {
-        children: '這是一個卡片元件',
+        children: 'This is a card component',
     },
 };
 
 export const WithCustomClass: Story = {
     args: {
-        children: '自定義樣式的卡片',
+        children: 'Card with custom styles',
         className: 'bg-blue-100 p-4',
     },
 }; 

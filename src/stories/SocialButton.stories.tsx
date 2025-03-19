@@ -15,7 +15,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<SocialButtonProps>;
 
-// 基本示例
+// Basic example
 export const Default: Story = {
     args: {
         href: "https://github.com/SunZhi-Will",
@@ -29,52 +29,52 @@ export const Default: Story = {
     },
 };
 
-// 標題位置展示
+// Title positions
 export const TitlePositions: Story = {
     render: () => (
         <div className="relative w-[200px] h-[200px] bg-gray-100/30 rounded-lg p-4">
             <div className="grid grid-cols-2 gap-8">
-                {/* 右上角 */}
+                {/* Top left */}
                 <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
                     position={{ x: 0, y: 0 }}
                     className="from-purple-600/90 to-indigo-800/90"
                     iconClassName="[filter:invert(1)]"
-                    title="左上角"
+                    title="Top Left"
                     titleDisplay="always"
                     titlePosition="top"
                 />
 
-                {/* 左上角 */}
+                {/* Top right */}
                 <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg"
                     position={{ x: 48, y: 0 }}
                     className="from-blue-600/90 to-blue-800/90"
-                    title="右上角"
+                    title="Top Right"
                     titleDisplay="always"
                     titlePosition="right"
                 />
 
-                {/* 左下角 */}
+                {/* Bottom left */}
                 <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/twitter/twitter-original.svg"
                     position={{ x: 0, y: 48 }}
                     className="from-white/90 to-white/90"
-                    title="左下角"
+                    title="Bottom Left"
                     titleDisplay="always"
                     titlePosition="left"
                 />
 
-                {/* 右下角 */}
+                {/* Bottom right */}
                 <EnhancedSocialButton
                     href="#"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
                     position={{ x: 48, y: 48 }}
                     className="from-blue-600/90 to-blue-700/90"
-                    title="右下角"
+                    title="Bottom Right"
                     titleDisplay="always"
                     titlePosition="bottom"
                 />
@@ -83,12 +83,12 @@ export const TitlePositions: Story = {
     )
 };
 
-// 九宮格布局
+// Grid layout
 export const GridLayout: Story = {
     render: () => (
         <div className="relative w-[300px] h-[300px] bg-gray-100/30 rounded-lg p-4">
             <div className="grid grid-cols-3 gap-8">
-                {/* 第一行 */}
+                {/* First row */}
                 <EnhancedSocialButton
                     href="https://github.com"
                     icon="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
@@ -119,7 +119,7 @@ export const GridLayout: Story = {
                     titleDisplay="hover"
                 />
 
-                {/* 第二行 */}
+                {/* Second row */}
                 <EnhancedSocialButton
                     href="https://facebook.com"
                     icon={
@@ -158,7 +158,7 @@ export const GridLayout: Story = {
                     titleDisplay="hover"
                 />
 
-                {/* 第三行 */}
+                {/* Third row */}
                 <EnhancedSocialButton
                     href="https://youtube.com"
                     icon={

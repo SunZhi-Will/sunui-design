@@ -11,34 +11,34 @@ const meta = {
     argTypes: {
         show: {
             control: 'boolean',
-            description: '是否顯示浮動按鈕',
+            description: 'Whether to show the floating button',
             defaultValue: true
         },
         isOpen: {
             control: 'boolean',
-            description: '是否展開按鈕組',
+            description: 'Whether to expand the button group',
             defaultValue: undefined
         },
         defaultOpen: {
             control: 'boolean',
-            description: '默認是否展開',
+            description: 'Whether to expand by default',
             defaultValue: false
         },
         position: {
             control: 'select',
             options: ['bottom-right', 'bottom-left', 'top-right', 'top-left'],
-            description: '浮動按鈕位置',
+            description: 'Floating button position',
             defaultValue: 'bottom-right'
         },
         variant: {
             control: 'select',
             options: ['petal', 'vertical', 'grid'],
-            description: '展開方式',
+            description: 'Expansion style',
             defaultValue: 'petal'
         },
         showToggleButton: {
             control: 'boolean',
-            description: '是否顯示展開按鈕',
+            description: 'Whether to show the toggle button',
             defaultValue: true
         }
     }

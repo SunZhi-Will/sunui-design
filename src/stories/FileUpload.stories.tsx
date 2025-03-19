@@ -8,7 +8,7 @@ const meta = {
         layout: 'centered',
         docs: {
             description: {
-                component: '一個現代化的檔案上傳元件，支援拖放上傳、多檔案上傳、檔案預覽和進度顯示。'
+                component: 'A modern file upload component that supports drag and drop, multiple file upload, file preview, and progress display.'
             }
         }
     },
@@ -17,27 +17,27 @@ const meta = {
         theme: {
             control: 'select',
             options: ['orange', 'violet', 'cyan', 'custom'],
-            description: '元件主題顏色'
+            description: 'Component theme color'
         },
         accept: {
             control: 'text',
-            description: '接受的檔案類型，例如：image/*,application/pdf'
+            description: 'Accepted file types, e.g., image/*,application/pdf'
         },
         multiple: {
             control: 'boolean',
-            description: '是否允許多檔案上傳'
+            description: 'Whether to allow multiple file uploads'
         },
         maxSize: {
             control: 'number',
-            description: '檔案大小限制（bytes）'
+            description: 'File size limit (bytes)'
         },
         showProgress: {
             control: 'boolean',
-            description: '是否顯示上傳進度'
+            description: 'Whether to show upload progress'
         },
         showPreview: {
             control: 'boolean',
-            description: '是否顯示檔案預覽'
+            description: 'Whether to show file preview'
         }
     }
 } satisfies Meta<FileUploadProps>;
@@ -45,12 +45,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<FileUploadProps>;
 
-// 基本用法
+// Basic usage
 export const Basic: Story = {
     args: {
-        onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
+        onFileSelect: (files: File[]) => console.log('Selected files:', files),
         onFileUpload: async (files: File[]) => {
-            console.log('上傳檔案中:', files);
+            console.log('Uploading files:', files);
             await new Promise(resolve => setTimeout(resolve, 1000));
         },
         accept: 'image/*,application/pdf',
@@ -62,13 +62,13 @@ export const Basic: Story = {
     parameters: {
         docs: {
             description: {
-                story: '最基本的檔案上傳功能，支援拖放和點擊上傳。預設使用橘色主題。'
+                story: 'Basic file upload functionality with drag and drop and click-to-upload support. Uses orange theme by default.'
             }
         }
     }
 };
 
-// 紫色主題
+// Violet theme
 export const VioletTheme: Story = {
     args: {
         ...Basic.args,
@@ -77,13 +77,13 @@ export const VioletTheme: Story = {
     parameters: {
         docs: {
             description: {
-                story: '使用紫色主題的上傳元件。'
+                story: 'Upload component with violet theme.'
             }
         }
     }
 };
 
-// 青色主題
+// Cyan theme
 export const CyanTheme: Story = {
     args: {
         ...Basic.args,
@@ -92,18 +92,18 @@ export const CyanTheme: Story = {
     parameters: {
         docs: {
             description: {
-                story: '使用青色主題的上傳元件。'
+                story: 'Upload component with cyan theme.'
             }
         }
     }
 };
 
-// 單檔案上傳
+// Single file upload
 export const SingleFile: Story = {
     args: {
-        onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
+        onFileSelect: (files: File[]) => console.log('Selected files:', files),
         onFileUpload: async (files: File[]) => {
-            console.log('上傳檔案中:', files);
+            console.log('Uploading files:', files);
             await new Promise(resolve => setTimeout(resolve, 1000));
         },
         multiple: false,
@@ -116,18 +116,18 @@ export const SingleFile: Story = {
     parameters: {
         docs: {
             description: {
-                story: '限制單檔案上傳的示例，只接受圖片檔案。'
+                story: 'Example of single file upload, only accepting image files.'
             }
         }
     }
 };
 
-// 完整功能展示
+// Full feature showcase
 export const FullFeatured: Story = {
     args: {
-        onFileSelect: (files: File[]) => console.log('選擇的檔案:', files),
+        onFileSelect: (files: File[]) => console.log('Selected files:', files),
         onFileUpload: async (files: File[]) => {
-            console.log('上傳檔案中:', files);
+            console.log('Uploading files:', files);
             await new Promise(resolve => setTimeout(resolve, 1000));
         },
         multiple: true,
@@ -139,13 +139,13 @@ export const FullFeatured: Story = {
         className: 'w-[600px]',
         previewGridClassName: 'mt-4',
         onRemovePreview: (index: number) => {
-            console.log(`移除預覽項目 ${index}`);
+            console.log(`Removing preview item ${index}`);
         }
     },
     parameters: {
         docs: {
             description: {
-                story: '展示所有功能的完整示例，包括多檔案上傳、檔案預覽、進度顯示等。'
+                story: 'Complete example showcasing all features, including multiple file upload, file preview, progress display, and more.'
             }
         }
     }

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
+  <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
   <p align="center">
     <b>A modern React UI component library built with Next.js and TailwindCSS</b>
     <br />
@@ -43,61 +43,17 @@ A modern React UI component library built with Next.js and TailwindCSS, featurin
 
 ## Components
 
-### FilterGrid
+Sun UI Design provides a collection of modern and customizable components. Each component is available as a separate package and can be used independently.
 
-A grid component for displaying skills or categorized content with filtering, pagination, and loading states.
+### Available Components
 
-Features:
-- Multiple themes: light, dark, blue, green, purple
-- Multiple shapes: hexagon, square, circle
-- Customizable categories and items
-- Icon support with hover effects
-- Pagination support
-- Infinite scroll support
-- Loading states with animations
-- Click handlers for items
-- Optional title and category filters
-- Customizable item dimensions
-
-### SocialButton
-
-A button component for social media links with tooltip and gradient effects.
-
-Features:
-- Custom icon support (image URL or React element)
-- Customizable button and icon styles
-- Tooltip support with multiple display modes
-- Tooltip positions: top, right, bottom, left
-- Gradient background effects
-- Main button mode support
-- Animation effects
-- Multiple layout modes: petal, vertical, grid
-
-### FloatingButton
-
-A floating button component that can expand to display multiple child buttons.
-
-Features:
-- Three expansion modes: petal, vertical, grid
-- Show/hide control with animations
-- Controlled and uncontrolled modes
-- Customizable positions: bottom-right, bottom-left, top-right, top-left
-- Custom child buttons support
-- Gradient background and shadow effects
-- Smooth animations and transitions
-
-### GradientBackground
-
-An animated gradient background component with dynamic glow effects and customizable grid overlay.
-
-Features:
-- Customizable gradient colors (from, via, to)
-- Dynamic glow effects with customizable colors
-- Customizable grid overlay with adjustable size and color
-- Smooth animations with configurable duration and effects
-- Multiple animation layers for enhanced visual depth
-- Responsive and full-screen design
-- Zero-configuration defaults
+- [Card](packages/card/README.md) - A simple and elegant card component
+- [FileUpload](packages/file-upload/README.md) - A modern file upload component with drag and drop support
+- [FilterGrid](packages/filter/README.md) - A grid component for displaying categorized content
+- [FloatingButton](packages/floating/README.md) - A floating button component with expandable options
+- [GradientBackground](packages/gradient/README.md) - An animated gradient background component
+- [SidePanel](packages/side-panel/README.md) - A side panel component for displaying side content
+- [SocialButton](packages/social/README.md) - A button component for social media links
 
 ## Installation
 
@@ -118,10 +74,13 @@ pnpm add @sunui-design/all
 npm install @sunui-design/core
 
 # Individual components
-npm install @sunui-design/filter    # FilterGrid
-npm install @sunui-design/floating  # FloatingButton
-npm install @sunui-design/gradient  # GradientBackground
-npm install @sunui-design/social    # SocialButton
+npm install @sunui-design/card
+npm install @sunui-design/file-upload
+npm install @sunui-design/filter
+npm install @sunui-design/floating
+npm install @sunui-design/gradient
+npm install @sunui-design/side-panel
+npm install @sunui-design/social
 ```
 
 ## Basic Usage
@@ -129,9 +88,12 @@ npm install @sunui-design/social    # SocialButton
 ```tsx
 import '@sunui-design/core/styles/base.css';
 import {
+  Card,
+  FileUpload,
   FilterGrid,
   FloatingButton,
   GradientBackground,
+  SidePanel,
   SocialButton
 } from '@sunui-design/all';
 
@@ -139,9 +101,11 @@ export default function App() {
   return (
     <div>
       <GradientBackground>
-        <FilterGrid>
-          {/* Your content */}
-        </FilterGrid>
+        <Card>
+          <FilterGrid>
+            {/* Your content */}
+          </FilterGrid>
+        </Card>
         <FloatingButton />
         <SocialButton href="https://github.com" />
       </GradientBackground>
@@ -152,16 +116,7 @@ export default function App() {
 
 ## Documentation
 
-Each component comes with comprehensive documentation, including examples and property descriptions. To view the documentation, check the individual package READMEs:
-
-- [@sunui-design/core](packages/core/README.md)
-- [@sunui-design/all](packages/all/README.md)
-- [@sunui-design/filter](packages/filter-grid/README.md)
-- [@sunui-design/floating](packages/floating-button/README.md)
-- [@sunui-design/gradient](packages/gradient-background/README.md)
-- [@sunui-design/social](packages/social-button/README.md)
-
-Or run Storybook to see live examples:
+Each component comes with comprehensive documentation, including examples and property descriptions. To view the documentation, check the individual package READMEs or run Storybook to see live examples:
 
 ```bash
 npm run storybook

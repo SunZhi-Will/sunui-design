@@ -12,7 +12,7 @@ const meta = {
         layout: 'fullscreen',
         docs: {
             description: {
-                component: '側邊面板元件，用於顯示側邊內容，支援左右兩側展示。'
+                component: 'A side panel component for displaying side content, supporting both left and right positions.'
             }
         }
     },
@@ -21,7 +21,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof SidePanel>;
 
-// 基本示例
+// Basic example
 const BasicTemplate = () => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -30,11 +30,11 @@ const BasicTemplate = () => {
             <EnhancedSidePanel
                 isOpen={isOpen}
                 onToggle={() => setIsOpen(!isOpen)}
-                title="側邊面板"
+                title="Side Panel"
             >
                 <div className="space-y-4">
-                    <p className="text-gray-800">這是側邊面板的內容。</p>
-                    <p className="text-gray-800">你可以在這裡放置任何內容。</p>
+                    <p className="text-gray-800">This is the side panel content.</p>
+                    <p className="text-gray-800">You can place any content here.</p>
                 </div>
             </EnhancedSidePanel>
         </div>
@@ -46,13 +46,13 @@ export const Default: Story = {
     parameters: {
         docs: {
             description: {
-                story: '最基本的側邊面板使用方式。'
+                story: 'Basic usage of the side panel component.'
             }
         }
     }
 };
 
-// 不同位置展示
+// Different positions
 const PositionsTemplate = () => {
     const [leftIsOpen, setLeftIsOpen] = useState(false);
     const [rightIsOpen, setRightIsOpen] = useState(false);
@@ -62,24 +62,24 @@ const PositionsTemplate = () => {
             <EnhancedSidePanel
                 isOpen={leftIsOpen}
                 onToggle={() => setLeftIsOpen(!leftIsOpen)}
-                title="左側面板"
+                title="Left Panel"
                 position="left"
             >
                 <div className="space-y-4">
-                    <p className="text-gray-800">這是左側面板。</p>
-                    <p className="text-gray-800">通常用於導航菜單。</p>
+                    <p className="text-gray-800">This is the left panel.</p>
+                    <p className="text-gray-800">Typically used for navigation menus.</p>
                 </div>
             </EnhancedSidePanel>
 
             <EnhancedSidePanel
                 isOpen={rightIsOpen}
                 onToggle={() => setRightIsOpen(!rightIsOpen)}
-                title="右側面板"
+                title="Right Panel"
                 position="right"
             >
                 <div className="space-y-4">
-                    <p className="text-gray-800">這是右側面板。</p>
-                    <p className="text-gray-800">通常用於詳細信息或設置。</p>
+                    <p className="text-gray-800">This is the right panel.</p>
+                    <p className="text-gray-800">Typically used for details or settings.</p>
                 </div>
             </EnhancedSidePanel>
         </div>
@@ -91,13 +91,13 @@ export const Positions: Story = {
     parameters: {
         docs: {
             description: {
-                story: '展示左側和右側兩種面板位置。'
+                story: 'Demonstrates both left and right panel positions.'
             }
         }
     }
 };
 
-// 自定義樣式
+// Custom styles
 const CustomStylesTemplate = () => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -106,15 +106,15 @@ const CustomStylesTemplate = () => {
             <EnhancedSidePanel
                 isOpen={isOpen}
                 onToggle={() => setIsOpen(!isOpen)}
-                title="自定義樣式面板"
+                title="Custom Styled Panel"
                 className="bg-blue-50"
                 headerClassName="bg-blue-500 text-white"
                 contentClassName="p-6"
                 width="320px"
             >
                 <div className="space-y-4">
-                    <p className="text-blue-800">這是一個使用自定義樣式的面板。</p>
-                    <p className="text-blue-600">你可以自定義面板的各個部分。</p>
+                    <p className="text-blue-800">This is a panel with custom styles.</p>
+                    <p className="text-blue-600">You can customize various parts of the panel.</p>
                 </div>
             </EnhancedSidePanel>
         </div>
@@ -126,13 +126,13 @@ export const CustomStyles: Story = {
     parameters: {
         docs: {
             description: {
-                story: '展示如何自定義面板的樣式，包括背景色、標題樣式和內容樣式。'
+                story: 'Shows how to customize panel styles, including background color, header style, and content style.'
             }
         }
     }
 };
 
-// 無按鈕版本
+// No buttons version
 const NoButtonsTemplate = () => {
     const [isOpen, setIsOpen] = useState(true);
 
@@ -141,18 +141,18 @@ const NoButtonsTemplate = () => {
             <EnhancedSidePanel
                 isOpen={isOpen}
                 onToggle={() => setIsOpen(!isOpen)}
-                title="無按鈕面板"
+                title="No Buttons Panel"
                 showToggleButton={false}
                 showCloseButton={false}
             >
                 <div className="space-y-4">
-                    <p className="text-gray-800">這個面板沒有顯示切換按鈕和關閉按鈕。</p>
-                    <p className="text-gray-800">適用於需要程式控制開關的場景。</p>
+                    <p className="text-gray-800">This panel does not show toggle and close buttons.</p>
+                    <p className="text-gray-800">Suitable for scenarios where programmatic control is needed.</p>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
-                        {isOpen ? '關閉面板' : '開啟面板'}
+                        {isOpen ? 'Close Panel' : 'Open Panel'}
                     </button>
                 </div>
             </EnhancedSidePanel>
@@ -165,7 +165,7 @@ export const NoButtons: Story = {
     parameters: {
         docs: {
             description: {
-                story: '展示如何創建沒有內建按鈕的面板，完全由外部控制。'
+                story: 'Demonstrates how to create a panel without built-in buttons, controlled entirely externally.'
             }
         }
     }
