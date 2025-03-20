@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/floating",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "description": "Animated floating action button component for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,8 +31,8 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.45",
-    "@sunui-design/social": "0.0.45",
+    "@sunui-design/core": "0.0.46",
+    "@sunui-design/social": "0.0.46",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
@@ -40,7 +40,7 @@
     "rimraf": "^6.0.1",
     "typescript": "^5.8.2"
   },
-  "gitHead": "944cdbc99ae2368a9d5af23da53fe9eacb23a0dd",
+  "gitHead": "e405f5c124a6043fc072e150ad38520fe3fba200",
   "publishConfig": {
     "access": "public"
   }
