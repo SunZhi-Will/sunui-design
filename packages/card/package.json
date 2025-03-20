@@ -1,33 +1,45 @@
 {
   "name": "@sunui-design/card",
-  "version": "0.0.41",
-  "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
+  "version": "0.0.44",
+  "description": "Card component for SunUI Design",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "dist/**"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
-  "license": "MIT",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "dev": "tsc -w",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "ui",
+    "card"
+  ],
+  "author": "Sunzhi",
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@sunui-design/core": "0.0.42",
+    "framer-motion": "^12.4.12"
   },
   "devDependencies": {
-    "@sunui-design/core": "0.0.41",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "clsx": "^2.1.0",
-    "eslint": "^8.0.0",
-    "react": "^18.2.0",
-    "tailwind-merge": "^2.2.1",
-    "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "@types/react": "^19.0.10",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
   },
-  "peerDependencies": {
-    "react": "^18.2.0"
+  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
+  "publishConfig": {
+    "access": "public"
   }
 }

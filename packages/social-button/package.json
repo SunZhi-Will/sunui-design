@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/social",
-  "version": "0.0.41",
+  "version": "0.0.44",
   "description": "Social media integration buttons for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.41",
+    "@sunui-design/core": "0.0.44",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
