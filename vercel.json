@@ -1,6 +1,5 @@
 {
     "buildCommand": "npm install && lerna bootstrap && npm run build:packages && npm run build-storybook",
     "outputDirectory": "storybook-static",
-    "installCommand": "npm install --legacy-peer-deps --workspaces",
-    "framework": "nextjs"
+    "installCommand": "npm install --legacy-peer-deps --workspaces"
 }
