@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/gradient",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "description": "Beautiful gradient background effects for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.39",
+    "@sunui-design/core": "0.0.40",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
