@@ -11,9 +11,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "npx tsup",
     "clean": "rimraf dist",
-    "dev": "tsup --watch",
+    "dev": "npx tsup --watch",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build"
   },
