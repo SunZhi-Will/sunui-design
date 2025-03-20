@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
-    "@sunui-design/core": "^0.0.39",
+    "@sunui-design/core": "0.0.47",
     "@sunui-design/filter": "^0.0.39",
     "@sunui-design/floating": "^0.0.39",
     "@sunui-design/gradient": "^0.0.39",

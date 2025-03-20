@@ -38,7 +38,7 @@
     "rimraf": "^6.0.1",
     "typescript": "^5.8.2"
   },
-  "gitHead": "a4704bd6468bf791f74a562dc69aab483fbee057",
+  "gitHead": "5d0616b6ef336b613340a1304228c62d91ad0400",
   "publishConfig": {
     "access": "public"
   }
