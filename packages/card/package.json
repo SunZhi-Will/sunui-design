@@ -1,33 +1,33 @@
 {
-    "name": "@sunui-design/card",
-    "version": "0.0.1",
-    "private": true,
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "sideEffects": false,
-    "files": [
-        "dist/**"
-    ],
-    "license": "MIT",
-    "scripts": {
-        "build": "tsup",
-        "dev": "tsup --watch",
-        "lint": "eslint \"src/**/*.ts*\"",
-        "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
-    },
-    "devDependencies": {
-        "@sunui-design/core": "*",
-        "@types/react": "^18.2.0",
-        "@types/react-dom": "^18.2.0",
-        "clsx": "^2.1.0",
-        "eslint": "^8.0.0",
-        "react": "^18.2.0",
-        "tailwind-merge": "^2.2.1",
-        "tsup": "^8.0.0",
-        "typescript": "^5.0.0"
-    },
-    "peerDependencies": {
-        "react": "^18.2.0"
-    }
+  "name": "@sunui-design/card",
+  "version": "0.0.39",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@sunui-design/core": "*",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "clsx": "^2.1.0",
+    "eslint": "^8.0.0",
+    "react": "^18.2.0",
+    "tailwind-merge": "^2.2.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
 }

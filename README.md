@@ -84,6 +84,101 @@ npm install @sunui-design/side-panel
 npm install @sunui-design/social
 ```
 
+## Development Setup
+
+### Development Environment Setup
+
+1. Clone the project:
+```bash
+git clone https://github.com/yourusername/sun-ui-design.git
+cd sun-ui-design
+```
+
+2. Install all dependencies:
+```bash
+npm install
+# or
+npx lerna bootstrap
+```
+
+3. Build all packages:
+```bash
+npm run build:packages
+```
+
+4. Start development server:
+```bash
+npm run dev
+```
+
+5. Start Storybook:
+```bash
+npm run storybook
+```
+
+### Development Workflow
+
+1. Create a new package:
+```bash
+cd packages
+mkdir your-package-name
+cd your-package-name
+npm init
+```
+
+2. Develop the package:
+```bash
+npm run dev
+```
+
+3. Build the package:
+```bash
+npm run build
+```
+
+4. Pack the package:
+```bash
+npm run pack
+```
+
+5. Publish the package:
+```bash
+npm run publish
+```
+
+### Common Commands
+
+- `npm run dev` - Start development server
+- `npm run build` - Build project
+- `npm run build:packages` - Build all packages
+- `npm run storybook` - Start Storybook
+- `npm run build-storybook` - Build Storybook
+- `npm run pack:all` - Pack all packages
+- `npm run publish` - Publish packages
+- `npm run clean` - Clean build files
+- `npm run lint` - Run linting
+
+### Troubleshooting
+
+If you encounter module not found errors:
+
+1. Clean and reinstall dependencies:
+```bash
+npm run clean
+npm install
+```
+
+2. Rebuild packages:
+```bash
+npm run build:packages
+```
+
+3. If issues persist, check package versions:
+```bash
+npm ls @sunui-design/core
+npm ls @sunui-design/social
+```
+
 ## Basic Usage
 
 ```tsx

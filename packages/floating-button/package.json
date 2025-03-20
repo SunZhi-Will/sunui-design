@@ -1,47 +1,47 @@
 {
-    "name": "@sunui-design/floating",
-    "version": "0.0.32",
-    "description": "Animated floating action button component for SunUI Design",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist",
-        "README.md",
-        "LICENSE"
-    ],
-    "scripts": {
-        "build": "tsc --build --verbose --force",
-        "clean": "rimraf dist tsconfig.tsbuildinfo",
-        "dev": "tsc -w",
-        "pack": "npm pack",
-        "prepublishOnly": "npm run clean && npm run build",
-        "publish:same": "npm publish --no-git-tag-version --force"
-    },
-    "keywords": [
-        "nextjs",
-        "react",
-        "ui",
-        "floating-button"
-    ],
-    "author": "Sunzhi",
-    "license": "MIT",
-    "peerDependencies": {
-        "next": ">=12.0.0",
-        "react": ">=16.8.0",
-        "react-dom": ">=16.8.0"
-    },
-    "dependencies": {
-        "@sunui-design/core": "0.0.32",
-        "@sunui-design/social": "0.0.32",
-        "framer-motion": "^12.4.12"
-    },
-    "devDependencies": {
-        "@types/react": "^19.0.10",
-        "rimraf": "^6.0.1",
-        "typescript": "^5.8.2"
-    },
-    "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
-    "publishConfig": {
-        "access": "public"
-    }
+  "name": "@sunui-design/floating",
+  "version": "0.0.39",
+  "description": "Animated floating action button component for SunUI Design",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "dev": "tsc -w",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run clean && npm run build",
+    "publish:same": "npm publish --no-git-tag-version --force"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "ui",
+    "floating-button"
+  ],
+  "author": "Sunzhi",
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@sunui-design/core": "0.0.39",
+    "@sunui-design/social": "0.0.39",
+    "framer-motion": "^12.4.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
+  },
+  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,45 +1,45 @@
 {
-    "name": "@sunui-design/gradient",
-    "version": "0.0.32",
-    "description": "Beautiful gradient background effects for SunUI Design",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist",
-        "README.md",
-        "LICENSE"
-    ],
-    "scripts": {
-        "build": "tsc",
-        "clean": "rimraf dist",
-        "dev": "tsc -w",
-        "pack": "npm pack",
-        "prepublishOnly": "npm run clean && npm run build"
-    },
-    "keywords": [
-        "nextjs",
-        "react",
-        "ui",
-        "gradient-background"
-    ],
-    "author": "Sunzhi",
-    "license": "MIT",
-    "peerDependencies": {
-        "next": ">=12.0.0",
-        "react": ">=16.8.0",
-        "react-dom": ">=16.8.0"
-    },
-    "dependencies": {
-        "@sunui-design/core": "0.0.32",
-        "framer-motion": "^12.4.12"
-    },
-    "devDependencies": {
-        "@types/react": "^19.0.10",
-        "rimraf": "^6.0.1",
-        "typescript": "^5.8.2"
-    },
-    "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
-    "publishConfig": {
-        "access": "public"
-    }
+  "name": "@sunui-design/gradient",
+  "version": "0.0.39",
+  "description": "Beautiful gradient background effects for SunUI Design",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dev": "tsc -w",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "ui",
+    "gradient-background"
+  ],
+  "author": "Sunzhi",
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@sunui-design/core": "0.0.39",
+    "framer-motion": "^12.4.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
+  },
+  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
+  "publishConfig": {
+    "access": "public"
+  }
 }

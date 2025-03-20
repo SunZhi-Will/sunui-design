@@ -1,49 +1,49 @@
 {
-    "name": "@sunui-design/react",
-    "version": "0.0.32",
-    "description": "A modern React UI library with elegant design and smooth animations",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "dist",
-        "README.md",
-        "LICENSE"
-    ],
-    "scripts": {
-        "build": "tsc --build --verbose --force",
-        "clean": "rimraf dist tsconfig.tsbuildinfo",
-        "dev": "tsc -w",
-        "pack": "npm pack",
-        "prepublishOnly": "npm run clean && npm run build",
-        "publish:same": "npm publish --no-git-tag-version --force"
-    },
-    "keywords": [
-        "nextjs",
-        "react",
-        "ui"
-    ],
-    "author": "Sunzhi",
-    "license": "MIT",
-    "dependencies": {
-        "@sunui-design/core": "0.0.32",
-        "@sunui-design/filter": "0.0.32",
-        "@sunui-design/floating": "0.0.32",
-        "@sunui-design/gradient": "0.0.32",
-        "@sunui-design/side-panel": "0.0.32",
-        "@sunui-design/social": "0.0.32"
-    },
-    "peerDependencies": {
-        "next": ">=12.0.0",
-        "react": ">=16.8.0",
-        "react-dom": ">=16.8.0"
-    },
-    "devDependencies": {
-        "@types/react": "^19.0.10",
-        "rimraf": "^6.0.1",
-        "typescript": "^5.8.2"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675"
+  "name": "@sunui-design/react",
+  "version": "0.0.39",
+  "description": "A modern React UI library with elegant design and smooth animations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "dev": "tsc -w",
+    "pack": "npm pack",
+    "prepublishOnly": "npm run clean && npm run build",
+    "publish:same": "npm publish --no-git-tag-version --force"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "ui"
+  ],
+  "author": "Sunzhi",
+  "license": "MIT",
+  "dependencies": {
+    "@sunui-design/core": "0.0.33",
+    "@sunui-design/filter": "0.0.33",
+    "@sunui-design/floating": "0.0.33",
+    "@sunui-design/gradient": "0.0.33",
+    "@sunui-design/side-panel": "0.0.33",
+    "@sunui-design/social": "0.0.33"
+  },
+  "peerDependencies": {
+    "next": ">=12.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675"
 }
