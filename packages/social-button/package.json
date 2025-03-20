@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/social",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "Social media integration buttons for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "tsc --build --verbose --force",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "if exist dist rmdir /s /q dist && if exist tsconfig.tsbuildinfo del tsconfig.tsbuildinfo",
     "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build",
@@ -31,7 +31,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.48",
+    "@sunui-design/core": "0.0.49",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "rimraf": "^6.0.1",
     "typescript": "^5.8.2"
   },
-  "gitHead": "e405f5c124a6043fc072e150ad38520fe3fba200",
+  "gitHead": "52ea6717d131144bacfb1ce6384845c525aa1c0c",
   "publishConfig": {
     "access": "public"
   }
