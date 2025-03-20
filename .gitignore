@@ -51,3 +51,4 @@ packages/*/*.tgz
 # Cache
 .cache/
 .next/
+storybook-static/
