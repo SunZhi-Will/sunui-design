@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/side-panel",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "Side panel component for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.44",
+    "@sunui-design/core": "0.0.45",
     "react-icons": "^5.0.1"
   },
   "devDependencies": {
@@ -41,5 +41,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675"
+  "gitHead": "944cdbc99ae2368a9d5af23da53fe9eacb23a0dd"
 }

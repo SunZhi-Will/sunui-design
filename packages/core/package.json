@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/core",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "Core utilities and base components for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
     "@types/react": "^19.0.10",
     "typescript": "^5.8.2"
   },
-  "gitHead": "ab5a02e50ab505c4a5aea5139ee4860249653675",
+  "gitHead": "944cdbc99ae2368a9d5af23da53fe9eacb23a0dd",
   "publishConfig": {
     "access": "public"
   }
