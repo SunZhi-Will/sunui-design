@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/card",
-  "version": "0.0.49",
+  "version": "0.0.50",
   "description": "Card component for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.49",
+    "@sunui-design/core": "0.0.50",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "rimraf": "^6.0.1",
     "typescript": "^5.8.2"
   },
-  "gitHead": "52ea6717d131144bacfb1ce6384845c525aa1c0c",
+  "gitHead": "a4704bd6468bf791f74a562dc69aab483fbee057",
   "publishConfig": {
     "access": "public"
   }
