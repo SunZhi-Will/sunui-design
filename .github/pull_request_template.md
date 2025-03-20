@@ -1,28 +1,27 @@
 ## Description
-Please describe the content and purpose of this PR.
+Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context.
 
-## Related Issue
-- Related Issue: #(issue number)
+Fixes # (issue)
 
-## Type of Change
-Please select one:
-- [ ] New feature (non-breaking change)
-- [ ] Bug fix (non-breaking change)
-- [ ] Breaking change
-- [ ] Documentation update
+## Type of change
+Please delete options that are not relevant.
 
-## Testing
-- [ ] Unit tests updated
-- [ ] Integration tests updated
-- [ ] Manual testing completed
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
 
-## Checklist
-- [ ] Code follows project code style
-- [ ] All tests pass
-- [ ] Documentation updated
-- [ ] Changelog updated
-- [ ] No new dependencies added
-- [ ] No breaking changes
+## How Has This Been Tested?
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce.
 
-## Additional Information
-Add any additional information here. 
+## Checklist:
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
+
+## Screenshots (if appropriate): 
