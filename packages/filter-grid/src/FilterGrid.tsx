@@ -236,7 +236,9 @@ export const FilterGrid: React.FC<FilterGridProps> = ({
                 layout
             >
                 <AnimatePresence mode="popLayout">
-                    {paginatedItems}
+                    <Fragment key="items">
+                        {paginatedItems}
+                    </Fragment>
                     {loading && <LoadingItems />}
                 </AnimatePresence>
             </motion.div>
