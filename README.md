@@ -4,6 +4,8 @@
   <p align="center">
     <h1> Sun UI Design</h1>
     <a href="README.zh.md">中文</a> | <a href="README.md">English</a>
+  </p>
+  <p align="center">
     <b>A modern React UI component library with beautiful animations</b>
     <br />
     <i>Built with React, TailwindCSS, and TypeScript</i>
