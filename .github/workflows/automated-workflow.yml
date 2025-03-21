@@ -1,5 +1,10 @@
 name: Automated Workflow
 
+# 添加這個權限配置
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -14,6 +19,7 @@ jobs:
       - name: Auto Label
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # 明確指定 token
           script: |
             const labels = ['needs-review'];
             await github.rest.issues.addLabels({
