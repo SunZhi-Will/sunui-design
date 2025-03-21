@@ -56,37 +56,34 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
     // 主題顏色配置
     const themeColors = React.useMemo(() => ({
         violet: {
-            primary: 'violet',
-            secondary: 'fuchsia',
-            text: 'violet-600',
-            bg: 'violet-50',
-            border: 'violet-300',
-            shadow: 'shadow-violet-100',
-            gradient: 'from-violet-500/5 to-fuchsia-500/5',
-            hoverGradient: 'from-violet-500/10 to-fuchsia-500/10',
-            ring: 'ring-violet-500/20',
+            primary: 'primary',
+            text: 'primary-700',
+            bg: 'primary-50/30',
+            border: 'primary-200',
+            shadow: 'shadow-primary-100/50',
+            gradient: 'from-primary-100/20 to-primary-50/20',
+            hoverGradient: 'from-primary-100/30 to-primary-50/30',
+            ring: 'ring-primary-200',
         },
         cyan: {
-            primary: 'cyan',
-            secondary: 'sky',
-            text: 'cyan-600',
-            bg: 'cyan-50',
-            border: 'cyan-300',
-            shadow: 'shadow-cyan-100',
-            gradient: 'from-cyan-500/5 to-sky-500/5',
-            hoverGradient: 'from-cyan-500/10 to-sky-500/10',
-            ring: 'ring-cyan-500/20',
+            primary: 'info',
+            text: 'info-700',
+            bg: 'info-50/30',
+            border: 'info-200',
+            shadow: 'shadow-info-100/50',
+            gradient: 'from-info-100/20 to-info-50/20',
+            hoverGradient: 'from-info-100/30 to-info-50/30',
+            ring: 'ring-info-200',
         },
         orange: {
-            primary: 'orange',
-            secondary: 'amber',
-            text: 'orange-600',
-            bg: 'orange-50',
-            border: 'orange-300',
-            shadow: 'shadow-orange-100',
-            gradient: 'from-orange-500/5 to-amber-500/5',
-            hoverGradient: 'from-orange-500/10 to-amber-500/10',
-            ring: 'ring-orange-500/20',
+            primary: 'warning',
+            text: 'warning-700',
+            bg: 'warning-50/30',
+            border: 'warning-200',
+            shadow: 'shadow-warning-100/50',
+            gradient: 'from-warning-100/20 to-warning-50/20',
+            hoverGradient: 'from-warning-100/30 to-warning-50/30',
+            ring: 'ring-warning-200',
         },
     }), []);
 
@@ -95,22 +92,26 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
     const baseStyles = cn(
         'rounded-xl border bg-white/95 text-gray-900 relative overflow-hidden',
         'backdrop-blur-md transition-all duration-300',
-        'focus:outline-none focus:ring-2 ring-gray-200/50',
+        'focus:outline-none focus:ring-2',
         'shadow-sm hover:shadow-md'
     );
 
     const variantStyles = {
         outlined: cn(
-            'border-gray-200/60',
-            'hover:border-gray-300/80 hover:bg-white/100'
+            'border-primary-200',
+            'hover:border-primary-300/80 hover:bg-primary-50/30',
+            'hover:shadow-primary-100/20'
         ),
         filled: cn(
-            'bg-gray-50/90 backdrop-blur-md border-transparent',
-            'hover:bg-white/100'
+            'bg-primary-50/30 backdrop-blur-md border-transparent',
+            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
+            'hover:bg-gradient-to-br from-primary-100/30 to-primary-50/30',
+            'hover:shadow-primary-100/30'
         ),
         elevated: cn(
             'border-transparent shadow-lg',
-            'hover:shadow-xl hover:-translate-y-0.5'
+            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
+            'hover:shadow-xl hover:-translate-y-0.5 hover:shadow-primary-100/20'
         ),
     };
 
@@ -120,28 +121,32 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
         lg: 'p-7',
     };
 
+    const loadingOverlayStyles = cn(
+        "absolute inset-0 flex items-center justify-center",
+        loadingMode === 'overlay' ? "bg-white/60" : "bg-white/95"
+    );
+
+    const loadingSpinnerStyles = {
+        outer: "absolute w-full h-full rounded-full border-[3px] border-gray-100",
+        inner: "absolute w-full h-full rounded-full border-[3px] border-gray-400 border-t-transparent animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite]"
+    };
+
+    const skeletonStyles = {
+        base: "bg-gray-100 rounded animate-pulse",
+        title: "h-5 w-2/3",
+        subtitle: "h-4 w-1/2",
+        line: "h-3.5",
+        button: "h-8 w-1/3"
+    };
+
     return (
         <motion.div
-            className={cn(
-                baseStyles,
-                variantStyles[variant],
-                sizeStyles[size],
-                className
-            )}
+            className={cn(baseStyles, variantStyles[variant], sizeStyles[size], className)}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-                duration: 0.3,
-                ease: "easeOut"
-            }}
-            whileHover={{
-                scale: 1.01,
-                transition: { duration: 0.2, ease: "easeOut" }
-            }}
-            whileTap={{
-                scale: 0.99,
-                transition: { duration: 0.1, ease: "easeIn" }
-            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            whileHover={{ scale: 1.01, transition: { duration: 0.2, ease: "easeOut" } }}
+            whileTap={{ scale: 0.99, transition: { duration: 0.1, ease: "easeIn" } }}
         >
             <AnimatePresence>
                 {loading && (
@@ -150,10 +155,7 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className={cn(
-                            "absolute inset-0 flex items-center justify-center backdrop-blur-[2px]",
-                            loadingMode === 'overlay' ? "bg-white/60" : "bg-white/95"
-                        )}
+                        className={loadingOverlayStyles}
                     >
                         {loadingMode === 'overlay' ? (
                             <motion.div
@@ -163,8 +165,8 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
                                 transition={{ duration: 0.2 }}
                             >
                                 <div className="relative w-10 h-10">
-                                    <div className="absolute w-full h-full rounded-full border-[3px] border-gray-100" />
-                                    <div className="absolute w-full h-full rounded-full border-[3px] border-gray-400 border-t-transparent animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite]" />
+                                    <div className={loadingSpinnerStyles.outer} />
+                                    <div className={loadingSpinnerStyles.inner} />
                                 </div>
                                 <span className="font-medium text-xs text-gray-500">
                                     Loading...
@@ -174,18 +176,18 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
                             <div className="w-full h-full flex flex-col px-5 py-4">
                                 {/* 標題載入動畫 */}
                                 <div className="flex flex-col gap-2 mb-5">
-                                    <div className="h-5 w-2/3 bg-gray-100 rounded-md animate-pulse" />
-                                    <div className="h-4 w-1/2 bg-gray-100/80 rounded-md animate-pulse" />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.title)} />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.subtitle)} />
                                 </div>
                                 {/* 內容載入動畫 */}
                                 <div className="flex flex-col gap-2.5 mb-5">
-                                    <div className="h-3.5 w-full bg-gray-100/80 rounded animate-pulse" />
-                                    <div className="h-3.5 w-11/12 bg-gray-100/80 rounded animate-pulse" />
-                                    <div className="h-3.5 w-4/5 bg-gray-100/80 rounded animate-pulse" />
-                                    <div className="h-3.5 w-full bg-gray-100/80 rounded animate-pulse" />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-11/12")} />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-4/5")} />
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
                                 </div>
                                 {/* 底部載入動畫 */}
-                                <div className="h-8 w-1/3 bg-gray-100 rounded-md animate-pulse" />
+                                <div className={cn(skeletonStyles.base, skeletonStyles.button)} />
                             </div>
                         )}
                     </motion.div>
@@ -205,7 +207,7 @@ export const CardHeader = ({ children, showDivider = false, className }: CardHea
         <div
             className={cn(
                 'flex flex-col space-y-1.5 px-5 py-4',
-                showDivider && 'border-b border-gray-100/60',
+                showDivider && 'border-b border-primary-100/30',
                 className
             )}
         >
@@ -219,7 +221,7 @@ export const CardContent = ({ children, showDivider = false, className }: CardCo
         <div
             className={cn(
                 'px-5 py-3',
-                showDivider && 'border-b border-gray-100/60',
+                showDivider && 'border-b border-primary-100/30',
                 className
             )}
         >
@@ -233,7 +235,7 @@ export const CardFooter = ({ children, showDivider = false, className }: CardFoo
         <div
             className={cn(
                 'flex items-center px-5 py-4',
-                showDivider && 'border-t border-gray-100/60',
+                showDivider && 'border-t border-primary-100/30',
                 className
             )}
         >

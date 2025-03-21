@@ -170,7 +170,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                         key={button.href}
                         {...button}
                         icon={IconComponent ? <IconComponent /> : button.icon}
-                        className={button.className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"}
+                        className={button.className || "from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50"}
                         variant={variant}
                     />
                 );
@@ -282,7 +282,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                     d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
                             </motion.svg>
                         }
-                        className="from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50"
+                        className="from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50"
                         onClick={handleToggle}
                     />
                 </div>

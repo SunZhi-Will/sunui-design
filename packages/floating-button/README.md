@@ -33,27 +33,27 @@ const socialButtons = [
     {
         type: 'github' as const,
         href: 'https://github.com',
-        className: 'from-gray-600/90 to-gray-800/90 hover:shadow-gray-500/50'
+        className: 'from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50'
     },
     {
         type: 'twitter' as const,
         href: 'https://twitter.com',
-        className: 'from-blue-400/90 to-blue-600/90 hover:shadow-blue-500/50'
+        className: 'from-info-400/90 to-info-600/90 hover:shadow-info-500/50'
     },
     {
         type: 'facebook' as const,
         href: 'https://facebook.com',
-        className: 'from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50'
+        className: 'from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50'
     },
     {
         type: 'linkedin' as const,
         href: 'https://linkedin.com',
-        className: 'from-blue-700/90 to-blue-900/90 hover:shadow-blue-600/50'
+        className: 'from-info-700/90 to-info-900/90 hover:shadow-info-600/50'
     },
     {
         type: 'instagram' as const,
         href: 'https://instagram.com',
-        className: 'from-pink-500/90 to-purple-600/90 hover:shadow-purple-500/50'
+        className: 'from-warning-500/90 to-danger-600/90 hover:shadow-danger-500/50'
     }
 ];
 

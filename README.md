@@ -1,3 +1,7 @@
+# Sun UI Design
+
+[English](./README.md) | [繁體中文](./README.zh.md)
+
 <div align="center">
   <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
   <p align="center">
@@ -13,7 +17,7 @@
       <img src="https://img.shields.io/npm/dm/@sunui-design/all.svg?style=flat-square" alt="npm downloads" />
     </a>
     <a href="https://github.com/yourusername/sun-ui-design/blob/main/LICENSE">
-      <img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square" alt="license" />
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license" />
     </a>
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
   </p>
@@ -25,8 +29,6 @@
   </p>
   <br />
 </div>
-
-# Sun UI Design
 
 A modern React UI component library featuring beautiful animations and customizable components. Built with React, TailwindCSS, and TypeScript, it's perfect for any React project.
 
@@ -228,14 +230,24 @@ Issues and Pull Requests are welcome! Please read our contributing guidelines be
 
 ## License
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+MIT License
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Copyright (c) 2024 Sun UI Design
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,11 +1,40 @@
 :root {
-    --sun-ui-primary: #3b82f6;
-    --sun-ui-secondary: #6b7280;
-    --sun-ui-success: #22c55e;
-    --sun-ui-danger: #ef4444;
-    --sun-ui-warning: #f59e0b;
-    --sun-ui-info: #3b82f6;
+    /* Primary Colors */
+    --sun-ui-primary-50: #f0f9ff;
+    --sun-ui-primary-100: #e0f2fe;
+    --sun-ui-primary-200: #bae6fd;
+    --sun-ui-primary-300: #7dd3fc;
+    --sun-ui-primary-400: #38bdf8;
+    --sun-ui-primary-500: #0ea5e9;
+    --sun-ui-primary-600: #0284c7;
+    --sun-ui-primary-700: #0369a1;
+    --sun-ui-primary-800: #075985;
+    --sun-ui-primary-900: #0c4a6e;
+    --sun-ui-primary-950: #082f49;
 
+    /* Semantic Colors */
+    --sun-ui-success-light: #86efac;
+    --sun-ui-success: #22c55e;
+    --sun-ui-success-dark: #15803d;
+
+    --sun-ui-warning-light: #fcd34d;
+    --sun-ui-warning: #f59e0b;
+    --sun-ui-warning-dark: #b45309;
+
+    --sun-ui-danger-light: #fca5a5;
+    --sun-ui-danger: #ef4444;
+    --sun-ui-danger-dark: #b91c1c;
+
+    --sun-ui-info-light: #93c5fd;
+    --sun-ui-info: #3b82f6;
+    --sun-ui-info-dark: #1d4ed8;
+
+    /* System Colors */
+    --sun-ui-background: #ffffff;
+    --sun-ui-foreground: #000000;
+    --sun-ui-border: #e5e7eb;
+
+    /* Component Variables */
     --sun-ui-transition-duration: 0.3s;
     --sun-ui-border-radius: 0.375rem;
     --sun-ui-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
