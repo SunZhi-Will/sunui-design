@@ -1,13 +1,11 @@
 
-<div align="center">
-# Sun UI Design
 
-[English](./README.md) | [繁體中文](./README.zh.md)
-</div>
 <div align="center">
 
   <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
   <p align="center">
+    <h1> Sun UI Design</h1>
+  <a href="README.zh.md">中文</a> | <a href="README.md">English</a>
     <b>一個具有精美動畫效果的現代 React UI 組件庫</b>
     <br />
     <i>使用 React、TailwindCSS 和 TypeScript 構建</i>
