@@ -31,11 +31,11 @@
     "@sunui-design/social": "^0.0.39",
     "@types/pdfjs-dist": "^2.10.378",
     "@types/postcss-load-config": "^3.0.1",
-    "framer-motion": "^11.0.0",
-    "next": "14.2.24",
-    "pdfjs-dist": "^4.10.38",
+    "framer-motion": "^12.5.0",
+    "next": "15.2.3",
+    "pdfjs-dist": "^5.0.375",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.4",
@@ -49,18 +49,18 @@
     "@storybook/nextjs": "^8.6.7",
     "@storybook/react": "^8.6.7",
     "@storybook/test": "^8.6.7",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^18.0.0",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19",
     "@types/webpack": "^5.28.5",
     "autoprefixer": "^10.4.17",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.24",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.3",
     "eslint-plugin-storybook": "^0.11.3",
     "lerna": "^8.2.0",
     "postcss": "^8",
     "storybook": "^8.6.7",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^4.0.15",
     "typescript": "^5"
   }
 }
