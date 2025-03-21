@@ -15,6 +15,7 @@ export interface CardProps {
     loading?: boolean;
     loadingMode?: CardLoadingMode;
     className?: string;
+    style?: React.CSSProperties;
 }
 
 export interface CardHeaderProps {
@@ -43,7 +44,7 @@ export interface CardImageProps {
     className?: string;
 }
 
-export const Card = ({ children, ...props }: CardProps): JSX.Element => {
+export const Card: React.FC<CardProps> = ({ children, ...props }) => {
     const {
         className,
         variant = 'outlined',
@@ -51,6 +52,7 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
         theme = 'violet',
         loading = false,
         loadingMode = 'skeleton',
+        style,
     } = props;
 
     // 主題顏色配置
@@ -147,6 +149,7 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
             transition={{ duration: 0.3, ease: "easeOut" }}
             whileHover={{ scale: 1.01, transition: { duration: 0.2, ease: "easeOut" } }}
             whileTap={{ scale: 0.99, transition: { duration: 0.1, ease: "easeIn" } }}
+            style={style}
         >
             <AnimatePresence>
                 {loading && (

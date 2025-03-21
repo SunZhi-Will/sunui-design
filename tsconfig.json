@@ -1,48 +1,43 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
+    "target": "es5",
     "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
-    "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "esModuleInterop": true,
-    "jsx": "preserve",
-    "types": [
-      "@types/react"
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
     "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
     "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
       "@/*": [
-        "./src/*"
-      ],
-      "@sunui-design/*": [
-        "packages/*/src"
-      ],
-      "sunui-social-button": [
-        "packages/social-button/src"
-      ],
-      "sunui-social-button/*": [
-        "packages/social-button/src/*"
-      ],
-      "@storybook/nextjs": [
-        "node_modules/@storybook/nextjs"
+        "./*"
       ]
-    }
+    },
+    "types": [
+      "jest",
+      "@testing-library/jest-dom"
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".storybook/**/*"
+    ".next/types/**/*.ts",
+    "jest.setup.js"
   ],
   "exclude": [
     "node_modules"
