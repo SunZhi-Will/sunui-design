@@ -54,13 +54,21 @@
     "@types/react-dom": "^18",
     "@types/webpack": "^5.28.5",
     "autoprefixer": "^10.4.17",
-    "eslint": "^8",
+    "eslint": "^9.0.0",
     "eslint-config-next": "14.2.24",
     "eslint-plugin-storybook": "^0.11.3",
     "lerna": "^8.2.0",
     "postcss": "^8",
     "storybook": "^8.6.7",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "glob": "^10.3.10",
+    "rimraf": "^5.0.5"
+  },
+  "resolutions": {
+    "glob": "^10.3.10",
+    "rimraf": "^5.0.5",
+    "@eslint/config-array": "^2.1.0",
+    "@eslint/object-schema": "^2.0.0"
   }
 }
