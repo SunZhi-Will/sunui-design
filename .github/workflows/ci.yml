@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '**'  # matches all branches
   pull_request:
     branches: [ master ]
 
@@ -37,6 +38,21 @@ jobs:
     - name: Build Storybook
       run: npm run build-storybook
 
+    - name: Check if PR to master
+      if: failure() && github.event_name == 'pull_request' && github.base_ref == 'master'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const { number } = context.payload.pull_request;
+          
+          await github.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: number,
+            body: `❌ CI Build Failed\n\nView failure details: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+          });
+
   security:
     runs-on: ubuntu-latest
     steps:
@@ -56,8 +72,31 @@ jobs:
         npm run build:packages
     
     - name: Run Snyk to check for vulnerabilities
+      # Only run Snyk on trusted sources
+      if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
       uses: snyk/actions/node@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --severity-threshold=high 
+        args: --severity-threshold=high
+
+    - name: Skip Snyk for untrusted PR
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+      run: |
+        echo "Skipping Snyk security check for PR from fork"
+        echo "For security reasons, Snyk checks are only run on internal PRs"
+
+    - name: Check if PR to master
+      if: failure() && github.event_name == 'pull_request' && github.base_ref == 'master'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const { number } = context.payload.pull_request;
+          
+          await github.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: number,
+            body: `❌ Security Check Failed\n\nView failure details: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+          }); 
