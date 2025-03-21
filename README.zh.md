@@ -1,8 +1,9 @@
+
+
+<div align="center">
 # Sun UI Design
 
 [English](./README.md) | [繁體中文](./README.zh.md)
-
-<div align="center">
   <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
   <p align="center">
     <b>一個具有精美動畫效果的現代 React UI 組件庫</b>
