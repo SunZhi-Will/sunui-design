@@ -1,46 +1,191 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import { Card, CardHeader, CardContent, CardFooter, CardImage } from '@sunui-design/card';
+import type { CardProps } from '@sunui-design/card';
 
-interface CardProps {
-    title: string;
-    content: string;
-    onClick?: () => void;
-}
+type CardStory = StoryObj<typeof Card>;
 
-const Card = ({ title, content, onClick }: CardProps) => {
-    return (
-        <div
-            className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            onClick={onClick}
-        >
-            <h3 className="text-lg font-semibold mb-2">{title}</h3>
-            <p className="text-gray-600">{content}</p>
-        </div>
-    );
-};
-
-const meta: Meta<typeof Card> = {
+const meta = {
     title: 'Components/Card',
     component: Card,
     parameters: {
         layout: 'centered',
     },
     tags: ['autodocs'],
-};
+} satisfies Meta<typeof Card>;
 
 export default meta;
-type Story = StoryObj<typeof Card>;
 
-export const Basic: Story = {
+// 基本卡片
+export const Basic: CardStory = {
     args: {
-        title: '示例卡片',
-        content: '這是一個基本的卡片組件示例。',
+        variant: 'outlined',
+        size: 'md',
     },
+    render: (args) => (
+        <Card {...args}>
+            <CardHeader>
+                <h3 className="text-lg font-semibold">基本卡片</h3>
+            </CardHeader>
+            <CardContent>
+                <p className="text-gray-600">這是一個基本的卡片組件示例。</p>
+            </CardContent>
+        </Card>
+    ),
 };
 
-export const WithClick: Story = {
+// 不同主題
+export const Themes: CardStory = {
+    render: () => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card theme="violet">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Violet 主題</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">紫色主題的卡片。</p>
+                </CardContent>
+            </Card>
+            <Card theme="cyan">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Cyan 主題</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">青色主題的卡片。</p>
+                </CardContent>
+            </Card>
+            <Card theme="orange">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Orange 主題</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">橙色主題的卡片。</p>
+                </CardContent>
+            </Card>
+        </div>
+    ),
+};
+
+// 不同樣式
+export const Variants: CardStory = {
+    render: () => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card variant="outlined">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Outlined 樣式</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">帶有邊框的卡片樣式。</p>
+                </CardContent>
+            </Card>
+            <Card variant="filled">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Filled 樣式</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">填充背景的卡片樣式。</p>
+                </CardContent>
+            </Card>
+            <Card variant="elevated">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">Elevated 樣式</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">帶有陰影的卡片樣式。</p>
+                </CardContent>
+            </Card>
+        </div>
+    ),
+};
+
+// 不同尺寸
+export const Sizes: CardStory = {
+    render: () => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card size="sm">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">小尺寸</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">較小的內邊距。</p>
+                </CardContent>
+            </Card>
+            <Card size="md">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">中尺寸</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">標準內邊距。</p>
+                </CardContent>
+            </Card>
+            <Card size="lg">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">大尺寸</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">較大的內邊距。</p>
+                </CardContent>
+            </Card>
+        </div>
+    ),
+};
+
+// 載入狀態
+export const LoadingStates: CardStory = {
+    render: () => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card loading={true} loadingMode="skeleton" theme="violet">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">骨架屏載入</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">使用骨架屏顯示載入狀態。</p>
+                </CardContent>
+            </Card>
+            <Card loading={true} loadingMode="overlay" theme="cyan">
+                <CardHeader>
+                    <h3 className="text-lg font-semibold">覆蓋式載入</h3>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-gray-600">使用覆蓋式載入動畫。</p>
+                </CardContent>
+            </Card>
+        </div>
+    ),
+};
+
+// 完整卡片示例
+export const Complete: CardStory = {
     args: {
-        title: '可點擊卡片',
-        content: '點擊此卡片可以觸發事件。',
-        onClick: () => alert('卡片被點擊了！'),
+        theme: 'violet',
+        variant: 'elevated',
+        size: 'lg',
     },
+    render: (args) => (
+        <div onClick={() => alert('卡片被點擊了！')}>
+            <Card {...args}>
+                <CardImage
+                    src="https://picsum.photos/400/200"
+                    alt="示例圖片"
+                    loading="lazy"
+                    fallback="https://via.placeholder.com/400x200"
+                />
+                <CardHeader showDivider>
+                    <h3 className="text-lg font-semibold">完整卡片示例</h3>
+                    <p className="text-sm text-gray-500">副標題</p>
+                </CardHeader>
+                <CardContent showDivider>
+                    <p className="text-gray-600">
+                        這是一個完整的卡片示例，包含圖片、標題、內容和底部按鈕。
+                        卡片具有 hover 效果和點擊事件。
+                    </p>
+                </CardContent>
+                <CardFooter>
+                    <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                        了解更多
+                    </button>
+                </CardFooter>
+            </Card>
+        </div>
+    ),
 }; 
