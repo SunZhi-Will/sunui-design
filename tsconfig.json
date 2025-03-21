@@ -1,43 +1,44 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2020",
+    "module": "ESNext",
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "types": [
+      "@types/react",
+      "@types/jest",
+      "@testing-library/jest-dom"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "@sunui-design/*": [
+        "packages/*/src"
+      ],
+      "@storybook/nextjs": [
+        "node_modules/@storybook/nextjs"
       ]
-    },
-    "types": [
-      "jest",
-      "@testing-library/jest-dom"
-    ]
+    }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "jest.setup.js"
+    ".storybook/**/*"
   ],
   "exclude": [
     "node_modules"

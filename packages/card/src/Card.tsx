@@ -44,7 +44,7 @@ export interface CardImageProps {
     className?: string;
 }
 
-export const Card: React.FC<CardProps> = ({ children, ...props }) => {
+export const Card = ({ children, ...props }: CardProps): JSX.Element => {
     const {
         className,
         variant = 'outlined',
