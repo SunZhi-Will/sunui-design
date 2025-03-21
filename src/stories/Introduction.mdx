@@ -4,38 +4,265 @@ import { Meta } from '@storybook/blocks';
 
 # Sun UI Design System
 
-歡迎使用 Sun UI Design System，這是一個現代化的 React 組件庫。
+Welcome to Sun UI Design System, a modern React component library focused on providing elegant, customizable, and easy-to-use UI components.
 
-## 組件列表
+## System Requirements
 
-我們的組件庫包含以下主要組件：
+- Node.js 16.0.0 or higher
+- React 17.0.0 or higher
+- TypeScript 4.5.0 or higher (optional)
 
-- Card - 卡片組件
-- FloatingButton - 浮動按鈕
-- SocialButton - 社交媒體按鈕
-- SidePanel - 側邊面板
-- FileUpload - 文件上傳
-- FilterGrid - 過濾網格
-- GradientBackground - 漸變背景
+## Installation
 
-## 使用方法
-
-要使用這些組件，您需要先安裝相關的包：
+Using npm:
 
 ```bash
 npm install @sunui-design/core
 ```
 
-然後在您的代碼中導入需要的組件：
+Using yarn:
 
-```jsx
-import { Card } from '@sunui-design/core';
+```bash
+yarn add @sunui-design/core
 ```
 
-## 主題定制
+## Component List
 
-Sun UI 支持主題定制，您可以通過配置來改變組件的外觀。
+Our component library includes the following main components:
 
-## 貢獻指南
+- Card
+  - Supports custom content, shadows, and borders
+  - Provides multiple preset styles
+- FloatingButton
+  - Customizable position and animation effects
+  - Supports multiple trigger modes
+- SocialButton
+  - Built-in social platform icons
+  - Supports custom styling
+- SidePanel
+  - Configurable appearance position and animation
+  - Supports custom width and content
+- FileUpload
+  - Supports drag and drop upload
+  - Provides progress display and error handling
+- FilterGrid
+  - Supports multi-condition filtering
+  - Provides sorting functionality
+- GradientBackground
+  - Multiple preset gradient effects
+  - Supports custom colors and directions
 
-我們歡迎社區貢獻！如果您想要改進或添加新功能，請查看我們的 [CONTRIBUTING.md](../CONTRIBUTING.md) 文件。 
+## Usage Guide
+
+### 1. Project Setup
+
+First, ensure your project has React properly set up. For new projects, we recommend:
+
+```bash
+# Using Create React App
+npx create-react-app my-app --template typescript
+
+# Or using Next.js
+npx create-next-app my-app --typescript
+```
+
+### 2. Install Dependencies
+
+Install Sun UI and its dependencies:
+
+```bash
+# Using npm
+npm install @sunui-design/core @emotion/react @emotion/styled
+
+# Or using yarn
+yarn add @sunui-design/core @emotion/react @emotion/styled
+```
+
+### 3. Set Up Theme Provider
+
+Set up the ThemeProvider in your root component:
+
+```jsx
+import { ThemeProvider } from '@sunui-design/core';
+import { App } from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>
+);
+```
+
+### 4. Import Styles
+
+Import styles in your application entry file (e.g., `src/index.tsx` or `pages/_app.tsx`):
+
+```jsx
+// Base styles
+import '@sunui-design/core/dist/styles.css';
+// Optional theme styles
+import '@sunui-design/core/dist/themes/dark.css';
+```
+
+### 5. Using Components
+
+Here are some common usage examples:
+
+```jsx
+import { Card, FloatingButton, SidePanel } from '@sunui-design/core';
+import { useState } from 'react';
+
+function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      {/* Basic card usage */}
+      <Card 
+        title="Project Overview"
+        subtitle="Key Metrics"
+        hoverable
+        shadow="medium"
+      >
+        <div>
+          <h3>Monthly Completion Rate</h3>
+          <p>85%</p>
+        </div>
+      </Card>
+
+      {/* SidePanel with FloatingButton */}
+      <FloatingButton 
+        icon="plus"
+        position="bottom-right"
+        tooltip="Add Item"
+        onClick={() => setIsOpen(true)}
+      />
+
+      <SidePanel
+        title="Add New Item"
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        width="400px"
+      >
+        <form>
+          {/* Your form content */}
+        </form>
+      </SidePanel>
+    </div>
+  );
+}
+```
+
+### 6. Component Composition
+
+Sun UI components are designed for flexible composition. Here's a comprehensive example:
+
+```jsx
+import { 
+  Card, 
+  FilterGrid, 
+  FileUpload,
+  SocialButton 
+} from '@sunui-design/core';
+
+function ProjectDashboard() {
+  return (
+    <FilterGrid
+      filters={[
+        { key: 'status', label: 'Status' },
+        { key: 'priority', label: 'Priority' }
+      ]}
+      onFilterChange={(filters) => console.log('Filters:', filters)}
+    >
+      <Card>
+        <FileUpload
+          accept="image/*,application/pdf"
+          maxSize={5 * 1024 * 1024}
+          onUpload={(files) => handleFileUpload(files)}
+        />
+        
+        <div className="social-share">
+          <SocialButton 
+            platform="twitter" 
+            onClick={() => share('twitter')}
+          />
+          <SocialButton 
+            platform="linkedin" 
+            onClick={() => share('linkedin')}
+          />
+        </div>
+      </Card>
+    </FilterGrid>
+  );
+}
+```
+
+### 7. Responsive Design
+
+All components support responsive design. You can use breakpoints to adjust component behavior:
+
+```jsx
+<Card
+  responsive={{
+    sm: { columns: 1 },
+    md: { columns: 2 },
+    lg: { columns: 3 }
+  }}
+>
+  {/* Card content */}
+</Card>
+```
+
+## Theme Customization
+
+Sun UI provides rich theme customization options. You can customize component appearances using ThemeProvider:
+
+```jsx
+import { ThemeProvider } from '@sunui-design/core';
+
+const theme = {
+  colors: {
+    primary: '#1890ff',
+    secondary: '#f5222d',
+    // More color configurations...
+  },
+  spacing: {
+    small: '8px',
+    medium: '16px',
+    large: '24px',
+  },
+  // Other theme configurations...
+};
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      {/* Your application content */}
+    </ThemeProvider>
+  );
+}
+```
+
+## Contributing
+
+We welcome community contributions! To contribute:
+
+1. Check our [CONTRIBUTING.md](../CONTRIBUTING.md) file
+2. Fork the project
+3. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
+
+## Version Information
+
+Current Version: 1.0.0
+
+View the complete [Changelog](../CHANGELOG.md) for more details.
+
+## Support & Help
+
+- Documentation: [https://sunui.design/docs](https://sunui.design/docs)
+- GitHub Issues: [https://github.com/sunui/sunui/issues](https://github.com/sunui/sunui/issues)
+- Community Discussions: [https://github.com/sunui/sunui/discussions](https://github.com/sunui/sunui/discussions) 
