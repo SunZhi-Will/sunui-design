@@ -22,4 +22,14 @@ updates:
     groups:
       dependencies:
         patterns:
-          - "*" 
+          - "*"
+    # 添加以下設置
+    versioning-strategy: increase
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "@sunui-design/*"  # 忽略內部包的更新
+    commit-message:
+      prefix: "fix"
+      prefix-development: "chore"
+      include: "scope" 
