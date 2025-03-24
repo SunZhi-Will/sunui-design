@@ -31,10 +31,9 @@ jobs:
           git checkout -B master origin/master
           
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-        
-      - name: Build packages
-        run: npm run build:packages
+        run: |
+          npm install
+          npm run build:packages
           
       - name: Publish to NPM
         run: npm run release
