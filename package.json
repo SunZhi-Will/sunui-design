@@ -1,7 +1,7 @@
 {
   "name": "sunui-design",
   "version": "0.0.39",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "workspaces": [
     "packages/*"
