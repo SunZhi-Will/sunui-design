@@ -9,7 +9,7 @@
     "publish": {
       "npmClient": "npm",
       "allowBranch": [
-        "refs/heads/master"
+        "master"
       ],
       "registry": "https://registry.npmjs.org/"
     }
