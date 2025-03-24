@@ -19,7 +19,7 @@
     "vercel-build": "npm install && lerna bootstrap && next build",
     "build:packages": "lerna run build --stream",
     "changelog": "node scripts/changelog.js",
-    "release": "lerna publish --cd-version patch --no-private --force-publish --exact",
+    "release": "lerna publish patch --no-private --force-publish --exact",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
