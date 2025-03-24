@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/core",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "description": "Core utilities and base components for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
