@@ -35,6 +35,9 @@ jobs:
           npm install
           npm run build:packages
           
+      - name: Reset working directory
+        run: git reset --hard HEAD
+          
       - name: Publish to NPM
         run: npx lerna publish from-package --force-publish --exact --yes
         env:
