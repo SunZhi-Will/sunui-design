@@ -17,11 +17,11 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "declaration": true,
-        "declarationDir": "./dist",
+        "declarationDir": "./dist/types",
         "outDir": "./dist",
         "types": [
-            "react",
-            "node"
+            "@types/react",
+            "@types/node"
         ]
     },
     "exclude": [
