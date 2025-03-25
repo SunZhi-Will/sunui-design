@@ -1,0 +1,19 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'npm:node-fetch:20180115':
+    - '*':
+        reason: Not affected
+        expires: 2025-01-01T00:00:00.000Z
+
+# patches apply the minimum changes required to fix a vulnerability
+patch: {}
+
+# Configure Snyk CLI behavior
+cli:
+  # Set timeout for API calls
+  timeout: 5m
+  # Set the number of retries for API calls
+  retries: 3 

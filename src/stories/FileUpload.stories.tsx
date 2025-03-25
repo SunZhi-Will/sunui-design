@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { FileUpload, FileUploadProps } from '@sunui-design/file-upload';
+import { FileUpload } from '@sunui-design/file-upload';
+import type { FileUploadProps } from '@sunui-design/file-upload';
 
 const meta = {
     title: 'Components/FileUpload',
