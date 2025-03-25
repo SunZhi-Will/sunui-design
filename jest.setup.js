@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { jest } from '@jest/globals';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -24,16 +25,16 @@ global.IntersectionObserver = class IntersectionObserver {
 };
 
 // Mock next/image
-jest.mock('next/image', () => ({
+const nextImageMock = {
     __esModule: true,
     default: (props) => {
         // eslint-disable-next-line jsx-a11y/alt-text
         return <img {...props} />;
     },
-}));
+};
 
 // Mock next/router
-jest.mock('next/router', () => ({
+const nextRouterMock = {
     useRouter() {
         return {
             route: '/',
@@ -44,4 +45,8 @@ jest.mock('next/router', () => ({
             replace: jest.fn(),
         };
     },
-})); 
+};
+
+// Register mocks
+jest.unstable_mockModule('next/image', () => nextImageMock);
+jest.unstable_mockModule('next/router', () => nextRouterMock); 

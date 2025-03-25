@@ -5,10 +5,12 @@ module.exports = {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
         '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+        '\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest',
     },
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
     },
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     testPathIgnorePatterns: [
         '<rootDir>/node_modules/',
         '<rootDir>/.next/',
