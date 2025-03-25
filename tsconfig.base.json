@@ -11,6 +11,22 @@
         "strict": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-        "jsx": "react-jsx"
-    }
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "declaration": true,
+        "declarationDir": "./dist",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "types": [
+            "react",
+            "node"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }
