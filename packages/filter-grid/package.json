@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/filter",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "Advanced grid filtering system for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.51",
+    "@sunui-design/core": "0.0.52",
     "framer-motion": "^12.4.12"
   },
   "devDependencies": {
