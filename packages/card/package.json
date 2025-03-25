@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/card",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "description": "Card component for SunUI Design",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.52",
+    "@sunui-design/core": "0.0.53",
     "clsx": "^2.1.0",
     "framer-motion": "^12.4.12",
     "tailwind-merge": "^3.0.2"
