@@ -36,7 +36,7 @@ jobs:
           npm run build:packages
           
       - name: Publish to NPM
-        run: npm run release
+        run: npx lerna publish from-package --force-publish --exact --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

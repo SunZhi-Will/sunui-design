@@ -11,7 +11,10 @@
       "allowBranch": [
         "master"
       ],
-      "registry": "https://registry.npmjs.org/"
+      "registry": "https://registry.npmjs.org/",
+      "ignoreChanges": [
+        "**/*.md"
+      ]
     }
   }
 }
