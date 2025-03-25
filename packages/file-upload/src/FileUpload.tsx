@@ -24,7 +24,7 @@ export interface FilePreview {
     type?: string;
 }
 
-export interface FileUploadProps {
+export type FileUploadProps = {
     onFileSelect?: (files: File[]) => void;
     onFileUpload?: (files: File[]) => Promise<void>;
     accept?: string;
