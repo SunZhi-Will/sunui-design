@@ -82,6 +82,5 @@
     "rimraf": "^5.0.5",
     "@eslint/config-array": "^2.1.0",
     "@eslint/object-schema": "^2.0.0"
-  },
-  "type": "module"
+  }
 }
