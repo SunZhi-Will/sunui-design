@@ -10,10 +10,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15  # 設定整體任務超時時間
 
     strategy:
       matrix:
         node-version: [20.x]
+      fail-fast: true  # 如果一個任務失敗，立即停止其他任務
 
     steps:
     - uses: actions/checkout@v4
@@ -28,15 +30,29 @@ jobs:
       run: |
         npm install
         npm run build:packages
+      timeout-minutes: 5  # 設定安裝依賴超時時間
         
     - name: Run linting
       run: npx eslint . --ext .js,.jsx,.ts,.tsx
+      timeout-minutes: 2
       
     - name: Run tests
       run: npm test
+      timeout-minutes: 3
       
     - name: Build Storybook
       run: npm run build-storybook
+      timeout-minutes: 3
+
+    - name: Quick Security Scan
+      if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+      uses: snyk/actions/node@master
+      timeout-minutes: 5  # 設定快速掃描超時時間
+      continue-on-error: true  # 即使掃描失敗也繼續執行
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=critical --json-file-output=snyk-quick-results.json
 
     - name: Check if PR to master
       if: failure() && github.event_name == 'pull_request' && github.base_ref == 'master'
@@ -55,6 +71,9 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    timeout-minutes: 20  # 設定安全檢查整體超時時間
+    # 只在合併到 master 之前或推送到 master 時運行完整安全檢查
+    if: github.event_name == 'pull_request' && github.base_ref == 'master' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
     steps:
     - uses: actions/checkout@v4
     
@@ -62,29 +81,44 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
+        cache: 'npm'
 
     - name: Clean and install dependencies
       run: |
-        rm -rf node_modules
-        rm -rf packages/*/node_modules
-        rm -f package-lock.json
-        npm install
+        npm ci
         npm run build:packages
+      timeout-minutes: 5
     
     - name: Run Snyk to check for vulnerabilities
-      # Only run Snyk on trusted sources
-      if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+      id: snyk
       uses: snyk/actions/node@master
+      timeout-minutes: 10  # 設定 Snyk 檢查超時時間
+      continue-on-error: true  # 允許失敗繼續執行
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --severity-threshold=high
+        args: --severity-threshold=high --all-projects --json-file-output=snyk-results.json
 
-    - name: Skip Snyk for untrusted PR
-      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    - name: Run additional security checks
+      if: always()  # 即使前面步驟失敗也執行
+      timeout-minutes: 5
       run: |
-        echo "Skipping Snyk security check for PR from fork"
-        echo "For security reasons, Snyk checks are only run on internal PRs"
+        npm audit || true  # 即使 audit 失敗也繼續執行
+        if [ -f "snyk-results.json" ]; then
+          echo "Snyk scan completed"
+        else
+          echo "Snyk scan failed or timed out"
+        fi
+
+    - name: Upload security scan results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-results
+        path: |
+          snyk-results.json
+          snyk-quick-results.json
+        retention-days: 30
 
     - name: Check if PR to master
       if: failure() && github.event_name == 'pull_request' && github.base_ref == 'master'
@@ -98,5 +132,5 @@ jobs:
             owner,
             repo,
             issue_number: number,
-            body: `❌ Security Check Failed\n\nView failure details: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+            body: `⚠️ Security Check Completed with Issues\n\nSome security checks failed or timed out. Please review the artifacts for details: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
           }); 

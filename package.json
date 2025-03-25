@@ -23,7 +23,10 @@
     "release": "lerna publish patch --no-private --force-publish --exact --yes",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch",
-    "test:coverage": "jest --config jest.config.cjs --coverage"
+    "test:coverage": "jest --config jest.config.cjs --coverage",
+    "snyk:test": "snyk test",
+    "snyk:monitor": "snyk monitor",
+    "snyk:wizard": "snyk wizard"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
@@ -75,6 +78,7 @@
     "lerna": "^8.2.0",
     "postcss": "^8",
     "rimraf": "^6.0.1",
+    "snyk": "^1.1296.0",
     "storybook": "^8.6.7",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.3.0",
