@@ -1,6 +1,6 @@
 {
   "name": "@sunui-design/file-upload",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "Modern file upload component for SunUI Design with drag and drop support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,14 +31,16 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@sunui-design/core": "0.0.51",
+    "@sunui-design/core": "0.0.52",
     "framer-motion": "^12.4.12",
-    "pdfjs-dist": "^4.10.38"
+    "pdfjs-dist": "^5.0.375"
   },
   "devDependencies": {
-    "@types/react": "^19.0.10",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
     "rimraf": "^6.0.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.3.3"
   },
   "gitHead": "5d0616b6ef336b613340a1304228c62d91ad0400",
   "publishConfig": {

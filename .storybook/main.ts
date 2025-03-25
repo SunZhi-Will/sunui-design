@@ -7,24 +7,46 @@ const config: StorybookConfig = {
     options: {}
   },
   stories: [
-    '../src/stories/**/*.stories.@(js|jsx|ts|tsx)',
-    '../src/stories/**/*.mdx'
+    '../src/**/*.mdx',
+    '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
+    '@storybook/addon-onboarding',
     '@storybook/addon-interactions',
+    '@storybook/addon-themes',
     '@storybook/addon-a11y',
-    '@storybook/addon-themes'
   ],
   staticDirs: ["../public"],
   webpackFinal: async (config: webpack.Configuration) => {
-    if (config.resolve) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
+    if (config.module?.rules) {
+      config.module.rules = (config.module.rules as Array<any>).filter(
+        rule => !rule.test?.test?.('.css')
+      );
+    }
 
-      };
-      config.resolve.extensions = ['.ts', '.tsx', '.js', '.jsx'];
+    if (config.module?.rules) {
+      const rules = config.module.rules as Array<any>;
+      rules.push({
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require('tailwindcss'),
+                  require('autoprefixer'),
+                ],
+              },
+            },
+          },
+        ],
+        include: /\.css$/,
+      });
     }
     return config;
   },
@@ -33,7 +55,7 @@ const config: StorybookConfig = {
     reactDocgen: 'react-docgen-typescript'
   },
   docs: {
-    autodocs: true,
+    autodocs: "tag",
     defaultName: 'Docs'
   }
 };
