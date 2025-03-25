@@ -3,7 +3,6 @@
   "version": "0.0.51",
   "description": "Card component for SunUI Design",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
@@ -11,9 +10,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npx tsup",
-    "clean": "rimraf dist",
-    "dev": "npx tsup --watch",
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build"
   },
@@ -37,10 +36,11 @@
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
-    "@types/react": "^19.0.12",
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
     "rimraf": "^6.0.1",
-    "tsup": "^8.0.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.3.3"
   },
   "gitHead": "5d0616b6ef336b613340a1304228c62d91ad0400",
   "publishConfig": {
