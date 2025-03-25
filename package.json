@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build --quiet",
+    "build-storybook": "storybook build",
     "pack": "lerna run pack --stream",
     "pack:all": "node scripts/pack-all.js",
     "publish": "lerna publish --no-private --force-publish --exact",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",
+    "@sunui-design/card": "^0.0.51",
     "@sunui-design/core": "0.0.47",
     "@sunui-design/filter": "^0.0.39",
     "@sunui-design/floating": "^0.0.39",
@@ -74,7 +75,7 @@
     "postcss": "^8",
     "rimraf": "^6.0.1",
     "storybook": "^8.6.7",
-    "tailwindcss": "^4.0.15",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
   "resolutions": {

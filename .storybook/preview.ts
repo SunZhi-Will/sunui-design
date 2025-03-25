@@ -14,14 +14,11 @@ const preview: Preview = {
     backgrounds: {
       default: 'light',
       values: [
-        {
-          name: 'light',
-          value: '#f8fafc',
-        },
-        {
-          name: 'dark',
-          value: '#1e293b',
-        },
+        { name: 'light', value: '#f8fafc' },
+        { name: 'dark', value: '#0f172a' },
+        { name: 'blue', value: '#172554' },
+        { name: 'green', value: '#064e3b' },
+        { name: 'purple', value: '#4c1d95' },
       ],
     },
   },

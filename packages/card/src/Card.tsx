@@ -55,33 +55,65 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
         style,
     } = props;
 
+    // 主題顏色配置
+    const themeColors = React.useMemo(() => ({
+        violet: {
+            primary: 'primary',
+            text: 'primary-700',
+            bg: 'primary-50/30',
+            border: 'primary-200',
+            shadow: 'shadow-primary-100/50',
+            gradient: 'from-primary-100/20 to-primary-50/20',
+            hoverGradient: 'from-primary-100/30 to-primary-50/30',
+            ring: 'ring-primary-200',
+        },
+        cyan: {
+            primary: 'info',
+            text: 'info-700',
+            bg: 'info-50/30',
+            border: 'info-200',
+            shadow: 'shadow-info-100/50',
+            gradient: 'from-info-100/20 to-info-50/20',
+            hoverGradient: 'from-info-100/30 to-info-50/30',
+            ring: 'ring-info-200',
+        },
+        orange: {
+            primary: 'warning',
+            text: 'warning-700',
+            bg: 'warning-50/30',
+            border: 'warning-200',
+            shadow: 'shadow-warning-100/50',
+            gradient: 'from-warning-100/20 to-warning-50/20',
+            hoverGradient: 'from-warning-100/30 to-warning-50/30',
+            ring: 'ring-warning-200',
+        },
+    }), []);
+
+    const colors = themeColors[theme];
+
     const baseStyles = cn(
         'rounded-xl border bg-white/95 text-gray-900 relative overflow-hidden',
         'backdrop-blur-md transition-all duration-300',
         'focus:outline-none focus:ring-2',
-        'shadow-sm hover:shadow-md',
-        theme === 'violet' && 'hover:shadow-primary-100/20',
-        theme === 'cyan' && 'hover:shadow-info-100/20',
-        theme === 'orange' && 'hover:shadow-warning-100/20'
+        'shadow-sm hover:shadow-md'
     );
 
     const variantStyles = {
         outlined: cn(
-            theme === 'violet' && 'border-primary-200 hover:border-primary-300/80 hover:bg-primary-50/30',
-            theme === 'cyan' && 'border-info-200 hover:border-info-300/80 hover:bg-info-50/30',
-            theme === 'orange' && 'border-warning-200 hover:border-warning-300/80 hover:bg-warning-50/30'
+            'border-primary-200',
+            'hover:border-primary-300/80 hover:bg-primary-50/30',
+            'hover:shadow-primary-100/20'
         ),
         filled: cn(
-            theme === 'violet' && 'bg-primary-50/30 bg-gradient-to-br from-primary-100/20 to-primary-50/20 hover:from-primary-100/30 hover:to-primary-50/30',
-            theme === 'cyan' && 'bg-info-50/30 bg-gradient-to-br from-info-100/20 to-info-50/20 hover:from-info-100/30 hover:to-info-50/30',
-            theme === 'orange' && 'bg-warning-50/30 bg-gradient-to-br from-warning-100/20 to-warning-50/20 hover:from-warning-100/30 hover:to-warning-50/30'
+            'bg-primary-50/30 backdrop-blur-md border-transparent',
+            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
+            'hover:bg-gradient-to-br from-primary-100/30 to-primary-50/30',
+            'hover:shadow-primary-100/30'
         ),
         elevated: cn(
             'border-transparent shadow-lg',
-            theme === 'violet' && 'bg-gradient-to-br from-primary-100/20 to-primary-50/20 hover:shadow-primary-100/20',
-            theme === 'cyan' && 'bg-gradient-to-br from-info-100/20 to-info-50/20 hover:shadow-info-100/20',
-            theme === 'orange' && 'bg-gradient-to-br from-warning-100/20 to-warning-50/20 hover:shadow-warning-100/20',
-            'hover:shadow-xl hover:-translate-y-0.5'
+            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
+            'hover:shadow-xl hover:-translate-y-0.5 hover:shadow-primary-100/20'
         ),
     };
 
