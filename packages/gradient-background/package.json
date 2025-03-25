@@ -10,8 +10,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
-    "clean": "if exist dist rmdir /s /q dist",
+    "build": "tsc --build --verbose --force",
+    "clean": "rimraf dist",
     "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build"

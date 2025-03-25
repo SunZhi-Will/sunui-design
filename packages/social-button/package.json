@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "tsc --build --verbose --force",
-    "clean": "if exist dist rmdir /s /q dist && if exist tsconfig.tsbuildinfo del tsconfig.tsbuildinfo",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build",
