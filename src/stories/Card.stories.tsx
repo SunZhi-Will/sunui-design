@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { Card, CardHeader, CardContent, CardFooter, CardImage } from '@sunui-design/card';
-import type { CardProps } from '@sunui-design/card';
+import type { CardProps as _CardProps } from '@sunui-design/card';
 
 type CardStory = StoryObj<typeof Card>;
 
@@ -162,7 +162,18 @@ export const Complete: CardStory = {
         size: 'lg',
     },
     render: (args) => (
-        <div onClick={() => alert('卡片被點擊了！')}>
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={() => alert('卡片被點擊了！')}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    alert('卡片被點擊了！');
+                }
+            }}
+            className="cursor-pointer"
+        >
             <Card {...args}>
                 <CardImage
                     src="https://picsum.photos/400/200"

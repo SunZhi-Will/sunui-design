@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as pdfjsLib from 'pdfjs-dist';
-import { UploadIcon } from './UploadIcon';
-import { DragPrompt } from './DragPrompt';
+import { UploadIcon as _UploadIcon } from './UploadIcon';
+import { DragPrompt as _DragPrompt } from './DragPrompt';
 import { UploadProgress } from './UploadProgress';
 import { PreviewGrid } from './PreviewGrid';
 
@@ -65,7 +65,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const [isDragActive, setIsDragActive] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [isUploading, setIsUploading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [_error, setError] = useState<string | null>(null);
     const [previews, setPreviews] = useState<FilePreview[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [uploadComplete, setUploadComplete] = useState(false);
@@ -115,7 +115,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                 : 'bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 border-violet-300 hover:border-violet-500/50'
         } backdrop-blur-sm border-2 border-dashed rounded-xl p-8 transition-all duration-300 hover:shadow-lg`, [theme]);
 
-    const defaultClassName = `w-full ${baseClassName}`;
+    const _defaultClassName = `w-full ${baseClassName}`;
 
     const defaultDragActiveClassName = useMemo(() => `scale-[1.02] ${theme === 'violet'
         ? 'border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
@@ -618,7 +618,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     </AnimatePresence>
                 </>
             )}
-            {error && (
+            {_error && (
                 <motion.div
                     className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[300px]"
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -654,7 +654,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: 0.15 }}
                         >
-                            {error}
+                            {_error}
                         </motion.p>
                         <motion.button
                             onClick={() => setError(null)}
@@ -675,7 +675,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     return (
         <div className="w-full flex flex-col items-center">
             <motion.div
-                className={`w-full max-w-[600px] relative ${baseClassName} ${className} ${isDragActive ? (dragActiveClassName || defaultDragActiveClassName) : ''}`}
+                className={`w-full max-w-[600px] relative ${_defaultClassName} ${className} ${isDragActive ? (dragActiveClassName || defaultDragActiveClassName) : ''}`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
@@ -693,7 +693,18 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     multiple={multiple}
                 />
 
-                <div className="cursor-pointer flex flex-col items-start justify-start h-full min-h-[200px] relative" onClick={() => inputRef.current?.click()}>
+                <div
+                    role="button"
+                    tabIndex={0}
+                    className="cursor-pointer flex flex-col items-start justify-start h-full min-h-[200px] relative"
+                    onClick={() => inputRef.current?.click()}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            inputRef.current?.click();
+                        }
+                    }}
+                >
                     {previews.length > 0 && (
                         <PreviewGrid
                             previews={previews}
