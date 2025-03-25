@@ -21,6 +21,12 @@ const config: StorybookConfig = {
   staticDirs: ["../public"],
   webpackFinal: async (config: webpack.Configuration) => {
     if (config.module?.rules) {
+      config.module.rules = (config.module.rules as Array<any>).filter(
+        rule => !rule.test?.test?.('.css')
+      );
+    }
+
+    if (config.module?.rules) {
       const rules = config.module.rules as Array<any>;
       rules.push({
         test: /\.css$/,
@@ -39,6 +45,7 @@ const config: StorybookConfig = {
             },
           },
         ],
+        include: /\.css$/,
       });
     }
     return config;
