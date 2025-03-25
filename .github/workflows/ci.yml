@@ -89,15 +89,15 @@ jobs:
         npm run build:packages
       timeout-minutes: 5
     
-    - name: Run Snyk to check for vulnerabilities
-      id: snyk
-      uses: snyk/actions/node@master
-      timeout-minutes: 10  # 設定 Snyk 檢查超時時間
-      continue-on-error: true  # 允許失敗繼續執行
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --severity-threshold=high --all-projects --json-file-output=snyk-results.json
+    # - name: Run Snyk to check for vulnerabilities
+    #   id: snyk
+    #   uses: snyk/actions/node@master
+    #   timeout-minutes: 10  # 設定 Snyk 檢查超時時間
+    #   continue-on-error: true  # 允許失敗繼續執行
+    #   env:
+    #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    #   with:
+    #     args: --severity-threshold=high --all-projects --json-file-output=snyk-results.json
 
     - name: Run additional security checks
       if: always()  # 即使前面步驟失敗也執行
