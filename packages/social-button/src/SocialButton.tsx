@@ -15,8 +15,7 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
     titleDisplay = 'none',
     titlePosition = 'bottom',
     onClick,
-    isMainButton,
-    isOpen
+    isMainButton
 }) => {
     const getTitlePosition = () => {
         switch (titlePosition) {

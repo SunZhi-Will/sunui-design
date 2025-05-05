@@ -1,2 +1,3 @@
-export { SidePanel } from './SidePanel';
+export * from './SidePanel';
+export { default } from './SidePanel';
 export type { SidePanelProps } from './SidePanel'; 

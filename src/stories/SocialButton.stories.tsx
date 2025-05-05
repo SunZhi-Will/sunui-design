@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SocialButton } from '@sunui-design/social';
 import type { SocialButtonProps } from '@sunui-design/social';
 
-const EnhancedSocialButton = SocialButton as any;
+const EnhancedSocialButton = SocialButton as React.ComponentType<SocialButtonProps>;
 
 const meta = {
     title: 'Components/SocialButton',

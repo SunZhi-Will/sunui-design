@@ -20,4 +20,7 @@ export interface FloatingButtonProps {
     buttons?: SocialButtonConfig[];
     variant?: 'petal' | 'vertical' | 'grid';
     showToggleButton?: boolean;
+    draggable?: boolean;
+    onPositionChange?: (x: number, y: number) => void;
+    defaultPosition?: { x: number, y: number };
 } 

@@ -11,6 +11,7 @@ A floating button component that can expand to display multiple child buttons.
 - Custom child buttons support
 - Gradient background and shadow effects
 - No Toggle Button mode support
+- Smooth draggable functionality with position persistence
 
 ## Installation
 
@@ -33,27 +34,27 @@ const socialButtons = [
     {
         type: 'github' as const,
         href: 'https://github.com',
-        className: 'from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50'
+        className: 'bg-gradient-to-r from-gray-600 to-gray-800 hover:shadow-gray-500/50'
     },
     {
         type: 'twitter' as const,
         href: 'https://twitter.com',
-        className: 'from-info-400/90 to-info-600/90 hover:shadow-info-500/50'
+        className: 'bg-gradient-to-r from-blue-400 to-blue-600 hover:shadow-blue-500/50'
     },
     {
         type: 'facebook' as const,
         href: 'https://facebook.com',
-        className: 'from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50'
+        className: 'bg-gradient-to-r from-blue-600 to-blue-800 hover:shadow-blue-500/50'
     },
     {
         type: 'linkedin' as const,
         href: 'https://linkedin.com',
-        className: 'from-info-700/90 to-info-900/90 hover:shadow-info-600/50'
+        className: 'bg-gradient-to-r from-blue-700 to-blue-900 hover:shadow-blue-600/50'
     },
     {
         type: 'instagram' as const,
         href: 'https://instagram.com',
-        className: 'from-warning-500/90 to-danger-600/90 hover:shadow-danger-500/50'
+        className: 'bg-gradient-to-r from-pink-500 to-purple-600 hover:shadow-purple-500/50'
     }
 ];
 
@@ -127,20 +128,96 @@ export default function App() {
 </div>
 ```
 
+### Draggable Mode
+
+Enable users to drag and position the floating button anywhere on the screen:
+
+```tsx
+<FloatingButton
+    buttons={socialButtons}
+    position="bottom-right"
+    variant="petal"
+    draggable={true}
+    onPositionChange={(x, y) => console.log('New position:', x, y)}
+    defaultPosition={{ x: 0, y: 0 }}
+/>
+```
+
+### Saving Draggable Position
+
+Use localStorage to persist the button position between sessions:
+
+```tsx
+import { useState, useEffect } from 'react';
+import { FloatingButton } from '@sunui-design/floating';
+
+function App() {
+    // Initialize with saved position or default position
+    const [position, setPosition] = useState(() => {
+        const saved = localStorage.getItem('floatingButtonPosition');
+        return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+    });
+    
+    // Update position and save to localStorage
+    const handlePositionChange = (x, y) => {
+        const newPosition = { x, y };
+        setPosition(newPosition);
+        localStorage.setItem('floatingButtonPosition', JSON.stringify(newPosition));
+    };
+    
+    return (
+        <FloatingButton
+            buttons={socialButtons}
+            position="bottom-right"
+            variant="petal"
+            draggable={true}
+            defaultPosition={position}
+            onPositionChange={handlePositionChange}
+        />
+    );
+}
+```
+
 ## Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| show | boolean | Control button visibility |
-| isOpen | boolean | Control menu expansion (controlled mode) |
-| defaultOpen | boolean | Default menu expansion state (uncontrolled mode) |
-| onOpenChange | (open: boolean) => void | Callback when menu state changes |
-| position | 'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left' | Component position |
-| className | string | Custom container styles |
-| buttonClassName | string | Custom button styles |
-| variant | 'petal' \| 'vertical' \| 'grid' | Button expansion mode |
-| buttons | SocialButtonProps[] | Array of button configurations |
-| showToggleButton | boolean | Whether to show the toggle button. When set to false, enables No Toggle Button mode |
+| Prop             | Type                                                         | Description                                                                         |
+| ---------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| show             | boolean                                                      | Control button visibility                                                           |
+| isOpen           | boolean                                                      | Control menu expansion (controlled mode)                                            |
+| defaultOpen      | boolean                                                      | Default menu expansion state (uncontrolled mode)                                    |
+| onOpenChange     | (open: boolean) => void                                      | Callback when menu state changes                                                    |
+| position         | 'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left' | Component position                                                                  |
+| className        | string                                                       | Custom container styles                                                             |
+| buttonClassName  | string                                                       | Custom button styles                                                                |
+| variant          | 'petal' \| 'vertical' \| 'grid'                              | Button expansion mode                                                               |
+| buttons          | SocialButtonProps[]                                          | Array of button configurations                                                      |
+| showToggleButton | boolean                                                      | Whether to show the toggle button. When set to false, enables No Toggle Button mode |
+| draggable        | boolean                                                      | Enable draggable mode                                                               |
+| onPositionChange | (x: number, y: number) => void                               | Callback when position changes in draggable mode                                    |
+| defaultPosition  | { x: number, y: number }                                     | Initial position in draggable mode                                                  |
+
+## Draggable Mode Behavior
+
+When using the draggable mode:
+
+- Click the button to toggle the menu open/close
+- Drag the button to move it around the screen
+- The button's position will be maintained while dragging
+- Use `onPositionChange` to save the position for persistence
+
+## Button Styling
+
+For proper gradient background rendering, include `bg-gradient-to-r` in your button className:
+
+```tsx
+const socialButtons = [
+    {
+        type: 'github',
+        href: 'https://github.com',
+        className: 'bg-gradient-to-r from-gray-600 to-gray-800' // Include bg-gradient-to-r
+    }
+];
+```
 
 ## License
 
