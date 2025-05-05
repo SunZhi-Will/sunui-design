@@ -58,6 +58,7 @@ Sun UI Design provides a collection of modern and customizable components. Each 
 - [GradientBackground](packages/gradient/README.md) - An animated gradient background component
 - [SidePanel](packages/side-panel/README.md) - A side panel component for displaying side content
 - [SocialButton](packages/social/README.md) - A button component for social media links
+- [CountdownBanner](packages/countdown-banner/README.md) - A countdown timer banner with beautiful animations for time-sensitive offers
 
 ## Installation
 
@@ -85,6 +86,7 @@ npm install @sunui-design/floating
 npm install @sunui-design/gradient
 npm install @sunui-design/side-panel
 npm install @sunui-design/social
+npm install @sunui-design/countdown-banner
 ```
 
 ## Development Setup
@@ -193,7 +195,8 @@ import {
   FloatingButton,
   GradientBackground,
   SidePanel,
-  SocialButton
+  SocialButton,
+  CountdownBanner
 } from '@sunui-design/all';
 
 export default function App() {
@@ -207,6 +210,10 @@ export default function App() {
         </Card>
         <FloatingButton />
         <SocialButton href="https://github.com" />
+        <CountdownBanner 
+          title="Limited Time Offer"
+          endDate={new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()}
+        />
       </GradientBackground>
     </div>
   );
