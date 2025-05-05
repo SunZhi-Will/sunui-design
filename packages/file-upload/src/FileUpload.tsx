@@ -65,7 +65,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const [isDragActive, setIsDragActive] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [isUploading, setIsUploading] = useState(false);
-    const [_error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [previews, setPreviews] = useState<FilePreview[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [uploadComplete, setUploadComplete] = useState(false);
@@ -277,7 +277,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                 setTimeout(() => {
                     setIsUploading(false);
                 }, 300);
-            } catch (_error) {
+            } catch (error) {
                 setError('Upload failed. Please try again.');
                 setIsUploading(false);
                 setUploadComplete(false);
@@ -345,7 +345,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
 
     const removePreview = useCallback((index: number) => {
         setPreviews(prev => {
-            const newPreviews = prev.filter((_, i) => i !== index);
+            const newPreviews = prev.filter((_item, i) => i !== index);
             if (newPreviews.length === 0) {
                 // 當移除所有檔案時，重置所有狀態
                 setUploadedFiles([]);
@@ -618,7 +618,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     </AnimatePresence>
                 </>
             )}
-            {_error && (
+            {error && (
                 <motion.div
                     className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-[300px]"
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -654,7 +654,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: 0.15 }}
                         >
-                            {_error}
+                            {error}
                         </motion.p>
                         <motion.button
                             onClick={() => setError(null)}

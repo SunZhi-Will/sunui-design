@@ -36,7 +36,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const [dragPosition, setDragPosition] = useState(defaultPosition || { x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
-    const dragStartTimeRef = useRef(0);
+    const _dragStartTimeRef = useRef(0);
     const dragThresholdExceeded = useRef(false);
 
     const positionClasses = {
@@ -51,13 +51,13 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
         if (!draggable) {
             setDragPosition({ x: 0, y: 0 });
         }
-    }, [draggable]);
+    }, [draggable, setDragPosition]);
 
     const handleDragStart = () => {
         setIsDragging(true);
     };
 
-    const handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const _handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         const newX = dragPosition.x + info.offset.x;
         const newY = dragPosition.y + info.offset.y;
 
@@ -219,11 +219,11 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
             }) as React.ReactElement[];
         }
 
-        return React.Children.map(children, (child, index) => {
+        return React.Children.map(children, (child, _index) => {
             if (React.isValidElement<SocialButtonProps>(child)) {
                 return React.cloneElement(child, {
                     ...child.props,
-                    key: index,
+                    key: _index,
                     variant,
                     className: child.props.className?.includes('bg-gradient-to-r')
                         ? child.props.className

@@ -4,7 +4,7 @@ import type { SidePanelProps } from '@sunui-design/side-panel';
 import { useState } from 'react';
 import { IoSettingsOutline, IoArrowBack, IoColorPaletteOutline, IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 
-const EnhancedSidePanel = SidePanel as any;
+const EnhancedSidePanel = SidePanel as React.ComponentType<SidePanelProps>;
 
 const meta = {
     title: 'Components/SidePanel',

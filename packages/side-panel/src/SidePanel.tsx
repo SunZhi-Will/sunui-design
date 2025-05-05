@@ -194,16 +194,16 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     const [isHovering, setIsHovering] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
-    // Wrap onToggle in useMemo to prevent it from changing on every render
-    const memoizedToggle = useMemo(() => {
-        // Handle toggle with animation guarantee
-        return () => {
-            // Use timeout to ensure state updates properly for animations
-            setTimeout(() => {
-                onToggle();
-            }, 0);
-        };
-    }, [onToggle]);
+    // Define a toggle handler function outside of useMemo
+    const handleToggle = () => {
+        // Use timeout to ensure state updates properly for animations
+        setTimeout(() => {
+            onToggle();
+        }, 0);
+    };
+
+    // Memoize the toggle handler to prevent unnecessary re-renders
+    const memoizedToggle = useMemo(() => handleToggle, [handleToggle]);
 
     // Register/unregister with context when open state changes
     useEffect(() => {
