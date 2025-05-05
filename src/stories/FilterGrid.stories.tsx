@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterGrid, GridItem } from '@sunui-design/filter';
-import type { FilterGridProps } from '@sunui-design/filter';
+import type { FilterGridProps, GridItemProps } from '@sunui-design/filter';
 
-const EnhancedFilterGrid = FilterGrid as any;
-const EnhancedGridItem = GridItem as any;
+const EnhancedFilterGrid = FilterGrid as React.ComponentType<FilterGridProps>;
+const EnhancedGridItem = GridItem as React.ComponentType<GridItemProps>;
 
 const defaultTranslations = {
     title: "Skills",
@@ -244,7 +244,7 @@ export const WithClickHandler: Story = {
             <EnhancedGridItem
                 key={item.name}
                 {...item}
-                onClick={(name: string, category: string) => {
+                onClick={(name: string, category?: string) => {
                     alert(`Clicked: ${name} (${category})`);
                 }}
             />

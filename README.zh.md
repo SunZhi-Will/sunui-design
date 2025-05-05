@@ -62,6 +62,7 @@ Sun UI Design 提供了一系列現代化且可自定義的組件。每個組件
 - [GradientBackground](packages/gradient/README.md) - 動畫漸變背景組件
 - [SidePanel](packages/side-panel/README.md) - 側邊面板組件
 - [SocialButton](packages/social/README.md) - 社交媒體按鈕組件
+- [CountdownBanner](packages/countdown-banner/README.md) - 具有精美動畫效果的倒數計時橫幅，用於展示限時優惠
 
 ## 安裝
 
@@ -89,6 +90,7 @@ npm install @sunui-design/floating
 npm install @sunui-design/gradient
 npm install @sunui-design/side-panel
 npm install @sunui-design/social
+npm install @sunui-design/countdown-banner
 ```
 
 ## 開發設置
@@ -197,7 +199,8 @@ import {
   FloatingButton,
   GradientBackground,
   SidePanel,
-  SocialButton
+  SocialButton,
+  CountdownBanner
 } from '@sunui-design/all';
 
 export default function App() {
@@ -211,6 +214,10 @@ export default function App() {
         </Card>
         <FloatingButton />
         <SocialButton href="https://github.com" />
+        <CountdownBanner 
+          title="限時優惠活動"
+          endDate={new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()}
+        />
       </GradientBackground>
     </div>
   );
