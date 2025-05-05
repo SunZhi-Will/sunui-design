@@ -10,14 +10,13 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc --build --verbose --force",
+    "build": "tsc",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "dev": "tsc -w",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
-    "nextjs",
     "react",
     "ui",
     "side-panel"
@@ -25,7 +24,6 @@
   "author": "Sunzhi",
   "license": "MIT",
   "peerDependencies": {
-    "next": ">=12.0.0",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },

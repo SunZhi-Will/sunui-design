@@ -1,6 +1,9 @@
 import type { StorybookConfig } from "@storybook/nextjs";
 import type webpack from 'webpack';
 
+// Define a type for webpack rule
+type WebpackRule = webpack.RuleSetRule;
+
 const config: StorybookConfig = {
   framework: {
     name: '@storybook/nextjs',
@@ -21,13 +24,13 @@ const config: StorybookConfig = {
   staticDirs: ["../public"],
   webpackFinal: async (config: webpack.Configuration) => {
     if (config.module?.rules) {
-      config.module.rules = (config.module.rules as Array<any>).filter(
-        rule => !rule.test?.test?.('.css')
+      config.module.rules = (config.module.rules as WebpackRule[]).filter(
+        (rule) => !(rule.test instanceof RegExp && rule.test.test('.css'))
       );
     }
 
     if (config.module?.rules) {
-      const rules = config.module.rules as Array<any>;
+      const rules = config.module.rules as WebpackRule[];
       rules.push({
         test: /\.css$/,
         use: [

@@ -89,7 +89,7 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
         },
     }), []);
 
-    const colors = themeColors[theme];
+    const _colors = themeColors[theme];
 
     const baseStyles = cn(
         'rounded-xl border bg-white/95 text-gray-900 relative overflow-hidden',

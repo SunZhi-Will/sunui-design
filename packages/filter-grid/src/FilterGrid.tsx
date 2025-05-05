@@ -75,7 +75,7 @@ export const FilterGrid: React.FC<FilterGridProps> = ({
 
         observer.observe(node);
         return () => observer.disconnect();
-    }, [loadMore, usePagination]);
+    }, [loadMore, usePagination, setIsIntersecting]);
 
     useEffect(() => {
         if (isIntersecting && loadMore && !loading) {
