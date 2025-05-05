@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useDragControls, PanInfo } from 'framer-motion';
 import { SocialButton, SocialButtonProps } from '@sunui-design/social';
 import type { FloatingButtonProps } from './types';
 import { FacebookIcon, GithubIcon, InstagramIcon, LinkedinIcon, TwitterIcon } from './icons';
@@ -21,14 +21,23 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     defaultOpen = false,
     children,
     className = '',
-    buttonClassName = '',
+    buttonClassName: _buttonClassName = '',
     position = 'bottom-right',
     buttons = [],
     variant = 'petal',
-    showToggleButton = true
+    showToggleButton = true,
+    draggable = false,
+    onPositionChange,
+    defaultPosition
 }) => {
     const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(defaultOpen);
     const isMenuOpen = controlledIsOpen !== undefined ? controlledIsOpen : uncontrolledIsOpen;
+    const dragControls = useDragControls();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [dragPosition, setDragPosition] = useState(defaultPosition || { x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const _dragStartTimeRef = useRef(0);
+    const dragThresholdExceeded = useRef(false);
 
     const positionClasses = {
         'bottom-right': 'right-4 sm:right-8 bottom-8',
@@ -37,7 +46,40 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
         'top-left': 'left-4 sm:left-8 top-8'
     };
 
+    // 當無法拖拉時，重置位置
+    useEffect(() => {
+        if (!draggable) {
+            setDragPosition({ x: 0, y: 0 });
+        }
+    }, [draggable, setDragPosition]);
+
+    const handleDragStart = () => {
+        setIsDragging(true);
+    };
+
+    const _handleDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+        const newX = dragPosition.x + info.offset.x;
+        const newY = dragPosition.y + info.offset.y;
+
+        setDragPosition({ x: newX, y: newY });
+        onPositionChange?.(newX, newY);
+
+        // 如果實際上沒有超過移動閾值，這可能是一個點擊而非拖拽
+        if (!dragThresholdExceeded.current) {
+            handleToggle();
+        }
+
+        // 重置狀態
+        setIsDragging(false);
+        dragThresholdExceeded.current = false;
+    };
+
     const handleToggle = () => {
+        // 如果正在拖動，不觸發切換，但不檢查時間間隔了
+        if (isDragging) {
+            return;
+        }
+
         const newState = !isMenuOpen;
         onOpenChange?.(newState);
         if (controlledIsOpen === undefined) {
@@ -47,7 +89,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
 
     const calculatePosition = (index: number, total: number) => {
         const baseRadius = 56;
-        const baseButtonCount = 3;
+        const _baseButtonCount = 3;
 
         if (variant === 'grid') {
             const spacing = 56;
@@ -170,19 +212,22 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                         key={button.href}
                         {...button}
                         icon={IconComponent ? <IconComponent /> : button.icon}
-                        className={button.className || "from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50"}
+                        className={button.className || "bg-gradient-to-r from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50"}
                         variant={variant}
                     />
                 );
             }) as React.ReactElement[];
         }
 
-        return React.Children.map(children, (child, index) => {
+        return React.Children.map(children, (child, _index) => {
             if (React.isValidElement<SocialButtonProps>(child)) {
                 return React.cloneElement(child, {
                     ...child.props,
-                    key: index,
-                    variant
+                    key: _index,
+                    variant,
+                    className: child.props.className?.includes('bg-gradient-to-r')
+                        ? child.props.className
+                        : `bg-gradient-to-r ${child.props.className || 'from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50'}`
                 });
             }
             return child;
@@ -190,30 +235,83 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     };
 
     return (
-        <div className={`fixed ${positionClasses[position]} z-[140] transition-all duration-500
-            ${show ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}
-            ${className}`}>
+        <motion.div
+            ref={containerRef}
+            className={`fixed ${draggable ? '' : positionClasses[position]} z-[140] 
+                ${draggable ? '' : 'transition-all duration-300'}
+                ${show ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} ${draggable ? 'cursor-move' : ''}
+                ${className}`}
+            drag={draggable}
+            dragControls={dragControls}
+            dragMomentum={false}
+            dragElastic={0}
+
+            // 使用最基本的拖拽配置，移除所有可能導致延遲的高級功能
+            dragTransition={{
+                power: 0,
+                timeConstant: 0,
+                modifyTarget: target => target
+            }}
+
+            onDragStart={handleDragStart}
+            onDragEnd={(_event, info) => {
+                const newX = dragPosition.x + info.offset.x;
+                const newY = dragPosition.y + info.offset.y;
+
+                setDragPosition({ x: newX, y: newY });
+                onPositionChange?.(newX, newY);
+
+                // 如果實際上沒有超過移動閾值，這可能是一個點擊而非拖拽
+                if (!dragThresholdExceeded.current) {
+                    // 短暫延遲執行toggle，確保其他事件已處理完成
+                    setTimeout(handleToggle, 10);
+                }
+
+                // 重置狀態
+                setIsDragging(false);
+                dragThresholdExceeded.current = false;
+            }}
+
+            dragListener={draggable}
+            style={draggable ? {
+                position: 'fixed',
+                right: position.includes('right') ? '20px' : 'auto',
+                left: position.includes('left') ? '20px' : 'auto',
+                bottom: position.includes('bottom') ? '20px' : 'auto',
+                top: position.includes('top') ? '20px' : 'auto',
+                x: dragPosition.x,
+                y: dragPosition.y,
+                // 徹底關閉所有過渡效果，確保即時響應
+                transition: 'none',
+                // 確保比其他元素更高的層級
+                zIndex: 1000
+            } : undefined}
+
+            // 關閉所有自動佈局和初始動畫
+            layout={false}
+            initial={false}
+        >
             <AnimatePresence mode="wait">
                 {isMenuOpen && (
-                    <div className="absolute" style={{ inset: 0 }}>
-                        {renderChildren().map((child, index) => {
+                    <div className="absolute" style={{ inset: 0, pointerEvents: isDragging ? 'none' : 'auto' }}>
+                        {renderChildren().map((child, _index) => {
                             if (!React.isValidElement(child)) return null;
 
                             let pos;
                             if (!showToggleButton) {
-                                if (index === 0) {
+                                if (_index === 0) {
                                     // 第一個按鈕在展開位置
                                     pos = { x: -24, y: -24 };
                                 } else {
                                     // 其他按鈕從第一個位置開始依序排列
-                                    const basePos = calculatePosition(index - 1, renderChildren().length - 1);
+                                    const basePos = calculatePosition(_index - 1, renderChildren().length - 1);
                                     pos = {
                                         x: basePos.x - 24,
                                         y: basePos.y - 24
                                     };
                                 }
                             } else {
-                                pos = calculatePosition(index, renderChildren().length);
+                                pos = calculatePosition(_index, renderChildren().length);
                             }
 
                             return (
@@ -222,8 +320,8 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                     style={{
                                         width: '48px',
                                         height: '48px',
-                                        pointerEvents: 'auto',
-                                        zIndex: variant === 'vertical' ? 1000 - index : 10,
+                                        pointerEvents: isDragging ? 'none' : 'auto',
+                                        zIndex: variant === 'vertical' ? 1000 - _index : 10,
                                         transform: 'translate(-50%, -50%)'
                                     }}
                                     key={child.key}
@@ -237,7 +335,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                             type: "spring",
                                             stiffness: 300,
                                             damping: 24,
-                                            delay: index * 0.05
+                                            delay: _index * 0.05
                                         }
                                     }}
                                     exit={{
@@ -247,7 +345,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                         y: 0,
                                         transition: {
                                             duration: 0.2,
-                                            delay: (renderChildren().length - index - 1) * 0.05
+                                            delay: (renderChildren().length - _index - 1) * 0.05
                                         }
                                     }}
                                 >
@@ -277,16 +375,34 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                 viewBox="0 0 24 24"
                                 animate={{ rotate: isMenuOpen ? 180 : 0 }}
                                 transition={{ duration: 0.3 }}
+                                onPointerDown={draggable ? (e) => {
+                                    // 只在左鍵點擊時處理
+                                    if (e.buttons === 1) {
+                                        // 直接開始拖動，不再等待移動
+                                        dragControls.start(e);
+                                        dragThresholdExceeded.current = false;
+                                        e.stopPropagation();
+                                    }
+                                } : undefined}
+
+                                // 添加移動事件處理
+                                onPointerMove={draggable ? (e) => {
+                                    if (e.buttons === 1 && Math.abs(e.movementX) + Math.abs(e.movementY) > 3) {
+                                        // 如果移動超過閾值，才標記為拖動操作
+                                        dragThresholdExceeded.current = true;
+                                        setIsDragging(true);
+                                    }
+                                } : undefined}
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                     d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
                             </motion.svg>
                         }
-                        className="from-primary-600/90 to-primary-800/90 hover:shadow-primary-500/50"
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50"
                         onClick={handleToggle}
                     />
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 }; 
