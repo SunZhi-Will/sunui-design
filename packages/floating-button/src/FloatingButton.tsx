@@ -21,7 +21,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
     defaultOpen = false,
     children,
     className = '',
-    buttonClassName = '',
+    buttonClassName: _buttonClassName = '',
     position = 'bottom-right',
     buttons = [],
     variant = 'petal',
@@ -47,7 +47,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
 
     const calculatePosition = (index: number, total: number) => {
         const baseRadius = 56;
-        const baseButtonCount = 3;
+        const _baseButtonCount = 3;
 
         if (variant === 'grid') {
             const spacing = 56;
@@ -196,24 +196,24 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
             <AnimatePresence mode="wait">
                 {isMenuOpen && (
                     <div className="absolute" style={{ inset: 0 }}>
-                        {renderChildren().map((child, index) => {
+                        {renderChildren().map((child, _index) => {
                             if (!React.isValidElement(child)) return null;
 
                             let pos;
                             if (!showToggleButton) {
-                                if (index === 0) {
+                                if (_index === 0) {
                                     // 第一個按鈕在展開位置
                                     pos = { x: -24, y: -24 };
                                 } else {
                                     // 其他按鈕從第一個位置開始依序排列
-                                    const basePos = calculatePosition(index - 1, renderChildren().length - 1);
+                                    const basePos = calculatePosition(_index - 1, renderChildren().length - 1);
                                     pos = {
                                         x: basePos.x - 24,
                                         y: basePos.y - 24
                                     };
                                 }
                             } else {
-                                pos = calculatePosition(index, renderChildren().length);
+                                pos = calculatePosition(_index, renderChildren().length);
                             }
 
                             return (
@@ -223,7 +223,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                         width: '48px',
                                         height: '48px',
                                         pointerEvents: 'auto',
-                                        zIndex: variant === 'vertical' ? 1000 - index : 10,
+                                        zIndex: variant === 'vertical' ? 1000 - _index : 10,
                                         transform: 'translate(-50%, -50%)'
                                     }}
                                     key={child.key}
@@ -237,7 +237,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                             type: "spring",
                                             stiffness: 300,
                                             damping: 24,
-                                            delay: index * 0.05
+                                            delay: _index * 0.05
                                         }
                                     }}
                                     exit={{
@@ -247,7 +247,7 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                                         y: 0,
                                         transition: {
                                             duration: 0.2,
-                                            delay: (renderChildren().length - index - 1) * 0.05
+                                            delay: (renderChildren().length - _index - 1) * 0.05
                                         }
                                     }}
                                 >

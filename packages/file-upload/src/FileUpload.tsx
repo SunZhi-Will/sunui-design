@@ -277,7 +277,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                 setTimeout(() => {
                     setIsUploading(false);
                 }, 300);
-            } catch (error) {
+            } catch (_error) {
                 setError('Upload failed. Please try again.');
                 setIsUploading(false);
                 setUploadComplete(false);

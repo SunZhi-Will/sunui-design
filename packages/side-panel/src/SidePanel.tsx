@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState, createContext, useContext } from 'react';
+import React, { memo, useEffect, useRef, useState, createContext, useContext, useMemo } from 'react';
 import { IoCloseOutline, IoMenuOutline } from 'react-icons/io5';
 import type { IconType, IconBaseProps } from 'react-icons';
 
@@ -194,13 +194,16 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     const [isHovering, setIsHovering] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
-    // Handle toggle with animation guarantee
-    const handleToggle = () => {
-        // Use timeout to ensure state updates properly for animations
-        setTimeout(() => {
-            onToggle();
-        }, 0);
-    };
+    // Wrap onToggle in useMemo to prevent it from changing on every render
+    const memoizedToggle = useMemo(() => {
+        // Handle toggle with animation guarantee
+        return () => {
+            // Use timeout to ensure state updates properly for animations
+            setTimeout(() => {
+                onToggle();
+            }, 0);
+        };
+    }, [onToggle]);
 
     // Register/unregister with context when open state changes
     useEffect(() => {
@@ -253,19 +256,19 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
             return () => clearTimeout(timer);
         }
-    }, [isOpen, animationDuration, onOpen, onClose]);
+    }, [isOpen, animationDuration, onOpen, onClose, setIsInDOM, setIsPositioned]);
 
     // Handle ESC key press
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (closeOnEscape && isOpen && e.key === 'Escape') {
-                onToggle();
+                memoizedToggle();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [closeOnEscape, isOpen, onToggle]);
+    }, [closeOnEscape, isOpen, memoizedToggle]);
 
     // Handle outside click
     useEffect(() => {
@@ -276,13 +279,13 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                 panelRef.current &&
                 !panelRef.current.contains(e.target as Node)
             ) {
-                onToggle();
+                memoizedToggle();
             }
         };
 
         document.addEventListener('mousedown', handleOutsideClick);
         return () => document.removeEventListener('mousedown', handleOutsideClick);
-    }, [closeOnOutsideClick, isOpen, onToggle]);
+    }, [closeOnOutsideClick, isOpen, memoizedToggle]);
 
     // Get theme-based background classes
     const getThemeClasses = () => {
@@ -431,7 +434,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
         <>
             {!isOpen && shouldShowToggleButton && (
                 <button
-                    onClick={handleToggle}
+                    onClick={memoizedToggle}
                     onMouseEnter={() => setIsHovering(true)}
                     onMouseLeave={() => setIsHovering(false)}
                     className={classNames(
@@ -488,7 +491,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                         zIndex: overlayZIndex,
                         transitionDuration: `${animationDuration}ms`
                     }}
-                    onClick={closeOnOutsideClick ? onToggle : undefined}
+                    onClick={closeOnOutsideClick ? memoizedToggle : undefined}
                     aria-hidden="true"
                 />
             )}
@@ -540,7 +543,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                             </h2>
                             {showCloseButton && (
                                 <button
-                                    onClick={handleToggle}
+                                    onClick={memoizedToggle}
                                     className={classNames(
                                         'flex items-center justify-center',
                                         'w-8 h-8 rounded-full',

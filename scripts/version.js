@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync: _execSync } = require('child_process');
 
 // 讀取 package.json
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'));

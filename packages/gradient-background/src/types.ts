@@ -1,5 +1,3 @@
-import React from "react";
-
 export interface GradientBackgroundProps {
     // 主要背景色系
     fromColor?: string;

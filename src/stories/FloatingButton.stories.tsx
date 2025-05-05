@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta as _Meta, StoryObj } from '@storybook/react';
 import { FloatingButton } from '@sunui-design/floating';
 import type { FloatingButtonProps } from '@sunui-design/floating';
 

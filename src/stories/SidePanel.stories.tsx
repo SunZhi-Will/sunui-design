@@ -661,7 +661,7 @@ const MultipleNonOverlappingTemplate = () => {
             >
                 <div className="space-y-4">
                     <p>This is the third panel.</p>
-                    <p>It's positioned on the right side of the screen.</p>
+                    <p>It&apos;s positioned on the right side of the screen.</p>
                     <button
                         onClick={togglePanel3}
                         className="px-4 py-2 bg-purple-100 text-purple-800 rounded hover:bg-purple-200"
