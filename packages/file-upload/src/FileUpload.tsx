@@ -378,7 +378,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                                 {file.name}
                             </p>
                             <p className="text-xs text-gray-500">
-                                {(file.size / 1024).toFixed(1)} KB • Upload successful
+                                {(file.size / 1024).toFixed(1)} KB &bull; Upload successful
                             </p>
                         </div>
                         <div className={`text-${colors.primary}-500 flex-shrink-0`}>
@@ -602,7 +602,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                                             </motion.p>
                                             {(accept || description) && (
                                                 <p className="mt-2 text-sm text-gray-500">
-                                                    {description || (accept && `Supported file types: ${accept.split(',').map(type => type.replace('/*', '')).join(', ')}`)}
+                                                    {description || (accept && `Supported file types: ${accept.split(",").map(type => type.replace("/*", "")).join(", ")}`)}
                                                 </p>
                                             )}
                                             {maxSize && (
@@ -658,6 +658,12 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                         </motion.p>
                         <motion.button
                             onClick={() => setError(null)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setError(null);
+                                }
+                            }}
                             className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
