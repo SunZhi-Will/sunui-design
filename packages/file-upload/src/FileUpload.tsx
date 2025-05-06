@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useRef, useMemo, ReactElement } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as pdfjsLib from 'pdfjs-dist';
 import { UploadIcon as _UploadIcon } from './UploadIcon';
@@ -42,7 +42,7 @@ export type FileUploadProps = {
     description?: string;
 }
 
-export const FileUpload = (props: FileUploadProps): JSX.Element => {
+export const FileUpload = (props: FileUploadProps): ReactElement => {
     const {
         onFileSelect,
         onFileUpload,
