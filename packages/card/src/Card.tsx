@@ -83,7 +83,6 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
     const [isDarkBackground, setIsDarkBackground] = useState(false);
     const [isExpanded, setIsExpanded] = useState(expanded);
     const [isDragging, setIsDragging] = useState(false);
-    const [isClicked, setIsClicked] = useState(false);
     const controls = useAnimation();
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -193,7 +192,7 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
         opacity: disabled ? 0.6 : 1,
         cursor: (interactive || clickable) ? 'pointer' : (disabled ? 'not-allowed' : 'default'),
         pointerEvents: disabled ? 'none' : 'auto',
-    }) as any, [
+    }) as React.CSSProperties, [
         isDarkBackground, themeColor, size, variantStyle,
         isHovered, hoverStyle, elevation, position, propStyle,
         minHeight, maxHeight, disabled, interactive, clickable
@@ -304,7 +303,6 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
         }
 
         if (onClick3D && !disabled) {
-            setIsClicked(true);
             controls.start({
                 scale: 0.98,
                 transition: { duration: 0.1 }
@@ -313,7 +311,6 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
                     scale: 1,
                     transition: { type: 'spring', stiffness: 300, damping: 15 }
                 });
-                setIsClicked(false);
             });
         }
 
