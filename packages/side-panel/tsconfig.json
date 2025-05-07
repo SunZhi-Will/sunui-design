@@ -17,6 +17,7 @@
         "isolatedModules": true,
         "jsx": "react",
         "declaration": true,
+        "composite": true,
         "declarationDir": "./dist",
         "outDir": "./dist",
         "rootDir": "./src"

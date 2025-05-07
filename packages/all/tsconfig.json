@@ -2,15 +2,46 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "outDir": "./dist",
-        "rootDir": "../",
-        "moduleResolution": "node16",
-        "module": "Node16"
+        "rootDir": "./src",
+        "declaration": true,
+        "composite": true,
+        "moduleResolution": "node",
+        "module": "ESNext"
     },
     "include": [
-        "../**/*"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",
         "dist"
+    ],
+    "references": [
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../floating-button"
+        },
+        {
+            "path": "../social-button"
+        },
+        {
+            "path": "../gradient-background"
+        },
+        {
+            "path": "../filter-grid"
+        },
+        {
+            "path": "../card"
+        },
+        {
+            "path": "../countdown-banner"
+        },
+        {
+            "path": "../file-upload"
+        },
+        {
+            "path": "../side-panel"
+        }
     ]
 }

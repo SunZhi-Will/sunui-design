@@ -1,4 +1,7 @@
+// Core components
 export * from '@sunui-design/core';
+
+// Individual components
 export { FloatingButton } from '@sunui-design/floating';
 export { SocialButton } from '@sunui-design/social';
 export { GradientBackground } from '@sunui-design/gradient';
