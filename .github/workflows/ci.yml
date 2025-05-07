@@ -26,11 +26,20 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
-    - name: Clean install dependencies
-      run: |
-        npm install
-        npm run build:packages
-      timeout-minutes: 5  # 設定安裝依賴超時時間
+    - name: Install dependencies
+      run: npm install
+      env:
+        NODE_ENV: development
+        CI: true
+      timeout-minutes: 5
+        
+    - name: Build packages
+      run: npm run build:packages
+      env:
+        NODE_ENV: production
+        CI: true
+        NX_VERBOSE_LOGGING: true
+      timeout-minutes: 5
         
     - name: Run linting
       run: npx eslint . --ext .js,.jsx,.ts,.tsx
