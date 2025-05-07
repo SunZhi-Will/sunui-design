@@ -2,6 +2,7 @@
   "name": "@sunui-design/react",
   "version": "0.0.54",
   "description": "A modern React UI library with elegant design and smooth animations",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
