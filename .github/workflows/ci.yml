@@ -32,6 +32,9 @@ jobs:
         NODE_ENV: development
         CI: true
       timeout-minutes: 5
+    
+    - name: Make scripts executable
+      run: chmod +x scripts/*.cjs scripts/*.js
         
     - name: Build packages
       run: npm run build:packages
