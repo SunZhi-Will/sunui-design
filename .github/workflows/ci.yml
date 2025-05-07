@@ -36,13 +36,20 @@ jobs:
     - name: Make scripts executable
       run: chmod +x scripts/*.cjs scripts/*.js
         
+    - name: Debug environment
+      run: |
+        echo "Node version: $(node -v)"
+        echo "NPM version: $(npm -v)"
+        echo "TypeScript version: $(npx tsc --version)"
+        
     - name: Build packages
       run: npm run build:packages
       env:
         NODE_ENV: production
         CI: true
-        NX_VERBOSE_LOGGING: true
-      timeout-minutes: 5
+        DEBUG: "*"
+        LOGLEVEL: "verbose"
+      timeout-minutes: 7
         
     - name: Run linting
       run: npx eslint . --ext .js,.jsx,.ts,.tsx
