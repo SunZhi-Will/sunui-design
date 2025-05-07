@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [20.16.0]
       fail-fast: true  # 如果一個任務失敗，立即停止其他任務
 
     steps:
@@ -80,7 +80,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20.x'
+        node-version: '20.16.0'
         cache: 'npm'
 
     - name: Clean and install dependencies
