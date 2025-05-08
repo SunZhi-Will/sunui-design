@@ -71,9 +71,50 @@ export default [
         },
     },
 
+    // Jest 配置文件
+    {
+        files: ['jest.*.js'],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            globals: {
+                // Jest globals
+                jest: 'readonly',
+                describe: 'readonly',
+                it: 'readonly',
+                test: 'readonly',
+                expect: 'readonly',
+                beforeAll: 'readonly',
+                afterAll: 'readonly',
+                beforeEach: 'readonly',
+                afterEach: 'readonly',
+                global: 'readonly',
+
+                // Browser globals
+                window: 'readonly',
+                document: 'readonly',
+
+                // Node globals
+                require: 'readonly',
+                module: 'readonly',
+                process: 'readonly',
+                console: 'readonly',
+            },
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
+        },
+        rules: {
+            'no-undef': 'off',
+            'no-unused-vars': 'off',
+        },
+    },
+
     // CommonJS 腳本文件配置
     {
-        files: ['scripts/**/*.js', 'jest.*.js'],
+        files: ['scripts/**/*.js'],
         languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'commonjs',
@@ -91,7 +132,7 @@ export default [
         },
         rules: {
             'no-undef': 'off',
-            'no-unused-vars': 'warn',
+            'no-unused-vars': 'off', // 禁用未使用變量警告
         },
     },
 
