@@ -9,6 +9,16 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 export default [
     js.configs.recommended,
     {
+        ignores: [
+            '**/dist/**',
+            '**/node_modules/**',
+            'build/**',
+            'out/**',
+            '.next/**',
+            '**/__tests__/**',
+            '**/test/**',
+            'storybook-static/**'
+        ],
         files: ['**/*.{js,jsx,ts,tsx}'],
         plugins: {
             '@typescript-eslint': typescript,
@@ -72,12 +82,17 @@ export default [
                 varsIgnorePattern: '^_'
             }],
             '@typescript-eslint/no-require-imports': 'off',
+            '@typescript-eslint/no-empty-object-type': ['error', {
+                allowObjectTypes: true
+            }],
             'import/no-unresolved': 'off',
             'jsx-a11y/alt-text': 'error',
             'no-undef': 'off', // TypeScript handles this
             'no-redeclare': 'off', // TypeScript handles this
             '@typescript-eslint/no-unused-expressions': 'off',
             'react-hooks/exhaustive-deps': 'warn',
+            'no-fallthrough': 'error',
+            'no-sparse-arrays': 'error',
         },
         settings: {
             react: {
