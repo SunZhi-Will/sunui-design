@@ -82,9 +82,7 @@ export default [
                 varsIgnorePattern: '^_'
             }],
             '@typescript-eslint/no-require-imports': 'off',
-            '@typescript-eslint/no-empty-object-type': ['error', {
-                allowObjectTypes: true
-            }],
+            '@typescript-eslint/no-empty-object-type': 'error',
             'import/no-unresolved': 'off',
             'jsx-a11y/alt-text': 'error',
             'no-undef': 'off', // TypeScript handles this
