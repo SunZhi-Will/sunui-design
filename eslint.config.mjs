@@ -7,24 +7,97 @@ import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default [
-    js.configs.recommended,
+    // 全局忽略配置
     {
         ignores: [
+            // 忽略編譯後和類型文件
             '**/dist/**',
-            '**/dist/**/*',
             '**/types/**',
             '**/*.d.ts',
+
+            // 忽略測試文件
             '**/__tests__/**',
             '**/test/**',
-            'scripts/**',
-            'jest.*.js',
+
+            // 其他忽略規則
             '**/node_modules/**',
             'build/**',
             'out/**',
             '.next/**',
             'storybook-static/**'
         ],
-        files: ['**/*.{js,jsx,ts,tsx}'],
+    },
+
+    // 基本 JavaScript 配置（適用於所有 JS 文件）
+    {
+        files: ['**/*.js'],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            globals: {
+                // Node globals
+                __dirname: 'readonly',
+                require: 'readonly',
+                module: 'readonly',
+                process: 'readonly',
+                console: 'readonly',
+                Buffer: 'readonly',
+
+                // Browser globals
+                window: 'readonly',
+                document: 'readonly',
+                localStorage: 'readonly',
+                sessionStorage: 'readonly',
+                navigator: 'readonly',
+                location: 'readonly',
+
+                // Common globals
+                setTimeout: 'readonly',
+                clearTimeout: 'readonly',
+                setInterval: 'readonly',
+                clearInterval: 'readonly',
+
+                // Testing globals
+                jest: 'readonly',
+                describe: 'readonly',
+                it: 'readonly',
+                expect: 'readonly',
+            },
+        },
+        rules: {
+            ...js.configs.recommended.rules,
+            'no-undef': 'error',
+            'no-unused-vars': 'warn',
+        },
+    },
+
+    // CommonJS 腳本文件配置
+    {
+        files: ['scripts/**/*.js', 'jest.*.js'],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'commonjs',
+            globals: {
+                // Node globals
+                __dirname: 'readonly',
+                __filename: 'readonly',
+                require: 'readonly',
+                module: 'readonly',
+                exports: 'readonly',
+                process: 'readonly',
+                console: 'readonly',
+                Buffer: 'readonly',
+            },
+        },
+        rules: {
+            'no-undef': 'off',
+            'no-unused-vars': 'warn',
+        },
+    },
+
+    // TypeScript 和 React 配置
+    {
+        files: ['**/*.{ts,tsx}'],
         plugins: {
             '@typescript-eslint': typescript,
             'react': react,
