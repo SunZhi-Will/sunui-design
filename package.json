@@ -39,7 +39,7 @@
     "@types/pdfjs-dist": "^2.10.378",
     "@types/postcss-load-config": "^3.0.1",
     "framer-motion": "^12.4.12",
-    "next": "^15.2.3",
+    "next": "^15.2.4",
     "pdfjs-dist": "^5.0.375",
     "react": "^19",
     "react-dom": "^19"
