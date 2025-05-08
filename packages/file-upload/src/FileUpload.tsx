@@ -153,7 +153,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             }
             return true;
         });
-    }, [maxSize, accept]);
+    }, [maxSize, accept, setError]);
 
     const handlePreviewDragAction = useCallback((e: React.DragEvent) => {
         e.stopPropagation();
@@ -198,7 +198,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                 }]);
             }
         }
-    }, []);
+    }, [setPreviews]);
 
     const createImagePreview = (file: File): Promise<FilePreview> => {
         return new Promise((resolve, _error) => {
@@ -305,7 +305,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         if (validFiles.length > 0) {
             await handleFileUploadProcess(validFiles);
         }
-    }, [validateFiles, handleFileUploadProcess]);
+    }, [validateFiles, handleFileUploadProcess, setIsDragActive]);
 
     const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -337,6 +337,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                 </svg>
             );
         }
+        // 預設圖標
         return (
             <svg className={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />

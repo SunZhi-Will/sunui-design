@@ -287,7 +287,7 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
                 transition: { type: 'spring', stiffness: 300, damping: 20 }
             });
         }
-    }, [onClick3D, disabled, controls]);
+    }, [onClick3D, disabled, controls, setIsHovered]);
 
     const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (hoverable && !disabled) {
@@ -296,7 +296,7 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
         if (onHover) {
             onHover(e);
         }
-    }, [hoverable, disabled, onHover]);
+    }, [hoverable, disabled, onHover, setIsHovered]);
 
     const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (collapsible) {
@@ -318,22 +318,22 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
         if (onClick && !disabled) {
             onClick(e);
         }
-    }, [collapsible, onClick3D, disabled, controls, onClick]);
+    }, [collapsible, onClick3D, disabled, controls, onClick, setIsExpanded]);
 
     const handleDragStart = useCallback(() => {
         if (draggable) {
             setIsDragging(true);
         }
-    }, [draggable]);
+    }, [draggable, setIsDragging]);
 
     const handleDragEnd = useCallback(() => {
         setIsDragging(false);
-    }, []);
+    }, [setIsDragging]);
 
     const handleCollapseClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         setIsExpanded(prev => !prev);
-    }, []);
+    }, [setIsExpanded]);
 
     return (
         <motion.div

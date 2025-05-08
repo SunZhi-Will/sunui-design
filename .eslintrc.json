@@ -9,12 +9,30 @@
     "@typescript-eslint/no-unused-expressions": "warn",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-empty-object-type": [
+      "error",
+      {
+        "allowObjectTypes": true
+      }
+    ],
     "react-hooks/exhaustive-deps": "warn",
     "@next/next/no-img-element": "warn",
-    "@next/next/no-html-link-for-pages": "off"
+    "@next/next/no-html-link-for-pages": "off",
+    "no-fallthrough": "error",
+    "no-sparse-arrays": "error",
+    "import/export": "error"
   },
   "ignorePatterns": [
-    "**/dist/**",
-    "**/*.js"
+    "node_modules"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.js"
+      ],
+      "rules": {
+        "no-fallthrough": "error"
+      }
+    }
   ]
 }
