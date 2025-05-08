@@ -11,28 +11,10 @@
     "@typescript-eslint/no-explicit-any": "warn",
     "react-hooks/exhaustive-deps": "warn",
     "@next/next/no-img-element": "warn",
-    "@next/next/no-html-link-for-pages": "off",
-    "no-fallthrough": "error",
-    "no-sparse-arrays": "error",
-    "import/export": "warn"
+    "@next/next/no-html-link-for-pages": "off"
   },
   "ignorePatterns": [
     "**/dist/**",
-    "**/dist/styles.d.ts",
-    "**/dist/types.d.ts",
-    "**/node_modules/**",
-    "**/.next/**",
-    "**/.storybook/**"
-  ],
-  "overrides": [
-    {
-      "files": [
-        "scripts/*.cjs",
-        "*.cjs"
-      ],
-      "env": {
-        "node": true
-      }
-    }
+    "**/*.js"
   ]
 }

@@ -9,49 +9,6 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 export default [
     js.configs.recommended,
     {
-        ignores: [
-            // 忽略所有編譯後的文件
-            '**/dist/**',
-            '**/.next/**',
-            '**/node_modules/**',
-            '**/.storybook/**',
-            '**/out/**',
-            '**/build/**',
-            '**/coverage/**',
-
-            // 忽略生成的類型文件
-            '**/*.d.ts',
-
-            // 忽略特定的問題文件
-            'packages/card/dist/src/Card.js',
-            'packages/card/dist/src/components.js',
-            'packages/card/dist/src/index.js',
-            'packages/file-upload/dist/FileUpload.js',
-            'packages/countdown-banner/dist/CountdownBanner.js',
-            'packages/side-panel/dist/SidePanel.js',
-
-            // 其他常見的忽略
-            '**/*.min.js',
-            '**/*.bundle.js'
-        ]
-    },
-    // Node.js 專用配置
-    {
-        files: ['**/*.cjs', '**/scripts/**/*.js'],
-        languageOptions: {
-            globals: {
-                // Node.js globals
-                process: 'readonly',
-                console: 'readonly',
-                __dirname: 'readonly',
-                __filename: 'readonly',
-                require: 'readonly',
-                module: 'readonly',
-                exports: 'writable',
-            }
-        }
-    },
-    {
         files: ['**/*.{js,jsx,ts,tsx}'],
         plugins: {
             '@typescript-eslint': typescript,
@@ -116,12 +73,9 @@ export default [
             }],
             '@typescript-eslint/no-require-imports': 'off',
             'import/no-unresolved': 'off',
-            'import/namespace': 'off',
-            'import/named': 'off',
-            'import/no-duplicates': 'off',
             'jsx-a11y/alt-text': 'error',
-            'no-undef': 'off',
-            'no-redeclare': 'off',
+            'no-undef': 'off', // TypeScript handles this
+            'no-redeclare': 'off', // TypeScript handles this
             '@typescript-eslint/no-unused-expressions': 'off',
             'react-hooks/exhaustive-deps': 'warn',
         },
@@ -130,9 +84,9 @@ export default [
                 version: 'detect',
             },
             'import/resolver': {
-                node: {
-                    extensions: ['.js', '.jsx', '.ts', '.tsx']
-                }
+                typescript: {
+                    alwaysTryTypes: true,
+                },
             },
         },
     },

@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.16.0]
+        node-version: [20.x]
       fail-fast: true  # 如果一個任務失敗，立即停止其他任務
 
     steps:
@@ -26,30 +26,11 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
-    - name: Install dependencies
-      run: npm install
-      env:
-        NODE_ENV: development
-        CI: true
-      timeout-minutes: 5
-    
-    - name: Make scripts executable
-      run: chmod +x scripts/*.cjs scripts/*.js
-        
-    - name: Debug environment
+    - name: Clean install dependencies
       run: |
-        echo "Node version: $(node -v)"
-        echo "NPM version: $(npm -v)"
-        echo "TypeScript version: $(npx tsc --version)"
-        
-    - name: Build packages
-      run: npm run build:packages
-      env:
-        NODE_ENV: production
-        CI: true
-        DEBUG: "*"
-        LOGLEVEL: "verbose"
-      timeout-minutes: 7
+        npm install
+        npm run build:packages
+      timeout-minutes: 5  # 設定安裝依賴超時時間
         
     - name: Run linting
       run: npx eslint . --ext .js,.jsx,.ts,.tsx
@@ -61,9 +42,7 @@ jobs:
       
     - name: Build Storybook
       run: npm run build-storybook
-      env:
-        NODE_OPTIONS: "--max-old-space-size=4096"
-      timeout-minutes: 5
+      timeout-minutes: 3
 
     - name: Quick Security Scan
       if: github.event_name == 'push' && github.ref != 'refs/heads/master'
@@ -101,7 +80,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20.16.0'
+        node-version: '20.x'
         cache: 'npm'
 
     - name: Clean and install dependencies
