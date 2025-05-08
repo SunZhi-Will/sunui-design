@@ -61,7 +61,9 @@ jobs:
       
     - name: Build Storybook
       run: npm run build-storybook
-      timeout-minutes: 3
+      env:
+        NODE_OPTIONS: "--max-old-space-size=4096"
+      timeout-minutes: 5
 
     - name: Quick Security Scan
       if: github.event_name == 'push' && github.ref != 'refs/heads/master'
