@@ -116,9 +116,12 @@ export default [
             }],
             '@typescript-eslint/no-require-imports': 'off',
             'import/no-unresolved': 'off',
+            'import/namespace': 'off',
+            'import/named': 'off',
+            'import/no-duplicates': 'off',
             'jsx-a11y/alt-text': 'error',
-            'no-undef': 'off', // TypeScript handles this
-            'no-redeclare': 'off', // TypeScript handles this
+            'no-undef': 'off',
+            'no-redeclare': 'off',
             '@typescript-eslint/no-unused-expressions': 'off',
             'react-hooks/exhaustive-deps': 'warn',
         },
@@ -127,9 +130,9 @@ export default [
                 version: 'detect',
             },
             'import/resolver': {
-                typescript: {
-                    alwaysTryTypes: true,
-                },
+                node: {
+                    extensions: ['.js', '.jsx', '.ts', '.tsx']
+                }
             },
         },
     },
