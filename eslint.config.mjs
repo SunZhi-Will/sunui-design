@@ -11,11 +11,13 @@ export default [
     {
         ignores: [
             '**/dist/**',
-            '**/dist/**/*.d.ts',
-            '**/dist/**/*.js',
+            '**/dist/**/*',
+            '**/types/**',
             '**/*.d.ts',
             '**/__tests__/**',
             '**/test/**',
+            'scripts/**',
+            'jest.*.js',
             '**/node_modules/**',
             'build/**',
             'out/**',
@@ -38,8 +40,6 @@ export default [
                 ecmaFeatures: {
                     jsx: true,
                 },
-                project: './tsconfig.json',
-                tsconfigRootDir: '.',
             },
             globals: {
                 // Browser globals
