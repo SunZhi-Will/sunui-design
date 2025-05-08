@@ -115,9 +115,16 @@ export interface CardActionsProps {
 }
 
 export interface AnimationVariant {
-    initial?: Record<string, any>;
-    animate?: Record<string, any>;
-    transition?: Record<string, any>;
+    initial?: Record<string, number | string>;
+    animate?: Record<string, number | string>;
+    transition?: {
+        duration?: number;
+        delay?: number;
+        type?: string;
+        stiffness?: number;
+        damping?: number;
+        times?: number[];
+    };
 }
 
 export declare const Card: React.FC<CardProps>;

@@ -126,4 +126,16 @@ export interface AnimationVariant {
         damping?: number;
         times?: number[];
     };
-} 
+}
+
+// 添加命名導出
+export const CardTypes = {
+    CardVariant: null,
+    CardSize: null,
+    CardTheme: null,
+    CardLoadingMode: null,
+    TextColorMode: null,
+    CardPosition: null,
+    CardElevation: null,
+    CardAnimation: null
+}; 
