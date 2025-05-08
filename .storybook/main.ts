@@ -51,6 +51,22 @@ const config: StorybookConfig = {
         include: /\.css$/,
       });
     }
+
+    // 幫助 Webpack 解析內部模組
+    if (config.resolve) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@sunui-design/card': require.resolve('../packages/card'),
+        '@sunui-design/core': require.resolve('../packages/core'),
+        '@sunui-design/countdown-banner': require.resolve('../packages/countdown-banner'),
+        '@sunui-design/filter': require.resolve('../packages/filter-grid'),
+        '@sunui-design/floating': require.resolve('../packages/floating-button'),
+        '@sunui-design/gradient': require.resolve('../packages/gradient-background'),
+        '@sunui-design/side-panel': require.resolve('../packages/side-panel'),
+        '@sunui-design/social': require.resolve('../packages/social-button')
+      };
+    }
+
     return config;
   },
   typescript: {
