@@ -6,7 +6,37 @@
         "declaration": true,
         "composite": true,
         "moduleResolution": "node",
-        "module": "ESNext"
+        "module": "ESNext",
+        "baseUrl": ".",
+        "paths": {
+            "@sunui-design/core": [
+                "../core/src"
+            ],
+            "@sunui-design/floating": [
+                "../floating-button/src"
+            ],
+            "@sunui-design/social": [
+                "../social-button/src"
+            ],
+            "@sunui-design/gradient": [
+                "../gradient-background/src"
+            ],
+            "@sunui-design/filter": [
+                "../filter-grid/src"
+            ],
+            "@sunui-design/card": [
+                "../card/src"
+            ],
+            "@sunui-design/countdown-banner": [
+                "../countdown-banner/src"
+            ],
+            "@sunui-design/file-upload": [
+                "../file-upload/src"
+            ],
+            "@sunui-design/side-panel": [
+                "../side-panel/src"
+            ]
+        }
     },
     "include": [
         "src/**/*"
