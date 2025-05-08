@@ -74,6 +74,10 @@ export default [
     // Jest 配置文件
     {
         files: ['jest.*.js'],
+        plugins: {
+            'react': react,
+            'jsx-a11y': jsxA11y,
+        },
         languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'module',
@@ -109,6 +113,7 @@ export default [
         rules: {
             'no-undef': 'off',
             'no-unused-vars': 'off',
+            'jsx-a11y/alt-text': 'off',
         },
     },
 
