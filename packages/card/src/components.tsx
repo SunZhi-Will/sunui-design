@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { cn } from './utils';
 import {
     CardHeaderProps, CardContentProps, CardFooterProps,
@@ -78,11 +77,10 @@ export const CardImage: React.FC<CardImageProps> = React.memo(({
     const [error, setError] = useState(false);
     const finalSrc = error && fallback ? fallback : src;
 
-    const handleError = useCallback(() => {
-        if (fallback) {
-            setError(true);
-        }
-    }, [fallback]);
+    const handleError = useCallback((e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        e.currentTarget.src = fallback || '';
+        setError(true);
+    }, [fallback, setError]);
 
     return (
         <div
@@ -92,9 +90,13 @@ export const CardImage: React.FC<CardImageProps> = React.memo(({
                 className
             )}
             style={{
-                height: height ? (typeof height === 'number' ? `${height}px` : height) : 'auto',
-                aspectRatio
-            }}
+                width: "100%",
+                height: aspectRatio ? "auto" : height || "auto",
+                aspectRatio: aspectRatio || "undefined",
+                objectFit: "cover",
+                borderTopLeftRadius: roundedTop ? "0.75rem" : "0",
+                borderTopRightRadius: roundedTop ? "0.75rem" : "0"
+            } as React.CSSProperties}
         >
             <img
                 src={finalSrc}
@@ -164,14 +166,18 @@ export const CardGroup: React.FC<CardGroupProps> = React.memo(({
                     ? 'last'
                     : 'middle';
 
-            return React.cloneElement(child as React.ReactElement<any>, {
+            return React.cloneElement(child as React.ReactElement<{
+                position?: string;
+                style?: React.CSSProperties;
+                interactive?: boolean;
+            }>, {
                 position,
                 style: {
-                    ...((child as React.ReactElement<any>).props.style || {}),
+                    ...((child as React.ReactElement<{ style?: React.CSSProperties }>).props.style || {}),
                     marginTop: index === 0 ? 0 : '-1rem',
                     zIndex: React.Children.count(children) - index
                 },
-                interactive: interactive || (child as React.ReactElement<any>).props.interactive
+                interactive: interactive || (child as React.ReactElement<{ interactive?: boolean }>).props.interactive
             });
         });
     }, [children, stacked, interactive]);

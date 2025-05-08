@@ -63,7 +63,17 @@ export const themeColorMap = {
 // 獲取變體樣式
 export const getVariantStyle = (
     variant: CardVariant,
-    themeColor: any,
+    themeColor: {
+        light: string;
+        medium: string;
+        dark: string;
+        border: string;
+        shadow: string;
+        hoverBg: string;
+        ringColor: string;
+        lightText: string;
+        darkText: string;
+    },
     isDarkBackground: boolean,
     isHovered: boolean,
     hoverable: boolean

@@ -155,15 +155,14 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         });
     }, [maxSize, accept]);
 
-    const handleDrag = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
+    const handlePreviewDragAction = useCallback((e: React.DragEvent) => {
         e.stopPropagation();
         if (e.type === 'dragenter' || e.type === 'dragover') {
             setIsDragActive(true);
         } else if (e.type === 'dragleave') {
             setIsDragActive(false);
         }
-    }, []);
+    }, [setIsDragActive]);
 
     const simulateProgress = useCallback(async () => {
         setIsUploading(true);
@@ -172,7 +171,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             await new Promise(resolve => setTimeout(resolve, 30));
             setUploadProgress(i);
         }
-    }, []);
+    }, [setIsUploading, setUploadProgress]);
 
     const handlePreview = useCallback(async (files: File[]) => {
         for (const file of files) {
@@ -202,16 +201,16 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
     }, []);
 
     const createImagePreview = (file: File): Promise<FilePreview> => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _error) => {
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onload = (e) => {
+                const result = e.target?.result as string;
                 resolve({
-                    url: reader.result as string,
+                    url: result,
                     name: file.name,
                     type: file.type
                 });
             };
-            reader.onerror = reject;
             reader.readAsDataURL(file);
         });
     };
@@ -256,6 +255,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                         type: file.type
                     });
                 } catch (error) {
+                    console.error('預覽生成失敗:', error);
                     reject(error);
                 }
             };
@@ -278,12 +278,13 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                     setIsUploading(false);
                 }, 300);
             } catch (error) {
+                console.error('Upload failed:', error);
                 setError('Upload failed. Please try again.');
                 setIsUploading(false);
                 setUploadComplete(false);
             }
         }
-    }, [onFileSelect, onFileUpload, handlePreview, simulateProgress]);
+    }, [onFileSelect, onFileUpload, handlePreview, simulateProgress, setUploadProgress, setUploadedFiles, setUploadComplete, setIsUploading, setError]);
 
     const resetUpload = useCallback(() => {
         setUploadedFiles([]);
@@ -291,7 +292,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         setUploadProgress(0);
         setPreviews([]);
         setError(null);
-    }, []);
+    }, [setUploadedFiles, setUploadComplete, setUploadProgress, setPreviews, setError]);
 
     const handleDrop = useCallback(async (e: React.DragEvent) => {
         e.preventDefault();
@@ -356,7 +357,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             return newPreviews;
         });
         onRemovePreview?.(index);
-    }, [onRemovePreview]);
+    }, [onRemovePreview, setPreviews, setUploadedFiles, setUploadComplete, setUploadProgress, setError]);
 
     const renderUploadedFiles = () => (
         <motion.div
@@ -682,9 +683,9 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         <div className="w-full flex flex-col items-center">
             <motion.div
                 className={`w-full max-w-[600px] relative ${_defaultClassName} ${className} ${isDragActive ? (dragActiveClassName || defaultDragActiveClassName) : ''}`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
+                onDragEnter={handlePreviewDragAction}
+                onDragLeave={handlePreviewDragAction}
+                onDragOver={handlePreviewDragAction}
                 onDrop={handleDrop}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

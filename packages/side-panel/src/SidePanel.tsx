@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState, createContext, useContext, useMemo } from 'react';
+import React, { memo, useEffect, useRef, useState, createContext, useContext, useMemo, useCallback } from 'react';
 import { IoCloseOutline, IoMenuOutline } from 'react-icons/io5';
 import type { IconType, IconBaseProps } from 'react-icons';
 
@@ -194,13 +194,14 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     const [isHovering, setIsHovering] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
-    // Define a toggle handler function outside of useMemo
-    const handleToggle = () => {
-        // Use timeout to ensure state updates properly for animations
-        setTimeout(() => {
+    // 使用 useCallback 包裝 handleToggle 函數
+    const handleToggle = useCallback(() => {
+        if (onToggle) {
             onToggle();
-        }, 0);
-    };
+        } else {
+            setIsInDOM(!isInDOM);
+        }
+    }, [onToggle, isInDOM, setIsInDOM]);
 
     // Memoize the toggle handler to prevent unnecessary re-renders
     const memoizedToggle = useMemo(() => handleToggle, [handleToggle]);

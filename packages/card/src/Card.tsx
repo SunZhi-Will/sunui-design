@@ -108,7 +108,6 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
                     }
                 });
             }, 4000);
-
             return () => clearInterval(floatInterval);
         }
     }, [floatingEffect, disabled, controls, intensityFactor]);
@@ -130,13 +129,14 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
 
     useEffect(() => {
         setIsExpanded(expanded);
-    }, [expanded]);
+    }, [expanded, setIsExpanded]);
 
     // Check if background is dark based on backgroundImage or overlay
     useEffect(() => {
         if (backgroundImage) {
             setIsDarkBackground(true);
-        } else if (backgroundImageOverlay) {
+        }
+        else if (backgroundImageOverlay) {
             // Check if overlay is dark by looking for dark colors in the gradient
             const isDark = backgroundImageOverlay.includes('rgba(0, 0, 0') ||
                 backgroundImageOverlay.includes('rgb(0, 0, 0') ||
@@ -144,10 +144,11 @@ export const Card: React.FC<CardProps> = ({ children, ...props }) => {
                 backgroundImageOverlay.includes('black') ||
                 /rgba\(\d+,\s*\d+,\s*\d+,\s*[0-7]\)/.test(backgroundImageOverlay);
             setIsDarkBackground(isDark);
-        } else {
+        }
+        else {
             setIsDarkBackground(false);
         }
-    }, [backgroundImage, backgroundImageOverlay]);
+    }, [backgroundImage, backgroundImageOverlay, setIsDarkBackground]);
 
     // Memoize variant styles to prevent recalculation on every render
     const { variantStyle, hoverStyle } = useMemo(() =>

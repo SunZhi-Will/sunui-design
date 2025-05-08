@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
+/* eslint-env node */
+// @ts-check
+
 /**
  * 構建所有包的腳本，順序執行以確保正確的依賴關係
  * CommonJS 版本，確保在任何 Node.js 環境中都能正常工作
+ * 
+ * @global process
+ * @global console
  */
 
 const { execSync } = require('child_process');
