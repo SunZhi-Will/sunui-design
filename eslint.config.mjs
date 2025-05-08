@@ -11,12 +11,15 @@ export default [
     {
         ignores: [
             '**/dist/**',
+            '**/dist/**/*.d.ts',
+            '**/dist/**/*.js',
+            '**/*.d.ts',
+            '**/__tests__/**',
+            '**/test/**',
             '**/node_modules/**',
             'build/**',
             'out/**',
             '.next/**',
-            '**/__tests__/**',
-            '**/test/**',
             'storybook-static/**'
         ],
         files: ['**/*.{js,jsx,ts,tsx}'],
@@ -35,6 +38,8 @@ export default [
                 ecmaFeatures: {
                     jsx: true,
                 },
+                project: './tsconfig.json',
+                tsconfigRootDir: '.',
             },
             globals: {
                 // Browser globals
@@ -42,6 +47,9 @@ export default [
                 window: 'readonly',
                 console: 'readonly',
                 setTimeout: 'readonly',
+                clearTimeout: 'readonly',
+                setInterval: 'readonly',
+                clearInterval: 'readonly',
                 alert: 'readonly',
                 File: 'readonly',
                 FileReader: 'readonly',
@@ -49,6 +57,11 @@ export default [
                 HTMLDivElement: 'readonly',
                 IntersectionObserver: 'readonly',
                 SVGSVGElement: 'readonly',
+                localStorage: 'readonly',
+                sessionStorage: 'readonly',
+                navigator: 'readonly',
+                location: 'readonly',
+                fetch: 'readonly',
 
                 // Node globals
                 __dirname: 'readonly',
