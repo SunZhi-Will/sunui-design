@@ -2,76 +2,13 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "outDir": "./dist",
-        "rootDir": "./src",
-        "declaration": true,
-        "composite": true,
-        "moduleResolution": "node",
-        "module": "ESNext",
-        "baseUrl": ".",
-        "paths": {
-            "@sunui-design/core": [
-                "../core/src"
-            ],
-            "@sunui-design/floating": [
-                "../floating-button/src"
-            ],
-            "@sunui-design/social": [
-                "../social-button/src"
-            ],
-            "@sunui-design/gradient": [
-                "../gradient-background/src"
-            ],
-            "@sunui-design/filter": [
-                "../filter-grid/src"
-            ],
-            "@sunui-design/card": [
-                "../card/src"
-            ],
-            "@sunui-design/countdown-banner": [
-                "../countdown-banner/src"
-            ],
-            "@sunui-design/file-upload": [
-                "../file-upload/src"
-            ],
-            "@sunui-design/side-panel": [
-                "../side-panel/src"
-            ]
-        }
+        "rootDir": "../"
     },
     "include": [
-        "src/**/*"
+        "../**/*"
     ],
     "exclude": [
         "node_modules",
         "dist"
-    ],
-    "references": [
-        {
-            "path": "../core"
-        },
-        {
-            "path": "../floating-button"
-        },
-        {
-            "path": "../social-button"
-        },
-        {
-            "path": "../gradient-background"
-        },
-        {
-            "path": "../filter-grid"
-        },
-        {
-            "path": "../card"
-        },
-        {
-            "path": "../countdown-banner"
-        },
-        {
-            "path": "../file-upload"
-        },
-        {
-            "path": "../side-panel"
-        }
     ]
 }

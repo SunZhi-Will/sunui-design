@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo, ReactElement } from 'react';
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as pdfjsLib from 'pdfjs-dist';
 import { UploadIcon as _UploadIcon } from './UploadIcon';
@@ -42,7 +42,7 @@ export type FileUploadProps = {
     description?: string;
 }
 
-export const FileUpload = (props: FileUploadProps): ReactElement => {
+export const FileUpload = (props: FileUploadProps): JSX.Element => {
     const {
         onFileSelect,
         onFileUpload,
@@ -153,16 +153,17 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             }
             return true;
         });
-    }, [maxSize, accept, setError]);
+    }, [maxSize, accept]);
 
-    const handlePreviewDragAction = useCallback((e: React.DragEvent) => {
+    const handleDrag = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
         e.stopPropagation();
         if (e.type === 'dragenter' || e.type === 'dragover') {
             setIsDragActive(true);
         } else if (e.type === 'dragleave') {
             setIsDragActive(false);
         }
-    }, [setIsDragActive]);
+    }, []);
 
     const simulateProgress = useCallback(async () => {
         setIsUploading(true);
@@ -171,7 +172,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             await new Promise(resolve => setTimeout(resolve, 30));
             setUploadProgress(i);
         }
-    }, [setIsUploading, setUploadProgress]);
+    }, []);
 
     const handlePreview = useCallback(async (files: File[]) => {
         for (const file of files) {
@@ -198,19 +199,19 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                 }]);
             }
         }
-    }, [setPreviews]);
+    }, []);
 
     const createImagePreview = (file: File): Promise<FilePreview> => {
-        return new Promise((resolve, _error) => {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const result = e.target?.result as string;
+            reader.onloadend = () => {
                 resolve({
-                    url: result,
+                    url: reader.result as string,
                     name: file.name,
                     type: file.type
                 });
             };
+            reader.onerror = reject;
             reader.readAsDataURL(file);
         });
     };
@@ -255,7 +256,6 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                         type: file.type
                     });
                 } catch (error) {
-                    console.error('預覽生成失敗:', error);
                     reject(error);
                 }
             };
@@ -278,13 +278,12 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                     setIsUploading(false);
                 }, 300);
             } catch (error) {
-                console.error('Upload failed:', error);
                 setError('Upload failed. Please try again.');
                 setIsUploading(false);
                 setUploadComplete(false);
             }
         }
-    }, [onFileSelect, onFileUpload, handlePreview, simulateProgress, setUploadProgress, setUploadedFiles, setUploadComplete, setIsUploading, setError]);
+    }, [onFileSelect, onFileUpload, handlePreview, simulateProgress]);
 
     const resetUpload = useCallback(() => {
         setUploadedFiles([]);
@@ -292,7 +291,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         setUploadProgress(0);
         setPreviews([]);
         setError(null);
-    }, [setUploadedFiles, setUploadComplete, setUploadProgress, setPreviews, setError]);
+    }, []);
 
     const handleDrop = useCallback(async (e: React.DragEvent) => {
         e.preventDefault();
@@ -305,7 +304,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         if (validFiles.length > 0) {
             await handleFileUploadProcess(validFiles);
         }
-    }, [validateFiles, handleFileUploadProcess, setIsDragActive]);
+    }, [validateFiles, handleFileUploadProcess]);
 
     const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -337,7 +336,6 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                 </svg>
             );
         }
-        // 預設圖標
         return (
             <svg className={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -358,7 +356,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
             return newPreviews;
         });
         onRemovePreview?.(index);
-    }, [onRemovePreview, setPreviews, setUploadedFiles, setUploadComplete, setUploadProgress, setError]);
+    }, [onRemovePreview]);
 
     const renderUploadedFiles = () => (
         <motion.div
@@ -380,7 +378,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                                 {file.name}
                             </p>
                             <p className="text-xs text-gray-500">
-                                {(file.size / 1024).toFixed(1)} KB &bull; Upload successful
+                                {(file.size / 1024).toFixed(1)} KB • Upload successful
                             </p>
                         </div>
                         <div className={`text-${colors.primary}-500 flex-shrink-0`}>
@@ -604,7 +602,7 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                                             </motion.p>
                                             {(accept || description) && (
                                                 <p className="mt-2 text-sm text-gray-500">
-                                                    {description || (accept && `Supported file types: ${accept.split(",").map(type => type.replace("/*", "")).join(", ")}`)}
+                                                    {description || (accept && `Supported file types: ${accept.split(',').map(type => type.replace('/*', '')).join(', ')}`)}
                                                 </p>
                                             )}
                                             {maxSize && (
@@ -660,12 +658,6 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
                         </motion.p>
                         <motion.button
                             onClick={() => setError(null)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    setError(null);
-                                }
-                            }}
                             className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -684,9 +676,9 @@ export const FileUpload = (props: FileUploadProps): ReactElement => {
         <div className="w-full flex flex-col items-center">
             <motion.div
                 className={`w-full max-w-[600px] relative ${_defaultClassName} ${className} ${isDragActive ? (dragActiveClassName || defaultDragActiveClassName) : ''}`}
-                onDragEnter={handlePreviewDragAction}
-                onDragLeave={handlePreviewDragAction}
-                onDragOver={handlePreviewDragAction}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
                 onDrop={handleDrop}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

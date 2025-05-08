@@ -209,27 +209,29 @@ export const FloatingButton: React.FC<FloatingButtonProps> = ({
                 const IconComponent = button.type ? socialIcons[button.type] : undefined;
                 return (
                     <SocialButton
-                        key={button.href || index}
+                        key={button.href}
                         {...button}
                         icon={IconComponent ? <IconComponent /> : button.icon}
                         className={button.className || "bg-gradient-to-r from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50"}
                         variant={variant}
                     />
                 );
-            });
+            }) as React.ReactElement[];
         }
 
-        // 避免直接使用 React.Children.map 來修改子元素
-        // 這裡我們使用一個不同的方法來處理
-        const childrenArray = React.Children.toArray(children);
-        return childrenArray.map((child, index) => {
-            // 直接返回子元素，不進行修改
-            return (
-                <React.Fragment key={index}>
-                    {child}
-                </React.Fragment>
-            );
-        });
+        return React.Children.map(children, (child, _index) => {
+            if (React.isValidElement<SocialButtonProps>(child)) {
+                return React.cloneElement(child, {
+                    ...child.props,
+                    key: _index,
+                    variant,
+                    className: child.props.className?.includes('bg-gradient-to-r')
+                        ? child.props.className
+                        : `bg-gradient-to-r ${child.props.className || 'from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50'}`
+                });
+            }
+            return child;
+        }) as React.ReactElement[];
     };
 
     return (

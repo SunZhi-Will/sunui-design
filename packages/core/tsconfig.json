@@ -18,7 +18,6 @@
         "jsx": "react",
         "incremental": true,
         "declaration": true,
-        "composite": true,
         "outDir": "./dist",
         "baseUrl": ".",
         "paths": {

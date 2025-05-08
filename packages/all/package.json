@@ -2,7 +2,6 @@
   "name": "@sunui-design/react",
   "version": "0.0.54",
   "description": "A modern React UI library with elegant design and smooth animations",
-  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -26,10 +25,7 @@
   "author": "Sunzhi",
   "license": "MIT",
   "dependencies": {
-    "@sunui-design/card": "0.0.54",
     "@sunui-design/core": "0.0.54",
-    "@sunui-design/countdown-banner": "0.0.53",
-    "@sunui-design/file-upload": "0.0.54",
     "@sunui-design/filter": "0.0.54",
     "@sunui-design/floating": "0.0.54",
     "@sunui-design/gradient": "0.0.54",

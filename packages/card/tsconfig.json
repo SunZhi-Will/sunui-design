@@ -1,32 +1,9 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "target": "es5",
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "esnext"
-        ],
-        "allowJs": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "react",
-        "incremental": true,
-        "declaration": true,
-        "composite": true,
+        "rootDir": "./src",
         "outDir": "./dist",
-        "baseUrl": ".",
-        "paths": {
-            "sunui-*": [
-                "../*/src"
-            ]
-        }
+        "jsx": "react-jsx"
     },
     "include": [
         "src/**/*"
