@@ -38,7 +38,7 @@
     "@sunui-design/social": "0.0.53",
     "@types/pdfjs-dist": "^2.10.378",
     "@types/postcss-load-config": "^3.0.1",
-    "framer-motion": "^12.4.12",
+    "framer-motion": "^12.8.2",
     "next": "^15.2.4",
     "pdfjs-dist": "^5.0.375",
     "react": "^19",
