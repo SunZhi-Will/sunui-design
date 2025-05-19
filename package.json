@@ -41,7 +41,7 @@
     "framer-motion": "^12.4.12",
     "next": "^15.2.4",
     "pdfjs-dist": "^5.0.375",
-    "react": "^19",
+    "react": "^19.1.0",
     "react-dom": "^19"
   },
   "devDependencies": {
