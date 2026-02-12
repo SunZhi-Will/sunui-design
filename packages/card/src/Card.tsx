@@ -1,39 +1,53 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { cn } from './utils';
 
-export type CardVariant = 'outlined' | 'filled' | 'elevated';
-export type CardSize = 'sm' | 'md' | 'lg';
-export type CardTheme = 'violet' | 'cyan' | 'orange';
-export type CardLoadingMode = 'overlay' | 'skeleton';
+export type CardVariant = 'outlined' | 'filled' | 'elevated' | 'glass' | 'gradient';
+export type CardSize = 'sm' | 'md' | 'lg' | 'xl';
+export type CardTheme = 'violet' | 'cyan' | 'orange' | 'gradient' | 'dark' | 'light';
+export type CardLoadingMode = 'overlay' | 'skeleton' | 'shimmer';
+export type CardMode = 'light' | 'dark';
 
 export interface CardProps {
     children?: React.ReactNode;
     variant?: CardVariant;
     size?: CardSize;
     theme?: CardTheme;
+    mode?: CardMode;
     loading?: boolean;
     loadingMode?: CardLoadingMode;
+    hoverable?: boolean;
+    clickable?: boolean;
+    bordered?: boolean;
+    shadow?: boolean;
+    glow?: boolean;
     className?: string;
     style?: React.CSSProperties;
+    onClick?: () => void;
 }
 
 export interface CardHeaderProps {
     children?: React.ReactNode;
     showDivider?: boolean;
     className?: string;
+    mode?: CardMode;
+    align?: 'left' | 'center' | 'right';
 }
 
 export interface CardContentProps {
     children?: React.ReactNode;
     showDivider?: boolean;
     className?: string;
+    mode?: CardMode;
+    noPadding?: boolean;
 }
 
 export interface CardFooterProps {
     children?: React.ReactNode;
     showDivider?: boolean;
     className?: string;
+    mode?: CardMode;
+    justify?: 'start' | 'center' | 'end' | 'between' | 'around';
 }
 
 export interface CardImageProps {
@@ -42,6 +56,10 @@ export interface CardImageProps {
     loading?: 'lazy' | 'eager';
     fallback?: string;
     className?: string;
+    aspectRatio?: '16/9' | '4/3' | '1/1' | 'auto';
+    objectFit?: 'cover' | 'contain' | 'fill' | 'none';
+    overlay?: boolean;
+    overlayGradient?: 'top' | 'bottom' | 'both' | 'none';
 }
 
 export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
@@ -50,107 +68,319 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
         variant = 'outlined',
         size = 'md',
         theme = 'violet',
+        mode = 'light',
         loading = false,
         loadingMode = 'skeleton',
+        hoverable = true,
+        clickable = false,
+        bordered = true,
+        shadow = true,
+        glow = false,
         style,
+        onClick,
     } = props;
 
-    // 主題顏色配置
-    const themeColors = React.useMemo(() => ({
+    const ref = React.useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.2 });
+    const [isHovering, setIsHovering] = React.useState(false);
+
+    // 深色模式主題配置
+    const darkThemeColors = React.useMemo(() => ({
         violet: {
-            primary: 'primary',
-            text: 'primary-700',
-            bg: 'primary-50/30',
-            border: 'primary-200',
-            shadow: 'shadow-primary-100/50',
-            gradient: 'from-primary-100/20 to-primary-50/20',
-            hoverGradient: 'from-primary-100/30 to-primary-50/30',
-            ring: 'ring-primary-200',
+            bg: 'from-gray-950 to-gray-900',
+            border: 'border-violet-900/50',
+            hoverBorder: 'hover:border-violet-700/70',
+            text: 'text-gray-100',
+            accent: 'text-violet-400',
+            glow: 'shadow-violet-500/20',
+            glowHover: 'hover:shadow-violet-500/40',
+            gradient: 'from-violet-950/50 via-gray-900/50 to-gray-950/50',
+            glassBg: 'bg-gray-900/80',
         },
         cyan: {
-            primary: 'info',
-            text: 'info-700',
-            bg: 'info-50/30',
-            border: 'info-200',
-            shadow: 'shadow-info-100/50',
-            gradient: 'from-info-100/20 to-info-50/20',
-            hoverGradient: 'from-info-100/30 to-info-50/30',
-            ring: 'ring-info-200',
+            bg: 'from-gray-950 to-gray-900',
+            border: 'border-cyan-900/50',
+            hoverBorder: 'hover:border-cyan-700/70',
+            text: 'text-gray-100',
+            accent: 'text-cyan-400',
+            glow: 'shadow-cyan-500/20',
+            glowHover: 'hover:shadow-cyan-500/40',
+            gradient: 'from-cyan-950/50 via-gray-900/50 to-gray-950/50',
+            glassBg: 'bg-gray-900/80',
         },
         orange: {
-            primary: 'warning',
-            text: 'warning-700',
-            bg: 'warning-50/30',
-            border: 'warning-200',
-            shadow: 'shadow-warning-100/50',
-            gradient: 'from-warning-100/20 to-warning-50/20',
-            hoverGradient: 'from-warning-100/30 to-warning-50/30',
-            ring: 'ring-warning-200',
+            bg: 'from-gray-950 to-gray-900',
+            border: 'border-orange-900/50',
+            hoverBorder: 'hover:border-orange-700/70',
+            text: 'text-gray-100',
+            accent: 'text-orange-400',
+            glow: 'shadow-orange-500/20',
+            glowHover: 'hover:shadow-orange-500/40',
+            gradient: 'from-orange-950/50 via-gray-900/50 to-gray-950/50',
+            glassBg: 'bg-gray-900/80',
+        },
+        gradient: {
+            bg: 'from-gray-950 via-gray-900 to-gray-950',
+            border: 'border-pink-900/50',
+            hoverBorder: 'hover:border-pink-700/70',
+            text: 'text-gray-100',
+            accent: 'text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500',
+            glow: 'shadow-pink-500/20',
+            glowHover: 'hover:shadow-pink-500/40',
+            gradient: 'from-pink-950/50 via-purple-950/50 to-orange-950/50',
+            glassBg: 'bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80',
+        },
+        dark: {
+            bg: 'from-gray-950 via-slate-900 to-gray-900',
+            border: 'border-blue-900/50',
+            hoverBorder: 'hover:border-blue-700/70',
+            text: 'text-gray-100',
+            accent: 'text-blue-400',
+            glow: 'shadow-blue-500/20',
+            glowHover: 'hover:shadow-blue-500/40',
+            gradient: 'from-blue-950/50 via-slate-900/50 to-gray-950/50',
+            glassBg: 'bg-gray-900/80',
+        },
+        light: {
+            bg: 'from-white to-gray-50',
+            border: 'border-gray-200',
+            hoverBorder: 'hover:border-gray-300',
+            text: 'text-gray-900',
+            accent: 'text-gray-700',
+            glow: 'shadow-gray-200/50',
+            glowHover: 'hover:shadow-gray-300/60',
+            gradient: 'from-gray-50/50 via-white/50 to-gray-100/50',
+            glassBg: 'bg-white/80',
         },
     }), []);
 
-    const _colors = themeColors[theme];
+    // 淺色模式主題配置
+    const lightThemeColors = React.useMemo(() => ({
+        violet: {
+            bg: 'from-white to-violet-50',
+            border: 'border-violet-200',
+            hoverBorder: 'hover:border-violet-300',
+            text: 'text-gray-900',
+            accent: 'text-violet-600',
+            glow: 'shadow-violet-200/50',
+            glowHover: 'hover:shadow-violet-300/60',
+            gradient: 'from-violet-50/50 via-white/50 to-purple-50/50',
+            glassBg: 'bg-white/80',
+        },
+        cyan: {
+            bg: 'from-white to-cyan-50',
+            border: 'border-cyan-200',
+            hoverBorder: 'hover:border-cyan-300',
+            text: 'text-gray-900',
+            accent: 'text-cyan-600',
+            glow: 'shadow-cyan-200/50',
+            glowHover: 'hover:shadow-cyan-300/60',
+            gradient: 'from-cyan-50/50 via-white/50 to-blue-50/50',
+            glassBg: 'bg-white/80',
+        },
+        orange: {
+            bg: 'from-white to-orange-50',
+            border: 'border-orange-200',
+            hoverBorder: 'hover:border-orange-300',
+            text: 'text-gray-900',
+            accent: 'text-orange-600',
+            glow: 'shadow-orange-200/50',
+            glowHover: 'hover:shadow-orange-300/60',
+            gradient: 'from-orange-50/50 via-white/50 to-amber-50/50',
+            glassBg: 'bg-white/80',
+        },
+        gradient: {
+            bg: 'from-white via-purple-50 to-pink-50',
+            border: 'border-pink-200',
+            hoverBorder: 'hover:border-pink-300',
+            text: 'text-gray-900',
+            accent: 'text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600',
+            glow: 'shadow-pink-200/50',
+            glowHover: 'hover:shadow-pink-300/60',
+            gradient: 'from-pink-50/50 via-purple-50/50 to-orange-50/50',
+            glassBg: 'bg-gradient-to-br from-white/80 via-purple-50/80 to-pink-50/80',
+        },
+        dark: {
+            bg: 'from-gray-50 to-gray-100',
+            border: 'border-gray-300',
+            hoverBorder: 'hover:border-gray-400',
+            text: 'text-gray-900',
+            accent: 'text-gray-700',
+            glow: 'shadow-gray-300/50',
+            glowHover: 'hover:shadow-gray-400/60',
+            gradient: 'from-gray-100/50 via-gray-50/50 to-slate-100/50',
+            glassBg: 'bg-white/80',
+        },
+        light: {
+            bg: 'from-white to-gray-50',
+            border: 'border-gray-200',
+            hoverBorder: 'hover:border-gray-300',
+            text: 'text-gray-900',
+            accent: 'text-gray-700',
+            glow: 'shadow-gray-200/50',
+            glowHover: 'hover:shadow-gray-300/60',
+            gradient: 'from-gray-50/50 via-white/50 to-gray-100/50',
+            glassBg: 'bg-white/80',
+        },
+    }), []);
 
+    const themeColors = mode === 'dark' ? darkThemeColors : lightThemeColors;
+    const colors = themeColors[theme];
+
+    // 基礎樣式
     const baseStyles = cn(
-        'rounded-xl border bg-white/95 text-gray-900 relative overflow-hidden',
-        'backdrop-blur-md transition-all duration-300',
-        'focus:outline-none focus:ring-2',
-        'shadow-sm hover:shadow-md'
+        'relative overflow-hidden transition-all duration-300',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        colors.text,
+        clickable && 'cursor-pointer',
     );
 
+    // 變體樣式
     const variantStyles = {
         outlined: cn(
-            'border-primary-200',
-            'hover:border-primary-300/80 hover:bg-primary-50/30',
-            'hover:shadow-primary-100/20'
+            'bg-gradient-to-b backdrop-blur-sm',
+            mode === 'dark' ? 'from-gray-900/95 to-gray-950/95' : 'from-white/95 to-gray-50/95',
+            bordered && colors.border,
+            bordered && colors.hoverBorder,
+            shadow && 'shadow-md',
+            shadow && hoverable && 'hover:shadow-xl',
+            glow && colors.glow,
+            glow && hoverable && colors.glowHover,
         ),
         filled: cn(
-            'bg-primary-50/30 backdrop-blur-md border-transparent',
-            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
-            'hover:bg-gradient-to-br from-primary-100/30 to-primary-50/30',
-            'hover:shadow-primary-100/30'
+            `bg-gradient-to-br ${colors.bg}`,
+            'backdrop-blur-md',
+            bordered && 'border border-white/10',
+            shadow && 'shadow-lg',
+            shadow && hoverable && 'hover:shadow-2xl',
+            glow && colors.glow,
+            glow && hoverable && colors.glowHover,
         ),
         elevated: cn(
-            'border-transparent shadow-lg',
-            'bg-gradient-to-br from-primary-100/20 to-primary-50/20',
-            'hover:shadow-xl hover:-translate-y-0.5 hover:shadow-primary-100/20'
+            'bg-gradient-to-br backdrop-blur-md',
+            mode === 'dark' ? 'from-gray-900/95 via-gray-800/95 to-gray-900/95' : 'from-white/95 via-gray-50/95 to-white/95',
+            'border-transparent',
+            'shadow-xl',
+            hoverable && 'hover:shadow-2xl',
+            glow && colors.glow,
+            glow && hoverable && colors.glowHover,
+        ),
+        glass: cn(
+            `backdrop-blur-xl ${colors.glassBg}`,
+            'border border-white/20',
+            mode === 'dark' && 'shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
+            mode === 'light' && 'shadow-[0_8px_32px_rgba(0,0,0,0.08)]',
+            hoverable && mode === 'dark' && 'hover:shadow-[0_12px_48px_rgba(0,0,0,0.5)]',
+            hoverable && mode === 'light' && 'hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)]',
+        ),
+        gradient: cn(
+            `bg-gradient-to-br ${colors.gradient}`,
+            'backdrop-blur-lg border border-white/10',
+            shadow && 'shadow-xl',
+            shadow && hoverable && 'hover:shadow-2xl',
+            glow && colors.glow,
+            glow && hoverable && colors.glowHover,
         ),
     };
 
+    // 尺寸樣式
     const sizeStyles = {
-        sm: 'p-3',
-        md: 'p-5',
-        lg: 'p-7',
+        sm: 'p-4 rounded-lg',
+        md: 'p-6 rounded-xl',
+        lg: 'p-8 rounded-2xl',
+        xl: 'p-10 rounded-3xl',
     };
 
+    // 載入覆蓋層樣式
     const loadingOverlayStyles = cn(
-        "absolute inset-0 flex items-center justify-center",
-        loadingMode === 'overlay' ? "bg-white/60" : "bg-white/95"
+        "absolute inset-0 flex items-center justify-center z-30",
+        "backdrop-blur-sm",
+        mode === 'dark' ? "bg-gray-900/80" : "bg-white/80"
     );
 
+    // 載入動畫樣式
     const loadingSpinnerStyles = {
-        outer: "absolute w-full h-full rounded-full border-[3px] border-gray-100",
-        inner: "absolute w-full h-full rounded-full border-[3px] border-gray-400 border-t-transparent animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite]"
+        outer: cn(
+            "absolute w-full h-full rounded-full border-[3px]",
+            mode === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        ),
+        inner: cn(
+            "absolute w-full h-full rounded-full border-[3px] border-t-transparent animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite]",
+            mode === 'dark' ? 'border-gray-300' : 'border-gray-600'
+        ),
     };
 
+    // 骨架屏樣式
     const skeletonStyles = {
-        base: "bg-gray-100 rounded animate-pulse",
-        title: "h-5 w-2/3",
+        base: cn(
+            "rounded animate-pulse",
+            mode === 'dark' ? 'bg-gray-700/50' : 'bg-gray-200'
+        ),
+        title: "h-6 w-2/3",
         subtitle: "h-4 w-1/2",
-        line: "h-3.5",
-        button: "h-8 w-1/3"
+        line: "h-4",
+        button: "h-10 w-1/3"
     };
+
+    // Shimmer 載入效果
+    const shimmerStyles = cn(
+        "absolute inset-0 z-20",
+        "bg-gradient-to-r",
+        mode === 'dark' 
+            ? 'from-transparent via-white/5 to-transparent' 
+            : 'from-transparent via-white/50 to-transparent',
+        "animate-[shimmer_2s_infinite]"
+    );
 
     return (
         <motion.div
-            className={cn(baseStyles, variantStyles[variant], sizeStyles[size], className)}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            whileHover={{ scale: 1.01, transition: { duration: 0.2, ease: "easeOut" } }}
-            whileTap={{ scale: 0.99, transition: { duration: 0.1, ease: "easeIn" } }}
+            ref={ref}
+            className={cn(
+                baseStyles, 
+                variantStyles[variant], 
+                sizeStyles[size],
+                bordered && 'border',
+                className
+            )}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            whileHover={hoverable ? { 
+                scale: clickable ? 1.02 : 1.01, 
+                transition: { duration: 0.2, ease: "easeOut" } 
+            } : undefined}
+            whileTap={clickable ? { 
+                scale: 0.98, 
+                transition: { duration: 0.1, ease: "easeIn" } 
+            } : undefined}
             style={style}
+            onClick={onClick}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
         >
+            {/* 光暈效果 */}
+            {glow && isHovering && (
+                <motion.div
+                    className={cn(
+                        "absolute inset-0 -z-10 blur-xl opacity-50",
+                        `bg-gradient-radial ${colors.glow}`
+                    )}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 0.5, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                />
+            )}
+
+            {/* 內部光澤效果 */}
+            <div className={cn(
+                "absolute inset-0 pointer-events-none z-0",
+                "bg-gradient-to-b",
+                mode === 'dark' 
+                    ? "from-white/[0.05] via-transparent to-transparent" 
+                    : "from-white/60 via-transparent to-transparent"
+            )} />
+
             <AnimatePresence>
                 {loading && (
                     <motion.div
@@ -167,88 +397,160 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <div className="relative w-10 h-10">
+                                <div className="relative w-12 h-12">
                                     <div className={loadingSpinnerStyles.outer} />
                                     <div className={loadingSpinnerStyles.inner} />
                                 </div>
-                                <span className="font-medium text-xs text-gray-500">
+                                <span className={cn(
+                                    "font-medium text-sm",
+                                    mode === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                )}>
                                     Loading...
                                 </span>
                             </motion.div>
+                        ) : loadingMode === 'shimmer' ? (
+                            <>
+                                <div className={shimmerStyles} />
+                                <div className="w-full h-full flex flex-col px-6 py-5">
+                                    <div className="flex flex-col gap-3 mb-6">
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.title)} />
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.subtitle)} />
+                                    </div>
+                                    <div className="flex flex-col gap-3 mb-6">
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-11/12")} />
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-4/5")} />
+                                        <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
+                                    </div>
+                                    <div className={cn(skeletonStyles.base, skeletonStyles.button)} />
+                                </div>
+                            </>
                         ) : (
-                            <div className="w-full h-full flex flex-col px-5 py-4">
-                                {/* 標題載入動畫 */}
-                                <div className="flex flex-col gap-2 mb-5">
+                            <div className="w-full h-full flex flex-col px-6 py-5">
+                                <div className="flex flex-col gap-3 mb-6">
                                     <div className={cn(skeletonStyles.base, skeletonStyles.title)} />
                                     <div className={cn(skeletonStyles.base, skeletonStyles.subtitle)} />
                                 </div>
-                                {/* 內容載入動畫 */}
-                                <div className="flex flex-col gap-2.5 mb-5">
+                                <div className="flex flex-col gap-3 mb-6">
                                     <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
                                     <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-11/12")} />
                                     <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-4/5")} />
                                     <div className={cn(skeletonStyles.base, skeletonStyles.line, "w-full")} />
                                 </div>
-                                {/* 底部載入動畫 */}
                                 <div className={cn(skeletonStyles.base, skeletonStyles.button)} />
                             </div>
                         )}
                     </motion.div>
                 )}
             </AnimatePresence>
+            
             <div className={cn(
                 "relative z-10",
-                loading && loadingMode === 'skeleton' && "invisible",
-                loading && loadingMode === 'overlay' && "blur-[1px] select-none pointer-events-none opacity-50"
-            )}>{children}</div>
+                loading && loadingMode !== 'overlay' && "invisible",
+                loading && loadingMode === 'overlay' && "blur-[1px] select-none pointer-events-none opacity-30"
+            )}>
+                {children}
+            </div>
         </motion.div>
     );
 };
 
-export const CardHeader = ({ children, showDivider = false, className }: CardHeaderProps): React.JSX.Element => {
+export const CardHeader = ({ 
+    children, 
+    showDivider = false, 
+    className, 
+    mode = 'light',
+    align = 'left' 
+}: CardHeaderProps): React.JSX.Element => {
+    const alignStyles = {
+        left: 'items-start text-left',
+        center: 'items-center text-center',
+        right: 'items-end text-right',
+    };
+
     return (
         <div
             className={cn(
-                'flex flex-col space-y-1.5 px-5 py-4',
-                showDivider && 'border-b border-primary-100/30',
+                'flex flex-col space-y-2 relative z-10',
+                showDivider && 'pb-4 mb-4',
+                showDivider && mode === 'dark' && 'border-b border-white/10',
+                showDivider && mode === 'light' && 'border-b border-gray-200/60',
+                alignStyles[align],
                 className
             )}
         >
-            <div className="relative z-10">{children}</div>
+            {children}
         </div>
     );
 };
 
-export const CardContent = ({ children, showDivider = false, className }: CardContentProps): React.JSX.Element => {
+export const CardContent = ({ 
+    children, 
+    showDivider = false, 
+    className, 
+    mode = 'light',
+    noPadding = false 
+}: CardContentProps): React.JSX.Element => {
     return (
         <div
             className={cn(
-                'px-5 py-3',
-                showDivider && 'border-b border-primary-100/30',
+                'relative z-10',
+                !noPadding && 'py-3',
+                showDivider && 'pb-4 mb-4',
+                showDivider && mode === 'dark' && 'border-b border-white/10',
+                showDivider && mode === 'light' && 'border-b border-gray-200/60',
                 className
             )}
         >
-            <div className="relative z-10">{children}</div>
+            {children}
         </div>
     );
 };
 
-export const CardFooter = ({ children, showDivider = false, className }: CardFooterProps): React.JSX.Element => {
+export const CardFooter = ({ 
+    children, 
+    showDivider = false, 
+    className, 
+    mode = 'light',
+    justify = 'start' 
+}: CardFooterProps): React.JSX.Element => {
+    const justifyStyles = {
+        start: 'justify-start',
+        center: 'justify-center',
+        end: 'justify-end',
+        between: 'justify-between',
+        around: 'justify-around',
+    };
+
     return (
         <div
             className={cn(
-                'flex items-center px-5 py-4',
-                showDivider && 'border-t border-primary-100/30',
+                'flex items-center relative z-10',
+                showDivider && 'pt-4 mt-4',
+                showDivider && mode === 'dark' && 'border-t border-white/10',
+                showDivider && mode === 'light' && 'border-t border-gray-200/60',
+                justifyStyles[justify],
                 className
             )}
         >
-            <div className="relative z-10">{children}</div>
+            {children}
         </div>
     );
 };
 
-export const CardImage = ({ className, src, alt, loading = 'lazy', fallback }: CardImageProps): React.JSX.Element => {
+export const CardImage = ({ 
+    className, 
+    src, 
+    alt, 
+    loading = 'lazy', 
+    fallback,
+    aspectRatio = '16/9',
+    objectFit = 'cover',
+    overlay = false,
+    overlayGradient = 'bottom'
+}: CardImageProps): React.JSX.Element => {
     const [imgSrc, setImgSrc] = React.useState(src);
+    const [imageLoaded, setImageLoaded] = React.useState(false);
 
     const handleError = () => {
         if (fallback) {
@@ -256,27 +558,80 @@ export const CardImage = ({ className, src, alt, loading = 'lazy', fallback }: C
         }
     };
 
+    const handleLoad = () => {
+        setImageLoaded(true);
+    };
+
+    const aspectRatioStyles = {
+        '16/9': 'aspect-[16/9]',
+        '4/3': 'aspect-[4/3]',
+        '1/1': 'aspect-square',
+        'auto': 'h-auto',
+    };
+
+    const objectFitStyles = {
+        cover: 'object-cover',
+        contain: 'object-contain',
+        fill: 'object-fill',
+        none: 'object-none',
+    };
+
+    const overlayGradients = {
+        top: 'bg-gradient-to-b from-black/40 via-transparent to-transparent',
+        bottom: 'bg-gradient-to-t from-black/40 via-transparent to-transparent',
+        both: 'bg-gradient-to-b from-black/30 via-transparent to-black/30',
+        none: '',
+    };
+
     return (
-        <div className="relative w-full aspect-[16/9] overflow-hidden group rounded-xl">
+        <div className={cn(
+            "relative w-full overflow-hidden group rounded-xl -mx-6 -mt-6 mb-4",
+            aspectRatioStyles[aspectRatio]
+        )}>
+            {/* 載入骨架屏 */}
+            {!imageLoaded && (
+                <div className={cn(
+                    "absolute inset-0 animate-pulse",
+                    "bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200"
+                )} />
+            )}
+
             <motion.img
                 src={imgSrc}
                 alt={alt}
                 loading={loading}
                 onError={handleError}
+                onLoad={handleLoad}
                 className={cn(
-                    'w-full h-full object-cover transition-transform duration-500',
-                    'group-hover:scale-105 group-hover:brightness-105',
+                    'w-full h-full transition-all duration-700',
+                    objectFitStyles[objectFit],
+                    'group-hover:scale-110 group-hover:brightness-110',
                     className
                 )}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: imageLoaded ? 1 : 0, scale: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
             />
-            <motion.div
-                className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-            />
+
+            {/* 覆蓋層漸變 */}
+            {overlay && overlayGradient !== 'none' && (
+                <motion.div
+                    className={cn(
+                        "absolute inset-0 pointer-events-none",
+                        overlayGradients[overlayGradient],
+                        "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    )}
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                />
+            )}
+
+            {/* 光暈效果 */}
+            <div className={cn(
+                "absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100",
+                "bg-gradient-to-t from-transparent via-white/5 to-transparent",
+                "transition-opacity duration-500"
+            )} />
         </div>
     );
 };

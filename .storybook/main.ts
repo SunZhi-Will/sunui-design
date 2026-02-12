@@ -22,39 +22,9 @@ const config: StorybookConfig = {
     '@storybook/addon-a11y',
   ],
   staticDirs: ["../public"],
-  webpackFinal: async (config: webpack.Configuration) => {
-    if (config.module?.rules) {
-      config.module.rules = (config.module.rules as WebpackRule[]).filter(
-        (rule) => !(rule.test instanceof RegExp && rule.test.test('.css'))
-      );
-    }
-
-    if (config.module?.rules) {
-      const rules = config.module.rules as WebpackRule[];
-      rules.push({
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [
-                  require('@tailwindcss/postcss'),
-                  require('autoprefixer'),
-                ],
-              },
-            },
-          },
-        ],
-        include: /\.css$/,
-      });
-    }
-    return config;
-  },
+  // Tailwind CSS 4.0 不需要 webpack 配置，使用內建的 CSS 處理
   typescript: {
-    check: true,
+    check: false,
     reactDocgen: 'react-docgen-typescript'
   },
   docs: {

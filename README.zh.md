@@ -57,11 +57,11 @@ Sun UI Design 提供了一系列現代化且可自定義的組件。每個組件
 
 - [Card](packages/card/README.md) - 簡潔優雅的卡片組件
 - [FileUpload](packages/file-upload/README.md) - 支持拖放的現代文件上傳組件
-- [FilterGrid](packages/filter/README.md) - 用於顯示分類內容的網格組件
-- [FloatingButton](packages/floating/README.md) - 可展開選項的浮動按鈕組件
-- [GradientBackground](packages/gradient/README.md) - 動畫漸變背景組件
+- [FilterGrid](packages/filter-grid/README.md) - 用於顯示分類內容的網格組件
+- [FloatingButton](packages/floating-button/README.md) - 可展開選項的浮動按鈕組件
+- [GradientBackground](packages/gradient-background/README.md) - 動畫漸變背景組件
 - [SidePanel](packages/side-panel/README.md) - 側邊面板組件
-- [SocialButton](packages/social/README.md) - 社交媒體按鈕組件
+- [SocialButton](packages/social-button/README.md) - 社交媒體按鈕組件
 - [CountdownBanner](packages/countdown-banner/README.md) - 具有精美動畫效果的倒數計時橫幅，用於展示限時優惠
 
 ## 安裝

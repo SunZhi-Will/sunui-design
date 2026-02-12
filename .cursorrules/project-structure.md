@@ -80,9 +80,9 @@ SunUI Design 是一個基於 React 的 UI 組件庫，採用 monorepo 架構使�
 sunui-design/
 │
 ├── .storybook/       # Storybook 配置
-│   ├── main.js       # 主配置文件
-│   ├── preview.js    # 預覽配置
-│   └── theme.js      # 主題定義
+│   ├── main.ts       # 主配置文件
+│   ├── manager.ts    # Manager 配置
+│   └── preview.ts    # 預覽配置
 │
 ├── packages/         # 組件包集合
 │   ├── all/          # 整合所有組件的包
@@ -106,14 +106,13 @@ sunui-design/
 │   ├── fonts/        # 字體文件
 │   └── favicon.ico   # 網站圖標
 │
-├── scripts/          # 構建和發布腳本
-│   ├── build.js      # 構建腳本
-│   ├── publish.js    # 發布腳本
-│   ├── changelog.js  # 更新日誌生成腳本
-│   └── create-package.js # 創建新包腳本
+├── scripts/          # 構建與發布相關腳本
+│   ├── changelog.js  # 更新日誌生成
+│   ├── version.js    # 版本號處理
+│   ├── pack-all.js   # 打包所有 packages
+│   └── close-open-prs.ps1 # 一鍵處理開放 PR（需 Token）
 │
-├── src/              # 源代碼目錄（文檔網站）
-│   ├── app/          # Next.js App Router
+├── src/              # 根專案源碼（文檔與展示）
 │   ├── stories/      # Storybook 故事文件
 │   └── styles/       # 全局樣式
 │

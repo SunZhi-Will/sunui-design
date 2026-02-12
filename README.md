@@ -53,11 +53,11 @@ Sun UI Design provides a collection of modern and customizable components. Each 
 
 - [Card](packages/card/README.md) - A simple and elegant card component
 - [FileUpload](packages/file-upload/README.md) - A modern file upload component with drag and drop support
-- [FilterGrid](packages/filter/README.md) - A grid component for displaying categorized content
-- [FloatingButton](packages/floating/README.md) - A floating button component with expandable options
-- [GradientBackground](packages/gradient/README.md) - An animated gradient background component
+- [FilterGrid](packages/filter-grid/README.md) - A grid component for displaying categorized content
+- [FloatingButton](packages/floating-button/README.md) - A floating button component with expandable options
+- [GradientBackground](packages/gradient-background/README.md) - An animated gradient background component
 - [SidePanel](packages/side-panel/README.md) - A side panel component for displaying side content
-- [SocialButton](packages/social/README.md) - A button component for social media links
+- [SocialButton](packages/social-button/README.md) - A button component for social media links
 - [CountdownBanner](packages/countdown-banner/README.md) - A countdown timer banner with beautiful animations for time-sensitive offers
 
 ## Installation
