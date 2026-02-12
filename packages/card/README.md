@@ -139,6 +139,51 @@ export default function ProductCard() {
 </Card>
 ```
 
+### 可拖拉的卡片
+
+```tsx
+import { useState } from 'react';
+
+export default function DraggableCardExample() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleDragEnd = (event: any, info: any) => {
+    setPosition({
+      x: position.x + info.offset.x,
+      y: position.y + info.offset.y,
+    });
+  };
+
+  return (
+    <Card
+      variant="elevated"
+      theme="violet"
+      draggable                      // 啟用拖拉功能
+      dragConstraints={{             // 拖拉範圍限制
+        top: -200,
+        left: -200,
+        right: 200,
+        bottom: 200,
+      }}
+      dragElastic={0.1}              // 彈性係數 (0-1)
+      onDragStart={() => console.log('開始拖拉')}
+      onDragEnd={handleDragEnd}      // 拖拉結束事件
+      hoverable
+      shadow
+      glow
+    >
+      <CardHeader>
+        <h3 className="text-xl font-bold">可拖拉卡片</h3>
+        <p className="text-sm opacity-70">拖動我試試！</p>
+      </CardHeader>
+      <CardContent>
+        <p>這是一個可以自由拖動的卡片元件。</p>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
 ## Props
 
 ### Card Props
@@ -156,6 +201,11 @@ export default function ProductCard() {
 | `bordered` | `boolean` | `true` | 是否顯示邊框 |
 | `shadow` | `boolean` | `true` | 是否顯示陰影 |
 | `glow` | `boolean` | `false` | 是否顯示光暈效果 |
+| `draggable` | `boolean` | `false` | 是否啟用拖拉功能 |
+| `dragConstraints` | `object` | - | 拖拉範圍限制 `{ top, left, right, bottom }` |
+| `dragElastic` | `number` | `0.1` | 拖拉彈性係數 (0-1) |
+| `onDragStart` | `() => void` | - | 拖拉開始事件 |
+| `onDragEnd` | `(event, info) => void` | - | 拖拉結束事件 |
 | `onClick` | `() => void` | - | 點擊事件處理 |
 | `className` | `string` | - | 自訂 CSS 類別 |
 

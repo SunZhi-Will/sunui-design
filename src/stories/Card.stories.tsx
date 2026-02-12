@@ -8,7 +8,7 @@ const meta = {
     title: 'Components/Card',
     component: Card,
     parameters: {
-        layout: 'padded',
+        layout: 'centered',
         backgrounds: {
             default: 'light',
             values: [
@@ -36,6 +36,13 @@ const meta = {
             options: ['light', 'dark'],
         },
     },
+    decorators: [
+        (Story) => (
+            <div className="flex items-center justify-center min-h-screen w-full p-4">
+                <Story />
+            </div>
+        ),
+    ],
 } satisfies Meta<typeof Card>;
 
 export default meta;
@@ -502,4 +509,372 @@ export const DarkModeComplete: CardStory = {
             </Card>
         </div>
     ),
+};
+
+// 可拖拉的卡片 - 超酷炫版本 ✨
+export const DraggableCards: CardStory = {
+    render: () => {
+        const [positions, setPositions] = React.useState<Record<string, { x: number; y: number }>>({});
+        const [activeCard, setActiveCard] = React.useState<string | null>(null);
+
+        const handleDragStart = (id: string) => () => {
+            setActiveCard(id);
+        };
+
+        const handleDragEnd = (id: string) => (_event: any, info: any) => {
+            setPositions(prev => ({
+                ...prev,
+                [id]: {
+                    x: (prev[id]?.x || 0) + info.offset.x,
+                    y: (prev[id]?.y || 0) + info.offset.y,
+                },
+            }));
+            setActiveCard(null);
+        };
+
+        return (
+            <div className="relative w-full h-[700px] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-3xl overflow-hidden">
+                {/* 動態背景效果 */}
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob" />
+                    <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000" />
+                    <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000" />
+                </div>
+
+                {/* 網格背景 */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+                {/* 標題區域 */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
+                    <div className="bg-white/10 backdrop-blur-xl px-8 py-4 rounded-2xl border border-white/20 shadow-2xl">
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center animate-pulse">
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                                    </svg>
+                                </div>
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-ping" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Interactive Drag Cards</h3>
+                                <p className="text-sm text-white/60">拖動卡片，感受絲滑體驗 ✨</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 狀態指示器 */}
+                {activeCard && (
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+                        <div className="bg-green-500/20 backdrop-blur-xl px-6 py-3 rounded-full border border-green-400/30 shadow-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                <span className="text-sm font-medium text-green-100">
+                                    正在拖動卡片 {activeCard}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 卡片 1 - 設計師卡片 */}
+                <Card 
+                    variant="glass"
+                    theme="violet"
+                    size="sm"
+                    hoverable
+                    shadow
+                    glow
+                    draggable
+                    dragConstraints={{
+                        top: -280,
+                        left: -350,
+                        right: 350,
+                        bottom: 280,
+                    }}
+                    dragElastic={0.1}
+                    onDragStart={handleDragStart('1')}
+                    onDragEnd={handleDragEnd('card1')}
+                    className="absolute top-32 left-20 w-72"
+                    style={{
+                        x: positions['card1']?.x || 0,
+                        y: positions['card1']?.y || 0,
+                        zIndex: activeCard === '1' ? 50 : 10,
+                    }}
+                >
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">1</span>
+                    </div>
+                    <CardHeader mode="dark">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center shadow-lg">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">UI Designer</h3>
+                                <p className="text-xs text-white/60">創意設計師</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent mode="dark">
+                        <p className="text-sm text-white/80 mb-3 leading-relaxed">
+                            專注於創造美麗且功能強大的用戶介面
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                            <span className="px-2 py-1 bg-purple-500/20 text-purple-200 text-xs rounded-full border border-purple-400/30">Figma</span>
+                            <span className="px-2 py-1 bg-purple-500/20 text-purple-200 text-xs rounded-full border border-purple-400/30">Sketch</span>
+                            <span className="px-2 py-1 bg-purple-500/20 text-purple-200 text-xs rounded-full border border-purple-400/30">Design</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* 卡片 2 - 開發者卡片 */}
+                <Card 
+                    variant="glass"
+                    theme="cyan"
+                    size="sm"
+                    hoverable
+                    shadow
+                    glow
+                    draggable
+                    dragConstraints={{
+                        top: -280,
+                        left: -350,
+                        right: 350,
+                        bottom: 280,
+                    }}
+                    dragElastic={0.1}
+                    onDragStart={handleDragStart('2')}
+                    onDragEnd={handleDragEnd('card2')}
+                    className="absolute top-32 right-20 w-72"
+                    style={{
+                        x: positions['card2']?.x || 0,
+                        y: positions['card2']?.y || 0,
+                        zIndex: activeCard === '2' ? 50 : 10,
+                    }}
+                >
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">2</span>
+                    </div>
+                    <CardHeader mode="dark">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center shadow-lg">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Developer</h3>
+                                <p className="text-xs text-white/60">全端工程師</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent mode="dark">
+                        <p className="text-sm text-white/80 mb-3 leading-relaxed">
+                            用程式碼實現創意，構建優秀的產品
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                            <span className="px-2 py-1 bg-cyan-500/20 text-cyan-200 text-xs rounded-full border border-cyan-400/30">React</span>
+                            <span className="px-2 py-1 bg-cyan-500/20 text-cyan-200 text-xs rounded-full border border-cyan-400/30">Node.js</span>
+                            <span className="px-2 py-1 bg-cyan-500/20 text-cyan-200 text-xs rounded-full border border-cyan-400/30">TypeScript</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* 卡片 3 - 產品經理卡片 */}
+                <Card 
+                    variant="glass"
+                    theme="orange"
+                    size="sm"
+                    hoverable
+                    shadow
+                    glow
+                    draggable
+                    dragConstraints={{
+                        top: -280,
+                        left: -350,
+                        right: 350,
+                        bottom: 280,
+                    }}
+                    dragElastic={0.1}
+                    onDragStart={handleDragStart('3')}
+                    onDragEnd={handleDragEnd('card3')}
+                    className="absolute bottom-32 left-20 w-72"
+                    style={{
+                        x: positions['card3']?.x || 0,
+                        y: positions['card3']?.y || 0,
+                        zIndex: activeCard === '3' ? 50 : 10,
+                    }}
+                >
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-orange-400 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">3</span>
+                    </div>
+                    <CardHeader mode="dark">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center shadow-lg">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Product Manager</h3>
+                                <p className="text-xs text-white/60">產品經理</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent mode="dark">
+                        <p className="text-sm text-white/80 mb-3 leading-relaxed">
+                            規劃產品方向，協調團隊資源
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                            <span className="px-2 py-1 bg-orange-500/20 text-orange-200 text-xs rounded-full border border-orange-400/30">Strategy</span>
+                            <span className="px-2 py-1 bg-orange-500/20 text-orange-200 text-xs rounded-full border border-orange-400/30">Planning</span>
+                            <span className="px-2 py-1 bg-orange-500/20 text-orange-200 text-xs rounded-full border border-orange-400/30">Analysis</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* 卡片 4 - 數據分析師卡片 */}
+                <Card 
+                    variant="glass"
+                    theme="gradient"
+                    size="sm"
+                    hoverable
+                    shadow
+                    glow
+                    draggable
+                    dragConstraints={{
+                        top: -280,
+                        left: -350,
+                        right: 350,
+                        bottom: 280,
+                    }}
+                    dragElastic={0.1}
+                    onDragStart={handleDragStart('4')}
+                    onDragEnd={handleDragEnd('card4')}
+                    className="absolute bottom-32 right-20 w-72"
+                    style={{
+                        x: positions['card4']?.x || 0,
+                        y: positions['card4']?.y || 0,
+                        zIndex: activeCard === '4' ? 50 : 10,
+                    }}
+                >
+                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">4</span>
+                    </div>
+                    <CardHeader mode="dark">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-700 flex items-center justify-center shadow-lg">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white">Data Analyst</h3>
+                                <p className="text-xs text-white/60">數據分析師</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent mode="dark">
+                        <p className="text-sm text-white/80 mb-3 leading-relaxed">
+                            從數據中發現洞察，驅動決策
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                            <span className="px-2 py-1 bg-pink-500/20 text-pink-200 text-xs rounded-full border border-pink-400/30">Python</span>
+                            <span className="px-2 py-1 bg-pink-500/20 text-pink-200 text-xs rounded-full border border-pink-400/30">SQL</span>
+                            <span className="px-2 py-1 bg-pink-500/20 text-pink-200 text-xs rounded-full border border-pink-400/30">Tableau</span>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* 中央特色卡片 */}
+                <Card 
+                    variant="gradient"
+                    theme="gradient"
+                    size="md"
+                    hoverable
+                    shadow
+                    glow
+                    draggable
+                    dragConstraints={{
+                        top: -280,
+                        left: -350,
+                        right: 350,
+                        bottom: 280,
+                    }}
+                    dragElastic={0.15}
+                    onDragStart={handleDragStart('center')}
+                    onDragEnd={handleDragEnd('card-center')}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80"
+                    style={{
+                        x: positions['card-center']?.x || 0,
+                        y: positions['card-center']?.y || 0,
+                        zIndex: activeCard === 'center' ? 50 : 20,
+                    }}
+                >
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <div className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 px-4 py-1.5 rounded-full shadow-lg">
+                            <span className="text-white text-xs font-bold">⭐ FEATURED</span>
+                        </div>
+                    </div>
+                    <CardHeader mode="dark" align="center">
+                        <div className="flex flex-col items-center mb-3">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 flex items-center justify-center shadow-2xl mb-3">
+                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 text-transparent bg-clip-text">
+                                Dream Team
+                            </h3>
+                            <p className="text-sm text-white/60 mt-1">打造卓越產品的核心團隊</p>
+                        </div>
+                    </CardHeader>
+                    <CardContent mode="dark">
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                                <span className="text-sm text-white/80">團隊成員</span>
+                                <span className="text-sm font-bold text-white">12 人</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                                <span className="text-sm text-white/80">完成專案</span>
+                                <span className="text-sm font-bold text-white">48+</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                                <span className="text-sm text-white/80">客戶滿意度</span>
+                                <span className="text-sm font-bold text-white">98%</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter mode="dark" justify="center" showDivider>
+                        <button className="w-full py-3 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg">
+                            Join Our Team
+                        </button>
+                    </CardFooter>
+                </Card>
+
+                {/* 添加 CSS 動畫 */}
+                <style>{`
+                    @keyframes blob {
+                        0%, 100% { transform: translate(0, 0) scale(1); }
+                        25% { transform: translate(20px, -50px) scale(1.1); }
+                        50% { transform: translate(-20px, 20px) scale(0.9); }
+                        75% { transform: translate(50px, 50px) scale(1.05); }
+                    }
+                    .animate-blob {
+                        animation: blob 7s infinite;
+                    }
+                    .animation-delay-2000 {
+                        animation-delay: 2s;
+                    }
+                    .animation-delay-4000 {
+                        animation-delay: 4s;
+                    }
+                `}</style>
+            </div>
+        );
+    },
 }; 

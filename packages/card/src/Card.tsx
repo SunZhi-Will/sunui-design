@@ -21,6 +21,11 @@ export interface CardProps {
     bordered?: boolean;
     shadow?: boolean;
     glow?: boolean;
+    draggable?: boolean;
+    dragConstraints?: { top?: number; left?: number; right?: number; bottom?: number };
+    dragElastic?: number;
+    onDragStart?: () => void;
+    onDragEnd?: (event: any, info: any) => void;
     className?: string;
     style?: React.CSSProperties;
     onClick?: () => void;
@@ -76,6 +81,11 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
         bordered = true,
         shadow = true,
         glow = false,
+        draggable = false,
+        dragConstraints,
+        dragElastic = 0.1,
+        onDragStart,
+        onDragEnd,
         style,
         onClick,
     } = props;
@@ -83,6 +93,7 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
     const ref = React.useRef(null);
     const isInView = useInView(ref, { once: true, amount: 0.2 });
     const [isHovering, setIsHovering] = React.useState(false);
+    const [isDragging, setIsDragging] = React.useState(false);
 
     // 深色模式主題配置
     const darkThemeColors = React.useMemo(() => ({
@@ -332,6 +343,16 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
         "animate-[shimmer_2s_infinite]"
     );
 
+    const handleDragStart = () => {
+        setIsDragging(true);
+        onDragStart?.();
+    };
+
+    const handleDragEnd = (event: any, info: any) => {
+        setIsDragging(false);
+        onDragEnd?.(event, info);
+    };
+
     return (
         <motion.div
             ref={ref}
@@ -340,21 +361,29 @@ export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
                 variantStyles[variant], 
                 sizeStyles[size],
                 bordered && 'border',
+                draggable && 'cursor-move',
+                isDragging && 'cursor-grabbing',
                 className
             )}
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            whileHover={hoverable ? { 
+            whileHover={hoverable && !isDragging ? { 
                 scale: clickable ? 1.02 : 1.01, 
                 transition: { duration: 0.2, ease: "easeOut" } 
             } : undefined}
-            whileTap={clickable ? { 
+            whileTap={clickable && !draggable ? { 
                 scale: 0.98, 
                 transition: { duration: 0.1, ease: "easeIn" } 
             } : undefined}
+            drag={draggable}
+            dragConstraints={dragConstraints}
+            dragElastic={dragElastic}
+            dragMomentum={false}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
             style={style}
-            onClick={onClick}
+            onClick={!isDragging ? onClick : undefined}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
@@ -585,7 +614,7 @@ export const CardImage = ({
 
     return (
         <div className={cn(
-            "relative w-full overflow-hidden group rounded-xl -mx-6 -mt-6 mb-4",
+            "relative w-full overflow-hidden rounded-xl mb-4",
             aspectRatioStyles[aspectRatio]
         )}>
             {/* 載入骨架屏 */}
