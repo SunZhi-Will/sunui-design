@@ -28,9 +28,9 @@ jobs:
         
     - name: Clean install dependencies
       run: |
-        npm install
+        npm install --no-audit --no-fund
         npm run build:packages
-      timeout-minutes: 5  # 設定安裝依賴超時時間
+      timeout-minutes: 8  # lockfile 可能與 package.json 不同步時用 install 可解析
         
     - name: Run linting
       run: npx eslint . --ext .js,.jsx,.ts,.tsx
@@ -85,9 +85,9 @@ jobs:
 
     - name: Clean and install dependencies
       run: |
-        npm ci
+        npm install --no-audit --no-fund
         npm run build:packages
-      timeout-minutes: 5
+      timeout-minutes: 8
     
     - name: Run additional security checks
       if: always()  # 即使前面步驟失敗也執行

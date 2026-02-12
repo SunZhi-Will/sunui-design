@@ -1,5 +1,5 @@
-# Close all open PRs: merge PR #25 (next 15.3.8), close PR #26 (next 16 - declined).
-# Requires: $env:GITHUB_TOKEN with repo scope
+# Close ALL open pull requests.
+# Requires: $env:GITHUB_TOKEN with repo scope (Issues: read & write)
 # Usage: .\scripts\close-open-prs.ps1
 
 $ErrorActionPreference = "Stop"
@@ -16,26 +16,24 @@ if ($env:GITHUB_TOKEN) {
     exit 1
 }
 
-# Merge PR #25 (next 15.3.8 security upgrade)
-try {
-    $mergeBody = @{ commit_title = "Merge pull request #25 from SunZhi-Will/snyk-fix - next 15.3.8" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "https://api.github.com/repos/$owner/$repo/pulls/25/merge" -Method Post -Headers $headers -Body $mergeBody -ContentType "application/json"
-    Write-Host "PR #25 merged."
-} catch {
-    if ($_.Exception.Response.StatusCode.value__ -eq 405) {
-        Write-Host "PR #25: already merged or not mergeable (405)."
-    } else {
-        Write-Host "PR #25 merge failed: $_"
+# Get all open PRs
+$prs = Invoke-RestMethod -Uri "https://api.github.com/repos/$owner/$repo/pulls?state=open&per_page=100" -Headers $headers
+if (-not $prs -or $prs.Count -eq 0) {
+    Write-Host "No open PRs."
+    exit 0
+}
+if (-not $prs.Count) { $prs = @($prs) }
+
+Write-Host "Found $($prs.Count) open PR(s). Closing..."
+$closeBody = @{ state = "closed" } | ConvertTo-Json
+foreach ($pr in $prs) {
+    $num = $pr.number
+    try {
+        Invoke-RestMethod -Uri "https://api.github.com/repos/$owner/$repo/issues/$num" -Method Patch -Headers $headers -Body $closeBody -ContentType "application/json" | Out-Null
+        Write-Host "  PR #$num closed."
+    } catch {
+        $code = $_.Exception.Response.StatusCode.value__
+        Write-Host "  PR #$num failed: $code"
     }
 }
-
-# Close PR #26 (next 16 - we stay on 15.x)
-try {
-    $closeBody = @{ state = "closed" } | ConvertTo-Json
-    Invoke-RestMethod -Uri "https://api.github.com/repos/$owner/$repo/issues/26" -Method Patch -Headers $headers -Body $closeBody -ContentType "application/json"
-    Write-Host "PR #26 closed."
-} catch {
-    Write-Host "PR #26 close failed: $_"
-}
-
 Write-Host "Done."

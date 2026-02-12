@@ -19,4 +19,17 @@
 ## 已執行的本機變更
 1. `package.json`：`next` 維持 `^15.3.8`，`eslint-config-next` 改為 `^15.3.8`
 2. `package-lock.json`：根依賴中 `next` 由 `^15.2.4` 改為 `^15.3.8`
-3. 請在本機執行 `npm install` 以完整更新 lockfile 與 `node_modules`
+3. 已 push 至 `origin/master`。
+
+## 手動處理掉所有 PR（約 30 秒）
+目前 API 用 token 會回 404/403（需 **Classic PAT 的 `repo`** 或 **Fine-grained 的 Pull requests + Issues 寫入**）。請直接到 GitHub 操作：
+
+1. **[PR #25](https://github.com/SunZhi-Will/sunui-design/pull/25)** → 點綠色 **Merge pull request** → 確認合併  
+2. **[PR #26](https://github.com/SunZhi-Will/sunui-design/pull/26)** → 點 **Close pull request**
+
+## 一鍵腳本（需 Token 具備寫入權限）
+若使用 **Classic PAT** 請勾選 `repo`；若為 **Fine-grained** 請勾選此 repo 的 **Pull requests: Read and write**、**Issues: Read and write**。然後執行：
+```powershell
+$env:GITHUB_TOKEN = "your_github_token"
+.\scripts\close-open-prs.ps1
+```
