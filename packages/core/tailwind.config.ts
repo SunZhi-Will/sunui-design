@@ -1,6 +1,12 @@
-import type { Config } from 'tailwindcss';
+/** Minimal type for Tailwind config to avoid resolving tailwindcss ESM types (moduleResolution) */
+interface TailwindConfig {
+  content?: string[];
+  darkMode?: string;
+  theme?: { extend?: Record<string, unknown> };
+  plugins?: unknown[];
+}
 
-const config: Config = {
+const config: TailwindConfig = {
     content: [
         './src/**/*.{js,ts,jsx,tsx}',
     ],
