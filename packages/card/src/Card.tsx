@@ -44,7 +44,7 @@ export interface CardImageProps {
     className?: string;
 }
 
-export const Card = ({ children, ...props }: CardProps): JSX.Element => {
+export const Card = ({ children, ...props }: CardProps): React.JSX.Element => {
     const {
         className,
         variant = 'outlined',
@@ -205,7 +205,7 @@ export const Card = ({ children, ...props }: CardProps): JSX.Element => {
     );
 };
 
-export const CardHeader = ({ children, showDivider = false, className }: CardHeaderProps): JSX.Element => {
+export const CardHeader = ({ children, showDivider = false, className }: CardHeaderProps): React.JSX.Element => {
     return (
         <div
             className={cn(
@@ -219,7 +219,7 @@ export const CardHeader = ({ children, showDivider = false, className }: CardHea
     );
 };
 
-export const CardContent = ({ children, showDivider = false, className }: CardContentProps): JSX.Element => {
+export const CardContent = ({ children, showDivider = false, className }: CardContentProps): React.JSX.Element => {
     return (
         <div
             className={cn(
@@ -233,7 +233,7 @@ export const CardContent = ({ children, showDivider = false, className }: CardCo
     );
 };
 
-export const CardFooter = ({ children, showDivider = false, className }: CardFooterProps): JSX.Element => {
+export const CardFooter = ({ children, showDivider = false, className }: CardFooterProps): React.JSX.Element => {
     return (
         <div
             className={cn(
@@ -247,7 +247,7 @@ export const CardFooter = ({ children, showDivider = false, className }: CardFoo
     );
 };
 
-export const CardImage = ({ className, src, alt, loading = 'lazy', fallback }: CardImageProps): JSX.Element => {
+export const CardImage = ({ className, src, alt, loading = 'lazy', fallback }: CardImageProps): React.JSX.Element => {
     const [imgSrc, setImgSrc] = React.useState(src);
 
     const handleError = () => {

@@ -42,7 +42,7 @@ export type FileUploadProps = {
     description?: string;
 }
 
-export const FileUpload = (props: FileUploadProps): JSX.Element => {
+export const FileUpload = (props: FileUploadProps): React.JSX.Element => {
     const {
         onFileSelect,
         onFileUpload,
