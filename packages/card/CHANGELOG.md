@@ -2,30 +2,27 @@
 
 All notable changes to the Card component will be documented in this file.
 
+## [2.1.1] - 2024-02-13
+
+### 🗑️ 移除功能
+
+- **移除可拖拉卡片 (Draggable Cards)**
+  - 移除 Card 元件的 `draggable`、`dragConstraints`、`dragElastic`、`onDragStart`、`onDragEnd` 屬性
+  - 移除 Storybook 的 Draggable Cards 範例
+  - 更新 README 移除可拖拉相關文檔
+
+---
+
 ## [2.1.0] - 2024-02-13
-
-### ✨ 新增功能
-
-#### 可拖拉卡片
-- ✅ **新增 `draggable` 屬性** - 啟用卡片拖拉功能
-- ✅ **新增 `dragConstraints` 屬性** - 控制拖拉範圍限制
-- ✅ **新增 `dragElastic` 屬性** - 調整拖拉彈性效果
-- ✅ **新增 `onDragStart` 事件** - 拖拉開始時的回調
-- ✅ **新增 `onDragEnd` 事件** - 拖拉結束時的回調
 
 ### 🐛 修復問題
 
 - ✅ 修復 CardImage 負邊距導致的跑版問題
 - ✅ 移除圖片 `-mx-6 -mt-6` 負邊距
-- ✅ 優化拖拉時的點擊事件處理
-- ✅ 拖拉時禁用 hover 縮放效果
 
 ### 🎨 視覺優化
 
-- ✅ 拖拉時顯示 `cursor-grabbing` 游標
-- ✅ 靜態時顯示 `cursor-move` 游標（當啟用拖拉時）
 - ✅ Storybook 佈局調整為居中顯示
-- ✅ 新增拖拉卡片展示範例
 
 ---
 
