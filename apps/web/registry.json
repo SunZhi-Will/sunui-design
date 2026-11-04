@@ -48,6 +48,51 @@
       ]
     },
     {
+      "name": "addon-checklist",
+      "type": "registry:block",
+      "title": "Add-on Checklist",
+      "description": "A paper receipt of optional extras with dotted leaders between each item and its price, where every row is a checkbox and the subtotal rolls to its new value as you tick. Rows use role=checkbox with keyboard toggling, the subtotal is announced via aria-live, and the number jumps instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "receipt",
+        "checkout"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Gift wrap, warranty and accessory upsells on a product or cart page",
+            "Booking extras such as parking, prints or insurance before checkout"
+          ],
+          "watchOut": [
+            "The total is display only; recalculate the price on the server from the selected ids",
+            "Required rows always count toward the total and cannot be unticked"
+          ],
+          "aliases": [
+            "add-ons",
+            "upsell checklist",
+            "extras picker",
+            "live total checklist",
+            "order options"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/addon-checklist/addon-checklist.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "animated-number",
       "type": "registry:block",
       "title": "Animated Number",
@@ -88,6 +133,51 @@
       "files": [
         {
           "path": "registry/free/animated-number/animated-number.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "announcement-strip",
+      "type": "registry:block",
+      "title": "Announcement Strip",
+      "description": "A paper strip notice bar for the top of the store with notched ends, manual previous and next for several messages, and a dismiss that collapses its height and is remembered under a storageKey. Messages sit in a labelled region with a polite live area, controls have ARIA labels, and the collapse is instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "notification",
+        "section",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Site-wide notices such as free shipping thresholds, holiday returns or store hours",
+            "Rotating two or three short messages in one bar without auto-playing"
+          ],
+          "watchOut": [
+            "With a storageKey the strip renders after mount, so reserve no space for it or accept a small shift; change the key when the message changes",
+            "Keep each message to one line on mobile; long copy wraps and makes the bar tall"
+          ],
+          "aliases": [
+            "announcement bar",
+            "promo bar",
+            "top banner",
+            "site notice",
+            "dismissible banner"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/announcement-strip/announcement-strip.tsx",
           "type": "registry:component"
         }
       ]
@@ -665,6 +755,51 @@
       ]
     },
     {
+      "name": "coupon-wallet",
+      "type": "registry:block",
+      "title": "Coupon Wallet",
+      "description": "A stack of owned coupons that fans out on hover, keyboard focus or a first tap, so shoppers can compare and pick one to apply, which stamps it Applied. It is a radiogroup with roving focus (arrow keys, Home, End, Escape to collapse), ineligible coupons explain why in their label, and the fan snaps into place without motion under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "coupon",
+        "checkout",
+        "cart"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Choosing which of several owned coupons to apply at checkout or in the cart",
+            "A compact coupon picker where a full list would push the order summary off screen"
+          ],
+          "watchOut": [
+            "The fan is about 1.5 card widths wide, so give it a column of at least 22rem or keep it to four coupons",
+            "Recalculate the discount on the server; the selection only tells you which coupon the shopper picked"
+          ],
+          "aliases": [
+            "coupon picker",
+            "voucher selector",
+            "apply coupon",
+            "stacked coupons",
+            "fan out cards"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/coupon-wallet/coupon-wallet.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "dialogue-box",
       "type": "registry:block",
       "title": "Dialogue Box",
@@ -972,6 +1107,51 @@
       "files": [
         {
           "path": "registry/free/honest-countdown/honest-countdown.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hover-card",
+      "type": "registry:block",
+      "title": "Hover Card",
+      "description": "A product quick-view card that opens after a short hover delay and stays open while the pointer moves into it, with price, discount and an add to cart button on paper. Keyboard focus opens it, Escape closes it and returns focus, touch opens it on first tap, it flips above the trigger near the viewport edge, and reduced motion removes the slide.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "overlay",
+        "product"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product names inside carts, bundles or editorial text where a quick preview saves a page visit",
+            "Recommendation lists where shoppers compare price before opening the product page"
+          ],
+          "watchOut": [
+            "It is positioned inside its parent, so an overflow hidden ancestor will clip the card",
+            "Keep essential information on the product page too; the card is a shortcut, not the only place"
+          ],
+          "aliases": [
+            "quick view",
+            "product preview",
+            "popover card",
+            "hover preview",
+            "peek card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hover-card/hover-card.tsx",
           "type": "registry:component"
         }
       ]
@@ -1290,6 +1470,51 @@
       ]
     },
     {
+      "name": "order-history",
+      "type": "registry:block",
+      "title": "Order History",
+      "description": "A receipt-style list of past orders with small status stamps, expandable line items with dotted leaders and totals, an actions slot for buy again or track, and an empty state. Each row is a disclosure button with aria-expanded and aria-controls, and the expand and collapse are instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "receipt",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The orders tab of a customer account page",
+            "A recent orders panel on an account dashboard with buy again shortcuts"
+          ],
+          "watchOut": [
+            "Totals are computed from line items, shipping and discount on the client; pass server-confirmed values so they match the real charge",
+            "For a single order's shipping timeline use order-tracker instead"
+          ],
+          "aliases": [
+            "order list",
+            "purchase history",
+            "my orders",
+            "past orders",
+            "order receipts"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/order-history/order-history.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "otp-input",
       "type": "registry:block",
       "title": "OTP Input",
@@ -1329,6 +1554,51 @@
       "files": [
         {
           "path": "registry/free/otp-input/otp-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "registry:block",
+      "title": "Pagination",
+      "description": "Page navigation with a fixed width ellipsis range (first, last, current and siblings), previous and next controls, aria-current=\"page\" and an optional compact '3 / 12' mode; pass getHref to render crawlable links or onPageChange for buttons. A small underline slides to the current page with a snappy spring, and jumps instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "navigation",
+        "listing"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product listing, search result and order history pages with a known page count",
+            "SEO sensitive catalogues where every page needs a real link"
+          ],
+          "watchOut": [
+            "Use getHref for pages that should be indexed; buttons alone are invisible to crawlers",
+            "For endless feeds without a total count, prefer a load more button"
+          ],
+          "aliases": [
+            "pager",
+            "page numbers",
+            "paginator",
+            "page navigation",
+            "next previous"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/pagination/pagination.tsx",
           "type": "registry:component"
         }
       ]
@@ -2173,6 +2443,51 @@
       ]
     },
     {
+      "name": "shipping-options",
+      "type": "registry:block",
+      "title": "Shipping Options",
+      "description": "Ticket-stub radio cards for delivery methods: a perforated stub holds the method name and radio dot, the body shows the arrival date, note and fee, and free shipping is printed in vermilion. Works as a radiogroup with arrow keys and roving focus, skips disabled methods, wraps to a single column on narrow screens, and the dot switches instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "checkout",
+        "form"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Choosing standard, express or pickup delivery at checkout",
+            "Any single choice between two to five priced options with a date"
+          ],
+          "watchOut": [
+            "Recalculate the shipping fee on the server; the card fee is display only",
+            "Mark unavailable methods as disabled instead of hiding them so shoppers know why"
+          ],
+          "aliases": [
+            "delivery options",
+            "shipping method",
+            "radio cards",
+            "option cards",
+            "delivery picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/shipping-options/shipping-options.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "side-panel",
       "type": "registry:block",
       "title": "Side Panel",
@@ -2435,6 +2750,95 @@
       ]
     },
     {
+      "name": "terms-consent",
+      "type": "registry:block",
+      "title": "Terms Consent",
+      "description": "A paper slip of checkout consents where required items show an n / m counter and gate the pay button, while optional opt-ins like marketing email default to off. The button stays focusable with aria-disabled and explains why it is blocked through aria-describedby and a polite live region; with reduced motion the check marks switch instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "checkout",
+        "forms"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Right above the pay button when terms of sale or a privacy notice must be accepted",
+            "Sign up or subscription flows that mix required agreements with optional opt-ins"
+          ],
+          "watchOut": [
+            "The gate is only a UI hint, so record and verify consent on the server",
+            "Never pre-tick optional marketing items; many regions require an explicit opt-in"
+          ],
+          "aliases": [
+            "terms checkbox",
+            "consent checklist",
+            "agree to terms",
+            "checkout agreement",
+            "gated button"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/terms-consent/terms-consent.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "tier-progress",
+      "type": "registry:block",
+      "title": "Tier Progress",
+      "description": "A membership card with a half ring gauge showing points toward the next tier, a tier ladder and the perks the next tier unlocks, with a stamp once the top tier is reached. The gauge is a labelled progressbar with readable value text, SVG ids come from useId, and the arc moves only when points change, instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "loyalty",
+        "rewards",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Account or rewards pages that show how far a member is from the next tier",
+            "Order confirmation pages that show the points just earned against the next tier"
+          ],
+          "watchOut": [
+            "Pass tiers sorted from lowest to highest threshold, with the first tier starting at 0"
+          ],
+          "aliases": [
+            "membership level",
+            "loyalty tier",
+            "points progress",
+            "vip progress",
+            "rewards gauge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/tier-progress/tier-progress.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "toast-stack",
       "type": "registry:block",
       "title": "Toast Stack",
@@ -2561,6 +2965,51 @@
       "files": [
         {
           "path": "registry/free/undo-toast/undo-toast.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "variant-picker",
+      "type": "registry:block",
+      "title": "Variant Picker",
+      "description": "Product colour swatches and size chips driven by per-combination stock, where sold-out sizes carry a faded ink Sold out stamp and cannot be picked, and the chosen colour name and remaining stock are shown below. Both rows are labelled radiogroups with arrow keys, swatch names live in aria-label, stock changes are announced politely, and press feedback is skipped under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "product",
+        "form"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Apparel and goods product pages with colour and size variants",
+            "Showing low stock and sold-out combinations before add to cart"
+          ],
+          "watchOut": [
+            "Stock keys are colorId:sizeId and missing keys count as sold out",
+            "Switching to a colour where the chosen size is sold out clears the size"
+          ],
+          "aliases": [
+            "colour swatches",
+            "size selector",
+            "product options",
+            "variant selector",
+            "SKU picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/variant-picker/variant-picker.tsx",
           "type": "registry:component"
         }
       ]
