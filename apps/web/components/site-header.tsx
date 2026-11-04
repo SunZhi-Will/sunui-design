@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { githubUrl } from "@/lib/site";
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur">
@@ -9,19 +11,13 @@ export function SiteHeader() {
           SunUI
         </Link>
         <nav className="flex items-center gap-1 text-sm">
-          <Link href="/" className="rounded-md px-3 py-1.5 text-muted hover:text-fg">
+          <Link href="/" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
             Blocks
           </Link>
-          <span className="hidden items-center gap-1.5 rounded-md px-3 py-1.5 text-muted sm:flex">
-            Pro
-            <span className="rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-medium text-accent">
-              soon
-            </span>
-          </span>
-          <a
-            href="https://github.com/SunZhi-Will/sunui-design"
-            className="rounded-md px-3 py-1.5 text-muted hover:text-fg"
-          >
+          <Link href="/pricing" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+            Pricing
+          </Link>
+          <a href={githubUrl} className="hidden rounded-md px-3 py-1.5 text-subtle hover:text-fg sm:block">
             GitHub
           </a>
         </nav>

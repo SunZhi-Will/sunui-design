@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { siteUrl } from "@/lib/registry";
+import { siteUrl } from "@/lib/site";
 
 import "./globals.css";
 

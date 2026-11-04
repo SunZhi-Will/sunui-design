@@ -18,7 +18,7 @@ export function CopyButton({ value, className }: { value: string; className?: st
       type="button"
       onClick={copy}
       className={cn(
-        "rounded-md border border-line bg-card px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:text-fg",
+        "rounded-md border border-line bg-card px-2.5 py-1 text-xs font-medium text-subtle transition-colors hover:text-fg",
         className,
       )}
     >

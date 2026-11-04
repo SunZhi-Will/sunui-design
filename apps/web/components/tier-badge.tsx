@@ -6,7 +6,7 @@ export function TierBadge({ tier }: { tier: Tier }) {
     <span
       className={cn(
         "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide",
-        tier === "pro" ? "bg-accent text-accent-fg" : "bg-stage text-muted",
+        tier === "pro" ? "bg-accent text-accent-fg" : "bg-stage text-subtle",
       )}
     >
       {tier}

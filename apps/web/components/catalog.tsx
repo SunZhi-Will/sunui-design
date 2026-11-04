@@ -47,7 +47,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
               <div className="flex items-start justify-between gap-3 border-t border-line p-4">
                 <div className="min-w-0">
                   <h3 className="font-medium tracking-tight">{item.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted">{item.description}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-subtle">{item.description}</p>
                 </div>
                 <TierBadge tier={item.meta.tier} />
               </div>
@@ -57,7 +57,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
       </ul>
 
       {visible.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-muted">
+        <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-subtle">
           {filter !== "all" ? `${interactionLabels[filter]} blocks are on the way.` : "No blocks yet."}
         </p>
       )}
@@ -83,7 +83,7 @@ function FilterChip({
       onClick={onClick}
       className={cn(
         "flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors",
-        active ? "border-fg bg-fg text-bg" : "border-line text-muted hover:text-fg",
+        active ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
       )}
     >
       {label}

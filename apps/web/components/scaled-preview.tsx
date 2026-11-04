@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { previews } from "@/registry/previews";
+import { previews } from "@/registry/__generated__/previews";
 
 /** 以固定寬度渲染 block，再等比縮小塞進卡片。 */
 export function ScaledPreview({ name, width = 960 }: { name: string; width?: number }) {

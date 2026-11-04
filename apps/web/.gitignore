@@ -1,0 +1,8 @@
+# 自動產生
+registry/__generated__/
+
+# Pro 原始碼放在私有 repo，clone 到這裡，不得進入公開 repo
+registry/pro/
+
+# 本機 waitlist 暫存
+.data/

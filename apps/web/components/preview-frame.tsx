@@ -50,7 +50,7 @@ export function PreviewFrame({ name }: { name: string }) {
               onClick={() => setViewport(v.key)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                viewport === v.key ? "bg-stage text-fg" : "text-muted hover:text-fg",
+                viewport === v.key ? "bg-stage text-fg" : "text-subtle hover:text-fg",
               )}
             >
               {v.label}
@@ -60,7 +60,7 @@ export function PreviewFrame({ name }: { name: string }) {
         <button
           type="button"
           onClick={() => setRun((n) => n + 1)}
-          className="rounded-md px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:text-fg"
+          className="rounded-md px-2.5 py-1 text-xs font-medium text-subtle transition-colors hover:text-fg"
         >
           Replay
         </button>
