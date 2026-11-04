@@ -1,15 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "outDir": "./dist",
-    "rootDir": "../"
+    "declarationDir": "./dist"
   },
-  "include": ["../**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/tailwind.config.ts",
-    "**/postcss.config.*",
-    "../core/tailwind.config.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

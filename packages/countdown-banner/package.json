@@ -1,9 +1,8 @@
 {
     "name": "@sunui-design/countdown-banner",
-    "version": "0.0.53",
+    "version": "0.0.54",
     "description": "Countdown promotional banner component",
     "main": "dist/index.js",
-    "module": "dist/index.esm.js",
     "types": "dist/index.d.ts",
     "files": [
         "dist"
