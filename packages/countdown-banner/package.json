@@ -28,5 +28,9 @@
         "framer-motion": "^12.4.12",
         "react": "^19",
         "react-dom": "^19"
+    },
+    "gitHead": "58bfcfac3ed232049343d3f3fec26d10e6cdce22",
+    "publishConfig": {
+        "access": "public"
     }
 }
