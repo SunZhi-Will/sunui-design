@@ -1,6 +1,8 @@
 # SunUI 圖示規範
 
-> 圖示庫：`registry/icons/sunui-icons.tsx`；展示頁：`/icons`；安裝：`npx shadcn@latest add <site>/r/icons/sunui-icons.json`。
+> 靜態：`registry/icons/sunui-icons.tsx`（`<site>/r/icons/sunui-icons.json`，無依賴）
+> 動態：`registry/icons/sunui-animated-icons.tsx`（`<site>/r/icons/sunui-animated-icons.json`，依賴 framer-motion 與靜態版）
+> 展示頁：`/icons`，可切換 Static / Animated。
 
 ## 為什麼要做
 
@@ -34,12 +36,39 @@
 | Product UI | 工具型介面 | status、loader、activity、gauge、terminal、inbox、shield、caption… |
 | Story | 敘事遊戲 | play、pause、skip、book、dialogue、lantern、scroll、quill、map |
 
+## 動態圖示
+
+動態版與靜態版共用同一份幾何（`icons`），只在 `recipes` 裡描述「哪個部位、怎麼動」。需要拆開的形狀（優惠券的票根、下載的箭頭）或兩種狀態互換（選單與叉、播放與暫停、太陽與月亮）才自帶 `nodes`。
+
+| 類型 | 觸發 | 例子 | 規則 |
+|---|---|---|---|
+| hover | 滑過或聚焦**父元素**（整顆按鈕） | bell 擺動、coupon 沿打孔線撕開、stamp 壓下彈起、cart 傾斜、retry 轉一圈 | 陣列值是一次性關鍵影格，離開時立即歸位不倒放；單一值是滑過期間維持的狀態 |
+| toggle | `active` prop | menu 變叉、heart 與 star 像印章一樣填滿、punch-card 蓋下一格、chevron-down 翻轉、theme 太陽換月亮 | 雙向都用 gentle 彈簧，填滿類用 stamp 彈簧 |
+| loop | `active` 為真期間 | loader、status | 只給載入與即時狀態，對應 DESIGN.md「常駐循環只限倒數與載入」 |
+
+動作原則：
+
+1. 動作要有實體意義：撕票根是以打孔線頂端為軸張開、蓋章是先壓下再彈回、垃圾桶蓋以左端為軸掀起。不做沒有意義的縮放閃爍。
+2. 單次 400ms 以內（`ONCE` 預設 0.4 秒）。
+3. 旋轉中心一律用 24 網格座標（`origin: [x, y]`），內部轉成 `transform-box: view-box`，不同形狀才能共用同一個軸心。
+4. `useReducedMotion()` 為真：所有轉場改為 0 秒，直接顯示結果；loop 不播放。
+5. 朱紅只出現在 accent 部位（例如填滿後的愛心、集點卡新蓋的一格）。
+
 ## 新增圖示
 
 1. 在 `sunui-icons.tsx` 的 `icons` 加一筆，名稱用 kebab-case 名詞。
 2. 在 `lib/icon-groups.ts` 放進對應分組，必要時補中英關鍵字。
 3. 到 `/icons` 用 16 與 24 兩個尺寸、Light 與 Dark 各看一次，確認在 16px 下還認得出來。
+4. 若要動態版，在 `sunui-animated-icons.tsx` 的 `recipes` 加一筆，選 hover、toggle 或 loop，並在 Animated 模式下用 72px 預覽確認軸心方向。
 
 ## 與 block 的關係
 
 Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block 需要圖示時，從 `/icons` 按 Copy SVG 貼成 inline SVG，形狀就會和整套一致。既有 block 逐步替換即可，不必一次改完。
+
+替換範圍（2026-11-05 決定）：
+
+| 系列 | 圖示 |
+|---|---|
+| pro、free 的 paper 系列 | 已換成 24 網格的 SunUI 圖示 |
+| product、story、classic | **保留來源專案的原圖示**，因為這些是忠實移植，圖示屬於原作外觀的一部分，不要換成 SunUI 圖示 |
+| 評分與收藏（star-rating、favorite-button）、animated-number 的箭頭 | 刻意保留，屬於元件本身的造型 |

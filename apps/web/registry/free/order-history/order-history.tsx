@@ -170,7 +170,7 @@ export function OrderHistory({
                   </span>
                   <motion.svg
                     aria-hidden="true"
-                    viewBox="0 0 16 16"
+                    viewBox="0 0 24 24"
                     className={cn("size-4 shrink-0", inkMuted)}
                     fill="none"
                     stroke="currentColor"
@@ -181,7 +181,7 @@ export function OrderHistory({
                     animate={{ rotate: expanded ? 180 : 0 }}
                     transition={reduce ? { duration: 0 } : springs.gentle}
                   >
-                    <path d="M4 6l4 4 4-4" />
+                    <path d="M6 9.5l6 6 6-6" />
                   </motion.svg>
                 </button>
 

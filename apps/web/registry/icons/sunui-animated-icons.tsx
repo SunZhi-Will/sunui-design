@@ -149,7 +149,7 @@ export const recipes = {
       { d: "M8 14.5l3.5-5", accent: true },
     ],
     // 沿打孔線撕開：右側票根往外轉開
-    parts: { 1: { active: { x: 1.5, y: 0.5, rotate: 10 }, origin: [15, 5.5] } },
+    parts: { 1: { active: { x: 1, rotate: -12 }, origin: [15, 5.5] } },
   },
   receipt: { kind: "hover", parts: { 1: { active: { pathLength: [0, 1] } } } },
   stamp: {

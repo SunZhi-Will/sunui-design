@@ -15,22 +15,31 @@
     {
       "name": "web-alt",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "-w", "@sunui-design/web", "--", "-p", "3102"],
-      "port": 3102
-    },
-    {
-      "name": "web-prod",
-      "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
-        "start",
+        "dev",
         "-w",
         "@sunui-design/web",
         "--",
         "-p",
-        "3101"
+        "3102"
       ],
-      "port": 3101
+      "port": 3102,
+      "env": {
+        "NEXT_DIST_DIR": ".next-alt"
+      }
+    },
+    {
+      "name": "web-prod",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "npm run build -w @sunui-design/web && npm run start -w @sunui-design/web -- -p ${PORT:-3101}"
+      ],
+      "port": 3101,
+      "env": {
+        "NEXT_DIST_DIR": ".next-prod"
+      }
     }
   ]
 }
