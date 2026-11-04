@@ -1,43 +1,61 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type CheckinDayStatus = "done" | "missed" | "today" | "todayDone" | "upcoming";
+// 每日簽到卡：最近 7 天（含今天）的圓圈、連續天數、簽到按鈕與結果提示。
+// 簽到成功後送出一個 window 事件，讓額度表之類的元件重新讀取。
 
-export interface CheckinDay {
-  label: ReactNode;
-  reward: number;
-}
+/** 預設的全域事件名稱，quota-meter 也聽這個 */
+export const REWARDS_EVENT = "sunui:rewards";
 
 export interface CheckinStreakLabels {
   title?: ReactNode;
-  streak?: (days: number) => ReactNode;
-  points?: (points: string) => ReactNode;
+  /** 說明行：每天多幾張，以及連續天數 */
+  description?: (reward: number, streak: number) => ReactNode;
+  weekAria?: string;
+  today?: string;
+  weekday?: (date: Date, locale?: string) => string;
+  dayAria?: (label: string, done: boolean) => string;
   checkIn?: (reward: number) => ReactNode;
-  checking?: ReactNode;
-  retry?: ReactNode;
-  error?: ReactNode;
-  comeBack?: (reward: number | null) => ReactNode;
-  announce?: (reward: number) => string;
+  done?: ReactNode;
+  success?: (reward: number) => string;
+  error?: string;
+  close?: string;
+}
+
+export interface CheckinResult {
+  /** 實際拿到的張數；不傳時用 reward */
+  reward?: number;
+  /** 伺服器算好的連續天數；不傳時自動加一 */
+  streak?: number;
 }
 
 export interface CheckinStreakProps {
-  /** 一週七天，依序排列 */
-  days: CheckinDay[];
-  /** 今天在 days 中的位置 */
-  todayIndex: number;
-  /** 今天以前已簽到的位置；不在其中的視為漏簽 */
-  checked?: number[];
-  checkedInToday?: boolean;
-  defaultCheckedInToday?: boolean;
-  /** 連續天數；不傳時由本週資料推算 */
-  streak?: number;
-  points?: number;
-  /** 簽到；拋錯顯示重試，回傳 reward 覆寫當天獎勵 */
-  onCheckIn?: () => void | { reward?: number } | Promise<void | { reward?: number }>;
+  /** 今天，當地時間 YYYY-MM-DD */
+  today: string;
+  /** 最近 7 天裡已簽到的日期（YYYY-MM-DD） */
+  week: string[];
+  /** 連續簽到天數 */
+  streak: number;
+  /** 每次簽到多幾張 */
+  reward: number;
+  /** 今天是否已簽到 */
+  done?: boolean;
+  /** 簽到；拋錯會顯示錯誤提示（Error.message 優先） */
+  onCheckIn?: () => void | CheckinResult | Promise<void | CheckinResult>;
+  /** 拿到獎勵後的回呼，例如重新讀取額度 */
+  onClaimed?: (reward: number) => void;
+  /** 成功後送出的 window 事件；設為 null 不送 */
+  refreshEvent?: string | null;
+  /** 品牌色，預設為原本的靛藍 */
+  accent?: string;
+  /** 提示固定在視窗上方；false 時放在卡片上方 */
+  fixed?: boolean;
+  /** 提示自動關閉毫秒數 */
+  toastDuration?: number;
   locale?: string;
   labels?: CheckinStreakLabels;
   className?: string;
@@ -45,167 +63,254 @@ export interface CheckinStreakProps {
 
 const defaultLabels: Required<CheckinStreakLabels> = {
   title: "Daily check-in",
-  streak: (days) => <>{days}-day streak</>,
-  points: (points) => <>{points} pts</>,
-  checkIn: (reward) => <>Check in, +{reward} pts</>,
-  checking: "Checking in",
-  retry: "Try again",
-  error: "Couldn't check in. Try again.",
-  comeBack: (reward) => (reward === null ? "See you next week" : <>Come back tomorrow for +{reward}</>),
-  announce: (reward) => `Checked in. +${reward} points.`,
+  description: (reward, streak) => (
+    <>
+      Once a day, {reward} more images.
+      {streak ? (
+        <>
+          {" "}
+          <span className="font-medium text-[var(--yc-fg)] tabular-nums">{streak}</span>-day streak.
+        </>
+      ) : null}
+    </>
+  ),
+  weekAria: "Check-ins over the last 7 days",
+  today: "Today",
+  weekday: (date, locale) => date.toLocaleDateString(locale ?? "en-US", { weekday: "short" }),
+  dayAria: (label, done) => `${label}, ${done ? "checked in" : "not checked in"}`,
+  checkIn: (reward) => <>Check in for {reward} images</>,
+  done: "Checked in today, come back tomorrow",
+  success: (reward) => `Checked in, ${reward} more images`,
+  error: "Check-in failed. Please try again.",
+  close: "Close",
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+// 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
+const tokens =
+  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:#4F46E5] [--yc-brand-fg:#FFFFFF] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
+  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:#818CF8] dark:[--yc-brand-fg:#09090B] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
 
-const springs = {
-  snappy: { type: "spring", stiffness: 520, damping: 34 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
-} as const;
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** 最近 7 天（含今天）的日期，格式和後端一樣是當地的 YYYY-MM-DD */
+function lastWeek(today: string) {
+  const [y, m, d] = today.split("-").map(Number);
+  return Array.from({ length: 7 }, (_, i) => {
+    const dt = new Date(y, m - 1, d - 6 + i);
+    return { iso: `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`, date: dt };
+  });
+}
+
+function Icon({ d, className }: { d: ReactNode; className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cn("shrink-0", className)}>
+      {d}
+    </svg>
+  );
+}
+
+const CheckPath = <path d="M20 6 9 17l-5-5" />;
+const GiftPath = (
+  <>
+    <rect x="3" y="8" width="18" height="4" rx="1" />
+    <path d="M12 8v13" />
+    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+  </>
+);
+const CalendarCheckPath = (
+  <>
+    <path d="M8 2v4" />
+    <path d="M16 2v4" />
+    <rect width="18" height="18" x="3" y="4" rx="2" />
+    <path d="M3 10h18" />
+    <path d="m9 16 2 2 4-4" />
+  </>
+);
+const LoaderPath = <path d="M21 12a9 9 0 1 1-6.219-8.56" />;
+const CircleCheckPath = (
+  <>
+    <circle cx="12" cy="12" r="10" />
+    <path d="m9 12 2 2 4-4" />
+  </>
+);
+const OctagonXPath = (
+  <>
+    <path d="m15 9-6 6" />
+    <path d="M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z" />
+    <path d="m9 9 6 6" />
+  </>
+);
+const XPath = (
+  <>
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </>
+);
+
+type Toast = { id: number; kind: "success" | "error"; text: string };
 
 export function CheckinStreak({
-  days,
-  todayIndex,
-  checked = [],
-  checkedInToday: checkedProp,
-  defaultCheckedInToday = false,
+  today,
+  week: weekProp,
   streak: streakProp,
-  points = 0,
+  reward,
+  done: doneProp = false,
   onCheckIn,
-  locale = "en-US",
+  onClaimed,
+  refreshEvent = REWARDS_EVENT,
+  accent,
+  fixed = true,
+  toastDuration = 4000,
+  locale,
   labels,
   className,
 }: CheckinStreakProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduceMotion = useReducedMotion();
-  const [inner, setInner] = useState(defaultCheckedInToday);
-  const done = checkedProp ?? inner;
-  const [pending, setPending] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [earned, setEarned] = useState(0);
-  const [stamped, setStamped] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
+  const reduce = useReducedMotion() ?? false;
+  const [busy, setBusy] = useState(false);
+  const [state, setState] = useState({ week: weekProp, streak: streakProp, done: doneProp });
+  const [toast, setToast] = useState<Toast | null>(null);
+  const seq = useRef(0);
 
-  const doneSet = new Set(checked);
-  const statusOf = (i: number): CheckinDayStatus =>
-    i < todayIndex ? (doneSet.has(i) ? "done" : "missed") : i === todayIndex ? (done ? "todayDone" : "today") : "upcoming";
+  // 外部資料更新（例如重新讀取）時跟著換
+  useEffect(() => {
+    setState({ week: weekProp, streak: streakProp, done: doneProp });
+  }, [weekProp, streakProp, doneProp]);
 
-  // 從昨天往回數連續簽到天數
-  let computed = done ? 1 : 0;
-  for (let i = todayIndex - 1; i >= 0 && doneSet.has(i); i--) computed++;
-  const streak = streakProp !== undefined ? streakProp + (earned ? 1 : 0) : computed;
+  // 提示自動關閉，行為同 sonner 預設的 4 秒
+  useEffect(() => {
+    if (!toast) return;
+    const id = window.setTimeout(() => setToast(null), toastDuration);
+    return () => window.clearTimeout(id);
+  }, [toast, toastDuration]);
 
-  const todayReward = days[todayIndex]?.reward ?? 0;
-  const nextReward = days[todayIndex + 1]?.reward ?? null;
+  const days = lastWeek(today);
+  const doneSet = new Set(state.week);
 
-  async function checkIn() {
-    if (done || pending) return;
-    setPending(true);
-    setFailed(false);
+  const checkin = async () => {
+    setBusy(true);
     try {
-      const result = await onCheckIn?.();
-      const reward = (result && typeof result === "object" && result.reward) || todayReward;
-      setEarned(reward);
-      setStamped(true);
-      setInner(true);
-      setAnnouncement(t.announce(reward));
-    } catch {
-      setFailed(true);
-      setAnnouncement(typeof t.error === "string" ? t.error : "Couldn't check in.");
+      const res = (await onCheckIn?.()) || {};
+      const got = res.reward ?? reward;
+      setToast({ id: ++seq.current, kind: "success", text: t.success(got) });
+      setState((s) => ({
+        done: true,
+        week: s.week.includes(today) ? s.week : [...s.week, today],
+        streak: res.streak ?? s.streak + 1,
+      }));
+      onClaimed?.(got);
+      if (refreshEvent) window.dispatchEvent(new Event(refreshEvent));
+    } catch (e) {
+      setToast({ id: ++seq.current, kind: "error", text: e instanceof Error && e.message ? e.message : t.error });
     } finally {
-      setPending(false);
+      setBusy(false);
     }
-  }
+  };
+
+  const style = accent ? ({ "--yc-brand": accent } as CSSProperties) : undefined;
 
   return (
-    <section className={cn("w-full max-w-md min-w-0 rounded-md border p-4 sm:p-5", paper, edge, ink, className)}>
-      <header className="flex items-baseline justify-between gap-3">
-        <div className="min-w-0">
-          <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.title}</p>
-          <p className="mt-1 text-xl font-semibold tracking-tight tabular-nums">{t.streak(streak)}</p>
+    <div
+      style={style}
+      className={cn(
+        tokens,
+        "[--yc-brand-c:var(--yc-brand,var(--yc-brand-default))]",
+        "relative flex flex-col gap-4 rounded-[0.7rem] border border-[var(--yc-border)] bg-[var(--yc-card)] p-4 text-[var(--yc-fg)]",
+        className,
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-[0.5rem] bg-[color-mix(in_oklab,var(--yc-brand-c)_15%,transparent)] text-[var(--yc-brand-c)]">
+          <Icon d={CalendarCheckPath} className="size-[1.125rem]" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-semibold">{t.title}</h3>
+          <p className="mt-0.5 text-xs text-[var(--yc-muted-fg)]">{t.description(reward, state.streak)}</p>
         </div>
-        <p className={cn("shrink-0 text-sm tabular-nums", inkMuted)}>
-          {t.points(new Intl.NumberFormat(locale).format(points + earned))}
-        </p>
-      </header>
+      </div>
 
-      <ol className="mt-4 grid grid-cols-7 gap-1 sm:gap-2">
-        {days.map((day, i) => {
-          const status = statusOf(i);
+      <ol className="grid grid-cols-7 gap-1" aria-label={t.weekAria}>
+        {days.map((d, i) => {
+          const on = doneSet.has(d.iso);
+          const isToday = i === 6;
+          const label = isToday ? t.today : t.weekday(d.date, locale);
           return (
-            <li key={i} className="flex min-w-0 flex-col items-center gap-1.5">
-              <span className={cn("text-[11px] tabular-nums", status === "today" || status === "todayDone" ? "font-semibold" : inkMuted)}>
-                {day.label}
-              </span>
+            <li key={d.iso} className="flex min-w-0 flex-col items-center gap-1">
               <span
-                className={cn(
-                  "relative flex aspect-square w-full max-w-10 items-center justify-center rounded-full text-[11px] font-medium tabular-nums",
-                  status === "done" && "bg-[#1c1917] text-[#faf7f0] dark:bg-[#ece7dc] dark:text-[#1f1c18]",
-                  status === "today" && "border-2 border-current",
-                  status === "missed" && cn("border border-dashed border-current", inkMuted, "opacity-60"),
-                  status === "upcoming" && cn("border", edge, inkMuted),
-                )}
                 role="img"
-                aria-label={`${typeof day.label === "string" ? day.label : `Day ${i + 1}`}: ${status === "todayDone" ? "checked in" : status === "done" ? "checked in" : status === "missed" ? "missed" : `+${day.reward}`}`}
-              >
-                {status === "done" && <CheckIcon />}
-                {(status === "today" || status === "upcoming") && <span aria-hidden="true">+{day.reward}</span>}
-                {status === "missed" && <span aria-hidden="true">&times;</span>}
-                {status === "todayDone" && (
-                  <motion.span
-                    aria-hidden="true"
-                    className={cn(
-                      "absolute inset-0 flex items-center justify-center rounded-full border-2 border-current mix-blend-multiply dark:mix-blend-screen",
-                      vermilion,
-                    )}
-                    initial={reduceMotion || !stamped ? false : { scale: 1.6, opacity: 0, rotate: 8 }}
-                    animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-                    transition={springs.stamp}
-                  >
-                    <CheckIcon />
-                  </motion.span>
+                aria-label={t.dayAria(label, on)}
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full border text-[11px] tabular-nums sm:size-9",
+                  on
+                    ? "border-transparent bg-[var(--yc-brand-c)] text-[var(--yc-brand-fg)]"
+                    : isToday
+                      ? "border-[color-mix(in_oklab,var(--yc-fg)_40%,transparent)] text-[var(--yc-fg)]"
+                      : "border-dashed border-[var(--yc-border)] text-[var(--yc-muted-fg)]",
                 )}
+              >
+                {on ? <Icon d={CheckPath} className="size-4" /> : `+${reward}`}
               </span>
+              <span className={cn("truncate text-[11px]", isToday ? "font-medium text-[var(--yc-fg)]" : "text-[var(--yc-muted-fg)]")}>{label}</span>
             </li>
           );
         })}
       </ol>
 
-      <div className="mt-4">
-        {done ? (
-          <p className={cn("text-center text-sm", inkMuted)}>{t.comeBack(nextReward)}</p>
-        ) : (
-          <>
-            <motion.button
-              type="button"
-              onClick={checkIn}
-              aria-disabled={pending}
-              whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-              transition={springs.snappy}
-              className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none aria-disabled:cursor-progress aria-disabled:opacity-70"
-            >
-              {pending ? t.checking : failed ? t.retry : t.checkIn(todayReward)}
-            </motion.button>
-            {failed && <p className="mt-2 text-center text-xs text-destructive">{t.error}</p>}
-          </>
+      <button
+        type="button"
+        onClick={checkin}
+        disabled={state.done || busy}
+        className={cn(
+          "mt-auto inline-flex h-8 w-full shrink-0 items-center justify-center gap-1.5 rounded-[0.5rem] border border-transparent px-2.5 text-sm font-medium whitespace-nowrap transition-all outline-none select-none",
+          "focus-visible:border-[var(--yc-ring)] focus-visible:ring-3 focus-visible:ring-[color-mix(in_oklab,var(--yc-ring)_50%,transparent)] active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
+          state.done
+            ? "bg-[var(--yc-secondary)] text-[var(--yc-fg)]"
+            : "bg-[var(--yc-primary)] text-[var(--yc-primary-fg)] hover:bg-[color-mix(in_oklab,var(--yc-primary)_80%,transparent)]",
         )}
+      >
+        {busy ? (
+          <Icon d={LoaderPath} className={cn("size-4", !reduce && "animate-spin")} />
+        ) : state.done ? (
+          <Icon d={CheckPath} className="size-4" />
+        ) : (
+          <Icon d={GiftPath} className="size-4" />
+        )}
+        {state.done ? t.done : t.checkIn(reward)}
+      </button>
+
+      <div
+        aria-live="polite"
+        className={cn("pointer-events-none z-50 flex justify-center", fixed ? "fixed inset-x-4 top-4" : "absolute inset-x-3 top-3")}
+      >
+        <AnimatePresence>
+          {toast ? (
+            <motion.div
+              key={toast.id}
+              role={toast.kind === "error" ? "alert" : "status"}
+              initial={reduce ? { opacity: 1 } : { opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -16 }}
+              transition={{ duration: reduce ? 0 : 0.4, ease: [0.21, 1.02, 0.73, 1] }}
+              className="pointer-events-auto relative flex w-full max-w-[356px] items-center gap-1.5 rounded-[0.5rem] border border-[var(--yc-border)] bg-[var(--yc-popover)] py-4 pr-4 pl-4 text-[13px] text-[var(--yc-fg)] shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+            >
+              <Icon
+                d={toast.kind === "success" ? CircleCheckPath : OctagonXPath}
+                className={cn("size-4", toast.kind === "success" ? "text-[var(--yc-success)]" : "text-[var(--yc-destructive)]")}
+              />
+              <span className="min-w-0 flex-1">{toast.text}</span>
+              <button
+                type="button"
+                onClick={() => setToast(null)}
+                aria-label={t.close}
+                className="absolute -top-2 -left-2 flex size-5 items-center justify-center rounded-full border border-[var(--yc-border)] bg-[var(--yc-popover)] text-[var(--yc-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--yc-ring)]"
+              >
+                <Icon d={XPath} className="size-3" />
+              </button>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
-
-      <span className="sr-only" role="status" aria-live="polite">
-        {announcement}
-      </span>
-    </section>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path d="m3.5 8.5 3 3 6-7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    </div>
   );
 }

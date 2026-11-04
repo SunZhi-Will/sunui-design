@@ -14,6 +14,9 @@ export function SiteHeader() {
           <Link href="/" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
             Blocks
           </Link>
+          <Link href="/icons" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+            Icons
+          </Link>
           <Link href="/docs" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
             Docs
           </Link>

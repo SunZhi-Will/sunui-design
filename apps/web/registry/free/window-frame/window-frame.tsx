@@ -2,127 +2,271 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type WindowFrameVariant = "mac" | "browser" | "phone";
-export type WindowFrameTone = "neutral" | "success" | "danger" | "brand";
+export type WindowFrameTone = "default" | "danger" | "success" | "brand";
+/** auto 跟著深淺色切換；dark／light 固定色，給不吃主題的簡報舞台用 */
+export type WindowFrameScheme = "auto" | "dark" | "light";
 
-export interface WindowFrameProps {
-  variant?: WindowFrameVariant;
-  /** mac 視窗置中的標題 */
-  title?: ReactNode;
-  /** browser 網址列文字 */
-  url?: string;
-  /** 標題列右側插槽 */
-  right?: ReactNode;
-  /** 只用 1px 邊框顏色表示示範狀態 */
-  tone?: WindowFrameTone;
-  caption?: ReactNode;
-  /** 內容區高度（超出時在框內捲動），例如 320 或 "20rem" */
-  height?: number | string;
-  children?: ReactNode;
-  className?: string;
-}
+/*
+ * 色彩 token。auto 沿用部落格 tokens.css（淺色 stone、深色 zinc），
+ * dark／light 沿用簡報裝置外框的固定色。
+ */
+const lightVars =
+  "[--wf-surface:#ffffff] [--wf-raised:#f5f5f4] [--wf-sunken:#f3f1ed] [--wf-fg:#1c1917] [--wf-fg-body:#292524] [--wf-fg-muted:#57534e] [--wf-line:rgba(28,25,23,0.1)] [--wf-line-strong:rgba(28,25,23,0.22)] [--wf-dot:rgba(28,25,23,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(217,119,6,0.7)] [--wf-shadow:0_1px_2px_rgba(28,25,23,0.05),0_4px_14px_-6px_rgba(28,25,23,0.08)]";
+const darkAutoVars =
+  "dark:[--wf-surface:#111113] dark:[--wf-raised:#1a1a1d] dark:[--wf-sunken:#161619] dark:[--wf-fg:#fafafa] dark:[--wf-fg-body:#e4e4e7] dark:[--wf-fg-muted:#e4e4e7] dark:[--wf-line:rgba(255,255,255,0.1)] dark:[--wf-line-strong:rgba(255,255,255,0.22)] dark:[--wf-dot:rgba(250,250,250,0.08)] dark:[--wf-success:rgba(52,211,153,0.6)] dark:[--wf-danger:rgba(248,113,113,0.6)] dark:[--wf-brand:rgba(250,204,21,0.7)] dark:[--wf-shadow:none]";
+const fixedDark =
+  "[--wf-surface:#151518] [--wf-raised:#1c1c20] [--wf-sunken:#1c1c20] [--wf-fg:#f6f1e6] [--wf-fg-body:#f6f1e6] [--wf-fg-muted:#bdb6a6] [--wf-line:#3a3a42] [--wf-line-strong:#3a3a42] [--wf-dot:rgba(246,241,230,0.08)] [--wf-success:rgba(52,211,153,0.6)] [--wf-danger:rgba(248,113,113,0.6)] [--wf-brand:rgba(232,184,74,0.7)] [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)]";
+const fixedLight =
+  "[--wf-surface:#ffffff] [--wf-raised:#e8e0cf] [--wf-sunken:#f4efe4] [--wf-fg:#17140d] [--wf-fg-body:#17140d] [--wf-fg-muted:#58513f] [--wf-line:#cfc6ae] [--wf-line-strong:#cfc6ae] [--wf-dot:rgba(23,20,13,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(138,90,0,0.7)] [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)]";
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-
-const toneBorder: Record<WindowFrameTone, string> = {
-  neutral: edge,
-  success: "border-emerald-600/70 dark:border-emerald-400/60",
-  danger: "border-destructive/70",
-  brand: "border-primary",
+const schemeVars: Record<WindowFrameScheme, string> = {
+  auto: `${lightVars} ${darkAutoVars}`,
+  dark: fixedDark,
+  light: fixedLight,
 };
 
-const toneIcon: Partial<Record<WindowFrameTone, ReactNode>> = {
-  success: <path d="m3.5 8.5 3 3 6-7" className="text-emerald-700 dark:text-emerald-400" />,
-  danger: <path d="M8 4.5v4.5M8 11.5v.01M8 1.75 14.5 13.5h-13Z" className="text-destructive" />,
+const toneRing: Record<WindowFrameTone, string> = {
+  default: "border-[var(--wf-line-strong)]",
+  danger: "border-[var(--wf-danger)]",
+  success: "border-[var(--wf-success)]",
+  brand: "border-[var(--wf-brand)]",
 };
 
-/** 中性灰的三個點，不用紅黃綠，避免多出強調色 */
-function Dots() {
+/** macOS 紅黃綠三顆燈 */
+export function TrafficLights({ className }: { className?: string }) {
   return (
-    <span aria-hidden="true" className={cn("flex shrink-0 gap-1.5", inkMuted)}>
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="size-2.5 rounded-full border border-current opacity-60" />
-      ))}
+    <span aria-hidden="true" className={cn("flex shrink-0 gap-1.5", className)}>
+      <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+      <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+      <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
     </span>
   );
 }
 
+function SimBadge({ children }: { children: ReactNode }) {
+  return (
+    <span className="flex-none rounded-full border border-[var(--wf-line-strong)] bg-[var(--wf-sunken)] px-2 py-px text-[11px] font-bold tracking-[0.04em] text-[var(--wf-fg-muted)]">
+      {children}
+    </span>
+  );
+}
+
+function LockIcon({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+/* ───────── 展示區 ───────── */
+
+export interface StageProps {
+  children: ReactNode;
+  scheme?: WindowFrameScheme;
+  className?: string;
+  style?: CSSProperties;
+}
+
+/** 帶點點底紋的展示區，放圖表、插圖與視窗 */
+export function Stage({ children, scheme = "auto", className, style }: StageProps) {
+  return (
+    <div
+      className={cn("relative overflow-hidden rounded-xl border border-[var(--wf-line)] bg-[var(--wf-sunken)]", schemeVars[scheme], className)}
+      style={{
+        backgroundImage: "radial-gradient(var(--wf-dot) 1px, transparent 1px)",
+        backgroundSize: "18px 18px",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ───────── 視窗 ───────── */
+
+export interface WindowFrameProps {
+  /** 標題列置中的文字（檔名、App 名稱） */
+  title: ReactNode;
+  /** 標題前的小圖示 */
+  icon?: ReactNode;
+  /** 標題列右側插槽 */
+  right?: ReactNode;
+  /** 標題列下方的選單列（窄螢幕隱藏） */
+  menus?: string[];
+  /** 外框顏色表示示範狀態：失敗、成功、品牌 */
+  tone?: WindowFrameTone;
+  scheme?: WindowFrameScheme;
+  /** 有給就在右上角掛小徽章，例如「Simulated」，表示畫面是程式畫的 */
+  badge?: ReactNode;
+  /** 內容區最大高度，超過在框內捲動 */
+  maxHeight?: number;
+  children: ReactNode;
+  className?: string;
+}
+
+/** 像編輯器或瀏覽器的視窗外框 */
 export function WindowFrame({
-  variant = "browser",
   title,
-  url,
+  icon,
   right,
-  tone = "neutral",
-  caption,
-  height,
+  menus,
+  tone = "default",
+  scheme = "auto",
+  badge,
+  maxHeight,
   children,
   className,
 }: WindowFrameProps) {
-  const bodyStyle: CSSProperties | undefined = height === undefined ? undefined : { height };
-  const border = toneBorder[tone];
-
-  let frame: ReactNode;
-
-  if (variant === "phone") {
-    frame = (
-      <div className={cn("mx-auto w-[16rem] max-w-full rounded-[2rem] border p-2", paper, border)}>
-        <div aria-hidden="true" className="flex justify-center pt-1 pb-2">
-          <span className="h-1.5 w-16 rounded-full bg-current opacity-20" />
-        </div>
-        <div
-          className={cn("overflow-auto rounded-[1.4rem] border bg-card text-card-foreground", edge)}
-          style={bodyStyle ?? { aspectRatio: "9 / 17" }}
-        >
-          {children}
-        </div>
-        <div aria-hidden="true" className="flex justify-center pt-2 pb-1">
-          <span className="h-1 w-20 rounded-full bg-current opacity-25" />
-        </div>
-      </div>
-    );
-  } else {
-    frame = (
-      <div className={cn("w-full overflow-hidden rounded-md border", border)}>
-        <div className={cn("flex h-9 items-center gap-3 border-b px-3", paper, edge)}>
-          <Dots />
-          {variant === "browser" ? (
-            <span className={cn("flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded-[4px] border px-2", edge, "bg-white/60 dark:bg-black/20")}>
-              <svg viewBox="0 0 16 16" aria-hidden="true" className={cn("size-3 shrink-0", inkMuted)} fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="3.5" y="7" width="9" height="6.5" rx="1" />
-                <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
-              </svg>
-              <span className="truncate font-mono text-[11px] tracking-[0.04em]">{url}</span>
-            </span>
-          ) : (
-            <span className="min-w-0 flex-1 truncate text-center font-mono text-xs tracking-[0.06em]">{title}</span>
-          )}
-          {/* mac 標題置中：右側沒內容時補一個與點同寬的空位 */}
-          {right ? <span className="flex shrink-0 items-center">{right}</span> : variant === "mac" && <span aria-hidden="true" className="w-[2.625rem] shrink-0" />}
-        </div>
-        <div className="overflow-auto bg-card text-card-foreground" style={bodyStyle}>
-          {children}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <figure className={cn("w-full", ink, className)}>
-      {frame}
-      {caption && (
-        <figcaption className={cn("mt-2 flex items-center gap-1.5 text-xs", variant === "phone" && "justify-center", inkMuted)}>
-          {toneIcon[tone] && (
-            <svg viewBox="0 0 16 16" aria-hidden="true" className="size-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              {toneIcon[tone]}
-            </svg>
-          )}
-          {caption}
+    <div
+      className={cn(
+        "min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] text-[var(--wf-fg-body)] shadow-[var(--wf-shadow)] transition-colors",
+        schemeVars[scheme],
+        toneRing[tone],
+        className,
+      )}
+    >
+      <div className="flex h-9 items-center gap-2 border-b border-[var(--wf-line)] bg-[var(--wf-raised)] px-3">
+        <TrafficLights />
+        <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate font-mono text-[11px] font-semibold text-[var(--wf-fg-body)]">
+          {icon && <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center text-[var(--wf-fg)] [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span>}
+          <span className="truncate">{title}</span>
+        </span>
+        <span className="flex min-w-[42px] items-center justify-end gap-2">
+          {badge && <SimBadge>{badge}</SimBadge>}
+          {right}
+        </span>
+      </div>
+      {menus && menus.length > 0 && (
+        <div aria-hidden="true" className="hidden gap-4 border-b border-[var(--wf-line)] px-3 py-1.5 text-[11px] text-[var(--wf-fg-muted)] sm:flex">
+          {menus.map((m) => (
+            <span key={m}>{m}</span>
+          ))}
+        </div>
+      )}
+      <div style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>{children}</div>
+    </div>
+  );
+}
+
+/* ───────── 電腦瀏覽器 ───────── */
+
+export interface BrowserFrameProps {
+  /** 網址列（只顯示網域與路徑） */
+  url: string;
+  /** 分頁標題，不給就顯示網址 */
+  title?: ReactNode;
+  tone?: WindowFrameTone;
+  scheme?: WindowFrameScheme;
+  badge?: ReactNode;
+  maxHeight?: number;
+  children: ReactNode;
+  className?: string;
+}
+
+export function BrowserFrame({ url, title, tone = "default", scheme = "auto", badge, maxHeight, children, className }: BrowserFrameProps) {
+  return (
+    <figure
+      aria-label={`Browser window, ${url}`}
+      className={cn(
+        "m-0 min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] text-[var(--wf-fg)] shadow-[0_12px_30px_rgba(0,0,0,0.22)] transition-colors",
+        schemeVars[scheme],
+        toneRing[tone],
+        className,
+      )}
+    >
+      <div aria-hidden="true" className="flex items-center gap-2.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3 py-2 text-xs text-[var(--wf-fg-muted)]">
+        <TrafficLights />
+        <span className="min-w-0 flex-1 truncate text-center">{title ?? url}</span>
+        {badge && <SimBadge>{badge}</SimBadge>}
+      </div>
+      <div className="mx-3 my-2 flex items-center gap-2 rounded-full border border-[var(--wf-line-strong)] bg-[var(--wf-sunken)] px-3 py-1.5 text-[12.5px] text-[var(--wf-fg-muted)]">
+        <LockIcon size={12} />
+        <span className="truncate text-[var(--wf-fg)]">{url}</span>
+      </div>
+      <div className="min-h-[120px]" style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
+        {children}
+      </div>
+    </figure>
+  );
+}
+
+/* ───────── 手機 ───────── */
+
+export interface PhoneFrameProps {
+  children: ReactNode;
+  /** 瀏覽器網址列；不給就沒有網址列 */
+  url?: string;
+  time?: string;
+  /** 手機寬度（px），窄容器裡會縮到 100% */
+  width?: number;
+  /** 手機整體高度。給了就固定大小，內容在螢幕裡捲動 */
+  height?: number;
+  /** 手機上方的小標 */
+  label?: ReactNode;
+  scheme?: WindowFrameScheme;
+  badge?: ReactNode;
+  className?: string;
+}
+
+export function PhoneFrame({ children, url, time = "20:41", width = 320, height, label, scheme = "auto", badge, className }: PhoneFrameProps) {
+  // 窄手機框：動態島縮小、狀態列收緊，不蓋到時間與電量
+  const compact = width < 240;
+  const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
+  return (
+    <figure
+      aria-label={typeof label === "string" ? label : "Phone screen"}
+      className={cn("m-0 grid min-w-0 max-w-full justify-items-center gap-2", schemeVars[scheme], className)}
+      style={{ width }}
+    >
+      {(label || badge) && (
+        <figcaption className="flex items-center justify-center gap-2 text-[12.5px] text-[var(--wf-fg-muted)]">
+          {label && <span>{label}</span>}
+          {badge && <SimBadge>{badge}</SimBadge>}
         </figcaption>
       )}
+      <div
+        className="relative flex w-full flex-col overflow-hidden rounded-[38px] bg-[#0b0b0d] p-2.5 shadow-[0_0_0_1.5px_color-mix(in_srgb,var(--wf-fg)_22%,transparent),0_18px_40px_rgba(0,0,0,0.35)]"
+        style={height ? { height } : undefined}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute top-4 left-1/2 z-[2] h-5 w-[76px] -translate-x-1/2 rounded-full bg-[#0b0b0d]"
+          style={compact ? { width: 34, height: 12, top: 13 } : undefined}
+        />
+        <div
+          aria-hidden="true"
+          className={cn("flex flex-none items-center justify-between rounded-t-[28px] px-5 pt-2 pb-1.5 text-[12.5px] font-bold", part)}
+          style={compact ? { padding: "7px 10px 4px", fontSize: 11 } : undefined}
+        >
+          <span className="tabular-nums">{time}</span>
+          <span className="inline-flex items-center gap-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16" />
+            </svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h.01M2 8.82a15 15 0 0 1 20 0M5 12.859a10 10 0 0 1 14 0M8.5 16.429a5 5 0 0 1 7 0" />
+            </svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+              <rect width="16" height="10" x="2" y="7" rx="2" ry="2" />
+              <path d="M22 11v2" />
+            </svg>
+          </span>
+        </div>
+        {url && (
+          <div aria-label={`URL ${url}`} className="flex flex-none items-center gap-1.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3.5 py-1.5 text-xs text-[var(--wf-fg-muted)]">
+            <LockIcon size={11} />
+            <span className="truncate text-[var(--wf-fg)]">{url}</span>
+          </div>
+        )}
+        <div className={cn("min-h-[120px] flex-auto overflow-x-hidden", part, height && "min-h-0 flex-1 overflow-y-auto overscroll-contain")}>{children}</div>
+        <div aria-hidden="true" className={cn("relative h-[22px] flex-none rounded-b-[28px]", part)}>
+          <span className="absolute bottom-[7px] left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-45" />
+        </div>
+      </div>
     </figure>
   );
 }

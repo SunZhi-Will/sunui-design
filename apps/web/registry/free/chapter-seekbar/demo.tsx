@@ -1,87 +1,80 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { ChapterSeekbar, type SeekChapter, type SeekMarker } from "./chapter-seekbar";
+import { ChapterSeekbar, formatTime, type SeekChapter, type SeekMarker } from "./chapter-seekbar";
 
-const DURATION = 12 * 60 + 40;
+const DURATION = 18 * 60 + 24;
 
 const chapters: SeekChapter[] = [
-  { start: 0, title: "Intro" },
-  { start: 95, title: "Setup" },
-  { start: 260, title: "Build the form" },
-  { start: 520, title: "Handle payments" },
-  { start: 690, title: "Wrap up" },
+  { t: 0, title: "Opening" },
+  { t: 74, title: "Unboxing the camera" },
+  { t: 262, title: "Sensor and lens" },
+  { t: 548, title: "Low light test" },
+  { t: 806, title: "Battery life" },
+  { t: 1012, title: "Verdict" },
 ];
 
 const markers: SeekMarker[] = [
-  { t: 210, label: "Code" },
-  { t: 455, label: "Key point" },
-  { t: 640, label: "Quiz" },
+  { t: 333, label: "Bookmark", kind: "user" },
+  { t: 612, label: "Clip", kind: "clip" },
+  { t: 890, label: "Sponsor" },
 ];
 
-const fmt = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+// 縮圖用漸層色塊代替，依時間換色
+function Thumb({ t }: { t: number }) {
+  const hue = Math.round((t / DURATION) * 220 + 20);
+  return (
+    <div className="flex h-full w-full items-end p-2" style={{ background: `linear-gradient(135deg, hsl(${hue} 45% 32%), hsl(${hue + 40} 35% 12%))` }}>
+      <span className="h-2 w-16 rounded-full bg-white/25" />
+    </div>
+  );
+}
 
 export default function ChapterSeekbarDemo() {
-  const [current, setCurrent] = useState(132);
-  const [playing, setPlaying] = useState(false);
-  const wasPlaying = useRef(false);
+  const [current, setCurrent] = useState(301);
+  const [playing, setPlaying] = useState(true);
 
   useEffect(() => {
     if (!playing) return;
-    const id = setInterval(() => {
-      setCurrent((c) => {
-        if (c + 0.25 >= DURATION) {
-          setPlaying(false);
-          return DURATION;
-        }
-        return c + 0.25;
-      });
-    }, 250);
+    const id = setInterval(() => setCurrent((c) => (c + 0.25 >= DURATION ? DURATION : c + 0.25)), 250);
     return () => clearInterval(id);
   }, [playing]);
 
-  const chapter = [...chapters].reverse().find((c) => current >= c.start) ?? chapters[0];
-
   return (
-    <div className="w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-card text-card-foreground">
-      <button
-        type="button"
-        onClick={() => setPlaying((p) => !p)}
-        aria-label={playing ? "Pause lesson" : "Play lesson"}
-        className="relative flex aspect-video w-full items-center justify-center bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-      >
-        <span className="absolute top-3 left-4 text-left">
-          <span className="block text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">Lesson 4</span>
-          <span className="block text-sm font-medium">{chapter.title}</span>
-        </span>
-        <span className="flex size-14 items-center justify-center rounded-full border border-border bg-background">
-          <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
-            {playing ? <path d="M9 5v14M15 5v14" /> : <path d="M8 5.5v13l10-6.5z" />}
-          </svg>
-        </span>
-      </button>
+    <div className="w-full max-w-3xl">
+      <div className="relative aspect-video w-full overflow-hidden rounded-[10px] bg-black select-none">
+        {/* 影片畫面以色塊示意 */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 30% 35%, #2b3242, #0d0f13 70%)" }} />
+        <div className="absolute top-[22%] left-[18%] h-[38%] w-[34%] rounded-xl bg-[#1e222b]" />
+        <div className="absolute top-[30%] left-[58%] h-[20%] w-[22%] rounded-lg bg-[#282d38]" />
 
-      <div className="space-y-3 px-4 pt-6 pb-4">
-        <ChapterSeekbar
-          duration={DURATION}
-          current={current}
-          buffered={Math.min(DURATION, current + 90)}
-          chapters={chapters}
-          markers={markers}
-          onSeek={setCurrent}
-          onScrubStart={() => {
-            wasPlaying.current = playing;
-            setPlaying(false);
-          }}
-          onScrubEnd={() => setPlaying(wasPlaying.current)}
-          labels={{ seek: "Lesson position" }}
-        />
-        <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="truncate text-muted-foreground">Build a checkout with Stripe</span>
-          <span className="shrink-0 font-mono text-xs tabular-nums">
-            {fmt(current)} / {fmt(DURATION)}
-          </span>
+        <div className="absolute inset-x-0 bottom-0 z-10 px-3.5 pt-7 pb-1.5" style={{ background: "linear-gradient(transparent, rgba(5, 6, 9, .85))" }}>
+          <ChapterSeekbar
+            duration={DURATION}
+            current={current}
+            buffered={Math.min(DURATION, current + 120)}
+            chapters={chapters}
+            markers={markers}
+            onSeek={setCurrent}
+            renderThumb={(t) => <Thumb t={t} />}
+            labels={{ seek: "Video position" }}
+          />
+          <div className="flex h-11 min-w-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? "Pause" : "Play"}
+              className="grid size-10 shrink-0 place-items-center rounded-lg text-[#e9ecf1] hover:bg-white/10"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden="true">
+                {playing ? <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /> : <path d="M8 5.5v13l10.5-6.5z" />}
+              </svg>
+            </button>
+            <span className="min-w-0 truncate text-[13px] text-[#e9ecf1] tabular-nums">
+              {formatTime(current)} / {formatTime(DURATION)}
+            </span>
+          </div>
         </div>
       </div>
     </div>

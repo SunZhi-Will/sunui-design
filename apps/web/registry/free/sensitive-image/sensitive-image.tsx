@@ -1,141 +1,235 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useId, useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+export type ImageRating = "general" | "sensitive" | "explicit";
+
 export interface SensitiveImageLabels {
-  /** 遮蔽時的中性替代文字 */
-  hiddenAlt?: (rating?: string) => string;
-  cover?: ReactNode;
-  show?: ReactNode;
-  revealed?: string;
-  open?: string;
+  rating?: Partial<Record<ImageRating, string>>;
+  /** 分級說明，用在標籤 title 與大圖的說明文字 */
+  ratingDesc?: Partial<Record<ImageRating, string>>;
+  /** 遮住時的中性 alt */
+  blurredAlt?: (ratingLabel: string) => string;
+  coveredAlt?: string;
+  show?: string;
+  showAria?: (ratingLabel: string) => string;
+  /** 大圖檢視時的說明，接在分級說明後面 */
+  fullHint?: string;
+  curtainOn?: string;
+  curtainOff?: string;
 }
 
 export interface SensitiveImageProps {
   src: string;
   alt: string;
-  /** 為真時從第一幀就以紙面遮住，原圖不會閃現 */
-  flagged?: boolean;
-  /** 分級標籤，例如 Spoiler、Mature、Graphic */
-  rating?: string;
-  /** 為什麼被遮住，一行說明 */
-  reason?: ReactNode;
-  revealLabel?: ReactNode;
-  /** CSS aspect-ratio，例如 "4 / 3" */
-  aspect?: string;
+  width?: number;
+  height?: number;
+  rating?: ImageRating;
+  /** 這個分級要不要先模糊；預設非全年齡就模糊 */
+  blur?: boolean;
+  /** 給了就跨元件共享「這次瀏覽已顯示」：縮圖點開後，大圖也不再模糊 */
+  revealKey?: string;
+  /** 隱私遮罩：遮住所有圖片（不論分級） */
+  curtain?: boolean;
+  onCurtainOff?: () => void;
   onReveal?: () => void;
-  /** 顯示後點擊圖片，例如開啟大圖 */
+  /** 有 onOpen 時整張圖是可點的按鈕，「顯示」按鈕疊在上面 */
   onOpen?: () => void;
+  openLabel?: string;
+  /** tile：縮圖（小遮罩）；full：大圖檢視 */
+  size?: "tile" | "full";
   labels?: SensitiveImageLabels;
   className?: string;
+  imgClassName?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
 }
 
-const defaultLabels: Required<SensitiveImageLabels> = {
-  hiddenAlt: (rating) => (rating ? `Hidden image: ${rating.toLowerCase()}` : "Hidden image: sensitive"),
-  cover: "Sensitive content",
+const defaultLabels = {
+  rating: { general: "All ages", sensitive: "Sensitive", explicit: "18+" } as Record<ImageRating, string>,
+  ratingDesc: {
+    general: "No nudity or suggestive content",
+    sensitive: "Underwear, suggestive poses, nudity without explicit detail",
+    explicit: "Explicit nudity or sexual content",
+  } as Record<ImageRating, string>,
+  blurredAlt: (r: string) => `Blurred ${r} image`,
+  coveredAlt: "Covered image",
   show: "Show",
-  revealed: "Image shown",
-  open: "Open image",
+  showAria: (r: string) => `Show this ${r} image`,
+  fullHint: "Blurred by your settings. Use the button below to show it.",
+  curtainOn: "Privacy curtain is on",
+  curtainOff: "Lift curtain",
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+// 單張點開只存在記憶體，重新整理後恢復模糊
+let revealedKeys: ReadonlySet<string> = new Set();
+const listeners = new Set<() => void>();
+const store = {
+  subscribe(l: () => void) {
+    listeners.add(l);
+    return () => {
+      listeners.delete(l);
+    };
+  },
+  get: () => revealedKeys,
+};
+export function revealImage(key: string, on = true) {
+  const next = new Set(revealedKeys);
+  if (on) next.add(key);
+  else next.delete(key);
+  revealedKeys = next;
+  listeners.forEach((l) => l());
+}
 
-const springs = {
-  gentle: { type: "spring", stiffness: 240, damping: 30 },
-} as const;
+/** 分級標籤：性感用琥珀色、18+ 用紅色，全年齡不顯示 */
+export function RatingBadge({ rating, labels, className }: { rating?: ImageRating; labels?: SensitiveImageLabels; className?: string }) {
+  if (!rating || rating === "general") return null;
+  const label = labels?.rating?.[rating] ?? defaultLabels.rating[rating];
+  const desc = labels?.ratingDesc?.[rating] ?? defaultLabels.ratingDesc[rating];
+  return (
+    <span
+      title={desc}
+      className={cn(
+        "inline-flex h-5 items-center rounded-md px-1.5 text-[11px] font-semibold tracking-wide tabular-nums",
+        rating === "explicit"
+          ? "bg-[#DC2626] text-[#FAFAFA] dark:bg-[#F87171] dark:text-[#09090B]"
+          : "bg-[#B45309] text-[#FAFAFA] dark:bg-[#FBBF24] dark:text-[#09090B]",
+        className,
+      )}
+    >
+      {label}
+    </span>
+  );
+}
 
+function Eye({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOff({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+      <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+      <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+      <path d="m2 2 20 20" />
+    </svg>
+  );
+}
+
+const pill =
+  "pointer-events-auto rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur transition-colors hover:bg-white/25 focus-visible:ring-3 focus-visible:ring-white/50 focus-visible:outline-none";
+
+/**
+ * 依分級顯示的圖片。遮住時從第一個畫格就套用模糊（不會先閃出原圖），
+ * alt 也改成中性文字；點「顯示」只在這次瀏覽有效。
+ * 有 onOpen 時整張圖是可點的按鈕，「顯示」按鈕疊在上面（避免按鈕包按鈕）。
+ */
 export function SensitiveImage({
   src,
   alt,
-  flagged = false,
+  width,
+  height,
   rating,
-  reason,
-  revealLabel,
-  aspect = "4 / 3",
+  blur,
+  revealKey,
+  curtain = false,
+  onCurtainOff,
   onReveal,
   onOpen,
+  openLabel,
+  size = "tile",
   labels,
   className,
+  imgClassName,
+  style,
+  children,
 }: SensitiveImageProps) {
-  const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const id = useId();
-  // 只在這次瀏覽有效，不寫入任何儲存
-  const [revealed, setRevealed] = useState(false);
-  const hidden = flagged && !revealed;
-  const [announcement, setAnnouncement] = useState("");
+  const t = {
+    ...defaultLabels,
+    ...labels,
+    rating: { ...defaultLabels.rating, ...labels?.rating },
+    ratingDesc: { ...defaultLabels.ratingDesc, ...labels?.ratingDesc },
+  };
+  const shared = useSyncExternalStore(store.subscribe, store.get, store.get);
+  const [localShown, setLocalShown] = useState(false);
+  const mature = !!rating && rating !== "general";
+  const shouldBlur = blur ?? mature;
+  const shown = revealKey ? shared.has(revealKey) : localShown;
+  const covered = curtain || (shouldBlur && !shown);
+  const ratingLabel = rating ? t.rating[rating] : "";
 
-  function reveal() {
-    setRevealed(true);
-    setAnnouncement(t.revealed);
+  const reveal = () => {
+    if (revealKey) revealImage(revealKey);
+    else setLocalShown(true);
     onReveal?.();
-  }
-
-  const img = (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={hidden ? t.hiddenAlt(rating) : alt} className="size-full object-cover" draggable={false} />
-  );
+  };
 
   return (
-    <figure className={cn("relative w-full overflow-hidden rounded-md border", edge, ink, className)} style={{ aspectRatio: aspect }}>
+    <div className={cn("group/rated relative overflow-hidden bg-muted", className)} style={style}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={covered ? (mature ? t.blurredAlt(ratingLabel) : t.coveredAlt) : alt}
+        width={width}
+        height={height}
+        loading={size === "tile" ? "lazy" : undefined}
+        draggable={!covered}
+        className={cn(
+          "transition-[filter,transform] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+          size === "tile" && "size-full object-cover",
+          imgClassName,
+          covered && "scale-110 blur-2xl saturate-50 select-none",
+        )}
+      />
       {onOpen ? (
         <button
           type="button"
           onClick={onOpen}
-          tabIndex={hidden ? -1 : undefined}
-          aria-hidden={hidden || undefined}
-          aria-label={hidden ? undefined : `${t.open}: ${alt}`}
-          className="block size-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
-        >
-          {img}
-        </button>
-      ) : (
-        img
-      )}
+          aria-label={openLabel}
+          className="absolute inset-0 z-[1] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
+        />
+      ) : null}
 
-      {/* 遮罩在伺服器端就輸出，所以原圖不會先露出再被蓋住 */}
-      <AnimatePresence initial={false}>
-        {hidden && (
-          <motion.div
-            key="cover"
-            className={cn("absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-3 text-center", paper)}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: springs.gentle }}
-          >
-            <span aria-hidden="true" className={cn("absolute inset-2 rounded-[3px] border border-dashed", edge)} />
-            {rating && (
-              <span className="relative rounded-[3px] border border-current px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-[0.16em] uppercase">
-                {rating}
-              </span>
-            )}
-            <p id={`${id}-reason`} className={cn("relative line-clamp-3 max-w-[16rem] text-xs leading-[1.35]", inkMuted)}>
-              {reason ?? t.cover}
-            </p>
-            <button
-              type="button"
-              onClick={reveal}
-              aria-describedby={`${id}-reason`}
-              className={cn(
-                "relative mt-1 rounded-md border bg-transparent px-3 py-1 text-xs font-medium transition-colors hover:bg-[#1c1917]/5 dark:hover:bg-[#ece7dc]/10",
-                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
-                edge,
-              )}
-            >
-              {revealLabel ?? t.show}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {covered ? (
+        // 遮罩本身也做背景模糊，萬一圖片的模糊失效仍看不到原圖
+        <div className="pointer-events-none absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 bg-black/35 p-3 text-center text-white backdrop-blur-2xl">
+          {curtain ? (
+            <>
+              <EyeOff className={size === "full" ? "size-6" : "size-4"} />
+              {size === "full" ? <p className="text-sm font-medium">{t.curtainOn}</p> : null}
+              {onCurtainOff ? (
+                <button type="button" onClick={onCurtainOff} className={pill}>
+                  {t.curtainOff}
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <RatingBadge rating={rating} labels={t} />
+              {size === "full" && rating ? (
+                <p className="max-w-xs text-sm text-white/90">
+                  {t.ratingDesc[rating]}. {t.fullHint}
+                </p>
+              ) : null}
+              <button type="button" onClick={reveal} aria-label={t.showAria(ratingLabel)} className={cn(pill, "inline-flex items-center gap-1")}>
+                <Eye className="size-3.5" /> {t.show}
+              </button>
+            </>
+          )}
+        </div>
+      ) : mature ? (
+        <RatingBadge rating={rating} labels={t} className="pointer-events-none absolute top-2 left-2 z-[2] shadow-sm" />
+      ) : null}
 
-      <span className="sr-only" role="status" aria-live="polite">
-        {announcement}
-      </span>
-    </figure>
+      {children}
+    </div>
   );
 }

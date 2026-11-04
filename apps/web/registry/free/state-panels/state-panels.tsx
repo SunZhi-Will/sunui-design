@@ -1,71 +1,99 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface StateAction {
-  label: ReactNode;
-  onClick?: () => void;
+/* ---------- 按鈕（同 shadcn Button 的 default 與 outline） ---------- */
+
+const buttonBase =
+  "inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+const buttonVariant = {
+  default: "bg-primary text-primary-foreground hover:bg-primary/80",
+  outline: "border-border bg-background hover:bg-muted hover:text-foreground",
+};
+const buttonSize = {
+  default: "h-8 gap-1.5 px-2.5",
+  sm: "h-7 gap-1 rounded-md px-2.5 text-[0.8rem] [&_svg:not([class*='size-'])]:size-3.5",
+};
+
+export interface StateButtonProps extends Omit<ComponentProps<"button">, "type"> {
+  variant?: keyof typeof buttonVariant;
+  size?: keyof typeof buttonSize;
+  /** 給了就輸出成連結 */
   href?: string;
 }
 
-// 設計語言（DESIGN.md）：紙邊、墨；狀態色只上在小圖示
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const bone = "bg-[#e7e0d0]/70 dark:bg-[#38332b]/80";
-
-const primaryClass =
-  "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none aria-disabled:cursor-progress aria-disabled:opacity-70";
-const linkClass =
-  "text-sm font-medium underline decoration-current/30 underline-offset-4 hover:decoration-current focus-visible:decoration-current focus-visible:outline-none";
-
-function ActionControl({ action, className }: { action: StateAction; className: string }) {
-  if (action.href) {
+export function StateButton({ variant = "default", size = "default", href, className, children, ...props }: StateButtonProps) {
+  const cls = cn(buttonBase, buttonVariant[variant], buttonSize[size], className);
+  if (href) {
     return (
-      <a href={action.href} onClick={action.onClick} className={className}>
-        {action.label}
+      <a href={href} className={cls} onClick={props.onClick as ComponentProps<"a">["onClick"]}>
+        {children}
       </a>
     );
   }
   return (
-    <button type="button" onClick={action.onClick} className={className}>
-      {action.label}
+    <button type="button" className={cls} {...props}>
+      {children}
     </button>
   );
 }
 
 /* ---------- Empty ---------- */
 
+export interface StateLink {
+  label: ReactNode;
+  href?: string;
+  onClick?: () => void;
+}
+
 export interface EmptyStateProps {
   title: ReactNode;
   description?: ReactNode;
-  /** 1.5 線寬的圖示，預設是空箱子 */
+  /** 1.5 線寬的圖示，預設是收件匣 */
   icon?: ReactNode;
-  action?: StateAction;
-  /** 「載入範例」：讓使用者先看到填滿後的樣子 */
+  /** 自訂動作；給了就不輸出內建的雙按鈕 */
+  action?: ReactNode;
+  /** 「載入範例」主按鈕，讓使用者先看到填好的樣子 */
   onLoadExample?: () => void;
+  /** 旁邊的 outline 按鈕，例如「去加成員」 */
+  secondary?: StateLink;
+  /** start：靠左的版本（標題、說明、按鈕列靠左） */
+  align?: "center" | "start";
   labels?: { loadExample?: ReactNode };
   className?: string;
 }
 
-export function EmptyState({ title, description, icon, action, onLoadExample, labels, className }: EmptyStateProps) {
+export function EmptyState({ title, description, icon, action, onLoadExample, secondary, align = "center", labels, className }: EmptyStateProps) {
+  const start = align === "start";
+  const builtIn =
+    onLoadExample || secondary ? (
+      <div className={cn("flex flex-wrap gap-2", start ? "justify-start" : "justify-center")}>
+        {onLoadExample && (
+          <StateButton onClick={onLoadExample}>
+            <SparklesIcon />
+            {labels?.loadExample ?? "Load example"}
+          </StateButton>
+        )}
+        {secondary && (
+          <StateButton variant="outline" href={secondary.href} onClick={secondary.onClick}>
+            {secondary.label}
+          </StateButton>
+        )}
+      </div>
+    ) : null;
+
   return (
-    <div className={cn("rounded-md border border-dashed px-6 py-10 text-center font-sans", edge, ink, className)}>
-      <span className={cn("mx-auto flex size-10 items-center justify-center [&_svg]:size-6", inkMuted)}>{icon ?? <BoxIcon />}</span>
-      <p className="mt-3 text-sm font-semibold">{title}</p>
-      {description && <p className={cn("mx-auto mt-1 max-w-xs text-sm text-pretty", inkMuted)}>{description}</p>}
-      {(action || onLoadExample) && (
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
-          {action && <ActionControl action={action} className={primaryClass} />}
-          {onLoadExample && (
-            <button type="button" onClick={onLoadExample} className={linkClass}>
-              {labels?.loadExample ?? "Load an example"}
-            </button>
-          )}
+    <div className={cn("flex flex-col overflow-hidden rounded-xl border border-dashed border-border bg-transparent text-sm text-card-foreground", className)}>
+      <div className={cn("flex flex-col gap-4 px-5 py-16", start ? "items-start text-left" : "items-center text-center")}>
+        <span className="text-muted-foreground [&_svg]:size-6">{icon ?? <InboxIcon />}</span>
+        <div>
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          {description ? <p className={cn("mt-1 max-w-sm text-sm text-muted-foreground", !start && "mx-auto")}>{description}</p> : null}
         </div>
-      )}
+        {action ?? builtIn}
+      </div>
     </div>
   );
 }
@@ -74,79 +102,30 @@ export function EmptyState({ title, description, icon, action, onLoadExample, la
 
 export interface ErrorStateProps {
   title?: ReactNode;
-  description?: ReactNode;
-  /** 給客服看的技術細節，收在「Technical details」裡，不直接秀出例外 */
-  detail?: string;
-  /** 可回傳 Promise；拋錯代表重試仍失敗 */
-  onRetry?: () => void | Promise<void>;
-  support?: StateAction;
-  labels?: {
-    retry?: ReactNode;
-    retrying?: ReactNode;
-    details?: ReactNode;
-    stillFailing?: string;
-  };
+  /** 給使用者看的友善訊息；不要傳原始例外或技術訊息 */
+  message?: ReactNode;
+  onRetry?: () => void;
+  labels?: { retry?: ReactNode };
   className?: string;
 }
 
-const errorLabels = {
-  retry: "Try again",
-  retrying: "Trying again",
-  details: "Technical details",
-  stillFailing: "Still couldn't load. Try again in a moment.",
-};
-
-export function ErrorState({
-  title = "We couldn't load this",
-  description = "Your data is safe. This is usually a brief connection problem.",
-  detail,
-  onRetry,
-  support,
-  labels,
-  className,
-}: ErrorStateProps) {
-  const t = { ...errorLabels, ...labels };
-  const [retrying, setRetrying] = useState(false);
-  const [failedAgain, setFailedAgain] = useState(false);
-
-  async function retry() {
-    if (retrying || !onRetry) return;
-    setRetrying(true);
-    setFailedAgain(false);
-    try {
-      await onRetry();
-    } catch {
-      setFailedAgain(true);
-    } finally {
-      setRetrying(false);
-    }
-  }
-
+export function ErrorState({ title = "Couldn't load data", message = "Something went wrong. Please try again.", onRetry, labels, className }: ErrorStateProps) {
   return (
-    <div role="alert" className={cn("rounded-md border px-6 py-8 text-center font-sans", edge, ink, className)}>
-      <span className="mx-auto flex size-10 items-center justify-center text-destructive [&_svg]:size-6">
-        <AlertIcon />
-      </span>
-      <p className="mt-3 text-sm font-semibold">{title}</p>
-      <p className={cn("mx-auto mt-1 max-w-xs text-sm text-pretty", inkMuted)}>{failedAgain ? t.stillFailing : description}</p>
-      {(onRetry || support) && (
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
-          {onRetry && (
-            <button type="button" onClick={retry} aria-disabled={retrying || undefined} className={primaryClass}>
-              {retrying ? t.retrying : t.retry}
-            </button>
-          )}
-          {support && <ActionControl action={support} className={linkClass} />}
+    <div role="alert" className={cn("flex flex-col overflow-hidden rounded-xl border border-border bg-card text-sm text-card-foreground", className)}>
+      <div className="flex flex-col items-center gap-4 px-5 py-12 text-center">
+        <span className="text-destructive [&_svg]:size-6">
+          <AlertTriangleIcon />
+        </span>
+        <div>
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{message}</p>
         </div>
-      )}
-      {detail && (
-        <details className={cn("mx-auto mt-5 max-w-sm text-left text-xs", inkMuted)}>
-          <summary className="cursor-pointer text-center select-none hover:underline">{t.details}</summary>
-          <pre className={cn("mt-2 overflow-x-auto rounded-md border p-3 font-mono text-[11px] leading-relaxed break-all whitespace-pre-wrap", edge)}>
-            {detail}
-          </pre>
-        </details>
-      )}
+        {onRetry ? (
+          <StateButton variant="outline" size="sm" onClick={onRetry}>
+            {labels?.retry ?? "Retry"}
+          </StateButton>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -154,66 +133,72 @@ export function ErrorState({
 /* ---------- Loading ---------- */
 
 export interface LoadingStateProps {
-  /** 要模擬的列數，讓骨架和真正內容同高，載入後不跳版 */
   rows?: number;
-  /** 每列左側是否有縮圖 */
-  media?: boolean;
-  /** 超過這個毫秒數才顯示「還在載入」 */
-  slowAfter?: number;
-  labels?: { loading?: string; slow?: ReactNode };
+  label?: string;
   className?: string;
 }
 
-// 固定的寬度序列，伺服器與瀏覽器渲染一致
-const widths = ["w-3/5", "w-2/5", "w-1/2", "w-2/3", "w-1/3"];
-
-export function LoadingState({ rows = 3, media = true, slowAfter = 4000, labels, className }: LoadingStateProps) {
-  const [slow, setSlow] = useState(false);
-
-  useEffect(() => {
-    const id = setTimeout(() => setSlow(true), slowAfter);
-    return () => clearTimeout(id);
-  }, [slowAfter]);
-
+export function LoadingState({ rows = 4, label = "Loading", className }: LoadingStateProps) {
   return (
-    <div
-      role="status"
-      aria-busy="true"
-      aria-live="polite"
-      className={cn("rounded-md border px-4 py-2 font-sans", edge, ink, className)}
-    >
-      <span className="sr-only">{labels?.loading ?? "Loading"}</span>
-      <ul aria-hidden="true" className={cn("divide-y", "divide-[#e7e0d0] dark:divide-[#38332b]")}>
-        {Array.from({ length: rows }, (_, i) => (
-          <li key={i} className="flex items-center gap-3 py-3">
-            {media && <span className={cn("size-10 shrink-0 rounded-md", bone)} />}
-            <span className="flex min-w-0 flex-1 flex-col gap-2">
-              <span className={cn("h-3 rounded-sm", bone, widths[i % widths.length])} />
-              <span className={cn("h-2.5 rounded-sm opacity-70", bone, widths[(i + 2) % widths.length])} />
-            </span>
-            <span className={cn("h-3 w-12 shrink-0 rounded-sm", bone)} />
-          </li>
-        ))}
-      </ul>
-      {slow && <p className={cn("py-2 text-center text-xs", inkMuted)}>{labels?.slow ?? "Still loading, thanks for waiting"}</p>}
+    <div className={cn("flex flex-col gap-3", className)} role="status" aria-label={label}>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="h-11 w-full animate-pulse rounded-lg bg-muted motion-reduce:animate-none" />
+      ))}
     </div>
   );
 }
 
-function BoxIcon() {
+/* ---------- 圖示（lucide 形狀，線寬 1.5） ---------- */
+
+const iconProps = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+} as const;
+
+export function InboxIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5Z" />
-      <path d="M3.5 7.5 12 12l8.5-4.5M12 12v9" />
+    <svg {...iconProps}>
+      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
     </svg>
   );
 }
 
-function AlertIcon() {
+export function UsersIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5v5.5M12 16.25v.01" />
+    <svg {...iconProps}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function AlertTriangleIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
+// 按鈕裡的圖示維持 lucide 預設線寬 2
+function SparklesIcon() {
+  return (
+    <svg {...iconProps} strokeWidth={2}>
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+      <path d="M20 3v4" />
+      <path d="M22 5h-4" />
+      <path d="M4 17v2" />
+      <path d="M5 18H3" />
     </svg>
   );
 }

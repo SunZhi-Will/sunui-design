@@ -1,167 +1,202 @@
 "use client";
 
-import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform, type AnimationPlaybackControls } from "framer-motion";
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export interface CompareSliderLabels {
   /** range 的無障礙名稱 */
-  slider?: string;
-  valueText?: (before: number, after: number) => string;
+  slider?: (before: string, after: string) => string;
+  valueText?: (before: string, after: string, pos: number) => string;
 }
 
 export interface CompareSliderProps {
-  /** 圖片網址或任意節點 */
+  /** 左半：圖片網址或任意節點 */
   before: ReactNode | string;
+  /** 右半：圖片網址或任意節點 */
   after: ReactNode | string;
-  /** 分隔線起始位置（0 到 100，左側為 before 的比例） */
+  /** 外框比例照成品的寬高 */
+  width?: number;
+  height?: number;
+  beforeLabel?: string;
+  afterLabel?: string;
+  /** before 的填法；比例不同時預設 contain 置中，不裁切也不變形 */
+  beforeFit?: "contain" | "cover";
+  afterFit?: "contain" | "cover";
+  /** 分隔線起始位置（0 到 100） */
   initial?: number;
-  /** 第一次進入畫面時示範掃一次；使用者一碰就停，reduced motion 時略過 */
+  /** 第一次進入畫面時掃一次示範（中間、左、右、回中間，約 2.4 秒），一碰就停 */
   demoSweep?: boolean;
-  beforeLabel?: ReactNode;
-  afterLabel?: ReactNode;
-  /** CSS aspect-ratio，例如 "4 / 3" */
-  aspect?: string;
-  fit?: "cover" | "contain";
-  /** 圖片的替代文字（before / after 為網址時使用） */
-  beforeAlt?: string;
-  afterAlt?: string;
-  onChange?: (value: number) => void;
+  /** 由父層控制何時開始示範；給了就不看進入畫面 */
+  play?: boolean;
+  onChange?: (pos: number) => void;
   labels?: CompareSliderLabels;
   className?: string;
 }
 
 const defaultLabels: Required<CompareSliderLabels> = {
-  slider: "Comparison position",
-  valueText: (b, a) => `${b}% before, ${a}% after`,
+  slider: (b, a) => `Divider position between ${b} and ${a}`,
+  valueText: (b, a, pos) => `${b} ${pos}%, ${a} ${100 - pos}%`,
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const clamp = (v: number) => Math.max(0, Math.min(100, v));
+const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+const SWEEP_MS = 2400;
 
-const clamp = (n: number) => Math.min(100, Math.max(0, n));
+/** 開場示範的關鍵影格：[進度, 位置]，起點與終點用 initial */
+function sweepAt(t: number, home: number) {
+  const keys: [number, number][] = [
+    [0, home],
+    [0.3, 8],
+    [0.75, 92],
+    [1, home],
+  ];
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) {
+      const [t0, v0] = keys[i - 1];
+      const [t1, v1] = keys[i];
+      return v0 + (v1 - v0) * ease((t - t0) / (t1 - t0));
+    }
+  }
+  return home;
+}
 
-function Layer({ content, alt, fit }: { content: ReactNode | string; alt?: string; fit: "cover" | "contain" }) {
+function Layer({ content, alt, fit }: { content: ReactNode | string; alt: string; fit: "contain" | "cover" }) {
   if (typeof content === "string") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={content} alt={alt ?? ""} draggable={false} className={cn("size-full select-none", fit === "cover" ? "object-cover" : "object-contain")} />;
+    return <img src={content} alt={alt} draggable={false} className={cn("size-full", fit === "contain" ? "object-contain" : "object-cover")} />;
   }
   return <div className="size-full">{content}</div>;
 }
 
+function ChevronsLeftRight() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden="true">
+      <path d="m9 7-5 5 5 5" />
+      <path d="m15 7 5 5-5 5" />
+    </svg>
+  );
+}
+
+/**
+ * 前後對照：左半是 before，右半是 after，拖曳分隔線、點擊或用方向鍵調整比例。
+ * 底下是一個透明的 range input，點哪裡分隔線就到哪裡，鍵盤與螢幕報讀器也能操作。
+ * 外框比例照成品，before 比例不同時以 contain 置中，留白用 muted 底色。
+ */
 export function CompareSlider({
   before,
   after,
-  initial = 50,
-  demoSweep = false,
+  width = 4,
+  height = 3,
   beforeLabel = "Before",
   afterLabel = "After",
-  aspect = "4 / 3",
-  fit = "cover",
-  beforeAlt,
-  afterAlt,
+  beforeFit = "contain",
+  afterFit = "cover",
+  initial = 50,
+  demoSweep = false,
+  play,
   onChange,
   labels,
   className,
 }: CompareSliderProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion();
-  const id = useId();
+  const home = clamp(initial);
+  const [pos, setPos] = useState(home);
+  const [inView, setInView] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  const sweep = useRef<AnimationPlaybackControls | null>(null);
-  const start = clamp(initial);
+  const touched = useRef(false);
+  const running = play ?? (demoSweep && inView);
 
-  const pos = useMotionValue(start);
-  const [value, setValue] = useState(start);
-  useMotionValueEvent(pos, "change", (v) => setValue(Math.round(v)));
-
-  // after 疊在上層，只露出分隔線右側
-  const clipPath = useTransform(pos, (v) => `inset(0 0 0 ${v}%)`);
-  const handleX = useTransform(pos, (v) => `${v}%`);
-
-  const stopSweep = () => {
-    sweep.current?.stop();
-    sweep.current = null;
-  };
-
-  // 示範掃動：只在第一次進入畫面時播一次
+  // 第一次進入畫面（底部扣掉 20%）才開始示範
   useEffect(() => {
-    if (!demoSweep || reduce || !root.current) return;
+    if (play !== undefined || !demoSweep) return;
     const el = root.current;
+    if (!el) return;
     const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        io.disconnect();
-        sweep.current = animate(pos, [start, 30, 70, start], { duration: 2.4, ease: "easeInOut", times: [0, 0.3, 0.7, 1] });
+      ([e]) => {
+        if (e?.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
       },
-      { threshold: 0.6 },
+      { rootMargin: "0px 0px -20% 0px" },
     );
     io.observe(el);
-    return () => {
-      io.disconnect();
-      stopSweep();
-    };
-  }, [demoSweep, reduce, pos, start]);
+    return () => io.disconnect();
+  }, [play, demoSweep]);
 
-  const tag = cn("pointer-events-none absolute top-2 z-10 rounded-[3px] border px-1.5 py-0.5 text-[10px] font-medium tracking-[0.14em] uppercase", paper, edge, inkMuted);
+  // 示範掃動：使用者一碰就停，減少動態時不掃
+  useEffect(() => {
+    if (!running || touched.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      if (touched.current) return;
+      const p = Math.min(1, (now - t0) / SWEEP_MS);
+      setPos(sweepAt(p, home));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [running, home]);
+
+  const stop = () => {
+    touched.current = true;
+  };
+  const shown = Math.round(pos);
 
   return (
     <div
       ref={root}
-      className={cn("relative w-full overflow-hidden rounded-md border select-none", paper, edge, ink, className)}
-      style={{ aspectRatio: aspect } as CSSProperties}
-      onPointerDownCapture={stopSweep}
-      onKeyDownCapture={stopSweep}
+      className={cn("relative w-full overflow-hidden rounded-lg bg-muted select-none", className)}
+      style={{ aspectRatio: `${width} / ${height}`, maxWidth: `calc(70dvh * ${width} / ${height})` }}
+      onPointerDownCapture={stop}
+      onKeyDownCapture={stop}
     >
       <div className="absolute inset-0">
-        <Layer content={before} alt={beforeAlt} fit={fit} />
+        <Layer content={after} alt={afterLabel} fit={afterFit} />
       </div>
-      <motion.div className="absolute inset-0" style={{ clipPath, WebkitClipPath: clipPath }}>
-        <Layer content={after} alt={afterAlt} fit={fit} />
-      </motion.div>
+      <div className="absolute inset-0 bg-muted" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
+        <Layer content={before} alt={beforeLabel} fit={beforeFit} />
+      </div>
 
-      <span className={cn(tag, "left-2")}>{beforeLabel}</span>
-      <span className={cn(tag, "right-2")}>{afterLabel}</span>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 z-[1] w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.25)]"
+        style={{ left: `${pos}%` }}
+      >
+        <span className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-md">
+          <ChevronsLeftRight />
+        </span>
+      </div>
+      <span className="pointer-events-none absolute top-3 left-3 z-[1] rounded-md bg-black/55 px-2 py-0.5 text-xs font-medium text-white backdrop-blur">
+        {beforeLabel}
+      </span>
+      <span className="pointer-events-none absolute top-3 right-3 z-[1] rounded-md bg-black/55 px-2 py-0.5 text-xs font-medium text-white backdrop-blur">
+        {afterLabel}
+      </span>
 
-      {/* 透明 range 蓋在最上層：點擊跳位、方向鍵、Home/End 與螢幕閱讀器都由原生元件處理 */}
       <input
-        id={id}
         type="range"
         min={0}
         max={100}
         step={1}
-        value={value}
-        aria-label={t.slider}
-        aria-valuetext={t.valueText(value, 100 - value)}
+        value={shown}
         onChange={(e) => {
+          touched.current = true;
           const v = clamp(Number(e.target.value));
-          stopSweep();
-          pos.set(v);
+          setPos(v);
           onChange?.(v);
         }}
-        className="peer absolute inset-0 z-20 m-0 size-full cursor-ew-resize appearance-none opacity-0"
+        aria-label={t.slider(beforeLabel, afterLabel)}
+        aria-valuetext={t.valueText(beforeLabel, afterLabel, shown)}
+        className="peer absolute inset-0 z-[2] m-0 size-full cursor-ew-resize touch-pan-y appearance-none opacity-0"
       />
-
-      {/* 分隔線與把手只是視覺，位置用 transform 移動 */}
-      <motion.div
+      <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-10 peer-focus-visible:[&_[data-grip]]:ring-2 peer-focus-visible:[&_[data-grip]]:ring-ring"
-        style={{ x: handleX }}
-      >
-        <div className="absolute inset-y-0 left-0 w-px -translate-x-1/2 bg-[#1c1917] dark:bg-[#ece7dc]" />
-        <div
-          data-grip
-          className={cn("absolute top-1/2 left-0 flex h-9 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[4px] border", paper, edge)}
-        >
-          <svg viewBox="0 0 20 12" className="w-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 2 2 6l4 4M14 2l4 4-4 4" />
-          </svg>
-        </div>
-      </motion.div>
+        className="pointer-events-none absolute inset-0 z-[3] rounded-lg peer-focus-visible:ring-3 peer-focus-visible:ring-ring/60 peer-focus-visible:ring-inset"
+      />
     </div>
   );
 }

@@ -1,32 +1,38 @@
 "use client";
 
-import { CheckinStreak, type CheckinDay } from "./checkin-streak";
+import { useState } from "react";
 
-const week: CheckinDay[] = [
-  { label: "Mon", reward: 5 },
-  { label: "Tue", reward: 5 },
-  { label: "Wed", reward: 10 },
-  { label: "Thu", reward: 10 },
-  { label: "Fri", reward: 15 },
-  { label: "Sat", reward: 15 },
-  { label: "Sun", reward: 50 },
-];
+import { CheckinStreak } from "./checkin-streak";
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+// 方案頁的福利區塊：簽到拿到的張數直接加進額度
+function isoDaysAgo(n: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export default function CheckinStreakDemo() {
+  const [left, setLeft] = useState(42);
+
   return (
-    <section aria-labelledby="rewards-heading" className="w-full max-w-[52rem] space-y-5">
+    <section aria-labelledby="rewards-title" className="flex w-full max-w-md min-w-0 flex-col gap-3">
       <div>
-        <h2 id="rewards-heading" className="text-xl font-semibold tracking-tight">
-          Rewards
+        <h2 id="rewards-title" className="text-base font-semibold">
+          Get more images for free
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Check in every day. Points come off your next order, 100 pts = $1.</p>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          Images you earn go straight into your quota. About <span className="tabular-nums">{left}</span> images left.
+        </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <CheckinStreak days={week} todayIndex={4} checked={[0, 2, 3]} points={340} onCheckIn={() => wait(600)} />
-        <CheckinStreak days={week} todayIndex={2} checked={[0, 1]} defaultCheckedInToday points={1260} />
-      </div>
+      <CheckinStreak
+        fixed={false}
+        today={isoDaysAgo(0)}
+        week={[isoDaysAgo(6), isoDaysAgo(4), isoDaysAgo(3), isoDaysAgo(2), isoDaysAgo(1)]}
+        streak={4}
+        reward={5}
+        onCheckIn={() => new Promise((resolve) => setTimeout(() => resolve({ reward: 5 }), 700))}
+        onClaimed={(n) => setLeft((v) => v + n)}
+      />
     </section>
   );
 }

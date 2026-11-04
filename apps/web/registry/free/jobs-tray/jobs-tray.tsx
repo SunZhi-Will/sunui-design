@@ -1,271 +1,506 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type JobState = "running" | "done" | "failed";
+/* AutoLens 的深色 token，元件自帶，不依賴網站主題 */
+const tokens = {
+  "--al-bg-elevated": "#252525",
+  "--al-border": "rgba(255, 255, 255, 0.06)",
+  "--al-text-primary": "#e5e5e5",
+  "--al-text-secondary": "#a3a3a3",
+  "--al-text-muted": "#8a8a8a",
+  "--al-danger": "#dc2626",
+} as CSSProperties;
 
-export interface Job {
+export type BackgroundJobState = "queued" | "running" | "completed" | "failed" | "cancelled";
+
+export interface BackgroundJob {
   id: string;
-  label: ReactNode;
-  state: JobState;
-  /** 0 到 1；省略時顯示不確定進度 */
+  /** 只用來判斷要不要顯示，例如 hash 這類內部工作只有失敗才顯示 */
+  type?: string;
+  /** 給使用者看的名稱，例如「Saving camera track」 */
+  label: string;
+  state: BackgroundJobState;
+  /** 0 到 1；未知進度時為 undefined */
   progress?: number;
-  detail?: ReactNode;
-  error?: ReactNode;
+  errorCode?: string;
+  startedAt: number;
+  endedAt?: number;
+  /** 可取消的工作在面板上多一顆 ✕ */
+  onCancel?: () => void;
+}
+
+/** 跑不到這麼久就完成的工作不值得事後再跳一則「完成」出來 */
+const QUICK_JOB_MS = 1500;
+/** 已完成的工作保留多久才從清單移除 */
+const COMPLETED_TTL_MS = 8000;
+
+/**
+ * 這個工作該不該出現在面板上：失敗與取消一律顯示；hash 只有失敗才顯示；
+ * 一下子就完成的工作不補一則「完成」。
+ */
+export function isJobWorthShowing(job: BackgroundJob): boolean {
+  if (job.state === "failed" || job.state === "cancelled") return true;
+  if (job.type === "hash") return false;
+  if (job.state === "completed") return (job.endedAt ?? job.startedAt) - job.startedAt >= QUICK_JOB_MS;
+  return true;
+}
+
+/** 背景工作登記簿：startJob、updateJob、finishJob、dismissJob、runJob，行為同原本的 service */
+export function useBackgroundJobs(options?: { completedTtl?: number }) {
+  const ttl = options?.completedTtl ?? COMPLETED_TTL_MS;
+  const [jobs, setJobs] = useState<BackgroundJob[]>([]);
+  const seq = useRef(0);
+  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+
+  useEffect(() => {
+    const set = timers.current;
+    return () => set.forEach(clearTimeout);
+  }, []);
+
+  const startJob = useCallback((type: string, label: string, opts?: { onCancel?: () => void }) => {
+    seq.current += 1;
+    const id = `${type}-${seq.current}`;
+    const job: BackgroundJob = { id, type, label, state: "running", startedAt: Date.now(), ...(opts?.onCancel ? { onCancel: opts.onCancel } : {}) };
+    setJobs((prev) => [...prev, job]);
+    return id;
+  }, []);
+
+  const updateJob = useCallback((id: string, patch: Partial<Pick<BackgroundJob, "progress" | "label">>) => {
+    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  }, []);
+
+  const dismissJob = useCallback((id: string) => setJobs((prev) => prev.filter((j) => j.id !== id)), []);
+
+  const finishJob = useCallback(
+    (id: string, result: { success: boolean; errorCode?: string } = { success: true }) => {
+      setJobs((prev) =>
+        prev.map((j) =>
+          j.id === id
+            ? { ...j, state: result.success ? "completed" : "failed", ...(result.errorCode ? { errorCode: result.errorCode } : {}), endedAt: Date.now() }
+            : j,
+        ),
+      );
+      // 成功的工作自動淡出；失敗的留著，讓使用者看到
+      if (result.success) {
+        const timer = setTimeout(() => {
+          timers.current.delete(timer);
+          dismissJob(id);
+        }, ttl);
+        timers.current.add(timer);
+      }
+    },
+    [dismissJob, ttl],
+  );
+
+  const cancelJob = useCallback((id: string) => {
+    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, state: "cancelled", endedAt: Date.now(), onCancel: undefined } : j)));
+  }, []);
+
+  /** 包住一段背景工作：自動登記、成功或失敗收尾 */
+  const runJob = useCallback(
+    async <T,>(type: string, label: string, fn: (report: (progress: number) => void) => Promise<T>) => {
+      const id = startJob(type, label);
+      try {
+        const out = await fn((progress) => updateJob(id, { progress }));
+        finishJob(id, { success: true });
+        return out;
+      } catch (err) {
+        finishJob(id, { success: false, errorCode: err instanceof Error ? err.message : String(err) });
+        throw err;
+      }
+    },
+    [finishJob, startJob, updateJob],
+  );
+
+  return { jobs, startJob, updateJob, finishJob, dismissJob, cancelJob, runJob };
 }
 
 export interface JobsTrayLabels {
   region?: string;
-  summary?: (total: number, failed: number) => ReactNode;
-  retry?: ReactNode;
+  running?: string;
+  completed?: string;
+  failed?: string;
+  cancelled?: string;
+  queued?: string;
   dismiss?: string;
-  collapse?: string;
-  expand?: string;
-  done?: ReactNode;
-  doneAnnouncement?: (label: string) => string;
-  failedAnnouncement?: (label: string) => string;
+  cancel?: string;
 }
 
+const defaultLabels: Required<JobsTrayLabels> = {
+  region: "Background jobs",
+  running: "In progress",
+  completed: "Done",
+  failed: "Failed",
+  cancelled: "Cancelled",
+  queued: "Queued",
+  dismiss: "Dismiss",
+  cancel: "Cancel this job",
+};
+
 export interface JobsTrayProps {
-  jobs: Job[];
-  onRetry?: (id: string) => void;
+  jobs: BackgroundJob[];
+  /** 失敗那一列的 ✕ */
   onDismiss?: (id: string) => void;
-  collapsed?: boolean;
-  defaultCollapsed?: boolean;
-  onCollapsedChange?: (collapsed: boolean) => void;
-  /** 完成的工作在幾毫秒後自動收掉；Infinity 表示保留 */
-  doneTimeout?: number;
   /** 預設 fixed 於視窗右下；false 時改為 absolute，交給父層定位 */
   fixed?: boolean;
+  /** 進行中圓點的顏色，預設 AutoLens 金 */
+  accent?: string;
   labels?: JobsTrayLabels;
   className?: string;
 }
 
-const defaultLabels: Required<JobsTrayLabels> = {
-  region: "Background tasks",
-  summary: (total, failed) => (
-    <>
-      {total} {total === 1 ? "task" : "tasks"}
-      {failed > 0 && <> · {failed} failed</>}
-    </>
-  ),
-  retry: "Retry",
-  dismiss: "Dismiss",
-  collapse: "Collapse tasks",
-  expand: "Expand tasks",
-  done: "Done",
-  doneAnnouncement: (label) => `${label} finished.`,
-  failedAnnouncement: (label) => `${label} failed.`,
-};
-
-const ease = [0.23, 1, 0.32, 1] as const;
-const springs = { gentle: { type: "spring", stiffness: 240, damping: 30 } } as const;
-
-/** 管理背景工作清單的小工具 */
-export function useJobs(initial: Job[] = []) {
-  const [jobs, setJobs] = useState<Job[]>(initial);
-  const add = useCallback((job: Job) => setJobs((prev) => [...prev.filter((j) => j.id !== job.id), job]), []);
-  const update = useCallback(
-    (id: string, patch: Partial<Job>) => setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j))),
-    [],
-  );
-  const remove = useCallback((id: string) => setJobs((prev) => prev.filter((j) => j.id !== id)), []);
-  return { jobs, add, update, remove, setJobs };
-}
-
-const toText = (n: ReactNode) => (typeof n === "string" || typeof n === "number" ? String(n) : "Task");
-
-export function JobsTray({
-  jobs,
-  onRetry,
-  onDismiss,
-  collapsed: collapsedProp,
-  defaultCollapsed = false,
-  onCollapsedChange,
-  doneTimeout = 4000,
-  fixed = true,
-  labels,
-  className,
-}: JobsTrayProps) {
+export function JobsTray({ jobs: allJobs, onDismiss, fixed = true, accent = "#eab308", labels, className }: JobsTrayProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const [inner, setInner] = useState(defaultCollapsed);
-  const collapsed = collapsedProp ?? inner;
-  const [hidden, setHidden] = useState<Set<string>>(() => new Set());
-  const [announce, setAnnounce] = useState("");
-  const prevStates = useRef(new Map<string, JobState>());
+  const jobs = allJobs.filter(isJobWorthShowing);
 
-  // 只在完成或失敗時播報，並排程自動收掉已完成的工作
-  useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    for (const job of jobs) {
-      const before = prevStates.current.get(job.id);
-      if (before && before !== job.state) {
-        if (job.state === "done") setAnnounce(t.doneAnnouncement(toText(job.label)));
-        if (job.state === "failed") setAnnounce(t.failedAnnouncement(toText(job.label)));
-      }
-      if (job.state === "done" && before !== "done" && Number.isFinite(doneTimeout)) {
-        timers.push(setTimeout(() => setHidden((s) => new Set(s).add(job.id)), doneTimeout));
-      }
-      if (job.state !== "done" && hidden.has(job.id)) {
-        setHidden((s) => {
-          const next = new Set(s);
-          next.delete(job.id);
-          return next;
-        });
-      }
+  const stateLabel = (job: BackgroundJob) => {
+    switch (job.state) {
+      case "running":
+        return job.progress !== undefined ? `${Math.round(job.progress * 100)}%` : t.running;
+      case "completed":
+        return t.completed;
+      case "failed":
+        return t.failed;
+      case "cancelled":
+        return t.cancelled;
+      default:
+        return t.queued;
     }
-    prevStates.current = new Map(jobs.map((j) => [j.id, j.state]));
-    return () => timers.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobs, doneTimeout]);
-
-  const visible = jobs.filter((j) => !(j.state === "done" && hidden.has(j.id)));
-  const failed = visible.filter((j) => j.state === "failed").length;
-
-  const toggle = () => {
-    const next = !collapsed;
-    if (collapsedProp === undefined) setInner(next);
-    onCollapsedChange?.(next);
   };
 
+  // 沒有工作時清單是空的，不佔畫面，但保留 live region 讓報讀器接得到下一則
   return (
-    <section
+    <div
+      role="region"
       aria-label={t.region}
+      style={{ ...tokens, "--al-accent": accent } as CSSProperties}
       className={cn(
-        fixed ? "fixed right-4 bottom-4 z-50" : "absolute right-3 bottom-3 z-10",
-        "w-[min(22rem,calc(100%-1.5rem))]",
+        fixed ? "fixed z-[9998]" : "absolute z-10",
+        "right-4 bottom-4 flex w-64 max-w-[calc(100%-2rem)] flex-col gap-1 pointer-events-none",
         className,
       )}
     >
-      <AnimatePresence initial={false}>
-        {visible.length > 0 && (
-          <motion.div
-            key="tray"
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 12, transition: { duration: 0.18, ease } }}
-            transition={reduce ? { duration: 0 } : springs.gentle}
-            className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm"
-          >
-            <button
-              type="button"
-              onClick={toggle}
-              aria-expanded={!collapsed}
-              aria-label={collapsed ? t.expand : t.collapse}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm outline-none hover:bg-muted/60 focus-visible:bg-muted/60"
-            >
-              <span className={cn("size-1.5 shrink-0 rounded-full", failed ? "bg-destructive" : "bg-primary")} aria-hidden="true" />
-              <span className="flex-1 font-medium tabular-nums">{t.summary(visible.length, failed)}</span>
-              <svg
-                viewBox="0 0 16 16"
-                className={cn("size-4 text-muted-foreground transition-transform", collapsed && "rotate-180")}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                aria-hidden="true"
-              >
-                <path d="m4 6 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            {!collapsed && (
-              <ul className="max-h-72 divide-y divide-border overflow-y-auto border-t border-border">
-                <AnimatePresence initial={false}>
-                  {visible.map((job) => (
-                    <motion.li
-                      key={job.id}
-                      layout={!reduce}
-                      initial={reduce ? false : { opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, height: 0, transition: { duration: 0.18, ease } }}
-                      transition={reduce ? { duration: 0 } : springs.gentle}
-                      className="px-3 py-2.5"
-                    >
-                      <JobRow job={job} t={t} onRetry={onRetry} onDismiss={onDismiss} />
-                    </motion.li>
-                  ))}
-                </AnimatePresence>
-              </ul>
+      <ul aria-live="polite" className="contents">
+        {jobs.map((job) => (
+          <li
+            key={job.id}
+            className={cn(
+              "pointer-events-auto flex items-center gap-2 rounded-[8px] border px-3 py-2 text-xs shadow-lg backdrop-blur",
+              job.state === "failed"
+                ? "border-[var(--al-danger)] bg-[var(--al-bg-elevated)] text-[var(--al-text-primary)]"
+                : "border-[var(--al-border)] bg-[var(--al-bg-elevated)] text-[var(--al-text-secondary)]",
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <span className="sr-only" role="status" aria-live="polite">
-        {announce}
-      </span>
-    </section>
+          >
+            {job.state === "running" && (
+              <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[var(--al-accent)] motion-reduce:animate-none" />
+            )}
+            <span className="min-w-0 flex-1 truncate" title={job.errorCode ?? job.label}>
+              {job.label}
+            </span>
+            <span className={cn("tabular-nums", job.state === "failed" ? "text-[var(--al-danger)]" : "text-[var(--al-text-muted)]")}>
+              {stateLabel(job)}
+            </span>
+            {job.state === "running" && job.onCancel && (
+              <button
+                type="button"
+                onClick={job.onCancel}
+                className="text-[var(--al-text-muted)] hover:text-[var(--al-danger)]"
+                aria-label={t.cancel}
+                title={t.cancel}
+              >
+                ✕
+              </button>
+            )}
+            {job.state === "failed" && (
+              <button
+                type="button"
+                onClick={() => onDismiss?.(job.id)}
+                className="text-[var(--al-text-muted)] hover:text-[var(--al-text-primary)]"
+                aria-label={t.dismiss}
+              >
+                ✕
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
-function JobRow({
-  job,
-  t,
-  onRetry,
-  onDismiss,
-}: {
-  job: Job;
-  t: Required<JobsTrayLabels>;
-  onRetry?: (id: string) => void;
-  onDismiss?: (id: string) => void;
-}) {
-  const pct = job.progress === undefined ? null : Math.round(Math.min(Math.max(job.progress, 0), 1) * 100);
-  const dot = job.state === "failed" ? "bg-destructive" : job.state === "done" ? "bg-emerald-500" : "bg-primary";
+/* ───────────── UpdateBanner：同一套深色、金色的更新橫幅 ───────────── */
+
+/** 外部（updater）推進來的事件；checking、not-available 不顯示，等同 idle */
+export type UpdaterEvent =
+  | { type: "idle" }
+  | { type: "available"; version?: string }
+  | { type: "progress"; percent: number }
+  | { type: "downloaded" }
+  | { type: "error"; message: string };
+
+type BannerState =
+  | { type: "idle" }
+  | { type: "available"; version?: string }
+  | { type: "downloading"; percent: number; retryAttempt?: number }
+  | { type: "downloaded" }
+  | { type: "installing" }
+  | { type: "error"; message: string };
+
+type Result = { success: boolean; error?: string } | void | undefined;
+
+// 大檔下載偶爾被 CDN 中途截斷，這類暫時性錯誤自動重試幾次
+const MAX_DOWNLOAD_RETRIES = 2;
+const RETRY_DELAY_MS = 3000;
+const TRANSIENT_ERROR_PATTERNS = [
+  "ERR_INCOMPLETE_CHUNKED_ENCODING",
+  "ERR_CONNECTION_RESET",
+  "ERR_CONNECTION_CLOSED",
+  "ERR_CONNECTION_ABORTED",
+  "ERR_NETWORK_CHANGED",
+  "ERR_TIMED_OUT",
+  "ERR_EMPTY_RESPONSE",
+];
+const isTransientDownloadError = (message: string) => TRANSIENT_ERROR_PATTERNS.some((p) => message.includes(p));
+
+export interface UpdateBannerLabels {
+  updateAvailable?: (version?: string) => string;
+  downloadNow?: string;
+  dismissUpdate?: string;
+  downloadingUpdate?: (percent: number) => string;
+  downloadRetrying?: (attempt: number, max: number) => string;
+  updateDownloaded?: string;
+  restartNow?: string;
+  installingUpdate?: string;
+  updateFailed?: (message: string) => string;
+  dismissError?: string;
+}
+
+const bannerLabels: Required<UpdateBannerLabels> = {
+  updateAvailable: (v) => `A new version${v ? ` v${v}` : ""} is available. Ready to update?`,
+  downloadNow: "Download Now",
+  dismissUpdate: "Dismiss update notice",
+  downloadingUpdate: (p) => `Downloading update… ${p}%`,
+  downloadRetrying: (a, m) => `Download interrupted, retrying… (${a}/${m})`,
+  updateDownloaded: "Update downloaded. After you restart, the app will close for a few seconds then reopen automatically.",
+  restartNow: "Restart Now",
+  installingUpdate: "Installing update… the app will restart shortly.",
+  updateFailed: (m) => `Update failed: ${m}`,
+  dismissError: "Dismiss error notice",
+};
+
+export interface UpdateBannerProps {
+  /** 每次 updater 推來新事件就換一個新物件 */
+  event: UpdaterEvent;
+  /** 回傳 { success: false, error } 或丟例外視為失敗；暫時性網路錯誤會自動重試 */
+  onDownload?: () => Promise<Result>;
+  onInstall?: () => Promise<Result>;
+  /** 預設 fixed 於視窗頂部並把實際高度寫進 :root 的 --banner-height；false 時改為 absolute */
+  fixed?: boolean;
+  labels?: UpdateBannerLabels;
+  className?: string;
+}
+
+const Icon = ({ className, children }: { className?: string; children: ReactNode }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+    {children}
+  </svg>
+);
+const Spinner = () => (
+  <Icon className="h-4 w-4 shrink-0 animate-spin text-yellow-300">
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </Icon>
+);
+const CloseIcon = () => (
+  <Icon className="h-3.5 w-3.5">
+    <path d="M18 6 6 18" />
+    <path d="m6 6 12 12" />
+  </Icon>
+);
+
+export function UpdateBanner({ event, onDownload, onInstall, fixed = true, labels, className }: UpdateBannerProps) {
+  const t = { ...bannerLabels, ...labels };
+  const reduce = useReducedMotion() ?? false;
+  const [banner, setBanner] = useState<BannerState>({ type: "idle" });
+  const [dismissed, setDismissed] = useState(false);
+  // 重試進行中壓下外部 error 事件，避免畫面在 error 與重試中之間閃爍
+  const retryInFlightRef = useRef(false);
+
+  useEffect(() => {
+    switch (event.type) {
+      case "available":
+        setBanner({ type: "available", version: event.version });
+        setDismissed(false);
+        break;
+      case "progress":
+        setBanner({ type: "downloading", percent: Math.round(event.percent ?? 0) });
+        break;
+      case "downloaded":
+        setBanner({ type: "downloaded" });
+        setDismissed(false);
+        break;
+      case "error":
+        if (retryInFlightRef.current) break;
+        setBanner({ type: "error", message: event.message });
+        setDismissed(false);
+        break;
+      default:
+        break;
+    }
+  }, [event]);
+
+  const isVisible = banner.type !== "idle" && !dismissed;
+
+  // 把橫幅實際高度寫到 :root，讓各畫面可以 calc(var(--titlebar-height) + var(--banner-height)) 讓開
+  const bannerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!fixed) return;
+    const root = document.documentElement;
+    if (!isVisible) {
+      root.style.setProperty("--banner-height", "0px");
+      return;
+    }
+    const node = bannerRef.current;
+    if (!node) return;
+    const sync = () => root.style.setProperty("--banner-height", `${node.offsetHeight}px`);
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(node);
+    return () => {
+      observer.disconnect();
+      root.style.setProperty("--banner-height", "0px");
+    };
+  }, [isVisible, fixed]);
+
+  if (!isVisible) return null;
+
+  const handleDownload = async () => {
+    retryInFlightRef.current = true;
+    try {
+      for (let attempt = 0; attempt <= MAX_DOWNLOAD_RETRIES; attempt++) {
+        // 立刻給回饋，不等第一個 progress 事件
+        setBanner({ type: "downloading", percent: 0, retryAttempt: attempt > 0 ? attempt : undefined });
+        let message: string | null = null;
+        try {
+          const result = await onDownload?.();
+          if (!result || result.success !== false) return; // 成功，交給 progress 與 downloaded 事件接手
+          message = result.error ?? "downloadUpdate failed";
+        } catch (err) {
+          message = String(err);
+        }
+        const canRetry = attempt < MAX_DOWNLOAD_RETRIES && isTransientDownloadError(message);
+        if (!canRetry) {
+          setBanner({ type: "error", message });
+          setDismissed(false);
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
+    } finally {
+      retryInFlightRef.current = false;
+    }
+  };
+
+  const handleInstall = async () => {
+    // 立即切到安裝中，應用程式關閉前的空窗期才不像當機
+    setBanner({ type: "installing" });
+    try {
+      const result = await onInstall?.();
+      if (result && result.success === false) {
+        setBanner({ type: "error", message: result.error ?? "installUpdateNow failed" });
+        setDismissed(false);
+      }
+    } catch (err) {
+      setBanner({ type: "error", message: String(err) });
+      setDismissed(false);
+    }
+  };
+
+  const primary = "shrink-0 px-3 py-0.5 rounded bg-yellow-500 hover:bg-yellow-400 text-[#111111] text-xs font-medium transition-colors";
+  const close = "shrink-0 p-1 rounded hover:bg-white/10 transition-colors";
+
   return (
-    <div className="text-sm">
-      <div className="flex items-center gap-2">
-        <span className={cn("size-1.5 shrink-0 rounded-full", dot)} aria-hidden="true" />
-        <span className="min-w-0 flex-1 truncate font-medium">{job.label}</span>
-        {job.state === "running" && pct !== null && (
-          <span className="text-xs text-muted-foreground tabular-nums">{pct}%</span>
-        )}
-        {job.state === "done" && <span className="text-xs text-muted-foreground">{t.done}</span>}
-      </div>
-
-      {job.state === "running" && (
-        <div
-          role="progressbar"
-          aria-label={toText(job.label)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={pct ?? undefined}
-          className="mt-2 h-1 overflow-hidden rounded-full bg-muted"
-        >
-          <div
-            className={cn("h-full origin-left rounded-full bg-primary transition-transform duration-300", pct === null && "w-1/3")}
-            style={pct === null ? undefined : { transform: `scaleX(${pct / 100})` }}
-          />
-        </div>
+    <motion.div
+      ref={bannerRef}
+      role="status"
+      aria-live="polite"
+      initial={reduce ? false : { y: "-0.25rem" }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className={cn(
+        fixed ? "fixed top-[var(--titlebar-height,0px)] z-[9998]" : "absolute top-0 z-20",
+        "left-0 right-0 flex items-center gap-3 px-4 py-2 text-sm bg-yellow-900/95 border-b border-yellow-500/40 text-yellow-100 backdrop-blur-sm",
+        className,
+      )}
+    >
+      {banner.type === "available" && (
+        <>
+          <Icon className="h-4 w-4 shrink-0 text-yellow-300">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v8" />
+            <path d="m8 12 4 4 4-4" />
+          </Icon>
+          <span className="min-w-0 flex-1">{t.updateAvailable(banner.version)}</span>
+          <button type="button" onClick={handleDownload} className={primary}>
+            {t.downloadNow}
+          </button>
+          <button type="button" onClick={() => setDismissed(true)} className={close} aria-label={t.dismissUpdate}>
+            <CloseIcon />
+          </button>
+        </>
       )}
 
-      {job.state === "failed" ? (
-        <div className="mt-1 flex items-start gap-3 pl-3.5">
-          <p className="min-w-0 flex-1 text-xs text-muted-foreground">{job.error}</p>
-          {onRetry && (
-            <button
-              type="button"
-              onClick={() => onRetry(job.id)}
-              className="shrink-0 text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-            >
-              {t.retry}
-            </button>
-          )}
-          {onDismiss && (
-            <button
-              type="button"
-              onClick={() => onDismiss(job.id)}
-              className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-            >
-              {t.dismiss}
-            </button>
-          )}
-        </div>
-      ) : (
-        job.detail && <p className="mt-1 truncate pl-3.5 text-xs text-muted-foreground">{job.detail}</p>
+      {banner.type === "downloading" && (
+        <>
+          <Spinner />
+          <span className="min-w-0 flex-1">
+            {banner.retryAttempt ? t.downloadRetrying(banner.retryAttempt, MAX_DOWNLOAD_RETRIES) : t.downloadingUpdate(banner.percent)}
+          </span>
+          <div className="h-1.5 w-32 max-w-[30%] shrink-0 overflow-hidden rounded-full bg-yellow-800">
+            <div className="h-full rounded-full bg-yellow-400 transition-all duration-300 motion-reduce:transition-none" style={{ width: `${banner.percent}%` }} />
+          </div>
+        </>
       )}
-    </div>
+
+      {banner.type === "downloaded" && (
+        <>
+          <Icon className="h-4 w-4 shrink-0 text-[#e5e5e5]">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m9 12 2 2 4-4" />
+          </Icon>
+          <span className="min-w-0 flex-1">{t.updateDownloaded}</span>
+          <button type="button" onClick={handleInstall} className={primary}>
+            {t.restartNow}
+          </button>
+          <button type="button" onClick={() => setDismissed(true)} className={close} aria-label={t.dismissUpdate}>
+            <CloseIcon />
+          </button>
+        </>
+      )}
+
+      {banner.type === "installing" && (
+        <>
+          <Spinner />
+          <span className="min-w-0 flex-1">{t.installingUpdate}</span>
+        </>
+      )}
+
+      {banner.type === "error" && (
+        <>
+          <Icon className="h-4 w-4 shrink-0 text-red-400">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" x2="12" y1="8" y2="12" />
+            <line x1="12" x2="12.01" y1="16" y2="16" />
+          </Icon>
+          <span className="min-w-0 flex-1 break-words text-red-200">{t.updateFailed(banner.message)}</span>
+          <button type="button" onClick={() => setDismissed(true)} className={close} aria-label={t.dismissError}>
+            <CloseIcon />
+          </button>
+        </>
+      )}
+    </motion.div>
   );
 }

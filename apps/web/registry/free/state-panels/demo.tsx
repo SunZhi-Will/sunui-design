@@ -1,35 +1,36 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { EmptyState, ErrorState, LoadingState } from "./state-panels";
+import { EmptyState, ErrorState, LoadingState, UsersIcon } from "./state-panels";
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+type Share = { name: string; amount: number };
+type Bill = { id: string; title: string; date: string; total: number };
 
-type Row = { id: string; title: string; meta: string; amount: string };
-
-const exampleReturns: Row[] = [
-  { id: "RT-2041", title: "Linen shirt, size M", meta: "Refund to card, label sent", amount: "$58.00" },
-  { id: "RT-2038", title: "Ceramic pour-over set", meta: "Exchange, arriving Thu", amount: "$42.00" },
+const exampleBill: Share[] = [
+  { name: "Ava", amount: 210 },
+  { name: "Ben", amount: 180 },
+  { name: "Chloe", amount: 170 },
 ];
 
-const invoices: Row[] = [
-  { id: "INV-8812", title: "Order SU-48213", meta: "Nov 3, 2026", amount: "$128.00" },
-  { id: "INV-8790", title: "Order SU-48190", meta: "Oct 28, 2026", amount: "$64.50" },
+const history: Bill[] = [
+  { id: "b-31", title: "Hotpot night", date: "Nov 2", total: 1840 },
+  { id: "b-30", title: "Team lunch", date: "Oct 29", total: 960 },
+  { id: "b-29", title: "Ramen after the match", date: "Oct 21", total: 720 },
 ];
 
-function Rows({ rows }: { rows: Row[] }) {
+const yuan = (n: number) => `$${n.toLocaleString("en-US")}`;
+
+function Rows({ rows }: { rows: { key: string; left: string; sub?: string; right: string }[] }) {
   return (
-    <ul className="divide-y divide-border rounded-md border border-border text-sm">
+    <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card text-sm">
       {rows.map((r) => (
-        <li key={r.id} className="flex items-center gap-3 px-4 py-3">
+        <li key={r.key} className="flex min-w-0 items-center gap-3 px-4 py-3">
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-medium">{r.title}</span>
-            <span className="block truncate text-xs text-muted-foreground">
-              <span className="font-mono tracking-[0.12em]">{r.id}</span> · {r.meta}
-            </span>
+            <span className="block truncate font-medium">{r.left}</span>
+            {r.sub && <span className="block truncate text-xs text-muted-foreground">{r.sub}</span>}
           </span>
-          <span className="shrink-0 font-medium tabular-nums">{r.amount}</span>
+          <span className="shrink-0 font-medium tabular-nums">{r.right}</span>
         </li>
       ))}
     </ul>
@@ -37,57 +38,50 @@ function Rows({ rows }: { rows: Row[] }) {
 }
 
 export default function StatePanelsDemo() {
-  const [returns, setReturns] = useState<Row[]>([]);
-  const [invoicesLoaded, setInvoicesLoaded] = useState(false);
-  const attempts = useRef(0);
+  const [bill, setBill] = useState<Share[]>([]);
+  const [status, setStatus] = useState<"loading" | "error" | "ready">("loading");
+  const tries = useRef(0);
 
-  // 第一次重試仍失敗，第二次成功
-  async function retryInvoices() {
-    attempts.current += 1;
-    await wait(800);
-    if (attempts.current < 2) throw new Error("timeout");
-    setInvoicesLoaded(true);
-  }
+  // 帳單紀錄：第一次載入逾時，重試後成功
+  useEffect(() => {
+    if (status !== "loading") return;
+    const id = setTimeout(() => {
+      tries.current += 1;
+      setStatus(tries.current < 2 ? "error" : "ready");
+    }, 1400);
+    return () => clearTimeout(id);
+  }, [status]);
 
   return (
-    <div className="grid w-full max-w-[60rem] gap-6 lg:grid-cols-3">
-      <section aria-labelledby="returns-heading" className="space-y-3">
-        <h2 id="returns-heading" className="text-sm font-semibold">
-          Returns
+    <div className="grid w-full max-w-3xl grid-cols-1 gap-6 md:grid-cols-2">
+      <section aria-labelledby="sp-bill" className="min-w-0 space-y-3">
+        <h2 id="sp-bill" className="text-sm font-semibold">
+          This bill
         </h2>
-        {returns.length ? (
-          <Rows rows={returns} />
+        {bill.length ? (
+          <Rows rows={bill.map((s) => ({ key: s.name, left: s.name, right: yuan(s.amount) }))} />
         ) : (
           <EmptyState
-            title="No returns yet"
-            description="When you send something back, you can track the refund here."
-            action={{ label: "Start a return", href: "#" }}
-            onLoadExample={() => setReturns(exampleReturns)}
+            icon={<UsersIcon />}
+            title="No bill yet"
+            description="Start by adding people, or load a filled-in example to see how it works."
+            onLoadExample={() => setBill(exampleBill)}
+            secondary={{ label: "Add people", href: "#members" }}
           />
         )}
       </section>
 
-      <section aria-labelledby="invoices-heading" className="space-y-3">
-        <h2 id="invoices-heading" className="text-sm font-semibold">
-          Invoices
+      <section aria-labelledby="sp-history" className="min-w-0 space-y-3">
+        <h2 id="sp-history" className="text-sm font-semibold">
+          Past bills
         </h2>
-        {invoicesLoaded ? (
-          <Rows rows={invoices} />
+        {status === "loading" ? (
+          <LoadingState rows={3} label="Loading past bills" />
+        ) : status === "error" ? (
+          <ErrorState title="Couldn't load past bills" message="The connection timed out. Your bills are safe, please try again." onRetry={() => setStatus("loading")} />
         ) : (
-          <ErrorState
-            title="Invoices didn't load"
-            detail={"GET /api/invoices 504 Gateway Timeout\nrequest-id: 7f3c9a12-b8e4"}
-            onRetry={retryInvoices}
-            support={{ label: "Contact support", href: "#" }}
-          />
+          <Rows rows={history.map((b) => ({ key: b.id, left: b.title, sub: b.date, right: yuan(b.total) }))} />
         )}
-      </section>
-
-      <section aria-labelledby="addresses-heading" className="space-y-3">
-        <h2 id="addresses-heading" className="text-sm font-semibold">
-          Saved addresses
-        </h2>
-        <LoadingState rows={3} media={false} slowAfter={3000} labels={{ loading: "Loading saved addresses" }} />
       </section>
     </div>
   );

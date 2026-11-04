@@ -1,238 +1,653 @@
 "use client";
 
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, type AnimationPlaybackControls } from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+// 腳本化的產品 Demo：瀏覽器框裡依場景自動播放，假游標移到目標、點擊漣漪、章節進度條。
+// 只在播放中且位於畫面內才前進；分頁在背景時也暫停。
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface ScriptedDemoScene {
-  key: string;
+/* ---------- 動畫樣式（原 welcome.css 的 ww-* keyframes） ---------- */
+
+const CSS = `
+.sd-root{--sd-success:var(--success,#15803D);--sd-warning:var(--warning,#B45309);--sd-popover:var(--popover,var(--card))}
+@media (prefers-color-scheme: dark){.sd-root{--sd-success:var(--success,#4ADE80);--sd-warning:var(--warning,#FBBF24)}}
+@keyframes sd-pop{0%{opacity:0;transform:translateY(6px) scale(.85)}70%{opacity:1;transform:translateY(-1px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes sd-fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sd-slide-in-right{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sd-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+@keyframes sd-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sd-ripple{from{opacity:.55;transform:translate(-50%,-50%) scale(.2)}to{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+@keyframes sd-glow{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--sd-warning) 45%,transparent)}50%{box-shadow:0 0 0 5px color-mix(in oklab,var(--sd-warning) 0%,transparent)}}
+@keyframes sd-blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes sd-spin{to{transform:rotate(360deg)}}
+.sd-pop{animation:sd-pop 420ms cubic-bezier(.2,.8,.2,1) both}
+.sd-fade-up{animation:sd-fade-up 520ms cubic-bezier(.2,.8,.2,1) both}
+.sd-slide-in-right{animation:sd-slide-in-right 480ms cubic-bezier(.2,.8,.2,1) both}
+.sd-shake{animation:sd-shake 480ms ease-in-out 2}
+.sd-glow{animation:sd-glow 1.4s ease-in-out infinite}
+.sd-blink{animation:sd-blink 1.2s ease-in-out infinite}
+.sd-spin{animation:sd-spin 1s linear infinite}
+.sd-progress{transform-origin:left center;animation:sd-progress var(--sd-duration,2s) cubic-bezier(.4,0,.2,1) both}
+.sd-ripple{position:absolute;left:4px;top:4px;width:36px;height:36px;border-radius:9999px;background:var(--foreground);pointer-events:none;animation:sd-ripple 700ms ease-out both}
+@media (prefers-reduced-motion: reduce){
+.sd-pop,.sd-fade-up,.sd-slide-in-right,.sd-shake,.sd-glow,.sd-blink,.sd-spin{animation:none}
+.sd-progress{animation-duration:1ms}
+.sd-ripple{display:none}
+.sd-cursor{transition:none!important}
+}
+`;
+
+/* ---------- 型別 ---------- */
+
+export interface ScriptedDemoScene<K extends string = string> {
+  key: K;
   /** 這一幕停留的毫秒數 */
   duration: number;
-  /** 所屬章節 id */
-  chapter: string;
-  /** 游標要移到的元素：stage 內 data-demo-target 的值 */
-  target?: string;
+  /** 所屬章節索引（0 起算） */
+  chapter: number;
+  /** 游標要移到的目標名稱（以 target(name) 註冊） */
+  cursor?: string;
+  /** 這一幕是否在游標位置播放點擊漣漪 */
+  click?: boolean;
+  /** 漣漪延遲毫秒，例如等游標移到再點 */
+  clickDelay?: number;
+  /** 說明卡片要貼齊的目標名稱，位置由 popover 提供 */
+  popover?: string;
 }
 
 export interface ScriptedDemoChapter {
-  id: string;
   title: ReactNode;
   caption?: ReactNode;
 }
 
-export interface ScriptedDemoProps {
-  scenes: ScriptedDemoScene[];
-  chapters: ScriptedDemoChapter[];
-  renderScene: (key: string) => ReactNode;
-  autoPlay?: boolean;
-  loop?: boolean;
-  labels?: { play?: string; pause?: string; replay?: string; next?: string; stage?: string; chapters?: string };
-  className?: string;
+export interface ScriptedDemoLabels {
+  /** 整個 demo 的群組名稱 */
+  group: string;
+  play: string;
+  pause: string;
 }
 
-const defaultLabels = {
-  play: "Play demo",
-  pause: "Pause demo",
-  replay: "Replay demo",
-  next: "Next step",
-  stage: "Product demo",
-  chapters: "Demo chapters",
-};
+export interface ScriptedDemoProps<K extends string = string> {
+  scenes: ScriptedDemoScene<K>[];
+  chapters: ScriptedDemoChapter[];
+  /** 瀏覽器框網址列的文字；不給就不顯示 */
+  url?: string;
+  /** 一開始是否自動播放 */
+  autoPlay?: boolean;
+  labels?: Partial<ScriptedDemoLabels>;
+  className?: string;
+  children: ReactNode;
+}
 
-const ease = [0.23, 1, 0.32, 1] as const;
-const cursorEase = [0.65, 0, 0.35, 1] as const;
+interface DemoContextValue {
+  /** 目前場景索引 */
+  scene: number;
+  /** 目前場景 key */
+  sceneKey: string;
+  /** 第幾輪；跳章或重播時加一，拿來當 key 讓進場動畫重播 */
+  loop: number;
+  /** 正在播放且位於畫面內 */
+  active: boolean;
+  reduced: boolean;
+  /** 註冊游標目標或說明卡片錨點 */
+  target: (name: string) => (el: HTMLElement | null) => void;
+  /** 說明卡片的位置（相對於瀏覽器框） */
+  popover: { top: number; left: number; width: number };
+}
 
-export function ScriptedDemo({ scenes, chapters, renderScene, autoPlay = true, loop = true, labels, className }: ScriptedDemoProps) {
-  const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+const DemoContext = createContext<DemoContextValue | null>(null);
 
-  const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(autoPlay);
+export function useScriptedDemo() {
+  const ctx = useContext(DemoContext);
+  if (!ctx) throw new Error("useScriptedDemo must be used inside <ScriptedDemo>");
+  return ctx;
+}
+
+const defaultLabels: ScriptedDemoLabels = { group: "Animated product demo", play: "Play animation", pause: "Pause animation" };
+
+/* ---------- 小工具 ---------- */
+
+function subscribeReduced(cb: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+
+function useReducedMotionPref() {
+  return useSyncExternalStore(
+    subscribeReduced,
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
+}
+
+function useInView<T extends Element>({ once = true, threshold = 0.2 }: { once?: boolean; threshold?: number } = {}) {
+  const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [ended, setEnded] = useState(false);
-  const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
-
-  const scene = scenes[index];
-  const running = playing && inView && visible && !reduce && !ended;
-
-  // 進入視窗才播放、分頁隱藏就暫停
   useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.35 });
-    io.observe(el);
-    const onVis = () => setVisible(!document.hidden);
-    onVis();
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      io.disconnect();
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, []);
-
-  // 目前章節的進度，以 motion value 驅動進度條，不逐幀 setState
-  const chapterScenes = scenes.filter((s) => s.chapter === scene?.chapter);
-  const chapterTotal = chapterScenes.reduce((sum, s) => sum + s.duration, 0) || 1;
-  const before = chapterScenes.slice(0, chapterScenes.indexOf(scene)).reduce((sum, s) => sum + s.duration, 0);
-  const progress = useMotionValue(0);
-  const elapsed = useRef(0);
-  const lastIndex = useRef(-1);
-
-  useEffect(() => {
-    if (!scene) return;
-    if (lastIndex.current !== index) {
-      lastIndex.current = index;
-      elapsed.current = 0;
-      progress.set(before / chapterTotal);
-    }
-    if (!running) return;
-    const t0 = performance.now();
-    const remaining = Math.max(0, scene.duration - elapsed.current);
-    const controls: AnimationPlaybackControls = animate(progress, (before + scene.duration) / chapterTotal, {
-      duration: remaining / 1000,
-      ease: "linear",
-    });
-    const timer = setTimeout(() => {
-      if (index < scenes.length - 1) setIndex(index + 1);
-      else if (loop) setIndex(0);
-      else setEnded(true);
-    }, remaining);
-    return () => {
-      elapsed.current += performance.now() - t0;
-      controls.stop();
-      clearTimeout(timer);
-    };
-  }, [index, running, scene, scenes.length, loop, before, chapterTotal, progress]);
-
-  // 量測目標元素，把假游標移過去
-  useLayoutEffect(() => {
-    const stage = stageRef.current;
-    if (!stage || !scene?.target) return setCursor(null);
-    const el = stage.querySelector<HTMLElement>(`[data-demo-target="${scene.target}"]`);
-    if (!el) return setCursor(null);
-    const s = stage.getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    setCursor({ x: r.left - s.left + r.width / 2, y: r.top - s.top + r.height / 2 });
-  }, [index, scene?.target]);
-
-  const goChapter = (id: string) => {
-    const first = scenes.findIndex((s) => s.chapter === id);
-    if (first < 0) return;
-    setEnded(false);
-    setIndex(first);
-  };
-
-  const activeChapter = chapters.find((c) => c.id === scene?.chapter);
-  const activeChapterIdx = chapters.findIndex((c) => c.id === scene?.chapter);
-
-  const toggle = () => {
-    if (ended) {
-      setEnded(false);
-      setIndex(0);
-      setPlaying(true);
+    const node = ref.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
       return;
     }
-    setPlaying((p) => !p);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setInView(false);
+        }
+      },
+      { threshold },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [once, threshold]);
+  return { ref, inView };
+}
+
+function useTabVisible() {
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const onVis = () => setVisible(document.visibilityState === "visible");
+    onVis();
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+  return visible;
+}
+
+const svg = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+export function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg {...svg} className={className}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+export function XIcon({ className }: { className?: string }) {
+  return (
+    <svg {...svg} className={className}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
+
+export function SpinnerIcon({ className }: { className?: string }) {
+  return (
+    <svg {...svg} className={cn("sd-spin", className)}>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+/* ---------- 主元件 ---------- */
+
+export function ScriptedDemo<K extends string = string>({
+  scenes,
+  chapters,
+  url,
+  autoPlay = true,
+  labels,
+  className,
+  children,
+}: ScriptedDemoProps<K>) {
+  const t = { ...defaultLabels, ...labels };
+  const reduced = useReducedMotionPref();
+  const tabVisible = useTabVisible();
+  const [scene, setScene] = useState(0);
+  const [loop, setLoop] = useState(0);
+  const [playing, setPlaying] = useState(autoPlay);
+  const { ref: viewRef, inView } = useInView<HTMLDivElement>({ once: false, threshold: 0.25 });
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const targets = useRef(new Map<string, HTMLElement>());
+  const targetRefs = useRef(new Map<string, (el: HTMLElement | null) => void>());
+  const [cursor, setCursor] = useState({ x: 0, y: 0, ready: false });
+  const [popover, setPopover] = useState({ top: 0, left: 0, width: 280 });
+
+  const current = scenes[Math.min(scene, scenes.length - 1)];
+  const chapter = current.chapter;
+  const active = playing && inView && tabVisible;
+
+  const target = useCallback((name: string) => {
+    let fn = targetRefs.current.get(name);
+    if (!fn) {
+      fn = (el: HTMLElement | null) => {
+        if (el) targets.current.set(name, el);
+        else targets.current.delete(name);
+      };
+      targetRefs.current.set(name, fn);
+    }
+    return fn;
+  }, []);
+
+  // 場景計時器：只在播放中且位於畫面內才前進。
+  useEffect(() => {
+    if (!active) return;
+    const timer = window.setTimeout(() => {
+      setScene((s) => {
+        if (s >= scenes.length - 1) {
+          setLoop((l) => l + 1);
+          return 0;
+        }
+        return s + 1;
+      });
+    }, current.duration);
+    return () => window.clearTimeout(timer);
+  }, [active, scene, current.duration, loop, scenes.length]);
+
+  // 依場景量測游標目標與說明卡片位置。
+  const measure = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const box = container.getBoundingClientRect();
+    const center = (el: Element | undefined) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.left - box.left + r.width * 0.55, y: r.top - box.top + r.height * 0.6 };
+    };
+    const point = current.cursor ? center(targets.current.get(current.cursor)) : null;
+    if (point) setCursor({ ...point, ready: true });
+
+    const anchor = current.popover ? targets.current.get(current.popover) : undefined;
+    if (anchor) {
+      const r = anchor.getBoundingClientRect();
+      const width = Math.min(290, box.width - 16);
+      const left = Math.max(8, Math.min(r.left - box.left - 24, box.width - width - 8));
+      setPopover({ top: r.bottom - box.top + 10, left, width });
+    }
+  }, [current.cursor, current.popover]);
+
+  useLayoutEffect(() => {
+    measure();
+  }, [measure, scene, loop]);
+
+  useEffect(() => {
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [measure]);
+
+  const goToChapter = (index: number) => {
+    const first = scenes.findIndex((s) => s.chapter === index);
+    if (first < 0) return;
+    setScene(first);
+    setLoop((l) => l + 1);
   };
 
+  const chapterDuration = (index: number) =>
+    scenes.filter((s) => s.chapter === index).reduce((sum, s) => sum + s.duration, 0);
+
+  const value: DemoContextValue = { scene, sceneKey: current.key, loop, active, reduced, target, popover };
+
   return (
-    <div ref={rootRef} className={cn("w-full space-y-3", className)}>
-      <div
-        ref={stageRef}
-        aria-label={t.stage}
-        role="group"
-        inert
-        className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-border bg-card text-card-foreground"
-      >
-        <AnimatePresence initial={false} mode="popLayout">
-          <motion.div
-            key={scene?.key}
-            className="absolute inset-0"
-            initial={reduce ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
-            transition={{ duration: 0.24, ease }}
-          >
-            {scene && renderScene(scene.key)}
-          </motion.div>
-        </AnimatePresence>
-
-        {!reduce && (
-          <motion.div
-            aria-hidden="true"
-            className="pointer-events-none absolute top-0 left-0 z-10"
-            initial={false}
-            animate={cursor ? { x: cursor.x, y: cursor.y, opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.7, ease: cursorEase }}
-          >
-            <AnimatePresence>
-              {cursor && (
-                <motion.span
-                  key={index}
-                  className="absolute -top-4 -left-4 size-8 rounded-full border border-primary"
-                  initial={{ scale: 0.4, opacity: 0 }}
-                  animate={{ scale: [0.4, 1.6], opacity: [0.6, 0] }}
-                  transition={{ delay: 0.7, duration: 0.5, ease }}
-                />
-              )}
-            </AnimatePresence>
-            <svg viewBox="0 0 20 20" className="size-5 -translate-x-0.5 -translate-y-0.5 text-foreground drop-shadow-sm" aria-hidden="true">
-              <path d="M3 2.5 16 9.2l-5.6 1.5L8 16.5Z" fill="currentColor" className="stroke-background" strokeWidth="1.5" strokeLinejoin="round" />
-            </svg>
-          </motion.div>
-        )}
-      </div>
-
-      <div className="flex items-start gap-3">
-        <div role="tablist" aria-label={t.chapters} className="grid min-w-0 flex-1 gap-2" style={{ gridTemplateColumns: `repeat(${chapters.length}, minmax(0, 1fr))` }}>
-          {chapters.map((c, i) => {
-            const active = c.id === scene?.chapter;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => goChapter(c.id)}
-                className="group min-w-0 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span aria-hidden="true" className="block h-0.5 w-full overflow-hidden rounded-full bg-border">
-                  <motion.span
-                    className="block h-full origin-left bg-primary"
-                    style={active ? { scaleX: progress } : { scaleX: i < activeChapterIdx ? 1 : 0 }}
-                  />
-                </span>
-                <span className={cn("mt-2 block truncate text-sm font-medium transition-colors", active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
-                  {c.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <button
-          type="button"
-          onClick={reduce ? () => setIndex((i) => (i + 1) % scenes.length) : toggle}
-          aria-label={reduce ? t.next : ended ? t.replay : playing ? t.pause : t.play}
-          className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+    <DemoContext.Provider value={value}>
+      <style>{CSS}</style>
+      <div ref={viewRef} role="group" aria-label={t.group} className={cn("sd-root w-full", className)}>
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-20px_rgba(0,0,0,0.18)]"
         >
-          <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            {reduce ? (
-              <path d="m6 3.5 4.5 4.5L6 12.5" />
-            ) : ended ? (
-              <path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.5h2.5" />
-            ) : playing ? (
-              <path d="M5.5 3.5v9M10.5 3.5v9" />
-            ) : (
-              <path d="M5 3.2v9.6L12.5 8Z" />
+          {/* 瀏覽器框 */}
+          <div aria-hidden className="flex items-center gap-2 border-b border-border bg-muted/50 px-4 py-2.5">
+            <span className="size-2.5 rounded-full bg-[#FF5F57]" />
+            <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
+            <span className="size-2.5 rounded-full bg-[#28C840]" />
+            {url ? (
+              <div className="mx-auto hidden rounded-md bg-background px-3 py-0.5 font-mono text-[11px] text-muted-foreground sm:block">
+                {url}
+              </div>
+            ) : null}
+            <div className="w-10 sm:hidden" />
+          </div>
+
+          {children}
+
+          {/* 模擬游標 */}
+          <div
+            aria-hidden
+            className={cn(
+              "sd-cursor pointer-events-none absolute top-0 left-0 z-30 transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.65,0,0.35,1)]",
+              cursor.ready ? "opacity-100" : "opacity-0",
             )}
-          </svg>
-        </button>
+            style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }}
+          >
+            {current.click ? (
+              <span key={`${scene}-${loop}`} className="sd-ripple" style={{ animationDelay: `${current.clickDelay ?? 0}ms` }} />
+            ) : null}
+            <svg viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="relative size-5 fill-foreground stroke-background drop-shadow-md">
+              <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* 章節控制 */}
+        <div className="mt-4 flex items-start gap-3">
+          <button
+            type="button"
+            onClick={() => setPlaying((p) => !p)}
+            className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            aria-label={playing ? t.pause : t.play}
+          >
+            {playing ? (
+              <svg {...svg} className="size-3.5">
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+              </svg>
+            ) : (
+              <svg {...svg} className="size-3.5">
+                <polygon points="6 3 20 12 6 21 6 3" />
+              </svg>
+            )}
+          </button>
+          <ol className="grid min-w-0 flex-1 gap-2" style={{ gridTemplateColumns: `repeat(${chapters.length}, minmax(0, 1fr))` }}>
+            {chapters.map((c, i) => (
+              <li key={i} className="min-w-0">
+                <button
+                  type="button"
+                  onClick={() => goToChapter(i)}
+                  className="group w-full rounded-sm text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  aria-current={i === chapter ? "step" : undefined}
+                >
+                  <span className="relative block h-1 overflow-hidden rounded-full bg-muted">
+                    {i < chapter ? <span className="absolute inset-0 bg-foreground/70" /> : null}
+                    {i === chapter ? (
+                      <span
+                        key={`${loop}-${i}`}
+                        className="sd-progress absolute inset-0 bg-foreground"
+                        style={
+                          {
+                            "--sd-duration": `${chapterDuration(i)}ms`,
+                            animationPlayState: active ? "running" : "paused",
+                          } as CSSProperties
+                        }
+                      />
+                    ) : null}
+                  </span>
+                  <span
+                    className={cn(
+                      "mt-2 block truncate text-xs font-medium transition-colors",
+                      i === chapter ? "text-foreground" : "text-muted-foreground group-hover:text-foreground",
+                    )}
+                  >
+                    {c.title}
+                  </span>
+                  {c.caption ? (
+                    <span className="mt-0.5 hidden text-[11px] leading-snug text-muted-foreground md:block">{c.caption}</span>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
-      {activeChapter?.caption && <p className="text-sm text-muted-foreground">{activeChapter.caption}</p>}
+    </DemoContext.Provider>
+  );
+}
+
+/* ---------- 場景裡常用的零件 ---------- */
+
+/** 進入畫面時從 from 跳到目標值，ease-out cubic。 */
+export function CountUp({
+  to,
+  from = 0,
+  decimals = 0,
+  duration = 1200,
+  start = true,
+  suffix = "",
+}: {
+  to: number;
+  from?: number;
+  decimals?: number;
+  duration?: number;
+  start?: boolean;
+  suffix?: string;
+}) {
+  const reduced = useReducedMotionPref();
+  const [value, setValue] = useState(from);
+  const fromRef = useRef(from);
+
+  useEffect(() => {
+    if (!start) {
+      setValue(fromRef.current);
+      return;
+    }
+    if (reduced) {
+      fromRef.current = to;
+      setValue(to);
+      return;
+    }
+    let frame = 0;
+    const begin = performance.now();
+    const origin = fromRef.current;
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - begin) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(origin + (to - origin) * eased);
+      if (progress < 1) frame = requestAnimationFrame(tick);
+      else fromRef.current = to;
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [to, duration, start, reduced]);
+
+  return (
+    <span className="tabular-nums">
+      {value.toFixed(decimals)}
+      {suffix}
+    </span>
+  );
+}
+
+/** 帶進場動畫的包裝：晶片一個接一個彈出，delay 為毫秒。 */
+export function Pop({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+  return (
+    <span className={cn("sd-pop", className)} style={{ animationDelay: `${delay}ms` }}>
+      {children}
+    </span>
+  );
+}
+
+/**
+ * 終端機風格的單行 log。running 時每 interval 毫秒換下一行（停在最後一行），
+ * 不在 running 時顯示 idle 內容。
+ */
+export function TypedLog({
+  lines,
+  running,
+  interval = 600,
+  idle,
+  className,
+}: {
+  lines: string[];
+  running: boolean;
+  interval?: number;
+  idle?: ReactNode;
+  className?: string;
+}) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (!running) {
+      setIndex(0);
+      return;
+    }
+    const timer = window.setInterval(() => setIndex((i) => Math.min(i + 1, lines.length - 1)), interval);
+    return () => window.clearInterval(timer);
+  }, [running, interval, lines.length]);
+
+  return (
+    <div className={cn("mt-2 h-5 overflow-hidden font-mono text-[11px] text-muted-foreground", className)}>
+      {running ? (
+        <p key={index} className="sd-fade-up">
+          <span className="text-foreground">›</span> {lines[index]}
+          <span className="sd-blink">_</span>
+        </p>
+      ) : (
+        idle
+      )}
+    </div>
+  );
+}
+
+/** log 下方的細進度條：running 時以 duration 填滿，done 時顯示成功色。 */
+export function DemoProgress({ running, done, duration = 2200 }: { running: boolean; done?: boolean; duration?: number }) {
+  return (
+    <div className="relative mt-1 h-0.5 overflow-hidden rounded-full bg-muted">
+      {running ? (
+        <div className="sd-progress absolute inset-0 bg-foreground" style={{ "--sd-duration": `${duration}ms` } as CSSProperties} />
+      ) : done ? (
+        <div className="absolute inset-0 bg-(--sd-success)/60" />
+      ) : null}
+    </div>
+  );
+}
+
+export type DemoTone = "muted" | "brand" | "success" | "warning";
+
+/** 狀態膠囊：文字變了就重播淡入；brand 色調的圓點會閃爍。 */
+export function DemoStatus({ text, tone }: { text: string; tone: DemoTone }) {
+  return (
+    <span
+      key={text}
+      className={cn(
+        "sd-fade-up hidden items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium sm:inline-flex",
+        tone === "muted" && "border-border text-muted-foreground",
+        tone === "brand" && "border-border bg-muted text-foreground",
+        tone === "success" && "border-(--sd-success)/30 bg-(--sd-success)/10 text-(--sd-success)",
+        tone === "warning" && "border-(--sd-warning)/30 bg-(--sd-warning)/10 text-(--sd-warning)",
+      )}
+    >
+      <span className={cn("size-1.5 rounded-full bg-current", tone === "brand" && "sd-blink")} />
+      {text}
+    </span>
+  );
+}
+
+/** 從右側滑入的通知卡片，位置相對於瀏覽器框。 */
+export function DemoNotice({
+  icon,
+  tone = "success",
+  title,
+  body,
+  className,
+  noticeKey,
+}: {
+  icon: ReactNode;
+  tone?: "success" | "warning";
+  title: ReactNode;
+  body: ReactNode;
+  className?: string;
+  /** 換這個值時重播滑入 */
+  noticeKey?: string;
+}) {
+  return (
+    <div
+      key={noticeKey}
+      className={cn(
+        "sd-slide-in-right absolute top-[8.5rem] right-3 z-10 flex max-w-[calc(100%-1.5rem)] items-start gap-2.5 rounded-xl border border-border bg-(--sd-popover) p-3 shadow-lg sm:right-5",
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-7 shrink-0 items-center justify-center rounded-full",
+          tone === "warning" ? "bg-(--sd-warning)/15 text-(--sd-warning)" : "bg-(--sd-success)/15 text-(--sd-success)",
+        )}
+      >
+        {icon}
+      </span>
+      <div className="text-xs">
+        <p className="font-semibold">{title}</p>
+        <p className="text-muted-foreground">{body}</p>
+      </div>
+    </div>
+  );
+}
+
+/** 「為什麼」說明卡片：貼在 scene.popover 指定的目標下方，理由逐條淡入。 */
+export function DemoPopover({
+  title,
+  subtitle,
+  reasons,
+  delay = 650,
+}: {
+  title: ReactNode;
+  subtitle?: ReactNode;
+  reasons: { ok: boolean; text: string }[];
+  /** 卡片出現前的延遲毫秒，等游標點下去 */
+  delay?: number;
+}) {
+  const { popover, loop } = useScriptedDemo();
+  return (
+    <div
+      key={`pop-${loop}`}
+      className="sd-fade-up absolute z-20 rounded-xl border border-border bg-(--sd-popover) p-3.5 text-xs shadow-2xl"
+      style={{ top: popover.top, left: popover.left, width: popover.width, animationDelay: `${delay}ms` }}
+    >
+      <p className="text-sm font-semibold">{title}</p>
+      {subtitle ? <p className="mb-2 text-muted-foreground">{subtitle}</p> : null}
+      <ul className="space-y-1.5">
+        {reasons.map((reason, i) => (
+          <li key={reason.text} className="sd-fade-up flex items-start gap-1.5" style={{ animationDelay: `${delay + 300 + i * 280}ms` }}>
+            {reason.ok ? (
+              <CheckIcon className="mt-0.5 size-3.5 shrink-0 text-(--sd-success)" />
+            ) : (
+              <XIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+            )}
+            <span className={reason.ok ? "" : "text-muted-foreground"}>{reason.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** 指標小卡：start 前顯示 "--"，highlight 時換成警示色外框。 */
+export function DemoMetric({
+  label,
+  children,
+  start,
+  highlight,
+}: {
+  label: ReactNode;
+  children: ReactNode;
+  start: boolean;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "min-w-0 rounded-lg border px-2 py-1.5 transition-colors duration-500 sm:px-3 sm:py-2",
+        highlight ? "border-(--sd-warning)/40 bg-(--sd-warning)/5" : "border-border bg-background",
+      )}
+    >
+      <p className="truncate text-[10px] text-muted-foreground sm:text-[11px]">{label}</p>
+      <p className={cn("text-sm font-semibold sm:text-lg", !start && "text-muted-foreground/50")}>{start ? children : "--"}</p>
     </div>
   );
 }

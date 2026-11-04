@@ -1,58 +1,91 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { JobsTray, useJobs, type Job } from "./jobs-tray";
+import { JobsTray, UpdateBanner, useBackgroundJobs, type UpdaterEvent } from "./jobs-tray";
 
-const exports: { id: string; label: string; detail: string; speed: number; failAt?: number }[] = [
-  { id: "orders", label: "Export orders.csv", detail: "October, 1,284 rows", speed: 0.07 },
-  { id: "invoices", label: "Build invoice PDFs", detail: "212 invoices", speed: 0.04, failAt: 0.62 },
-  { id: "images", label: "Resize product images", detail: "86 of 140 photos", speed: 0.025 },
-];
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function JobsTrayDemo() {
-  const { jobs, setJobs, update, remove } = useJobs(
-    exports.map<Job>((e) => ({ id: e.id, label: e.label, detail: e.detail, state: "running", progress: 0 })),
-  );
-  // 每個匯出依自己的速度前進，發票那一個會在中途失敗
+  const { jobs, startJob, updateJob, finishJob, dismissJob, cancelJob, runJob } = useBackgroundJobs();
+  const [event, setEvent] = useState<UpdaterEvent>({ type: "idle" });
+
+  // 停止錄影後，編輯器立刻可用，寫檔、波形、匯出都在背景跑
   useEffect(() => {
-    const timer = setInterval(() => {
-      setJobs((prev) =>
-        prev.map((job) => {
-          if (job.state !== "running") return job;
-          const spec = exports.find((e) => e.id === job.id)!;
-          const next = Math.min(1, (job.progress ?? 0) + spec.speed);
-          if (spec.failAt && next >= spec.failAt && !job.detail?.toString().startsWith("Retry")) {
-            return { ...job, state: "failed", error: "Invoice #4471 has no billing address. Add it and retry." };
-          }
-          return next >= 1 ? { ...job, state: "done", progress: 1 } : { ...job, progress: next };
-        }),
-      );
-    }, 400);
-    return () => clearInterval(timer);
-  }, [setJobs]);
+    let alive = true;
+    const ids: string[] = [];
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+    runJob("media-write", "Saving camera track", async (report) => {
+      if (!alive) throw new Error("unmounted");
+      for (let p = 0; p <= 1.001 && alive; p += 0.08) {
+        report(p);
+        await wait(450);
+      }
+    }).catch(() => {});
+
+    const mic = startJob("media-write", "Saving microphone track");
+    timeouts.push(setTimeout(() => finishJob(mic, { success: false, errorCode: "DISK_FULL: 0 bytes left on Recordings volume" }), 2600));
+
+    const wave = startJob("waveform", "Building waveform");
+    timeouts.push(setTimeout(() => finishJob(wave), 5200));
+
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const exp = startJob("export", "Export · intro-take-3.mp4", {
+      onCancel: () => {
+        clearInterval(timer);
+        cancelJob(exp);
+      },
+    });
+    let p = 0;
+    timer = setInterval(() => {
+      p = Math.min(1, p + 0.03);
+      updateJob(exp, { progress: p });
+      if (p >= 1) {
+        clearInterval(timer);
+        finishJob(exp);
+      }
+    }, 600);
+
+    ids.push(mic, wave, exp);
+    timeouts.push(setTimeout(() => setEvent({ type: "available", version: "2.4.0" }), 900));
+    // 卸載時收掉計時器與這輪登記的工作
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      timeouts.forEach(clearTimeout);
+      ids.forEach(dismissJob);
+    };
+  }, [cancelJob, dismissJob, finishJob, runJob, startJob, updateJob]);
+
+  // 模擬 updater：下載後持續推 progress，最後 downloaded
+  const download = async () => {
+    for (let pct = 8; pct <= 100; pct += 12) {
+      await wait(350);
+      setEvent({ type: "progress", percent: Math.min(100, pct) });
+    }
+    await wait(300);
+    setEvent({ type: "downloaded" });
+    return { success: true };
+  };
 
   return (
-    <div className="relative h-[28rem] w-full max-w-3xl overflow-hidden rounded-xl border border-border bg-background">
-      <div className="border-b border-border px-5 py-4">
-        <p className="text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">Reports</p>
-        <h2 className="mt-1 text-lg font-semibold tracking-tight">Month end close</h2>
-      </div>
-      <div className="space-y-3 p-5 text-sm">
-        {["Orders", "Invoices", "Product media", "Payouts"].map((row) => (
-          <div key={row} className="flex items-center justify-between rounded-md border border-border px-3 py-2.5">
-            <span>{row}</span>
-            <span className="text-xs text-muted-foreground">Keep working while exports run</span>
-          </div>
-        ))}
+    <div className="relative h-[26rem] w-full max-w-3xl overflow-hidden rounded-[14px] border border-white/5 bg-[#111111] text-[#e5e5e5]">
+      <UpdateBanner fixed={false} event={event} onDownload={download} onInstall={() => wait(60_000)} />
+
+      {/* 編輯器示意：預覽與時間軸 */}
+      <div className="flex h-full min-w-0 flex-col gap-3 p-4 pt-14">
+        <div className="grid min-h-0 flex-1 place-items-center rounded-[14px] bg-[#1c1c1c]">
+          <div className="aspect-video w-3/5 rounded-lg bg-[#0a0a0a]" />
+        </div>
+        <div className="space-y-1.5 rounded-[14px] bg-[#1c1c1c] p-3">
+          <div className="h-5 w-[86%] rounded bg-[#eab308]/25" />
+          <div className="h-5 w-[64%] rounded bg-white/10" />
+          <div className="h-5 w-[72%] rounded bg-white/5" />
+        </div>
       </div>
 
-      <JobsTray
-        fixed={false}
-        jobs={jobs}
-        onRetry={(id) => update(id, { state: "running", progress: 0.62, detail: "Retrying with the fixed address", error: undefined })}
-        onDismiss={remove}
-      />
+      <JobsTray fixed={false} jobs={jobs} onDismiss={dismissJob} />
     </div>
   );
 }

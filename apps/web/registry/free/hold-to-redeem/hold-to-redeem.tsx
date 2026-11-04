@@ -4,81 +4,114 @@ import {
   animate,
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
+  useTransform,
   type AnimationPlaybackControls,
 } from "framer-motion";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
 
 import { cn } from "@/lib/utils";
 
 export interface HoldToRedeemLabels {
-  /** 按鈕下方的說明，也是 aria-describedby 的內容 */
-  hint?: ReactNode;
-  keepHolding?: ReactNode;
+  /** 平常圈圈下方的提示，{key} 會換成鍵帽上的字 */
+  hint?: string;
+  /** 走進警告區（warnFrom 之後）時的提示 */
+  warn?: string;
   confirming?: ReactNode;
-  retry?: ReactNode;
-  error?: ReactNode;
+  failed?: ReactNode;
   redeemed?: ReactNode;
-  redeemedStamp?: ReactNode;
   doneAnnouncement?: string;
-  errorAnnouncement?: string;
+  failedAnnouncement?: string;
 }
 
 export interface HoldToRedeemProps {
-  label?: ReactNode;
-  /** 顯示在按鈕右側的花費，例如「500 pts」 */
+  label: ReactNode;
+  /** 名稱旁的金色小標籤，例如「120 碎晶」 */
   cost?: ReactNode;
-  /** 需要按住多久（ms） */
+  /** 圈圈中央鍵帽上的字；單一字元時按下該鍵也算按住 */
+  keyLabel?: string;
+  /** 需要按住多久（ms），原作玩家互動是 0.7 秒 */
   holdMs?: number;
-  /** 按滿後呼叫；拋錯顯示重試 */
+  /** 進度走到這裡（0..1）開始警告：圈圈紅閃、上面驚嘆號、下面提示放開 */
+  warnFrom?: number;
+  /** 圈滿後呼叫；拋錯＝失敗，圈圈變紅並倒退 */
   onConfirm?: () => void | Promise<void>;
   disabled?: boolean;
-  /** 停用時顯示的原因，取代說明文字 */
   disabledReason?: ReactNode;
   done?: boolean;
   defaultDone?: boolean;
-  /** 兌換完成後印在票面上的內容，例如兌換碼 */
+  /** 兌換完成後顯示的內容，例如兌換碼 */
   result?: ReactNode;
+  /** 進度色，預設是原作的金色 */
+  color?: string;
   labels?: HoldToRedeemLabels;
   className?: string;
 }
 
 const defaultLabels: Required<HoldToRedeemLabels> = {
-  hint: "Press and hold to confirm",
-  keepHolding: "Keep holding to redeem",
-  confirming: "Redeeming",
-  retry: "Hold to try again",
-  error: "Couldn't redeem. Your points were not used.",
+  hint: "Hold {key} to redeem",
+  warn: "Release {key} to back out",
+  confirming: "Redeeming...",
+  failed: "It didn't take. Nothing was spent.",
   redeemed: "Redeemed",
-  redeemedStamp: "Redeemed",
   doneAnnouncement: "Redeemed.",
-  errorAnnouncement: "Couldn't redeem. Your points were not used.",
+  failedAnnouncement: "Redeem failed. Nothing was spent.",
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+// 原作 HoldRing.tsx 的尺寸與顏色
+const SIZE = 76;
+const STROKE = 7;
+const R = (SIZE - STROKE) / 2;
+const C = 2 * Math.PI * R;
+const RED = "#ff6b6b";
+/** 倒退速度（進度／秒）：比填滿快很多，一圈約 0.45 秒退光 */
+const REWIND_PER_SEC = 2.2;
 
-const springs = {
-  gentle: { type: "spring", stiffness: 240, damping: 30 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
-} as const;
+type Phase = "idle" | "filling" | "rewinding" | "confirming";
 
-const isHoldKey = (key: string) => key === " " || key === "Enter";
+const STYLES = `
+  @keyframes hr-tell { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .hr-panel { position: relative; color: #e8edf5;
+    background: linear-gradient(180deg, rgba(17,24,35,0.96), rgba(9,13,20,0.96));
+    border-top: 2px solid #3d4f6b; border-left: 2px solid #3d4f6b; border-bottom: 2px solid #05070b; border-right: 2px solid #05070b;
+    box-shadow: 0 0 0 1px #000, 5px 5px 0 rgba(0,0,0,0.45); }
+  .hr-panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; pointer-events: none;
+    background: linear-gradient(90deg, rgba(245,197,66,0.7), rgba(245,197,66,0) 60%); }
+  .hr-keycap { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box;
+    font-weight: 900; font-size: 0.76rem; line-height: 1; color: #231600; text-shadow: none;
+    background: linear-gradient(180deg, #ffe08a 0%, #f5c542 55%, #d9981e 100%);
+    border-top: 2px solid #fff1bf; border-left: 2px solid #ffe7a0; border-bottom: 3px solid #7a4d08; border-right: 2px solid #8f5e10;
+    box-shadow: 0 0 0 1px #000; }
+  .hr-keycap.dim { color: #d8dee9; background: rgba(14,20,30,0.9); border-color: #4a5d7c #05070b #05070b #4a5d7c; }
+  .hr-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.06em;
+    color: #f5c542; background: rgba(6,10,18,0.7); border: 1px solid rgba(245,197,66,0.5); white-space: nowrap; }
+  .hr-ring:focus-visible { outline: 2px solid #f5c542; outline-offset: 4px; }
+  @media (prefers-reduced-motion: reduce) { .hr-tell { animation: none !important; } }
+`;
 
 export function HoldToRedeem({
-  label = "Hold to redeem",
+  label,
   cost,
-  holdMs = 1200,
+  keyLabel = "E",
+  holdMs = 700,
+  warnFrom,
   onConfirm,
   disabled = false,
   disabledReason,
   done: doneProp,
   defaultDone = false,
   result,
+  color = "#ffd96b",
   labels,
   className,
 }: HoldToRedeemProps) {
@@ -88,52 +121,75 @@ export function HoldToRedeem({
 
   const [doneState, setDoneState] = useState(defaultDone);
   const done = doneProp ?? doneState;
-  const [phase, setPhase] = useState<"idle" | "holding" | "confirming" | "error">("idle");
-  const [nudge, setNudge] = useState(false);
-  const [justDone, setJustDone] = useState(false);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [failed, setFailed] = useState(false);
+  const [alarm, setAlarm] = useState(false);
   const [announcement, setAnnouncement] = useState("");
 
-  const progress = useMotionValue(0);
+  const progress = useMotionValue(done ? 1 : 0);
+  const scale = useMotionValue(1);
+  const dash = useTransform(progress, (p) => `${C * p} ${C}`);
+  // 0 的時候圓頭線帽會留一個點，原作沒在按就整個不畫
+  const arcOpacity = useTransform(progress, (p) => (p > 0.001 ? 1 : 0));
   const controls = useRef<AnimationPlaybackControls | null>(null);
   const holding = useRef(false);
-  const nudgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(
-    () => () => {
-      controls.current?.stop();
-      if (nudgeTimer.current) clearTimeout(nudgeTimer.current);
-    },
-    [],
-  );
+  useEffect(() => () => controls.current?.stop(), []);
+  useEffect(() => {
+    if (done) progress.set(1);
+  }, [done, progress]);
+
+  // 走進警告區時亮起驚嘆號
+  useMotionValueEvent(progress, "change", (p) => {
+    const next = holding.current && warnFrom !== undefined && p >= warnFrom && p < 1;
+    setAlarm((a) => (a === next ? a : next));
+  });
 
   const busy = phase === "confirming";
 
+  function rewind() {
+    controls.current?.stop();
+    const p = progress.get();
+    if (reduce || p <= 0) {
+      progress.set(0);
+      setPhase("idle");
+      return;
+    }
+    setPhase("rewinding");
+    controls.current = animate(progress, 0, {
+      duration: p / REWIND_PER_SEC,
+      ease: "linear",
+      onComplete: () => setPhase("idle"),
+    });
+  }
+
   async function complete() {
     holding.current = false;
+    setAlarm(false);
     setPhase("confirming");
+    if (!reduce) animate(scale, [1.12, 1], { duration: 0.25, ease: "linear" });
     try {
       await onConfirm?.();
       setDoneState(true);
-      setJustDone(true);
       setPhase("idle");
       setAnnouncement(t.doneAnnouncement);
     } catch {
-      progress.set(0);
-      setPhase("error");
-      setAnnouncement(t.errorAnnouncement);
+      // 失敗：圈圈變紅並倒退
+      setFailed(true);
+      setAnnouncement(t.failedAnnouncement);
+      rewind();
     }
   }
 
-  // 從目前進度繼續線性填滿，剩餘時間按比例計算
+  // 從目前進度繼續往前填，剩餘時間按比例算
   function start() {
     if (disabled || busy || done || holding.current) return;
     holding.current = true;
-    setPhase("holding");
-    setNudge(false);
+    setFailed(false);
+    setPhase("filling");
     controls.current?.stop();
-    const remaining = ((1 - progress.get()) * holdMs) / 1000;
     controls.current = animate(progress, 1, {
-      duration: remaining,
+      duration: ((1 - progress.get()) * holdMs) / 1000,
       ease: "linear",
       onComplete: () => {
         if (holding.current) void complete();
@@ -141,36 +197,30 @@ export function HoldToRedeem({
     });
   }
 
-  // 提早放開：倒退回 0，並短暫提示要按住
   function release() {
     if (!holding.current) return;
     holding.current = false;
-    controls.current?.stop();
-    if (reduce) {
-      progress.set(0);
-      controls.current = null;
-    } else {
-      controls.current = animate(progress, 0, springs.gentle);
-    }
-    setPhase("idle");
-    setNudge(true);
-    if (nudgeTimer.current) clearTimeout(nudgeTimer.current);
-    nudgeTimer.current = setTimeout(() => setNudge(false), 1800);
+    setAlarm(false);
+    rewind();
   }
 
   function onPointerDown(e: PointerEvent<HTMLButtonElement>) {
     if (e.button !== 0) return;
     e.preventDefault();
+    e.currentTarget.focus();
     e.currentTarget.setPointerCapture?.(e.pointerId);
     start();
   }
 
-  // 有 pointer capture 時 pointerleave 不會觸發，改用座標判斷手指是否滑出按鈕
+  // 有 pointer capture 時 pointerleave 不會觸發，改用座標判斷手指是否滑出圈圈
   function onPointerMove(e: PointerEvent<HTMLButtonElement>) {
     if (!holding.current) return;
     const r = e.currentTarget.getBoundingClientRect();
     if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) release();
   }
+
+  const isHoldKey = (key: string) =>
+    key === " " || key === "Enter" || (keyLabel.length === 1 && key.toLowerCase() === keyLabel.toLowerCase());
 
   function onKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
     if (!isHoldKey(e.key)) return;
@@ -184,72 +234,115 @@ export function HoldToRedeem({
     release();
   }
 
-  const note = disabled && disabledReason ? disabledReason : phase === "error" ? t.error : nudge ? t.keepHolding : t.hint;
+  const ringColor = failed || alarm ? RED : color;
+  const fill = (s: string) => s.replace("{key}", keyLabel);
+
+  let hint: ReactNode = fill(t.hint);
+  let hintColor = "#bfe3ff";
+  if (done) {
+    hint = t.redeemed;
+    hintColor = "#5ee092";
+  } else if (disabled) {
+    hint = disabledReason ?? fill(t.hint);
+    hintColor = "#8a97ab";
+  } else if (busy) {
+    hint = t.confirming;
+    hintColor = "#ffd96b";
+  } else if (alarm) {
+    hint = fill(t.warn);
+    hintColor = "#ff8a8a";
+  } else if (failed) {
+    hint = t.failed;
+    hintColor = "#ff8a8a";
+  }
+
+  const tell = alarm && !reduce ? { animation: "hr-tell 0.28s linear infinite" } : undefined;
 
   return (
-    <div className={cn("relative w-full", ink, className)}>
-      {done ? (
-        <div className={cn("flex min-h-11 items-center gap-3 rounded-md border px-3 py-2", paper, edge)}>
-          <div className="min-w-0 flex-1">
-            <p className={cn("text-[11px] tracking-[0.14em] uppercase", inkMuted)}>{t.redeemed}</p>
-            {result && <p className="truncate font-mono text-sm font-semibold tracking-[0.12em] select-all">{result}</p>}
-          </div>
-          <motion.span
+    <div className={cn("hr-panel w-full px-4 pt-3 pb-3 select-none", className)}>
+      <style>{STYLES}</style>
+      <div className="flex items-start justify-between gap-3">
+        <p id={`${id}-label`} className="min-w-0 text-base leading-snug font-black [overflow-wrap:anywhere] text-white [text-shadow:2px_2px_0_#000]">
+          {label}
+        </p>
+        {cost && <span className="hr-chip mt-0.5 shrink-0">{cost}</span>}
+      </div>
+
+      <div className="relative mx-auto mt-9" style={{ width: SIZE, height: SIZE }}>
+        {alarm && (
+          <span
             aria-hidden="true"
-            className={cn(
-              "shrink-0 rounded-[3px] border-2 border-current px-1.5 py-0.5 text-[10px] font-bold tracking-[0.16em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-              vermilion,
-            )}
-            initial={reduce || !justDone ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-            animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-            transition={springs.stamp}
+            className="hr-tell pointer-events-none absolute left-1/2 -translate-x-1/2"
+            style={{ top: -32, fontSize: 26, fontWeight: 900, lineHeight: 1, color: "#ff5050", textShadow: "0 0 6px rgba(0,0,0,0.85)", ...tell }}
           >
-            {t.redeemedStamp}
-          </motion.span>
-        </div>
-      ) : (
-        <>
-          <button
-            type="button"
-            disabled={disabled}
-            aria-disabled={busy || undefined}
-            aria-describedby={`${id}-note`}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={release}
-            onPointerCancel={release}
-            onLostPointerCapture={release}
-            onKeyDown={onKeyDown}
-            onKeyUp={onKeyUp}
-            onBlur={release}
-            onContextMenu={(e) => e.preventDefault()}
-            className={cn(
-              "relative flex h-11 w-full touch-none items-center justify-between gap-3 overflow-hidden rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground select-none [-webkit-touch-callout:none]",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
-              "disabled:cursor-not-allowed disabled:opacity-45 aria-disabled:cursor-progress",
-            )}
-          >
-            {/* 按住時由左往右填滿的墨色 */}
-            <motion.span
-              aria-hidden="true"
-              className="absolute inset-0 origin-left bg-primary-foreground/20"
-              style={{ scaleX: progress }}
+            !
+          </span>
+        )}
+        <motion.button
+          type="button"
+          className="hr-ring absolute inset-0 touch-none rounded-full outline-none [-webkit-touch-callout:none] disabled:cursor-not-allowed aria-disabled:cursor-progress"
+          style={{ scale, cursor: done ? "default" : undefined }}
+          disabled={disabled}
+          aria-disabled={busy || done || undefined}
+          aria-labelledby={`${id}-label`}
+          aria-describedby={`${id}-hint`}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={release}
+          onPointerCancel={release}
+          onLostPointerCapture={release}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
+          onBlur={release}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} className="block -rotate-90" aria-hidden="true">
+            <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="rgba(10,14,22,0.55)" stroke="rgba(255,255,255,0.22)" strokeWidth={STROKE} />
+            <motion.circle
+              cx={SIZE / 2}
+              cy={SIZE / 2}
+              r={R}
+              fill="none"
+              stroke={ringColor}
+              strokeWidth={STROKE}
+              strokeLinecap="round"
+              className="hr-tell"
+              style={{ strokeDasharray: dash, opacity: arcOpacity, ...(tell as CSSProperties | undefined) }}
             />
-            <span className="relative truncate">{busy ? t.confirming : phase === "error" ? t.retry : label}</span>
-            {cost && <span className="relative shrink-0 tabular-nums opacity-80">{cost}</span>}
-          </button>
-          <p
-            id={`${id}-note`}
-            className={cn("mt-1.5 min-h-4 text-xs", phase === "error" ? "text-destructive" : inkMuted)}
+          </svg>
+          <span
+            className={cn("hr-keycap absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap", disabled && "dim")}
+            aria-hidden="true"
           >
-            {note}
-          </p>
-        </>
+            {done ? <CheckIcon /> : keyLabel}
+          </span>
+        </motion.button>
+      </div>
+
+      <p
+        id={`${id}-hint`}
+        className="mt-1.5 min-h-5 text-center text-sm leading-5 font-extrabold [overflow-wrap:anywhere]"
+        style={{ color: hintColor, textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}
+      >
+        {hint}
+      </p>
+      {done && result && (
+        <p className="mt-1 text-center font-mono text-sm font-black tracking-[0.12em] text-[#ffe08a] select-all [text-shadow:2px_2px_0_#000]">
+          {result}
+        </p>
       )}
 
       <span className="sr-only" role="status" aria-live="polite">
         {announcement}
       </span>
     </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" shapeRendering="crispEdges">
+      <path d="M1 6h2v2H1zM3 8h2v2H3zM5 6h2v2H5zM7 4h2v2H7zM9 2h2v2H9z" fill="currentColor" />
+    </svg>
   );
 }
