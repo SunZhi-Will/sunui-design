@@ -13,7 +13,7 @@ export function GET() {
 
   const body = `# SunUI
 
-> Animated React + Tailwind blocks for commerce and campaign pages (countdowns, coupons, carts, checkout, pricing, loyalty). Distributed as a shadcn registry: blocks are copied into the project with the shadcn CLI. Every block respects prefers-reduced-motion and supports keyboard and screen readers. Only dependency: framer-motion.
+> Paper-feel React + Tailwind blocks for commerce and campaign pages (coupons, receipts, loyalty stamps, countdowns, carts, checkout, pricing). Design language: paper surfaces, ink text, one vermilion accent, stamps for results, motion only on user action. Distributed as a shadcn registry: blocks are copied into the project with the shadcn CLI. Every block respects prefers-reduced-motion and supports keyboard and screen readers. Only dependency: framer-motion.
 
 ## Docs
 

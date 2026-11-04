@@ -2,32 +2,52 @@
 
 import { useState } from "react";
 
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
+
 import { FavoriteButton } from "./favorite-button";
 
+const products: { kind: ProductKind; price: string; saved?: boolean }[] = [
+  { kind: "jacket", price: "$128", saved: true },
+  { kind: "mug", price: "$22" },
+  { kind: "lamp", price: "$86" },
+  { kind: "watch", price: "$165" },
+];
+
 export default function FavoriteButtonDemo() {
-  const [liked, setLiked] = useState(false);
-  const base = 1284;
+  return (
+    <section aria-labelledby="also-like" className="w-full max-w-3xl space-y-4">
+      <h2 id="also-like" className="text-lg font-semibold tracking-tight">
+        You may also like
+      </h2>
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+        {products.map((p) => (
+          <ProductCard key={p.kind} {...p} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ProductCard({ kind, price, saved = false }: (typeof products)[number]) {
+  const [pressed, setPressed] = useState(saved);
+  const name = productNames[kind];
 
   return (
-    <div className="flex w-full max-w-xl flex-wrap items-center justify-center gap-8">
-      <div className="w-64 overflow-hidden rounded-2xl border border-border bg-card text-card-foreground">
-        <div className="relative aspect-square bg-gradient-to-br from-rose-200 via-orange-100 to-amber-200 dark:from-rose-900/60 dark:via-orange-900/40 dark:to-amber-900/50">
-          <FavoriteButton className="absolute top-3 right-3" pressed={liked} onPressedChange={setLiked} />
-        </div>
-        <div className="flex items-center justify-between p-4">
-          <div>
-            <p className="text-sm font-medium">Ceramic Pour-over</p>
-            <p className="text-sm text-muted-foreground">$42</p>
-          </div>
-          <FavoriteButton size="sm" pressed={liked} onPressedChange={setLiked} count={base + (liked ? 1 : 0)} />
-        </div>
+    <li className="min-w-0">
+      <div className="relative">
+        <ProductArt kind={kind} className="rounded-md" />
+        <FavoriteButton
+          size="sm"
+          pressed={pressed}
+          onPressedChange={setPressed}
+          labels={{ add: `Save ${name}`, remove: `Remove ${name} from saved` }}
+          className="absolute top-2 right-2"
+        />
       </div>
-
-      <div className="flex flex-col items-center gap-4">
-        <FavoriteButton size="lg" color="amber" defaultPressed />
-        <FavoriteButton size="lg" color="violet" />
-        <p className="text-xs text-muted-foreground">Sizes and colors</p>
+      <div className="mt-2.5 flex items-baseline justify-between gap-2">
+        <p className="truncate text-sm font-medium">{name}</p>
+        <p className="shrink-0 text-sm text-muted-foreground tabular-nums">{price}</p>
       </div>
-    </div>
+    </li>
   );
 }

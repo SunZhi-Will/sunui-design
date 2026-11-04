@@ -1,0 +1,618 @@
+[
+  {
+    "name": "floating-action-menu",
+    "type": "registry:block",
+    "title": "Floating Action Menu",
+    "description": "A floating action button that springs open into a radial fan or vertical stack of quick actions, pinned to any corner of the viewport or a container. Implements the menu button pattern with arrow key navigation, Escape to close and focus return; items appear instantly when reduced motion is preferred.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "navigation",
+      "button"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "press",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Mobile screens with two to five primary actions",
+          "Editors and tools that need quick create actions"
+        ],
+        "watchOut": [
+          "Keep the button clear of bottom navigation and cookie bars",
+          "More than five actions belongs in a real menu"
+        ],
+        "aliases": [
+          "fab",
+          "speed dial",
+          "radial menu",
+          "quick actions"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/floating-action-menu/floating-action-menu.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "gradient-background",
+    "type": "registry:block",
+    "title": "Gradient Background",
+    "description": "An ambient backdrop of slowly drifting, blurred color fields with an optional grid or dot texture, wrapping any content as a children slot. Ideal for heroes, empty states and auth screens; decorative layers are aria-hidden and the drift stops when reduced motion is preferred or paused.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "background",
+      "section"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "loading",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Hero sections and empty states that need atmosphere",
+          "Behind glass cards and pricing tables"
+        ],
+        "watchOut": [
+          "Keep text contrast high on top of moving color",
+          "Large blurred layers cost GPU on low end phones"
+        ],
+        "aliases": [
+          "mesh gradient",
+          "aurora background",
+          "animated background",
+          "blur blobs"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/gradient-background/gradient-background.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "logo-marquee",
+    "type": "registry:block",
+    "title": "Logo Marquee",
+    "description": "An infinite, seamless logo or text marquee with direction and speed props, edge fade masks, pause on hover or focus and an optional pause button. Duplicate copies are hidden from assistive tech; with reduced motion it renders a static wrapped list.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "section",
+      "marquee",
+      "logos"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "scroll",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Customer and partner logo rows",
+          "Ticker style news or feature lists"
+        ],
+        "watchOut": [
+          "Duplicate content is hidden from screen readers, so keep one readable copy",
+          "Pause on hover so people can read it"
+        ],
+        "aliases": [
+          "logo cloud",
+          "infinite scroll",
+          "ticker",
+          "carousel loop"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/logo-marquee/logo-marquee.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "magnetic-button",
+    "type": "registry:block",
+    "title": "Magnetic Button",
+    "description": "A call-to-action button that is pulled toward the pointer within a radius, with label parallax and a spring back on exit. The effect only runs for fine hover pointers and is disabled on touch devices and under reduced motion; the button stays a native, keyboard-accessible element.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "button",
+      "cta",
+      "hover"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "hover",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "One primary call to action on a hero",
+          "Playful portfolio or agency sites"
+        ],
+        "watchOut": [
+          "Use it once per page or it stops feeling special",
+          "Pointer only effect, touch users see a normal button"
+        ],
+        "aliases": [
+          "magnet button",
+          "hover attraction",
+          "cursor follow button"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/magnetic-button/magnetic-button.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "social-link-button",
+    "type": "registry:block",
+    "title": "Social Link Button",
+    "description": "A social profile link with built-in GitHub, X, LinkedIn, Instagram, Facebook, YouTube and email glyphs, where the brand color floods in on hover or focus. Comes as icon, pill or expanding variants with an accessible name and new-tab hint; the fill switches instantly under reduced motion.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "button",
+      "social"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "hover",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Footers, profile cards and contact sections",
+          "Author bios on blogs"
+        ],
+        "watchOut": [
+          "Brand colors change, check each platform guide",
+          "Label icon only links with the platform name"
+        ],
+        "aliases": [
+          "social icons",
+          "share button",
+          "profile link"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/social-link-button/social-link-button.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "spotlight-card",
+    "type": "registry:block",
+    "title": "Spotlight Card",
+    "description": "A card whose surface and border light up with a soft glow that follows the pointer, in solid, glass or outline variants with an optional subtle tilt. Keyboard focus inside the card centers the glow; tilt is disabled and fades are instant under reduced motion.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "card"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "hover",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Feature grids and pricing tiers",
+          "Dark landing pages that need depth"
+        ],
+        "watchOut": [
+          "Glow is pointer driven, so keep the card useful without it",
+          "Too many glowing cards side by side compete for attention"
+        ],
+        "aliases": [
+          "glow card",
+          "hover glow",
+          "mouse follow card",
+          "glassmorphism card"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/spotlight-card/spotlight-card.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "tilt-card",
+    "type": "registry:block",
+    "title": "Tilt Card",
+    "description": "A 3D product card that tilts toward the pointer with a following glare and depth layers for image, title and price. Supports a link or action button; keyboard focus shows a ring and a subtle lift, and reduced motion keeps it flat.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "commerce",
+      "card",
+      "product"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "hover",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Hero product shots and collectible style cards",
+          "Small grids of featured items"
+        ],
+        "watchOut": [
+          "Keep tilt subtle on cards with text",
+          "Disable on touch where it can feel jittery"
+        ],
+        "aliases": [
+          "3d tilt card",
+          "parallax card",
+          "holographic card",
+          "hover tilt"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/tilt-card/tilt-card.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "animated-tabs",
+    "type": "registry:block",
+    "title": "Animated Tabs",
+    "description": "Tabs with a sliding indicator in underline, pill or browser-style folder variants, optional count badges for filter tabs, and panels that cross-fade on change. Follows the WAI-ARIA tabs pattern with automatic activation, arrow, Home and End keys; reduced motion swaps the indicator and panels instantly.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "navigation",
+      "tabs",
+      "filter"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "press",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Splitting related content into peer sections on one page",
+          "Filter tabs that show result counts, like All, Open, Closed"
+        ],
+        "watchOut": [
+          "Only the active panel is mounted, so panel state resets when switching tabs",
+          "Automatic activation switches on focus; avoid it for panels that load slowly"
+        ],
+        "aliases": [
+          "tab bar",
+          "filter tabs",
+          "folder tabs",
+          "browser tabs",
+          "tabs with badges"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/animated-tabs/animated-tabs.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "border-beam",
+    "type": "registry:block",
+    "title": "Border Beam",
+    "description": "A wrapper that draws an animated border around any content in four styles: a travelling light beam, a rotating conic gradient, marching ants and a flickering neon glow, with configurable colors, duration, width and radius. The border is decorative and hidden from assistive tech; with reduced motion it renders as a static border.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "feedback",
+      "border",
+      "effect"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "section",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Highlighting a featured pricing tier or call to action",
+          "Signalling that an AI input or job is actively working"
+        ],
+        "watchOut": [
+          "Beam and rotating rely on CSS @property, so very old browsers show a static gradient",
+          "Use on one element per view; several moving borders compete for attention"
+        ],
+        "aliases": [
+          "animated border",
+          "glowing border",
+          "shine border",
+          "gradient border",
+          "neon border"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/border-beam/border-beam.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "command-palette",
+    "type": "registry:block",
+    "title": "Command Palette",
+    "description": "A \u2318K / Ctrl+K command dialog with fuzzy search that highlights matched characters, grouped results, recent items, per-item shortcut hints, an empty state and a footer legend. Built as an ARIA combobox and listbox with arrow, Home/End, Enter and Escape keys, a focus trap, focus restore and body scroll lock; the opt-in global hotkey ignores typing in other fields, and reduced motion removes the scale and highlight animations.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "navigation",
+      "search",
+      "dialog"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "type",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Apps with many pages or actions that power users jump between",
+          "A single keyboard entry point for navigation, actions and settings"
+        ],
+        "watchOut": [
+          "The hotkey is global; disable it when another component already owns \u2318K",
+          "Fuzzy matching runs on the client, so very large lists should be pre-filtered or virtualised"
+        ],
+        "aliases": [
+          "cmdk",
+          "spotlight search",
+          "command menu",
+          "quick switcher",
+          "omnibar"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/command-palette/command-palette.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "loader-set",
+    "type": "registry:block",
+    "title": "Loader Set",
+    "description": "A family of seven loaders (orbit, bouncing dots, equalizer bars, ring spinner, pulse rings, infinity and a spinner that morphs into a drawn checkmark) sharing one size, speed and label API and inheriting color from currentColor. Each renders role=\"status\" with sr-only text; with reduced motion they hold a static frame with a slow opacity pulse.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "feedback",
+      "loader",
+      "spinner"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "loading",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Indeterminate waits inside buttons, cards or full pages",
+          "Confirming a save with SpinnerToCheck once the request resolves"
+        ],
+        "watchOut": [
+          "Prefer a skeleton for waits longer than a couple of seconds",
+          "Set color with a text-* class on a parent since loaders use currentColor"
+        ],
+        "aliases": [
+          "spinner",
+          "activity indicator",
+          "progress indicator",
+          "loading animation",
+          "throbber"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/loader-set/loader-set.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "notification-bell",
+    "type": "registry:block",
+    "title": "Notification Bell",
+    "description": "A bell button with a capped unread badge that pops on change and a shake when new items arrive, opening a popover with avatars, relative times, unread dots, mark all as read and an empty state. The panel is a labelled dialog with aria-expanded, Escape and outside click to close and focus return, and new arrivals are announced politely; reduced motion removes the shake and pop.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "feedback",
+      "notification",
+      "popover"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "press",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "App headers that surface mentions, assignments and system alerts",
+          "Inbox style feeds where users clear unread items in bulk"
+        ],
+        "watchOut": [
+          "The component is controlled, so persist read state yourself in onItemClick and onMarkAllRead",
+          "Relative times use Intl.RelativeTimeFormat; pass locale to match your UI language"
+        ],
+        "aliases": [
+          "notification center",
+          "inbox",
+          "alerts dropdown",
+          "activity feed",
+          "unread badge"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/notification-bell/notification-bell.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "password-strength-input",
+    "type": "registry:block",
+    "title": "Password Strength Input",
+    "description": "A password field with a show and hide toggle, a four-segment strength meter whose fill and color track the level, and a live checklist of configurable rules that tick with a drawn check. Strength is announced through aria-live only when the level changes and the meter and rules are linked via aria-describedby; reduced motion fills and ticks instantly.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "forms",
+      "input",
+      "auth"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "type",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Sign-up and change password forms",
+          "Showing users exactly which password rules are still missing"
+        ],
+        "watchOut": [
+          "Rule-based strength is a hint, not real entropy; always validate on the server",
+          "Pass a stable rules array (module level or useMemo) to avoid needless recomputation"
+        ],
+        "aliases": [
+          "password meter",
+          "password validator",
+          "strength meter",
+          "new password field",
+          "password checklist"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/password-strength-input/password-strength-input.tsx",
+        "type": "registry:component"
+      }
+    ]
+  },
+  {
+    "name": "toggle-switch",
+    "type": "registry:block",
+    "title": "Toggle Switch",
+    "description": "An accessible role=\"switch\" button with a spring knob that squashes and stretches while pressed, in default, day-night (sun to moon with sky gradient and stars) and icon (cross to check) variants, plus sizes, label, description and disabled state. Labels and descriptions are wired via aria-labelledby and aria-describedby; reduced motion removes the squash and springs.",
+    "dependencies": [
+      "framer-motion"
+    ],
+    "registryDependencies": [
+      "utils"
+    ],
+    "categories": [
+      "forms",
+      "switch",
+      "settings"
+    ],
+    "meta": {
+      "tier": "free",
+      "interaction": "press",
+      "addedAt": "2026-11-05",
+      "usage": {
+        "whenToUse": [
+          "Settings that take effect immediately, like Wi-Fi or notifications",
+          "A playful dark mode toggle with the day-night variant"
+        ],
+        "watchOut": [
+          "Use a checkbox instead when the change only applies after a form submit",
+          "Without a visible label, pass aria-label so the switch has a name"
+        ],
+        "aliases": [
+          "switch",
+          "toggle",
+          "dark mode toggle",
+          "on off switch",
+          "settings toggle"
+        ]
+      }
+    },
+    "files": [
+      {
+        "path": "registry/lab/toggle-switch/toggle-switch.tsx",
+        "type": "registry:component"
+      }
+    ]
+  }
+]

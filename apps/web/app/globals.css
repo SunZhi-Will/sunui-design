@@ -10,8 +10,9 @@
   --line: #e7e5e4;
   --card: #ffffff;
   --stage: #f5f5f4;
-  --accent: #ea580c;
-  --accent-soft: #ffedd5;
+  /* 招牌朱紅（DESIGN.md） */
+  --accent: #c8361d;
+  --accent-soft: #f6e4dc;
   --accent-fg: #ffffff;
   color-scheme: light;
 
@@ -35,8 +36,8 @@
     --line: #292524;
     --card: #151311;
     --stage: #1c1917;
-    --accent: #fb923c;
-    --accent-soft: #431407;
+    --accent: #ec6a4f;
+    --accent-soft: #3a1d16;
     --accent-fg: #1c1917;
     color-scheme: dark;
     --muted: #292524;

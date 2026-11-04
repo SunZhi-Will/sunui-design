@@ -1,14 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type MouseEvent,
-  type PointerEvent,
-} from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -47,18 +40,26 @@ const defaultLabels = {
   remove: "Remove item",
 };
 
+// 設計語言（DESIGN.md）：收據紙、紙邊虛線、墨色數字
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
+
 const sizeClass: Record<QuantityStepperSize, { root: string; button: string; field: string }> = {
-  sm: { root: "h-8 rounded-lg", button: "w-8 [&_svg]:size-3.5", field: "w-9 text-sm" },
-  md: { root: "h-10 rounded-xl", button: "w-10 [&_svg]:size-4", field: "w-11 text-base" },
+  sm: { root: "h-8", button: "w-8 [&_svg]:size-3.5", field: "w-9 text-sm" },
+  md: { root: "h-10", button: "w-10 [&_svg]:size-4", field: "w-12 text-base" },
 };
 
 function clampSnap(n: number, min: number, max: number, step: number) {
   if (!Number.isFinite(n)) return min;
-  const snapped = Math.round((n - min) / step) * step + min;
-  // 修正浮點誤差
-  const fixed = Number(snapped.toFixed(6));
-  return Math.min(max, Math.max(min, fixed));
+  // toFixed 修正浮點誤差
+  const snapped = Number((Math.round((n - min) / step) * step + min).toFixed(6));
+  return Math.min(max, Math.max(min, snapped));
 }
+
+const keyDelta = (key: string, step: number) =>
+  ({ ArrowUp: step, ArrowDown: -step, PageUp: step * 10, PageDown: -step * 10 })[key];
 
 export function QuantityStepper({
   value: valueProp,
@@ -77,7 +78,7 @@ export function QuantityStepper({
   className,
 }: QuantityStepperProps) {
   const reduce = useReducedMotion() ?? false;
-  const text = { ...defaultLabels, ...labels };
+  const t = { ...defaultLabels, ...labels };
   const [inner, setInner] = useState(() => clampSnap(defaultValue ?? min, min, max, step));
   const value = valueProp ?? inner;
   const [draft, setDraft] = useState<string | null>(null);
@@ -87,10 +88,7 @@ export function QuantityStepper({
   valueRef.current = value;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const s = sizeClass[size];
-
-  const atMin = value <= min;
-  const atMax = value >= max;
-  const showRemove = removable && atMin;
+  const showRemove = removable && value <= min;
 
   const set = (next: number) => {
     const v = clampSnap(next, min, max, step);
@@ -99,7 +97,7 @@ export function QuantityStepper({
     valueRef.current = v;
     if (valueProp === undefined) setInner(v);
     onValueChange?.(v);
-    setAnnounce(`${text.quantity} ${v}`);
+    setAnnounce(`${t.quantity} ${v}`);
     return true;
   };
 
@@ -107,7 +105,6 @@ export function QuantityStepper({
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
   };
-
   useEffect(() => stop, []);
 
   // 長按：先跳一次，延遲後持續增減並逐步加速，到邊界自動停止
@@ -143,43 +140,15 @@ export function QuantityStepper({
     if (draft === null) return;
     const parsed = parseFloat(draft);
     setDraft(null);
-    if (Number.isNaN(parsed)) return;
-    set(parsed);
+    if (!Number.isNaN(parsed)) set(parsed);
   };
 
   const onFieldKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     const base = draft !== null && !Number.isNaN(parseFloat(draft)) ? parseFloat(draft) : value;
-    let next: number | null = null;
-    switch (e.key) {
-      case "ArrowUp":
-        next = base + step;
-        break;
-      case "ArrowDown":
-        next = base - step;
-        break;
-      case "PageUp":
-        next = base + step * 10;
-        break;
-      case "PageDown":
-        next = base - step * 10;
-        break;
-      case "Home":
-        next = min;
-        break;
-      case "End":
-        next = max;
-        break;
-      case "Enter":
-        e.preventDefault();
-        commitDraft();
-        return;
-      case "Escape":
-        if (draft !== null) {
-          e.preventDefault();
-          setDraft(null);
-        }
-        return;
-    }
+    if (e.key === "Enter") return (e.preventDefault(), commitDraft());
+    if (e.key === "Escape" && draft !== null) return (e.preventDefault(), setDraft(null));
+    const delta = keyDelta(e.key, step);
+    const next = e.key === "Home" ? min : e.key === "End" ? max : delta !== undefined ? base + delta : null;
     if (next === null) return;
     e.preventDefault();
     setDraft(null);
@@ -188,16 +157,19 @@ export function QuantityStepper({
 
   const editing = draft !== null;
   const buttonClass = cn(
-    "flex h-full shrink-0 items-center justify-center text-foreground transition-colors outline-none select-none touch-manipulation",
-    "hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-    "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent",
+    "flex h-full shrink-0 items-center justify-center text-current/60 transition-colors outline-none select-none touch-manipulation",
+    "hover:text-current focus-visible:text-current focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+    "disabled:cursor-not-allowed disabled:text-current/25",
     s.button,
   );
 
   return (
     <div
       className={cn(
-        "inline-flex items-stretch overflow-hidden border border-border bg-card text-card-foreground",
+        "inline-flex items-stretch overflow-hidden rounded-md border",
+        paper,
+        edge,
+        ink,
         disabled && "opacity-60",
         s.root,
         className,
@@ -206,48 +178,30 @@ export function QuantityStepper({
       {showRemove ? (
         <button
           type="button"
-          aria-label={text.remove}
+          aria-label={t.remove}
           disabled={disabled}
           onClick={() => onRemove?.()}
-          className={cn(buttonClass, "text-rose-600 hover:bg-rose-500/10 focus-visible:bg-rose-500/10 dark:text-rose-400")}
+          className={cn(buttonClass, "hover:text-[#c8361d] focus-visible:text-[#c8361d] dark:hover:text-[#ec6a4f] dark:focus-visible:text-[#ec6a4f]")}
         >
-          <motion.svg
-            key="trash"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            initial={reduce ? false : { scale: 0.5, rotate: -20, opacity: 0 }}
-            animate={{ scale: 1, rotate: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 20 }}
-          >
-            <path d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
-          </motion.svg>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M2.5 4.5h11M6.5 7v4.5M9.5 7v4.5M3.5 4.5l.7 8.6a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9l.7-8.6M6 4.5V2.5h4v2" />
+          </svg>
         </button>
       ) : (
-        <button
-          type="button"
-          aria-label={text.decrement}
-          tabIndex={-1}
-          disabled={disabled || atMin}
-          {...pressHandlers(-step)}
-          className={buttonClass}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <path d="M5 12h14" />
+        <button type="button" aria-label={t.decrement} tabIndex={-1} disabled={disabled || value <= min} {...pressHandlers(-step)} className={buttonClass}>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <path d="M3 8h10" />
           </svg>
         </button>
       )}
 
-      <div className={cn("relative border-x border-border", s.field)}>
+      {/* 數字欄：左右虛線，像收據上的數量格 */}
+      <div className={cn("relative border-x border-dashed", edge, s.field)}>
         <input
           type="text"
           inputMode="decimal"
           role="spinbutton"
-          aria-label={text.quantity}
+          aria-label={t.quantity}
           aria-valuenow={value}
           aria-valuemin={min}
           aria-valuemax={max}
@@ -260,24 +214,20 @@ export function QuantityStepper({
           onBlur={commitDraft}
           onKeyDown={onFieldKeyDown}
           className={cn(
-            "size-full bg-transparent text-center font-medium tabular-nums outline-none focus-visible:bg-muted/60",
+            "size-full bg-transparent text-center font-mono font-medium tabular-nums outline-none focus-visible:bg-current/[0.04]",
             // 非編輯狀態時文字透明，由下方滾動數字顯示
-            editing ? "text-foreground" : "text-transparent caret-foreground selection:bg-primary/20 selection:text-foreground",
+            editing ? "text-current" : "text-transparent caret-current selection:bg-current/15",
           )}
         />
         {!editing && (
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden font-medium tabular-nums"
-          >
-            <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden font-mono font-medium tabular-nums">
+            <AnimatePresence initial={false} mode="popLayout">
               <motion.span
                 key={value}
-                custom={direction}
                 initial={reduce ? false : { y: `${direction * 100}%`, opacity: 0 }}
                 animate={{ y: "0%", opacity: 1 }}
                 exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: `${direction * -100}%`, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 34 }}
+                transition={reduce ? { duration: 0 } : snappy}
                 className="block"
               >
                 {value}
@@ -287,16 +237,9 @@ export function QuantityStepper({
         )}
       </div>
 
-      <button
-        type="button"
-        aria-label={text.increment}
-        tabIndex={-1}
-        disabled={disabled || atMax}
-        {...pressHandlers(step)}
-        className={buttonClass}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" />
+      <button type="button" aria-label={t.increment} tabIndex={-1} disabled={disabled || value >= max} {...pressHandlers(step)} className={buttonClass}>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+          <path d="M8 3v10M3 8h10" />
         </svg>
       </button>
 

@@ -3,110 +3,77 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 
-import { QuantityStepper, type QuantityStepperSize } from "./quantity-stepper";
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
 
-type Line = { id: string; name: string; variant: string; price: number; qty: number; from: string; to: string };
+import { QuantityStepper } from "./quantity-stepper";
+
+type Line = { kind: ProductKind; variant: string; price: number; qty: number; max: number };
 
 const initial: Line[] = [
-  { id: "mug", name: "Stoneware Mug", variant: "Sand, 350 ml", price: 18, qty: 2, from: "#f59e0b", to: "#ef4444" },
-  { id: "tote", name: "Canvas Tote", variant: "Natural", price: 24, qty: 1, from: "#10b981", to: "#0ea5e9" },
+  { kind: "mug", variant: "Sand, 350 ml", price: 22, qty: 2, max: 10 },
+  { kind: "tote", variant: "Natural", price: 48, qty: 1, max: 10 },
+  { kind: "bottle", variant: "Brushed steel", price: 34, qty: 3, max: 3 },
 ];
 
-const money = (n: number) => `$${n.toFixed(2)}`;
+const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
 export default function QuantityStepperDemo() {
   const reduce = useReducedMotion() ?? false;
   const [lines, setLines] = useState(initial);
-  const [size, setSize] = useState<QuantityStepperSize>("md");
-  const [removable, setRemovable] = useState(true);
-  const [standalone, setStandalone] = useState(25);
-
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
+  const count = lines.reduce((sum, l) => sum + l.qty, 0);
 
   return (
-    <div className="w-full max-w-xl space-y-4">
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <div role="group" aria-label="Size" className="flex gap-1">
-          {(["sm", "md"] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              aria-pressed={size === s}
-              onClick={() => setSize(s)}
-              className="rounded-full border border-border px-3 py-1.5 uppercase text-foreground transition-colors hover:bg-muted aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-        <label className="ml-2 flex items-center gap-2 text-muted-foreground">
-          <input type="checkbox" checked={removable} onChange={(e) => setRemovable(e.target.checked)} className="size-4 accent-current" />
-          Removable
-        </label>
-        <button
-          type="button"
-          onClick={() => setLines(initial)}
-          className="ml-auto rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          Reset cart
-        </button>
-      </div>
+    <section aria-labelledby="bag-heading" className="w-full max-w-xl rounded-md border border-border bg-card text-card-foreground">
+      <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
+        <h2 id="bag-heading" className="font-semibold tracking-tight">
+          Your bag
+        </h2>
+        <span className="text-sm text-muted-foreground tabular-nums">{count} items</span>
+      </header>
 
-      <div className="rounded-2xl border border-border bg-card text-card-foreground">
-        <ul className="divide-y divide-border">
-          <AnimatePresence initial={false}>
-            {lines.map((l) => (
+      <ul>
+        <AnimatePresence initial={false}>
+          {lines.map((l) => {
+            const name = productNames[l.kind];
+            return (
               <motion.li
-                key={l.id}
-                initial={reduce ? false : { opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
+                key={l.kind}
                 exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, height: 0 }}
-                className="overflow-hidden"
+                transition={{ type: "spring", stiffness: 240, damping: 30 }}
+                className="overflow-hidden border-b border-border last:border-b-0"
               >
-                <div className="flex items-center gap-4 p-4">
-                  <span
-                    className="size-14 shrink-0 rounded-xl"
-                    style={{ background: `linear-gradient(135deg, ${l.from}, ${l.to})` }}
-                    aria-hidden="true"
-                  />
+                <div className="flex items-center gap-3 p-4 sm:gap-4">
+                  <ProductArt kind={l.kind} className="size-14 shrink-0 rounded-md" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{l.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {l.variant}, {money(l.price)} each
+                    <p className="truncate text-sm font-medium">{name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {l.variant}, {money(l.price)}
                     </p>
+                    {l.qty >= l.max && <p className="text-xs text-muted-foreground">Limit {l.max} per order</p>}
                   </div>
                   <QuantityStepper
-                    size={size}
+                    size="sm"
                     value={l.qty}
-                    min={1}
-                    max={10}
-                    removable={removable}
-                    onRemove={() => setLines((ls) => ls.filter((x) => x.id !== l.id))}
-                    onValueChange={(qty) => setLines((ls) => ls.map((x) => (x.id === l.id ? { ...x, qty } : x)))}
-                    labels={{ quantity: `${l.name} quantity`, remove: `Remove ${l.name}` }}
+                    max={l.max}
+                    removable
+                    onRemove={() => setLines((ls) => ls.filter((x) => x.kind !== l.kind))}
+                    onValueChange={(qty) => setLines((ls) => ls.map((x) => (x.kind === l.kind ? { ...x, qty } : x)))}
+                    labels={{ quantity: `${name} quantity`, remove: `Remove ${name}` }}
                   />
-                  <span className="w-16 text-right text-sm font-medium tabular-nums">{money(l.price * l.qty)}</span>
+                  <span className="hidden w-16 text-right text-sm font-medium tabular-nums sm:block">{money(l.price * l.qty)}</span>
                 </div>
               </motion.li>
-            ))}
-          </AnimatePresence>
-        </ul>
-        {!lines.length && <p className="p-6 text-center text-sm text-muted-foreground">Your cart is empty.</p>}
-        <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
-          <span className="text-muted-foreground">Subtotal</span>
-          <span className="font-semibold tabular-nums" aria-live="polite">
-            {money(subtotal)}
-          </span>
-        </div>
-      </div>
+            );
+          })}
+        </AnimatePresence>
+      </ul>
+      {!lines.length && <p className="p-6 text-center text-sm text-muted-foreground">Your bag is empty.</p>}
 
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 text-sm text-card-foreground">
-        <span>
-          <span className="font-medium">Bulk order</span>
-          <span className="block text-xs text-muted-foreground">Step 5, from 5 to 500. Hold + to repeat, PageUp jumps 50.</span>
-        </span>
-        <QuantityStepper size={size} value={standalone} min={5} max={500} step={5} onValueChange={setStandalone} />
-      </div>
-    </div>
+      <footer className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
+        <span className="text-muted-foreground">Subtotal</span>
+        <span className="font-semibold tracking-tight tabular-nums">{money(subtotal)}</span>
+      </footer>
+    </section>
   );
 }

@@ -1,15 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion, type PanInfo } from "framer-motion";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -20,6 +12,8 @@ export interface ToastInput {
   title: ReactNode;
   description?: ReactNode;
   tone?: ToastTone;
+  /** 左側小圖，例如加入購物車的商品縮圖 */
+  media?: ReactNode;
   /** 毫秒；Infinity 表示不自動關閉 */
   duration?: number;
   action?: { label: string; onClick: () => void };
@@ -62,23 +56,28 @@ export interface ToastStackProps {
   /** 收合狀態下每層露出的距離 */
   peek?: number;
   gap?: number;
-  labels?: {
-    region?: string;
-    dismiss?: string;
-  };
+  labels?: { region?: string; dismiss?: string };
   className?: string;
 }
 
-const defaultLabels = {
-  region: "Notifications",
-  dismiss: "Dismiss notification",
-};
+const defaultLabels = { region: "Notifications", dismiss: "Dismiss notification" };
 
-const toneStyles: Record<ToastTone, { dot: string; bar: string }> = {
-  default: { dot: "bg-foreground", bar: "bg-foreground/40" },
-  success: { dot: "bg-emerald-500", bar: "bg-emerald-500" },
-  error: { dot: "bg-red-500", bar: "bg-red-500" },
-  info: { dot: "bg-sky-500", bar: "bg-sky-500" },
+// 設計語言（DESIGN.md）：紙、紙邊、墨
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+
+const springs = {
+  gentle: { type: "spring", stiffness: 240, damping: 30 },
+} as const;
+
+/** 狀態只用小圖示表達，不鋪底色 */
+const toneIcons: Record<ToastTone, ReactNode> = {
+  default: null,
+  success: <path d="m3.5 8.5 3 3 6-7" className="text-emerald-700 dark:text-emerald-400" />,
+  error: <path d="M8 4.5v4.5M8 11.5v.01M8 1.75 14.5 13.5h-13Z" className="text-destructive" />,
+  info: <path d="M8 7v4.5M8 4.5v.01M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13Z" />,
 };
 
 export function ToastStack({
@@ -88,8 +87,8 @@ export function ToastStack({
   visibleCount = 3,
   placement = "bottom",
   fixed = true,
-  peek = 12,
-  gap = 10,
+  peek = 10,
+  gap = 8,
   labels,
   className,
 }: ToastStackProps) {
@@ -98,7 +97,6 @@ export function ToastStack({
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const expanded = hovered || focused;
-  const paused = expanded;
   const [heights, setHeights] = useState<Record<string, number>>({});
   const dir = placement === "bottom" ? -1 : 1;
 
@@ -107,12 +105,12 @@ export function ToastStack({
     dismissRef.current = onDismiss;
   });
 
-  // 自動關閉計時；暫停時記下剩餘時間
+  // 自動關閉計時；展開時暫停並記下剩餘時間
   const remaining = useRef(new Map<string, number>());
   useEffect(() => {
     const ids = new Set(toasts.map((t) => t.id));
     for (const id of remaining.current.keys()) if (!ids.has(id)) remaining.current.delete(id);
-    if (paused) return;
+    if (expanded) return;
     const start = Date.now();
     const timers: number[] = [];
     for (const t of toasts) {
@@ -130,7 +128,7 @@ export function ToastStack({
       }
       timers.forEach((id) => window.clearTimeout(id));
     };
-  }, [toasts, paused, duration]);
+  }, [toasts, expanded, duration]);
 
   const measure = useCallback((id: string, h: number) => {
     setHeights((prev) => (prev[id] === h ? prev : { ...prev, [id]: h }));
@@ -157,7 +155,7 @@ export function ToastStack({
     }
   };
 
-  const spring = reduceMotion ? { duration: 0 } : { type: "spring" as const, stiffness: 380, damping: 32 };
+  const transition = reduceMotion ? { duration: 0 } : springs.gentle;
 
   return (
     <section
@@ -185,26 +183,27 @@ export function ToastStack({
         <AnimatePresence initial={false}>
           {toasts.map((t, index) => {
             const hidden = !expanded && index >= visibleCount;
-            const tone = toneStyles[t.tone ?? "default"];
             const d = t.duration ?? duration;
             return (
               <motion.li
                 key={t.id}
-                layout={false}
                 className={cn(
-                  "absolute inset-x-0 overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-lg",
+                  "absolute inset-x-0 overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+                  paper,
+                  edge,
+                  ink,
                   placement === "bottom" ? "bottom-0 origin-bottom" : "top-0 origin-top",
                 )}
                 style={{ zIndex: toasts.length - index }}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 40 * -dir, scale: 0.96 }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 28 * -dir }}
                 animate={{
                   opacity: hidden ? 0 : 1,
                   y: offsetOf(index),
-                  scale: expanded ? 1 : 1 - index * 0.05,
+                  scale: expanded ? 1 : 1 - index * 0.04,
                   height: !expanded && index > 0 ? frontHeight : "auto",
                 }}
-                exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.94, transition: { duration: 0.18 } }}
-                transition={spring}
+                exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 12 * -dir, transition: { duration: 0.16 } }}
+                transition={transition}
                 drag={index === 0 || expanded ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.6}
@@ -213,24 +212,14 @@ export function ToastStack({
                 }}
                 aria-hidden={hidden || undefined}
               >
-                <ToastBody
-                  item={t}
-                  dotClass={tone.dot}
-                  dismissLabel={text.dismiss}
-                  onDismiss={() => onDismiss(t.id)}
-                  onMeasure={(h) => measure(t.id, h)}
-                  inert={hidden}
-                />
+                <ToastBody item={t} dismissLabel={text.dismiss} onDismiss={() => onDismiss(t.id)} onMeasure={(h) => measure(t.id, h)} inert={hidden} />
+                {/* 剩餘時間：底部一條墨線慢慢縮短 */}
                 {!reduceMotion && Number.isFinite(d) && d > 0 && (
-                  <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-0.5 bg-muted">
-                    <span
-                      className={cn("block h-full origin-left", tone.bar)}
-                      style={{
-                        animation: `sunui-toast-timer ${d}ms linear forwards`,
-                        animationPlayState: paused ? "paused" : "running",
-                      }}
-                    />
-                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 bottom-0 h-px origin-left bg-current opacity-25"
+                    style={{ animation: `sunui-toast-timer ${d}ms linear forwards`, animationPlayState: expanded ? "paused" : "running" }}
+                  />
                 )}
               </motion.li>
             );
@@ -244,14 +233,12 @@ export function ToastStack({
 
 function ToastBody({
   item,
-  dotClass,
   dismissLabel,
   onDismiss,
   onMeasure,
   inert,
 }: {
   item: ToastItem;
-  dotClass: string;
   dismissLabel: string;
   onDismiss: () => void;
   onMeasure: (h: number) => void;
@@ -272,33 +259,45 @@ function ToastBody({
     return () => ro.disconnect();
   }, []);
 
+  const icon = toneIcons[item.tone ?? "default"];
+
   return (
-    <div ref={ref} className="flex items-start gap-3 p-4 pr-3" {...(inert ? { inert: true } : {})}>
-      <span aria-hidden="true" className={cn("mt-1.5 size-2 shrink-0 rounded-full", dotClass)} />
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-foreground">{item.title}</p>
-        {item.description && <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>}
-        {item.action && (
-          <button
-            type="button"
-            onClick={() => {
-              item.action?.onClick();
-              onDismiss();
-            }}
-            className="mt-2 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {item.action.label}
-          </button>
-        )}
+    <div ref={ref} className="flex items-start gap-3 p-3 pr-2" {...(inert ? { inert: true } : {})}>
+      {item.media ? (
+        <span aria-hidden="true" className={cn("size-11 shrink-0 overflow-hidden rounded-[3px] border", edge)}>
+          {item.media}
+        </span>
+      ) : (
+        icon && (
+          <svg viewBox="0 0 16 16" className="mt-0.5 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {icon}
+          </svg>
+        )
+      )}
+      <div className="min-w-0 flex-1 py-0.5">
+        <p className="text-sm font-medium">{item.title}</p>
+        {item.description && <p className={cn("mt-0.5 text-[13px] leading-snug", inkMuted)}>{item.description}</p>}
       </div>
+      {item.action && (
+        <button
+          type="button"
+          onClick={() => {
+            item.action?.onClick();
+            onDismiss();
+          }}
+          className="mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {item.action.label}
+        </button>
+      )}
       <button
         type="button"
         onClick={onDismiss}
         aria-label={dismissLabel}
-        className="-mt-0.5 rounded-md p-1 text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-colors hover:text-[#1c1917] dark:hover:text-[#ece7dc] focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
       >
-        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18" />
+        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+          <path d="m4 4 8 8M12 4l-8 8" />
         </svg>
       </button>
     </div>

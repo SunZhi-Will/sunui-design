@@ -1,63 +1,75 @@
 "use client";
 
-import { useRef } from "react";
+import { useState } from "react";
 
-import { ToastStack, useToasts, type ToastInput } from "./toast-stack";
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
 
-const samples: ToastInput[] = [
-  { title: "Changes saved", description: "Your profile was updated.", tone: "success" },
-  { title: "Upload failed", description: "The file is larger than 10 MB.", tone: "error" },
-  { title: "New comment", description: "Mina replied to your design review.", tone: "info" },
-  { title: "Draft archived", tone: "default" },
+import { ToastStack, useToasts } from "./toast-stack";
+
+const products: { kind: ProductKind; variant: string; price: string; soldOut?: boolean }[] = [
+  { kind: "sneaker", variant: "Chalk, size 42", price: "$88" },
+  { kind: "mug", variant: "Oat glaze, 350 ml", price: "$24" },
+  { kind: "jacket", variant: "Navy canvas, M", price: "$148", soldOut: true },
+  { kind: "tote", variant: "Natural, one size", price: "$36" },
 ];
 
 export default function ToastStackDemo() {
-  const { toasts, push, dismiss, clear } = useToasts();
-  const n = useRef(0);
+  const { toasts, push, dismiss } = useToasts();
+  const [cart, setCart] = useState(2);
 
-  const fire = () => {
-    const sample = samples[n.current % samples.length];
-    n.current += 1;
-    push(sample);
+  const add = (kind: ProductKind, variant: string) => {
+    setCart((n) => n + 1);
+    push({
+      title: "Added to cart",
+      description: `${productNames[kind]}, ${variant}`,
+      media: <ProductArt kind={kind} />,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setCart((n) => Math.max(0, n - 1));
+          push({ title: "Removed from cart", description: productNames[kind], tone: "info" });
+        },
+      },
+    });
   };
 
   return (
-    <div className="relative h-[420px] w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-muted/30">
-      <div className="flex flex-col items-start gap-3 p-6">
-        <p className="max-w-xs text-sm text-muted-foreground">
-          Hover or tab into the stack to fan it out and pause timers. Swipe a toast sideways or press Escape to dismiss.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={fire}
-            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            Show toast
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              push({
-                title: "Message deleted",
-                description: "This stays until you act.",
-                duration: Infinity,
-                action: { label: "Undo", onClick: () => push({ title: "Message restored", tone: "success" }) },
-              })
-            }
-            className="rounded-full border border-border bg-card px-4 py-2 text-sm text-card-foreground hover:bg-muted"
-          >
-            With action
-          </button>
-          <button
-            type="button"
-            onClick={clear}
-            className="rounded-full px-4 py-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            Clear all
-          </button>
-        </div>
+    <div className="relative h-[460px] w-full max-w-2xl overflow-hidden rounded-md border border-border bg-background text-foreground">
+      <div className="flex items-baseline justify-between border-b border-border px-5 py-4">
+        <h2 className="text-base font-semibold tracking-tight">New this week</h2>
+        <span className="text-sm text-muted-foreground tabular-nums">Cart ({cart})</span>
       </div>
+      <ul className="divide-y divide-border">
+        {products.map((p) => (
+          <li key={p.kind} className="flex items-center gap-3 px-5 py-3">
+            <ProductArt kind={p.kind} className="size-12 shrink-0 rounded-[3px]" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{productNames[p.kind]}</p>
+              <p className="truncate text-xs text-muted-foreground">{p.variant}</p>
+            </div>
+            <span className="text-sm font-medium tracking-tight tabular-nums">{p.price}</span>
+            {p.soldOut ? (
+              <button
+                type="button"
+                onClick={() =>
+                  push({ title: "We'll email you", description: `When the ${productNames[p.kind]} is back in M.`, tone: "success" })
+                }
+                className="w-28 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                Notify me
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => add(p.kind, p.variant)}
+                className="w-28 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+              >
+                Add to cart
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
       <ToastStack toasts={toasts} onDismiss={dismiss} fixed={false} />
     </div>
   );

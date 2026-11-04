@@ -2,84 +2,82 @@
 
 import { useState } from "react";
 
+import { ProductArt, productNames } from "@/registry/_demo/product-art";
+
 import { AnimatedNumber } from "./animated-number";
 
-const currencies = [
-  { code: "USD", locale: "en-US" },
-  { code: "EUR", locale: "de-DE" },
-  { code: "JPY", locale: "ja-JP" },
+const finishes = [
+  { id: "black", label: "Matte black", extra: 0 },
+  { id: "walnut", label: "Walnut cups", extra: 40 },
 ];
 
 export default function AnimatedNumberDemo() {
+  const [finish, setFinish] = useState(finishes[0]);
   const [qty, setQty] = useState(1);
-  const [cur, setCur] = useState(0);
-  const unit = 49.9;
-  const subtotal = Math.round(unit * qty * 100) / 100;
-  const { code, locale } = currencies[cur];
+  const [withCase, setWithCase] = useState(false);
+  const total = (189 + finish.extra + (withCase ? 29 : 0)) * qty;
 
   return (
-    <div className="w-full max-w-md space-y-5 rounded-2xl border border-border bg-card p-6 text-card-foreground">
-      <div className="flex items-start justify-between gap-4">
+    <div className="grid w-full max-w-2xl gap-6 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[14rem_1fr] sm:p-5">
+      <ProductArt kind="headphones" className="rounded-md" />
+
+      <div className="flex min-w-0 flex-col gap-4">
         <div>
-          <p className="text-sm text-muted-foreground">Order total</p>
-          <AnimatedNumber
-            value={code === "JPY" ? Math.round(subtotal * 150) : subtotal}
-            currency={code}
-            locale={locale}
-            upIsGood={false}
-            announce
-            className="text-4xl font-semibold tracking-tight"
-          />
+          <h2 className="text-lg font-semibold tracking-tight">{productNames.headphones}</h2>
+          <p className="text-sm text-muted-foreground">Closed back, 40 h battery, folds flat.</p>
         </div>
-        <div className="flex rounded-full border border-border p-0.5 text-xs" role="group" aria-label="Currency">
-          {currencies.map((c, i) => (
-            <button
-              key={c.code}
-              type="button"
-              aria-pressed={i === cur}
-              onClick={() => setCur(i)}
-              className={
-                i === cur
-                  ? "rounded-full bg-primary px-2.5 py-1 text-primary-foreground"
-                  : "rounded-full px-2.5 py-1 text-muted-foreground hover:text-foreground"
-              }
-            >
-              {c.code}
-            </button>
+
+        <fieldset className="space-y-2">
+          <legend className="mb-2 text-sm font-medium">Finish</legend>
+          {finishes.map((f) => (
+            <label key={f.id} className="flex cursor-pointer items-center gap-2.5 text-sm">
+              <input
+                type="radio"
+                name="finish"
+                checked={finish.id === f.id}
+                onChange={() => setFinish(f)}
+                className="size-4 accent-foreground"
+              />
+              {f.label}
+              {f.extra > 0 && <span className="text-muted-foreground tabular-nums">+${f.extra}</span>}
+            </label>
           ))}
+          <label className="flex cursor-pointer items-center gap-2.5 pt-1 text-sm">
+            <input type="checkbox" checked={withCase} onChange={(e) => setWithCase(e.target.checked)} className="size-4 accent-foreground" />
+            Add travel case <span className="text-muted-foreground tabular-nums">+$29</span>
+          </label>
+        </fieldset>
+
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-border pt-4">
+          <div>
+            <p className="text-xs text-muted-foreground">Total</p>
+            <AnimatedNumber value={total} currency="USD" trendArrow announce className="text-3xl font-semibold tracking-tight" />
+          </div>
+          <div className="flex h-9 items-center rounded-md border border-border text-sm">
+            <button
+              type="button"
+              aria-label="Decrease quantity"
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
+              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+            >
+              <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="M3 8h10" strokeLinecap="round" />
+              </svg>
+            </button>
+            <AnimatedNumber value={qty} className="w-6 justify-center font-medium" />
+            <button
+              type="button"
+              aria-label="Increase quantity"
+              onClick={() => setQty((q) => Math.min(9, q + 1))}
+              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+            >
+              <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="M8 3v10M3 8h10" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
-
-      <div className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
-        <span className="text-sm">Trail Runner x {qty}</span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Decrease quantity"
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="grid size-8 place-items-center rounded-full border border-border bg-background text-foreground hover:bg-card"
-          >
-            -
-          </button>
-          <AnimatedNumber value={qty} className="w-6 justify-center text-sm font-medium" trendColors={false} />
-          <button
-            type="button"
-            aria-label="Increase quantity"
-            onClick={() => setQty((q) => Math.min(99, q + 1))}
-            className="grid size-8 place-items-center rounded-full border border-border bg-background text-foreground hover:bg-card"
-          >
-            +
-          </button>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setQty((q) => q + 7)}
-        className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-      >
-        Bulk add 7 (watch the odometer)
-      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useAnimationControls, useReducedMotion, type Variants } from "framer-motion";
-import { useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
+import { Fragment, useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,11 +16,11 @@ export interface OtpInputProps {
   onChange?: (value: string) => void;
   /** 填滿時觸發 */
   onComplete?: (value: string) => void;
-  /** success 會變綠，error 會搖晃並變紅 */
+  /** success 蓋上「已驗證」印章；error 輕搖一次並顯示錯誤文字 */
   status?: OtpStatus;
   /** numeric 只收數字；alphanumeric 收英數字 */
   mode?: "numeric" | "alphanumeric";
-  /** 在中間插入分隔線，例如 6 格時在第 3 格後 */
+  /** 每幾格插入一條分隔短線，例如 6 格時傳 3 */
   groupSize?: number;
   /** 以圓點遮蔽輸入內容 */
   mask?: boolean;
@@ -31,6 +31,7 @@ export interface OtpInputProps {
     digit?: (index: number, total: number) => string;
     success?: string;
     error?: string;
+    stamp?: string;
   };
   className?: string;
 }
@@ -39,8 +40,20 @@ const defaultLabels = {
   group: "One-time code",
   digit: (i: number, n: number) => `Digit ${i} of ${n}`,
   success: "Code verified",
-  error: "Code is incorrect, please try again",
+  error: "That code doesn't match. Check the email and try again.",
+  stamp: "Verified",
 };
+
+// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+
+const springs = {
+  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
+} as const;
 
 // 游標不在選取狀態時，新輸入會與舊字元並存，先去掉舊字元
 function stripExisting(next: string, prev: string) {
@@ -49,11 +62,6 @@ function stripExisting(next: string, prev: string) {
   if (next.endsWith(prev)) return next.slice(0, -prev.length);
   return next;
 }
-
-const cellVariants: Variants = {
-  empty: { scale: 1 },
-  filled: { scale: [1, 1.08, 1], transition: { duration: 0.18 } },
-};
 
 export function OtpInput({
   length = 6,
@@ -76,14 +84,15 @@ export function OtpInput({
   const controls = useAnimationControls();
   const refs = useRef<Array<HTMLInputElement | null>>([]);
   const [inner, setInner] = useState(defaultValue.slice(0, length));
+  const [focused, setFocused] = useState(-1);
   const code = (value ?? inner).slice(0, length);
   const chars = Array.from({ length }, (_, i) => code[i] ?? "");
   const pattern = mode === "numeric" ? /[0-9]/ : /[0-9a-zA-Z]/;
 
-  // error 時整排搖晃；減少動態時不搖
+  // 錯誤時整排輕搖一次，像紙被推回來；減少動態時不搖
   useEffect(() => {
     if (status === "error" && !reduceMotion) {
-      void controls.start({ x: [0, -8, 8, -6, 6, -3, 0], transition: { duration: 0.42 } });
+      void controls.start({ x: [0, -6, 5, -3, 2, 0], transition: { duration: 0.32, ease: "easeOut" } });
     }
   }, [status, reduceMotion, controls]);
 
@@ -104,59 +113,35 @@ export function OtpInput({
     el?.select();
   };
 
-  const setCharAt = (i: number, ch: string) => {
-    // 中間的空洞以空白保留位置，尾端空白去掉
+  // 中間的空洞以空白保留位置，尾端空白去掉
+  const write = (start: number, input: string[]) => {
     const arr = chars.map((c) => c || " ");
-    arr[i] = ch || " ";
+    input.slice(0, length - start).forEach((c, k) => (arr[start + k] = c || " "));
     commit(arr.join("").replace(/\s+$/, ""));
-  };
-
-  const handleInput = (i: number, raw: string) => {
-    const filtered = Array.from(raw).filter((c) => pattern.test(c));
-    if (filtered.length === 0) return;
-    if (filtered.length > 1) {
-      distribute(i, filtered.join(""));
-      return;
-    }
-    setCharAt(i, filtered[0]);
-    if (i < length - 1) focusAt(i + 1);
   };
 
   const distribute = (start: number, raw: string) => {
     const filtered = Array.from(raw).filter((c) => pattern.test(c));
     if (filtered.length === 0) return;
-    const arr = chars.map((c) => c || " ");
-    filtered.slice(0, length - start).forEach((c, k) => {
-      arr[start + k] = c;
-    });
-    commit(arr.join("").replace(/\s+$/, ""));
-    focusAt(Math.min(start + filtered.length, length - 1));
+    write(start, filtered);
+    focusAt(start + filtered.length);
   };
 
   const handleKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
+    const moves: Record<string, number> = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: length - 1 };
     if (e.key === "Backspace") {
       e.preventDefault();
-      if (chars[i] && chars[i] !== " ") {
-        setCharAt(i, "");
-      } else if (i > 0) {
-        setCharAt(i - 1, "");
+      if (chars[i] && chars[i] !== " ") write(i, [""]);
+      else if (i > 0) {
+        write(i - 1, [""]);
         focusAt(i - 1);
       }
     } else if (e.key === "Delete") {
       e.preventDefault();
-      setCharAt(i, "");
-    } else if (e.key === "ArrowLeft") {
+      write(i, [""]);
+    } else if (e.key in moves) {
       e.preventDefault();
-      focusAt(i - 1);
-    } else if (e.key === "ArrowRight") {
-      e.preventDefault();
-      focusAt(i + 1);
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      focusAt(0);
-    } else if (e.key === "End") {
-      e.preventDefault();
-      focusAt(length - 1);
+      focusAt(moves[e.key]);
     }
   };
 
@@ -165,66 +150,94 @@ export function OtpInput({
     distribute(i, e.clipboardData.getData("text"));
   };
 
-  const statusMessage = status === "success" ? text.success : status === "error" ? text.error : "";
-
   return (
-    <div className={cn("inline-flex flex-col items-center gap-3", className)}>
-      <motion.div
-        role="group"
-        aria-label={text.group}
-        aria-describedby={statusMessage ? `${groupId}-status` : undefined}
-        animate={controls}
-        className="flex items-center gap-2"
-      >
-        {chars.map((ch, i) => {
-          const filled = ch !== "" && ch !== " ";
-          return (
-            <span key={i} className="flex items-center gap-2">
-              {groupSize && i > 0 && i % groupSize === 0 && (
-                <span aria-hidden="true" className="h-0.5 w-3 rounded-full bg-border" />
-              )}
-              <motion.input
-                ref={(el) => {
-                  refs.current[i] = el;
-                }}
-                variants={cellVariants}
-                animate={filled && !reduceMotion ? "filled" : "empty"}
-                type={mask ? "password" : "text"}
-                inputMode={mode === "numeric" ? "numeric" : "text"}
-                autoComplete={i === 0 ? "one-time-code" : "off"}
-                pattern={mode === "numeric" ? "[0-9]*" : undefined}
-                maxLength={length}
-                disabled={disabled}
-                aria-label={text.digit(i + 1, length)}
-                aria-invalid={status === "error" || undefined}
-                value={filled ? ch : ""}
-                onChange={(e) => handleInput(i, stripExisting(e.target.value, filled ? ch : ""))}
-                onKeyDown={(e) => handleKeyDown(i, e)}
-                onPaste={(e) => handlePaste(i, e)}
-                onFocus={(e) => e.target.select()}
-                className={cn(
-                  "size-12 rounded-xl border bg-background text-center text-xl font-semibold tabular-nums text-foreground caret-primary shadow-sm outline-none transition-colors sm:size-14 sm:text-2xl",
-                  "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40",
-                  "disabled:cursor-not-allowed disabled:opacity-50",
-                  status === "idle" && (filled ? "border-foreground/30" : "border-border"),
-                  status === "success" && "border-emerald-500 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300",
-                  status === "error" && "border-red-500 bg-red-500/5 text-red-700 dark:text-red-300",
+    <div className={cn("inline-flex flex-col items-start gap-2.5", ink, className)}>
+      <div className="relative">
+        <motion.div
+          role="group"
+          aria-label={text.group}
+          aria-describedby={status !== "idle" ? `${groupId}-status` : undefined}
+          animate={controls}
+          className="flex items-center gap-1.5 sm:gap-2"
+        >
+          {chars.map((ch, i) => {
+            const filled = ch !== "" && ch !== " ";
+            return (
+              <Fragment key={i}>
+                {groupSize && i > 0 && i % groupSize === 0 && (
+                  <span aria-hidden="true" className={cn("mx-0.5 h-px w-2.5 bg-current", inkMuted)} />
                 )}
-              />
-            </span>
-          );
-        })}
-      </motion.div>
-      <p
-        id={`${groupId}-status`}
-        aria-live="polite"
-        className={cn(
-          "min-h-5 text-sm",
-          status === "success" && "text-emerald-600 dark:text-emerald-400",
-          status === "error" && "text-red-600 dark:text-red-400",
-        )}
-      >
-        {statusMessage}
+                <span className="relative">
+                  <input
+                    ref={(el) => {
+                      refs.current[i] = el;
+                    }}
+                    type={mask ? "password" : "text"}
+                    inputMode={mode === "numeric" ? "numeric" : "text"}
+                    autoComplete={i === 0 ? "one-time-code" : "off"}
+                    pattern={mode === "numeric" ? "[0-9]*" : undefined}
+                    maxLength={length}
+                    disabled={disabled}
+                    aria-label={text.digit(i + 1, length)}
+                    aria-invalid={status === "error" || undefined}
+                    value={filled ? ch : ""}
+                    onChange={(e) => {
+                      const next = Array.from(stripExisting(e.target.value, filled ? ch : "")).filter((c) => pattern.test(c));
+                      if (next.length > 1) distribute(i, next.join(""));
+                      else if (next.length === 1) {
+                        write(i, next);
+                        if (i < length - 1) focusAt(i + 1);
+                      }
+                    }}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    onPaste={(e) => handlePaste(i, e)}
+                    onFocus={(e) => {
+                      setFocused(i);
+                      e.target.select();
+                    }}
+                    onBlur={() => setFocused((f) => (f === i ? -1 : f))}
+                    className={cn(
+                      "block h-14 w-10 rounded-[3px] border text-center font-mono text-2xl font-medium tabular-nums caret-transparent outline-none transition-colors sm:w-12",
+                      paper,
+                      edge,
+                      "focus:border-[#1c1917]/45 dark:focus:border-[#ece7dc]/45 selection:bg-transparent",
+                      status === "error" && "border-[#c8361d]/50 dark:border-[#ec6a4f]/50",
+                      disabled && "cursor-not-allowed opacity-50",
+                    )}
+                  />
+                  {/* 墨線游標：印刷表格上的填寫位置 */}
+                  {focused === i && !disabled && (
+                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 bg-current sm:inset-x-3" />
+                  )}
+                </span>
+              </Fragment>
+            );
+          })}
+        </motion.div>
+
+        <AnimatePresence initial={false}>
+          {status === "success" && (
+            <motion.span
+              key="stamp"
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute -top-3 -right-2 rounded-[3px] border-2 border-current px-2 py-0.5 text-xs font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
+                vermilion,
+              )}
+              initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
+              animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
+              exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.15 } }}
+              transition={springs.stamp}
+            >
+              {text.stamp}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <p id={`${groupId}-status`} aria-live="polite" className={cn("min-h-5 text-sm", vermilion)}>
+        {status === "error" && text.error}
+        {status === "success" && <span className="sr-only">{text.success}</span>}
       </p>
     </div>
   );

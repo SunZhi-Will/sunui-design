@@ -17,13 +17,13 @@ export default function HomePage() {
   return (
     <>
       <section className="py-16 sm:py-24">
-        <p className="mb-4 text-sm font-medium text-accent">React · Tailwind · Motion · shadcn registry</p>
+        <p className="mb-4 text-sm font-medium text-accent">Paper-feel commerce blocks for React</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-          Animated blocks for campaigns that convert.
+          Coupons, receipts and stamps your shoppers can feel.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
-          Countdowns, coupons, carts, checkout and pricing sections, ready for your next sale. Accessible by default,
-          installed with one command, owned by you.
+          Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign. Motion only where
+          a shopper acts, accessible by default, installed with one command and owned by you.
         </p>
         {firstFree && (
           <div className="mt-8 max-w-2xl">
@@ -95,15 +95,15 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 const reasons = [
   {
+    title: "A material, not a theme",
+    body: "Paper, ink and one vermilion seal. Coupons tear along the perforation, receipts print, results get stamped. A look AI generators do not hand out by default.",
+  },
+  {
     title: "Built for sales moments",
-    body: "Flash sales, coupons, free shipping goals, carts, checkout and loyalty. Sections you can ship for Double 11 or Black Friday this week, not demos.",
+    body: "Flash sales, coupons, free shipping goals, carts, checkout and loyalty. Sections you can ship for Double 11, Black Friday or 週年慶, not demos.",
   },
   {
-    title: "Accessible by default",
-    body: "Every block respects reduced motion, works with a keyboard and announces changes to screen readers. CJK text is a first-class citizen.",
-  },
-  {
-    title: "Works where you work",
-    body: "Install with the shadcn CLI or let your AI agent do it through the shadcn MCP server. The source lands in your repo, so you own every line.",
+    title: "Calm by default",
+    body: "No glows, no confetti, no looping motion. Animation answers a click, respects reduced motion and never hides content. Chinese typesetting is first-class.",
   },
 ];

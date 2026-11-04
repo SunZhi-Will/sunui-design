@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,10 +13,7 @@ export interface FavoriteButtonProps {
   /** 顯示收藏數；不給則只顯示愛心 */
   count?: number;
   size?: "sm" | "md" | "lg";
-  /** 收藏時的主色 */
-  color?: "rose" | "amber" | "violet";
-  /** 顯示粒子與光環 */
-  burst?: boolean;
+  locale?: string;
   labels?: {
     add?: string;
     remove?: string;
@@ -29,24 +26,23 @@ const defaultLabels = {
   remove: "Remove from favorites",
 };
 
+// 設計語言（DESIGN.md）：墨色外框，收藏時朱紅實心
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+
+const springs = {
+  snappy: { type: "spring", stiffness: 520, damping: 34 },
+  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
+} as const;
+
 const sizes = {
   sm: { btn: "size-8", icon: "size-4", text: "text-xs" },
   md: { btn: "size-10", icon: "size-5", text: "text-sm" },
   lg: { btn: "size-12", icon: "size-6", text: "text-base" },
 };
 
-const palettes = {
-  rose: { text: "text-rose-500", ring: "border-rose-500", dots: ["#f43f5e", "#fb7185", "#f59e0b", "#ec4899"] },
-  amber: { text: "text-amber-500", ring: "border-amber-500", dots: ["#f59e0b", "#fbbf24", "#f97316", "#facc15"] },
-  violet: { text: "text-violet-500", ring: "border-violet-500", dots: ["#8b5cf6", "#a78bfa", "#ec4899", "#6366f1"] },
-};
-
-const heartVariants: Variants = {
-  off: { scale: 1 },
-  on: { scale: [1, 0.7, 1.25, 1], transition: { duration: 0.45, times: [0, 0.2, 0.6, 1] } },
-};
-
-const PARTICLES = 10;
+const HEART =
+  "M12 20.3s-7.5-4.4-8.9-9.4C2.2 7.6 4.3 4.5 7.6 4.5c1.9 0 3.4 1.1 4.4 2.6 1-1.5 2.5-2.6 4.4-2.6 3.3 0 5.4 3.1 4.5 6.4-1.4 5-8.9 9.4-8.9 9.4z";
 
 export function FavoriteButton({
   pressed: pressedProp,
@@ -54,25 +50,15 @@ export function FavoriteButton({
   onPressedChange,
   count,
   size = "md",
-  color = "rose",
-  burst = true,
+  locale = "en-US",
   labels,
   className,
 }: FavoriteButtonProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const t = { ...defaultLabels, ...labels };
   const [internal, setInternal] = useState(defaultPressed);
   const pressed = pressedProp ?? internal;
   const s = sizes[size];
-  const p = palettes[color];
-
-  // 只在使用者把狀態切為 true 的那一刻放光環
-  const [burstKey, setBurstKey] = useState(0);
-  const was = useRef(pressed);
-  useEffect(() => {
-    if (pressed && !was.current && burst && !reduceMotion) setBurstKey((k) => k + 1);
-    was.current = pressed;
-  }, [pressed, burst, reduceMotion]);
 
   function toggle() {
     const next = !pressed;
@@ -85,85 +71,63 @@ export function FavoriteButton({
       type="button"
       onClick={toggle}
       aria-pressed={pressed}
-      aria-label={pressed ? text.remove : text.add}
+      aria-label={pressed ? t.remove : t.add}
       className={cn(
-        "group inline-flex items-center gap-1.5 rounded-full text-muted-foreground transition-colors",
+        "group inline-flex items-center gap-1.5 rounded-full",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
-        count !== undefined && "pr-3",
+        ink,
+        count !== undefined && "pr-2",
         className,
       )}
     >
-      <span
+      <motion.span
+        whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+        transition={springs.snappy}
         className={cn(
-          "relative grid shrink-0 place-items-center rounded-full border border-border bg-card transition-colors group-hover:bg-muted",
+          "relative grid shrink-0 place-items-center rounded-full border border-border bg-background transition-colors group-hover:border-foreground/30",
           s.btn,
         )}
       >
-        <AnimatePresence>
-          {burstKey > 0 && (
-            <motion.span key={burstKey} className="pointer-events-none absolute inset-0" aria-hidden="true">
-              <motion.span
-                className={cn("absolute inset-0 rounded-full border-2", p.ring)}
-                initial={{ scale: 0.4, opacity: 0.9 }}
-                animate={{ scale: 1.7, opacity: 0, borderWidth: 0 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
+        <svg viewBox="0 0 24 24" className={cn("overflow-visible", s.icon)} aria-hidden="true">
+          {/* 實心像印章壓上去：先大後落定 */}
+          <AnimatePresence initial={false}>
+            {pressed && (
+              <motion.path
+                key="fill"
+                d={HEART}
+                fill="currentColor"
+                className={vermilion}
+                style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                initial={reduceMotion ? false : { scale: 1.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.12 } }}
+                transition={springs.stamp}
               />
-              {Array.from({ length: PARTICLES }, (_, i) => {
-                const angle = (i / PARTICLES) * Math.PI * 2 - Math.PI / 2;
-                const dist = i % 2 === 0 ? 26 : 19;
-                return (
-                  <motion.span
-                    key={i}
-                    className="absolute top-1/2 left-1/2 -mt-[3px] -ml-[3px] size-1.5 rounded-full"
-                    style={{ backgroundColor: p.dots[i % p.dots.length] }}
-                    initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                    animate={{
-                      x: Math.cos(angle) * dist,
-                      y: Math.sin(angle) * dist,
-                      scale: [0, 1.2, 0],
-                      opacity: [1, 1, 0],
-                    }}
-                    transition={{ duration: 0.6, delay: 0.08, ease: "easeOut" }}
-                  />
-                );
-              })}
-            </motion.span>
-          )}
-        </AnimatePresence>
-
-        <motion.svg
-          viewBox="0 0 24 24"
-          className={cn("relative", s.icon, pressed ? p.text : "group-hover:text-foreground")}
-          variants={heartVariants}
-          initial={false}
-          animate={pressed && !reduceMotion ? "on" : "off"}
-          aria-hidden="true"
-        >
-          <motion.path
-            d="M12 20.3s-7.5-4.4-8.9-9.4C2.2 7.6 4.3 4.5 7.6 4.5c1.9 0 3.4 1.1 4.4 2.6 1-1.5 2.5-2.6 4.4-2.6 3.3 0 5.4 3.1 4.5 6.4-1.4 5-8.9 9.4-8.9 9.4z"
+            )}
+          </AnimatePresence>
+          <path
+            d={HEART}
+            fill="none"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="1.5"
             strokeLinejoin="round"
-            initial={false}
-            animate={{ fillOpacity: pressed ? 1 : 0 }}
-            fill="currentColor"
-            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            className={cn("transition-colors", pressed && vermilion)}
           />
-        </motion.svg>
-      </span>
+        </svg>
+      </motion.span>
 
       {count !== undefined && (
-        <span className={cn("relative overflow-hidden font-medium tabular-nums", s.text, pressed && "text-foreground")}>
+        <span className={cn("relative overflow-hidden font-medium tabular-nums", s.text)}>
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={count}
               className="inline-block"
               initial={reduceMotion ? false : { y: pressed ? "100%" : "-100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={reduceMotion ? undefined : { y: pressed ? "-100%" : "100%", opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { y: pressed ? "-100%" : "100%", opacity: 0 }}
+              transition={springs.snappy}
             >
-              {new Intl.NumberFormat("en-US", { notation: "compact" }).format(count)}
+              {new Intl.NumberFormat(locale, { notation: "compact" }).format(count)}
             </motion.span>
           </AnimatePresence>
         </span>

@@ -1,26 +1,19 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export type ExpandingSearchSuggestion = {
   id: string;
   label: string;
-  /** 右側的輔助文字，例如分類 */
+  /** 第二行的說明，例如分類或款式 */
+  description?: string;
+  /** 右側的輔助文字，例如價格 */
   hint?: string;
-  icon?: ReactNode;
+  /** 左側縮圖，例如商品圖 */
+  thumbnail?: ReactNode;
 };
 
 export interface ExpandingSearchProps {
@@ -37,7 +30,7 @@ export interface ExpandingSearchProps {
   /** 是否依輸入內容過濾建議（不分大小寫的子字串比對）；自行過濾時設為 false */
   filterSuggestions?: boolean;
   onSuggestionSelect?: (suggestion: ExpandingSearchSuggestion) => void;
-  /** 展開後的寬度（px） */
+  /** 展開後的寬度（px），窄螢幕時不會超出父層 */
   expandedWidth?: number;
   /** 啟用 "/" 快捷鍵開啟搜尋；在其他輸入框打字時不會觸發 */
   slashShortcut?: boolean;
@@ -60,12 +53,22 @@ const defaultLabels = {
   results: (n: number) => (n === 1 ? "1 suggestion" : `${n} suggestions`),
 };
 
+// 設計語言（DESIGN.md）：紙、紙邊、墨
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const paperUnder = "bg-[#f1ebdd] dark:bg-[#29251f]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+
+const springs = {
+  gentle: { type: "spring", stiffness: 240, damping: 30 },
+} as const;
+
 const COLLAPSED = 40;
 
 function isTypingTarget(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
-  const tag = el.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+  return ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || el.isContentEditable;
 }
 
 function Match({ text, query }: { text: string; query: string }) {
@@ -75,20 +78,18 @@ function Match({ text, query }: { text: string; query: string }) {
   return (
     <>
       {text.slice(0, at)}
-      <mark className="bg-transparent font-semibold text-foreground">{text.slice(at, at + q.length)}</mark>
+      <mark className="bg-transparent text-current underline decoration-current/40 underline-offset-[3px]">{text.slice(at, at + q.length)}</mark>
       {text.slice(at + q.length)}
     </>
   );
 }
 
-function SearchIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" />
-    </svg>
-  );
-}
+const SearchIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m20 20-4.2-4.2" />
+  </svg>
+);
 
 export function ExpandingSearch({
   value: valueProp,
@@ -133,6 +134,7 @@ export function ExpandingSearch({
   const setValue = (next: string) => {
     if (valueProp === undefined) setInnerValue(next);
     onValueChange?.(next);
+    setActive(-1);
   };
 
   const filtered = useMemo(() => {
@@ -159,21 +161,13 @@ export function ExpandingSearch({
   }, [open]);
 
   useEffect(() => {
-    setActive(-1);
-  }, [value]);
-
-  // 鍵盤移動時把高亮建議捲入可視範圍
-  useEffect(() => {
-    if (active < 0) return;
-    document.getElementById(`${baseId}-opt-${active}`)?.scrollIntoView({ block: "nearest" });
+    if (active >= 0) document.getElementById(`${baseId}-opt-${active}`)?.scrollIntoView({ block: "nearest" });
   }, [active, baseId]);
 
-  // "/" 快捷鍵：opt-in，且不搶其他輸入框的按鍵
   useEffect(() => {
     if (!slashShortcut) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (isTypingTarget(e.target)) return;
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || isTypingTarget(e.target)) return;
       e.preventDefault();
       if (open) inputRef.current?.focus();
       else setOpen(true);
@@ -190,47 +184,29 @@ export function ExpandingSearch({
   const choose = (s: ExpandingSearchSuggestion) => {
     setValue(s.label);
     setListOpen(false);
-    setActive(-1);
     onSuggestionSelect?.(s);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    switch (e.key) {
-      case "ArrowDown":
-        if (!filtered.length) return;
-        e.preventDefault();
-        setListOpen(true);
-        setActive((i) => (showList ? (i + 1) % filtered.length : 0));
-        return;
-      case "ArrowUp":
-        if (!filtered.length) return;
-        e.preventDefault();
-        setListOpen(true);
-        setActive((i) => (showList ? (i <= 0 ? filtered.length - 1 : i - 1) : filtered.length - 1));
-        return;
-      case "Home":
-      case "End":
-        if (!showList) return;
-        e.preventDefault();
-        setActive(e.key === "Home" ? 0 : filtered.length - 1);
-        return;
-      case "Enter":
-        if (e.nativeEvent.isComposing) return;
-        if (showList && active >= 0) {
-          e.preventDefault();
-          choose(filtered[active]);
-        }
-        return;
-      case "Escape":
-        e.preventDefault();
-        // 第一下關閉建議清單，第二下收合
-        if (showList) {
-          setListOpen(false);
-          setActive(-1);
-        } else {
-          collapse(true);
-        }
-        return;
+    const n = filtered.length;
+    if ((e.key === "ArrowDown" || e.key === "ArrowUp") && n) {
+      e.preventDefault();
+      setListOpen(true);
+      const down = e.key === "ArrowDown";
+      setActive((i) => (!showList ? (down ? 0 : n - 1) : down ? (i + 1) % n : i <= 0 ? n - 1 : i - 1));
+    } else if ((e.key === "Home" || e.key === "End") && showList) {
+      e.preventDefault();
+      setActive(e.key === "Home" ? 0 : n - 1);
+    } else if (e.key === "Enter" && !e.nativeEvent.isComposing && showList && active >= 0) {
+      e.preventDefault();
+      choose(filtered[active]);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      // 第一下關閉建議清單，第二下收合
+      if (showList) {
+        setListOpen(false);
+        setActive(-1);
+      } else collapse(true);
     }
   };
 
@@ -240,8 +216,6 @@ export function ExpandingSearch({
     setListOpen(false);
     onSubmit?.(value.trim());
   };
-
-  const spring = reduce ? { duration: 0 } : { type: "spring" as const, stiffness: 420, damping: 34 };
 
   return (
     <form
@@ -254,20 +228,20 @@ export function ExpandingSearch({
         setListOpen(false);
         if (!value.trim()) collapse(false);
       }}
-      className={cn("relative inline-flex", className)}
+      className={cn("relative inline-flex max-w-full", ink, className)}
     >
       <motion.div
         initial={false}
         animate={{ width: open ? expandedWidth : COLLAPSED }}
-        transition={spring}
+        transition={reduce ? { duration: 0 } : springs.gentle}
         className={cn(
-          "relative flex h-10 max-w-full items-center overflow-hidden rounded-full border bg-card text-card-foreground transition-colors",
-          open ? "border-border shadow-sm focus-within:ring-2 focus-within:ring-ring" : "border-transparent",
+          "relative flex h-10 max-w-full items-center overflow-hidden rounded-md border transition-colors",
+          open ? cn(paper, edge, "focus-within:border-[#1c1917]/40 dark:focus-within:border-[#ece7dc]/40") : "border-transparent",
         )}
       >
         {open ? (
           <>
-            <SearchIcon className="pointer-events-none absolute left-3 size-4 text-muted-foreground" />
+            <SearchIcon className={cn("pointer-events-none absolute left-3 size-4", inkMuted)} />
             <input
               ref={inputRef}
               type="search"
@@ -287,30 +261,23 @@ export function ExpandingSearch({
               }}
               onFocus={() => setListOpen(true)}
               onKeyDown={onKeyDown}
-              className="h-full w-full min-w-0 bg-transparent pr-9 pl-9 text-sm text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+              className="h-full w-full min-w-0 bg-transparent pr-9 pl-9 text-sm outline-none placeholder:text-current/45 [&::-webkit-search-cancel-button]:hidden"
             />
-            <AnimatePresence>
-              {value && (
-                <motion.button
-                  key="clear"
-                  type="button"
-                  aria-label={text.clear}
-                  initial={reduce ? false : { opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.6 }}
-                  transition={{ duration: 0.12 }}
-                  onClick={() => {
-                    setValue("");
-                    inputRef.current?.focus();
-                  }}
-                  className="absolute right-2 flex size-6 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6 6 18" />
-                  </svg>
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {value && (
+              <button
+                type="button"
+                aria-label={text.clear}
+                onClick={() => {
+                  setValue("");
+                  inputRef.current?.focus();
+                }}
+                className={cn("absolute right-2 flex size-6 items-center justify-center rounded-[3px] outline-none hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
+              >
+                <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                  <path d="m4 4 8 8M12 4l-8 8" />
+                </svg>
+              </button>
+            )}
           </>
         ) : (
           <button
@@ -320,56 +287,54 @@ export function ExpandingSearch({
             aria-expanded={false}
             aria-keyshortcuts={slashShortcut ? "/" : undefined}
             onClick={() => setOpen(true)}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex size-10 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring"
           >
             <SearchIcon className="size-[18px]" />
           </button>
         )}
       </motion.div>
 
-      {suggestions && open && (
-        <AnimatePresence>
-          {showList && (
-            <motion.ul
-              key="list"
-              id={listId}
-              role="listbox"
-              aria-label={text.suggestions}
-              initial={reduce ? false : { opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -4 }}
-              transition={{ duration: 0.14 }}
-              className="absolute top-full right-0 left-0 z-20 mt-2 max-h-72 overflow-y-auto rounded-xl border border-border bg-card p-1 text-card-foreground shadow-lg"
-            >
-              {filtered.map((s, i) => (
-                <li
-                  key={s.id}
-                  id={`${baseId}-opt-${i}`}
-                  role="option"
-                  aria-selected={i === active}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onPointerMove={() => i !== active && setActive(i)}
-                  onClick={() => choose(s)}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground",
-                    i === active && "bg-muted text-foreground",
-                  )}
-                >
-                  {s.icon && (
-                    <span aria-hidden="true" className="flex size-4 shrink-0 items-center justify-center [&>svg]:size-4">
-                      {s.icon}
-                    </span>
-                  )}
-                  <span className="flex-1 truncate">
+      <AnimatePresence>
+        {showList && (
+          <motion.ul
+            key="list"
+            id={listId}
+            role="listbox"
+            aria-label={text.suggestions}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }}
+            transition={{ duration: 0.12 }}
+            className={cn("absolute top-full right-0 left-0 z-20 mt-1.5 max-h-80 overflow-y-auto rounded-md border p-1 shadow-[0_1px_0_rgb(0_0_0/0.04)]", paper, edge)}
+          >
+            {filtered.map((s, i) => (
+              <li
+                key={s.id}
+                id={`${baseId}-opt-${i}`}
+                role="option"
+                aria-selected={i === active}
+                onMouseDown={(e) => e.preventDefault()}
+                onPointerMove={() => i !== active && setActive(i)}
+                onClick={() => choose(s)}
+                className={cn("flex cursor-pointer items-center gap-3 rounded-[3px] px-2 py-1.5 text-sm", i === active && paperUnder)}
+              >
+                {s.thumbnail && (
+                  <span aria-hidden="true" className={cn("size-10 shrink-0 overflow-hidden rounded-[3px] border", edge)}>
+                    {s.thumbnail}
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">
                     <Match text={s.label} query={value} />
                   </span>
-                  {s.hint && <span className="shrink-0 text-xs text-muted-foreground">{s.hint}</span>}
-                </li>
-              ))}
-            </motion.ul>
-          )}
-        </AnimatePresence>
-      )}
+                  {s.description && <span className={cn("block truncate text-xs", inkMuted)}>{s.description}</span>}
+                </span>
+                {s.hint && <span className="shrink-0 text-sm tracking-tight tabular-nums">{s.hint}</span>}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
 
       <span className="sr-only" role="status" aria-live="polite">
         {showList && value.trim() ? text.results(filtered.length) : ""}

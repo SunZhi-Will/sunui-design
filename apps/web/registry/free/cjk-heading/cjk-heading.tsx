@@ -1,18 +1,17 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { useMemo, type ElementType } from "react";
+import { Fragment, useMemo, type ElementType, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export interface CjkHeadingProps {
-  /** 標題文字，可中英混排 */
+  /** 標題文字，可中英混排；用 \n 指定斷行位置 */
   text: string;
   as?: ElementType;
   /** 直排（writing-mode: vertical-rl） */
   vertical?: boolean;
   /**
-   * 標點擠壓：auto 優先使用 text-spacing-trim，不支援時退回 halt；
+   * 標點擠壓：auto 優先使用 text-spacing-trim（行首與相鄰標點擠壓），不支援時退回 halt；
    * palt 為比例字寬，halt 只壓縮標點，none 不處理
    */
   compress?: "auto" | "palt" | "halt" | "none";
@@ -20,11 +19,7 @@ export interface CjkHeadingProps {
   autoSpace?: boolean;
   /** 直排時把一到兩位數字橫向置中（縱中橫） */
   tateChuYoko?: boolean;
-  /** 進場動畫時機 */
-  animate?: "mount" | "view" | "none";
-  /** 每個字的間隔秒數 */
-  stagger?: number;
-  /** 需要上色的字詞 */
+  /** 以朱紅印章樣式標出的關鍵字；一個標題建議只標一處 */
   highlight?: string[];
   highlightClassName?: string;
   lang?: string;
@@ -32,32 +27,20 @@ export interface CjkHeadingProps {
 }
 
 const CJK_CLASS = "\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Hangul}";
-const CJK_RE = new RegExp(`[${CJK_CLASS}]`, "u");
-const LATIN_RE = /[A-Za-z0-9\u00C0-\u024F]/;
 // 中日文後接英數、或英數後接中日文之處插入細空格
 const SPACE_A = new RegExp(`([${CJK_CLASS}])([A-Za-z0-9\\u00C0-\\u024F])`, "gu");
 const SPACE_B = new RegExp(`([A-Za-z0-9\\u00C0-\\u024F%])([${CJK_CLASS}])`, "gu");
-const THIN = "\u2009";
+const THIN = " ";
+// 前後不接其他英數的一到兩位數字，直排時做縱中橫
+const TCY_RE = /(?<![\dA-Za-z])\d{1,2}(?![\dA-Za-z])/g;
 
 export function addCjkSpacing(text: string) {
   return text.replace(SPACE_A, `$1${THIN}$2`).replace(SPACE_B, `$1${THIN}$2`);
 }
 
-type Token = { text: string; kind: "cjk" | "latin" | "digits" | "space" | "other" };
-
-function tokenize(text: string): Token[] {
-  const out: Token[] = [];
-  const re = /\d{1,2}(?![\dA-Za-z])|[A-Za-z0-9\u00C0-\u024F'%.-]+|\s+|./gsu;
-  for (const m of text.matchAll(re)) {
-    const t = m[0];
-    if (/^\s+$/u.test(t)) out.push({ text: t, kind: "space" });
-    else if (/^\d{1,2}$/.test(t)) out.push({ text: t, kind: "digits" });
-    else if (LATIN_RE.test(t)) out.push({ text: t, kind: "latin" });
-    else if (CJK_RE.test(t)) out.push({ text: t, kind: "cjk" });
-    else out.push({ text: t, kind: "other" });
-  }
-  return out;
-}
+// 設計語言（DESIGN.md）：朱紅只用在印章關鍵字
+const seal =
+  "whitespace-nowrap rounded-[2px] bg-[#c8361d] [margin-inline:0.04em] [padding-inline:0.14em] text-[#faf7f0] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] dark:bg-[#ec6a4f] dark:text-[#1f1c18]";
 
 const NO_WORDS: string[] = [];
 
@@ -68,50 +51,66 @@ export function CjkHeading({
   compress = "auto",
   autoSpace = true,
   tateChuYoko = true,
-  animate = "view",
-  stagger = 0.045,
   highlight = NO_WORDS,
-  highlightClassName = "text-primary",
+  highlightClassName,
   lang = "zh-Hant",
   className,
 }: CjkHeadingProps) {
-  const reduceMotion = useReducedMotion();
-  const display = useMemo(() => (autoSpace ? addCjkSpacing(text) : text), [text, autoSpace]);
-  const tokens = useMemo(() => tokenize(display), [display]);
+  const highlightKey = highlight.join("\u0000");
 
-  // 標出要上色的字元位置
-  const marked = useMemo(() => {
-    const set = new Set<number>();
-    for (const word of highlight) {
-      if (!word) continue;
-      let from = display.indexOf(word);
-      while (from !== -1) {
-        for (let i = from; i < from + word.length; i++) set.add(i);
-        from = display.indexOf(word, from + word.length);
+  const parts = useMemo(() => {
+    const display = autoSpace ? addCjkSpacing(text) : text;
+    const words = highlightKey.split("\u0000").filter(Boolean);
+    // 依關鍵字切段；關鍵字內不插細空格的版本也要比對得到
+    const out: { text: string; sealed: boolean }[] = [];
+    let rest = display;
+    while (rest) {
+      let hit: { at: number; len: number } | null = null;
+      for (const w of words) {
+        for (const form of [w, autoSpace ? addCjkSpacing(w) : w]) {
+          const at = rest.indexOf(form);
+          if (at !== -1 && (!hit || at < hit.at)) hit = { at, len: form.length };
+        }
       }
+      if (!hit) {
+        out.push({ text: rest, sealed: false });
+        break;
+      }
+      if (hit.at > 0) out.push({ text: rest.slice(0, hit.at), sealed: false });
+      out.push({ text: rest.slice(hit.at, hit.at + hit.len), sealed: true });
+      rest = rest.slice(hit.at + hit.len);
     }
-    return set;
-  }, [display, highlight]);
+    return out;
+  }, [text, autoSpace, highlightKey]);
 
-  // 只動 opacity 與 blur：inline 元素不能 transform，但保留 inline 才不會破壞避頭尾斷行
-  const charVariants: Variants = {
-    hidden: reduceMotion ? { opacity: 0 } : { opacity: 0, filter: "blur(10px)" },
-    visible: (i: number) => ({
-      opacity: 1,
-      filter: "blur(0px)",
-      transition: reduceMotion ? { duration: 0 } : { delay: i * stagger, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    }),
+  // 換行符號 \n 視為設計好的斷行點，標題斷在詞與詞之間
+  const renderRun = (run: string): ReactNode =>
+    run.split("\n").map((line, i) => (
+      <Fragment key={i}>
+        {i > 0 && <br />}
+        {renderLine(line)}
+      </Fragment>
+    ));
+
+  const renderLine = (run: string): ReactNode => {
+    if (!vertical || !tateChuYoko) return run;
+    const nodes: ReactNode[] = [];
+    let last = 0;
+    for (const m of run.matchAll(TCY_RE)) {
+      const at = m.index ?? 0;
+      // 數字前後的細空格在直排裡多餘，一併去掉
+      nodes.push(run.slice(last, at).replace(/ $/, ""));
+      nodes.push(
+        <span key={at} className="[text-combine-upright:all]">
+          {m[0]}
+        </span>,
+      );
+      last = at + m[0].length;
+      if (run[last] === THIN) last += 1;
+    }
+    nodes.push(run.slice(last));
+    return nodes;
   };
-
-  const motionProps =
-    animate === "none"
-      ? {}
-      : animate === "mount"
-        ? { initial: "hidden", animate: "visible" }
-        : { initial: "hidden", whileInView: "visible", viewport: { once: true, amount: 0.4 } };
-
-  let offset = 0;
-  let step = 0;
 
   return (
     <Tag
@@ -119,37 +118,26 @@ export function CjkHeading({
       data-compress={compress}
       data-vertical={vertical || undefined}
       className={cn(
-        "sunui-cjk-heading text-4xl font-bold leading-[1.35] tracking-[0.02em] text-foreground sm:text-5xl",
-        vertical ? "[writing-mode:vertical-rl] leading-[1.6]" : "[text-wrap:balance]",
+        "sunui-cjk-heading text-[length:clamp(2rem,1.2rem+3vw,3rem)] font-bold tracking-[0.04em] text-[#1c1917] dark:text-[#ece7dc]",
+        vertical ? "leading-[1.5] [writing-mode:vertical-rl]" : "leading-[1.3] [text-wrap:balance]",
         className,
       )}
     >
-      <span className="sr-only">{text}</span>
-      <motion.span aria-hidden="true" {...motionProps}>
-        {tokens.map((t, i) => {
-          const start = offset;
-          offset += t.text.length;
-          if (t.kind === "space") return <span key={i}>{t.text}</span>;
-          const isMarked = marked.has(start);
-          const tcy = vertical && tateChuYoko && t.kind === "digits";
-          return (
-            <motion.span
-              key={i}
-              custom={step++}
-              variants={animate === "none" ? undefined : charVariants}
-              className={cn(isMarked && highlightClassName, tcy && "[text-combine-upright:all]")}
-            >
-              {t.text}
-            </motion.span>
-          );
-        })}
-      </motion.span>
+      {parts.map((p, i) =>
+        p.sealed ? (
+          <span key={i} className={cn(seal, highlightClassName)}>
+            {renderRun(p.text)}
+          </span>
+        ) : (
+          <span key={i}>{renderRun(p.text)}</span>
+        ),
+      )}
       <style href="sunui-cjk-heading" precedence="default">{`
-.sunui-cjk-heading { font-kerning: normal; line-break: strict; word-break: normal; }
+.sunui-cjk-heading { font-kerning: normal; line-break: strict; word-break: normal; hanging-punctuation: allow-end; }
 .sunui-cjk-heading[data-compress="auto"] { font-feature-settings: "halt"; }
 .sunui-cjk-heading[data-compress="auto"][data-vertical] { font-feature-settings: "vhal"; }
 @supports (text-spacing-trim: trim-start) {
-  .sunui-cjk-heading[data-compress="auto"], .sunui-cjk-heading[data-compress="auto"][data-vertical] { font-feature-settings: normal; text-spacing-trim: trim-both; }
+  .sunui-cjk-heading[data-compress="auto"], .sunui-cjk-heading[data-compress="auto"][data-vertical] { font-feature-settings: normal; text-spacing-trim: trim-start; }
 }
 .sunui-cjk-heading[data-compress="halt"] { font-feature-settings: "halt"; }
 .sunui-cjk-heading[data-compress="halt"][data-vertical] { font-feature-settings: "vhal"; }

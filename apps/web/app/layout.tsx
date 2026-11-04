@@ -11,11 +11,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "SunUI: Interactive blocks you can ship",
+    default: "SunUI: paper-feel commerce blocks for React",
     template: "%s | SunUI",
   },
   description:
-    "Animated React and Tailwind blocks: micro-interactions and production-ready sections for product, SaaS and campaign pages. Install the source with one command.",
+    "Tear-off coupons, printed receipts, loyalty stamps and sale sections for React and Tailwind. Accessible, calm motion, installed with the shadcn CLI.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

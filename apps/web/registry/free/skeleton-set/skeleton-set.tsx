@@ -1,18 +1,24 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type ShimmerStyle = "wave" | "pulse" | "none";
+/** pulse：緩慢的透明度呼吸（只在載入中）；none：靜止的紙面色塊 */
+export type ShimmerStyle = "pulse" | "none";
 
-const ShimmerContext = createContext<ShimmerStyle>("wave");
+const ShimmerContext = createContext<ShimmerStyle>("pulse");
+
+// 設計語言（DESIGN.md）：紙、紙邊。色塊比紙面深一階，像還沒印上去的版位
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const block = "bg-[#eee7d8] dark:bg-[#2c2822]";
 
 export interface SkeletonProps {
   className?: string;
   style?: CSSProperties;
-  /** 覆寫外層 SkeletonSet 的動畫樣式 */
+  /** 覆寫外層 SkeletonSet 的設定 */
   shimmer?: ShimmerStyle;
 }
 
@@ -25,25 +31,18 @@ export function Skeleton({ className, style, shimmer }: SkeletonProps) {
     <div
       aria-hidden="true"
       style={style}
-      className={cn(
-        "relative overflow-hidden rounded-md bg-muted",
-        mode === "pulse" && "animate-pulse",
-        className,
-      )}
+      className={cn("rounded-[3px]", block, mode === "pulse" && "animate-[sunui-skeleton-pulse_2.4s_ease-in-out_infinite]", className)}
     >
-      {mode === "wave" && (
-        <>
-          <span className="absolute inset-0 -translate-x-full animate-[sunui-skeleton-wave_1.6s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-foreground/[0.07] to-transparent" />
-          {/* React 19 會依 href 去重並提升到 head */}
-          <style href="sunui-skeleton-wave" precedence="default">{`@keyframes sunui-skeleton-wave { from { transform: translateX(-100%) } to { transform: translateX(100%) } }`}</style>
-        </>
+      {mode === "pulse" && (
+        // React 19 會依 href 去重並提升到 head
+        <style href="sunui-skeleton-pulse" precedence="default">{`@keyframes sunui-skeleton-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .55 } }`}</style>
       )}
     </div>
   );
 }
 
 export function SkeletonLine({ width = "100%", className }: { width?: string | number; className?: string }) {
-  return <Skeleton className={cn("h-3.5", className)} style={{ width }} />;
+  return <Skeleton className={cn("h-3", className)} style={{ width }} />;
 }
 
 export function SkeletonCircle({ size = 40, className }: { size?: number; className?: string }) {
@@ -55,7 +54,7 @@ const LINE_WIDTHS = ["92%", "84%", "96%", "70%", "88%", "62%"];
 
 export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2.5", className)}>
       {Array.from({ length: lines }, (_, i) => (
         <SkeletonLine key={i} width={i === lines - 1 && lines > 1 ? "55%" : LINE_WIDTHS[i % LINE_WIDTHS.length]} />
       ))}
@@ -63,14 +62,27 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
   );
 }
 
+/** 排版稿上的圖片版位：細線打叉的方框 */
+export function SkeletonImage({ className }: { className?: string }) {
+  return (
+    <div aria-hidden="true" className={cn("relative w-full text-[#e2d9c6] dark:text-[#37322a]", block, className)}>
+      <svg className="absolute inset-0 size-full" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+        <path d="M0 0 100 100M100 0 0 100" vectorEffect="non-scaling-stroke" />
+      </svg>
+    </div>
+  );
+}
+
+const surface = cn("rounded-md border", paper, edge);
+
 export function SkeletonCard({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div className={cn("rounded-2xl border border-border bg-card p-5", className)}>
+    <div className={cn(surface, "p-5", className)}>
       <div className="flex items-center gap-3">
-        <SkeletonCircle size={40} />
+        <SkeletonCircle size={36} />
         <div className="flex-1 space-y-2">
-          <SkeletonLine width="45%" />
-          <SkeletonLine width="28%" className="h-3" />
+          <SkeletonLine width="40%" />
+          <SkeletonLine width="24%" className="h-2.5" />
         </div>
       </div>
       <SkeletonText lines={lines} className="mt-5" />
@@ -80,14 +92,14 @@ export function SkeletonCard({ lines = 3, className }: { lines?: number; classNa
 
 export function SkeletonProductCard({ className }: { className?: string }) {
   return (
-    <div className={cn("overflow-hidden rounded-2xl border border-border bg-card", className)}>
-      <Skeleton className="aspect-[4/3] w-full rounded-none" />
+    <div className={cn(surface, "overflow-hidden", className)}>
+      <SkeletonImage className="aspect-square" />
       <div className="space-y-2.5 p-4">
-        <SkeletonLine width="70%" className="h-4" />
-        <SkeletonLine width="40%" />
+        <SkeletonLine width="70%" className="h-3.5" />
+        <SkeletonLine width="40%" className="h-2.5" />
         <div className="flex items-center justify-between pt-2">
-          <SkeletonLine width={64} className="h-5" />
-          <Skeleton className="h-8 w-20 rounded-full" />
+          <SkeletonLine width={52} className="h-4" />
+          <Skeleton className="h-8 w-20 rounded-md" />
         </div>
       </div>
     </div>
@@ -96,15 +108,15 @@ export function SkeletonProductCard({ className }: { className?: string }) {
 
 export function SkeletonList({ rows = 4, className }: { rows?: number; className?: string }) {
   return (
-    <ul className={cn("divide-y divide-border rounded-2xl border border-border bg-card", className)}>
+    <ul className={cn(surface, "divide-y divide-dashed divide-[#e7e0d0] dark:divide-[#38332b]", className)}>
       {Array.from({ length: rows }, (_, i) => (
-        <li key={i} className="flex items-center gap-3 p-4">
-          <SkeletonCircle size={36} />
+        <li key={i} className="flex items-center gap-3 px-4 py-3.5">
+          <Skeleton className="size-10 shrink-0" />
           <div className="flex-1 space-y-2">
-            <SkeletonLine width={LINE_WIDTHS[(i + 2) % LINE_WIDTHS.length]} />
-            <SkeletonLine width="35%" className="h-3" />
+            <SkeletonLine width={LINE_WIDTHS[(i + 2) % LINE_WIDTHS.length]} className="max-w-56" />
+            <SkeletonLine width="30%" className="h-2.5 max-w-24" />
           </div>
-          <SkeletonLine width={48} className="h-3" />
+          <SkeletonLine width={44} />
         </li>
       ))}
     </ul>
@@ -114,7 +126,7 @@ export function SkeletonList({ rows = 4, className }: { rows?: number; className
 export type SkeletonPreset = "text" | "card" | "product" | "list";
 
 export interface SkeletonSetProps {
-  /** true 時淡入真實內容 */
+  /** true 時換成真實內容 */
   loaded: boolean;
   children?: ReactNode;
   /** 載入中要顯示的骨架；可傳 preset 名稱或自訂節點 */
@@ -122,18 +134,12 @@ export interface SkeletonSetProps {
   shimmer?: ShimmerStyle;
   /** preset 的行數或列數 */
   count?: number;
-  /** 交叉淡入秒數 */
-  fadeDuration?: number;
   labels?: { loading?: string; loaded?: string };
   className?: string;
 }
 
 const defaultLabels = { loading: "Loading content", loaded: "Content loaded" };
-
-const fade: Variants = {
-  hidden: { opacity: 0, filter: "blur(4px)" },
-  visible: { opacity: 1, filter: "blur(0px)" },
-};
+const presets: SkeletonPreset[] = ["text", "card", "product", "list"];
 
 function renderPreset(preset: SkeletonPreset, count?: number) {
   switch (preset) {
@@ -148,24 +154,12 @@ function renderPreset(preset: SkeletonPreset, count?: number) {
   }
 }
 
-/** 包住真實內容：未載入時顯示骨架，載入後交叉淡入 */
-export function SkeletonSet({
-  loaded,
-  children,
-  skeleton = "card",
-  shimmer = "wave",
-  count,
-  fadeDuration = 0.35,
-  labels,
-  className,
-}: SkeletonSetProps) {
+/** 包住真實內容：未載入時顯示骨架，載入後短暫交叉淡入 */
+export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, labels, className }: SkeletonSetProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...defaultLabels, ...labels };
-  const placeholder =
-    typeof skeleton === "string" && ["text", "card", "product", "list"].includes(skeleton)
-      ? renderPreset(skeleton as SkeletonPreset, count)
-      : skeleton;
-  const transition = { duration: reduceMotion ? 0 : fadeDuration, ease: "easeOut" as const };
+  const placeholder = typeof skeleton === "string" && presets.includes(skeleton as SkeletonPreset) ? renderPreset(skeleton as SkeletonPreset, count) : skeleton;
+  const fade = { duration: reduceMotion ? 0 : 0.2, ease: "easeOut" as const };
 
   return (
     <ShimmerContext.Provider value={shimmer}>
@@ -174,32 +168,18 @@ export function SkeletonSet({
           {loaded ? text.loaded : text.loading}
         </span>
         <div aria-busy={!loaded} className="grid">
-        <AnimatePresence initial={false}>
-          {loaded ? (
+          <AnimatePresence initial={false}>
             <motion.div
-              key="content"
-              className="[grid-area:1/1]"
-              variants={reduceMotion ? undefined : fade}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              transition={transition}
-            >
-              {children}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="skeleton"
+              key={loaded ? "content" : "skeleton"}
               className="[grid-area:1/1]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={transition}
+              transition={fade}
             >
-              {placeholder}
+              {loaded ? children : placeholder}
             </motion.div>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
         </div>
       </div>
     </ShimmerContext.Provider>

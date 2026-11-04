@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { ProductArt, productNames } from "@/registry/_demo/product-art";
 
 import { CopyCodeButton } from "./copy-code-button";
 
 export default function CopyCodeButtonDemo() {
-  const [log, setLog] = useState<string | null>(null);
-
   return (
-    <div className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-6 text-card-foreground">
-      <div>
-        <p className="text-base font-semibold">Welcome gift</p>
-        <p className="text-sm text-muted-foreground">Use this code at checkout for 20% off your first order.</p>
+    <div className="grid w-full max-w-2xl gap-5 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[13rem_1fr] sm:p-5">
+      <ProductArt kind="tote" className="rounded-md" />
+
+      <div className="flex min-w-0 flex-col gap-4">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">{productNames.tote}</h2>
+          <p className="mt-0.5 text-lg tabular-nums">$48.00</p>
+          <p className="mt-1 text-sm text-muted-foreground">Heavy canvas, leather handles, inside pocket.</p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm">Extra 20% off your first order, use at checkout:</p>
+          <CopyCodeButton code="SUNNY20" caption="20% off" size="lg" />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border pt-4 text-sm text-muted-foreground">
+          <span>Free shipping over $60</span>
+          <CopyCodeButton code="FREESHIP" size="sm" />
+        </div>
       </div>
-      <div className="flex flex-wrap items-end gap-4 pt-6">
-        <CopyCodeButton code="SUNNY20" caption="20% off" size="lg" onCopy={(c) => setLog(c)} />
-        <CopyCodeButton code="FREESHIP" size="sm" onCopy={(c) => setLog(c)} />
-      </div>
-      <p className="text-xs text-muted-foreground" aria-hidden="true">
-        {log ? `Last copied: ${log}` : "Tab to a copy button and press Enter or Space."}
-      </p>
     </div>
   );
 }
