@@ -57,22 +57,29 @@ export function PreviewFrame({ name }: { name: string }) {
             </button>
           ))}
         </div>
-        <button
+        <div className="flex items-center gap-2">
+          {viewport !== "desktop" && <span className="font-mono text-[11px] text-subtle">{width}</span>}
+          <button
           type="button"
           onClick={() => setRun((n) => n + 1)}
           className="rounded-md px-2.5 py-1 text-xs font-medium text-subtle transition-colors hover:text-fg"
         >
           Replay
-        </button>
+          </button>
+        </div>
       </div>
-      <div className="stage-dots flex justify-center">
+      {/* 外層不加任何留白：三種尺寸的展示區高度一致，只有寬度改變 */}
+      <div className={cn("flex justify-center", viewport === "desktop" ? "stage-dots" : "stage-surround")}>
         <iframe
           key={run}
           ref={iframeRef}
           src={`/preview/${name}`}
           title={`${name} preview`}
           onLoad={handleLoad}
-          className={cn("block border-0 transition-[width] duration-300", viewport !== "desktop" && "border-x border-line")}
+          className={cn(
+            "block border-0 transition-[width] duration-300",
+            viewport !== "desktop" && "device-frame",
+          )}
           style={{ width, maxWidth: "100%", height }}
         />
       </div>

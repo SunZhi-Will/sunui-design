@@ -101,6 +101,28 @@ body {
   background-size: 16px 16px;
 }
 
+/* Tablet / Mobile 預覽時，裝置寬度以外的區域：斜線底紋，和舞台的點狀底明顯區隔 */
+.stage-surround {
+  --surround: #d6d3d1;
+  --surround-stripe: rgb(28 25 23 / 0.09);
+  --device-edge: #a8a29e;
+  background-color: var(--surround);
+  background-image: repeating-linear-gradient(-45deg, var(--surround-stripe) 0 1px, transparent 1px 9px);
+}
+@media (prefers-color-scheme: dark) {
+  .stage-surround {
+    --surround: #050404;
+    --surround-stripe: rgb(245 245 244 / 0.07);
+    --device-edge: #57534e;
+  }
+}
+/* 裝置左右邊緣：實線加外側陰影，不佔高度 */
+.stage-surround > .device-frame {
+  box-shadow:
+    0 0 0 1px var(--device-edge),
+    0 0 28px rgb(0 0 0 / 0.28);
+}
+
 /* 文件頁排版 */
 .docs h1 { font-size: 2.25rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
 .docs h2 { margin-top: 2.5rem; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
