@@ -6,21 +6,32 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ScaledPreview } from "@/components/scaled-preview";
 import { TierBadge } from "@/components/tier-badge";
 import { interactionLabels } from "@/lib/interactions";
-import type { Interaction, RegistryItem, Tier } from "@/lib/registry";
+import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
+import { seriesDescriptions, seriesLabels, seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
+
+const seriesKeys = Object.keys(seriesLabels) as Series[];
 
 export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | "meta" | "categories">;
 
 export function Catalog({ items }: { items: CatalogItem[] }) {
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
   const [tier, setTier] = useState<Tier | "all">("all");
+  const [series, setSeries] = useState<Series | "all">("all");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字
+  // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("q");
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
     if (q) setQuery(q);
+    const s = params.get("series");
+    if (s && (seriesKeys as string[]).includes(s)) setSeries(s as Series);
+    // 篩選後清單變短，瀏覽器先前的錨點跳轉會落在頁尾，篩完再對準一次
+    if (window.location.hash === "#blocks") {
+      setTimeout(() => document.getElementById("blocks")?.scrollIntoView(), 0);
+    }
   }, []);
 
   // 按 / 聚焦搜尋框；正在其他輸入框打字時不攔截
@@ -36,16 +47,32 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const filtered = query.trim() !== "" || interaction !== "all" || tier !== "all";
+  const filtered = query.trim() !== "" || interaction !== "all" || tier !== "all" || series !== "all";
   const reset = () => {
     setQuery("");
     setInteraction("all");
     setTier("all");
+    setSeries("all");
   };
+
+  // 互動數字跟著目前的系列與方案篩選，避免顯示點下去才發現是 0 的數字
+  const scoped = useMemo(
+    () =>
+      items.filter(
+        (item) => (tier === "all" || item.meta.tier === tier) && (series === "all" || seriesOf(item) === series),
+      ),
+    [items, tier, series],
+  );
 
   const counts = useMemo(() => {
     const map = new Map<Interaction, number>();
-    for (const item of items) map.set(item.meta.interaction, (map.get(item.meta.interaction) ?? 0) + 1);
+    for (const item of scoped) map.set(item.meta.interaction, (map.get(item.meta.interaction) ?? 0) + 1);
+    return map;
+  }, [scoped]);
+
+  const seriesCounts = useMemo(() => {
+    const map = new Map<Series, number>();
+    for (const item of items) map.set(seriesOf(item), (map.get(seriesOf(item)) ?? 0) + 1);
     return map;
   }, [items]);
 
@@ -54,6 +81,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
     return items.filter((item) => {
       if (interaction !== "all" && item.meta.interaction !== interaction) return false;
       if (tier !== "all" && item.meta.tier !== tier) return false;
+      if (series !== "all" && seriesOf(item) !== series) return false;
       if (!q) return true;
       const haystack = [
         item.title,
@@ -66,10 +94,10 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [items, interaction, tier, query]);
+  }, [items, interaction, tier, series, query]);
 
   return (
-    <section aria-label="Blocks">
+    <section id="blocks" aria-label="Blocks" className="scroll-mt-24">
       <div className="mb-6 grid gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <label className="relative min-w-0 flex-1 sm:max-w-xs">
@@ -119,8 +147,22 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
           </div>
         </div>
 
+        <div role="group" aria-label="Filter by series" className="flex flex-wrap items-center gap-2">
+          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label="All series" count={items.length} />
+          {seriesKeys.map((key) => (
+            <FilterChip
+              key={key}
+              active={series === key}
+              onClick={() => setSeries(key)}
+              label={seriesLabels[key]}
+              count={seriesCounts.get(key) ?? 0}
+            />
+          ))}
+          {series !== "all" && <p className="text-sm text-subtle">{seriesDescriptions[series]}</p>}
+        </div>
+
         <div role="group" aria-label="Filter by interaction" className="flex flex-wrap gap-2">
-          <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label="All" count={items.length} />
+          <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label="All" count={scoped.length} />
           {(Object.keys(interactionLabels) as Interaction[]).map((key) => (
             <FilterChip
               key={key}
@@ -161,7 +203,14 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
                 </h3>
                 <p className="mt-1 line-clamp-2 text-sm text-subtle">{item.description}</p>
               </div>
-              <TierBadge tier={item.meta.tier} />
+              <div className="flex shrink-0 flex-col items-end gap-1.5">
+                <TierBadge tier={item.meta.tier} />
+                {seriesOf(item) !== "paper" && (
+                  <span className="text-[11px] font-medium tracking-wide text-subtle uppercase">
+                    {seriesLabels[seriesOf(item)]}
+                  </span>
+                )}
+              </div>
             </div>
           </li>
         ))}

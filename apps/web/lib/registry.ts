@@ -16,6 +16,9 @@ export type Interaction =
   | "scroll"
   | "section";
 
+/** 設計語言系列：paper 見 DESIGN.md，product 見 DESIGN-product.md，story 見 DESIGN-story.md */
+export type Series = "paper" | "product" | "story";
+
 export type RegistryFile = {
   path: string;
   type: string;
@@ -39,6 +42,8 @@ export type RegistryItem = {
   meta: {
     tier: Tier;
     interaction: Interaction;
+    /** 省略時視為 paper */
+    series?: Series;
     addedAt: string;
     /** 區塊頁的使用指引；aliases 也會被目錄搜尋 */
     usage?: BlockUsage;

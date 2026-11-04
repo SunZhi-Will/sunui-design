@@ -8,6 +8,7 @@ import { PreviewFrame } from "@/components/preview-frame";
 import { TierBadge } from "@/components/tier-badge";
 import { interactionLabels } from "@/lib/interactions";
 import { getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
+import { seriesLabels, seriesOf } from "@/lib/series";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -54,6 +55,14 @@ export default async function BlockPage({ params }: Props) {
           <p className="mt-3 text-pretty text-subtle">{item.description}</p>
         </div>
         <div className="flex items-center gap-2">
+          {seriesOf(item) !== "paper" && (
+            <Link
+              href={`/?series=${seriesOf(item)}#blocks`}
+              className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:text-fg"
+            >
+              {seriesLabels[seriesOf(item)]}
+            </Link>
+          )}
           <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
             {interactionLabels[item.meta.interaction]}
           </span>
@@ -146,7 +155,9 @@ function RelatedBlocks({ item }: { item: Item }) {
     .filter((other) => other.name !== item.name)
     .map((other) => ({
       other,
+      // 同系列優先，避免紙感頁面推薦遊戲介面
       score:
+        (seriesOf(other) === seriesOf(item) ? 4 : 0) +
         (other.meta.interaction === item.meta.interaction ? 2 : 0) +
         (other.categories ?? []).filter((c) => item.categories?.includes(c)).length +
         (other.meta.usage?.aliases ?? []).filter((a) => item.meta.usage?.aliases?.includes(a)).length * 2,
