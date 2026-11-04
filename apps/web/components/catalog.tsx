@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ScaledPreview } from "@/components/scaled-preview";
 import { TierBadge } from "@/components/tier-badge";
@@ -15,6 +15,33 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
   const [tier, setTier] = useState<Tier | "all">("all");
   const [query, setQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setQuery(q);
+  }, []);
+
+  // 按 / 聚焦搜尋框；正在其他輸入框打字時不攔截
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      event.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const filtered = query.trim() !== "" || interaction !== "all" || tier !== "all";
+  const reset = () => {
+    setQuery("");
+    setInteraction("all");
+    setTier("all");
+  };
 
   const counts = useMemo(() => {
     const map = new Map<Interaction, number>();
@@ -28,7 +55,15 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
       if (interaction !== "all" && item.meta.interaction !== interaction) return false;
       if (tier !== "all" && item.meta.tier !== tier) return false;
       if (!q) return true;
-      const haystack = [item.title, item.description, item.name, ...(item.categories ?? [])].join(" ").toLowerCase();
+      const haystack = [
+        item.title,
+        item.description,
+        item.name,
+        ...(item.categories ?? []),
+        ...(item.meta.usage?.aliases ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
       return haystack.includes(q);
     });
   }, [items, interaction, tier, query]);
@@ -51,12 +86,20 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
               <path d="m20 20-3.5-3.5" />
             </svg>
             <input
+              ref={searchRef}
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search blocks, e.g. coupon, cart, countdown"
-              className="w-full rounded-full border border-line bg-card py-2 pr-4 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
+              aria-keyshortcuts="/"
+              className="peer w-full rounded-full border border-line bg-card py-2 pr-10 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
             />
+            <kbd
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 rounded border border-line px-1.5 font-mono text-[11px] text-subtle peer-focus:hidden"
+            >
+              /
+            </kbd>
           </label>
           <div role="group" aria-label="Filter by plan" className="flex rounded-full border border-line p-0.5 text-sm">
             {(["all", "free", "pro"] as const).map((value) => (
@@ -90,9 +133,16 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
         </div>
       </div>
 
-      <p className="mb-4 text-sm text-subtle" aria-live="polite">
-        {visible.length} {visible.length === 1 ? "block" : "blocks"}
-      </p>
+      <div className="mb-4 flex items-center gap-3 text-sm text-subtle">
+        <p aria-live="polite">
+          {visible.length} {visible.length === 1 ? "block" : "blocks"}
+        </p>
+        {filtered && (
+          <button type="button" onClick={reset} className="underline-offset-4 hover:text-fg hover:underline">
+            Clear filters
+          </button>
+        )}
+      </div>
 
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((item) => (
@@ -118,9 +168,16 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
       </ul>
 
       {visible.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-subtle">
-          No blocks match. Try another word or clear the filters.
-        </p>
+        <div className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-subtle">
+          <p>No blocks match. Try another word or clear the filters.</p>
+          <button
+            type="button"
+            onClick={reset}
+            className="mt-4 rounded-full border border-line px-4 py-1.5 text-fg transition-colors hover:border-accent/60"
+          >
+            Clear filters
+          </button>
+        </div>
       )}
     </section>
   );

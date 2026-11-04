@@ -22,6 +22,12 @@ export type RegistryFile = {
   target?: string;
 };
 
+export type BlockUsage = {
+  whenToUse?: string[];
+  watchOut?: string[];
+  aliases?: string[];
+};
+
 export type RegistryItem = {
   name: string;
   type: string;
@@ -34,6 +40,8 @@ export type RegistryItem = {
     tier: Tier;
     interaction: Interaction;
     addedAt: string;
+    /** 區塊頁的使用指引；aliases 也會被目錄搜尋 */
+    usage?: BlockUsage;
   };
   files: RegistryFile[];
 };

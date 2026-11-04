@@ -22,7 +22,23 @@
       "meta": {
         "tier": "free",
         "interaction": "press",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product cards and quick-add rows in a shop",
+            "Any action that moves an item somewhere the user can see"
+          ],
+          "watchOut": [
+            "Point the flight at a cart icon that stays visible, or the motion has nowhere to land",
+            "Keep the server request independent of the animation so a slow network does not freeze it"
+          ],
+          "aliases": [
+            "fly to cart",
+            "add to bag button",
+            "cart animation",
+            "buy button"
+          ]
+        }
       },
       "files": [
         {
@@ -50,11 +66,163 @@
       "meta": {
         "tier": "free",
         "interaction": "loading",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Prices, totals and counters that change after a choice",
+            "Dashboard stats that update live"
+          ],
+          "watchOut": [
+            "Use tabular numbers so the width does not jump",
+            "Do not animate numbers that change many times a second"
+          ],
+          "aliases": [
+            "odometer",
+            "number ticker",
+            "count up",
+            "rolling digits",
+            "price animation"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/animated-number/animated-number.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "animated-tabs",
+      "type": "registry:block",
+      "title": "Animated Tabs",
+      "description": "Tabs with a sliding indicator in underline, pill or browser-style folder variants, optional count badges for filter tabs, and panels that cross-fade on change. Follows the WAI-ARIA tabs pattern with automatic activation, arrow, Home and End keys; reduced motion swaps the indicator and panels instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "tabs",
+        "filter"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Splitting related content into peer sections on one page",
+            "Filter tabs that show result counts, like All, Open, Closed"
+          ],
+          "watchOut": [
+            "Only the active panel is mounted, so panel state resets when switching tabs",
+            "Automatic activation switches on focus; avoid it for panels that load slowly"
+          ],
+          "aliases": [
+            "tab bar",
+            "filter tabs",
+            "folder tabs",
+            "browser tabs",
+            "tabs with badges"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/animated-tabs/animated-tabs.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "avatar-stack",
+      "type": "registry:block",
+      "title": "Avatar Stack",
+      "description": "Overlapping avatars with image or deterministic initials fallback, a max visible count with a +N overflow chip, three sizes, optional ring color and presence dots, where hover or focus lifts an avatar and shows its name. Rendered as a labelled list with named avatars so screen readers hear every member; reduced motion keeps avatars still and fades tooltips instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "avatar",
+        "team"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Showing collaborators on a document, project or channel",
+            "Compact team rows in cards and table cells"
+          ],
+          "watchOut": [
+            "Each avatar is a tab stop so tooltips work by keyboard; keep max low in dense tables",
+            "Initials colors come from the name, so two people with the same name share a color"
+          ],
+          "aliases": [
+            "avatar group",
+            "facepile",
+            "people stack",
+            "member list",
+            "user avatars"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/avatar-stack/avatar-stack.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "border-beam",
+      "type": "registry:block",
+      "title": "Border Beam",
+      "description": "A wrapper that draws an animated border around any content in four styles: a travelling light beam, a rotating conic gradient, marching ants and a flickering neon glow, with configurable colors, duration, width and radius. The border is decorative and hidden from assistive tech; with reduced motion it renders as a static border.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "border",
+        "effect"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Highlighting a featured pricing tier or call to action",
+            "Signalling that an AI input or job is actively working"
+          ],
+          "watchOut": [
+            "Beam and rotating rely on CSS @property, so very old browsers show a static gradient",
+            "Use on one element per view; several moving borders compete for attention"
+          ],
+          "aliases": [
+            "animated border",
+            "glowing border",
+            "shine border",
+            "gradient border",
+            "neon border"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/border-beam/border-beam.tsx",
           "type": "registry:component"
         }
       ]
@@ -78,11 +246,72 @@
       "meta": {
         "tier": "free",
         "interaction": "section",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Chinese or Japanese headlines on landing pages",
+            "Editorial layouts that want vertical writing"
+          ],
+          "watchOut": [
+            "Vertical writing needs a fixed height and short lines",
+            "Check punctuation placement in every target font"
+          ],
+          "aliases": [
+            "vertical text",
+            "tategaki",
+            "chinese heading",
+            "japanese typography"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/cjk-heading/cjk-heading.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "command-palette",
+      "type": "registry:block",
+      "title": "Command Palette",
+      "description": "A ⌘K / Ctrl+K command dialog with fuzzy search that highlights matched characters, grouped results, recent items, per-item shortcut hints, an empty state and a footer legend. Built as an ARIA combobox and listbox with arrow, Home/End, Enter and Escape keys, a focus trap, focus restore and body scroll lock; the opt-in global hotkey ignores typing in other fields, and reduced motion removes the scale and highlight animations.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "search",
+        "dialog"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Apps with many pages or actions that power users jump between",
+            "A single keyboard entry point for navigation, actions and settings"
+          ],
+          "watchOut": [
+            "The hotkey is global; disable it when another component already owns ⌘K",
+            "Fuzzy matching runs on the client, so very large lists should be pre-filtered or virtualised"
+          ],
+          "aliases": [
+            "cmdk",
+            "spotlight search",
+            "command menu",
+            "quick switcher",
+            "omnibar"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/command-palette/command-palette.tsx",
           "type": "registry:component"
         }
       ]
@@ -106,7 +335,23 @@
       "meta": {
         "tier": "free",
         "interaction": "press",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Coupon and promo codes in checkout or emails",
+            "Any short string the user needs to paste elsewhere"
+          ],
+          "watchOut": [
+            "Clipboard access needs a secure context (https or localhost)",
+            "Keep the code visible as text so it can still be copied by hand"
+          ],
+          "aliases": [
+            "coupon code",
+            "copy to clipboard",
+            "promo code chip",
+            "copy button feedback"
+          ]
+        }
       },
       "files": [
         {
@@ -133,11 +378,72 @@
       "meta": {
         "tier": "free",
         "interaction": "section",
-        "addedAt": "2026-11-04"
+        "addedAt": "2026-11-04",
+        "usage": {
+          "whenToUse": [
+            "Time limited sales with a real end time",
+            "Launch day announcements"
+          ],
+          "watchOut": [
+            "Only show a countdown that reflects a real deadline",
+            "Render the end time on the server so every visitor sees the same clock"
+          ],
+          "aliases": [
+            "sale banner",
+            "timer banner",
+            "flash sale",
+            "announcement bar"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/countdown-banner/countdown-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "expanding-search",
+      "type": "registry:block",
+      "title": "Expanding Search",
+      "description": "A search icon button that grows into a field with autofocus, a clear button and an optional suggestions dropdown, collapsing on Escape or when it loses focus while empty. The dropdown follows the ARIA combobox pattern with arrow, Home/End and Enter keys, an opt-in \"/\" shortcut ignores typing elsewhere, and the width animation is instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "search",
+        "input"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Compact navbars where a full search field does not fit",
+            "Sites where search is secondary but should stay one click away"
+          ],
+          "watchOut": [
+            "Leave room in the layout for the expanded width so neighbouring items do not jump",
+            "Built-in filtering is a simple substring match; set filterSuggestions to false for server results"
+          ],
+          "aliases": [
+            "search toggle",
+            "collapsible search",
+            "search bar",
+            "navbar search",
+            "autocomplete"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/expanding-search/expanding-search.tsx",
           "type": "registry:component"
         }
       ]
@@ -161,7 +467,24 @@
       "meta": {
         "tier": "free",
         "interaction": "press",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Wishlists, likes and saves on product or content cards",
+            "Lightweight toggles that deserve a little delight"
+          ],
+          "watchOut": [
+            "Update the count optimistically and roll back on error",
+            "Give it an accessible name that includes the item"
+          ],
+          "aliases": [
+            "like button",
+            "heart button",
+            "wishlist toggle",
+            "save button",
+            "like with burst"
+          ]
+        }
       },
       "files": [
         {
@@ -188,7 +511,23 @@
       "meta": {
         "tier": "free",
         "interaction": "press",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Mobile screens with two to five primary actions",
+            "Editors and tools that need quick create actions"
+          ],
+          "watchOut": [
+            "Keep the button clear of bottom navigation and cookie bars",
+            "More than five actions belongs in a real menu"
+          ],
+          "aliases": [
+            "fab",
+            "speed dial",
+            "radial menu",
+            "quick actions"
+          ]
+        }
       },
       "files": [
         {
@@ -215,11 +554,72 @@
       "meta": {
         "tier": "free",
         "interaction": "loading",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero sections and empty states that need atmosphere",
+            "Behind glass cards and pricing tables"
+          ],
+          "watchOut": [
+            "Keep text contrast high on top of moving color",
+            "Large blurred layers cost GPU on low end phones"
+          ],
+          "aliases": [
+            "mesh gradient",
+            "aurora background",
+            "animated background",
+            "blur blobs"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/gradient-background/gradient-background.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "loader-set",
+      "type": "registry:block",
+      "title": "Loader Set",
+      "description": "A family of seven loaders (orbit, bouncing dots, equalizer bars, ring spinner, pulse rings, infinity and a spinner that morphs into a drawn checkmark) sharing one size, speed and label API and inheriting color from currentColor. Each renders role=\"status\" with sr-only text; with reduced motion they hold a static frame with a slow opacity pulse.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "loader",
+        "spinner"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Indeterminate waits inside buttons, cards or full pages",
+            "Confirming a save with SpinnerToCheck once the request resolves"
+          ],
+          "watchOut": [
+            "Prefer a skeleton for waits longer than a couple of seconds",
+            "Set color with a text-* class on a parent since loaders use currentColor"
+          ],
+          "aliases": [
+            "spinner",
+            "activity indicator",
+            "progress indicator",
+            "loading animation",
+            "throbber"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/loader-set/loader-set.tsx",
           "type": "registry:component"
         }
       ]
@@ -243,7 +643,23 @@
       "meta": {
         "tier": "free",
         "interaction": "scroll",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Customer and partner logo rows",
+            "Ticker style news or feature lists"
+          ],
+          "watchOut": [
+            "Duplicate content is hidden from screen readers, so keep one readable copy",
+            "Pause on hover so people can read it"
+          ],
+          "aliases": [
+            "logo cloud",
+            "infinite scroll",
+            "ticker",
+            "carousel loop"
+          ]
+        }
       },
       "files": [
         {
@@ -271,7 +687,23 @@
       "meta": {
         "tier": "free",
         "interaction": "loading",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product pages where stock is genuinely limited",
+            "Ticket and seat selection"
+          ],
+          "watchOut": [
+            "Only show real inventory numbers, fake scarcity erodes trust",
+            "Hide it entirely when stock is comfortable"
+          ],
+          "aliases": [
+            "stock badge",
+            "inventory meter",
+            "only n left",
+            "scarcity indicator"
+          ]
+        }
       },
       "files": [
         {
@@ -299,11 +731,71 @@
       "meta": {
         "tier": "free",
         "interaction": "hover",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "One primary call to action on a hero",
+            "Playful portfolio or agency sites"
+          ],
+          "watchOut": [
+            "Use it once per page or it stops feeling special",
+            "Pointer only effect, touch users see a normal button"
+          ],
+          "aliases": [
+            "magnet button",
+            "hover attraction",
+            "cursor follow button"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/magnetic-button/magnetic-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "notification-bell",
+      "type": "registry:block",
+      "title": "Notification Bell",
+      "description": "A bell button with a capped unread badge that pops on change and a shake when new items arrive, opening a popover with avatars, relative times, unread dots, mark all as read and an empty state. The panel is a labelled dialog with aria-expanded, Escape and outside click to close and focus return, and new arrivals are announced politely; reduced motion removes the shake and pop.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "notification",
+        "popover"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "App headers that surface mentions, assignments and system alerts",
+            "Inbox style feeds where users clear unread items in bulk"
+          ],
+          "watchOut": [
+            "The component is controlled, so persist read state yourself in onItemClick and onMarkAllRead",
+            "Relative times use Intl.RelativeTimeFormat; pass locale to match your UI language"
+          ],
+          "aliases": [
+            "notification center",
+            "inbox",
+            "alerts dropdown",
+            "activity feed",
+            "unread badge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/notification-bell/notification-bell.tsx",
           "type": "registry:component"
         }
       ]
@@ -327,11 +819,117 @@
       "meta": {
         "tier": "free",
         "interaction": "type",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Sign in and two step verification codes",
+            "Short numeric codes from SMS or email"
+          ],
+          "watchOut": [
+            "Keep autocomplete one-time-code so phones can autofill",
+            "Do not auto-submit before the last digit is entered"
+          ],
+          "aliases": [
+            "one-time code input",
+            "verification code",
+            "pin input",
+            "2fa code"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/otp-input/otp-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "password-strength-input",
+      "type": "registry:block",
+      "title": "Password Strength Input",
+      "description": "A password field with a show and hide toggle, a four-segment strength meter whose fill and color track the level, and a live checklist of configurable rules that tick with a drawn check. Strength is announced through aria-live only when the level changes and the meter and rules are linked via aria-describedby; reduced motion fills and ticks instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "forms",
+        "input",
+        "auth"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Sign-up and change password forms",
+            "Showing users exactly which password rules are still missing"
+          ],
+          "watchOut": [
+            "Rule-based strength is a hint, not real entropy; always validate on the server",
+            "Pass a stable rules array (module level or useMemo) to avoid needless recomputation"
+          ],
+          "aliases": [
+            "password meter",
+            "password validator",
+            "strength meter",
+            "new password field",
+            "password checklist"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/password-strength-input/password-strength-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "quantity-stepper",
+      "type": "registry:block",
+      "title": "Quantity Stepper",
+      "description": "A minus, number and plus control for carts with min, max and step, long-press to repeat with acceleration, direct typing clamped on blur, a rolling number animation and an optional trash button at the minimum. Exposes ARIA spinbutton semantics (ArrowUp/Down, PageUp/Down, Home/End) with a polite live region, and the roll animation is skipped under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "input",
+        "cart"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Cart and checkout line items",
+            "Any bounded numeric input changed in small steps"
+          ],
+          "watchOut": [
+            "The plus and minus buttons are removed from the tab order; keyboard users adjust via the field itself",
+            "Typed values snap to the nearest step, so tell users when step is larger than 1"
+          ],
+          "aliases": [
+            "number stepper",
+            "counter input",
+            "qty picker",
+            "spin button",
+            "plus minus input"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/quantity-stepper/quantity-stepper.tsx",
           "type": "registry:component"
         }
       ]
@@ -355,7 +953,22 @@
       "meta": {
         "tier": "free",
         "interaction": "scroll",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Long articles, docs and changelogs",
+            "Step based onboarding pages"
+          ],
+          "watchOut": [
+            "Hide it on short pages where it adds noise",
+            "Section markers need stable heading ids"
+          ],
+          "aliases": [
+            "reading progress",
+            "progress bar",
+            "scroll indicator"
+          ]
+        }
       },
       "files": [
         {
@@ -383,11 +996,72 @@
       "meta": {
         "tier": "free",
         "interaction": "scroll",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Manifesto or mission statements on landing pages",
+            "Story style product sections"
+          ],
+          "watchOut": [
+            "Keep the full text readable without scrolling for screen readers",
+            "Long paragraphs feel slow, use it on two to four lines"
+          ],
+          "aliases": [
+            "text reveal",
+            "scroll highlight",
+            "word by word",
+            "scrollytelling"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/scroll-reveal-text/scroll-reveal-text.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "segmented-control",
+      "type": "registry:block",
+      "title": "Segmented Control",
+      "description": "Joined segments with a pill that springs to the selected option, supporting sm, md and lg sizes, optional icons or icon-only mode, and controlled or uncontrolled use. Built as a radiogroup with roving tabindex and arrow, Home and End keys; reduced motion moves the pill instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "forms",
+        "navigation",
+        "toggle"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Switching between 2 to 5 mutually exclusive views or ranges",
+            "Compact filters like Daily, Weekly, Monthly or list and grid view"
+          ],
+          "watchOut": [
+            "Too many or long labels overflow; use tabs or a select instead",
+            "Icon-only options need a string label or ariaLabel for screen readers"
+          ],
+          "aliases": [
+            "toggle group",
+            "radio buttons",
+            "button group",
+            "segmented button",
+            "view switcher"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/segmented-control/segmented-control.tsx",
           "type": "registry:component"
         }
       ]
@@ -410,7 +1084,24 @@
       "meta": {
         "tier": "free",
         "interaction": "press",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Filters, carts and detail views beside a list",
+            "Mobile navigation and settings"
+          ],
+          "watchOut": [
+            "Trap focus and restore it to the trigger on close",
+            "Avoid stacking more than one drawer"
+          ],
+          "aliases": [
+            "drawer",
+            "sheet",
+            "off-canvas",
+            "slide over",
+            "collapsible sidebar"
+          ]
+        }
       },
       "files": [
         {
@@ -437,7 +1128,23 @@
       "meta": {
         "tier": "free",
         "interaction": "loading",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "First load of cards, lists and profiles",
+            "Any content that takes over 300 ms to arrive"
+          ],
+          "watchOut": [
+            "Match the real layout so the page does not jump",
+            "Use a spinner instead for actions under a second"
+          ],
+          "aliases": [
+            "shimmer placeholder",
+            "loading placeholder",
+            "content loader",
+            "ghost ui"
+          ]
+        }
       },
       "files": [
         {
@@ -464,7 +1171,22 @@
       "meta": {
         "tier": "free",
         "interaction": "hover",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Footers, profile cards and contact sections",
+            "Author bios on blogs"
+          ],
+          "watchOut": [
+            "Brand colors change, check each platform guide",
+            "Label icon only links with the platform name"
+          ],
+          "aliases": [
+            "social icons",
+            "share button",
+            "profile link"
+          ]
+        }
       },
       "files": [
         {
@@ -490,11 +1212,72 @@
       "meta": {
         "tier": "free",
         "interaction": "hover",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Feature grids and pricing tiers",
+            "Dark landing pages that need depth"
+          ],
+          "watchOut": [
+            "Glow is pointer driven, so keep the card useful without it",
+            "Too many glowing cards side by side compete for attention"
+          ],
+          "aliases": [
+            "glow card",
+            "hover glow",
+            "mouse follow card",
+            "glassmorphism card"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/spotlight-card/spotlight-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "star-rating",
+      "type": "registry:block",
+      "title": "Star Rating",
+      "description": "Rating input with hover preview, optional half stars, a word label under the stars, custom icons and an emoji mood variant whose chosen face scales up, plus a read-only mode with fractional fill for averages like 4.3. Uses radiogroup semantics with arrow, Home/End and Delete keys; under reduced motion the pop and scale effects are skipped.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "form",
+        "input",
+        "feedback"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Collecting product or order reviews",
+            "Showing an average rating next to a review count"
+          ],
+          "watchOut": [
+            "Half-star hit areas are small on mobile; use precision 1 on touch-first forms",
+            "Pass a name prop if the value must be submitted with a native form"
+          ],
+          "aliases": [
+            "rating input",
+            "review stars",
+            "emoji rating",
+            "feedback rating",
+            "score picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/star-rating/star-rating.tsx",
           "type": "registry:component"
         }
       ]
@@ -518,7 +1301,23 @@
       "meta": {
         "tier": "free",
         "interaction": "hover",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero product shots and collectible style cards",
+            "Small grids of featured items"
+          ],
+          "watchOut": [
+            "Keep tilt subtle on cards with text",
+            "Disable on touch where it can feel jittery"
+          ],
+          "aliases": [
+            "3d tilt card",
+            "parallax card",
+            "holographic card",
+            "hover tilt"
+          ]
+        }
       },
       "files": [
         {
@@ -545,11 +1344,72 @@
       "meta": {
         "tier": "free",
         "interaction": "loading",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Confirmations after save, copy or add to cart",
+            "Non blocking errors that the user can retry"
+          ],
+          "watchOut": [
+            "Do not put critical errors only in a toast",
+            "Keep messages short and give actions a clear label"
+          ],
+          "aliases": [
+            "toast notification",
+            "snackbar",
+            "stacked toasts",
+            "alert"
+          ]
+        }
       },
       "files": [
         {
           "path": "registry/free/toast-stack/toast-stack.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "toggle-switch",
+      "type": "registry:block",
+      "title": "Toggle Switch",
+      "description": "An accessible role=\"switch\" button with a spring knob that squashes and stretches while pressed, in default, day-night (sun to moon with sky gradient and stars) and icon (cross to check) variants, plus sizes, label, description and disabled state. Labels and descriptions are wired via aria-labelledby and aria-describedby; reduced motion removes the squash and springs.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "forms",
+        "switch",
+        "settings"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Settings that take effect immediately, like Wi-Fi or notifications",
+            "A playful dark mode toggle with the day-night variant"
+          ],
+          "watchOut": [
+            "Use a checkbox instead when the change only applies after a form submit",
+            "Without a visible label, pass aria-label so the switch has a name"
+          ],
+          "aliases": [
+            "switch",
+            "toggle",
+            "dark mode toggle",
+            "on off switch",
+            "settings toggle"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/toggle-switch/toggle-switch.tsx",
           "type": "registry:component"
         }
       ]
@@ -573,7 +1433,23 @@
       "meta": {
         "tier": "free",
         "interaction": "type",
-        "addedAt": "2026-11-05"
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero headlines that rotate through use cases",
+            "Terminal or chat style intros"
+          ],
+          "watchOut": [
+            "Keep the static part of the sentence meaningful on its own",
+            "Respect reduced motion by showing the first phrase"
+          ],
+          "aliases": [
+            "typing effect",
+            "text rotator",
+            "typed text",
+            "animated headline"
+          ]
+        }
       },
       "files": [
         {

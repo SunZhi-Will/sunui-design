@@ -4,8 +4,27 @@
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "-w", "@sunui-design/web"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "@sunui-design/web"
+      ],
       "port": 3100
+    },
+    {
+      "name": "web-prod",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start",
+        "-w",
+        "@sunui-design/web",
+        "--",
+        "-p",
+        "3101"
+      ],
+      "port": 3101
     }
   ]
 }

@@ -63,6 +63,8 @@ export default async function BlockPage({ params }: Props) {
 
       <PreviewFrame name={item.name} />
 
+      <UsageGuide item={item} />
+
       {isPro ? <ProInstall item={item} /> : <FreeInstall item={item} manualDeps={manualDeps} sources={sources} />}
 
       <RelatedBlocks item={item} />
@@ -72,6 +74,73 @@ export default async function BlockPage({ params }: Props) {
 
 type Item = NonNullable<ReturnType<typeof getItem>>;
 
+// 參考資料庫式的「何時用、注意什麼、別名」，幫讀者判斷這個 block 是否適合
+function UsageGuide({ item }: { item: Item }) {
+  const usage = item.meta.usage;
+  const whenToUse = usage?.whenToUse ?? [];
+  const watchOut = usage?.watchOut ?? [];
+  const aliases = usage?.aliases ?? [];
+  if (whenToUse.length + watchOut.length + aliases.length === 0) return null;
+
+  return (
+    <section aria-label="Usage guide" className="mt-8 grid gap-4 md:grid-cols-3">
+      {whenToUse.length > 0 && (
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <svg viewBox="0 0 24 24" className="size-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m5 12 4.5 4.5L19 7" />
+            </svg>
+            When to use it
+          </h2>
+          <ul className="grid gap-2 text-sm text-subtle">
+            {whenToUse.map((line) => (
+              <li key={line} className="flex gap-2">
+                <span aria-hidden="true" className="mt-2 size-1 shrink-0 rounded-full bg-subtle" />
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {watchOut.length > 0 && (
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <svg viewBox="0 0 24 24" className="size-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+            </svg>
+            Watch out
+          </h2>
+          <ul className="grid gap-2 text-sm text-subtle">
+            {watchOut.map((line) => (
+              <li key={line} className="flex gap-2">
+                <span aria-hidden="true" className="mt-2 size-1 shrink-0 rounded-full bg-subtle" />
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {aliases.length > 0 && (
+        <div className="rounded-2xl border border-line bg-card p-5">
+          <h2 className="mb-3 text-sm font-semibold">Also called</h2>
+          <ul className="flex flex-wrap gap-1.5">
+            {aliases.map((alias) => (
+              <li key={alias}>
+                <Link
+                  href={`/?q=${encodeURIComponent(alias)}`}
+                  className="inline-block rounded-full border border-line px-2.5 py-1 text-xs text-subtle transition-colors hover:border-accent/60 hover:text-fg"
+                >
+                  {alias}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function RelatedBlocks({ item }: { item: Item }) {
   const related = getItems()
     .filter((other) => other.name !== item.name)
@@ -79,7 +148,8 @@ function RelatedBlocks({ item }: { item: Item }) {
       other,
       score:
         (other.meta.interaction === item.meta.interaction ? 2 : 0) +
-        (other.categories ?? []).filter((c) => item.categories?.includes(c)).length,
+        (other.categories ?? []).filter((c) => item.categories?.includes(c)).length +
+        (other.meta.usage?.aliases ?? []).filter((a) => item.meta.usage?.aliases?.includes(a)).length * 2,
     }))
     .sort((a, b) => b.score - a.score || a.other.title.localeCompare(b.other.title))
     .slice(0, 6)
@@ -90,7 +160,7 @@ function RelatedBlocks({ item }: { item: Item }) {
   return (
     <section aria-labelledby="related-title" className="mt-16">
       <h2 id="related-title" className="mb-4 text-lg font-semibold tracking-tight">
-        More blocks
+        Similar blocks
       </h2>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((other) => (
