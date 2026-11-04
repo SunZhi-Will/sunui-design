@@ -4,13 +4,132 @@
   "homepage": "https://github.com/SunZhi-Will/sunui-design",
   "items": [
     {
+      "name": "add-to-cart-button",
+      "type": "registry:block",
+      "title": "Add To Cart Button",
+      "description": "An add-to-cart button whose product thumbnail flies along an arc into a cart icon (via ref or a screen corner), with idle, adding and added states and a companion CartIcon whose badge bumps on each add. Announces the result via aria-live; with reduced motion the flight is skipped and states switch instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "button",
+        "cart"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/add-to-cart-button/add-to-cart-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "animated-number",
+      "type": "registry:block",
+      "title": "Animated Number",
+      "description": "An odometer-style number that rolls digit by digit with Intl currency or number formatting and a brief green or red hint plus arrow when the value rises or falls. Use for prices, totals and counters; screen readers get the formatted text, and reduced motion swaps instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "number",
+        "price"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/animated-number/animated-number.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cjk-heading",
+      "type": "registry:block",
+      "title": "CJK Heading",
+      "description": "Headline for Traditional Chinese and Japanese with optional vertical writing (vertical-rl with tate-chu-yoko digits), punctuation compression via text-spacing-trim with palt/halt font-feature fallbacks, automatic thin spacing between CJK and Latin text, and a staggered per-character blur-in that keeps native line breaking rules. Screen readers read the original text; reduced motion uses an instant fade.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "typography",
+        "section",
+        "cjk"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/cjk-heading/cjk-heading.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "copy-code-button",
+      "type": "registry:block",
+      "title": "Copy Code Button",
+      "description": "A dashed coupon chip that copies a promo code to the clipboard, morphs its icon into a check and pops a Copied toast. Keyboard operable, announces success or failure via aria-live, keeps the code selectable as a fallback, and drops motion when reduced motion is preferred.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "button",
+        "coupon"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/copy-code-button/copy-code-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "countdown-banner",
       "type": "registry:block",
       "title": "Countdown Banner",
       "description": "A limited-time offer banner with a live countdown, price drop and a glowing call to action.",
-      "dependencies": ["framer-motion"],
-      "registryDependencies": ["utils"],
-      "categories": ["section", "commerce"],
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "section",
+        "commerce"
+      ],
       "meta": {
         "tier": "free",
         "interaction": "section",
@@ -19,6 +138,446 @@
       "files": [
         {
           "path": "registry/free/countdown-banner/countdown-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "favorite-button",
+      "type": "registry:block",
+      "title": "Favorite Button",
+      "description": "A heart toggle for wishlists with a burst ring, small particles and an optional rolling count. Uses aria-pressed with descriptive labels, works controlled or uncontrolled, and skips the burst and bounce under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "button",
+        "wishlist"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/favorite-button/favorite-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "floating-action-menu",
+      "type": "registry:block",
+      "title": "Floating Action Menu",
+      "description": "A floating action button that springs open into a radial fan or vertical stack of quick actions, pinned to any corner of the viewport or a container. Implements the menu button pattern with arrow key navigation, Escape to close and focus return; items appear instantly when reduced motion is preferred.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "button"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/floating-action-menu/floating-action-menu.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "gradient-background",
+      "type": "registry:block",
+      "title": "Gradient Background",
+      "description": "An ambient backdrop of slowly drifting, blurred color fields with an optional grid or dot texture, wrapping any content as a children slot. Ideal for heroes, empty states and auth screens; decorative layers are aria-hidden and the drift stops when reduced motion is preferred or paused.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "background",
+        "section"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/gradient-background/gradient-background.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "logo-marquee",
+      "type": "registry:block",
+      "title": "Logo Marquee",
+      "description": "An infinite, seamless logo or text marquee with direction and speed props, edge fade masks, pause on hover or focus and an optional pause button. Duplicate copies are hidden from assistive tech; with reduced motion it renders a static wrapped list.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "section",
+        "marquee",
+        "logos"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/logo-marquee/logo-marquee.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "low-stock-indicator",
+      "type": "registry:block",
+      "title": "Low Stock Indicator",
+      "description": "An honest scarcity indicator that shows the real remaining stock with a ticking count and a draining meter, shifting from emerald to amber to rose at configurable thresholds. It never fakes a countdown; changes are announced via role=status, and reduced motion removes the pulse and animation.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "inventory",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/low-stock-indicator/low-stock-indicator.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "magnetic-button",
+      "type": "registry:block",
+      "title": "Magnetic Button",
+      "description": "A call-to-action button that is pulled toward the pointer within a radius, with label parallax and a spring back on exit. The effect only runs for fine hover pointers and is disabled on touch devices and under reduced motion; the button stays a native, keyboard-accessible element.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "button",
+        "cta",
+        "hover"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/magnetic-button/magnetic-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "otp-input",
+      "type": "registry:block",
+      "title": "OTP Input",
+      "description": "One-time code input with N cells, auto-advance, backspace to previous cell, paste that fills every cell, numeric inputMode and autocomplete=\"one-time-code\" for SMS autofill. Shows success and error states (error shakes the row); each cell is labelled, arrow/Home/End keys navigate, and the shake is skipped under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "form",
+        "input",
+        "auth"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/otp-input/otp-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "scroll-progress",
+      "type": "registry:block",
+      "title": "Scroll Progress",
+      "description": "Reading progress bar tied to the window or any scroll container, with optional section markers that show progress and jump to each section on click. Exposes a progressbar role with percent values, markers are keyboard-focusable buttons, and smoothing and smooth scrolling are turned off under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "scroll",
+        "navigation",
+        "content"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-progress/scroll-progress.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "scroll-reveal-text",
+      "type": "registry:block",
+      "title": "Scroll Reveal Text",
+      "description": "A paragraph whose words light up one by one as it scrolls through the viewport or a scroll container, splitting per character for Chinese, Japanese and Korean and per word for Latin text, with optional accent words. Screen readers get the full text once; under reduced motion the text is shown fully lit.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "scroll",
+        "typography",
+        "cjk"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-reveal-text/scroll-reveal-text.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "side-panel",
+      "type": "registry:block",
+      "title": "Side Panel",
+      "description": "A modal drawer that slides in from the left, right or bottom with a title, description, scrollable body and sticky footer. Traps focus, closes on Escape or overlay click, locks page scroll and restores focus to the trigger; it fades instead of sliding under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "overlay",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/side-panel/side-panel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "skeleton-set",
+      "type": "registry:block",
+      "title": "Skeleton Set",
+      "description": "Skeleton loading primitives (line, circle, text, card, product card, list) with wave, pulse or no shimmer, plus a SkeletonSet wrapper that crossfades from the placeholder to real content when loaded. The region sets aria-busy and announces loading state via a visually hidden status; shimmer is disabled under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "loading"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/skeleton-set/skeleton-set.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "social-link-button",
+      "type": "registry:block",
+      "title": "Social Link Button",
+      "description": "A social profile link with built-in GitHub, X, LinkedIn, Instagram, Facebook, YouTube and email glyphs, where the brand color floods in on hover or focus. Comes as icon, pill or expanding variants with an accessible name and new-tab hint; the fill switches instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "button",
+        "social"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/social-link-button/social-link-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "spotlight-card",
+      "type": "registry:block",
+      "title": "Spotlight Card",
+      "description": "A card whose surface and border light up with a soft glow that follows the pointer, in solid, glass or outline variants with an optional subtle tilt. Keyboard focus inside the card centers the glow; tilt is disabled and fades are instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "card"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/spotlight-card/spotlight-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "tilt-card",
+      "type": "registry:block",
+      "title": "Tilt Card",
+      "description": "A 3D product card that tilts toward the pointer with a following glare and depth layers for image, title and price. Supports a link or action button; keyboard focus shows a ring and a subtle lift, and reduced motion keeps it flat.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "card",
+        "product"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/tilt-card/tilt-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "toast-stack",
+      "type": "registry:block",
+      "title": "Toast Stack",
+      "description": "Stacked notifications that fan out on hover or keyboard focus, dismiss by swipe, close button or Escape, and auto-dismiss with timers that pause while hovered or focused. Ships a useToasts hook; toasts render in a labelled region with an aria-live polite list, and springs become instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "notification"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/toast-stack/toast-stack.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "typewriter",
+      "type": "registry:block",
+      "title": "Typewriter",
+      "description": "Typing and deleting rotating phrases with a blinking caret (bar, block or underscore), grapheme-accurate via Intl.Segmenter and CJK-aware pacing with longer pauses after punctuation; starts when scrolled into view. Screen readers get the full text once from a visually hidden copy (aria-live off), and reduced motion swaps whole phrases without typing.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "typography",
+        "hero",
+        "cjk"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05"
+      },
+      "files": [
+        {
+          "path": "registry/free/typewriter/typewriter.tsx",
           "type": "registry:component"
         }
       ]

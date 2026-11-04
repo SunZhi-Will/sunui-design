@@ -96,3 +96,15 @@ body {
   background-image: radial-gradient(color-mix(in oklab, var(--fg) 12%, transparent) 1px, transparent 1px);
   background-size: 16px 16px;
 }
+
+/* 文件頁排版 */
+.docs h1 { font-size: 2.25rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
+.docs h2 { margin-top: 2.5rem; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+.docs p, .docs li { color: var(--subtle); line-height: 1.7; }
+.docs p { margin-top: 0.85rem; }
+.docs ul, .docs ol { margin-top: 0.85rem; padding-left: 1.25rem; display: grid; gap: 0.35rem; }
+.docs ul { list-style: disc; }
+.docs ol { list-style: decimal; }
+.docs a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+.docs code:not(pre code) { font-family: var(--font-mono); font-size: 0.875em; color: var(--fg); }
+.docs .block-gap { margin-top: 1rem; }

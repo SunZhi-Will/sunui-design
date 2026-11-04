@@ -21,6 +21,7 @@ npm run web:dev              # 在 repo 根目錄執行，http://localhost:3100
    - 動畫 variants 標註 `Variants` 型別；支援 `useReducedMotion`
 2. 同一資料夾加 `demo.tsx`（預設匯出、不需要 props）。`predev` / `prebuild` 會自動註冊到預覽清單。
 3. 在對應的 `registry.json`（免費：本資料夾；Pro：`registry/pro/registry.json`）加一筆 item。
+   多人同時開發時，可改寫到 `registry/_incoming/<group>.json`，再執行 `node scripts/merge-incoming.mjs` 一次併入。
 
 型錄、block 頁、`/preview/<name>`（iframe 預覽）和 registry 端點都會自動產生。
 

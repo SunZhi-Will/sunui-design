@@ -64,11 +64,53 @@ export default async function BlockPage({ params }: Props) {
       <PreviewFrame name={item.name} />
 
       {isPro ? <ProInstall item={item} /> : <FreeInstall item={item} manualDeps={manualDeps} sources={sources} />}
+
+      <RelatedBlocks item={item} />
     </article>
   );
 }
 
 type Item = NonNullable<ReturnType<typeof getItem>>;
+
+function RelatedBlocks({ item }: { item: Item }) {
+  const related = getItems()
+    .filter((other) => other.name !== item.name)
+    .map((other) => ({
+      other,
+      score:
+        (other.meta.interaction === item.meta.interaction ? 2 : 0) +
+        (other.categories ?? []).filter((c) => item.categories?.includes(c)).length,
+    }))
+    .sort((a, b) => b.score - a.score || a.other.title.localeCompare(b.other.title))
+    .slice(0, 6)
+    .map(({ other }) => other);
+
+  if (related.length === 0) return null;
+
+  return (
+    <section aria-labelledby="related-title" className="mt-16">
+      <h2 id="related-title" className="mb-4 text-lg font-semibold tracking-tight">
+        More blocks
+      </h2>
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {related.map((other) => (
+          <li key={other.name}>
+            <Link
+              href={`/blocks/${other.name}`}
+              className="flex items-start justify-between gap-3 rounded-xl border border-line bg-card p-4 transition-colors hover:border-accent/60"
+            >
+              <span className="min-w-0">
+                <span className="block font-medium">{other.title}</span>
+                <span className="mt-1 line-clamp-2 block text-sm text-subtle">{other.description}</span>
+              </span>
+              <TierBadge tier={other.meta.tier} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 function FreeInstall({
   item,
