@@ -27,12 +27,9 @@ export default function MarkdownCardDemo() {
   const [content, setContent] = useState(notes);
 
   return (
-    <div className="grid w-full max-w-3xl grid-cols-1 gap-6 rounded-xl bg-[#f3f4f6] p-4 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] sm:p-6">
+    <div className="w-full max-w-lg min-w-0 rounded-xl bg-[#f3f4f6] p-4 sm:p-6">
       <div className="h-[380px] min-w-0">
         <MarkdownCard value={content} onValueChange={setContent} />
-      </div>
-      <div className="h-[200px] min-w-0">
-        <MarkdownCard defaultValue="" fontSize={15} color="#1f2937" />
       </div>
     </div>
   );

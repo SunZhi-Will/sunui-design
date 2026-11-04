@@ -2,6 +2,7 @@
 
 // 功能 Bento 格：每一格都有一個只在畫面內播放的小動畫。
 // 卡片捲動進場（模糊 + 位移 + 淡入），滑鼠裝置 hover 上浮。
+// 格子裡的小動畫由使用端自備：用 useTicker 取得 tick 重播，並可使用下方注入的 lb-* 動畫 class。
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
@@ -48,7 +49,7 @@ const CSS = `
 
 /* ---------- hooks ---------- */
 
-export function usePrefersReducedMotion() {
+function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -60,7 +61,7 @@ export function usePrefersReducedMotion() {
   return reduced;
 }
 
-export function useInView<T extends Element>(options?: { once?: boolean; threshold?: number; rootMargin?: string }) {
+function useInView<T extends Element>(options?: { once?: boolean; threshold?: number; rootMargin?: string }) {
   const { once = true, threshold = 0.2, rootMargin } = options ?? {};
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
@@ -108,67 +109,15 @@ export function useTicker(period: number) {
   return { ref, inView, tick };
 }
 
-/* ---------- 共用元件 ---------- */
+/* ---------- 元件 ---------- */
 
 /** 捲動進場：模糊 + 位移 + 淡入，強 ease-out。 */
-export function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.15 });
   return (
     <div ref={ref} data-shown={inView} className={cn("lb-reveal", className)} style={{ "--lb-delay": `${delay}ms` } as CSSProperties}>
       {children}
     </div>
-  );
-}
-
-/** 進入畫面時從 from 跳到目標值。 */
-export function CountUp({
-  to,
-  from = 0,
-  decimals = 0,
-  duration = 1200,
-  start = true,
-  suffix = "",
-}: {
-  to: number;
-  from?: number;
-  decimals?: number;
-  duration?: number;
-  start?: boolean;
-  suffix?: string;
-}) {
-  const reduced = usePrefersReducedMotion();
-  const [value, setValue] = useState(from);
-  const fromRef = useRef(from);
-
-  useEffect(() => {
-    if (!start) {
-      setValue(fromRef.current);
-      return;
-    }
-    if (reduced) {
-      fromRef.current = to;
-      setValue(to);
-      return;
-    }
-    let frame = 0;
-    const begin = performance.now();
-    const origin = fromRef.current;
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - begin) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(origin + (to - origin) * eased);
-      if (progress < 1) frame = requestAnimationFrame(tick);
-      else fromRef.current = to;
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [to, duration, start, reduced]);
-
-  return (
-    <span className="tabular-nums">
-      {value.toFixed(decimals)}
-      {suffix}
-    </span>
   );
 }
 

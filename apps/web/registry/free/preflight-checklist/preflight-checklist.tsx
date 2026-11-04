@@ -5,8 +5,8 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /*
- * 錄製前檢查：底部即時檢查列 + 主 CTA、權限面板，以及產生檢查項的純函式。
- * 移植自 KapZoom 的 PreflightChecklist.tsx、PermissionCenter.tsx、preflightChecks.ts。
+ * 錄製前檢查：底部即時檢查列 + 主 CTA，以及產生檢查項的純函式。
+ * 移植自 KapZoom 的 PreflightChecklist.tsx 與 preflightChecks.ts。
  * 檢查結果放在 CTA 旁邊而不是彈 dialog：錄製前的問題幾乎都是「知道就好」，不值得中斷。
  */
 
@@ -81,71 +81,6 @@ export const Icons = {
     </>,
   ),
   ChevronDown: icon(<path d="m6 9 6 6 6-6" />),
-  Mic: icon(
-    <>
-      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3" />
-    </>,
-  ),
-  MicOff: icon(
-    <>
-      <path d="m2 2 20 20M18.89 13.23A7.12 7.12 0 0 0 19 12v-2M5 10v2a7 7 0 0 0 12 5M15 9.34V5a3 3 0 0 0-5.68-1.33M9 9v3a3 3 0 0 0 5.12 2.12M12 19v3" />
-    </>,
-  ),
-  Volume2: icon(
-    <>
-      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-      <path d="M16 9a5 5 0 0 1 0 6M19.364 18.364a9 9 0 0 0 0-12.728" />
-    </>,
-  ),
-  VolumeX: icon(
-    <>
-      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-      <path d="m22 9-6 6M16 9l6 6" />
-    </>,
-  ),
-  Camera: icon(
-    <>
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
-    </>,
-  ),
-  Timer: icon(
-    <>
-      <path d="M10 2h4M12 14l3-3" />
-      <circle cx="12" cy="14" r="8" />
-    </>,
-  ),
-  MousePointer: icon(
-    <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />,
-  ),
-  Zap: icon(
-    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />,
-  ),
-  Gauge: icon(<path d="m12 14 4-4M3.34 19a10 10 0 1 1 17.32 0" />),
-  Monitor: icon(
-    <>
-      <rect width="20" height="14" x="2" y="3" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </>,
-  ),
-  AppWindow: icon(
-    <>
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="M10 4v4M2 8h20M6 4v4" />
-    </>,
-  ),
-  Crop: icon(<path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2" />),
-  Search: icon(
-    <>
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </>,
-  ),
-  RefreshCw: icon(
-    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5" />,
-  ),
-  ArrowLeft: icon(<path d="m12 19-7-7 7-7M19 12H5" />),
 };
 
 /* ---------- 檢查項 ---------- */
@@ -507,128 +442,6 @@ export function PreflightChecklist({
           l.startRecording
         )}
       </button>
-    </div>
-  );
-}
-
-/* ---------- 權限面板 ---------- */
-
-export type PermissionKey = "screenRecording" | "microphone" | "camera";
-
-export interface PermissionSnapshot {
-  key: PermissionKey;
-  state: Exclude<PermissionState, "unknown">;
-  required: boolean;
-}
-
-export interface PermissionCenterLabels {
-  title: string;
-  checking: string;
-  current: string;
-  required: string;
-  blockedRequired: string;
-  degradedOptional: string;
-  request: string;
-  openSettings: string;
-  label: Record<PermissionKey, string>;
-  desc: Record<PermissionKey, string>;
-  state: Record<PermissionSnapshot["state"], string>;
-}
-
-export const defaultPermissionLabels: PermissionCenterLabels = {
-  title: "macOS permissions",
-  checking: "Checking current permission status…",
-  current: "Current permission status.",
-  required: "required",
-  blockedRequired: "Screen recording is blocked until this is granted.",
-  degradedOptional: "Screen-only recording still works without this.",
-  request: "Request",
-  openSettings: "Open System Settings",
-  label: { screenRecording: "Screen & system audio recording", microphone: "Microphone", camera: "Camera" },
-  desc: {
-    screenRecording: "Required to capture your screen. On macOS this single grant also covers system audio, there is no separate \"system audio\" permission.",
-    microphone: "Optional. Lets you record your voice alongside the screen.",
-    camera: "Optional. Lets you overlay a webcam bubble while recording.",
-  },
-  state: {
-    "not-determined": "Not requested yet",
-    granted: "Granted",
-    denied: "Denied",
-    restricted: "Restricted by system policy",
-    "restart-required": "Granted, restart the app to use it",
-  },
-};
-
-const STATE_DOT: Record<PermissionSnapshot["state"], string> = {
-  "not-determined": "bg-[var(--pf-muted)]",
-  granted: "bg-[var(--pf-success)]",
-  denied: "bg-[var(--pf-danger)]",
-  restricted: "bg-[var(--pf-danger)]",
-  "restart-required": "bg-[var(--pf-warning)]",
-};
-
-export interface PermissionCenterProps {
-  permissions: PermissionSnapshot[];
-  loading?: boolean;
-  /** 只有麥克風與攝影機能由 app 直接請求；螢幕錄製只能開系統設定 */
-  onRequest?: (key: PermissionKey) => void;
-  onOpenSettings: (key: PermissionKey) => void;
-  hideHeading?: boolean;
-  accent?: string;
-  labels?: Partial<PermissionCenterLabels>;
-  className?: string;
-}
-
-export function PermissionCenter({ permissions, loading = false, onRequest, onOpenSettings, hideHeading, accent, labels, className }: PermissionCenterProps) {
-  const l = { ...defaultPermissionLabels, ...labels };
-  return (
-    <div style={preflightTheme(accent)} className={cn("flex flex-col gap-2 text-left", className)}>
-      {!hideHeading && (
-        <div>
-          <h2 className="text-sm font-semibold text-[var(--pf-text)]">{l.title}</h2>
-          <p className="text-[11px] text-[var(--pf-muted)]">{loading ? l.checking : l.current}</p>
-        </div>
-      )}
-      {permissions.map((p) => {
-        const canRequest = onRequest && (p.key === "microphone" || p.key === "camera");
-        const degrade = p.state === "granted" ? null : p.required ? l.blockedRequired : l.degradedOptional;
-        return (
-          <div key={p.key} data-state={p.state} className="flex flex-col gap-1 rounded-[8px] border border-[var(--pf-border)] bg-[var(--pf-elevated)] p-3">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-              <div className="flex items-center gap-2 min-w-0">
-                <span aria-hidden="true" className={cn("inline-block h-2.5 w-2.5 shrink-0 rounded-full", STATE_DOT[p.state])} />
-                <span className="text-xs font-medium text-[var(--pf-text)]">{l.label[p.key]}</span>
-                {p.required && <span className="rounded bg-[var(--pf-surface)] px-1.5 py-0.5 text-[10px] text-[var(--pf-muted)]">{l.required}</span>}
-              </div>
-              <span className="text-[11px] text-[var(--pf-muted)]">{l.state[p.state]}</span>
-            </div>
-            <p className="text-[11px] text-[var(--pf-muted)]">{l.desc[p.key]}</p>
-            {degrade && <p className={cn("text-[11px]", p.required ? "text-[var(--pf-danger)]" : "text-[var(--pf-muted)]")}>{degrade}</p>}
-            {p.state !== "granted" && (
-              <div className="mt-1 flex flex-wrap gap-2">
-                {canRequest && (
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={() => onRequest(p.key)}
-                    className={cn("rounded-[8px] bg-[var(--pf-accent)] px-3 py-1 text-[11px] text-[var(--pf-accent-fg)] disabled:opacity-50", PF_FOCUS)}
-                  >
-                    {l.request}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => onOpenSettings(p.key)}
-                  className={cn("rounded-[8px] border border-[var(--pf-border)] px-3 py-1 text-[11px] text-[var(--pf-text)] disabled:opacity-50", PF_FOCUS)}
-                >
-                  {l.openSettings}
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
     </div>
   );
 }

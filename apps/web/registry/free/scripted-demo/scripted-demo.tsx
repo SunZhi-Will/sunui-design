@@ -181,23 +181,6 @@ const svg = {
   "aria-hidden": true,
 };
 
-export function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg {...svg} className={className}>
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
-
-export function XIcon({ className }: { className?: string }) {
-  return (
-    <svg {...svg} className={className}>
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
 export function SpinnerIcon({ className }: { className?: string }) {
   return (
     <svg {...svg} className={cn("sd-spin", className)}>
@@ -412,118 +395,12 @@ export function ScriptedDemo<K extends string = string>({
 
 /* ---------- 場景裡常用的零件 ---------- */
 
-/** 進入畫面時從 from 跳到目標值，ease-out cubic。 */
-export function CountUp({
-  to,
-  from = 0,
-  decimals = 0,
-  duration = 1200,
-  start = true,
-  suffix = "",
-}: {
-  to: number;
-  from?: number;
-  decimals?: number;
-  duration?: number;
-  start?: boolean;
-  suffix?: string;
-}) {
-  const reduced = useReducedMotionPref();
-  const [value, setValue] = useState(from);
-  const fromRef = useRef(from);
-
-  useEffect(() => {
-    if (!start) {
-      setValue(fromRef.current);
-      return;
-    }
-    if (reduced) {
-      fromRef.current = to;
-      setValue(to);
-      return;
-    }
-    let frame = 0;
-    const begin = performance.now();
-    const origin = fromRef.current;
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - begin) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(origin + (to - origin) * eased);
-      if (progress < 1) frame = requestAnimationFrame(tick);
-      else fromRef.current = to;
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [to, duration, start, reduced]);
-
-  return (
-    <span className="tabular-nums">
-      {value.toFixed(decimals)}
-      {suffix}
-    </span>
-  );
-}
-
 /** 帶進場動畫的包裝：晶片一個接一個彈出，delay 為毫秒。 */
 export function Pop({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   return (
     <span className={cn("sd-pop", className)} style={{ animationDelay: `${delay}ms` }}>
       {children}
     </span>
-  );
-}
-
-/**
- * 終端機風格的單行 log。running 時每 interval 毫秒換下一行（停在最後一行），
- * 不在 running 時顯示 idle 內容。
- */
-export function TypedLog({
-  lines,
-  running,
-  interval = 600,
-  idle,
-  className,
-}: {
-  lines: string[];
-  running: boolean;
-  interval?: number;
-  idle?: ReactNode;
-  className?: string;
-}) {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    if (!running) {
-      setIndex(0);
-      return;
-    }
-    const timer = window.setInterval(() => setIndex((i) => Math.min(i + 1, lines.length - 1)), interval);
-    return () => window.clearInterval(timer);
-  }, [running, interval, lines.length]);
-
-  return (
-    <div className={cn("mt-2 h-5 overflow-hidden font-mono text-[11px] text-muted-foreground", className)}>
-      {running ? (
-        <p key={index} className="sd-fade-up">
-          <span className="text-foreground">›</span> {lines[index]}
-          <span className="sd-blink">_</span>
-        </p>
-      ) : (
-        idle
-      )}
-    </div>
-  );
-}
-
-/** log 下方的細進度條：running 時以 duration 填滿，done 時顯示成功色。 */
-export function DemoProgress({ running, done, duration = 2200 }: { running: boolean; done?: boolean; duration?: number }) {
-  return (
-    <div className="relative mt-1 h-0.5 overflow-hidden rounded-full bg-muted">
-      {running ? (
-        <div className="sd-progress absolute inset-0 bg-foreground" style={{ "--sd-duration": `${duration}ms` } as CSSProperties} />
-      ) : done ? (
-        <div className="absolute inset-0 bg-(--sd-success)/60" />
-      ) : null}
-    </div>
   );
 }
 
@@ -545,109 +422,5 @@ export function DemoStatus({ text, tone }: { text: string; tone: DemoTone }) {
       <span className={cn("size-1.5 rounded-full bg-current", tone === "brand" && "sd-blink")} />
       {text}
     </span>
-  );
-}
-
-/** 從右側滑入的通知卡片，位置相對於瀏覽器框。 */
-export function DemoNotice({
-  icon,
-  tone = "success",
-  title,
-  body,
-  className,
-  noticeKey,
-}: {
-  icon: ReactNode;
-  tone?: "success" | "warning";
-  title: ReactNode;
-  body: ReactNode;
-  className?: string;
-  /** 換這個值時重播滑入 */
-  noticeKey?: string;
-}) {
-  return (
-    <div
-      key={noticeKey}
-      className={cn(
-        "sd-slide-in-right absolute top-[8.5rem] right-3 z-10 flex max-w-[calc(100%-1.5rem)] items-start gap-2.5 rounded-xl border border-border bg-(--sd-popover) p-3 shadow-lg sm:right-5",
-        className,
-      )}
-    >
-      <span
-        className={cn(
-          "flex size-7 shrink-0 items-center justify-center rounded-full",
-          tone === "warning" ? "bg-(--sd-warning)/15 text-(--sd-warning)" : "bg-(--sd-success)/15 text-(--sd-success)",
-        )}
-      >
-        {icon}
-      </span>
-      <div className="text-xs">
-        <p className="font-semibold">{title}</p>
-        <p className="text-muted-foreground">{body}</p>
-      </div>
-    </div>
-  );
-}
-
-/** 「為什麼」說明卡片：貼在 scene.popover 指定的目標下方，理由逐條淡入。 */
-export function DemoPopover({
-  title,
-  subtitle,
-  reasons,
-  delay = 650,
-}: {
-  title: ReactNode;
-  subtitle?: ReactNode;
-  reasons: { ok: boolean; text: string }[];
-  /** 卡片出現前的延遲毫秒，等游標點下去 */
-  delay?: number;
-}) {
-  const { popover, loop } = useScriptedDemo();
-  return (
-    <div
-      key={`pop-${loop}`}
-      className="sd-fade-up absolute z-20 rounded-xl border border-border bg-(--sd-popover) p-3.5 text-xs shadow-2xl"
-      style={{ top: popover.top, left: popover.left, width: popover.width, animationDelay: `${delay}ms` }}
-    >
-      <p className="text-sm font-semibold">{title}</p>
-      {subtitle ? <p className="mb-2 text-muted-foreground">{subtitle}</p> : null}
-      <ul className="space-y-1.5">
-        {reasons.map((reason, i) => (
-          <li key={reason.text} className="sd-fade-up flex items-start gap-1.5" style={{ animationDelay: `${delay + 300 + i * 280}ms` }}>
-            {reason.ok ? (
-              <CheckIcon className="mt-0.5 size-3.5 shrink-0 text-(--sd-success)" />
-            ) : (
-              <XIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-            )}
-            <span className={reason.ok ? "" : "text-muted-foreground"}>{reason.text}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/** 指標小卡：start 前顯示 "--"，highlight 時換成警示色外框。 */
-export function DemoMetric({
-  label,
-  children,
-  start,
-  highlight,
-}: {
-  label: ReactNode;
-  children: ReactNode;
-  start: boolean;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "min-w-0 rounded-lg border px-2 py-1.5 transition-colors duration-500 sm:px-3 sm:py-2",
-        highlight ? "border-(--sd-warning)/40 bg-(--sd-warning)/5" : "border-border bg-background",
-      )}
-    >
-      <p className="truncate text-[10px] text-muted-foreground sm:text-[11px]">{label}</p>
-      <p className={cn("text-sm font-semibold sm:text-lg", !start && "text-muted-foreground/50")}>{start ? children : "--"}</p>
-    </div>
   );
 }

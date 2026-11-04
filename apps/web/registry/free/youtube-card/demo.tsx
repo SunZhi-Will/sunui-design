@@ -34,18 +34,13 @@ function TalkThumbnail() {
 
 export default function YouTubeCardDemo() {
   return (
-    <div className="grid w-full max-w-3xl grid-cols-1 gap-6 rounded-xl bg-[#f3f4f6] p-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:p-6">
-      <div className="min-w-0">
-        <div className="aspect-[16/10] w-full">
-          <YouTubeCard
-            videoId="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-            title="Visual thinking on an infinite canvas (conference talk)"
-            thumbnail={<TalkThumbnail />}
-          />
-        </div>
-      </div>
-      <div className="h-[260px] min-w-0 sm:h-auto">
-        <YouTubeCard videoId="" />
+    <div className="w-full max-w-xl min-w-0 rounded-xl bg-[#f3f4f6] p-4 sm:p-6">
+      <div className="aspect-[16/10] w-full">
+        <YouTubeCard
+          videoId="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+          title="Visual thinking on an infinite canvas (conference talk)"
+          thumbnail={<TalkThumbnail />}
+        />
       </div>
     </div>
   );

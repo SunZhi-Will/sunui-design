@@ -232,6 +232,95 @@
       ]
     },
     {
+      "name": "app-chip",
+      "type": "registry:block",
+      "title": "App Chip",
+      "description": "A project or app tag with a stable colour dot hashed from the app id and an optional paid mark; AppDot is exported for using the dot alone. The dot is aria-hidden, the paid mark has an aria-label, and nothing animates, so reduced motion needs no change.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "badge",
+        "tag",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Listing which apps or products a customer uses",
+            "Tagging records with a project whose colour stays the same everywhere"
+          ],
+          "watchOut": [
+            "appColor hashes the id into 8 colours, so two apps can share a colour",
+            "Long names truncate inside the chip; give the parent a width so it can shrink"
+          ],
+          "aliases": [
+            "app chip",
+            "project tag",
+            "product pill",
+            "app badge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/app-chip/app-chip.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "assignment-sheet",
+      "type": "registry:block",
+      "title": "Assignment Sheet",
+      "description": "A \"why this person\" side sheet for a scheduled shift: the reasons, other candidates, a lock switch, and a find-replacement list with assign buttons. It is a labelled dialog with a role=switch lock, Escape to close and a polite live region for notices; reduced motion drops the slide and fades instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "ai",
+        "explainability",
+        "scheduling",
+        "panel"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Explaining why an automated scheduler or optimizer chose a person, with the alternatives it considered",
+            "Letting a manager lock, remove or reassign one assignment from its detail view"
+          ],
+          "watchOut": [
+            "onFindReplacement starts the load and replacement=null means loading; pass the result back through the replacement prop",
+            "Callbacks may throw to show an error notice; pass fixed={false} to render in place instead of as a fixed overlay"
+          ],
+          "aliases": [
+            "why panel",
+            "assignment detail",
+            "shift explainer",
+            "replacement picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/assignment-sheet/assignment-sheet.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "avatar-stack",
       "type": "registry:block",
       "title": "Avatar Stack",
@@ -317,6 +406,49 @@
       "files": [
         {
           "path": "registry/free/bill-split-rows/bill-split-rows.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "browser-frame",
+      "type": "registry:block",
+      "title": "Browser Frame",
+      "description": "A desktop browser mockup with traffic lights, a tab title, a pill address bar with lock icon and an optional tone ring and Simulated badge. It renders as a figure labelled with the URL, the chrome is hidden from assistive tech, and nothing animates, so reduced motion needs no handling.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "presentation",
+        "layout"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Presenting a web page or dashboard screenshot in docs, landing pages or slides",
+            "Framing a live embedded UI so readers know it represents a website"
+          ],
+          "watchOut": [
+            "The address bar is static text, not a real input",
+            "Set maxHeight for long content so it scrolls inside the frame instead of stretching the page"
+          ],
+          "aliases": [
+            "browser mockup",
+            "browser window",
+            "website frame",
+            "safari mockup"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/browser-frame/browser-frame.tsx",
           "type": "registry:component"
         }
       ]
@@ -493,6 +625,48 @@
       ]
     },
     {
+      "name": "character-glyph",
+      "type": "registry:block",
+      "title": "Character Glyph",
+      "description": "A seeded character avatar that shows one serif character from the name inside a style-pack shape (seal, circle, rounded square, hex or none), with a hashed colour inside the pack's saturation and lightness range; assignGlyphs gives earlier characters first pick so names in one cast do not collide. It is decorative (aria-hidden) unless a title is given, and it has no motion, so reduced motion needs no handling.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "story"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Character lists or casts for stories that have no character artwork",
+            "Avatars that must keep the same colour on every screen without images"
+          ],
+          "watchOut": [
+            "Use assignGlyphs for a whole cast in order; calling glyphSpec one by one can give two characters the same glyph",
+            "Minor tier characters drop their colour and use the muted text colour by design"
+          ],
+          "aliases": [
+            "character avatar",
+            "seeded avatar",
+            "name glyph",
+            "story cast icon"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/character-glyph/character-glyph.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "checkin-streak",
       "type": "registry:block",
       "title": "Check-in Streak",
@@ -540,7 +714,7 @@
       "name": "checkout-steps",
       "type": "registry:block",
       "title": "Checkout Steps",
-      "description": "Compact checkout step row from the V窩 checkout: numbered pills that turn accent-filled with a check once done, plus a NumberedSteps instruction list. Uses an ordered list with aria-current=\"step\", screen-reader text for completed steps and sr-only step prefixes; it is static, so nothing animates under reduced motion.",
+      "description": "Compact checkout step row from the V窩 checkout: numbered pills that turn accent-filled with a check once done. Uses an ordered list with aria-current=\"step\" and screen-reader text for completed steps; it is static, so nothing animates under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -557,7 +731,7 @@
         "usage": {
           "whenToUse": [
             "Showing where a buyer is in a short 2 to 4 step checkout above the step content",
-            "Numbered how-to instructions next to a payment or setup action"
+            "Multi-step forms where a full stepper with connectors would be too heavy"
           ],
           "watchOut": [
             "Step names are used as React keys, so keep them unique",
@@ -567,7 +741,7 @@
             "checkout progress",
             "stepper",
             "order steps",
-            "numbered steps"
+            "step indicator"
           ]
         }
       },
@@ -1020,6 +1194,50 @@
       ]
     },
     {
+      "name": "combine-dialog",
+      "type": "registry:block",
+      "title": "Combine Dialog",
+      "description": "Dark dialog that stitches a post's images into one postable image or a PDF. It has a live preview, layout chips (restore panorama, N columns, single row), a locked chip for paid layouts, a gap option and thumbnails you can leave out. It is a labelled modal dialog that closes on Escape, and its entrance animation is turned off under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "dialogs"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Stitching several images of a carousel into one image to repost",
+            "Restoring a panorama that was split across several slides"
+          ],
+          "watchOut": [
+            "Give every image its real width and height or the layout math cannot work",
+            "Throw from onSaveImages to keep the dialog open so people can switch layout or save a PDF instead"
+          ],
+          "aliases": [
+            "combine images",
+            "stitch images",
+            "merge photos",
+            "panorama restore"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/combine-dialog/combine-dialog.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "compare-slider",
       "type": "registry:block",
       "title": "Compare Slider",
@@ -1107,15 +1325,14 @@
       "name": "content-gate",
       "type": "registry:block",
       "title": "Content Gate",
-      "description": "Locked-course gate in three forms: an inline lock card, a designed dark modal (165 degree gradient panel, gradient top line, two blurred glows, gradient title) and a free-preview paywall overlay. Copy differs for logged-out and no-access. The modal traps focus, closes on Escape and the backdrop, locks scroll and gives focus back when it closes. The sign-in spinner only spins when reduced motion is off.",
+      "description": "Inline locked-course card with a glow, lock badge, gradient title and a sign-in button that shows a spinner and disables itself after one press, with different copy for signed-out and no-access visitors. Follows light and dark themes, announces the sign-in state politely to screen readers, and the spinner only spins when reduced motion is off.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "commerce",
-        "auth",
-        "overlay"
+        "auth"
       ],
       "meta": {
         "tier": "free",
@@ -1124,18 +1341,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "A paid course or members page reached by someone signed out or without a purchase",
-            "Capping a free preview of slides or episodes and sending people to buy"
+            "A paid course or members page reached by someone signed out",
+            "A signed-in visitor whose account has no purchase for this content"
           ],
           "watchOut": [
-            "The modal is dark only by design; put the inline gate on themed pages",
-            "Pass fixed={false} only when a relative parent should hold the modal (no portal, no scroll lock)"
+            "Pass signInHref or onSignIn; after a press the button stays disabled until the page navigates",
+            "Give the parent enough height; the card centers itself with vertical padding"
           ],
           "aliases": [
-            "paywall",
             "course gate",
-            "access modal",
-            "locked content"
+            "locked content",
+            "sign-in wall",
+            "access card"
           ]
         }
       },
@@ -1321,18 +1538,19 @@
       ]
     },
     {
-      "name": "dot-badge",
+      "name": "director-review",
       "type": "registry:block",
-      "title": "Dot Badge",
-      "description": "A family of dot-led labels: StatusDot (colour only on the dot), PersonChip/EmployeeChip and AppChip (stable colours keyed to an id), and the Synvize black-and-gold WorkBadge/StatusBadge with an optional live breathing dot. Dots are aria-hidden so the text carries the meaning, clickable chips use aria-pressed, the lock icon and paid mark are labelled, and the breathing dot runs only 3 times and never under reduced motion.",
+      "title": "Director Review",
+      "description": "A dark AI edit-suggestion review where each card shows confidence and risk. Safe suggestions are preselected, the batch actions are accept-safe or reject-all, and edits that change video length must be accepted one at a time (computePlanTotals is exported). Cards are labelled groups, the plan summary is a polite live region, and transitions are disabled under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "badge",
-        "status",
-        "data-display"
+        "ai",
+        "review",
+        "video",
+        "panel"
       ],
       "meta": {
         "tier": "free",
@@ -1341,24 +1559,24 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Status columns in tables and queues where a row of states should not turn into a rainbow",
-            "Tagging people or projects with a colour that stays the same on every screen"
+            "Reviewing AI-proposed edits to a recording before they are applied to a timeline",
+            "Any batch of suggestions where safe ones can be preselected but destructive ones need explicit consent"
           ],
           "watchOut": [
-            "WorkBadge defaults to Synvize's dark palette; put it on a dark surface or pass theme=\"light\"",
-            "personColor cycles 8 colours by id modulo, so different ids can share a colour; never use colour as the only identifier"
+            "Decisions are uncontrolled unless you pass decisions with onDecisionsChange",
+            "appliedKinds decides which cards say \"preview only\" and which count toward the length change; pass a stable array"
           ],
           "aliases": [
-            "status dot",
-            "person chip",
-            "status badge",
-            "pill"
+            "suggestion review",
+            "director plan",
+            "ai edit review",
+            "first cut suggestions"
           ]
         }
       },
       "files": [
         {
-          "path": "registry/free/dot-badge/dot-badge.tsx",
+          "path": "registry/free/director-review/director-review.tsx",
           "type": "registry:component"
         }
       ]
@@ -1411,6 +1629,90 @@
       ]
     },
     {
+      "name": "empty-state",
+      "type": "registry:block",
+      "title": "Empty State",
+      "description": "Dashed empty-state card with a 1.5-stroke icon, title, description and a Load example plus outline button pair (or a custom action), centered or start-aligned. Buttons are real buttons or links with visible focus rings; it is static, so nothing animates under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "states"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Lists or tables that have no data yet and need a clear next step",
+            "First-run screens where loading an example teaches the product faster than an empty form"
+          ],
+          "watchOut": [
+            "Passing action replaces the built-in Load example and secondary buttons",
+            "Keep the description to one or two short sentences so the card stays scannable"
+          ],
+          "aliases": [
+            "zero state",
+            "blank slate",
+            "no data",
+            "empty list"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/empty-state/empty-state.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "error-state",
+      "type": "registry:block",
+      "title": "Error State",
+      "description": "Error panel with a warning icon, friendly title and message, and an optional Retry button. Uses role=\"alert\" so screen readers announce it; it is static, so nothing animates under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "states"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A list or panel whose data request failed and can be retried",
+            "Replacing a section in place when it cannot load, without breaking the rest of the page"
+          ],
+          "watchOut": [
+            "Never pass raw exceptions as the message; map them to friendly text first",
+            "Omit onRetry when retrying cannot help, so users are not sent in a loop"
+          ],
+          "aliases": [
+            "error panel",
+            "failed to load",
+            "retry state",
+            "fetch error"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/error-state/error-state.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "expanding-search",
       "type": "registry:block",
       "title": "Expanding Search",
@@ -1451,52 +1753,6 @@
       "files": [
         {
           "path": "registry/free/expanding-search/expanding-search.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "explain-panel",
-      "type": "registry:block",
-      "title": "Explain Panel",
-      "description": "Two explanation surfaces. AssignmentExplainSheet is the \"why this person\" side sheet: reasons, other candidates, a lock switch, and a find-replacement list with assign buttons. DirectorReviewPanel is a dark suggestion review: confidence and risk on each card, batch accept-safe or reject-all, and edits that change video length must be accepted one at a time. The sheet is a labelled dialog with a role=switch lock, Escape to close and a polite live region for notices; reduced motion drops the slide and fades instantly.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "ai",
-        "explainability",
-        "review",
-        "panel"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "product",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Explaining why an automated scheduler or optimizer chose an item, with the alternatives it considered",
-            "Letting users review AI edit suggestions where safe ones are preselected and destructive ones need explicit consent"
-          ],
-          "watchOut": [
-            "The sheet calls onFindReplacement and treats replacement=null as loading; your callbacks may throw to show an error notice",
-            "Director decisions are uncontrolled unless you pass decisions with onDecisionsChange; appliedKinds decides which cards say \"preview only\""
-          ],
-          "aliases": [
-            "why panel",
-            "assignment detail",
-            "suggestion review",
-            "director plan"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/explain-panel/explain-panel.tsx",
           "type": "registry:component"
         }
       ]
@@ -1599,7 +1855,7 @@
       "name": "floating-toolbar",
       "type": "registry:block",
       "title": "Floating Toolbar",
-      "description": "CardFlow's vertical glass tool rail with dark tooltips, a selected state and a 300ms slide in and out, set up as the AI actions toolbar: Generate calls an async onAction and shows a spinner while it runs. It also exports the logo FloatingMenu, which expands into a pill of nav links on hover or focus. Escape goes back or collapses, tools use aria-pressed, and reduced motion removes the slide, scale and expand transitions.",
+      "description": "CardFlow's vertical glass tool rail with dark tooltips, a selected state and a 300ms slide in and out, set up as the AI actions toolbar: Generate calls an async onAction and shows a spinner while it runs. Tools use aria-pressed and aria-keyshortcuts, Escape goes back when onClose is set, and reduced motion removes the slide and scale transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -1616,24 +1872,67 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "A side tool rail in a canvas or editor that swaps to a mode-specific toolbar such as AI actions",
+            "A side tool rail in a canvas or editor",
             "Running an async AI action from a toolbar button with built-in pending feedback"
           ],
           "watchOut": [
             "Handle errors inside onAction: the toolbar only clears its pending state and selection",
-            "Two toolbars swap by passing open to each; the canvas needs overflow hidden so the hidden one slides off-screen"
+            "To swap two toolbars pass open to each, and give the canvas overflow hidden so the hidden one slides off-screen"
           ],
           "aliases": [
             "tool rail",
             "AI toolbar",
             "glass toolbar",
-            "logo menu"
+            "vertical toolbar"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/floating-toolbar/floating-toolbar.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "gate-modal",
+      "type": "registry:block",
+      "title": "Gate Modal",
+      "description": "Designed dark access modal (165 degree gradient panel, gradient top line, two blurred glows, gradient title, note box and gradient sign-in button) for locked lessons, with signed-out and no-access copy. It traps focus, closes on Escape and the backdrop, locks scroll and returns focus to the trigger; it uses no motion, so it is safe under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "auth",
+        "overlay"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Someone clicks a locked lesson or episode inside a course page",
+            "Asking for sign-in at the moment of intent instead of blocking the whole page"
+          ],
+          "watchOut": [
+            "The modal is dark only by design; use content-gate on themed pages",
+            "Pass fixed={false} only when a relative parent should hold the modal (no portal, no scroll lock)"
+          ],
+          "aliases": [
+            "access modal",
+            "paywall dialog",
+            "locked lesson modal",
+            "sign-in modal"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/gate-modal/gate-modal.tsx",
           "type": "registry:component"
         }
       ]
@@ -1813,10 +2112,52 @@
       ]
     },
     {
-      "name": "job-progress",
+      "name": "issue-card",
       "type": "registry:block",
-      "title": "Job Progress",
-      "description": "Progress UI for an AI generation job: a grid tile with shimmer over a blurred reference image, a side panel with named steps, non-linear percent, queue position and cancel or retry actions, and a compact console row with a status dot. It has progressbar roles, live status headings, aria-current on the current step and alert-role errors; under reduced motion the shimmer, spinner and pulse stop.",
+      "title": "Scan Issue Card",
+      "description": "One code scan issue with severity, category and AI badges, a fix suggestion that expands to show before and after with steps, and a code viewer that highlights the problem lines. Toggles use aria-expanded and the dialog closes on Escape; reduced motion removes the press and hover transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "developer",
+        "dashboard"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Static analysis or security scan result lists",
+            "Code review tools showing an issue with a suggested fix"
+          ],
+          "watchOut": [
+            "Ignore asks for confirmation through window.confirm unless you pass confirmIgnore",
+            "The Before and After boxes use light red and green backgrounds even in dark mode, as in the original"
+          ],
+          "aliases": [
+            "scan issue",
+            "lint finding",
+            "code issue card",
+            "fix suggestion"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/issue-card/issue-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "job-panel",
+      "type": "registry:block",
+      "title": "Job Panel",
+      "description": "The side panel of a generation progress page: a status heading, ETA or duration, a progress bar with five named steps, queue position, error or hold notes, and cancel, cancel and edit, retry or remove actions. It has a polite live heading, a progressbar role, aria-current on the current step and an alert region for failed actions; under reduced motion the spinner and note animation stop.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1834,24 +2175,110 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Image or video generation jobs with queue, model loading and sampling stages",
-            "A dashboard list of jobs in flight that link to their detail page"
+            "A job detail page that shows where a generation is and lets the user cancel or retry",
+            "Long-running AI tasks with distinct queue, load, generate and check stages"
           ],
           "watchOut": [
-            "Keep the non-linear percent mapping so sampling covers most of the bar",
-            "Remove a finished job's tile and show the result image in its place"
+            "Return a rejecting Promise from an action to show its inline error",
+            "Pass the prompt or rewrite result as children so it sits between steps and actions"
           ],
           "aliases": [
             "generation progress",
-            "render queue",
-            "task status",
-            "job tile"
+            "job detail",
+            "render status",
+            "task steps"
           ]
         }
       },
       "files": [
         {
-          "path": "registry/free/job-progress/job-progress.tsx",
+          "path": "registry/free/job-panel/job-panel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "job-row",
+      "type": "registry:block",
+      "title": "Job Row",
+      "description": "A compact console row for a job in flight: title, source type, a thin progress bar with a stage label and percent, or a failure line, linking to the job's detail page; it ships with JobStatusDot, a dot and text status marker. It has a progressbar role and a visible focus outline; under reduced motion the bar transition and running dot pulse stop.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "status",
+        "ai"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A dashboard list of jobs in progress that link to their detail pages",
+            "A quiet status row where a full card would be too heavy"
+          ],
+          "watchOut": [
+            "Pass the progress as 0 to 100 and a short stage label",
+            "Set failed to replace the bar with the retry hint instead of showing 0%"
+          ],
+          "aliases": [
+            "task row",
+            "job list item",
+            "progress row",
+            "status dot"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/job-row/job-row.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "job-tile",
+      "type": "registry:block",
+      "title": "Job Tile",
+      "description": "A grid tile for one AI generation job: a shimmer over the blurred reference image, a status line, a non-linear progress bar and ETA, which turns into a dashed tile with a reason once the job fails, is canceled or is held. It has a progressbar role, a polite live status, aria-busy and labelled cancel and remove buttons; under reduced motion the shimmer, spinner and preview transition stop.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "status",
+        "ai"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "An image or video generation grid where pending jobs sit beside finished results",
+            "Showing queue, model loading and sampling progress right where the result will appear"
+          ],
+          "watchOut": [
+            "Replace the tile with the result image when the job is done",
+            "Keep the non-linear percent mapping so sampling covers most of the bar"
+          ],
+          "aliases": [
+            "generation tile",
+            "pending image",
+            "render placeholder",
+            "job card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/job-tile/job-tile.tsx",
           "type": "registry:component"
         }
       ]
@@ -1860,10 +2287,8 @@
       "name": "jobs-tray",
       "type": "registry:block",
       "title": "Jobs Tray",
-      "description": "A bottom-right stack of background job rows, with a pulsing dot, a percent or state label, a cancel button on running jobs and a dismiss button on failed ones. It comes with a background jobs hook and a companion update banner. The list is a polite live region, and the pulse, slide-in and progress transitions are switched off under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A bottom-right stack of background job rows with a pulsing dot, a percent or state label, cancel on running jobs and dismiss on failed ones, plus a useBackgroundJobs hook. The list is a polite live region and the pulse is switched off under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
@@ -1879,7 +2304,7 @@
         "usage": {
           "whenToUse": [
             "Saving, encoding or exporting continues after the user is allowed back into the editor",
-            "Telling the user an app update is ready to download or install"
+            "Surfacing background failures that need the user's attention"
           ],
           "watchOut": [
             "Successful jobs are removed after 8 s and quick ones are never shown, so do not rely on the tray as a log",
@@ -1888,8 +2313,7 @@
           "aliases": [
             "background jobs panel",
             "task tray",
-            "job queue",
-            "update banner"
+            "job queue"
           ]
         }
       },
@@ -1990,7 +2414,7 @@
       "name": "live-bento",
       "type": "registry:block",
       "title": "Live Bento",
-      "description": "A feature bento grid whose tiles blur in on scroll, lift on hover and each run a small looping animation only while visible. It ships ready visuals: version timeline, matching hash runs, gap alert, comparison bars, phone list, lock grid, stamp card, strike list and consent toggle. Visuals are aria-hidden so the tile title and body carry the meaning, and with reduced motion tiles appear instantly and loops stop on a finished frame.",
+      "description": "A feature bento grid whose tiles blur in on scroll and lift on hover, with a useTicker hook so each tile's own small visual replays only while visible; the lb-* keyframes are injected for those visuals. Visuals are aria-hidden so the tile title and body carry the meaning, and with reduced motion tiles appear instantly and tickers stop on the first frame.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2011,8 +2435,8 @@
             "Showing secondary capabilities below a hero without heavy media"
           ],
           "watchOut": [
-            "Each visual runs its own observer and timer, so keep one grid to around 6 to 9 tiles",
-            "Visuals must sit inside <LiveBento>, which injects the lb-* keyframes"
+            "Each tile visual runs its own observer and timer, so keep one grid to around 6 to 9 tiles",
+            "Visuals that use lb-* classes must sit inside <LiveBento>, which injects the keyframes"
           ],
           "aliases": [
             "bento grid",
@@ -2026,9 +2450,89 @@
         {
           "path": "registry/free/live-bento/live-bento.tsx",
           "type": "registry:component"
-        },
+        }
+      ]
+    },
+    {
+      "name": "loading-state",
+      "type": "registry:block",
+      "title": "Loading State",
+      "description": "Skeleton loading placeholder made of pulsing rows. Exposes role=\"status\" with an accessible label, and the pulse stops under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "states"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Lists and tables while their first page of data is loading",
+            "Keeping layout stable while a section refetches"
+          ],
+          "watchOut": [
+            "Match the row count to the real content so the layout does not jump",
+            "Give label a specific name like Loading past bills instead of the generic default"
+          ],
+          "aliases": [
+            "skeleton",
+            "loading placeholder",
+            "shimmer rows",
+            "skeleton list"
+          ]
+        }
+      },
+      "files": [
         {
-          "path": "registry/free/live-bento/bento-visuals.tsx",
+          "path": "registry/free/loading-state/loading-state.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "logo-menu",
+      "type": "registry:block",
+      "title": "Logo Menu",
+      "description": "CardFlow's logo button that grows a pill of icon nav links on hover or focus, downward or to the right, and collapses 150ms after the pointer leaves. The logo button reports aria-expanded, links sit in a labelled nav, Escape collapses it, and reduced motion removes the expand transition.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "canvas"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A compact corner entry point to a few pages in a canvas app",
+            "Hiding secondary navigation behind the brand mark"
+          ],
+          "watchOut": [
+            "Every item is icon only, so give each a clear label (used for aria-label and title)",
+            "It positions itself absolute at the top left, so place it inside a relative container"
+          ],
+          "aliases": [
+            "floating menu",
+            "logo nav",
+            "expanding menu",
+            "brand menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/logo-menu/logo-menu.tsx",
           "type": "registry:component"
         }
       ]
@@ -2125,10 +2629,8 @@
       "name": "media-picker",
       "type": "registry:block",
       "title": "Media Picker",
-      "description": "Dark dialog for choosing which images and videos of a post to download. Everything starts selected, there are check badges and a play badge, an include-text option that is remembered, and a single-item shortcut that skips the dialog. A companion combine dialog shows a stitched preview with layout chips, a locked chip for paid layouts, a gap option and thumbnails you can leave out. Tiles are toggle buttons with aria-pressed, Escape closes, and the entrance animation is turned off under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Dark dialog for choosing which images and videos of a post to download: everything starts selected, with check and play badges, a remembered include-text option, and resolveMediaPick to skip the dialog when there is a single item. Tiles are toggle buttons with aria-pressed, Escape and backdrop click close it, and there is no motion to reduce.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
@@ -2144,27 +2646,23 @@
         "usage": {
           "whenToUse": [
             "Saving only some media from a post, carousel or gallery",
-            "Stitching several images into one postable image or a PDF"
+            "Letting people add the post text to a media download"
           ],
           "watchOut": [
-            "Give the combine dialog real width and height for each image or the layout math cannot work",
-            "Use resolveMediaPick first so a post with one item downloads directly without opening the dialog"
+            "Call resolveMediaPick first so a post with one item downloads directly without opening the dialog",
+            "Pass persistKey={null} if the include-text choice should not be stored in localStorage"
           ],
           "aliases": [
             "download picker",
             "select media",
-            "combine images",
-            "stitch images"
+            "media download dialog",
+            "pick images"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/media-picker/media-picker.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/media-picker/combine-dialog.tsx",
           "type": "registry:component"
         }
       ]
@@ -2207,6 +2705,48 @@
       "files": [
         {
           "path": "registry/free/notice-queue/notice-queue.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "numbered-steps",
+      "type": "registry:block",
+      "title": "Numbered Steps",
+      "description": "Numbered instruction list from the V窩 checkout, with soft info-tinted number badges and rich content (bold, links) per step. Keeps ordered-list semantics with sr-only step prefixes and aria-hidden visual numbers; it is static, so nothing animates under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "checkout",
+        "content"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Short how-to instructions next to a payment or setup action",
+            "Explaining what happens after a button press in two to four steps"
+          ],
+          "watchOut": [
+            "Keep each step to one or two sentences; long steps belong in docs",
+            "The theme follows prefers-color-scheme by default; pass theme=\"light\" or \"dark\" if your site uses a class toggle"
+          ],
+          "aliases": [
+            "numbered list",
+            "how-to steps",
+            "instructions list",
+            "step list"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/numbered-steps/numbered-steps.tsx",
           "type": "registry:component"
         }
       ]
@@ -2349,7 +2889,7 @@
       "name": "pause-menu",
       "type": "registry:block",
       "title": "Pause Menu",
-      "description": "An in-game system menu: a faded ink band with brush-sweep hover items (resume, journal, save, load, settings, exit), the current objective line, and an exit confirmation that names the last autosave and offers a third save-first option. It ships with a save-error banner and a save/load panel that confirms overwrite and delete in place. Dialogs are modal, take focus and close with Esc; with reduced motion the entrance animations are dropped.",
+      "description": "An in-game system menu: a faded ink band with brush-sweep hover items, the current objective, a save-error banner, and an exit confirmation that names the last autosave and offers a save-first option. The dialog is modal, takes focus and closes with Esc; with reduced motion the entrance animations are dropped.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2371,7 +2911,7 @@
           ],
           "watchOut": [
             "Pass lastAutosave as a readable chapter · scene · time line, never an internal id",
-            "Close the pause menu when opening the save panel so the two Esc handlers do not both fire"
+            "Close the pause menu when opening a save panel so the two Esc handlers do not both fire"
           ],
           "aliases": [
             "system menu",
@@ -2384,10 +2924,6 @@
       "files": [
         {
           "path": "registry/free/pause-menu/pause-menu.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/pause-menu/save-load-panel.tsx",
           "type": "registry:component"
         }
       ]
@@ -2435,10 +2971,138 @@
       ]
     },
     {
+      "name": "permission-center",
+      "type": "registry:block",
+      "title": "Permission Center",
+      "description": "Dark macOS permission panel from KapZoom listing screen recording, microphone and camera with a status dot, what breaks without each grant, and Request or Open System Settings actions. Status is text as well as color, all actions are real buttons with focus rings, and it has no motion to reduce.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "status",
+        "forms"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A settings or onboarding view that explains which OS permissions a recorder needs",
+            "Letting users recover from a denied permission without leaving the flow blind"
+          ],
+          "watchOut": [
+            "Screen recording cannot be requested in-app on macOS; only offer Open System Settings for it",
+            "Mark only truly required grants as required so optional ones read as degradations"
+          ],
+          "aliases": [
+            "permissions panel",
+            "macOS permissions",
+            "privacy settings",
+            "access status"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/permission-center/permission-center.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "person-chip",
+      "type": "registry:block",
+      "title": "Person Chip",
+      "description": "A name chip with a stable identity-colour dot keyed to the person's id, with states for emphasized (self), selected, highlighted (changed), muted and locked; EmployeeChip is the same component keyed by employeeId. Clickable chips render as buttons with aria-pressed, the lock icon is labelled, and the hover transition is removed under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "badge",
+        "avatar",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Staff or member rows on schedules and rosters where each person keeps the same colour on every screen",
+            "Selecting one person to open details in a side panel"
+          ],
+          "watchOut": [
+            "personColor cycles 8 colours by id modulo, so different ids can share a colour; never use colour as the only identifier",
+            "Pass onClick to get a button with aria-pressed; without it the chip is a plain span"
+          ],
+          "aliases": [
+            "person chip",
+            "employee chip",
+            "staff tag",
+            "member pill"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/person-chip/person-chip.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "phone-frame",
+      "type": "registry:block",
+      "title": "Phone Frame",
+      "description": "A phone mockup with a dynamic island, status bar (time, signal, wifi, battery), an optional browser URL bar and a home indicator, with a compact layout below 240px width. It renders as a labelled figure with the decorative chrome hidden from assistive tech, and nothing animates, so reduced motion needs no handling.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "presentation",
+        "layout"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Showing a mobile screen or mobile web page next to an article or pitch",
+            "Previewing how a flow such as a cart or checkout looks on a phone"
+          ],
+          "watchOut": [
+            "The width is fixed in pixels and shrinks to 100% in narrow containers; set height so long content scrolls inside the screen",
+            "It is a mockup; pass badge (for example Simulated) when the content is drawn, not recorded"
+          ],
+          "aliases": [
+            "phone mockup",
+            "iphone frame",
+            "mobile device frame",
+            "smartphone mockup"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/phone-frame/phone-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "preflight-checklist",
       "type": "registry:block",
-      "title": "Recording Preflight",
-      "description": "Pre-recording screen in the KapZoom dark style. Live checks sit beside the Start button: warnings and blockers always show, passing items fold into a 'N look fine' popover, and each issue can carry a fix action. It also includes an audio, camera and countdown sidebar with a mic level meter, source cards, a Screen, Window and Region tab bar, and a macOS permission center. The checks are a polite live region, the tabs use arrow-key roving focus, toggles are switches, and transitions and spinners stop under reduced motion.",
+      "title": "Recording Preflight Checks",
+      "description": "KapZoom-style live check bar beside the Start Recording button: warnings and blockers stay visible, passing items fold into an 'N look fine' popover, and buildPreflightChecks turns permissions, mic health, disk space and privacy scope into ordered checks. The list is a polite live region, the popover toggle reports aria-expanded, and the chevron and spinner stop under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2454,18 +3118,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "The last screen before starting a screen, camera or audio recording",
-            "Showing missing permissions, disk space and privacy risks without a blocking dialog"
+            "The bottom bar of the last screen before a screen, camera or audio recording starts",
+            "Surfacing missing permissions, low disk space and privacy risks without a blocking dialog"
           ],
           "watchOut": [
-            "Only blockers should disable Start; keep disk estimates and mic warnings at warning level",
-            "Pass the mic level as a subscription, not as React state, so the meter does not re-render the whole screen"
+            "Only blockers should disable Start; keep disk and mic issues at warning level",
+            "Rebuild checks from fresh input on every change instead of patching the array"
           ],
           "aliases": [
             "preflight",
             "pre-recording check",
-            "permission center",
-            "ready check"
+            "ready check",
+            "start bar"
           ]
         }
       },
@@ -2473,9 +3137,47 @@
         {
           "path": "registry/free/preflight-checklist/preflight-checklist.tsx",
           "type": "registry:component"
-        },
+        }
+      ]
+    },
+    {
+      "name": "preview-paywall",
+      "type": "registry:block",
+      "title": "Preview Paywall",
+      "description": "Blurred gradient overlay with a lock, preview-count message and gold gradient call to action, placed over a player when a free preview of slides or episodes runs out. It is a labelled region whose call to action is a real link or button, and it has no animation, so reduced motion needs no change.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "overlay"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Capping a free preview of slides or episodes and sending people to buy",
+            "Covering a player or reader once the visitor reaches the last free item"
+          ],
+          "watchOut": [
+            "The parent must be position: relative; the overlay fills it absolutely",
+            "Controls you want usable under the overlay need a z-index above 40"
+          ],
+          "aliases": [
+            "paywall",
+            "preview limit",
+            "buy overlay",
+            "locked player"
+          ]
+        }
+      },
+      "files": [
         {
-          "path": "registry/free/preflight-checklist/preflight-sidebar.tsx",
+          "path": "registry/free/preview-paywall/preview-paywall.tsx",
           "type": "registry:component"
         }
       ]
@@ -2613,7 +3315,7 @@
       "name": "recording-hud",
       "type": "registry:block",
       "title": "Recording HUD",
-      "description": "A floating dark glass pill for screen recording: a blinking record dot, a mono timer, pause/resume, an optional pen with draw swatches and Clear, and stop. It is draggable within its bounds, and a ref-driven VolumeBar level meter is included. Buttons have aria labels and pressed states, Esc closes the pen, and the blink and palette transitions stop under reduced motion.",
+      "description": "A draggable dark glass pill for screen recording with a blinking record dot, mono timer, pause/resume, an optional pen with draw swatches and Clear, and stop. Buttons have aria labels and pressed states, Esc closes the pen, and the blink and palette transitions stop under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2630,7 +3332,7 @@
         "usage": {
           "whenToUse": [
             "Controls that float over content being screen recorded",
-            "Live audio input meters that update many times a second without re-rendering"
+            "A compact timer plus pause and stop that the user can drag out of the way"
           ],
           "watchOut": [
             "Only enable the pen when recording a whole screen; it means nothing for a single window",
@@ -2639,14 +3341,55 @@
           "aliases": [
             "recorder hud",
             "recording pill",
-            "capture toolbar",
-            "volume meter"
+            "capture toolbar"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/recording-hud/recording-hud.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "recording-sidebar",
+      "type": "registry:block",
+      "title": "Recording Sidebar",
+      "description": "KapZoom recording options sidebar with microphone and system audio switches, a mic level meter fed by a subscription, camera toggle, countdown segmented control and a collapsed Advanced section for cursor, performance and quality. Toggles are role=switch, segments use aria-pressed, mic status is announced in a polite live region, and the meter and switch transitions stop under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "forms"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The settings column next to a recording source picker",
+            "Letting users test their mic level before a capture starts"
+          ],
+          "watchOut": [
+            "Pass the mic level as a subscription, not React state, so the meter does not re-render the sidebar",
+            "Arm the mic probe on user action so the OS permission prompt does not appear unprompted"
+          ],
+          "aliases": [
+            "recording settings",
+            "audio options",
+            "mic level",
+            "capture sidebar"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/recording-sidebar/recording-sidebar.tsx",
           "type": "registry:component"
         }
       ]
@@ -2736,10 +3479,52 @@
       ]
     },
     {
-      "name": "scan-report",
+      "name": "save-load-panel",
       "type": "registry:block",
-      "title": "Code Scan Report",
-      "description": "Code scan results: stat cards, a severity summary you can filter by, and issue cards with severity, category and AI badges, an expandable fix suggestion with before and after, and a code viewer that highlights the problem lines. Toggle buttons use aria-pressed and aria-expanded, and reduced motion removes the press and hover transitions.",
+      "title": "Save / Load Panel",
+      "description": "A story-themed save and load dialog listing autosave, quicksave and manual slots with chapter, scene, time and play time, confirming overwrite and delete in place. It is modal, focuses the first action, closes with Esc and reports errors in an alert; button transitions are removed under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "story",
+        "overlay"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Manual save and load slots in a narrative game",
+            "Any slot list where overwriting or deleting must be confirmed with a description of what is lost"
+          ],
+          "watchOut": [
+            "Throw from onSave to keep the panel open and show the error in place",
+            "Reject from onLoad to report a failed load without closing the panel"
+          ],
+          "aliases": [
+            "save slots",
+            "load game",
+            "save menu",
+            "save file picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/save-load-panel/save-load-panel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "scan-stats",
+      "type": "registry:block",
+      "title": "Scan Stats",
+      "description": "A responsive row of stat cards for a code scan (issues, files, lines, scan type) with a health score badge that turns destructive at 50 or below. Plain semantic text with tabular numbers and no animation, so reduced motion needs nothing extra.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2751,28 +3536,28 @@
       "meta": {
         "tier": "free",
         "series": "product",
-        "interaction": "press",
+        "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Static analysis or security scan result pages",
-            "Code review dashboards listing issues with suggested fixes"
+            "Header row of a scan or audit result page",
+            "Summarising repository health at a glance"
           ],
           "watchOut": [
-            "Ignore asks for confirmation through window.confirm unless you pass confirmIgnore",
-            "The Before and After boxes use light red and green backgrounds even in dark mode, as in the original"
+            "Optional cards are hidden when their prop is undefined, so the row can have 1 to 5 cards",
+            "The health reason is clamped to two lines, and the full text is only in the title tooltip"
           ],
           "aliases": [
-            "scan results",
-            "issue list",
-            "code audit",
-            "tech debt report"
+            "scan summary",
+            "health score",
+            "stat cards",
+            "audit stats"
           ]
         }
       },
       "files": [
         {
-          "path": "registry/free/scan-report/scan-report.tsx",
+          "path": "registry/free/scan-stats/scan-stats.tsx",
           "type": "registry:component"
         }
       ]
@@ -2824,7 +3609,7 @@
       "name": "scripted-demo",
       "type": "registry:block",
       "title": "Scripted Demo",
-      "description": "An auto-playing product walkthrough in a browser frame: a fake cursor glides to targets, click ripples, chapter tabs show progress bars, and a typed log, count-ups, chip pops, a slide-in notice and an explanation popover play along. It runs only while on screen and the tab is visible, has a labelled play/pause button and chapter buttons with aria-current, and with reduced motion scenes switch instantly with no cursor travel or ripple.",
+      "description": "An auto-playing product walkthrough in a browser frame: a fake cursor glides to registered targets, clicks ripple and chapter tabs show progress, with small Pop and DemoStatus helpers for scene content. It runs only while on screen and the tab is visible, has a labelled play/pause button and chapter buttons with aria-current, and with reduced motion scenes switch instantly with no cursor travel or ripple.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2954,7 +3739,7 @@
       "name": "scroll-story",
       "type": "registry:block",
       "title": "Scroll Story",
-      "description": "A feature story where copy scrolls on the left and a sticky panel on the right crossfades between per-step looping scenes, with anchor tabs underneath. On mobile each scene sits under its text and plays when in view. Only the active scene animates, the tabs are a labelled nav with aria-current, and with reduced motion scenes switch instantly and loops hold their final frame.",
+      "description": "A feature story where copy scrolls on the left and a sticky panel on the right crossfades between per-step looping scenes, with anchor tabs underneath; on mobile each scene sits under its text. Only the active scene animates, the tabs are a labelled nav with aria-current, and with reduced motion scenes switch instantly and loops hold their final frame.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2997,7 +3782,7 @@
       "name": "seeded-cover",
       "type": "registry:block",
       "title": "Seeded Cover",
-      "description": "A text-only book cover generated from a seed. A hash picks one of 12 traditional book-cover hues and one of four textures (lines, dots, weave, concentric arcs), and up to four title characters run vertically in serif. Only the hue is fixed; the colours are mixed from the theme's surface and text colours, so night, day and rice-paper themes all land at the right brightness. Also exports CharacterGlyph, a seeded avatar for characters without artwork. It is decorative (aria-hidden) unless a label is given, and it has no motion.",
+      "description": "A text-only book cover generated from a seed: a hash picks one of 12 traditional book-cover hues and one of four textures, and up to four title characters run vertically in serif, mixed from the theme's surface and text colours so night, day and rice-paper themes all land at the right brightness. It is decorative (aria-hidden) unless a label is given, and it has no motion, so reduced motion needs no handling.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -3014,7 +3799,7 @@
         "usage": {
           "whenToUse": [
             "Catalogs of stories or books where most items have no cover art",
-            "Character avatars that must keep the same colour on every screen without images"
+            "Shelves or lists that need stable, distinct covers without image assets"
           ],
           "watchOut": [
             "Only the first four title characters are shown; Latin titles become initials, so pass glyphs to override",
@@ -3210,6 +3995,48 @@
       ]
     },
     {
+      "name": "severity-summary",
+      "type": "registry:block",
+      "title": "Severity Summary",
+      "description": "Filter chips for critical, high and medium counts. Click one to filter, click it again to clear. The chips are toggle buttons with aria-pressed inside a labelled group; reduced motion removes the colour transition.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "developer",
+        "dashboard"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Filtering a list of scan issues by severity",
+            "Showing severity counts above a findings table"
+          ],
+          "watchOut": [
+            "Only critical, high and medium are shown, and chips with a count of 0 are hidden",
+            "It is controlled: you own the filter state and filter the list yourself"
+          ],
+          "aliases": [
+            "severity filter",
+            "issue counts",
+            "filter chips",
+            "severity badges"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/severity-summary/severity-summary.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "shipping-options",
       "type": "registry:block",
       "title": "Shipping Options",
@@ -3384,6 +4211,48 @@
       ]
     },
     {
+      "name": "source-picker",
+      "type": "registry:block",
+      "title": "Source Picker",
+      "description": "KapZoom capture source picker: 16:9 source cards for screens and windows with a selected ring and check, plus a Screen, Window and Region tab bar with search and refresh. Cards use aria-pressed, the tabs are a tablist with arrow, Home and End roving focus, and the lift and spin animations stop under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Choosing which screen or window to record or share",
+            "Filtering a long list of open windows by kind and title"
+          ],
+          "watchOut": [
+            "Give the card grid role=tabpanel with the same panelId so aria-controls resolves",
+            "Pass thumbnails as img or inline SVG sized to fill; do not hotlink remote screenshots"
+          ],
+          "aliases": [
+            "screen picker",
+            "window picker",
+            "capture source",
+            "share screen"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/source-picker/source-picker.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "speed-reader",
       "type": "registry:block",
       "title": "Flash Reader",
@@ -3471,43 +4340,44 @@
       ]
     },
     {
-      "name": "state-panels",
+      "name": "status-dot",
       "type": "registry:block",
-      "title": "State Panels",
-      "description": "Empty, error and loading panels. The empty state is a dashed card with a 1.5-stroke icon and a Load example plus outline button pair; the error state shows a friendly message with a Retry button; the loading state is skeleton rows. The panels use role=status and role=alert, and the skeleton pulse stops under reduced motion.",
+      "title": "Status Dot",
+      "description": "A status label where colour lives only on a small dot and the text keeps the normal foreground, so a column of states never turns into a rainbow. The dot is aria-hidden so the text carries the meaning; it is static, so reduced motion needs no change.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "feedback",
-        "states"
+        "badge",
+        "status",
+        "data-display"
       ],
       "meta": {
         "tier": "free",
         "series": "product",
-        "interaction": "loading",
+        "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Lists and dashboards that need consistent empty, error and loading views",
-            "First-run screens where loading an example teaches the product faster than an empty form"
+            "Status columns in order lists, tables and job queues",
+            "Inline state next to a name where a filled pill would be too loud"
           ],
           "watchOut": [
-            "Never pass raw exceptions as the error message; map them to friendly text first",
-            "Match the skeleton row count to the real content so the layout does not jump"
+            "Tone colours come from built-in CSS variables with light and dark values; the muted tone uses the site's muted-foreground",
+            "Always pass a text label; the dot alone is hidden from screen readers"
           ],
           "aliases": [
-            "empty state",
-            "error state",
-            "skeleton",
-            "zero state"
+            "status dot",
+            "status indicator",
+            "state label",
+            "dot label"
           ]
         }
       },
       "files": [
         {
-          "path": "registry/free/state-panels/state-panels.tsx",
+          "path": "registry/free/status-dot/status-dot.tsx",
           "type": "registry:component"
         }
       ]
@@ -3516,7 +4386,7 @@
       "name": "story-player",
       "type": "registry:block",
       "title": "Story Player",
-      "description": "Full-bleed recap story player: segmented progress bar, tap the left or right third to step, long-press to pause, slides with x plus or minus 100 and scale 0.95, and an end-of-story action dock on the last two slides. Keyboard arrows and Space work, live region announces position, and reduced motion swaps slides instantly and stops the arrow pulse.",
+      "description": "Full-bleed recap story player with a segmented progress bar, tap-to-step, long-press to pause and an end-of-story action dock on the last two slides. Keyboard arrows and Space work, a live region announces position, and reduced motion swaps slides instantly and stops the arrow pulse.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3777,6 +4647,50 @@
       ]
     },
     {
+      "name": "update-banner",
+      "type": "registry:block",
+      "title": "Update Banner",
+      "description": "A dark gold app update banner that walks through available, downloading with progress, downloaded and installing states, retrying transient download errors automatically. It is a polite status region with labelled dismiss buttons, and the slide-in and progress transitions are dropped under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Telling the user a desktop app update is ready to download or install",
+            "Showing download progress and a restart prompt driven by updater events"
+          ],
+          "watchOut": [
+            "Pass a new event object each time the updater emits, or the banner will not react",
+            "In fixed mode it writes --banner-height to :root; offset your layout with it"
+          ],
+          "aliases": [
+            "app update notice",
+            "updater banner",
+            "new version bar",
+            "auto update"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/update-banner/update-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "variant-picker",
       "type": "registry:block",
       "title": "Variant Picker",
@@ -3822,10 +4736,52 @@
       ]
     },
     {
+      "name": "volume-meter",
+      "type": "registry:block",
+      "title": "Volume Meter",
+      "description": "A thin audio level bar that subscribes to a level source and writes its width straight to the DOM, so it can update many times a second without React re-renders. It is a role=meter with a live aria-valuenow, and its width transition is removed under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Live microphone or system audio input levels in a recorder or call setup",
+            "Any rapidly changing 0 to 100 level where re-rendering per tick would be wasteful"
+          ],
+          "watchOut": [
+            "Memoize the subscribe function, or the meter resubscribes on every render",
+            "Levels are multiplied by gain and capped at 100%, so tune gain per source"
+          ],
+          "aliases": [
+            "volume bar",
+            "audio level meter",
+            "mic meter",
+            "vu meter"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/volume-meter/volume-meter.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "window-frame",
       "type": "registry:block",
       "title": "Window Frame",
-      "description": "Mock device frames for showing UI: a macOS window with red, yellow and green lights and a tone ring, a browser with a pill address bar, a phone with island and status bar, and a dotted Stage backdrop. The chrome is hidden from assistive tech and each frame is a labelled figure. Nothing animates, so there is nothing to reduce.",
+      "description": "A macOS style window frame with red, yellow and green lights, a centered title, an optional menu row and a tone ring (danger, success, brand), plus a dotted Stage backdrop to set it on. The traffic lights and menu row are hidden from assistive tech, and nothing animates, so reduced motion needs no handling.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -3842,24 +4798,67 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Showing screenshots or live demos inside an article, landing page or slide",
-            "Comparing a failing and a passing example side by side with the danger and success tones"
+            "Showing a code, prompt or app screen inside an article, landing page or slide",
+            "Marking an example as failing or passing with the danger and success tones"
           ],
           "watchOut": [
-            "These frames are mockups; pass badge (for example Simulated) when the content is drawn, not recorded",
-            "PhoneFrame has a fixed pixel width that shrinks to 100% in narrow containers; set height so long content scrolls inside the screen"
+            "It is a mockup; pass badge (for example Simulated) when the content is drawn, not recorded",
+            "The menu row is hidden below the sm breakpoint, so do not put essential information there"
           ],
           "aliases": [
-            "browser mockup",
-            "device frame",
             "mac window",
-            "phone mockup"
+            "editor window mockup",
+            "app window frame",
+            "traffic light window"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/window-frame/window-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "work-badge",
+      "type": "registry:block",
+      "title": "Work Badge",
+      "description": "Synvize's black-and-gold pill status badge (WorkBadge) plus StatusBadge, which maps work statuses such as available, beta, prototype and archived to tones and labels, with an optional live breathing dot. Dot plus text means status never relies on colour alone, the dot is aria-hidden with an optional screen-reader hint, and the breathing runs only 3 times and never under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "badge",
+        "status",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Marking a project or product's release stage in a portfolio or product card",
+            "Flagging something as actively in progress with the live dot"
+          ],
+          "watchOut": [
+            "Defaults to Synvize's dark palette; put it on a dark surface or pass theme=\"light\"",
+            "The live dot breathes only 3 times by design (WCAG 2.2.2); do not make it loop"
+          ],
+          "aliases": [
+            "status badge",
+            "work status",
+            "release badge",
+            "stage pill"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/work-badge/work-badge.tsx",
           "type": "registry:component"
         }
       ]

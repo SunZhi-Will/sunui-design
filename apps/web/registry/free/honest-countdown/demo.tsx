@@ -9,14 +9,7 @@ const fmt = (ms: number) =>
 
 export default function HonestCountdownDemo() {
   // 場次時間來自後台；這裡在初始化時算一次
-  const [s] = useState(() => {
-    const now = Date.now();
-    return {
-      next: now + 2 * 86_400_000 + 5 * 3_600_000 + 17 * 60_000,
-      live: now - 25 * 60_000,
-      past: now - 9 * 86_400_000,
-    };
-  });
+  const [next] = useState(() => Date.now() + 2 * 86_400_000 + 5 * 3_600_000 + 17 * 60_000);
 
   return (
     <div className="w-full max-w-3xl min-w-0 overflow-hidden rounded-[16px] border border-white/10 bg-black text-white/90">
@@ -33,18 +26,7 @@ export default function HonestCountdownDemo() {
         <a href="#register" className="inline-flex h-12 items-center rounded-[10px] bg-[#F5C045] px-6 text-[15px] font-bold text-black">
           Save my seat
         </a>
-        <HonestCountdown startAt={s.next} dateLabel={fmt(s.next)} />
-      </section>
-
-      <section aria-label="Other sessions" className="grid grid-cols-1 gap-3 border-t border-white/5 p-5 sm:grid-cols-2">
-        <div className="grid min-w-0 gap-2 rounded-[12px] border border-white/5 bg-white/5 p-4">
-          <p className="text-[13px] text-white/50">Office hours, session 4</p>
-          <HonestCountdown startAt={s.live} dateLabel={fmt(s.live)} />
-        </div>
-        <div className="grid min-w-0 gap-2 rounded-[12px] border border-white/5 bg-white/5 p-4">
-          <p className="text-[13px] text-white/50">Office hours, session 3</p>
-          <HonestCountdown startAt={s.past} dateLabel={fmt(s.past)} />
-        </div>
+        <HonestCountdown startAt={next} dateLabel={fmt(next)} />
       </section>
     </div>
   );

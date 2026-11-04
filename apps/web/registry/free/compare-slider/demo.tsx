@@ -50,15 +50,12 @@ function Render() {
 
 export default function CompareSliderDemo() {
   return (
-    <section aria-labelledby="cs-heading" className="w-full max-w-2xl min-w-0 rounded-xl border border-border bg-card p-4 text-card-foreground">
-      <header className="mb-3 flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id="cs-heading" className="truncate text-sm font-semibold">
-          Lighthouse at dusk
-        </h2>
-        <span className="text-xs text-muted-foreground tabular-nums">1920 x 1080, sketch to painting</span>
-      </header>
+    <figure className="w-full max-w-2xl min-w-0 rounded-xl border border-border bg-card p-4 text-card-foreground">
       <CompareSlider before={<Sketch />} after={<Render />} width={16} height={9} beforeLabel="Original" afterLabel="Result" demoSweep />
-      <p className="mt-3 text-xs text-muted-foreground">Drag the divider or use the arrow keys to compare your upload with the finished image.</p>
-    </section>
+      <figcaption className="mt-3 flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        <span className="truncate font-medium text-foreground">Lighthouse at dusk</span>
+        <span className="tabular-nums">1920 x 1080</span>
+      </figcaption>
+    </figure>
   );
 }

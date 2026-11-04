@@ -81,7 +81,7 @@ export type StoryTheme = keyof typeof storyThemes;
 const brushMask =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M9 8C38 4 92 3 140 4l50 2-6 3 12 2-9 3 13 3-12 3 10 4-8 3 11 4-14 2C140 37 70 38 14 35l-10-1 7-3-9-3 8-3-8-4 9-2-7-4 9-2-8-3z'/%3E%3C/svg%3E\")";
 
-/** 暫停選單、存讀檔面板共用的按鈕與動畫 */
+/** 暫停選單的按鈕與動畫 */
 export const storyMenuCss = `
 .spm-root{container-type:size;container-name:spm}
 .spm-overlay{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgb(var(--story-scrim) / .55) 0%,rgb(var(--story-scrim-deep) / .86) 100%);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:spm-fade 240ms ease-out both}

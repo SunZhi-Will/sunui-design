@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -106,43 +106,6 @@ export function CheckoutSteps({ steps, current, label = "Checkout steps", doneLa
             </span>
             {s}
             {i < current && <span className="sr-only">, {doneLabel}</span>}
-          </li>
-        ))}
-      </ol>
-    </>
-  );
-}
-
-export interface NumberedStepsProps {
-  items: ReactNode[];
-  /** 每一步前面給螢幕閱讀器的前綴，預設「Step 1: 」 */
-  stepPrefix?: (n: number) => string;
-  theme?: CheckoutStepsTheme;
-  className?: string;
-  style?: CSSProperties;
-}
-
-/** 編號步驟清單。保留有序清單語意，編號圓點僅作視覺。 */
-export function NumberedSteps({ items, stepPrefix = (n) => `Step ${n}: `, theme = "system", className, style }: NumberedStepsProps) {
-  return (
-    <>
-      <ThemeStyle theme={theme} />
-      <ol role="list" className={cn("sunui-vw-steps space-y-3", className)} style={{ ...themeStyle(theme), ...style }}>
-        {items.map((it, i) => (
-          <li key={i} className="flex gap-3">
-            <span
-              aria-hidden
-              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-bold"
-              style={{ background: "var(--vw-info-bg)", color: "var(--vw-info-text)", border: "1px solid var(--vw-border)" }}
-            >
-              {i + 1}
-            </span>
-            <div className="min-w-0 flex-1 text-[15px] leading-[1.8]" style={{ color: "var(--vw-text-secondary)" }}>
-              <span className="sr-only">{stepPrefix(i + 1)}</span>
-              <div className="space-y-2 [&_a]:text-[color:var(--vw-accent-text)] [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-bold [&_strong]:text-[color:var(--vw-text-primary)]">
-                {it}
-              </div>
-            </div>
           </li>
         ))}
       </ol>
