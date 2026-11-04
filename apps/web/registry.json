@@ -138,6 +138,94 @@
       ]
     },
     {
+      "name": "checkin-streak",
+      "type": "registry:block",
+      "title": "Check-in Streak",
+      "description": "A seven-day check-in card showing done, missed, today and upcoming days with their point rewards, a streak count and a points total. Checking in calls an async onCheckIn with checking and retry states, then presses a vermilion stamp into today's circle. The reward is announced via aria-live, and under reduced motion the stamp appears instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "loyalty",
+        "rewards"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Daily login rewards in shop apps and member centers",
+            "Loyalty programs that pay points for coming back"
+          ],
+          "watchOut": [
+            "Compute todayIndex and checked days on the server in the shopper's time zone",
+            "Make onCheckIn idempotent so a double tap does not grant points twice"
+          ],
+          "aliases": [
+            "daily check-in",
+            "login streak",
+            "daily reward",
+            "sign-in bonus"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/checkin-streak/checkin-streak.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "checkout-steps",
+      "type": "registry:block",
+      "title": "Checkout Steps",
+      "description": "A checkout progress indicator built on a semantic ordered list: completed steps draw a check and can jump back when onStepClick is given, the current step carries aria-current=\"step\", and connectors fill with the theme primary as steps complete. Below the sm breakpoint it collapses to a single 'Step 2 of 4' row with a segmented bar; with reduced motion the fills and checks switch instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "navigation",
+        "checkout"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Multi page or multi section checkout flows",
+            "Any short linear wizard where users may go back to edit an earlier step"
+          ],
+          "watchOut": [
+            "Keep it to five steps or fewer so labels fit on one row",
+            "Only let users jump back to completed steps, never skip ahead"
+          ],
+          "aliases": [
+            "stepper",
+            "checkout progress",
+            "wizard steps",
+            "progress tracker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/checkout-steps/checkout-steps.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "cjk-heading",
       "type": "registry:block",
       "title": "CJK Heading",
@@ -359,6 +447,50 @@
       ]
     },
     {
+      "name": "hold-to-redeem",
+      "type": "registry:block",
+      "title": "Hold To Redeem",
+      "description": "A press-and-hold button for irreversible spends such as redeeming points: a fill grows linearly while held (pointer or Space/Enter), rewinds with a hint if released early, then calls an async onConfirm and turns into a paper voucher line with a vermilion Redeemed stamp and optional code. The hold instruction is wired through aria-describedby and the result is announced via aria-live; under reduced motion the rewind and stamp are instant while the time-based fill still shows progress.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "button",
+        "loyalty"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Redeeming points, vouchers or one-time rewards that can't be undone",
+            "Any spend where an accidental tap would cost the shopper something"
+          ],
+          "watchOut": [
+            "Keep holdMs around one second; longer holds feel broken, not safe",
+            "Use it only for irreversible actions, or it becomes friction on ordinary buttons"
+          ],
+          "aliases": [
+            "long press button",
+            "press and hold",
+            "redeem points",
+            "hold to confirm"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hold-to-redeem/hold-to-redeem.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "low-stock-indicator",
       "type": "registry:block",
       "title": "Low Stock Indicator",
@@ -447,6 +579,50 @@
       ]
     },
     {
+      "name": "payment-status-banner",
+      "type": "registry:block",
+      "title": "Payment Status Banner",
+      "description": "A paper receipt banner for the page shoppers land on after an external payment redirect. While pending it polls a check() function on an interval, pausing while the tab is hidden, then turns paid with a vermilion stamp, failed with a retry, or an honest timeout with a Check again button. Status changes are announced via aria-live, and under reduced motion the stamp and text swaps are instant.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "checkout",
+        "status"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Order confirmation pages after Stripe, PayPal or bank redirects",
+            "Any purchase where the webhook can arrive after the shopper returns"
+          ],
+          "watchOut": [
+            "check() should read your own order record, not trust URL query params",
+            "Keep the timeout copy honest so shoppers do not pay twice"
+          ],
+          "aliases": [
+            "payment confirmation",
+            "checkout result",
+            "order status banner",
+            "webhook pending"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/payment-status-banner/payment-status-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "quantity-stepper",
       "type": "registry:block",
       "title": "Quantity Stepper",
@@ -487,6 +663,95 @@
       "files": [
         {
           "path": "registry/free/quantity-stepper/quantity-stepper.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "redeem-key-input",
+      "type": "registry:block",
+      "title": "Redeem Key Input",
+      "description": "A printed-voucher card for redeeming gift cards, license keys and promo codes: the mono input uppercases, strips stray characters and groups the code with dashes as you type or paste, optionally detects the key type, and shows server errors inline. On success the field becomes the printed code with a vermilion Redeemed stamp; results are announced via aria-live and the stamp appears instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "form",
+        "input",
+        "coupon"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Account pages where customers redeem gift cards or store credit",
+            "Activating a license or supporter key in an app"
+          ],
+          "watchOut": [
+            "Throw an Error with an actionable message from onRedeem; the message is shown as is",
+            "Match length and groupSize to your real code format or valid codes cannot be completed"
+          ],
+          "aliases": [
+            "gift card input",
+            "license key activation",
+            "promo code field",
+            "voucher redeem"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/redeem-key-input/redeem-key-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "reservation-timer",
+      "type": "registry:block",
+      "title": "Reservation Timer",
+      "description": "A paper slip that shows how long a limited item or ticket is held for you, with a mono countdown, a hairline bar for the remaining hold and a slot for the item summary. It renders a placeholder until mounted, resyncs with real time when the tab returns, turns vermilion inside the warning window, and on expiry calls onExpire, fades and presses an ink Released stamp with an optional Hold again action. Screen readers hear only the warning crossing and the expiry, and reduced motion skips the stamp animation.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "checkout",
+        "countdown"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Ticket, seat or limited drop checkouts that hold stock for a few minutes",
+            "Cart sidebars where an item is reserved until payment"
+          ],
+          "watchOut": [
+            "Only show a hold the server actually enforces; never fake urgency",
+            "Release the stock on the server too, the onExpire callback is only the UI side"
+          ],
+          "aliases": [
+            "hold timer",
+            "cart reservation",
+            "checkout countdown",
+            "held for you"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/reservation-timer/reservation-timer.tsx",
           "type": "registry:component"
         }
       ]
@@ -619,6 +884,50 @@
       "files": [
         {
           "path": "registry/free/segmented-control/segmented-control.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "settlement-receipt",
+      "type": "registry:block",
+      "title": "Settlement Receipt",
+      "description": "A torn-edge paper receipt for split bills: per-person subtotals with a line breakdown and payer tag, a balance check against the bill total, and a transfer list where each row is a checkbox to mark as sent. When every transfer is ticked a vermilion Settled stamp presses on, and a Copy summary button copies a plain-text recap. Settling is announced via aria-live and the stamp is instant under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "receipt",
+        "payment"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Bill splitting and group order results",
+            "Showing who owes whom after a shared purchase"
+          ],
+          "watchOut": [
+            "Pass the real bill total so mismatches surface instead of hiding rounding errors",
+            "Transfers reference people by id; unknown ids fall back to the raw id"
+          ],
+          "aliases": [
+            "split bill",
+            "bill splitter result",
+            "expense settlement",
+            "group payment receipt"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/settlement-receipt/settlement-receipt.tsx",
           "type": "registry:component"
         }
       ]
@@ -838,6 +1147,50 @@
       "files": [
         {
           "path": "registry/free/typewriter/typewriter.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "undo-toast",
+      "type": "registry:block",
+      "title": "Undo Toast",
+      "description": "Replaces confirm dialogs with undo: a useUndo hook keeps one pending action and commits the previous one when a new one starts, and UndoToast shows a paper slip with an Undo button and a hairline that runs out over the duration, then commits. The timer pauses on hover, focus or when the tab is hidden; Escape commits, Cmd/Ctrl+Z undoes (except while typing in a field), and the slip lives in an aria-live polite status region with instant transitions under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "notification",
+        "cart"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Removing cart items, saved addresses or wishlist entries without a confirm dialog",
+            "Any destructive action you can hold back for a few seconds before committing"
+          ],
+          "watchOut": [
+            "Apply the change optimistically in the UI and only call the server in onCommit",
+            "Don't use it for actions that can't be held back, such as payments"
+          ],
+          "aliases": [
+            "undo snackbar",
+            "undo instead of confirm",
+            "undoable delete",
+            "restore toast"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/undo-toast/undo-toast.tsx",
           "type": "registry:component"
         }
       ]
