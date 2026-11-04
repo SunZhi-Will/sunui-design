@@ -6,81 +6,76 @@ import { ConfirmButton } from "./confirm-button";
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-type Address = { id: string; name: string; lines: string; isDefault?: boolean };
+type Signup = { id: string; email: string; source: string; when: string; note?: string };
 
-const initial: Address[] = [
-  { id: "home", name: "Home", lines: "12 Harbor Lane, Apt 4B, Portland, OR 97209", isDefault: true },
-  { id: "office", name: "Office", lines: "400 Market Street, Floor 7, Portland, OR 97204" },
-  { id: "parents", name: "Mom and Dad", lines: "88 Cedar Road, Eugene, OR 97401" },
+const initial: Signup[] = [
+  { id: "ps_81f2", email: "mika.tan@example.com", source: "landing", when: "2 hours ago" },
+  { id: "ps_7c09", email: "test+qa@example.com", source: "-", when: "yesterday", note: "Looks like test data" },
+  { id: "ps_66ad", email: "o.ruiz@example.org", source: "newsletter", when: "3 days ago" },
 ];
 
 export default function ConfirmButtonDemo() {
-  const [addresses, setAddresses] = useState(initial);
+  const [rows, setRows] = useState(initial);
+  const [exportedAt, setExportedAt] = useState<string>();
 
   return (
-    <div className="w-full max-w-xl space-y-6">
-      <section aria-labelledby="addresses-heading" className="space-y-3">
-        <div>
-          <h2 id="addresses-heading" className="text-lg font-semibold tracking-tight">
-            Saved addresses
+    <section aria-labelledby="presale-heading" className="w-full max-w-2xl rounded-xl border border-border bg-card text-card-foreground">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border p-4">
+        <div className="min-w-0">
+          <h2 id="presale-heading" className="font-semibold tracking-tight">
+            Presale signups
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Press Remove twice to delete. Your default address can't be removed.</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Remove a signup only when the person asks, or it is clearly test data. Only the id stays in the audit log.
+          </p>
         </div>
-        <ul className="divide-y divide-border rounded-md border border-border bg-card text-card-foreground">
-          {addresses.map((a) => (
-            <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-sm font-medium">
-                  {a.name}
-                  {a.isDefault && (
-                    <span className="rounded-[3px] border border-border px-1.5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-                      Default
-                    </span>
-                  )}
-                </p>
-                <p className="mt-0.5 text-sm text-muted-foreground">{a.lines}</p>
-              </div>
-              <ConfirmButton
-                armedLabel="Press again to remove"
-                doneLabel="Removed"
-                disabled={a.isDefault}
-                onConfirm={async () => {
-                  await wait(500);
-                  setAddresses((list) => list.filter((x) => x.id !== a.id));
-                }}
-              >
-                Remove
-              </ConfirmButton>
-            </li>
-          ))}
-          {!addresses.length && <li className="p-6 text-center text-sm text-muted-foreground">No saved addresses.</li>}
-        </ul>
-      </section>
+        <ConfirmButton
+          variant="secondary"
+          armedVariant="default"
+          confirmLabel="Export and email CSV"
+          action={async () => {
+            await wait(600);
+            setExportedAt("just now");
+            return { ok: true, message: `Sent ${rows.length} rows to your inbox` };
+          }}
+        >
+          Export
+        </ConfirmButton>
+      </header>
 
-      <section aria-labelledby="order-heading" className="rounded-md border border-border bg-card p-4 text-card-foreground">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 id="order-heading" className="text-sm font-medium">
-              Order <span className="font-mono tracking-[0.12em]">SU-48213</span>
-            </h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">Placed today, 2 items, not shipped yet</p>
-          </div>
-          <span className="text-base font-semibold tracking-tight tabular-nums">$128.00</span>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-          <p className="text-xs text-muted-foreground">You can cancel until it ships. Refunds go back to your card.</p>
-          <ConfirmButton
-            tone="danger"
-            window={3000}
-            doneDuration={Infinity}
-            armedLabel="Press again to cancel order"
-            doneLabel="Order cancelled"
-            onConfirm={() => wait(700)}
-          >
-            Cancel order
-          </ConfirmButton>
-        </div>
-      </section>
-    </div>
+      <ul className="divide-y divide-border">
+        {rows.map((r) => (
+          <li key={r.id} className="flex items-start justify-between gap-3 p-4">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{r.email}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                {r.source} · {r.when}
+                {r.note ? ` · ${r.note}` : ""}
+              </p>
+            </div>
+            <ConfirmButton
+              variant="ghost"
+              size="xs"
+              confirmLabel="Remove signup"
+              action={async () => {
+                await wait(500);
+                // 有一筆會被伺服器拒絕，示範失敗訊息
+                if (r.id === "ps_66ad") return { ok: false, message: "Still in a paid order, can't remove" };
+                setRows((list) => list.filter((x) => x.id !== r.id));
+                return { ok: true, message: "Signup removed" };
+              }}
+            >
+              Remove
+            </ConfirmButton>
+          </li>
+        ))}
+        {!rows.length && <li className="p-6 text-center text-sm text-muted-foreground">No signups yet.</li>}
+      </ul>
+
+      <footer className="flex items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted-foreground">
+        <span className="tabular-nums">{rows.length} signups</span>
+        <span>{exportedAt ? `Last export ${exportedAt}` : "Not exported yet"}</span>
+      </footer>
+    </section>
   );
 }

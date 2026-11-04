@@ -1,12 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
+  useCallback,
   useEffect,
   useId,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent,
+  type CSSProperties,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -14,254 +15,470 @@ import {
 import { cn } from "@/lib/utils";
 
 export interface CapsuleNavItem {
-  /** 對應頁面上區段的 id，用來判斷目前段落 */
-  id: string;
+  key: string;
   label: ReactNode;
-  /** 預設為 #id；外部連結照常跳轉 */
-  href?: string;
+  href: string;
+  /** 對應頁面上的區段 id；捲到該區段時這一項亮起 */
+  sectionId?: string;
+  /** 目前所在頁面（aria-current="page"） */
+  current?: boolean;
+}
+
+export interface CapsuleNavCta {
+  label: ReactNode;
+  href: string;
+  onClick?: () => void;
+}
+
+export interface CapsuleNavLabels {
+  navigation?: string;
+  openMenu?: string;
+  closeMenu?: string;
+  /** 手機版膠囊中間的位置標籤，還沒捲到任何區段時顯示 */
+  home?: string;
 }
 
 export interface CapsuleNavProps {
+  /** 左側品牌（logo 與名稱） */
+  brand: ReactNode;
+  brandHref?: string;
+  /** 品牌連結的無障礙名稱 */
+  brandLabel?: string;
   items: CapsuleNavItem[];
-  logo?: ReactNode;
-  cta?: ReactNode;
+  cta?: CapsuleNavCta;
+  /** 右端的頁面專屬工具（搜尋、主題切換） */
+  tools?: ReactNode;
+  /** 捲動超過多少 px 從滿版 header 變成膠囊 */
+  threshold?: number;
   /** 往下捲時收起、往上捲時出現；焦點在導覽內時不收 */
   hideOnScroll?: boolean;
-  /** 預設固定在視窗頂端；false 時改為 sticky，交給捲動容器 */
+  /** 膠囊狀態的最大寬度 */
+  maxWidth?: number;
+  /** true：固定在視窗頂端；false：sticky 在捲動容器頂端 */
   fixed?: boolean;
   /** 捲動容器；不給時監聽 window */
   scrollContainer?: RefObject<HTMLElement | null>;
-  /** 捲動超過多少 px 後加上底框 */
-  threshold?: number;
-  /** 點擊連結後捲到區段時保留的頂端距離 */
-  offset?: number;
-  labels?: { nav?: string; menu?: string; close?: string };
+  onNavigate?: (item: CapsuleNavItem) => void;
+  labels?: CapsuleNavLabels;
   className?: string;
 }
 
-const defaultLabels = { nav: "Main", menu: "Open menu", close: "Close menu" };
+const defaultLabels: Required<CapsuleNavLabels> = {
+  navigation: "Main",
+  openMenu: "Open menu",
+  closeMenu: "Close menu",
+  home: "Home",
+};
 
-const ease = [0.23, 1, 0.32, 1] as const;
-const springs = { snappy: { type: "spring", stiffness: 520, damping: 34 } } as const;
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+const HIDE_AFTER = 160;
+const JITTER = 6;
+
+// 原站 base.css 的灰階雙主題 token
+const themeVars =
+  "[--cn-header:rgba(255,255,255,0.85)] [--cn-capsule:rgba(255,255,255,0.98)] [--cn-panel:#ffffff] [--cn-border:rgba(15,23,42,0.06)] [--cn-border-subtle:rgba(15,23,42,0.04)] [--cn-text:rgba(15,23,42,0.95)] [--cn-text-2:rgba(15,23,42,0.75)] [--cn-active:#eaeaea] [--cn-hover:#f4f4f5] [--cn-backdrop:rgba(255,255,255,0.6)] [--cn-panel-shadow:0_18px_60px_rgba(8,8,10,0.12)] dark:[--cn-header:rgba(0,0,0,0.85)] dark:[--cn-capsule:rgba(10,10,10,0.97)] dark:[--cn-panel:#121316] dark:[--cn-border:rgba(255,255,255,0.10)] dark:[--cn-border-subtle:rgba(255,255,255,0.06)] dark:[--cn-text:rgba(255,255,255,0.93)] dark:[--cn-text-2:rgba(255,255,255,0.58)] dark:[--cn-active:rgba(255,255,255,0.10)] dark:[--cn-hover:rgba(255,255,255,0.07)] dark:[--cn-backdrop:rgba(0,0,0,0.6)] dark:[--cn-panel-shadow:0_18px_60px_rgba(0,0,0,0.55)]";
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+function ToggleIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      width="20"
+      height="20"
+      role="presentation"
+      focusable="false"
+      aria-hidden="true"
+    >
+      {open ? (
+        <path
+          d="M5 5l10 10M15 5L5 15"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      ) : (
+        <path
+          d="M3.5 7h13M3.5 13h13"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}
 
 export function CapsuleNav({
+  brand,
+  brandHref = "/",
+  brandLabel,
   items,
-  logo,
   cta,
+  tools,
+  threshold = 40,
   hideOnScroll = false,
+  maxWidth = 600,
   fixed = true,
   scrollContainer,
-  threshold = 8,
-  offset = 72,
+  onNavigate,
   labels,
   className,
 }: CapsuleNavProps) {
-  const t = { ...defaultLabels, ...labels };
+  const l = { ...defaultLabels, ...labels };
   const reduce = useReducedMotion() ?? false;
-  const uid = useId();
-  const navRef = useRef<HTMLElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLButtonElement>(null);
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [active, setActive] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const ids = items.map((i) => i.id).join(",");
+  const panelId = useId();
 
-  // 捲動狀態機：top → scrolled，rAF 節流
+  const [state, setState] = useState<"top" | "scrolled">("top");
+  const [scrolledDown, setScrolledDown] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const hidden = hideOnScroll && scrolledDown && !focused && !menuOpen;
+
+  /* ── 捲動狀態機：TOP 與 SCROLLED 只差在外框，導覽項目全程可見 ── */
   useEffect(() => {
-    const el = scrollContainer?.current ?? null;
-    const target: HTMLElement | Window = el ?? window;
-    const getY = () => (el ? el.scrollTop : window.scrollY);
-    let last = getY();
+    const target: HTMLElement | Window = scrollContainer?.current ?? window;
+    const readY = () =>
+      target instanceof Window ? target.scrollY : target.scrollTop;
     let frame = 0;
+    let lastY = readY();
+
     const update = () => {
       frame = 0;
-      const y = getY();
-      setScrolled(y > threshold);
-      const delta = y - last;
-      if (Math.abs(delta) > 4 || y < 64) {
-        const focusInside = navRef.current?.contains(document.activeElement) ?? false;
-        setHidden(hideOnScroll && delta > 0 && y >= 64 && !focusInside);
-        last = y;
+      const y = readY();
+      setState(y <= threshold ? "top" : "scrolled");
+      // 小幅抖動不反應，避免導覽列閃爍
+      if (Math.abs(y - lastY) > JITTER) {
+        setScrolledDown(y > lastY && y > HIDE_AFTER);
+        lastY = y;
       }
     };
     const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+      if (frame) return;
+      frame = requestAnimationFrame(update);
     };
-    update();
+
     target.addEventListener("scroll", onScroll, { passive: true });
+    update();
     return () => {
       target.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
     };
-  }, [scrollContainer, threshold, hideOnScroll]);
+  }, [scrollContainer, threshold]);
 
-  // 目前段落：以畫面 40% 到 45% 之間的中線判斷，不監聽 scroll
+  /* ── 目前所在區段 ── */
   useEffect(() => {
-    const els = ids
-      .split(",")
+    const ids = items
+      .map((item) => item.sectionId)
+      .filter((id): id is string => Boolean(id));
+    if (ids.length === 0) return;
+    const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
-    if (!els.length) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
-      },
-      { root: scrollContainer?.current ?? null, rootMargin: "-40% 0px -55% 0px" },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [ids, scrollContainer]);
+    if (elements.length === 0) return;
 
-  // 行動版選單：鎖捲動、焦點陷阱、Esc 關閉並把焦點還給按鈕
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
+          )[0];
+        if (visible) setActiveSection(visible.target.id);
+      },
+      {
+        root: scrollContainer?.current ?? null,
+        rootMargin: "-40% 0px -55% 0px",
+        threshold: 0,
+      },
+    );
+    for (const el of elements) observer.observe(el);
+    return () => observer.disconnect();
+  }, [items, scrollContainer]);
+
+  /* ── 選單：焦點管理、Esc、背景鎖定 ── */
+  const closeMenu = useCallback((returnFocus = true) => {
+    setMenuOpen(false);
+    if (returnFocus) menuButtonRef.current?.focus();
+  }, []);
+
   useEffect(() => {
-    if (!open) return;
-    const lockEl = scrollContainer?.current ?? document.documentElement;
-    const prev = lockEl.style.overflow;
-    lockEl.style.overflow = "hidden";
-    sheetRef.current?.querySelector<HTMLElement>("a[href],button")?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        menuRef.current?.focus();
+    if (!menuOpen) return;
+
+    const lockTarget = fixed
+      ? document.documentElement
+      : scrollContainer?.current;
+    const previousOverflow = lockTarget?.style.overflow ?? "";
+    if (lockTarget) lockTarget.style.overflow = "hidden";
+    if (!fixed && scrollContainer?.current)
+      setContainerHeight(scrollContainer.current.clientHeight);
+
+    const panel = panelRef.current;
+    panel
+      ?.querySelector<HTMLElement>("a, button, input, select, textarea")
+      ?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu();
         return;
       }
-      if (e.key !== "Tab" || !sheetRef.current) return;
-      const focusables = [...sheetRef.current.querySelectorAll<HTMLElement>("a[href],button:not([disabled])")];
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const lastEl = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        lastEl.focus();
-      } else if (!e.shiftKey && document.activeElement === lastEl) {
-        e.preventDefault();
+      if (event.key !== "Tab" || !panel) return;
+      // 焦點在「選單鈕 + 面板」之間繞圈
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE),
+      );
+      const trigger = menuButtonRef.current;
+      const stops = trigger ? [trigger, ...focusable] : focusable;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
         first.focus();
       }
     };
-    document.addEventListener("keydown", onKey);
+
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      lockEl.style.overflow = prev;
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKeyDown);
+      if (lockTarget) lockTarget.style.overflow = previousOverflow;
     };
-  }, [open, scrollContainer]);
+  }, [menuOpen, closeMenu, fixed, scrollContainer]);
 
-  function goTo(e: ReactMouseEvent<HTMLAnchorElement>, item: CapsuleNavItem) {
-    if (item.href && !item.href.startsWith("#")) return;
-    const el = document.getElementById(item.id);
-    if (!el) return;
-    e.preventDefault();
-    const root = scrollContainer?.current;
-    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
-    const rect = el.getBoundingClientRect();
-    if (root) root.scrollTo({ top: rect.top - root.getBoundingClientRect().top + root.scrollTop - offset, behavior });
-    else window.scrollTo({ top: rect.top + window.scrollY - offset, behavior });
-    setActive(item.id);
-    setOpen(false);
-  }
+  const isScrolled = state === "scrolled";
+  const contextLabel =
+    items.find((item) => item.sectionId && item.sectionId === activeSection)
+      ?.label ??
+    items.find((item) => item.current)?.label ??
+    l.home;
 
-  const visible = !hidden || open;
+  // 從滿版 header 變形成膠囊：用 box-shadow 畫邊線，轉場才平順、不會閃白邊
+  const barStyle: CSSProperties = {
+    marginTop: isScrolled ? 10 : 0,
+    width: isScrolled ? "calc(100% - 24px)" : "100%",
+    maxWidth: isScrolled ? maxWidth : "100%",
+    height: 52,
+    borderRadius: isScrolled ? 26 : 0,
+    background: isScrolled ? "var(--cn-capsule)" : "var(--cn-header)",
+    backdropFilter: "blur(20px) saturate(180%)",
+    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+    boxShadow: isScrolled
+      ? "0 10px 30px rgba(0,0,0,0.18), 0 0 0 1px var(--cn-border)"
+      : "0 1px 0 0 var(--cn-border-subtle)",
+    paddingLeft: isScrolled ? 20 : 24,
+    paddingRight: isScrolled ? 8 : 16,
+    transition: reduce
+      ? "none"
+      : "all 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, box-shadow 0.25s ease",
+  };
 
   return (
-    <motion.div
-      className={cn(
-        "pointer-events-none z-30 flex justify-center px-3",
-        fixed ? "fixed inset-x-0 top-3" : "sticky top-3",
-        className,
-      )}
-      animate={{ y: visible ? 0 : -88, opacity: visible ? 1 : 0 }}
-      transition={reduce ? { duration: 0 } : { duration: 0.24, ease }}
-    >
-      <nav
-        ref={navRef}
-        aria-label={t.nav}
-        className={cn(
-          "pointer-events-auto relative flex w-full max-w-2xl items-center gap-2 rounded-full border px-2 py-1.5 text-foreground transition-[background-color,border-color,box-shadow] duration-200",
-          scrolled || open ? "border-border bg-background/88 shadow-sm backdrop-blur-sm" : "border-transparent",
-        )}
-      >
-        {logo && <div className="flex shrink-0 items-center pr-1 pl-2">{logo}</div>}
-
-        <ul className="hidden flex-1 items-center justify-center gap-0.5 sm:flex">
-          {items.map((item) => {
-            const current = active === item.id;
-            return (
-              <li key={item.id}>
-                <a
-                  href={item.href ?? `#${item.id}`}
-                  onClick={(e) => goTo(e, item)}
-                  aria-current={current ? "location" : undefined}
-                  className={cn(
-                    "relative block rounded-full px-3 py-1.5 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    current ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {current && (
-                    <motion.span
-                      layoutId={`${uid}-pill`}
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-full bg-primary/10"
-                      transition={reduce ? { duration: 0 } : springs.snappy}
-                    />
-                  )}
-                  <span className="relative">{item.label}</span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:ml-0">
-          {cta && <div className="hidden sm:block">{cta}</div>}
-          <button
-            ref={menuRef}
-            type="button"
-            aria-expanded={open}
-            aria-controls={`${uid}-sheet`}
-            aria-label={open ? t.close : t.menu}
-            onClick={() => setOpen((o) => !o)}
-            className="flex size-9 items-center justify-center rounded-full text-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring sm:hidden"
-          >
-            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-              {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 8h16M4 16h16" />}
-            </svg>
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              ref={sheetRef}
-              id={`${uid}-sheet`}
-              className="absolute inset-x-0 top-full mt-2 rounded-xl border border-border bg-background p-2 shadow-sm sm:hidden"
-              initial={reduce ? false : { opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.18, ease }}
-            >
-              <ul>
-                {items.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      href={item.href ?? `#${item.id}`}
-                      onClick={(e) => goTo(e, item)}
-                      aria-current={active === item.id ? "location" : undefined}
-                      className={cn(
-                        "block rounded-lg px-3 py-2.5 text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring",
-                        active === item.id ? "bg-primary/10 text-foreground" : "text-muted-foreground",
-                      )}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              {cta && <div className="mt-2 border-t border-border px-1 pt-2">{cta}</div>}
-            </motion.div>
+    <>
+      {menuOpen && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label={l.closeMenu}
+          onClick={() => closeMenu()}
+          className={cn(
+            "z-40 bg-[var(--cn-backdrop)]",
+            themeVars,
+            fixed
+              ? "fixed inset-0"
+              : "sticky top-0 -mb-[var(--cn-h)] block w-full",
           )}
-        </AnimatePresence>
-      </nav>
-    </motion.div>
+          style={
+            fixed
+              ? undefined
+              : ({
+                  height: containerHeight,
+                  "--cn-h": `${containerHeight}px`,
+                } as CSSProperties)
+          }
+        />
+      )}
+
+      <motion.header
+        data-state={menuOpen ? "menu-open" : state}
+        className={cn(
+          "@container/capsule pointer-events-none inset-x-0 top-0 z-50 flex flex-col items-center",
+          fixed ? "fixed" : "sticky h-0 overflow-visible",
+          themeVars,
+          className,
+        )}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
+      >
+        <div
+          className={cn(
+            "flex w-full flex-col items-center transition-[transform,opacity] duration-300",
+            reduce && "transition-none",
+            hidden && "-translate-y-[150%] opacity-0",
+          )}
+          onFocusCapture={() => setFocused(true)}
+          onBlurCapture={() => setFocused(false)}
+        >
+          <div
+            className={cn(
+              "flex items-center gap-2 text-[var(--cn-text)]",
+              hidden ? "pointer-events-none" : "pointer-events-auto",
+            )}
+            style={barStyle}
+          >
+            <a
+              href={brandHref}
+              aria-label={brandLabel}
+              className="group flex flex-none items-center gap-2 rounded-2xl text-sm font-semibold whitespace-nowrap"
+            >
+              {brand}
+            </a>
+
+            {/* 手機版：中間顯示目前位置 */}
+            <p
+              aria-hidden="true"
+              className="mx-auto truncate font-mono text-[11px] tracking-[0.04em] text-[var(--cn-text-2)] @3xl/capsule:hidden"
+            >
+              {contextLabel}
+            </p>
+
+            <nav
+              aria-label={l.navigation}
+              className="mx-auto hidden items-center @3xl/capsule:flex"
+            >
+              {items.map((item) => {
+                const lit =
+                  item.current ||
+                  (item.sectionId !== undefined &&
+                    item.sectionId === activeSection);
+                return (
+                  <a
+                    key={item.key}
+                    href={item.href}
+                    aria-current={item.current ? "page" : undefined}
+                    data-current={
+                      item.sectionId && item.sectionId === activeSection
+                        ? "true"
+                        : undefined
+                    }
+                    onClick={() => onNavigate?.(item)}
+                    className={cn(
+                      "relative rounded-2xl px-3.5 py-2 text-[13px] font-medium whitespace-nowrap transition-colors duration-200",
+                      lit
+                        ? "text-[var(--cn-text)]"
+                        : "text-[var(--cn-text-2)] hover:text-[var(--cn-text)]",
+                    )}
+                  >
+                    {lit && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-2xl bg-[var(--cn-active)]"
+                      />
+                    )}
+                    <span className="relative">{item.label}</span>
+                  </a>
+                );
+              })}
+            </nav>
+
+            {tools && (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="mx-1.5 hidden h-4 w-px bg-[var(--cn-border)] @3xl/capsule:block"
+                />
+                <div className="flex flex-none items-center gap-0.5">
+                  {tools}
+                </div>
+              </>
+            )}
+
+            {cta && (
+              <a
+                href={cta.href}
+                onClick={cta.onClick}
+                className="hidden min-h-9 flex-none items-center rounded-full bg-[var(--cn-text)] px-4 text-[13px] font-semibold whitespace-nowrap text-[var(--cn-panel)] transition-opacity hover:opacity-90 @3xl/capsule:inline-flex"
+              >
+                {cta.label}
+              </a>
+            )}
+
+            <button
+              ref={menuButtonRef}
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls={panelId}
+              onClick={() => setMenuOpen((open) => !open)}
+              className="flex size-10 flex-none items-center justify-center rounded-full text-[var(--cn-text-2)] hover:bg-[var(--cn-hover)] hover:text-[var(--cn-text)] @3xl/capsule:hidden"
+            >
+              <span className="sr-only">
+                {menuOpen ? l.closeMenu : l.openMenu}
+              </span>
+              <ToggleIcon open={menuOpen} />
+            </button>
+          </div>
+
+          <div
+            ref={panelRef}
+            id={panelId}
+            hidden={!menuOpen}
+            role="dialog"
+            aria-modal="true"
+            aria-label={l.navigation}
+            className="pointer-events-auto mt-2 max-h-[calc(100dvh-96px)] w-[calc(100%-24px)] overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--cn-border)] bg-[var(--cn-panel)] p-4 text-[var(--cn-text)] shadow-[var(--cn-panel-shadow)] @3xl/capsule:hidden"
+            style={{ maxWidth }}
+          >
+            <ul role="list" className="m-0 flex list-none flex-col gap-1 p-0">
+              {items.map((item) => (
+                <li key={item.key}>
+                  <a
+                    href={item.href}
+                    aria-current={item.current ? "page" : undefined}
+                    onClick={() => {
+                      onNavigate?.(item);
+                      closeMenu(false);
+                    }}
+                    className="flex min-h-12 items-center rounded-md px-3 text-[17px] hover:bg-[var(--cn-hover)] aria-[current=page]:bg-[var(--cn-active)]"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {cta && (
+              <>
+                <div className="my-4 border-t border-[var(--cn-border)]" />
+                <div className="flex flex-col gap-3">
+                  <a
+                    href={cta.href}
+                    onClick={() => {
+                      cta.onClick?.();
+                      closeMenu(false);
+                    }}
+                    className="flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--cn-text)] text-sm font-semibold text-[var(--cn-panel)]"
+                  >
+                    {cta.label}
+                  </a>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </motion.header>
+    </>
   );
 }

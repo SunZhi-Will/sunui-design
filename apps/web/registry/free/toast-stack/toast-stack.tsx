@@ -75,9 +75,21 @@ const springs = {
 /** 狀態只用小圖示表達，不鋪底色 */
 const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
-  success: <path d="m3.5 8.5 3 3 6-7" className="text-emerald-700 dark:text-emerald-400" />,
-  error: <path d="M8 4.5v4.5M8 11.5v.01M8 1.75 14.5 13.5h-13Z" className="text-[#c8361d] dark:text-[#ec6a4f]" />,
-  info: <path d="M8 7v4.5M8 4.5v.01M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13Z" />,
+  success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-emerald-700 dark:text-emerald-400" />,
+  error: (
+    <g className="text-[#c8361d] dark:text-[#ec6a4f]">
+      <path d="M10.3 4.6L3.4 17a2 2 0 0 0 1.7 3h13.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z" />
+      <path d="M12 9.5v4" />
+      <circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none" />
+    </g>
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 11v5" />
+      <circle cx="12" cy="8" r="1" fill="currentColor" stroke="none" />
+    </>
+  ),
 };
 
 export function ToastStack({
@@ -269,7 +281,7 @@ function ToastBody({
         </span>
       ) : (
         icon && (
-          <svg viewBox="0 0 16 16" className="mt-0.5 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             {icon}
           </svg>
         )
@@ -296,8 +308,8 @@ function ToastBody({
         aria-label={dismissLabel}
         className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-colors hover:text-[#1c1917] dark:hover:text-[#ece7dc] focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
       >
-        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-          <path d="m4 4 8 8M12 4l-8 8" />
+        <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
+          <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
         </svg>
       </button>
     </div>

@@ -185,8 +185,8 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
 
 function CheckIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="m3.5 8.5 3 3 6-7" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-3.5">
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
   );
 }

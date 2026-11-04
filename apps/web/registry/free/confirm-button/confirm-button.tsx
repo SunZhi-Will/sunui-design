@@ -1,203 +1,194 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type ConfirmButtonTone = "default" | "danger";
+export type ConfirmButtonVariant = "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
+export type ConfirmButtonSize = "default" | "xs" | "sm" | "lg";
+
+/** 跟 usermeld 的 ActionResult 同型：ok 與給人看的訊息 */
+export type ConfirmResult = { ok: boolean; message?: string } | void;
 
 export interface ConfirmButtonLabels {
-  armed?: ReactNode;
-  busy?: ReactNode;
-  done?: ReactNode;
-  error?: ReactNode;
-  /** 螢幕閱讀器在待確認時聽到的說明 */
-  hint?: (seconds: number) => string;
-  doneAnnouncement?: string;
-  errorAnnouncement?: string;
+  /** 第一次按下後的提示，{label} 會換成 confirmLabel */
+  armedNotice?: string;
+  /** 成功但 action 沒給訊息時 */
+  done?: string;
+  /** action 拋錯時 */
+  failed?: string;
 }
 
 export interface ConfirmButtonProps {
-  /** 平常的按鈕文字，寫動作本身，例如「Remove」 */
+  /** 平常的按鈕文字，寫動作本身，例如「移除」 */
   children: ReactNode;
-  /** 第一次按下後的文字，寫出結果，例如「Press again to remove」 */
-  armedLabel?: ReactNode;
-  /** 完成後的文字，例如「Removed」 */
-  doneLabel?: ReactNode;
-  /** 第二次按下的期限（ms） */
-  window?: number;
-  /** 完成狀態停留多久（ms）；Infinity 表示停在完成並停用 */
-  doneDuration?: number;
-  /** 拋錯時顯示錯誤並回到可再按的狀態 */
-  onConfirm?: () => void | Promise<void>;
-  tone?: ConfirmButtonTone;
+  /** 待確認時的按鈕文字，用結果命名，例如「移除登記」，不要用「確定」 */
+  confirmLabel: string;
+  /** 第二下的期限（ms），原作快讀是 2.5 秒 */
+  armMs?: number;
+  /** 提示停留多久（ms），原作是 1.8 秒 */
+  noticeMs?: number;
+  /** 第二下按到時呼叫；回 { ok: false, message } 或拋錯都算失敗 */
+  action: () => Promise<ConfirmResult> | ConfirmResult;
+  /** 設定後按下只顯示這句、不會進入待確認（例如還沒有可讀的快速存檔） */
+  unavailableMessage?: string;
+  variant?: ConfirmButtonVariant;
+  /** 待確認時換成的樣式，預設 destructive */
+  armedVariant?: ConfirmButtonVariant;
+  size?: ConfirmButtonSize;
   disabled?: boolean;
   labels?: ConfirmButtonLabels;
   className?: string;
 }
 
-type Phase = "idle" | "armed" | "busy" | "done" | "error";
-
 const defaultLabels: Required<ConfirmButtonLabels> = {
-  armed: "Press again to confirm",
-  busy: "Working",
+  armedNotice: "Press again to {label}",
   done: "Done",
-  error: "That didn't work. Try again.",
-  hint: (s) => `Press again within ${s} seconds to confirm, or press Escape to cancel.`,
-  doneAnnouncement: "Done.",
-  errorAnnouncement: "That didn't work. Try again.",
+  failed: "That didn't work. Please try again.",
 };
 
-const springs = {
-  snappy: { type: "spring", stiffness: 520, damping: 34 },
-} as const;
+// usermeld components/ui/button.tsx 的 buttonVariants
+const base =
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+
+const variants: Record<ConfirmButtonVariant, string> = {
+  default: "bg-primary text-primary-foreground hover:bg-primary/80",
+  outline:
+    "border-border bg-background hover:bg-muted hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+  secondary: "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]",
+  ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
+  destructive:
+    "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+  link: "text-primary underline-offset-4 hover:underline",
+};
+
+const sizes: Record<ConfirmButtonSize, string> = {
+  default: "h-8 gap-1.5 px-2.5",
+  xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
+  sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] [&_svg:not([class*='size-'])]:size-3.5",
+  lg: "h-9 gap-1.5 px-2.5",
+};
+
+type Notice = { text: string; tone: "info" | "success" | "error" };
 
 export function ConfirmButton({
   children,
-  armedLabel,
-  doneLabel,
-  window: windowMs = 2500,
-  doneDuration = 1800,
-  onConfirm,
-  tone = "default",
+  confirmLabel,
+  armMs = 2500,
+  noticeMs = 1800,
+  action,
+  unavailableMessage,
+  variant = "outline",
+  armedVariant = "destructive",
+  size = "default",
   disabled = false,
   labels,
   className,
 }: ConfirmButtonProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const id = useId();
-  const [phase, setPhase] = useState<Phase>("idle");
-  const [armCount, setArmCount] = useState(0);
-  const [announcement, setAnnouncement] = useState("");
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [armed, setArmed] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [notice, setNotice] = useState<Notice>();
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const armTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const alive = useRef(true);
 
-  const clear = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-  };
-  useEffect(() => clear, []);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      clearTimeout(noticeTimer.current);
+      clearTimeout(armTimer.current);
+    };
+  }, []);
 
-  const finalDone = phase === "done" && !Number.isFinite(doneDuration);
-  const inactive = disabled || phase === "busy" || finalDone;
-
-  function disarm() {
-    if (phase !== "armed") return;
-    clear();
-    setPhase("idle");
-    setAnnouncement("");
+  function flash(text: string, tone: Notice["tone"] = "info") {
+    setNotice({ text, tone });
+    clearTimeout(noticeTimer.current);
+    noticeTimer.current = setTimeout(() => setNotice(undefined), noticeMs);
   }
 
-  async function press() {
-    if (inactive) return;
-    if (phase === "armed") {
-      clear();
-      setPhase("busy");
-      try {
-        await onConfirm?.();
-        setPhase("done");
-        setAnnouncement(t.doneAnnouncement);
-        if (Number.isFinite(doneDuration)) {
-          timer.current = setTimeout(() => setPhase((p) => (p === "done" ? "idle" : p)), doneDuration);
-        }
-      } catch {
-        setPhase("error");
-        setAnnouncement(t.errorAnnouncement);
-      }
+  function disarm() {
+    clearTimeout(armTimer.current);
+    setArmed(false);
+  }
+
+  async function run() {
+    setPending(true);
+    try {
+      const res = await action();
+      if (!alive.current) return;
+      if (!res || res.ok) flash(res?.message ?? t.done, "success");
+      else flash(res.message ?? t.failed, "error");
+    } catch {
+      if (alive.current) flash(t.failed, "error");
+    } finally {
+      if (alive.current) setPending(false);
+    }
+  }
+
+  // 第一下只換來一行提示，armMs 內按第二下才真的執行
+  function press() {
+    if (pending) return;
+    if (unavailableMessage) {
+      flash(unavailableMessage);
       return;
     }
-    // 第一次按：只武裝，不做任何事
-    clear();
-    setPhase("armed");
-    setArmCount((n) => n + 1);
-    setAnnouncement(t.hint(Math.round(windowMs / 1000)));
-    timer.current = setTimeout(() => setPhase((p) => (p === "armed" ? "idle" : p)), windowMs);
+    if (!armed) {
+      setArmed(true);
+      flash(t.armedNotice.replace("{label}", confirmLabel.toLowerCase()));
+      clearTimeout(armTimer.current);
+      armTimer.current = setTimeout(() => setArmed(false), armMs);
+      return;
+    }
+    disarm();
+    void run();
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    if (e.key === "Escape" && phase === "armed") {
+    if (e.key === "Escape" && armed) {
       e.preventDefault();
       disarm();
+      setNotice(undefined);
     }
   }
 
-  const armed = phase === "armed";
-  const danger = tone === "danger";
-  const text =
-    phase === "armed"
-      ? (armedLabel ?? t.armed)
-      : phase === "busy"
-        ? t.busy
-        : phase === "done"
-          ? (doneLabel ?? t.done)
-          : children;
-
   return (
-    <span className={cn("inline-flex flex-col items-start gap-1", className)}>
+    <span className={cn("relative inline-flex flex-col items-end gap-1", className)}>
       <button
         type="button"
-        onClick={press}
-        onBlur={disarm}
+        data-slot="button"
+        data-active={armed || undefined}
+        disabled={disabled || pending}
+        aria-busy={pending || undefined}
+        onClick={(e) => {
+          e.stopPropagation();
+          press();
+        }}
         onKeyDown={onKeyDown}
-        disabled={disabled || finalDone}
-        aria-disabled={phase === "busy" || undefined}
-        aria-describedby={armed ? `${id}-hint` : phase === "error" ? `${id}-error` : undefined}
+        className={cn(base, variants[armed ? armedVariant : variant], sizes[size])}
+      >
+        {pending && <Spinner />}
+        {armed ? confirmLabel : children}
+      </button>
+      <span
+        role="status"
+        aria-live="polite"
         className={cn(
-          "relative inline-flex h-9 items-center gap-1.5 overflow-hidden rounded-md border bg-card px-3 text-sm font-medium whitespace-nowrap text-card-foreground transition-colors",
-          "hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
-          "disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-progress",
-          armed ? (danger ? "border-destructive text-destructive" : "border-foreground") : "border-border",
-          phase === "done" && "text-muted-foreground",
+          "min-h-4 max-w-64 text-right text-xs leading-4",
+          notice?.tone === "error" ? "text-destructive" : notice?.tone === "success" ? "text-foreground" : "text-muted-foreground",
         )}
       >
-        {phase === "done" && <CheckIcon />}
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={phase === "error" ? "idle" : phase}
-            initial={reduce ? false : { y: 8, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { y: -8, opacity: 0 }}
-            transition={reduce ? { duration: 0 } : springs.snappy}
-            className="block"
-          >
-            {text}
-          </motion.span>
-        </AnimatePresence>
-        {/* 第二次按下的剩餘時間，從滿到空 */}
-        {armed && (
-          <motion.span
-            key={armCount}
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-px origin-left bg-current"
-            initial={{ scaleX: 1 }}
-            animate={{ scaleX: 0 }}
-            transition={{ duration: windowMs / 1000, ease: "linear" }}
-          />
-        )}
-      </button>
-
-      {armed && (
-        <span id={`${id}-hint`} className="sr-only">
-          {t.hint(Math.round(windowMs / 1000))}
-        </span>
-      )}
-      {phase === "error" && (
-        <span id={`${id}-error`} className="text-xs text-destructive">
-          {t.error}
-        </span>
-      )}
-      <span className="sr-only" role="status" aria-live="polite">
-        {announcement}
+        {notice?.text}
       </span>
     </span>
   );
 }
 
-function CheckIcon() {
+function Spinner() {
   return (
-    <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path d="m3 8.5 3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin motion-reduce:animate-none" aria-hidden="true">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" strokeLinecap="round" />
     </svg>
   );
 }

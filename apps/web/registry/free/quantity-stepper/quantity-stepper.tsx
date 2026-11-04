@@ -184,14 +184,16 @@ export function QuantityStepper({
           onClick={() => onRemove?.()}
           className={cn(buttonClass, "hover:text-[#c8361d] focus-visible:text-[#c8361d] dark:hover:text-[#ec6a4f] dark:focus-visible:text-[#ec6a4f]")}
         >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M2.5 4.5h11M6.5 7v4.5M9.5 7v4.5M3.5 4.5l.7 8.6a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9l.7-8.6M6 4.5V2.5h4v2" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4.5 7h15M9.5 7V5.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7" />
+            <path d="M6.5 7l.8 11.6A1.5 1.5 0 0 0 8.8 20h6.4a1.5 1.5 0 0 0 1.5-1.4L17.5 7" />
+            <path d="M10 11v5M14 11v5" />
           </svg>
         </button>
       ) : (
         <button type="button" aria-label={t.decrement} tabIndex={-1} disabled={disabled || value <= min} {...pressHandlers(-step)} className={buttonClass}>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-            <path d="M3 8h10" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
+            <path d="M5 12h14" />
           </svg>
         </button>
       )}
@@ -239,8 +241,8 @@ export function QuantityStepper({
       </div>
 
       <button type="button" aria-label={t.increment} tabIndex={-1} disabled={disabled || value >= max} {...pressHandlers(step)} className={buttonClass}>
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-          <path d="M8 3v10M3 8h10" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
+          <path d="M12 5v14M5 12h14" />
         </svg>
       </button>
 

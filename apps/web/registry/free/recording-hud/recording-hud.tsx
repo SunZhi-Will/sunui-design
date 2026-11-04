@@ -1,228 +1,436 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+
+// 畫筆可用的顏色
+export const DRAW_COLORS = ["#ef4444", "#facc15", "#22c55e", "#3b82f6", "#ffffff"];
+
+// HUD 圖示色：深色玻璃上用較亮的 slate 與紅
+const HUD_ICON_COLOR = "#94a3b8";
+const HUD_ICON_COLOR_DISABLED = "#4b5563";
+const HUD_ACCENT_RED = "#f87171";
+const WARNING = "#f59e0b";
+const GLASS = "rgba(15, 15, 15, 0.88)";
+
+export function formatHudTime(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
 
 export interface RecordingHudLabels {
   region?: string;
   pause?: string;
   resume?: string;
+  pauseUnavailable?: string;
   stop?: string;
-  draw?: string;
-  clear?: ReactNode;
-  swatch?: (color: string) => string;
-  dragHint?: string;
+  pen?: string;
+  clear?: string;
+  color?: (color: string) => string;
 }
 
+const defaultLabels: Required<RecordingHudLabels> = {
+  region: "Recording controls",
+  pause: "Pause",
+  resume: "Resume",
+  pauseUnavailable: "Pause is not supported in this capture mode yet. Please stop recording instead.",
+  stop: "Stop Recording",
+  pen: "Pen",
+  clear: "Clear",
+  color: (c) => c,
+};
+
 export interface RecordingHudProps {
-  /** 開始錄影的時間戳（ms）；與 elapsed 擇一 */
-  startedAt?: number;
-  /** 已錄製的毫秒數，暫停時由父層凍結 */
-  elapsed?: number;
+  /** 外部推來的秒數；沒給或還沒推時 HUD 自己每秒加一 */
+  seconds?: number;
   paused?: boolean;
-  onPause?: () => void;
-  onResume?: () => void;
+  /** 擷取模式不支援暫停時把暫停鈕灰掉 */
+  pauseDisabled?: boolean;
+  onPauseToggle?: () => void;
   onStop?: () => void;
-  /** 顯示畫筆工具 */
-  tools?: boolean;
-  swatches?: string[];
-  onSwatch?: (color: string) => void;
+  /** 錄整個畫面時才有畫筆（單一視窗來源沒有意義） */
+  drawEnabled?: boolean;
+  penActive?: boolean;
+  defaultPenActive?: boolean;
+  onPenActiveChange?: (active: boolean) => void;
+  colors?: string[];
+  color?: string;
+  onColorChange?: (color: string) => void;
   onClear?: () => void;
-  /** 預設 fixed 於視窗；false 時改為 absolute，只能在父層範圍內拖曳 */
+  /** 拖曳時回報位移量（原本用來移動原生視窗） */
+  onMove?: (dx: number, dy: number) => void;
+  /** 預設 fixed 於視窗下緣置中；false 時改為 absolute，只在父層範圍內拖曳 */
   fixed?: boolean;
   labels?: RecordingHudLabels;
   className?: string;
 }
 
-const defaultLabels: Required<RecordingHudLabels> = {
-  region: "Recording controls",
-  pause: "Pause recording",
-  resume: "Resume recording",
-  stop: "Stop recording",
-  draw: "Draw on screen",
-  clear: "Clear",
-  swatch: (c) => `Pen color ${c}`,
-  dragHint: "Drag to move. Space pauses or resumes.",
-};
-
-const defaultSwatches = ["#fafafa", "#a1a1aa", "#3f3f46", "#f59e0b", "#3b82f6"];
-const ease = [0.23, 1, 0.32, 1] as const;
-
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(s / 3600);
-  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
-  const ss = String(s % 60).padStart(2, "0");
-  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-};
+const Svg = ({ children, fill = "none" }: { children: ReactNode; fill?: string }) => (
+  <svg width={12} height={12} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
 
 export function RecordingHud({
-  startedAt,
-  elapsed,
+  seconds: secondsProp,
   paused = false,
-  onPause,
-  onResume,
+  pauseDisabled = false,
+  onPauseToggle,
   onStop,
-  tools = true,
-  swatches = defaultSwatches,
-  onSwatch,
+  drawEnabled = false,
+  penActive: penProp,
+  defaultPenActive = false,
+  onPenActiveChange,
+  colors = DRAW_COLORS,
+  color: colorProp,
+  onColorChange,
   onClear,
+  onMove,
   fixed = true,
   labels,
   className,
 }: RecordingHudProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
+  const [seconds, setSeconds] = useState(secondsProp ?? 0);
+  const pausedRef = useRef(paused);
+  const [penInner, setPenInner] = useState(defaultPenActive);
+  const penActive = penProp ?? penInner;
+  const [colorInner, setColorInner] = useState(colors[0]);
+  const drawColor = colorProp ?? colorInner;
   const rootRef = useRef<HTMLDivElement>(null);
-  const timeRef = useRef<HTMLSpanElement>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const drag = useRef<{ dx: number; dy: number; id: number } | null>(null);
-  const [drawing, setDrawing] = useState(false);
-  const [color, setColor] = useState(swatches[0]);
+  const draggingRef = useRef(false);
+  const lastPosRef = useRef({ x: 0, y: 0 });
 
-  // 計時直接寫入文字節點，不讓整個 HUD 每秒重新渲染
+  const setPen = (active: boolean) => {
+    if (penProp === undefined) setPenInner(active);
+    onPenActiveChange?.(active);
+  };
+  const pickColor = (c: string) => {
+    if (colorProp === undefined) setColorInner(c);
+    onColorChange?.(c);
+  };
+
+  // 外部推來的秒數優先
   useEffect(() => {
-    const write = () => {
-      if (!timeRef.current) return;
-      const ms = elapsed ?? (startedAt !== undefined ? Date.now() - startedAt : 0);
-      timeRef.current.textContent = fmt(ms);
-    };
-    write();
-    if (paused || elapsed !== undefined) return;
-    const id = setInterval(write, 250);
-    return () => clearInterval(id);
-  }, [elapsed, startedAt, paused]);
+    if (secondsProp !== undefined) setSeconds(secondsProp);
+  }, [secondsProp]);
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
-  const clamp = (x: number, y: number) => {
+  // 備援：還沒收到外部秒數時 HUD 自己計時，靠 ref 讀最新暫停狀態
+  const external = secondsProp !== undefined;
+  useEffect(() => {
+    if (external) return;
+    const id = setInterval(() => {
+      if (!pausedRef.current) setSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [external]);
+
+  // 剛點開畫筆、焦點還在 HUD 上時，Esc 也能關掉
+  useEffect(() => {
+    if (!penActive) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [penActive]);
+
+  // 自訂拖移：以游標位移量驅動
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    draggingRef.current = true;
+    lastPosRef.current = { x: e.screenX, y: e.screenY };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    const dx = e.screenX - lastPosRef.current.x;
+    const dy = e.screenY - lastPosRef.current.y;
+    if (dx === 0 && dy === 0) return;
+    lastPosRef.current = { x: e.screenX, y: e.screenY };
+    onMove?.(dx, dy);
     const el = rootRef.current;
     const box = fixed ? { width: window.innerWidth, height: window.innerHeight } : el?.offsetParent?.getBoundingClientRect();
-    if (!el || !box) return { x, y };
-    const maxX = Math.max(0, (box.width - el.offsetWidth) / 2);
-    const maxY = Math.max(0, box.height - el.offsetHeight - 24);
-    return { x: Math.min(maxX, Math.max(-maxX, x)), y: Math.min(0, Math.max(-maxY, y)) };
+    setPos((p) => {
+      if (!el || !box) return { x: p.x + dx, y: p.y + dy };
+      const maxX = Math.max(0, (box.width - el.offsetWidth) / 2);
+      const maxY = Math.max(0, box.height - el.offsetHeight - (fixed ? 24 : 16));
+      return { x: Math.min(maxX, Math.max(-maxX, p.x + dx)), y: Math.min(0, Math.max(-maxY, p.y + dy)) };
+    });
   };
-
-  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-    drag.current = { dx: e.clientX - pos.x, dy: e.clientY - pos.y, id: e.pointerId };
-  };
-  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (!drag.current || drag.current.id !== e.pointerId) return;
-    setPos(clamp(e.clientX - drag.current.dx, e.clientY - drag.current.dy));
-  };
-  const endDrag = () => {
-    drag.current = null;
-  };
-
-  const togglePause = () => (paused ? onResume?.() : onPause?.());
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === " " && e.target === e.currentTarget) {
-      e.preventDefault();
-      togglePause();
+  const endDrag = (e: PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
     }
   };
 
-  const iconButton =
-    "flex size-8 items-center justify-center rounded-md text-zinc-300 outline-none transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-ring";
+  const btn: CSSProperties = { borderRadius: 6, padding: "3px 8px", display: "flex", alignItems: "center" };
+  const pauseTitle = pauseDisabled ? t.pauseUnavailable : paused ? t.resume : t.pause;
 
   return (
     <div
       ref={rootRef}
       role="toolbar"
       aria-label={t.region}
-      aria-description={t.dragHint}
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      style={{ transform: `translate(calc(-50% + ${pos.x}px), ${pos.y}px)` }}
+      style={{ transform: `translate(calc(-50% + ${pos.x}px), ${pos.y}px)`, gap: 6 }}
       className={cn(
-        fixed ? "fixed bottom-6 left-1/2 z-50" : "absolute bottom-4 left-1/2 z-10",
-        "cursor-grab touch-none outline-none select-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded-xl",
+        fixed ? "fixed bottom-6 z-50" : "absolute bottom-4 z-10",
+        "left-1/2 flex w-max flex-col justify-end touch-none select-none",
         className,
       )}
     >
-      <AnimatePresence initial={false}>
-        {tools && drawing && (
-          <motion.div
-            key="swatches"
-            initial={reduce ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 6, transition: { duration: 0.12, ease } }}
-            transition={{ duration: reduce ? 0 : 0.18, ease }}
-            className="absolute bottom-full left-1/2 mb-2 flex -translate-x-1/2 items-center gap-1.5 rounded-xl border border-white/10 bg-zinc-950/90 px-2 py-1.5 backdrop-blur-sm"
-          >
-            {swatches.map((c) => (
-              <button
-                key={c}
-                type="button"
-                aria-label={t.swatch(c)}
-                aria-pressed={color === c}
-                onClick={() => {
-                  setColor(c);
-                  onSwatch?.(c);
-                }}
-                className="flex size-6 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span
-                  className={cn("size-4 rounded-full ring-1 ring-white/20", color === c && "ring-2 ring-white")}
-                  style={{ backgroundColor: c }}
-                />
-              </button>
-            ))}
+      {/* 畫筆色盤與清除列：用 opacity 與 maxHeight 展開收合 */}
+      {drawEnabled && (
+        <div
+          className="hud-palette"
+          aria-hidden={!penActive}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            maxHeight: penActive ? 34 : 0,
+            opacity: penActive ? 1 : 0,
+            overflow: "hidden",
+            background: GLASS,
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            borderRadius: 10,
+            padding: "0 10px",
+            pointerEvents: penActive ? "auto" : "none",
+          }}
+        >
+          {colors.map((c) => (
             <button
+              key={c}
               type="button"
-              onClick={onClear}
-              className="ml-1 rounded-md px-2 py-1 text-xs text-zinc-300 outline-none hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {t.clear}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex h-11 items-center gap-1 rounded-xl border border-white/10 bg-zinc-950/90 pr-1.5 pl-3 text-zinc-100 backdrop-blur-sm">
-        <span
-          aria-hidden="true"
-          className={cn(
-            "size-2 rounded-full",
-            paused ? "bg-amber-400" : "bg-red-500",
-            !paused && !reduce && "animate-[rec-blink_1s_steps(1,end)_infinite]",
-          )}
-        />
-        <span ref={timeRef} className="mr-1 ml-2 min-w-[3.25rem] font-mono text-sm tabular-nums" aria-hidden="true">
-          00:00
-        </span>
-        <button type="button" aria-label={paused ? t.resume : t.pause} onClick={togglePause} className={iconButton}>
-          <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            {paused ? <path d="M5 3.5v9l7-4.5-7-4.5Z" strokeLinejoin="round" /> : <path d="M6 3.5v9M10 3.5v9" strokeLinecap="round" />}
-          </svg>
-        </button>
-        <button type="button" aria-label={t.stop} onClick={onStop} className={iconButton}>
-          <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <rect x="4" y="4" width="8" height="8" rx="1.5" />
-          </svg>
-        </button>
-        {tools && (
+              title={c}
+              aria-label={t.color(c)}
+              aria-pressed={drawColor === c}
+              tabIndex={penActive ? 0 : -1}
+              onClick={() => pickColor(c)}
+              className="hud-focus"
+              style={{
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                background: c,
+                border: drawColor === c ? "2px solid #f1f5f9" : "1px solid rgba(255,255,255,0.35)",
+                cursor: "pointer",
+                padding: 0,
+                flexShrink: 0,
+              }}
+            />
+          ))}
+          <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.15)" }} />
           <button
             type="button"
-            aria-label={t.draw}
-            aria-pressed={drawing}
-            onClick={() => setDrawing((d) => !d)}
-            className={cn(iconButton, drawing && "bg-white/10 text-white")}
+            title={t.clear}
+            tabIndex={penActive ? 0 : -1}
+            onClick={onClear}
+            className="hud-focus"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: 6,
+              color: HUD_ICON_COLOR,
+              cursor: "pointer",
+              padding: "3px 8px",
+              fontSize: 11,
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+            }}
           >
-            <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-              <path d="m10.5 3 2.5 2.5L6 12.5H3.5V10L10.5 3Z" strokeLinejoin="round" />
-            </svg>
+            {t.clear}
+          </button>
+        </div>
+      )}
+
+      {/* 藥丸本體 */}
+      <div
+        style={{
+          height: 44,
+          background: GLASS,
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "0 14px",
+          cursor: "move",
+        }}
+      >
+        {/* 錄製指示燈：steps(1) 只有亮暗兩格，不逼畫面每幀重繪 */}
+        <div
+          aria-hidden="true"
+          className={paused ? undefined : "hud-dot-blink"}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: paused ? WARNING : "#ef4444",
+            boxShadow: paused ? `0 0 6px ${WARNING}` : "0 0 6px #ef4444",
+            flexShrink: 0,
+          }}
+        />
+
+        <span
+          role="timer"
+          style={{
+            fontFamily: "ui-monospace, SFMono-Regular, monospace",
+            fontSize: 14,
+            fontWeight: 600,
+            color: "#f1f5f9",
+            letterSpacing: 1,
+            minWidth: 44,
+          }}
+        >
+          {formatHudTime(seconds)}
+        </span>
+
+        <button
+          type="button"
+          className="hud-icon-btn hud-focus"
+          disabled={pauseDisabled}
+          title={pauseTitle}
+          aria-label={pauseTitle}
+          onClick={() => {
+            if (pauseDisabled) return;
+            onPauseToggle?.();
+          }}
+          style={{
+            ...btn,
+            color: pauseDisabled ? HUD_ICON_COLOR_DISABLED : HUD_ICON_COLOR,
+            cursor: pauseDisabled ? "not-allowed" : "pointer",
+            opacity: pauseDisabled ? 0.5 : 1,
+          }}
+        >
+          {paused ? (
+            <Svg>
+              <polygon points="6 3 20 12 6 21 6 3" />
+            </Svg>
+          ) : (
+            <Svg>
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+            </Svg>
+          )}
+        </button>
+
+        {drawEnabled && (
+          <button
+            type="button"
+            className="hud-icon-btn hud-focus"
+            title={t.pen}
+            aria-label={t.pen}
+            aria-pressed={penActive}
+            onClick={() => setPen(!penActive)}
+            style={{
+              ...btn,
+              background: penActive ? "rgba(239,68,68,0.25)" : undefined,
+              border: penActive ? "1px solid rgba(239,68,68,0.5)" : undefined,
+              color: penActive ? HUD_ACCENT_RED : HUD_ICON_COLOR,
+              cursor: "pointer",
+            }}
+          >
+            <Svg>
+              <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+              <path d="m15 5 4 4" />
+            </Svg>
           </button>
         )}
+
+        <button
+          type="button"
+          className="hud-icon-btn hud-focus"
+          title={t.stop}
+          aria-label={t.stop}
+          onClick={onStop}
+          style={{ ...btn, color: HUD_ACCENT_RED, cursor: "pointer" }}
+        >
+          <Svg fill="currentColor">
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+          </Svg>
+        </button>
       </div>
-      <style>{`@keyframes rec-blink { 0%, 100% { opacity: 1 } 50% { opacity: 0.25 } }`}</style>
+
+      <style>{`
+        @keyframes hud-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        .hud-dot-blink { animation: hud-blink 1.2s steps(1, end) infinite; }
+        .hud-palette { transition: max-height 0.15s ease, opacity 0.15s ease; }
+        .hud-icon-btn {
+          background: transparent;
+          border: none;
+          transition: background-color 0.15s ease;
+        }
+        .hud-icon-btn:hover:not(:disabled) {
+          background: rgba(255,255,255,0.08);
+        }
+        .hud-focus:focus-visible { outline: 2px solid rgba(241,245,249,0.7); outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) {
+          .hud-dot-blink { animation: none; }
+          .hud-palette, .hud-icon-btn { transition: none; }
+        }
+      `}</style>
     </div>
   );
 }
+
+/**
+ * VolumeBar：音量條。直接訂閱音量並改 DOM 寬度，不經過 React re-render。
+ * level 以 0 到 100 計，乘上 gain（0 到 1 以上）後封頂 100%。
+ */
+export interface VolumeBarProps {
+  gain: number;
+  enabled: boolean;
+  /** 系統聲音用 AutoLens 金，麥克風用 #d4d4d4 */
+  color?: string;
+  subscribe: (cb: (level: number) => void) => () => void;
+  label?: string;
+  className?: string;
+}
+
+export const VolumeBar = memo(function VolumeBar({ gain, enabled, color = "#eab308", subscribe, label, className }: VolumeBarProps) {
+  const barRef = useRef<HTMLDivElement>(null);
+  const gainRef = useRef(gain);
+  const enabledRef = useRef(enabled);
+
+  useEffect(() => {
+    gainRef.current = gain;
+  }, [gain]);
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
+
+  useEffect(() => {
+    return subscribe((level) => {
+      if (!barRef.current) return;
+      const width = enabledRef.current ? Math.min(100, level * gainRef.current) : 0;
+      barRef.current.style.width = `${width}%`;
+      barRef.current.parentElement?.setAttribute("aria-valuenow", String(Math.round(width)));
+    });
+  }, [subscribe]);
+
+  return (
+    <div role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} className={cn("relative h-2 w-32 overflow-hidden rounded-md bg-slate-700/50", className)}>
+      <div ref={barRef} className="motion-reduce:!transition-none" style={{ height: "100%", width: "0%", backgroundColor: color, transition: "width 80ms linear" }} />
+    </div>
+  );
+});

@@ -187,8 +187,8 @@ function Leader() {
 
 function CheckIcon() {
   return (
-    <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path d="m3 8.5 3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-3">
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
   );
 }

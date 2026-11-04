@@ -1,119 +1,118 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { PauseMenu, storyThemes } from "./pause-menu";
+import { PauseMenu } from "./pause-menu";
+import { SaveLoadPanel, saveSlotOneLineLabel, type SaveSlot } from "./save-load-panel";
 
-// 原創場景：黃昏渡口，河面、遠山與一盞燈
-function Scene() {
-  return (
-    <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 size-full" aria-hidden="true">
-      <rect width="400" height="250" fill="#141a26" />
-      <path d="M0 150 L70 104 L130 136 L210 86 L290 132 L350 108 L400 130 V250 H0Z" fill="#1d2433" />
-      <rect y="168" width="400" height="82" fill="#101521" />
-      <path d="M0 176 H400 M30 196 H150 M220 210 H370" stroke="#2a3346" strokeWidth="1.5" />
-      <rect x="282" y="138" width="4" height="34" fill="#3a3326" />
-      <circle cx="284" cy="134" r="5" fill="#c9a063" opacity="0.85" />
-    </svg>
-  );
-}
+// 探索畫面：右上 HUD 的選單鍵或 Esc 開關暫停選單；離開前要兩段確認，並可先去存檔
+const autosave: SaveSlot = { id: "auto", chapter: "第二章・寒水渡", scene: "渡口・帳房", savedAt: "2026-11-05T21:14:03", playTimeSeconds: 4320 };
 
 export default function PauseMenuDemo() {
-  const [open, setOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const [atTitle, setAtTitle] = useState(false);
-  // 上次存檔時間在初始化時固定
-  const [savedAt] = useState(() => Date.now() - 4 * 60_000);
-  const lastSave = { chapter: "Chapter 2", scene: "The Ferry", at: savedAt };
+  const [open, setOpen] = useState(true);
+  const [panel, setPanel] = useState<"save" | "load" | null>(null);
+  const [slots, setSlots] = useState<(SaveSlot | undefined)[]>([
+    { id: "m1", chapter: "第一章・青石鎮", scene: "鎮口・老槐樹下", savedAt: "2026-11-04T22:40:12", playTimeSeconds: 2460 },
+    undefined,
+    undefined,
+  ]);
+  const [left, setLeft] = useState(false);
 
-  const note = (text: string) => {
-    setToast(text);
-    setOpen(false);
-  };
-
-  const items = [
-    { id: "journal", label: "Journal", onSelect: () => note("Journal: 3 new entries") },
-    { id: "save", label: "Save", onSelect: () => note("Saved to slot 1") },
-    { id: "load", label: "Load", disabled: true },
-    { id: "settings", label: "Settings", onSelect: () => note("Settings opened") },
-  ];
+  // 同一個鍵開關暫停；選單開著時由選單自己處理 Esc
+  useEffect(() => {
+    if (open || panel || left) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !e.defaultPrevented) setOpen(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, panel, left]);
 
   return (
-    <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
-      <div className="relative min-h-[26rem] overflow-hidden rounded-[3px] font-sans" style={{ ...storyThemes.ink, color: "var(--story-text)" }}>
-        <Scene />
-        {atTitle ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center">
-            <p className="font-serif text-2xl tracking-[0.18em]">Lantern Ferry</p>
-            <p className="font-serif text-sm" style={{ color: "var(--story-muted)" }}>
-              渡口的燈，等你回來。
-            </p>
-            <button
-              type="button"
-              onClick={() => setAtTitle(false)}
-              className="rounded-[3px] border px-4 py-2 text-sm tracking-[0.1em]"
-              style={{ borderColor: "var(--story-line)" }}
-            >
-              Continue
-            </button>
-          </div>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={() => {
-                setToast(null);
-                setOpen(true);
-              }}
-              className="absolute top-3 right-3 z-10 rounded-[3px] border px-3 py-1.5 text-xs tracking-[0.16em] uppercase"
-              style={{ borderColor: "var(--story-line)", background: "var(--story-panel)" }}
-            >
-              Pause
-            </button>
-            <p className="absolute right-4 bottom-4 left-4 font-serif text-[15px] leading-relaxed">
-              The ferryman&apos;s lamp is still lit. Someone crossed before you.
-            </p>
-            {toast && (
-              <p
-                role="status"
-                className="absolute top-3 left-3 rounded-[3px] border px-3 py-1.5 text-xs"
-                style={{ borderColor: "var(--story-line)", background: "var(--story-panel)" }}
-              >
-                {toast}
-              </p>
-            )}
-          </>
-        )}
-        <PauseMenu
-          open={open}
-          onResume={() => setOpen(false)}
-          objective="Find the ferryman before dusk"
-          items={items}
-          lastSave={lastSave}
-          onQuickLoad={() => note("Loaded Chapter 2, The Ferry")}
-          onSaveAndExit={() => {
-            setOpen(false);
-            setAtTitle(true);
-          }}
-          onExit={() => {
-            setOpen(false);
-            setAtTitle(true);
-          }}
-        />
-      </div>
+    <div
+      className="relative h-[30rem] w-full max-w-3xl min-w-0 overflow-hidden rounded-[4px]"
+      style={{
+        color: "#eae4d6",
+        fontFamily: '"Noto Serif TC", "Songti TC", serif',
+        background: "radial-gradient(ellipse at 25% 30%, rgb(231 196 137 / 0.16), transparent 40%), linear-gradient(180deg, #1a1d24, #08090c)",
+      }}
+    >
+      {left ? (
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+          <p className="text-2xl tracking-[0.5em]" style={{ color: "#e7c489" }}>
+            寒水渡
+          </p>
+          <button
+            type="button"
+            onClick={() => setLeft(false)}
+            className="border-b px-5 py-2 tracking-[0.18em] outline-none hover:text-[#e7c489] focus-visible:text-[#e7c489]"
+            style={{ borderColor: "rgb(201 160 99 / 0.22)" }}
+          >
+            讀取自動存檔
+          </button>
+        </div>
+      ) : (
+        <>
+          <p className="absolute top-4 left-5 text-xs tracking-[0.25em]" style={{ color: "#b3aa97" }}>
+            寒水渡・帳房
+          </p>
+          <button
+            type="button"
+            aria-label="開啟選單"
+            onClick={() => setOpen(true)}
+            className="absolute top-2 right-3 flex size-11 items-center justify-center rounded-full outline-none hover:text-[#e7c489] focus-visible:text-[#e7c489]"
+            style={{ color: "#b3aa97" }}
+          >
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M4.5 7h15M4.5 12h15M4.5 17h15" />
+            </svg>
+          </button>
+          <p className="absolute right-5 bottom-6 left-5 max-w-[34em] text-[15px] leading-[1.8]">
+            帳房裡只剩一盞燈。你把撕下的那半頁夾回簿子裡，雨聲忽然近了。
+          </p>
+        </>
+      )}
 
-      <div className="relative min-h-[26rem] overflow-hidden rounded-[3px]" style={{ background: storyThemes.rice["--story-bg"] }}>
-        <PauseMenu
-          open
-          theme="rice"
-          autoFocus={false}
-          objective="把信交給山腳的茶棚老闆"
-          items={[
-            { id: "journal", label: "Journal" },
-            { id: "settings", label: "Settings" },
-          ]}
+      <PauseMenu
+        open={open && !left}
+        onResume={() => setOpen(false)}
+        onOpenJournal={() => setOpen(false)}
+        onOpenSave={() => {
+          setOpen(false);
+          setPanel("save");
+        }}
+        onOpenLoad={() => {
+          setOpen(false);
+          setPanel("load");
+        }}
+        onOpenSettings={() => setOpen(false)}
+        onExitToMenu={() => {
+          setOpen(false);
+          setLeft(true);
+        }}
+        objective="查出帳簿那半頁是誰撕走的"
+        lastAutosave={saveSlotOneLineLabel(autosave)}
+        saveError="儲存空間已滿，無法寫入自動存檔。原有存檔未被覆蓋。"
+      />
+
+      {panel && (
+        <SaveLoadPanel
+          mode={panel}
+          autosave={autosave}
+          manualSlots={slots}
+          onClose={() => {
+            setPanel(null);
+            setOpen(true);
+          }}
+          onSave={(n) =>
+            setSlots((s) => s.map((slot, i) => (i === n - 1 ? { id: `m${n}-${Date.now()}`, chapter: "第二章・寒水渡", scene: "渡口・帳房", savedAt: new Date(), playTimeSeconds: 4500 } : slot)))
+          }
+          onLoad={() => {
+            setPanel(null);
+          }}
+          onDelete={(n) => setSlots((s) => s.map((slot, i) => (i === n - 1 ? undefined : slot)))}
         />
-      </div>
+      )}
     </div>
   );
 }

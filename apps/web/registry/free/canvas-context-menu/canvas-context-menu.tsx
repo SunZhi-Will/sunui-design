@@ -133,6 +133,7 @@ export function CanvasContextMenu({
     <div
       ref={menuRef}
       role="menu"
+      tabIndex={-1}
       aria-label={labels.menu}
       onKeyDown={onKeyDown}
       onContextMenu={(e) => e.preventDefault()}

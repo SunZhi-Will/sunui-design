@@ -352,6 +352,18 @@ export function FloatingMenu({
   };
   useEffect(() => () => void (timer.current && window.clearTimeout(timer.current)), []);
 
+  // 展開時按 Escape 收合
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpenState(false);
+      onOpenChange?.(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen, onOpenChange]);
+
   const itemClass = cn(
     "flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg outline-none transition-all duration-200 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600 hover:shadow-xl focus-visible:border-purple-300 focus-visible:bg-purple-50 focus-visible:text-purple-600 motion-reduce:transition-none",
     isRight ? "h-6 w-6" : "h-8 w-8",
@@ -365,7 +377,6 @@ export function FloatingMenu({
         onMouseLeave={leave}
         onFocus={enter}
         onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && leave()}
-        onKeyDown={(e) => e.key === "Escape" && isOpen && setOpen(false)}
       >
         {/* LOGO 按鈕 */}
         <button

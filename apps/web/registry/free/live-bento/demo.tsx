@@ -1,115 +1,97 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { CompareBars, CompareIcon, GapAlert, LockGrid, MatchingRuns, PhoneList, RefreshIcon, StampCard, VersionTimeline } from "./bento-visuals";
+import { BentoTile, CountUp, LiveBento } from "./live-bento";
 
-import { LiveBento, type LiveBentoTile } from "./live-bento";
+// 排班系統首頁的「更多功能」格子。
 
-const ease = [0.23, 1, 0.32, 1] as const;
-
-function VersionStack({ tick }: { tick: number }) {
-  const v = 12 + (tick % 4);
-  return (
-    <div className="relative h-24 w-56">
-      {[2, 1].map((d) => (
-        <div
-          key={d}
-          className="absolute inset-x-0 h-14 rounded-lg border border-border bg-background"
-          style={{ top: d * 8, transform: `scale(${1 - d * 0.05})`, opacity: 1 - d * 0.3 }}
-        />
-      ))}
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.div
-          key={v}
-          className="absolute inset-x-0 top-6 flex h-14 items-center justify-between rounded-lg border border-border bg-card px-3 text-sm"
-          initial={{ y: -16, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 12, opacity: 0 }}
-          transition={{ duration: 0.36, ease }}
-        >
-          <span className="font-mono text-xs">v{v}</span>
-          <span className="text-xs text-muted-foreground">Edited by {["Mia", "Ben", "Ravi", "Lena"][tick % 4]}</span>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function LockToggle({ tick }: { tick: number }) {
-  const locked = tick % 2 === 0;
-  return (
-    <div className="flex flex-col items-center gap-2 text-sm">
-      <svg viewBox="0 0 24 24" className="size-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-        <rect x="5" y="11" width="14" height="9" rx="2" />
-        <motion.path d="M8 11V8a4 4 0 0 1 8 0" animate={{ y: locked ? 0 : -3 }} transition={{ duration: 0.24, ease }} />
-      </svg>
-      <span className="flex items-center gap-1.5">
-        <span className={locked ? "size-1.5 rounded-full bg-amber-500" : "size-1.5 rounded-full bg-emerald-500"} />
-        {locked ? "Locked by Mia" : "Open for edits"}
-      </span>
-    </div>
-  );
-}
-
-const messages = ["Can you cover Friday close?", "Sure, swap my Sunday?", "Done. Schedule updated."];
-
-function ChatBubble({ tick }: { tick: number }) {
-  const shown = tick % (messages.length + 1);
-  return (
-    <div className="flex w-full max-w-56 flex-col gap-2 text-sm">
-      {messages.slice(0, Math.max(1, shown)).map((m, i) => (
-        <motion.p
-          key={m}
-          className={i % 2 ? "self-end rounded-lg bg-primary px-3 py-1.5 text-primary-foreground" : "self-start rounded-lg bg-muted px-3 py-1.5"}
-          initial={tick === 0 ? false : { opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.24, ease }}
-        >
-          {m}
-        </motion.p>
-      ))}
-      {shown < messages.length && shown > 0 && (
-        <span className="self-start rounded-lg bg-muted px-3 py-1.5 tracking-[0.3em] text-muted-foreground">...</span>
-      )}
-    </div>
-  );
-}
-
-function Counter({ tick }: { tick: number }) {
-  return (
-    <div className="text-center">
-      <p className="text-3xl font-semibold tracking-tight tabular-nums">{new Intl.NumberFormat("en-US").format(1280 + tick * 7)}</p>
-      <p className="mt-1 text-xs text-muted-foreground">shifts filled this month</p>
-    </div>
-  );
-}
-
-function Availability({ tick }: { tick: number }) {
-  return (
-    <div className="grid grid-cols-7 gap-1.5">
-      {Array.from({ length: 28 }, (_, i) => {
-        const on = (i * 7 + tick * 3) % 5 > 1;
-        return <span key={i} className={on ? "size-2.5 rounded-full bg-emerald-500 transition-colors" : "size-2.5 rounded-full bg-muted transition-colors"} />;
-      })}
-    </div>
-  );
-}
-
-const tiles: LiveBentoTile[] = [
-  { id: "versions", span: "2x1", title: "Every change is a version", body: "Roll back any schedule to how it looked last Tuesday.", visual: (t) => <VersionStack tick={t} /> },
-  { id: "lock", title: "Lock while you edit", body: "Nobody overwrites your draft.", visual: (t) => <LockToggle tick={t} /> },
-  { id: "chat", span: "1x2", title: "Swaps happen in chat", body: "Staff trade shifts in LINE. You just approve.", visual: (t) => <ChatBubble tick={t} /> },
-  { id: "count", title: "Gaps get filled", body: "Open shifts go to people who said they are free.", visual: (t) => <Counter tick={t} /> },
-  { id: "availability", span: "2x1", title: "See who is free at a glance", body: "Availability for the next four weeks, updated as people reply.", visual: (t) => <Availability tick={t} /> },
-];
+const DOT = { alex: "#2563EB", mia: "#16A34A", jordan: "#D97706", tina: "#DB2777", ken: "#7C3AED", ivy: "#0891B2", leo: "#E11D48" };
 
 export default function LiveBentoDemo() {
   return (
-    <section className="w-full max-w-5xl space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold tracking-tight">Scheduling that runs itself</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Built for shops with 5 to 50 staff.</p>
-      </div>
-      <LiveBento tiles={tiles} />
-    </section>
+    <div className="w-full max-w-5xl min-w-0">
+      <LiveBento>
+        <BentoTile wide title="Version history" body="Every reshuffle is saved as a new version, and any two can be compared side by side.">
+          <VersionTimeline
+            versions={[
+              { v: "v1", label: "Auto-scheduled", note: "30 slots" },
+              { v: "v2", label: "Mia off Wed", note: "1 change" },
+              { v: "v3", label: "Alex swaps Fri", note: "2 changes" },
+            ]}
+            action={
+              <>
+                <CompareIcon className="size-3.5" />
+                Compare v1 and v3
+              </>
+            }
+          />
+        </BentoTile>
+        <BentoTile title="Deterministic" body="No randomness. The same input always gives the same schedule." delay={80}>
+          <MatchingRuns runs={["Run 1", "Run 2"]} value="9f3a2c1e" result="Identical result" />
+        </BentoTile>
+        <BentoTile title="Explains when it can't" body="When you're short-handed it says which day, which shift, how many, and why.">
+          <GapAlert
+            cells={[
+              { label: "Early", value: "2 / 2" },
+              { label: "Mid", value: "2 / 2" },
+              { label: "Night", value: "1 / 2", short: true },
+            ]}
+            message="Saturday night is 1 short: only 1 person is available"
+          />
+        </BentoTile>
+        <BentoTile wide title="Research mode" body="Run Greedy and CP-SAT on the same data and see the quality gap at a glance." delay={80}>
+          <CompareBars
+            legend={["Greedy", "CP-SAT"]}
+            rows={[
+              { label: "Fairness", a: 0.71, b: 0.96, format: (v) => v.toFixed(2) },
+              { label: "Preferences", a: 0.64, b: 0.91 },
+              { label: "Coverage", a: 0.87, b: 1 },
+            ]}
+          />
+        </BentoTile>
+        <BentoTile title="Staff view" body="Staff sign in to see only their own shifts and set their availability.">
+          <PhoneList
+            title="Alex's shifts"
+            rows={[
+              { label: "Mon", value: "Early" },
+              { label: "Tue", value: "Mid" },
+              { label: "Wed", value: "Mid" },
+              { label: "Thu", value: "Early" },
+              { label: "Fri", value: "Night" },
+            ]}
+          />
+        </BentoTile>
+        <BentoTile title="Locked shifts" body="Lock the important shifts first. They stay put when you reshuffle." delay={80}>
+          <LockGrid
+            locked="Mia"
+            pool={[
+              { name: "Alex", color: DOT.alex },
+              { name: "Jordan", color: DOT.jordan },
+              { name: "Tina", color: DOT.tina },
+              { name: "Ken", color: DOT.ken },
+              { name: "Ivy", color: DOT.ivy },
+              { name: "Leo", color: DOT.leo },
+            ]}
+          />
+        </BentoTile>
+        <BentoTile title="Leave requests" body="Staff send a request, and approving it flows straight into a reshuffle." delay={160}>
+          <StampCard
+            name="Mia"
+            color={DOT.mia}
+            kind="Leave request"
+            detail="Wed 9/30 Early · family matter"
+            stamp="Approved"
+            footer={
+              <>
+                <RefreshIcon className="size-3.5 shrink-0" />
+                <span>
+                  Minimal reshuffle ran, <CountUp to={1} start duration={400} /> slot changed
+                </span>
+              </>
+            }
+          />
+        </BentoTile>
+      </LiveBento>
+    </div>
   );
 }

@@ -2,87 +2,114 @@
 
 import { useEffect, useState } from "react";
 
-import { JobProgress, type JobStatus } from "./job-progress";
+import { JobPanel, JobRow, JobStatusDot, JobTile, type Job } from "./job-progress";
 
-const printSteps = [
-  { id: "proof", label: "Checking your artwork" },
-  { id: "color", label: "Matching colors to paper" },
-  { id: "print", label: "Printing" },
-  { id: "trim", label: "Trimming and inspecting" },
-  { id: "pack", label: "Packing in a tube" },
+// 參考圖用內嵌 SVG 畫一張簡單的人像剪影，不用外部圖片
+const reference =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7d2fe"/><stop offset="1" stop-color="#f5d0fe"/></linearGradient></defs><rect width="200" height="300" fill="url(#g)"/><circle cx="150" cy="60" r="26" fill="#fef3c7"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a5b4fc"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
+  );
+
+type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;
+
+// 依原本的狀態流程推進：排隊、理解描述、載入模型、取樣 28 步、輸出、檢查、完成
+const timeline: Frame[] = [
+  { status: "queued", queuePosition: 3, etaSeconds: 48 },
+  { status: "queued", queuePosition: 2, etaSeconds: 40 },
+  { status: "queued", queuePosition: 1, etaSeconds: 32 },
+  { status: "planning", etaSeconds: 28 },
+  { status: "loading", etaSeconds: 24 },
+  ...Array.from({ length: 7 }, (_, i): Frame => ({ status: "sampling", step: (i + 1) * 4, total: 28, etaSeconds: 20 - i * 2.5 })),
+  { status: "decoding", etaSeconds: 3 },
+  { status: "checking", etaSeconds: 1 },
+  { status: "done" },
 ];
 
-// 模擬一張海報從排隊到完成；一律依時間推進，不放測試按鈕
-const timeline: JobStatus[] = [
-  { state: "queued", queuePosition: 2 },
-  { state: "queued", queuePosition: 1 },
-  { state: "running", step: 0, eta: "6 min" },
-  { state: "running", step: 1, eta: "5 min", reason: "Matte paper takes an extra color pass." },
-  { state: "running", step: 2, eta: "3 min", reason: "Matte paper takes an extra color pass." },
-  { state: "running", step: 3, eta: "1 min" },
-  { state: "running", step: 4, eta: "1 min" },
-  { state: "running", step: 5 },
-  { state: "done" },
-];
+const base: Job = {
+  id: "job_8f2a",
+  prompt: "Girl in a yellow raincoat on a rooftop at dusk, soft film grain, warm city lights",
+  status: "queued",
+  sourceSrc: reference,
+  aspect: "2 / 3",
+  count: 2,
+  meta: ["Just now", "Soft anime", "With reference"],
+};
 
-const exportSteps = [
-  { id: "a", label: "Preparing files" },
-  { id: "b", label: "Rendering" },
-  { id: "c", label: "Uploading" },
-];
+const failed: Job = {
+  id: "job_71cd",
+  prompt: "Two cats playing chess in a sunlit library",
+  status: "error",
+  error: "The GPU ran out of memory.",
+  hint: "Try again in a moment. Your quota was not used.",
+};
 
 export default function JobProgressDemo() {
   const [i, setI] = useState(0);
-  const [retried, setRetried] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
+  const [canceled, setCanceled] = useState(false);
+  const [run, setRun] = useState(0);
 
   useEffect(() => {
-    if (cancelled || i >= timeline.length - 1) return;
-    const id = setTimeout(() => setI((n) => n + 1), 1800);
+    if (canceled || i >= timeline.length - 1) return;
+    const id = setTimeout(() => setI((n) => n + 1), 1400);
     return () => clearTimeout(id);
-  }, [i, cancelled]);
+  }, [i, canceled, run]);
 
-  const live: JobStatus = cancelled
-    ? { state: "failed", step: timeline[i].step ?? 0, error: "Order cancelled. You haven't been charged." }
-    : timeline[i];
+  const frame = timeline[i];
+  const job: Job = canceled ? { ...base, status: "canceled", durationSeconds: 6 } : { ...base, ...frame, durationSeconds: frame.status === "done" ? 52 : null, images: frame.status === "done" ? 2 : 0 };
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   return (
-    <section aria-labelledby="orders-heading" className="w-full max-w-[52rem] space-y-5">
-      <div>
-        <h2 id="orders-heading" className="text-xl font-semibold tracking-tight">
-          Your print orders
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Custom posters are printed to order. We'll email you when each one ships.</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <JobProgress
-          jobId="PR-20931"
-          steps={printSteps}
-          status={live}
-          onCancel={() => setCancelled(true)}
-          onRetry={() => {
-            setCancelled(false);
-            setI(0);
-          }}
-          result={{ label: "Track delivery", href: "#" }}
-        />
-        <JobProgress jobId="PR-20874" steps={printSteps} status={{ state: "done" }} result={{ label: "Track delivery", href: "#" }} />
-      </div>
-
-      <div className="rounded-md border border-border bg-card px-4 text-card-foreground">
-        <div className="divide-y divide-border">
-          <JobProgress compact jobId="PR-20940" steps={printSteps} status={{ state: "queued", queuePosition: 3 }} />
-          <JobProgress compact jobId="EX-1182" steps={exportSteps} status={{ state: "running", step: 1 }} />
-          <JobProgress
-            compact
-            jobId="EX-1179"
-            steps={exportSteps}
-            status={retried ? { state: "running", step: 2 } : { state: "failed", step: 2, error: "Upload timed out" }}
-            onRetry={() => setRetried(true)}
-          />
+    <div className="flex w-full max-w-3xl min-w-0 flex-col gap-6">
+      <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid min-w-0 grid-cols-2 gap-3">
+          {job.status === "done" ? (
+            // 完成後格子換成成品圖
+            <img src={reference} alt={base.prompt} className="aspect-[2/3] w-full rounded-lg object-cover" />
+          ) : (
+            <JobTile
+              job={job}
+              onCancel={async () => {
+                await wait(500);
+                setCanceled(true);
+              }}
+            />
+          )}
+          <JobTile job={failed} onRemove={() => wait(400)} />
         </div>
+        <JobPanel
+          job={job}
+          onCancel={async () => {
+            await wait(500);
+            setCanceled(true);
+          }}
+          onEdit={() => undefined}
+          onRerun={async () => {
+            await wait(500);
+            setCanceled(false);
+            setI(0);
+            setRun((r) => r + 1);
+          }}
+        >
+          <section className="flex flex-col gap-2">
+            <h3 className="text-xs font-medium text-muted-foreground">Your prompt</h3>
+            <p className="text-sm text-pretty">{base.prompt}</p>
+          </section>
+        </JobPanel>
       </div>
-    </section>
+
+      <section aria-labelledby="active-heading" className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <h3 id="active-heading" className="text-sm font-semibold">
+            In progress
+          </h3>
+          <JobStatusDot state="running">2 running</JobStatusDot>
+        </div>
+        <div className="divide-y divide-border">
+          <JobRow title="Refero Styles: design systems for AI" source={{ kind: "url", label: "URL" }} progress={62} label="Composing voice and visuals" href="#project-1" />
+          <JobRow title="Perfect matcha latte ratio" source={{ kind: "text", label: "Text" }} progress={0} label="" failed href="#project-2" />
+        </div>
+      </section>
+    </div>
   );
 }

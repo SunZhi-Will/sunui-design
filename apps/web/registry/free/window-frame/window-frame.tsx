@@ -53,7 +53,18 @@ function SimBadge({ children }: { children: ReactNode }) {
 
 function LockIcon({ size }: { size: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0"
+    >
       <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
@@ -70,10 +81,19 @@ export interface StageProps {
 }
 
 /** 帶點點底紋的展示區，放圖表、插圖與視窗 */
-export function Stage({ children, scheme = "auto", className, style }: StageProps) {
+export function Stage({
+  children,
+  scheme = "auto",
+  className,
+  style,
+}: StageProps) {
   return (
     <div
-      className={cn("relative overflow-hidden rounded-xl border border-[var(--wf-line)] bg-[var(--wf-sunken)]", schemeVars[scheme], className)}
+      className={cn(
+        "relative overflow-hidden rounded-xl border border-[var(--wf-line)] bg-[var(--wf-sunken)]",
+        schemeVars[scheme],
+        className,
+      )}
       style={{
         backgroundImage: "radial-gradient(var(--wf-dot) 1px, transparent 1px)",
         backgroundSize: "18px 18px",
@@ -132,7 +152,11 @@ export function WindowFrame({
       <div className="flex h-9 items-center gap-2 border-b border-[var(--wf-line)] bg-[var(--wf-raised)] px-3">
         <TrafficLights />
         <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate font-mono text-[11px] font-semibold text-[var(--wf-fg-body)]">
-          {icon && <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center text-[var(--wf-fg)] [&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span>}
+          {icon && (
+            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center text-[var(--wf-fg)] [&>svg]:h-3.5 [&>svg]:w-3.5">
+              {icon}
+            </span>
+          )}
           <span className="truncate">{title}</span>
         </span>
         <span className="flex min-w-[42px] items-center justify-end gap-2">
@@ -141,13 +165,18 @@ export function WindowFrame({
         </span>
       </div>
       {menus && menus.length > 0 && (
-        <div aria-hidden="true" className="hidden gap-4 border-b border-[var(--wf-line)] px-3 py-1.5 text-[11px] text-[var(--wf-fg-muted)] sm:flex">
+        <div
+          aria-hidden="true"
+          className="hidden gap-4 border-b border-[var(--wf-line)] px-3 py-1.5 text-[11px] text-[var(--wf-fg-muted)] sm:flex"
+        >
           {menus.map((m) => (
             <span key={m}>{m}</span>
           ))}
         </div>
       )}
-      <div style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>{children}</div>
+      <div style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -167,7 +196,16 @@ export interface BrowserFrameProps {
   className?: string;
 }
 
-export function BrowserFrame({ url, title, tone = "default", scheme = "auto", badge, maxHeight, children, className }: BrowserFrameProps) {
+export function BrowserFrame({
+  url,
+  title,
+  tone = "default",
+  scheme = "auto",
+  badge,
+  maxHeight,
+  children,
+  className,
+}: BrowserFrameProps) {
   return (
     <figure
       aria-label={`Browser window, ${url}`}
@@ -178,16 +216,24 @@ export function BrowserFrame({ url, title, tone = "default", scheme = "auto", ba
         className,
       )}
     >
-      <div aria-hidden="true" className="flex items-center gap-2.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3 py-2 text-xs text-[var(--wf-fg-muted)]">
+      <div
+        aria-hidden="true"
+        className="flex items-center gap-2.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3 py-2 text-xs text-[var(--wf-fg-muted)]"
+      >
         <TrafficLights />
-        <span className="min-w-0 flex-1 truncate text-center">{title ?? url}</span>
+        <span className="min-w-0 flex-1 truncate text-center">
+          {title ?? url}
+        </span>
         {badge && <SimBadge>{badge}</SimBadge>}
       </div>
       <div className="mx-3 my-2 flex items-center gap-2 rounded-full border border-[var(--wf-line-strong)] bg-[var(--wf-sunken)] px-3 py-1.5 text-[12.5px] text-[var(--wf-fg-muted)]">
         <LockIcon size={12} />
         <span className="truncate text-[var(--wf-fg)]">{url}</span>
       </div>
-      <div className="min-h-[120px]" style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
+      <div
+        className="min-h-[120px]"
+        style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}
+      >
         {children}
       </div>
     </figure>
@@ -212,14 +258,28 @@ export interface PhoneFrameProps {
   className?: string;
 }
 
-export function PhoneFrame({ children, url, time = "20:41", width = 320, height, label, scheme = "auto", badge, className }: PhoneFrameProps) {
+export function PhoneFrame({
+  children,
+  url,
+  time = "20:41",
+  width = 320,
+  height,
+  label,
+  scheme = "auto",
+  badge,
+  className,
+}: PhoneFrameProps) {
   // 窄手機框：動態島縮小、狀態列收緊，不蓋到時間與電量
   const compact = width < 240;
   const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
   return (
     <figure
       aria-label={typeof label === "string" ? label : "Phone screen"}
-      className={cn("m-0 grid min-w-0 max-w-full justify-items-center gap-2", schemeVars[scheme], className)}
+      className={cn(
+        "m-0 grid min-w-0 max-w-full justify-items-center gap-2",
+        schemeVars[scheme],
+        className,
+      )}
       style={{ width }}
     >
       {(label || badge) && (
@@ -239,31 +299,77 @@ export function PhoneFrame({ children, url, time = "20:41", width = 320, height,
         />
         <div
           aria-hidden="true"
-          className={cn("flex flex-none items-center justify-between rounded-t-[28px] px-5 pt-2 pb-1.5 text-[12.5px] font-bold", part)}
-          style={compact ? { padding: "7px 10px 4px", fontSize: 11 } : undefined}
+          className={cn(
+            "flex flex-none items-center justify-between rounded-t-[28px] px-5 pt-2 pb-1.5 text-[12.5px] font-bold",
+            part,
+          )}
+          style={
+            compact ? { padding: "7px 10px 4px", fontSize: 11 } : undefined
+          }
         >
           <span className="tabular-nums">{time}</span>
           <span className="inline-flex items-center gap-1">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16" />
             </svg>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.4}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M12 20h.01M2 8.82a15 15 0 0 1 20 0M5 12.859a10 10 0 0 1 14 0M8.5 16.429a5 5 0 0 1 7 0" />
             </svg>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <rect width="16" height="10" x="2" y="7" rx="2" ry="2" />
               <path d="M22 11v2" />
             </svg>
           </span>
         </div>
         {url && (
-          <div aria-label={`URL ${url}`} className="flex flex-none items-center gap-1.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3.5 py-1.5 text-xs text-[var(--wf-fg-muted)]">
+          <div
+            aria-label={`URL ${url}`}
+            className="flex flex-none items-center gap-1.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3.5 py-1.5 text-xs text-[var(--wf-fg-muted)]"
+          >
             <LockIcon size={11} />
             <span className="truncate text-[var(--wf-fg)]">{url}</span>
           </div>
         )}
-        <div className={cn("min-h-[120px] flex-auto overflow-x-hidden", part, height && "min-h-0 flex-1 overflow-y-auto overscroll-contain")}>{children}</div>
-        <div aria-hidden="true" className={cn("relative h-[22px] flex-none rounded-b-[28px]", part)}>
+        <div
+          className={cn(
+            "min-h-[120px] flex-auto overflow-x-hidden",
+            part,
+            height && "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+          )}
+        >
+          {children}
+        </div>
+        <div
+          aria-hidden="true"
+          className={cn("relative h-[22px] flex-none rounded-b-[28px]", part)}
+        >
           <span className="absolute bottom-[7px] left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-45" />
         </div>
       </div>

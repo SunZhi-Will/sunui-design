@@ -143,13 +143,13 @@ export function AddToCartButton({
           className,
         )}
       >
-        <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           {state === "added" ? (
-            <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
           ) : (
             <>
-              <path d="M4 6.5h12l-1 10.5H5z" />
-              <path d="M7.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3" />
+              <path d="M5.5 7.5h13l-.9 11.6a1.5 1.5 0 0 1-1.5 1.4H7.9a1.5 1.5 0 0 1-1.5-1.4z" />
+              <path d="M9 10V6.5a3 3 0 0 1 6 0V10" />
             </>
           )}
         </svg>
@@ -280,9 +280,9 @@ export function CartIcon({ count, max = 99, label = "Cart", ref, onClick, classN
         className,
       )}
     >
-      <svg viewBox="0 0 20 20" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
-        <path d="M4 6.5h12l-1 10.5H5z" />
-        <path d="M7.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3" strokeLinecap="round" />
+      <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M5.5 7.5h13l-.9 11.6a1.5 1.5 0 0 1-1.5 1.4H7.9a1.5 1.5 0 0 1-1.5-1.4z" />
+        <path d="M9 10V6.5a3 3 0 0 1 6 0V10" />
       </svg>
       <AnimatePresence initial={false}>
         {count > 0 && (

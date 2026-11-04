@@ -1,56 +1,70 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
-import { PaymentStatusBanner, type PaymentCheckResult } from "./payment-status-banner";
+import { PaymentStatusBanner } from "./payment-status-banner";
+
+// 原站的暗色頁面：黑底、半透明卡片、白字分層
+function Page({ title, meta, banner, children }: { title: string; meta: string; banner: ReactNode; children: ReactNode }) {
+  return (
+    <div className="relative min-w-0 overflow-hidden rounded-[12px] border border-white/10 bg-black text-[15px] text-white/90">
+      <div className="flex h-14 items-center gap-2 border-b border-white/5 bg-black/85 px-6">
+        <span className="size-2 rounded-full bg-[#F5C045]" aria-hidden />
+        <span className="text-[13px] font-bold">AI Studio Class</span>
+      </div>
+      {banner}
+      <div className="flex flex-col gap-3 p-6">
+        <p className="text-[12px] font-black tracking-[0.22em] text-[#F5C045]">{meta}</p>
+        <h3 className="text-[22px] leading-snug font-black">{title}</h3>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function PaymentStatusBannerDemo() {
-  // 模擬金流：第三次查詢時確認付款
-  const calls = useRef(0);
-  const check = async (): Promise<PaymentCheckResult> => {
-    calls.current += 1;
-    return calls.current >= 3 ? "paid" : "pending";
-  };
+  // 模擬 webhook：第二次重新整理時課程已開通
+  const [unlocked, setUnlocked] = useState(false);
+  const refreshes = useRef(0);
 
   return (
-    <section aria-labelledby="orders-heading" className="w-full max-w-[52rem] space-y-5">
-      <div>
-        <h2 id="orders-heading" className="text-xl font-semibold tracking-tight">
-          Your recent orders
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Back from checkout. Here's where each payment stands.</p>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <PaymentStatusBanner
-          check={check}
-          interval={1500}
-          orderId="SU-48213"
-          amount={128}
-          email="mia@example.com"
-          successAction={{ label: "View order", href: "#" }}
-        />
-        <PaymentStatusBanner
-          defaultStatus="paid"
-          orderId="SU-48190"
-          amount={64.5}
-          successAction={{ label: "Track shipment", href: "#" }}
-        />
-        <PaymentStatusBanner
-          defaultStatus="failed"
-          orderId="SU-48177"
-          amount={42}
-          reason="Your card was declined by the bank. You haven't been charged."
-          onRetry={() => {}}
-        />
-        <PaymentStatusBanner
-          check={async () => "pending"}
-          interval={1500}
-          maxAttempts={2}
-          orderId="SU-48166"
-          amount={219}
-          email="mia@example.com"
-        />
-      </div>
-    </section>
+    <div className="grid w-full max-w-5xl grid-cols-1 gap-6 lg:grid-cols-2">
+      <Page
+        title="Build small tools with AI in one hour"
+        meta="COURSE"
+        banner={
+          <PaymentStatusBanner
+            fixed={false}
+            status="pending"
+            unlocked={unlocked}
+            onRefresh={() => {
+              refreshes.current += 1;
+              if (refreshes.current >= 2) setUnlocked(true);
+            }}
+            successHref="#lesson-1"
+          />
+        }
+      >
+        <p className="text-white/60">12 lessons, about 3 hours. Watch at your own pace and replay any time.</p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {["Lesson 1: Your first prompt", "Lesson 2: Checking what AI made"].map((l) => (
+            <div key={l} className="min-w-0 rounded-[10px] border border-white/5 bg-white/5 px-4 py-3 text-[13px]">
+              {l}
+            </div>
+          ))}
+        </div>
+      </Page>
+
+      <Page
+        title="Starter bundle: 3 courses"
+        meta="BUNDLE"
+        banner={<PaymentStatusBanner fixed={false} status="failed" unlocked={false} />}
+      >
+        <p className="text-white/60">You have not been charged. Pick a payment method below to try again.</p>
+        <button type="button" className="h-11 rounded-[10px] bg-[#F5C045] px-5 text-[14px] font-bold text-black sm:self-start">
+          Buy bundle NT$2,490
+        </button>
+      </Page>
+    </div>
   );
 }

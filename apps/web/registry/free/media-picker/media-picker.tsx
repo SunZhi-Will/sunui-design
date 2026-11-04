@@ -1,243 +1,313 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface MediaItem {
+/*
+ * 選擇要下載的（圖片、影片）
+ * 移植自 PostVault 的 media-pick-download.ts：點縮圖勾選（只選一個也可以），
+ * 預設全選，可連同貼文文字一起下載；整則只有一個媒體時不開視窗，直接給檔案（video-picker.ts）。
+ */
+
+export interface PickMediaItem {
   id: string;
   kind: "image" | "video";
-  thumb: ReactNode;
-  /** 影片長度，例如 "0:42" */
-  duration?: string;
-  alt?: string;
+  /** 圖片網址，或影片網址（用 metadata 預載顯示第一格） */
+  src?: string;
+  /** 影片封面；有給就不預載影片 */
+  poster?: string;
+  /** 自訂縮圖內容，優先於 src */
+  thumb?: ReactNode;
+  width?: number;
+  height?: number;
 }
 
 export interface MediaPickerLabels {
-  title?: ReactNode;
-  selectAll?: ReactNode;
-  selectNone?: ReactNode;
-  includeText?: ReactNode;
-  summary?: (count: number, videos: number) => ReactNode;
-  downloadOne?: ReactNode;
-  downloadMany?: (count: number) => ReactNode;
-  pickSome?: ReactNode;
-  pro?: ReactNode;
-  item?: (index: number, kind: MediaItem["kind"]) => string;
+  title: (count: number) => string;
+  subtitle: string;
+  imageLabel: (index: number) => string;
+  videoLabel: (index: number) => string;
+  selectAll: string;
+  clearAll: string;
+  includeText: string;
+  downloadTextOnly: string;
+  download: (count: number) => string;
+  downloadNone: string;
+  cancel: string;
 }
 
-export interface MediaPickerProps {
-  items: MediaItem[];
-  /** 依點選順序排列的 id */
-  value?: string[];
-  defaultValue?: string[];
-  onValueChange?: (ids: string[]) => void;
-  onDownload?: (ids: string[], options: { includeText: boolean }) => void;
-  /** 記住「包含貼文文字」的上次選擇 */
-  persistKey?: string;
-  lockedOptions?: { label: ReactNode; reason: ReactNode }[];
-  labels?: MediaPickerLabels;
-  className?: string;
-}
-
-const defaultLabels: Required<MediaPickerLabels> = {
-  title: "Download media",
+export const defaultMediaPickerLabels: MediaPickerLabels = {
+  title: (n) => `What to download? (${n} total)`,
+  subtitle: "Tap to select. One is fine",
+  imageLabel: (i) => `Image ${i}`,
+  videoLabel: (i) => `Video ${i}`,
   selectAll: "Select all",
-  selectNone: "Select none",
-  includeText: "Include caption text",
-  summary: (count, videos) => (
-    <>
-      {count} {count === 1 ? "item" : "items"}
-      {videos > 0 && <> · {videos} {videos === 1 ? "video" : "videos"}</>}
-    </>
-  ),
-  downloadOne: "Download file",
-  downloadMany: (n) => <>Download {n} as ZIP</>,
-  pickSome: "Pick at least one",
-  pro: "Pro",
-  item: (i, kind) => `${kind === "video" ? "Video" : "Image"} ${i + 1}`,
+  clearAll: "Clear",
+  includeText: "Include the post text",
+  downloadTextOnly: "Download text only",
+  download: (n) => `Download ${n}`,
+  downloadNone: "Select something first",
+  cancel: "Cancel",
 };
 
-const springs = { snappy: { type: "spring", stiffness: 520, damping: 34 } } as const;
+/** 只有一個媒體就不用選了，直接下載；沒有媒體回傳 none */
+export function resolveMediaPick(items: PickMediaItem[]): "none" | "direct" | "picker" {
+  if (items.length === 0) return "none";
+  return items.length === 1 ? "direct" : "picker";
+}
 
-function readPersisted(key?: string) {
+const INCLUDE_TEXT_KEY = "pickMediaIncludeText";
+
+// 記住上次「連同文字一起下載」的勾選；沒存過時預設勾選
+function loadIncludeText(key: string | undefined): boolean {
   if (!key) return true;
   try {
-    const v = localStorage.getItem(key);
-    return v === null ? true : v === "1";
+    return localStorage.getItem(key) !== "false";
   } catch {
     return true;
   }
 }
 
+function saveIncludeText(key: string | undefined, value: boolean) {
+  if (!key) return;
+  try {
+    localStorage.setItem(key, String(value));
+  } catch {
+    // 無法儲存就算了，下次回到預設
+  }
+}
+
+export interface MediaPickerProps {
+  open: boolean;
+  items: PickMediaItem[];
+  /** 貼文沒有文字就不顯示「包含文字」 */
+  hasText?: boolean;
+  /** 記住「包含文字」勾選的 localStorage key，傳 null 不記 */
+  persistKey?: string | null;
+  /** 勾選的項目（依原本順序）與是否包含文字 */
+  onDownload: (picked: PickMediaItem[], includeText: boolean) => void;
+  onClose: () => void;
+  /** true 時蓋住整個視窗；false 時蓋住最近的 relative 容器 */
+  fixed?: boolean;
+  labels?: Partial<MediaPickerLabels>;
+  className?: string;
+}
+
 export function MediaPicker({
+  open,
   items,
-  value: valueProp,
-  defaultValue = [],
-  onValueChange,
+  hasText = false,
+  persistKey = INCLUDE_TEXT_KEY,
   onDownload,
-  persistKey,
-  lockedOptions = [],
-  labels,
+  onClose,
+  fixed = true,
+  labels: labelsProp,
   className,
 }: MediaPickerProps) {
-  const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const id = useId();
-  const [inner, setInner] = useState(defaultValue);
-  const value = valueProp ?? inner;
-  const [includeText, setIncludeText] = useState(true);
-  const [active, setActive] = useState(0);
-  const cells = useRef<(HTMLDivElement | null)[]>([]);
+  const l = { ...defaultMediaPickerLabels, ...labelsProp };
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // 預設全選：大多數人是要整則存下來，不要的再取消
+  const [selected, setSelected] = useState<Set<number>>(() => new Set(items.map((_, i) => i)));
+  const [includeText, setIncludeText] = useState(false);
 
-  // 掛載後才讀 localStorage，避免 hydration 不一致
-  useEffect(() => setIncludeText(readPersisted(persistKey)), [persistKey]);
+  // 每次打開重置成全選，並讀回上次的「包含文字」
+  useEffect(() => {
+    if (!open) return;
+    setSelected(new Set(items.map((_, i) => i)));
+    setIncludeText(hasText && loadIncludeText(persistKey ?? undefined));
+    dialogRef.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, items.length, hasText, persistKey]);
 
-  const set = (next: string[]) => {
-    if (valueProp === undefined) setInner(next);
-    onValueChange?.(next);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  const toggle = useCallback((position: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(position)) next.delete(position);
+      else next.add(position);
+      return next;
+    });
+  }, []);
+
+  if (!open) return null;
+
+  // 影片與圖片各自編號，跟原本一樣「圖片 2」「影片 1」
+  let imageNo = 0;
+  let videoNo = 0;
+  const numbered = items.map((item) => ({
+    item,
+    label: item.kind === "image" ? l.imageLabel(++imageNo) : l.videoLabel(++videoNo),
+  }));
+
+  const count = selected.size;
+  // 沒勾媒體但有勾「包含文字」時，仍可只下載文字
+  const nothing = count === 0 && !includeText;
+  const allOn = count === items.length;
+
+  const handleDownload = () => {
+    if (nothing) return;
+    const picked = items.filter((_, i) => selected.has(i));
+    onClose();
+    onDownload(picked, includeText);
   };
-  const toggle = (itemId: string) => set(value.includes(itemId) ? value.filter((v) => v !== itemId) : [...value, itemId]);
-
-  const setText = (on: boolean) => {
-    setIncludeText(on);
-    if (!persistKey) return;
-    try {
-      localStorage.setItem(persistKey, on ? "1" : "0");
-    } catch {
-      // 私密模式等情況無法寫入，忽略即可
-    }
-  };
-
-  const cols = 3;
-  const onGridKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    const moves: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols };
-    if (e.key in moves) {
-      e.preventDefault();
-      const next = Math.min(items.length - 1, Math.max(0, active + moves[e.key]));
-      setActive(next);
-      cells.current[next]?.focus();
-    } else if (e.key === " " || e.key === "Enter") {
-      e.preventDefault();
-      if (items[active]) toggle(items[active].id);
-    } else if ((e.key === "a" || e.key === "A") && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      set(items.map((i) => i.id));
-    }
-  };
-
-  const videos = value.filter((v) => items.find((i) => i.id === v)?.kind === "video").length;
-  const allSelected = value.length === items.length && items.length > 0;
 
   return (
-    <section aria-labelledby={`${id}-title`} className={cn("w-full max-w-md rounded-xl border border-border bg-card text-card-foreground", className)}>
-      <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-        <h3 id={`${id}-title`} className="text-sm font-semibold">
-          {t.title}
-        </h3>
-        <button
-          type="button"
-          onClick={() => set(allSelected ? [] : items.map((i) => i.id))}
-          className="text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-        >
-          {allSelected ? t.selectNone : t.selectAll}
-        </button>
-      </header>
-
+    // 點遮罩關閉；鍵盤用 Escape（掛在 document 上）
+    <div
+      role="presentation"
+      className={cn(fixed ? "fixed" : "absolute", "inset-0 z-[60] flex items-center justify-center p-5")}
+      style={{ background: "rgba(0, 0, 0, 0.7)" }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        role="listbox"
-        aria-multiselectable="true"
-        aria-labelledby={`${id}-title`}
-        onKeyDown={onGridKey}
-        className="grid grid-cols-3 gap-2 p-4"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={cn(
+          "w-full max-w-[420px] max-h-[80vh] overflow-y-auto rounded-xl border p-5 text-sm text-white outline-none",
+          className,
+        )}
+        style={{ background: "rgb(38, 38, 38)", borderColor: "#4b5563", boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)" }}
       >
-        {items.map((item, i) => {
-          const order = value.indexOf(item.id);
-          const selected = order >= 0;
-          return (
-            <div
-              key={item.id}
-              ref={(el) => {
-                cells.current[i] = el;
-              }}
-              role="option"
-              aria-selected={selected}
-              aria-label={item.alt ?? t.item(i, item.kind)}
-              tabIndex={i === active ? 0 : -1}
-              onFocus={() => setActive(i)}
-              onClick={() => toggle(item.id)}
-              className={cn(
-                "relative aspect-square cursor-pointer overflow-hidden rounded-md border outline-none select-none",
-                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
-                selected ? "border-primary" : "border-border",
-              )}
-            >
-              <div className={cn("size-full transition-opacity", value.length > 0 && !selected && "opacity-60")}>{item.thumb}</div>
-              {item.kind === "video" && (
-                <span className="absolute bottom-1 left-1 flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[10px] text-white tabular-nums">
-                  <svg viewBox="0 0 16 16" className="size-2.5" fill="currentColor" aria-hidden="true">
-                    <path d="M5 3.5v9l7-4.5-7-4.5Z" />
-                  </svg>
-                  {item.duration}
-                </span>
-              )}
-              <motion.span
-                aria-hidden="true"
-                initial={false}
-                animate={{ scale: selected ? 1 : 0.6, opacity: selected ? 1 : 0 }}
-                transition={reduce ? { duration: 0 } : springs.snappy}
-                className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground tabular-nums"
+        <div id={titleId} className="mb-1 text-base font-semibold">
+          {l.title(items.length)}
+        </div>
+        <div className="mb-4 text-xs" style={{ color: "#a3a3a3" }}>
+          {l.subtitle}
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {numbered.map(({ item, label }, position) => {
+            const on = selected.has(position);
+            return (
+              <button
+                key={item.id}
+                type="button"
+                title={label}
+                aria-label={label}
+                aria-pressed={on}
+                onClick={() => toggle(position)}
+                className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border-2 p-0 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#262626]"
+                style={{
+                  background: "#1a1a1a",
+                  borderColor: on ? "#ffffff" : "transparent",
+                  opacity: on || count === 0 ? 1 : 0.6,
+                }}
               >
-                {selected ? order + 1 : ""}
-              </motion.span>
-              {!selected && (
-                <span aria-hidden="true" className="absolute top-1 right-1 size-5 rounded-full border border-zinc-500/70 bg-white/60" />
-              )}
-            </div>
-          );
-        })}
-      </div>
+                <Thumb item={item} />
+                {item.kind === "video" && (
+                  <>
+                    {/* 中間蓋播放鈕跟圖片區分，左下角標第幾支 */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-1/2 top-1/2 -ml-[18px] -mt-[18px] size-9 rounded-full border-2 border-white"
+                      style={{ background: "rgba(0, 0, 0, 0.6)" }}
+                    >
+                      <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true" focusable="false">
+                        <path fill="#ffffff" d="M9.5 7.5v9l7.5-4.5z" />
+                      </svg>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-1.5 left-1.5 rounded px-1.5 text-[11px] leading-4 text-white"
+                      style={{ background: "rgba(0, 0, 0, 0.6)" }}
+                    >
+                      {label}
+                    </span>
+                  </>
+                )}
+                {/* 右上角的勾選圈：沒選是半透明空圈，選了是白底打勾 */}
+                <span
+                  aria-hidden="true"
+                  className="absolute right-1.5 top-1.5 box-border size-[22px] rounded-full border-2 border-white text-center text-[13px] font-bold leading-[18px] text-black"
+                  style={{ background: on ? "#ffffff" : "rgba(0, 0, 0, 0.45)" }}
+                >
+                  {on ? "✓" : ""}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      <div className="space-y-2 border-t border-border px-4 py-3 text-sm">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={includeText}
-            onChange={(e) => setText(e.target.checked)}
-            className="size-4 accent-primary"
-          />
-          {t.includeText}
-        </label>
-        {lockedOptions.map((opt, i) => (
-          <div key={i} className="flex items-start gap-2 text-muted-foreground" aria-disabled="true">
-            <input type="checkbox" disabled className="mt-0.5 size-4" aria-describedby={`${id}-lock-${i}`} />
-            <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-2">
-                {opt.label}
-                <span className="rounded-full border border-border px-1.5 text-[10px] font-medium tracking-wide uppercase">{t.pro}</span>
-              </span>
-              <span id={`${id}-lock-${i}`} className="block text-xs">
-                {opt.reason}
-              </span>
-            </span>
-          </div>
-        ))}
-      </div>
+        {hasText && (
+          <label className="mt-3.5 flex cursor-pointer items-center gap-2 text-[13px]" style={{ color: "#d4d4d4" }}>
+            <input
+              type="checkbox"
+              checked={includeText}
+              onChange={(e) => {
+                setIncludeText(e.target.checked);
+                saveIncludeText(persistKey ?? undefined, e.target.checked);
+              }}
+              className="m-0 size-4 cursor-pointer"
+            />
+            <span>{l.includeText}</span>
+          </label>
+        )}
 
-      <footer className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
-        <span className="text-xs text-muted-foreground tabular-nums" aria-live="polite">
-          {value.length ? t.summary(value.length, videos) : t.pickSome}
-        </span>
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setSelected(allOn ? new Set() : new Set(items.map((_, i) => i)))}
+            className="flex-none cursor-pointer rounded-lg border bg-transparent px-3.5 py-2.5 text-[13px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            style={{ color: "#a3a3a3", borderColor: "#4b5563" }}
+          >
+            {allOn ? l.clearAll : l.selectAll}
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={nothing}
+            className="min-w-0 flex-auto rounded-lg border-none bg-white px-4 py-2.5 text-sm font-semibold text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#262626]"
+            style={{ opacity: nothing ? 0.4 : 1, cursor: nothing ? "default" : "pointer" }}
+          >
+            {nothing ? l.downloadNone : count === 0 ? l.downloadTextOnly : l.download(count)}
+          </button>
+        </div>
+
         <button
           type="button"
-          disabled={!value.length}
-          onClick={() => onDownload?.(value, { includeText })}
-          className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={onClose}
+          className="mt-1 w-full cursor-pointer border-none bg-transparent px-4 py-2.5 text-[13px] hover:text-white focus:outline-none focus-visible:text-white"
+          style={{ color: "#a3a3a3" }}
         >
-          {value.length > 1 ? t.downloadMany(value.length) : t.downloadOne}
+          {l.cancel}
         </button>
-      </footer>
-    </section>
+      </div>
+    </div>
   );
+}
+
+/** 縮圖：自訂內容 > 封面 > 圖片 > 影片第一格（載不到就是深色底） */
+export function Thumb({ item, className }: { item: PickMediaItem; className?: string }) {
+  if (item.thumb) return <span className={cn("absolute inset-0 block [&>svg]:size-full", className)}>{item.thumb}</span>;
+  const still = item.kind === "image" ? item.src : item.poster;
+  if (still) {
+    return <img src={still} alt="" className={cn("absolute inset-0 block size-full object-cover", className)} />;
+  }
+  if (item.kind === "video" && item.src) {
+    return (
+      <video
+        src={`${item.src}#t=0.1`}
+        muted
+        preload="metadata"
+        playsInline
+        className={cn("pointer-events-none absolute inset-0 block size-full object-cover", className)}
+      />
+    );
+  }
+  return null;
 }

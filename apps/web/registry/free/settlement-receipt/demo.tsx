@@ -1,51 +1,37 @@
 "use client";
 
-import { SettlementReceipt, type SettlementPerson } from "./settlement-receipt";
+import { SettlementReceipt, type SettlementPerson, type SettlementTransfer } from "./settlement-receipt";
 
-const dinner: SettlementPerson[] = [
-  { id: "amy", name: "Amy", paid: true, lines: [{ label: "Beef noodles", amount: 18 }, { label: "Iced tea", amount: 4 }] },
-  { id: "ben", name: "Ben", lines: [{ label: "Fried rice", amount: 15 }, { label: "Dumplings", amount: 9 }] },
-  { id: "chloe", name: "Chloe", lines: [{ label: "Wonton soup", amount: 12 }, { label: "Dumplings", amount: 9 }] },
-  { id: "dev", name: "Dev", lines: [{ label: "Mapo tofu", amount: 16 }, { label: "Rice", amount: 2 }, { label: "Beer", amount: 7 }] },
+// 四人聚餐，加 10% 服務費；炸薯條 90 分給四人，零頭由前兩位補
+const people: SettlementPerson[] = [
+  { id: "m1", name: "Amy", lines: [{ name: "Beef noodles", amount: 180 }, { name: "Fries", amount: 23 }], fee: 21, owe: 224 },
+  { id: "m2", name: "Ben", lines: [{ name: "Carbonara", amount: 220 }, { name: "Fries", amount: 23 }], fee: 24, owe: 267 },
+  { id: "m3", name: "Chloe", lines: [{ name: "Bubble tea", amount: 70 }, { name: "Fries", amount: 22 }], fee: 9, owe: 101 },
+  { id: "m4", name: "Dev", lines: [{ name: "Bubble tea", amount: 70 }, { name: "Fries", amount: 22 }], fee: 9, owe: 101 },
 ];
 
-const coffee: SettlementPerson[] = [
-  { id: "mia", name: "Mia", paid: true, lines: [{ label: "Flat white", amount: 5.5 }] },
-  { id: "leo", name: "Leo", lines: [{ label: "Latte", amount: 5 }, { label: "Croissant", amount: 4 }] },
+const transfers: SettlementTransfer[] = [
+  { from: "Ben", fromIndex: 1, to: "Amy", amount: 267 },
+  { from: "Chloe", fromIndex: 2, to: "Amy", amount: 101 },
+  { from: "Dev", fromIndex: 3, to: "Amy", amount: 101 },
 ];
 
 export default function SettlementReceiptDemo() {
   return (
-    <section aria-labelledby="split-heading" className="w-full max-w-[52rem] space-y-5">
-      <div>
-        <h2 id="split-heading" className="text-xl font-semibold tracking-tight">
-          Your splits
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Tick each transfer once it is sent. The receipt is stamped when everyone is square.</p>
-      </div>
-      <div className="flex flex-col items-start gap-6 md:flex-row">
-        <SettlementReceipt
-          title="Friday dinner"
-          date="Nov 1, 2026"
-          receiptNo="SPL-0418"
-          people={dinner}
-          total={92}
-          transfers={[
-            { from: "ben", to: "amy", amount: 24 },
-            { from: "chloe", to: "amy", amount: 21 },
-            { from: "dev", to: "amy", amount: 25 },
-          ]}
-        />
-        <SettlementReceipt
-          title="Coffee run"
-          date="Oct 30, 2026"
-          receiptNo="SPL-0412"
-          people={coffee}
-          total={14.5}
-          transfers={[{ from: "leo", to: "mia", amount: 9 }]}
-          defaultSettled
-        />
-      </div>
-    </section>
+    <div className="w-full max-w-5xl min-w-0">
+      <SettlementReceipt
+        people={people}
+        transfers={transfers}
+        payer="Amy"
+        subtotal={630}
+        fee={63}
+        discount={0}
+        grand={693}
+        counted={4}
+        oddments={[{ item: "Fries", people: ["Amy", "Ben"] }]}
+        onPrint={() => window.print()}
+        fixed={false}
+      />
+    </div>
   );
 }

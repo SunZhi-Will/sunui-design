@@ -173,16 +173,16 @@ export function AnnouncementStrip({ messages, storageKey, dismissible = true, on
 
 function Chevron({ dir }: { dir: "left" | "right" }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d={dir === "left" ? "M10 3.5 5.5 8l4.5 4.5" : "M6 3.5 10.5 8 6 12.5"} />
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d={dir === "left" ? "M14.5 6l-6 6 6 6" : "M9.5 6l6 6-6 6"} />
     </svg>
   );
 }
 
 function CloseIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-      <path d="m4 4 8 8M12 4l-8 8" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4">
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
     </svg>
   );
 }

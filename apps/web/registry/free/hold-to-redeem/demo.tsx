@@ -5,68 +5,55 @@ import { useState } from "react";
 import { HoldToRedeem } from "./hold-to-redeem";
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-const pts = (n: number) => `${new Intl.NumberFormat("en-US").format(n)} pts`;
+
+type Offering = { id: string; name: string; cost: number; warnFrom?: number; holdMs?: number; code?: string; flaky?: boolean };
+
+const offerings: Offering[] = [
+  { id: "lantern", name: "Spirit lantern", cost: 40, holdMs: 900 },
+  { id: "saddle", name: "Wolf saddle", cost: 120, holdMs: 1400, flaky: true },
+  { id: "seal", name: "Break the altar seal", cost: 300, holdMs: 2200, warnFrom: 0.72, code: "SEAL-7Q4K" },
+];
 
 export default function HoldToRedeemDemo() {
-  const [balance, setBalance] = useState(640);
-  const [voucherCode, setVoucherCode] = useState<string>();
-
-  const rewards = [
-    {
-      id: "voucher",
-      name: "$10 voucher",
-      detail: "Applies to any order over $40.",
-      cost: 500,
-    },
-    {
-      id: "shipping",
-      name: "Free shipping",
-      detail: "One standard delivery, any order size.",
-      cost: 200,
-      redeemedCode: "SHIPFREE-29QX",
-    },
-    {
-      id: "tote",
-      name: "Canvas tote",
-      detail: "Natural cotton, ships with your next order.",
-      cost: 1200,
-    },
-  ];
+  const [shards, setShards] = useState(320);
+  const [tries, setTries] = useState(0);
 
   return (
-    <section aria-labelledby="rewards-heading" className="w-full max-w-2xl space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 id="rewards-heading" className="text-xl font-semibold tracking-tight">
-            Rewards
+    <section
+      aria-labelledby="altar-heading"
+      className="w-full max-w-3xl bg-[#070a12] p-4 text-[#e8edf5] shadow-[0_0_0_1px_#000] sm:p-5"
+    >
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div className="min-w-0">
+          <h2 id="altar-heading" className="text-lg font-black tracking-[0.14em] text-white [text-shadow:2px_2px_0_#000]">
+            SHATTERED ALTAR
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Redeemed points can't be returned.</p>
+          <p className="mt-1 text-sm font-bold text-[#8a97ab]">Offer shards to the altar. Let go early to keep them.</p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Balance <span className="font-semibold text-foreground tabular-nums">{pts(balance)}</span>
-        </p>
+        <p className="text-sm font-black text-[#f5c542] tabular-nums [text-shadow:1px_1px_0_#000]">{shards} shards</p>
       </div>
 
-      <ul className="divide-y divide-border rounded-lg border border-border bg-card text-card-foreground">
-        {rewards.map((r) => {
-          const short = r.cost - balance;
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {offerings.map((o) => {
+          const short = o.cost - shards;
           return (
-            <li key={r.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <p className="font-medium">{r.name}</p>
-                <p className="text-sm text-muted-foreground">{r.detail}</p>
-              </div>
+            <li key={o.id} className="flex min-w-0">
               <HoldToRedeem
-                className="sm:w-64 sm:shrink-0"
-                cost={pts(r.cost)}
-                defaultDone={Boolean(r.redeemedCode)}
-                result={r.redeemedCode ?? (r.id === "voucher" ? voucherCode : undefined)}
-                disabled={!r.redeemedCode && short > 0}
-                disabledReason={short > 0 ? `Not enough points, ${pts(short)} more needed` : undefined}
+                label={o.name}
+                cost={`${o.cost} shards`}
+                holdMs={o.holdMs}
+                warnFrom={o.warnFrom}
+                result={o.code}
+                disabled={short > 0}
+                disabledReason={short > 0 ? `${short} more shards needed` : undefined}
                 onConfirm={async () => {
-                  await wait(700);
-                  setBalance((b) => b - r.cost);
-                  if (r.id === "voucher") setVoucherCode("SAVE10-H4KD");
+                  await wait(500);
+                  // 鞍座第一次會失敗：示範圈圈變紅倒退
+                  if (o.flaky && tries === 0) {
+                    setTries(1);
+                    throw new Error("The wolf shied away");
+                  }
+                  setShards((s) => s - o.cost);
                 }}
               />
             </li>

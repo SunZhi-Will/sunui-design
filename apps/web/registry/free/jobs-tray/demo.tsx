@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { JobsTray, UpdateBanner, useBackgroundJobs, type UpdaterEvent } from "./jobs-tray";
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export default function JobsTrayDemo() {
   const { jobs, startJob, updateJob, finishJob, dismissJob, cancelJob, runJob } = useBackgroundJobs();

@@ -618,7 +618,6 @@ export function RedeemKeyInput({
                     if (e.key === "Enter") void handleActivate();
                   }}
                   placeholder={l.placeholder}
-                  aria-label={l.field}
                   aria-describedby={kind ? kindId : undefined}
                   autoComplete="off"
                   spellCheck={false}

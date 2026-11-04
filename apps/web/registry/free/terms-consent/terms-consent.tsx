@@ -121,9 +121,9 @@ export function TermsConsent({
                     on ? "border-primary bg-primary text-primary-foreground" : "border-[#1c1917]/30 dark:border-[#ece7dc]/30",
                   )}
                 >
-                  <svg viewBox="0 0 16 16" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                     <motion.path
-                      d="m3.5 8.5 3 3 6-7"
+                      d="M5 12.5l4.5 4.5L19 7.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       initial={false}

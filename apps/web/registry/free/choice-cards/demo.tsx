@@ -2,80 +2,146 @@
 
 import { useState } from "react";
 
-import { ChoiceCards, type ChoiceOption } from "./choice-cards";
+import { ChoiceCards, type ChoiceRow } from "./choice-cards";
 
-const options: (ChoiceOption & { fee: number })[] = [
+// 用字串畫 12x12 像素圖：字元對應調色盤，"." 是透明
+function PixelArt({ rows, palette }: { rows: string[]; palette: Record<string, string> }) {
+  return (
+    <svg viewBox="0 0 12 12" shapeRendering="crispEdges" aria-hidden="true">
+      {rows.flatMap((row, y) =>
+        [...row].map((ch, x) => (ch === "." ? null : <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill={palette[ch]} />)),
+      )}
+    </svg>
+  );
+}
+
+// 錨被拔起：讓它停下
+const anchorArt = (
+  <PixelArt
+    palette={{ a: "#e5e7eb", b: "#9ca3af", c: "#4b5563" }}
+    rows={[
+      ".....aa.....",
+      "....a..a....",
+      ".....aa.....",
+      ".....ab.....",
+      "...aaabaa...",
+      ".....ab.....",
+      ".....ab.....",
+      ".a...ab...a.",
+      ".ab..ab..ab.",
+      "..abbabbba..",
+      "...cbbbbc...",
+      ".....cc.....",
+    ]}
+  />
+);
+
+// 兩隻手相握：跟它講好
+const handsArt = (
+  <PixelArt
+    palette={{ a: "#34d399", b: "#059669", c: "#d1fae5" }}
+    rows={[
+      "............",
+      "............",
+      "..a......b..",
+      ".aa......bb.",
+      ".aac....cbb.",
+      ".aaccccccbb.",
+      "..accccccbb.",
+      "...cccccc...",
+      "....cccc....",
+      "............",
+      "............",
+      "............",
+    ]}
+  />
+);
+
+// 握在手裡的紅水晶：拿走力量
+const crystalArt = (
+  <PixelArt
+    palette={{ a: "#fecaca", b: "#f87171", c: "#991b1b", d: "#d6b38a" }}
+    rows={[
+      ".....ab.....",
+      "....aabb....",
+      "...aabbbc...",
+      "...abbbcc...",
+      "...abbbcc...",
+      "....bbcc....",
+      ".....bc.....",
+      "..dddddddd..",
+      ".dddddddddd.",
+      ".dddddddddd.",
+      "..dddddddd..",
+      "...dddddd...",
+    ]}
+  />
+);
+
+const rows: ChoiceRow[] = [
   {
-    id: "standard",
-    fee: 4.9,
-    name: "Standard",
-    brief: "$4.90 · 3 to 5 business days",
-    gains: ["Free returns within 30 days"],
-    costs: ["Packed in a plastic mailer"],
-    includes: [{ term: "Tracking", desc: "Email updates at each scan" }],
-    meaning: "Your order ships with the regular courier. Returns stay free.",
+    id: "stop",
+    path: "stop",
+    label: "Make it stop",
+    brief: "Pull the anchor out",
+    art: anchorArt,
+    gains: ["The tremors end for good"],
+    costs: ["The altar goes dark forever"],
+    meaning: "The quiet comes back, and so does the cold. Nothing grows here again.",
   },
   {
-    id: "eco",
-    fee: 0,
-    name: "Eco bundle",
-    brief: "Free · ships Friday",
-    recommended: true,
-    gains: ["Free shipping", "Paper packaging, no plastic"],
-    costs: ["Waits for the weekly batch"],
-    includes: [
-      { term: "Tracking", desc: "One update when it ships" },
-      { term: "Bundling", desc: "Joins anything you order before Friday" },
-    ],
-    meaning: "We hold your order until Friday and ship it with others to your area in one trip.",
+    id: "talk",
+    path: "talk",
+    label: "Talk it down",
+    brief: "Loosen it just enough",
+    art: handsArt,
+    gains: ["The wolves stay friendly"],
+    costs: ["Shards drop half as often"],
+    meaning: "It keeps breathing, slower now. The valley learns to live beside it.",
   },
   {
-    id: "express",
-    fee: 14,
-    name: "Express",
-    brief: "$14.00 · next business day",
-    gains: ["Arrives tomorrow if ordered by 3 PM"],
-    costs: ["Returns cost $6", "Signature required"],
-    includes: [{ term: "Insurance", desc: "Covered up to $500" }],
-    meaning: "Picked and packed today. Someone needs to sign for it at the door.",
-  },
-  {
-    id: "same-day",
-    fee: 22,
-    name: "Same day",
-    brief: "$22.00 · by 9 PM tonight",
-    gains: ["Delivered by bike courier"],
+    id: "take",
+    path: "take",
+    label: "Take its power",
+    brief: "Hold it yourself",
+    art: crystalArt,
+    gains: ["Your tools strike twice"],
+    costs: ["Villagers stop trading"],
     disabled: true,
-    reason: "Not available for your address yet.",
+    reason: "Needs the third altar key",
+    meaning: "The red light crawls up your arm and does not let go.",
   },
 ];
 
-const subtotal = 86;
-const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+const replies: Record<string, string> = {
+  stop: "You grip the anchor and pull. The ground sighs, then goes still.",
+  talk: "You kneel and speak low. The cracks stop spreading.",
+};
 
 export default function ChoiceCardsDemo() {
-  const [delivery, setDelivery] = useState("eco");
-  const fee = options.find((o) => o.id === delivery)?.fee ?? 0;
+  const [line, setLine] = useState("The altar hums under your boots. Three ways to end this. Pick one, or walk away for now.");
+  const [open, setOpen] = useState(true);
 
   return (
-    <section aria-labelledby="delivery-heading" className="w-full max-w-[44rem] space-y-4">
-      <div>
-        <h2 id="delivery-heading" className="text-xl font-semibold tracking-tight">
-          Delivery
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Pick how your order gets to you. You can change it until it ships.</p>
-      </div>
-
-      <ChoiceCards label="Delivery method" options={options} value={delivery} onValueChange={setDelivery} />
-
-      <dl className="grid grid-cols-[1fr_auto] gap-y-1 border-t border-border pt-3 text-sm tabular-nums">
-        <dt className="text-muted-foreground">Subtotal</dt>
-        <dd>{money(subtotal)}</dd>
-        <dt className="text-muted-foreground">Delivery</dt>
-        <dd>{fee ? money(fee) : "Free"}</dd>
-        <dt className="font-medium">Total</dt>
-        <dd className="font-semibold">{money(subtotal + fee)}</dd>
-      </dl>
-    </section>
+    <div className="w-full max-w-4xl bg-[radial-gradient(ellipse_at_50%_20%,#1c2a44_0%,#070a12_70%)] p-3 sm:p-5">
+      {open ? (
+        <ChoiceCards
+          name="Shattered Altar"
+          line={line}
+          rows={rows}
+          leaveLabel="Leave it for now"
+          onChoose={(id) => setLine(replies[id] ?? line)}
+          onClose={() => setOpen(false)}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="mx-auto block border-2 border-t-[#4a5d7c] border-r-[#05070b] border-b-[#05070b] border-l-[#4a5d7c] bg-[#0e141e] px-4 py-2 text-sm font-black tracking-[0.1em] text-[#d8dee9] shadow-[0_0_0_1px_#000] [text-shadow:1px_1px_0_#000]"
+        >
+          Return to the altar
+        </button>
+      )}
+    </div>
   );
 }

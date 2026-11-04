@@ -1,216 +1,159 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export interface HonestCountdownLabels {
+  /** 倒數前的小標 */
+  until?: ReactNode;
   days?: ReactNode;
   hours?: ReactNode;
   minutes?: ReactNode;
   seconds?: ReactNode;
-  endedStamp?: ReactNode;
-  endsAt?: (date: string) => ReactNode;
-  endedAt?: (date: string) => ReactNode;
-  endedAnnouncement?: string;
+  /** 進行中 */
+  live?: ReactNode;
+  /** 結束後 */
+  ended?: (dateLabel: ReactNode) => ReactNode;
+  /** 給螢幕閱讀器的靜態完整說法，不每秒朗讀 */
+  srRemaining?: (days: number, hours: number, dateLabel: string) => string;
 }
 
 export interface HonestCountdownProps {
-  /** 結束時間 */
-  target: Date | string | number;
-  /** 倒數上方的標題，例如「Sale ends in」 */
-  label?: ReactNode;
-  /** 結束後取代倒數的文字 */
-  endedLabel?: ReactNode;
+  /** 開始時間（ISO 字串、Date 或毫秒）；沒有就只顯示日期文字 */
+  startAt?: Date | string | number;
+  /** 結束時間，預設開始後 2 小時 */
+  endAt?: Date | string | number;
+  /** 日期文字，掛載前、沒有時間、結束後都會用到，例如「Wed Oct 28, 8 PM」 */
+  dateLabel: string;
+  onStart?: () => void;
   onEnd?: () => void;
-  /** 剩餘時間低於這個值（毫秒）才顯示秒數，預設 1 小時 */
-  showSecondsUnder?: number;
-  locale?: string;
-  timeZone?: string;
+  /** 強調色，預設品牌金 */
+  accent?: string;
   labels?: HonestCountdownLabels;
   className?: string;
+  style?: CSSProperties;
 }
 
 const defaultLabels: Required<HonestCountdownLabels> = {
-  days: "days",
-  hours: "hrs",
-  minutes: "min",
-  seconds: "sec",
-  endedStamp: "Ended",
-  endsAt: (date) => <>Ends {date}</>,
-  endedAt: (date) => <>Ended {date}</>,
-  endedAnnouncement: "The countdown has ended.",
+  until: "Starts in",
+  days: "d",
+  hours: "h",
+  minutes: "m",
+  seconds: "s",
+  live: "Live now",
+  ended: (d) => <>The live stream has ended, {d}</>,
+  srRemaining: (d, h, label) => `${d} days ${h} hours to go, ${label}`,
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const parse = (v?: Date | string | number) => (v === undefined ? NaN : typeof v === "number" ? v : new Date(v).getTime());
 
-const springs = {
-  snappy: { type: "spring", stiffness: 520, damping: 34 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
-} as const;
+// 原站暗色 token 與活動頁的金色、等寬字
+const VARS = {
+  "--hc-accent": "#F5C045",
+  "--hc-text": "rgba(255,255,255,0.93)",
+  "--hc-text-secondary": "rgba(255,255,255,0.58)",
+  "--hc-text-muted": "rgba(255,255,255,0.50)",
+  "--hc-card": "rgba(255,255,255,0.05)",
+  "--hc-border-subtle": "rgba(255,255,255,0.06)",
+  "--hc-mono": 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace',
+} as CSSProperties;
 
-const HOUR = 3_600_000;
-const DAY = 86_400_000;
+const CSS = `@keyframes sunui-hc-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.sunui-hc-dot{width:8px;height:8px;border-radius:999px;background:var(--hc-accent);animation:sunui-hc-pulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.sunui-hc-dot{animation:none}}`;
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
-export function HonestCountdown({
-  target,
-  label,
-  endedLabel,
-  onEnd,
-  showSecondsUnder = HOUR,
-  locale = "en-US",
-  timeZone,
-  labels,
-  className,
-}: HonestCountdownProps) {
+/**
+ * 距離開始的倒數。只倒數到「真正開始的那一刻」，不製造假的截止壓力。
+ * 伺服器端與 hydration 前只顯示日期文字，掛載後才開始算，避免時間不同造成 hydration 不一致。
+ */
+export function HonestCountdown({ startAt, endAt, dateLabel, onStart, onEnd, accent, labels, className, style }: HonestCountdownProps) {
   const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion();
-  const end = new Date(target).getTime();
-
-  // 「現在」只在瀏覽器取得；伺服器端只輸出絕對日期
   const [now, setNow] = useState<number | null>(null);
-  const [announcement, setAnnouncement] = useState("");
-  const firstNow = useRef<number | null>(null);
-  const ticked = useRef(false);
-  const ended = useRef(false);
-  const onEndRef = useRef(onEnd);
-  onEndRef.current = onEnd;
+  const start = parse(startAt);
+  const end = endAt === undefined ? start + 2 * 60 * 60 * 1000 : parse(endAt);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setInterval> | null = null;
-    const tick = () => setNow(Date.now());
-    const start = () => {
-      tick();
-      if (!timer) timer = setInterval(tick, 1000);
-    };
-    const stop = () => {
-      if (timer) clearInterval(timer);
-      timer = null;
-    };
-    // 分頁隱藏時不跑計時器，回來時重新計算
-    const onVisibility = () => (document.hidden ? stop() : start());
-    start();
-    document.addEventListener("visibilitychange", onVisibility);
+    if (Number.isNaN(start)) return;
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    // 分頁回到前景時再對時一次
+    const onVisible = () => document.visibilityState === "visible" && setNow(Date.now());
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
-      stop();
-      document.removeEventListener("visibilitychange", onVisibility);
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
     };
-  }, []);
+  }, [start]);
 
-  if (now !== null && firstNow.current === null) firstNow.current = now;
-  const remaining = now === null ? null : Math.max(0, end - now);
-  const isEnded = remaining === 0;
-  const endedOnLoad = firstNow.current !== null && firstNow.current >= end;
+  const phase = now === null || Number.isNaN(start) ? "idle" : now >= end ? "ended" : now >= start ? "live" : "before";
 
+  // 跨過開始、結束時各通知一次
+  const startRef = useRef(onStart);
+  startRef.current = onStart;
+  const endRef = useRef(onEnd);
+  endRef.current = onEnd;
+  const prev = useRef(phase);
   useEffect(() => {
-    if (!isEnded || ended.current) return;
-    ended.current = true;
-    if (!endedOnLoad) setAnnouncement(t.endedAnnouncement);
-    onEndRef.current?.();
-  }, [isEnded, endedOnLoad, t.endedAnnouncement]);
+    if (prev.current === "before" && phase === "live") startRef.current?.();
+    if ((prev.current === "before" || prev.current === "live") && phase === "ended") endRef.current?.();
+    prev.current = phase;
+  }, [phase]);
 
-  useEffect(() => {
-    if (now !== null) ticked.current = true;
-  }, [now]);
+  const rootStyle = { ...VARS, ...(accent ? { "--hc-accent": accent } : null), ...style } as CSSProperties;
+  const fallback = "m-0 text-[14px] font-bold text-[color:var(--hc-text-secondary)]";
 
-  const absolute = new Intl.DateTimeFormat(locale, {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-    timeZone,
-    timeZoneName: "short",
-  }).format(end);
-
-  const units: { key: string; value: number; label: ReactNode }[] = [];
-  if (remaining !== null && !isEnded) {
-    const d = Math.floor(remaining / DAY);
-    const h = Math.floor((remaining % DAY) / HOUR);
-    const m = Math.floor((remaining % HOUR) / 60_000);
-    const s = Math.floor((remaining % 60_000) / 1000);
-    if (d > 0) units.push({ key: "d", value: d, label: t.days });
-    if (d > 0 || h > 0) units.push({ key: "h", value: h, label: t.hours });
-    units.push({ key: "m", value: m, label: t.minutes });
-    // 一天以上不顯示秒數，避免製造焦慮
-    if (d === 0 && remaining < showSecondsUnder) units.push({ key: "s", value: s, label: t.seconds });
+  if (phase === "idle") {
+    return (
+      <p className={cn(fallback, className)} style={rootStyle}>
+        {dateLabel}
+      </p>
+    );
   }
-  const finalHour = remaining !== null && remaining > 0 && remaining < HOUR;
-  const spoken = units.map((u) => `${u.value} ${typeof u.label === "string" ? u.label : u.key}`).join(" ");
+  if (phase === "ended") {
+    return (
+      <p className={cn(fallback, className)} style={rootStyle}>
+        {t.ended(dateLabel)}
+      </p>
+    );
+  }
+  if (phase === "live") {
+    return (
+      <p role="status" className={cn("m-0 inline-flex items-center gap-2 font-black text-[color:var(--hc-accent)]", className)} style={rootStyle}>
+        <style href="sunui-honest-countdown" precedence="default">
+          {CSS}
+        </style>
+        <span className="sunui-hc-dot" aria-hidden="true" />
+        {t.live}
+      </p>
+    );
+  }
+
+  const total = Math.floor((start - (now as number)) / 1000);
+  const parts = [
+    { value: Math.floor(total / 86400), unit: t.days, key: "d" },
+    { value: Math.floor((total % 86400) / 3600), unit: t.hours, key: "h" },
+    { value: Math.floor((total % 3600) / 60), unit: t.minutes, key: "m" },
+    { value: total % 60, unit: t.seconds, key: "s" },
+  ];
 
   return (
-    <div className={cn("relative w-full max-w-sm rounded-md border p-4 font-sans", paper, edge, ink, className)}>
-      {label && <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{label}</p>}
-
-      <div className="mt-2 flex min-h-[3.75rem] items-center">
-        {isEnded ? (
-          <p className={cn("text-base font-medium", inkMuted)}>{endedLabel ?? t.endedAt(absolute)}</p>
-        ) : (
-          units.length > 0 && (
-            <div role="timer" aria-label={spoken} className="flex gap-2">
-              {units.map((u) => (
-                <div
-                  key={u.key}
-                  aria-hidden="true"
-                  className={cn("flex min-w-[3.25rem] flex-col items-center rounded-md border px-2 py-1.5", edge)}
-                >
-                  <span className="relative h-7 overflow-hidden">
-                    <motion.span
-                      key={u.value}
-                      className={cn(
-                        "block font-mono text-2xl leading-7 font-semibold tracking-tight tabular-nums",
-                        finalHour && vermilion,
-                      )}
-                      initial={reduce || !ticked.current ? false : { y: -6, opacity: 0.4 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={springs.snappy}
-                    >
-                      {u.key === "d" ? u.value : pad(u.value)}
-                    </motion.span>
-                  </span>
-                  <span className={cn("text-[10px] tracking-[0.14em] uppercase", inkMuted)}>{u.label}</span>
-                </div>
-              ))}
-            </div>
-          )
-        )}
-      </div>
-
-      {/* 絕對日期永遠保留，倒數不取代真實資訊 */}
-      <p className={cn("mt-2 text-xs tabular-nums", inkMuted)}>
-        <time dateTime={new Date(end).toISOString()} suppressHydrationWarning>
-          {isEnded ? absolute : t.endsAt(absolute)}
-        </time>
-      </p>
-
-      <AnimatePresence initial={false}>
-        {isEnded && (
-          <motion.span
-            key="stamp"
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute top-3 right-4 rounded-[3px] border-2 border-current px-2 py-0.5 text-xs font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-              inkMuted,
-            )}
-            initial={reduce || endedOnLoad ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-            animate={{ scale: 1, opacity: 0.7, rotate: -10 }}
-            transition={springs.stamp}
+    <div className={cn("flex flex-wrap items-center justify-center gap-3 text-[color:var(--hc-text)]", className)} style={rootStyle}>
+      <span className="text-[13px] font-bold text-[color:var(--hc-text-muted)]">{t.until}</span>
+      {/* 每秒變動的數字不讓螢幕閱讀器一直念，給一個靜態的完整說法 */}
+      <span className="sr-only">{t.srRemaining(parts[0].value, parts[1].value, dateLabel)}</span>
+      <span className="flex gap-2" aria-hidden="true">
+        {parts.map((part) => (
+          <span
+            key={part.key}
+            className="grid min-w-[52px] justify-items-center rounded-[10px] border border-[color:var(--hc-border-subtle)] bg-[color:var(--hc-card)] px-1 py-2"
           >
-            {t.endedStamp}
-          </motion.span>
-        )}
-      </AnimatePresence>
-
-      <span className="sr-only" role="status" aria-live="polite">
-        {announcement}
+            <b className="text-[22px] leading-[1.1] tabular-nums" style={{ fontFamily: "var(--hc-mono)" }}>
+              {String(part.value).padStart(2, "0")}
+            </b>
+            <small className="text-[11px] text-[color:var(--hc-text-muted)]">{part.unit}</small>
+          </span>
+        ))}
       </span>
     </div>
   );

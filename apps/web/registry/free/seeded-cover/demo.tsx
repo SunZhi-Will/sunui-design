@@ -1,47 +1,106 @@
-import { SeededCover } from "./seeded-cover";
+"use client";
 
-type Product = { id: string; name: string; by: string; price: number; image?: boolean; label?: string };
+import { useState, type CSSProperties } from "react";
 
-const products: Product[] = [
-  { id: "p-mountains", name: "山河未歸", by: "Ink & Lantern Press", price: 18 },
-  { id: "p-field", name: "Field Notes on Slow Living", by: "Hearth Books", price: 24, label: "Sample" },
-  { id: "p-mug", name: "Stoneware Mug, Sand", by: "Kiln Studio", price: 18, image: true },
-  { id: "p-tea", name: "茶事手帖", by: "春日文庫", price: 22 },
-  { id: "p-course", name: "Pricing for Small Shops", by: "Online course, 12 lessons", price: 49 },
-  { id: "p-tote", name: "Canvas Tote, Natural", by: "Daily Goods", price: 24, image: true },
+import { CharacterGlyph, SeededCover, assignGlyphs, glyphPacks, storyThemes } from "./seeded-cover";
+
+type Work = { id: string; title: string; author: string; minutes: number };
+
+const works: Work[] = [
+  { id: "ferry-night-watch", title: "渡口守夜：燈下之約", author: "沈青禾", minutes: 40 },
+  { id: "rain-lane-courier", title: "雨巷信差", author: "林照", minutes: 25 },
+  { id: "the-lantern-hour", title: "The Lantern Hour", author: "Ada Wren", minutes: 30 },
+  { id: "mist-city", title: "霧城", author: "陸遠", minutes: 55 },
+  { id: "northern-letters", title: "北境書簡", author: "許南枝", minutes: 35 },
+  { id: "tide-almanac", title: "潮汐曆：第一卷", author: "周未", minutes: 20 },
 ];
 
+const cast = assignGlyphs(
+  [
+    { id: "shen-heng", displayName: "沈衡", tier: "major" },
+    { id: "shen-yao", displayName: "沈瑤", tier: "major" },
+    { id: "lu-qiu", displayName: "陸秋", tier: "supporting" },
+    { id: "ferryman", displayName: "老船夫", tier: "minor" },
+  ],
+  glyphPacks.inkWuxia,
+);
+const castNames: Record<string, string> = { "shen-heng": "沈衡", "shen-yao": "沈瑤", "lu-qiu": "陸秋", ferryman: "老船夫" };
+
+const themes = [
+  { key: "ink", label: "夜" },
+  { key: "day", label: "日" },
+  { key: "rice", label: "宣紙" },
+] as const;
+
 export default function SeededCoverDemo() {
+  const [theme, setTheme] = useState<(typeof themes)[number]["key"]>("ink");
+
   return (
-    <section aria-labelledby="shelf-heading" className="w-full max-w-3xl space-y-4">
-      <div>
-        <h2 id="shelf-heading" className="text-xl font-semibold tracking-tight">
-          New on the shelf
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Books, goods and courses added this week.</p>
+    // 外層設定 --story-* 後，封面與字符都會跟著主題混色
+    <section
+      aria-labelledby="browse-heading"
+      className="w-full max-w-3xl rounded-[8px] border p-4 sm:p-6"
+      style={{
+        ...(storyThemes[theme] as CSSProperties),
+        background: "var(--story-bg)",
+        color: "var(--story-text)",
+        borderColor: "var(--story-line)",
+      }}
+    >
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h2 id="browse-heading" className="font-serif text-xl font-semibold tracking-[0.08em]">
+            書架
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: "var(--story-muted)" }}>
+            沒有美術的作品也有自己的封面。
+          </p>
+        </div>
+        <div role="radiogroup" aria-label="閱讀主題" className="flex shrink-0 rounded-[4px] border p-0.5" style={{ borderColor: "var(--story-line)" }}>
+          {themes.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="radio"
+              aria-checked={theme === t.key}
+              onClick={() => setTheme(t.key)}
+              className="rounded-[3px] px-3 py-1 text-xs transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-current focus-visible:outline-none motion-reduce:transition-none"
+              style={theme === t.key ? { background: "var(--story-surface)", color: "var(--story-text)" } : { color: "var(--story-muted)" }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-        {products.map((p) => (
-          <li key={p.id} className="min-w-0">
-            {p.image ? (
-              // 有實拍圖的商品：這裡用中性留白代替
-              <div className="flex aspect-[2/3] w-full items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
-                <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                  <rect x="3.5" y="4.5" width="17" height="15" rx="1.5" />
-                  <path d="m3.5 16 5-5 4 4 3-3 5 5" />
-                </svg>
-              </div>
-            ) : (
-              <SeededCover seed={p.id} title={p.name} subtitle={p.by} label={p.label} />
-            )}
-            <p className="mt-2 truncate text-sm font-medium">{p.name}</p>
-            <p className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
-              <span className="truncate">{p.by}</span>
-              <span className="shrink-0 font-medium text-foreground tabular-nums">${p.price}</span>
-            </p>
+
+      <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">
+        {works.map((w) => (
+          <li key={w.id} className="flex min-w-0 flex-col gap-2">
+            <SeededCover seed={w.id} title={w.title} size="fill" />
+            <div className="min-w-0">
+              <p className="truncate font-serif text-sm font-semibold">{w.title}</p>
+              <p className="flex justify-between gap-2 text-xs" style={{ color: "var(--story-muted)" }}>
+                <span className="truncate">{w.author}</span>
+                <span className="shrink-0 tabular-nums">{w.minutes} 分鐘</span>
+              </p>
+            </div>
           </li>
         ))}
       </ul>
+
+      <div className="mt-6 border-t pt-4" style={{ borderColor: "var(--story-line)" }}>
+        <h3 className="text-xs tracking-[0.18em]" style={{ color: "var(--story-muted)" }}>
+          《渡口守夜》登場人物
+        </h3>
+        <ul className="mt-3 flex flex-wrap gap-4">
+          {[...cast.entries()].map(([id, spec]) => (
+            <li key={id} className="flex items-center gap-2">
+              <CharacterGlyph spec={spec} size={48} />
+              <span className="font-serif text-sm">{castNames[id]}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

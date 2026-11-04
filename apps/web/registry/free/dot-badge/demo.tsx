@@ -2,103 +2,107 @@
 
 import { useState } from "react";
 
-import { DotBadge, DotNote, PersonChip, type DotTone } from "./dot-badge";
+import { AppChip, EmployeeChip, PersonChip, StatusBadge, StatusDot, WorkBadge, type StatusTone, type WorkStatus } from "./dot-badge";
 
-const staff = [
-  { id: "u-mia", name: "Mia Chen" },
-  { id: "u-leo", name: "Leo Park" },
-  { id: "u-xm", name: "林小明" },
-  { id: "u-sam", name: "Sam Ortiz" },
+const works: { name: string; status: WorkStatus }[] = [
+  { name: "Lumen Reader", status: "available" },
+  { name: "Tidepool", status: "public-beta" },
+  { name: "Orbit Notes", status: "prototype" },
+  { name: "Paperfold", status: "archived" },
 ];
 
-type Status = { label: string; tone: DotTone; hint?: string };
+const jobs: { name: string; tone: StatusTone; label: string }[] = [
+  { name: "upscale_portrait.json", tone: "success", label: "Done" },
+  { name: "inpaint_room_v2.json", tone: "info", label: "Running" },
+  { name: "batch_thumbs.json", tone: "warning", label: "Queued" },
+  { name: "lora_train_cat.json", tone: "destructive", label: "Failed" },
+  { name: "old_preview.json", tone: "muted", label: "Cancelled" },
+];
 
-const statuses: Record<string, Status> = {
-  paid: { label: "Paid", tone: "info", hint: "waiting to be packed" },
-  packing: { label: "Packing", tone: "live", hint: "in progress now" },
-  shipped: { label: "Shipped", tone: "success" },
-  refund: { label: "Refund requested", tone: "warning", hint: "needs review" },
-  cancelled: { label: "Cancelled", tone: "neutral" },
-};
+const users = [
+  { id: 11, name: "Hana Ito", apps: [{ id: "lumen", name: "Lumen", paid: true }, { id: "tidepool", name: "Tidepool" }] },
+  { id: 12, name: "Marco Silva", apps: [{ id: "orbit", name: "Orbit" }] },
+  { id: 13, name: "王大同", apps: [{ id: "lumen", name: "Lumen" }, { id: "orbit", name: "Orbit", paid: true }] },
+];
 
-const orders = [
-  { id: "SU-48213", customer: "Ava Brooks", items: 3, status: "packing", packer: "u-xm" },
-  { id: "SU-48210", customer: "Noah Kim", items: 1, status: "paid", packer: "u-mia" },
-  { id: "SU-48204", customer: "陳怡君", items: 2, status: "shipped", packer: "u-leo" },
-  { id: "SU-48199", customer: "Liam Patel", items: 5, status: "refund", packer: "u-mia" },
-  { id: "SU-48192", customer: "Emma Rossi", items: 1, status: "cancelled", packer: "u-sam" },
-  { id: "SU-48188", customer: "Ethan Wu", items: 4, status: "shipped", packer: "u-xm" },
+const crew = [
+  { id: 1, name: "Mia" },
+  { id: 2, name: "Leo", locked: true },
+  { id: 3, name: "Ava", changed: true },
+  { id: 4, name: "Noah" },
 ];
 
 export default function DotBadgeDemo() {
-  const [selected, setSelected] = useState<string[]>([]);
-  const toggle = (id: string, on: boolean) =>
-    setSelected((s) => (on ? [...s, id] : s.filter((x) => x !== id)));
-
-  const shown = selected.length ? orders.filter((o) => selected.includes(o.packer)) : orders;
-  const byId = Object.fromEntries(staff.map((p) => [p.id, p]));
+  const [selected, setSelected] = useState<number | null>(3);
+  const me = 1;
 
   return (
-    <section aria-labelledby="fulfil-heading" className="w-full max-w-3xl space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 id="fulfil-heading" className="text-xl font-semibold tracking-tight">
-            Fulfilment
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Today&apos;s orders and who is packing them.</p>
+    <div className="grid w-full max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
+      {/* Synvize：品牌強制暗色，放在原本的黑底上 */}
+      <section className="min-w-0 rounded-xl border border-[rgba(212,175,55,0.14)] bg-[#08080a] p-4 text-[#f7f5f0]">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium">Work</h3>
+          <WorkBadge tone="brand" label="Building now" live hint="Currently in active development" />
         </div>
-        <DotNote tone="live">Warehouse open</DotNote>
-      </div>
-
-      <div role="group" aria-label="Filter by packer" className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs text-muted-foreground">Packed by</span>
-        {staff.map((p) => (
-          <PersonChip
-            key={p.id}
-            id={p.id}
-            name={p.name}
-            size="sm"
-            pressed={selected.includes(p.id)}
-            onPressedChange={(on) => toggle(p.id, on)}
-          />
-        ))}
-        <PersonChip id="u-temp" name="Temp staff" size="sm" locked pressed={false} />
-      </div>
-
-      <div className="overflow-hidden rounded-md border border-border bg-card text-card-foreground">
-        <div className="hidden grid-cols-[1fr_1.2fr_4rem_9rem_8rem] gap-3 border-b border-border px-4 py-2 text-[11px] tracking-[0.14em] text-muted-foreground uppercase sm:grid">
-          <span>Order</span>
-          <span>Customer</span>
-          <span className="text-right">Items</span>
-          <span>Status</span>
-          <span>Packer</span>
-        </div>
-        <ul className="divide-y divide-border">
-          {shown.map((o) => {
-            const st = statuses[o.status];
-            const packer = byId[o.packer];
-            return (
-              <li
-                key={o.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 text-sm sm:grid-cols-[1fr_1.2fr_4rem_9rem_8rem]"
-              >
-                <span className="font-mono text-xs tracking-[0.12em]">{o.id}</span>
-                <span className="truncate text-right sm:text-left">{o.customer}</span>
-                <span className="hidden text-right tabular-nums text-muted-foreground sm:block">{o.items}</span>
-                <span>
-                  <DotBadge tone={st.tone} hint={st.hint}>
-                    {st.label}
-                  </DotBadge>
-                </span>
-                <span className="justify-self-end sm:justify-self-start">
-                  <PersonChip id={packer.id} name={packer.name} size="sm" muted={o.status === "cancelled"} />
-                </span>
-              </li>
-            );
-          })}
+        <ul className="flex flex-col divide-y divide-[rgba(247,245,240,0.1)]">
+          {works.map((w) => (
+            <li key={w.name} className="flex min-w-0 items-center justify-between gap-3 py-2.5">
+              <span className="truncate text-sm">{w.name}</span>
+              <StatusBadge status={w.status} />
+            </li>
+          ))}
         </ul>
-        {!shown.length && <p className="p-6 text-center text-sm text-muted-foreground">No orders for this packer today.</p>}
-      </div>
-    </section>
+      </section>
+
+      <section className="min-w-0 rounded-xl border border-border bg-card p-4">
+        <h3 className="mb-3 text-sm font-medium text-foreground">Queue</h3>
+        <ul className="flex flex-col gap-2 text-sm">
+          {jobs.map((j) => (
+            <li key={j.name} className="flex min-w-0 items-center justify-between gap-3">
+              <span className="truncate font-mono text-xs text-muted-foreground">{j.name}</span>
+              <StatusDot tone={j.tone} className="text-xs text-foreground">
+                {j.label}
+              </StatusDot>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="min-w-0 rounded-xl border border-border bg-card p-4">
+        <h3 className="mb-3 text-sm font-medium text-foreground">Users</h3>
+        <ul className="flex flex-col gap-2.5">
+          {users.map((u) => (
+            <li key={u.id} className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <PersonChip name={u.name} personId={u.id} />
+              <span className="text-xs text-muted-foreground">uses</span>
+              {u.apps.map((a) => (
+                <AppChip key={a.id} appId={a.id} name={a.name} paid={a.paid} />
+              ))}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="min-w-0 rounded-xl border border-border bg-card p-4">
+        <h3 className="mb-1 text-sm font-medium text-foreground">Tonight&apos;s crew</h3>
+        <p className="mb-3 text-xs text-muted-foreground">You are Mia. Tap someone to open their details.</p>
+        <div className="flex flex-wrap gap-1.5">
+          {crew.map((c) => (
+            <EmployeeChip
+              key={c.id}
+              size="lg"
+              name={c.name}
+              employeeId={c.id}
+              locked={c.locked}
+              highlighted={c.changed}
+              emphasized={c.id === me}
+              muted={c.id !== me && c.id !== selected}
+              selected={c.id === selected}
+              onClick={() => setSelected((s) => (s === c.id ? null : c.id))}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

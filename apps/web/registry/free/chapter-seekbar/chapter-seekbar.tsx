@@ -213,9 +213,12 @@ export function ChapterSeekbar({
           {markers
             .filter((m) => Number.isFinite(m.t) && m.t >= 0 && m.t <= d)
             .map((m, i) => (
-              <i
+              <button
+                type="button"
                 key={`${m.t}-${i}`}
                 data-tip={`${m.label ? `${m.label} ` : ""}${fmt(m.t)}`}
+                aria-label={`${m.label ? `${m.label} ` : ""}${fmt(m.t)}`}
+                tabIndex={-1}
                 style={{ left: `${(m.t / d) * 100}%`, "--mk": markColor[m.kind ?? "default"] } as CSSProperties}
                 // 不要同時觸發進度條的跳轉
                 onPointerDown={(e) => e.stopPropagation()}
@@ -259,10 +262,11 @@ export function ChapterSeekbar({
         .va-sg .h { background: rgba(255,255,255,.35); }
         .va-sg .p { background: var(--accent); }
         .va-marks { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-        .va-marks i { --mk: rgba(255, 255, 255, .9); position: absolute; top: 1px; bottom: 1px; width: 9px; margin-left: -4px; cursor: pointer; pointer-events: auto; }
-        .va-marks i::before { content: ''; position: absolute; left: 4px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--mk); }
-        .va-marks i:hover::before { left: 3px; width: 4px; }
-        .va-marks i:hover::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); padding: 4px 8px; border-radius: 6px; background: rgba(8, 10, 14, .92); color: #fff; font-size: 12px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+        
+        .va-marks button { --mk: rgba(255, 255, 255, .9); position: absolute; top: 1px; bottom: 1px; width: 9px; margin-left: -4px; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; }
+        .va-marks button::before { content: ''; position: absolute; left: 4px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--mk); }
+        .va-marks button:hover::before { left: 3px; width: 4px; }
+        .va-marks button:hover::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); padding: 4px 8px; border-radius: 6px; background: rgba(8, 10, 14, .92); color: #fff; font-size: 12px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
         .va-knob { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px var(--accent); transform: scale(0); transition: transform .12s; pointer-events: none; z-index: 4; }
         .va-seek:hover .va-knob, .va-seek[data-drag] .va-knob, .va-seek:focus-visible .va-knob { transform: scale(1); }
         .va-hover { position: absolute; bottom: 24px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; color: #fff; z-index: 5; }

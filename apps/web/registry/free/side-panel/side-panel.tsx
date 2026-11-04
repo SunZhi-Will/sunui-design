@@ -207,8 +207,8 @@ export function SidePanel({
                   inkMuted,
                 )}
               >
-                <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-                  <path d="m4 4 8 8M12 4l-8 8" />
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
+                  <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
                 </svg>
               </button>
             </header>

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -191,13 +191,14 @@ const ArrowIcon = ({ className }: { className?: string }) => (
 );
 
 /** 標題列卡片（spliteat-web 的 Section） */
-function Section({ id, title, meta, children }: { id: string; title: ReactNode; meta?: ReactNode; children: ReactNode }) {
+function Section({ title, meta, children }: { title: ReactNode; meta?: ReactNode; children: ReactNode }) {
+  const id = useId();
   return (
     <section aria-labelledby={id} className="min-w-0 overflow-hidden rounded-xl border border-border bg-card text-sm text-card-foreground">
       <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <h2 id={id} className="text-sm font-semibold">
+        <h3 id={id} className="text-sm font-semibold">
           {title}
-        </h2>
+        </h3>
         {meta ? <span className="text-xs text-muted-foreground tabular-nums">{meta}</span> : null}
       </div>
       {children}
@@ -293,7 +294,7 @@ export function SettlementReceipt({
       {showHeader && (
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold tracking-[-0.01em]">{l.title}</h1>
+            <h2 className="text-xl font-semibold tracking-[-0.01em]">{l.title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{l.description}</p>
           </div>
           <div className="flex shrink-0 gap-2 print:hidden">
@@ -349,7 +350,7 @@ export function SettlementReceipt({
           })()}
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
-          <Section id="sr-people" title={l.perPerson} meta={l.peopleCount(people.length)}>
+          <Section title={l.perPerson} meta={l.peopleCount(people.length)}>
             <ul className="divide-y divide-border" aria-label={l.perPersonList}>
               {people.map((p, i) => {
                 const c = colorOf(i);
@@ -395,7 +396,7 @@ export function SettlementReceipt({
             </ul>
           </Section>
 
-          <Section id="sr-transfers" title={l.transfers} meta={payer ? l.payerMeta(payer) : undefined}>
+          <Section title={l.transfers} meta={payer ? l.payerMeta(payer) : undefined}>
             {transfers.length ? (
               <ol className="divide-y divide-border">
                 {transfers.map((t) => (

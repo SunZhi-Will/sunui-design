@@ -1,293 +1,376 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-type StoryVars = Record<`--story-${string}`, string>;
-
-const DEEP = "0 24px 64px rgb(0 0 0 / 0.45)";
-const KEYS = ["bg", "panel", "line", "text", "muted", "accent", "danger", "shadow"] as const;
-const vars = (...v: string[]) => Object.fromEntries(KEYS.map((k, i) => [`--story-${k}`, v[i]])) as StoryVars;
-
-// 設計語言（DESIGN-story.md）：所有顏色走 --story-* 變數，換 theme 即整套換皮
+// 移植自 山河未歸 save/pause-menu.tsx、save-error-banner.tsx 與 main.css 的暫停選單段落，
+// 操作說明的寫法參考互動小說平台 reader/modals/PauseModal.tsx
 export const storyThemes = {
-  ink: vars("#0b0e14", "rgb(14 18 28 / 0.86)", "rgb(234 228 214 / 0.14)", "#eae4d6", "rgb(234 228 214 / 0.6)", "#c9a063", "#c4553f", DEEP),
-  rice: vars("#f4efe3", "rgb(250 246 236 / 0.94)", "rgb(60 48 32 / 0.18)", "#2a2219", "rgb(42 34 25 / 0.6)", "#9a6b2a", "#a33a26", "none"),
-  moon: vars("#0a0d14", "rgb(12 16 26 / 0.86)", "rgb(220 228 240 / 0.14)", "#e4e8ef", "rgb(228 232 239 / 0.6)", "#a3b8d9", "#c4553f", DEEP),
-};
+  ink: {
+    "--story-bg": "#08090c",
+    "--story-panel": "rgba(10, 12, 16, 0.82)",
+    "--story-line": "rgba(234, 228, 214, 0.14)",
+    "--story-text": "#eae4d6",
+    "--story-secondary": "#b3aa97",
+    "--story-muted": "#837d6f",
+    "--story-accent": "#c9a063",
+    "--story-accent-bright": "#e7c489",
+    "--story-accent-dim": "rgba(201, 160, 99, 0.38)",
+    "--story-glow": "201 160 99",
+    "--story-on-accent": "#17130d",
+    "--story-band": "10 12 16",
+    "--story-scrim": "6 7 10",
+    "--story-scrim-deep": "4 5 7",
+    "--story-text-shadow": "rgba(0, 0, 0, 0.75)",
+    "--story-alert": "rgba(52, 18, 14, 0.94)",
+    "--story-danger": "#c04a3d",
+    "--story-panel-shadow": "0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(231, 196, 137, 0.1)",
+    "--story-font": '"Noto Serif TC", "Songti TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", serif',
+    "--story-font-display": '"LXGW WenKai TC", "Kaiti TC", "BiauKai", "DFKai-SB", "Noto Serif TC", "Songti TC", serif',
+  },
+  moon: {
+    "--story-bg": "#070a12",
+    "--story-panel": "rgba(12, 17, 28, 0.84)",
+    "--story-line": "rgba(233, 237, 245, 0.12)",
+    "--story-text": "#e9edf5",
+    "--story-secondary": "#aab4c7",
+    "--story-muted": "#808ba1",
+    "--story-accent": "#a3b8d9",
+    "--story-accent-bright": "#d5e1f5",
+    "--story-accent-dim": "rgba(163, 184, 217, 0.38)",
+    "--story-glow": "117 141 183",
+    "--story-on-accent": "#0b0f18",
+    "--story-band": "10 12 16",
+    "--story-scrim": "6 7 10",
+    "--story-scrim-deep": "4 5 7",
+    "--story-text-shadow": "rgba(0, 0, 0, 0.75)",
+    "--story-alert": "rgba(52, 18, 30, 0.94)",
+    "--story-danger": "#cb5579",
+    "--story-panel-shadow": "0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(157, 177, 211, 0.1)",
+    "--story-font": '"PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif',
+    "--story-font-display": '"Noto Serif TC", "Songti TC", "PMingLiU", serif',
+  },
+  rice: {
+    "--story-bg": "#f4efe3",
+    "--story-panel": "rgba(250, 246, 236, 0.94)",
+    "--story-line": "rgba(60, 48, 32, 0.18)",
+    "--story-text": "#2a2219",
+    "--story-secondary": "rgba(42, 34, 25, 0.72)",
+    "--story-muted": "rgba(42, 34, 25, 0.6)",
+    "--story-accent": "#9a6b2a",
+    "--story-accent-bright": "#7a4f17",
+    "--story-accent-dim": "rgba(154, 107, 42, 0.38)",
+    "--story-glow": "154 107 42",
+    "--story-on-accent": "#fbf6ea",
+    "--story-band": "250 246 236",
+    "--story-scrim": "244 239 227",
+    "--story-scrim-deep": "232 224 206",
+    "--story-text-shadow": "rgba(250, 246, 236, 0.6)",
+    "--story-alert": "rgba(250, 226, 214, 0.96)",
+    "--story-danger": "#a33a26",
+    "--story-panel-shadow": "0 12px 32px rgba(60, 48, 32, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+    "--story-font": '"Noto Serif TC", "Songti TC", serif',
+    "--story-font-display": '"LXGW WenKai TC", "Kaiti TC", "Noto Serif TC", "Songti TC", serif',
+  },
+} as const;
 
-export type StoryTheme = keyof typeof storyThemes | StoryVars;
+export type StoryTheme = keyof typeof storyThemes;
 
-export type PauseMenuItem = { id: string; label: ReactNode; onSelect?: () => void; disabled?: boolean };
-export type PauseMenuSave = { chapter: ReactNode; scene: ReactNode; at: Date | number | string };
+// 筆刷形狀：原作用一張金色筆刷圖，這裡改成 SVG 遮罩，顏色跟著 accent 走
+const brushMask =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'%3E%3Cpath d='M9 8C38 4 92 3 140 4l50 2-6 3 12 2-9 3 13 3-12 3 10 4-8 3 11 4-14 2C140 37 70 38 14 35l-10-1 7-3-9-3 8-3-8-4 9-2-7-4 9-2-8-3z'/%3E%3C/svg%3E\")";
 
-type TextLabel = "title" | "objective" | "resume" | "quickLoad" | "quickLoadArmed" | "exit" | "exitTitle" | "noSave" | "saveAndExit" | "exitWithoutSaving" | "back";
+/** 暫停選單、存讀檔面板共用的按鈕與動畫 */
+export const storyMenuCss = `
+.spm-root{container-type:size;container-name:spm}
+.spm-overlay{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgb(var(--story-scrim) / .55) 0%,rgb(var(--story-scrim-deep) / .86) 100%);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:spm-fade 240ms ease-out both}
+.spm-card{display:flex;flex-direction:column;gap:.75rem;width:clamp(18rem,26vw,23rem);max-width:92%;max-height:calc(100% - 2rem);overflow-y:auto;padding:2rem 3rem 1.75rem;box-sizing:border-box;background:linear-gradient(90deg,rgb(var(--story-band) / 0) 0%,rgb(var(--story-band) / .9) 18%,rgb(var(--story-band) / .9) 82%,rgb(var(--story-band) / 0) 100%);border-top:1px solid;border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,var(--story-accent-dim) 30%,var(--story-accent-dim) 70%,transparent) 1;animation:spm-rise 280ms cubic-bezier(.05,.7,.1,1) both}
+.spm-title{display:flex;align-items:center;justify-content:center;gap:.9rem;margin-bottom:.4rem;color:var(--story-accent-bright);font-family:var(--story-font-display);font-size:1.15rem;letter-spacing:.5em;text-indent:.5em}
+.spm-title::before,.spm-title::after{width:2.2rem;height:1px;content:"";background:linear-gradient(90deg,transparent,var(--story-accent-dim))}
+.spm-title::after{background:linear-gradient(90deg,var(--story-accent-dim),transparent)}
+.spm-objective{margin:-.4rem 0 1.2rem;color:var(--story-secondary);font-size:.9rem;letter-spacing:.1em;line-height:1.7;text-align:center}
+.spm-nav{display:flex;flex-direction:column;gap:.15rem}
+.spm-item{position:relative;isolation:isolate;width:100%;min-height:2.75rem;padding:.5rem 1.25rem .55rem;overflow:hidden;color:var(--story-text);font:inherit;font-size:1.05rem;letter-spacing:.18em;text-align:center;text-shadow:0 2px 8px var(--story-text-shadow);background:transparent;border:0;border-bottom:1px solid rgb(var(--story-glow) / .22);cursor:pointer;transition:color 180ms ease,text-shadow 180ms ease,border-color 180ms ease}
+.spm-item:last-child{border-bottom-color:transparent}
+.spm-item::before{position:absolute;inset:.12rem 0;z-index:-1;content:"";background:linear-gradient(180deg,var(--story-accent-bright),var(--story-accent) 55%,var(--story-accent-bright));-webkit-mask:${brushMask} center / 100% 100% no-repeat;mask:${brushMask} center / 100% 100% no-repeat;clip-path:inset(0 100% 0 0);opacity:0;filter:brightness(.82) saturate(.78);transition:clip-path 380ms cubic-bezier(.22,.72,.2,1),opacity 90ms ease;will-change:clip-path}
+.spm-item>span{position:relative;z-index:1}
+.spm-item:hover:not(:disabled),.spm-item:focus-visible:not(:disabled){color:var(--story-on-accent);text-shadow:0 1px 1px rgba(255,232,184,.28);border-bottom-color:transparent;outline:none}
+.spm-item:hover:not(:disabled)::before,.spm-item:focus-visible:not(:disabled)::before{clip-path:inset(0 0 0 0);opacity:.94}
+.spm-item:disabled{color:var(--story-muted);cursor:not-allowed;opacity:.52}
+.spm-item--resume{color:var(--story-accent-bright)}
+.spm-btn{padding:.6rem 1.6rem;font:inherit;font-size:1rem;letter-spacing:.12em;background:linear-gradient(90deg,rgb(var(--story-glow) / .2),rgb(var(--story-glow) / .04)) left center / 0% 100% no-repeat,rgb(var(--story-band) / .7);color:var(--story-text);border:1px solid var(--story-line);border-radius:3px;cursor:pointer;transition:border-color 120ms ease-out,color 120ms ease-out,background-size 320ms cubic-bezier(.22,.72,.2,1),transform 80ms ease-out}
+.spm-btn:hover:not(:disabled),.spm-btn:focus-visible:not(:disabled){border-color:var(--story-accent-dim);color:var(--story-accent-bright);background-size:100% 100%,auto;outline:none}
+.spm-btn:active:not(:disabled){transform:translateY(1px) scale(.985)}
+.spm-btn:disabled{color:var(--story-muted);cursor:not-allowed}
+.spm-btn-primary{padding:.6rem 1.8rem;font:inherit;font-size:1rem;letter-spacing:.14em;background:linear-gradient(180deg,rgb(var(--story-glow) / .24),rgb(var(--story-glow) / .08));color:var(--story-accent-bright);border:1px solid var(--story-accent-dim);border-radius:3px;box-shadow:inset 0 1px 0 rgba(255,232,184,.12);cursor:pointer;transition:border-color 120ms ease-out,box-shadow 120ms ease-out,filter 120ms ease-out,transform 80ms ease-out}
+.spm-btn-primary:hover:not(:disabled),.spm-btn-primary:focus-visible:not(:disabled){border-color:var(--story-accent);filter:brightness(1.12);box-shadow:0 0 18px rgb(var(--story-glow) / .28),inset 0 1px 0 rgba(255,232,184,.18);outline:none}
+.spm-btn-primary:active:not(:disabled){transform:translateY(1px) scale(.985)}
+.spm-btn-primary:disabled{opacity:.45;cursor:not-allowed}
+@keyframes spm-fade{from{opacity:0}to{opacity:1}}
+@keyframes spm-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@container spm (max-width:700px) or (max-height:500px){.spm-card{padding:.9rem 2.5rem .8rem;gap:.35rem}.spm-title{margin-bottom:.1rem;font-size:1rem}.spm-btn,.spm-btn-primary{min-height:44px;padding:.35rem .6rem}}
+@media (prefers-reduced-motion:reduce){.spm-overlay,.spm-card{animation:none}.spm-item::before{transition:opacity 90ms ease}}
+`;
 
-export type PauseMenuLabels = Partial<Record<TextLabel, ReactNode>> & {
-  lastSave?: (chapter: ReactNode, scene: ReactNode, ago: string | null) => ReactNode;
-  armedAnnouncement?: string;
+export interface PauseMenuLabels {
+  title?: string;
+  dialog?: string;
+  nav?: string;
+  objective?: string;
+  resume?: string;
+  journal?: string;
+  save?: string;
+  load?: string;
+  settings?: string;
+  exit?: string;
+  confirmDialog?: string;
+  confirmTitle?: string;
+  confirmBody?: string;
+  /** 有自動存檔時：「回到主選單後可讀取的自動存檔停在：」 */
+  autosaveAt?: string;
+  noAutosave?: string;
+  saveFirst?: string;
+  discardAndExit?: string;
+  cancel?: string;
+  saveErrorTitle?: string;
+  saveErrorDismiss?: string;
+  saveErrorDismissLabel?: string;
+}
+
+const defaultLabels: Required<PauseMenuLabels> = {
+  title: "選單",
+  dialog: "暫停選單",
+  nav: "暫停選項",
+  objective: "目標・",
+  resume: "繼續遊戲",
+  journal: "山河錄",
+  save: "存檔",
+  load: "讀檔",
+  settings: "設定",
+  exit: "返回主選單",
+  confirmDialog: "返回主選單確認",
+  confirmTitle: "返回主選單",
+  confirmBody: "遊戲只在劇情節點自動存檔。上次自動存檔之後的進度將不會保留。",
+  autosaveAt: "回到主選單後可讀取的自動存檔停在：",
+  noAutosave: "目前沒有任何自動存檔，這段遊玩進度將全部消失。",
+  saveFirst: "先去存檔",
+  discardAndExit: "捨棄進度並返回主選單",
+  cancel: "取消",
+  saveErrorTitle: "存檔失敗",
+  saveErrorDismiss: "知道了",
+  saveErrorDismissLabel: "關閉存檔失敗提示",
 };
 
 export interface PauseMenuProps {
   open: boolean;
-  onResume?: () => void;
+  onResume: () => void;
+  /** 冊子（山河錄、手帳）；沒給就不顯示這一項 */
+  onOpenJournal?: () => void;
+  onOpenSave: () => void;
+  onOpenLoad: () => void;
+  onOpenSettings: () => void;
+  onExitToMenu: () => void;
+  /** 目前目標；暫停時一定看得到 */
   objective?: ReactNode;
-  /** 介於「繼續」與「離開」之間的選項，例如日誌、存檔、設定 */
-  items?: PauseMenuItem[];
-  lastSave?: PauseMenuSave;
-  onSaveAndExit?: () => void;
-  onExit?: () => void;
-  /** 有提供才顯示「快速讀檔」，需在 2.5 秒內再按一次 */
-  onQuickLoad?: () => void;
+  /** 目標下方的摘要區，例如主角狀態一行 */
+  summary?: ReactNode;
+  /** 最近一筆自動存檔的一行描述，例如「第一卷・寒水渡 · 帳房 · 2026/11/5 21:14:03」；null 表示沒有 */
+  lastAutosave?: string | null;
+  /** 自動存檔失敗的訊息；換一則訊息時橫幅會重新出現 */
+  saveError?: string;
   theme?: StoryTheme;
-  /** 開啟時把焦點移進選單；靜態展示時可關閉 */
-  autoFocus?: boolean;
-  locale?: string;
+  /** true 時貼著視窗；預設 absolute 蓋滿最近的 relative 容器 */
+  fixed?: boolean;
   labels?: PauseMenuLabels;
   className?: string;
 }
 
-const defaultLabels: Required<PauseMenuLabels> = {
-  title: "Paused",
-  objective: "Objective",
-  resume: "Resume",
-  quickLoad: "Quick load",
-  quickLoadArmed: "Press again to load",
-  exit: "Exit to title",
-  exitTitle: "Leave this journey?",
-  lastSave: (chapter, scene, ago) => <>Your last save was {chapter}, {scene}{ago ? <>, {ago}</> : null}. Progress after that will be lost.</>,
-  noSave: "You haven't saved yet. Everything in this session will be lost.",
-  saveAndExit: "Save and exit",
-  exitWithoutSaving: "Exit without saving",
-  back: "Back",
-  armedAnnouncement: "Press quick load again within a few seconds to load your last save.",
-};
-
-const ease = [0.22, 0.72, 0.2, 1] as const;
-const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
-const ARM_MS = 2500;
-
-function relative(at: PauseMenuSave["at"], now: number, locale: string) {
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  const min = Math.round((now - new Date(at).getTime()) / 60_000);
-  if (min < 60) return rtf.format(-Math.max(0, min), "minute");
-  if (min < 1440) return rtf.format(-Math.round(min / 60), "hour");
-  return rtf.format(-Math.round(min / 1440), "day");
+/** 自動存檔失敗時唯一的提醒；關掉的只是「這一次」的失敗 */
+export function SaveErrorBanner({ message, labels }: { message?: string; labels?: PauseMenuLabels }) {
+  const l = { ...defaultLabels, ...labels };
+  const [dismissed, setDismissed] = useState(false);
+  const [seen, setSeen] = useState(message);
+  if (seen !== message) {
+    setSeen(message);
+    setDismissed(false);
+  }
+  if (!message || dismissed) return null;
+  return (
+    <div
+      role="alert"
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 75,
+        pointerEvents: "auto",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        gap: "0.75rem",
+        padding: "0.6rem 1rem",
+        background: "var(--story-alert)",
+        borderBottom: "1px solid var(--story-accent-bright)",
+        color: "var(--story-text)",
+        fontSize: "0.85rem",
+        lineHeight: 1.5,
+      }}
+    >
+      <span style={{ flex: 1, minWidth: 0, maxWidth: "48rem" }}>
+        <strong style={{ color: "var(--story-accent-bright)" }}>{l.saveErrorTitle}</strong>
+        <span> - {message}</span>
+      </span>
+      <button
+        type="button"
+        className="spm-btn"
+        aria-label={l.saveErrorDismissLabel}
+        onClick={() => setDismissed(true)}
+        style={{ flex: "0 0 auto", padding: "0.2rem 0.6rem", fontSize: "0.8rem", minHeight: 0 }}
+      >
+        {l.saveErrorDismiss}
+      </button>
+    </div>
+  );
 }
 
-export function PauseMenu(props: PauseMenuProps) {
-  const { open, onResume, objective, items = [], lastSave, onSaveAndExit, onExit, onQuickLoad } = props;
-  const { theme = "ink", autoFocus = true, locale = "en", labels, className } = props;
-  const t = { ...defaultLabels, ...labels };
-  const reduce = useReducedMotion() ?? false;
-  const titleId = useId();
-  const [step, setStep] = useState<"main" | "exit">("main");
-  const [active, setActive] = useState(0);
-  const [armed, setArmed] = useState(false);
-  const [now, setNow] = useState<number | null>(null);
-  const [announcement, setAnnouncement] = useState("");
-  const panelRef = useRef<HTMLDivElement>(null);
-  const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const primaryRef = useRef<HTMLButtonElement>(null);
-  const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const returning = useRef(false);
+export function PauseMenu({
+  open,
+  onResume,
+  onOpenJournal,
+  onOpenSave,
+  onOpenLoad,
+  onOpenSettings,
+  onExitToMenu,
+  objective,
+  summary,
+  lastAutosave,
+  saveError,
+  theme = "ink",
+  fixed = false,
+  labels: labelsProp,
+  className,
+}: PauseMenuProps) {
+  const l = { ...defaultLabels, ...labelsProp };
+  const [confirmingExit, setConfirmingExit] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
 
-  // 快速讀檔：第一次按下只是預備，2.5 秒內再按一次才讀檔
-  const quickLoad = () => {
-    if (armTimer.current) clearTimeout(armTimer.current);
-    if (armed) {
-      setArmed(false);
-      onQuickLoad?.();
-      return;
-    }
-    setArmed(true);
-    setAnnouncement(t.armedAnnouncement);
-    armTimer.current = setTimeout(() => setArmed(false), ARM_MS);
-  };
+  // 重新打開選單時，不能直接落在先前已經退出的確認卡上
+  if (!open && confirmingExit) setConfirmingExit(false);
 
-  const rows: PauseMenuItem[] = [
-    { id: "__resume", label: t.resume, onSelect: onResume },
-    ...items,
-    ...(onQuickLoad ? [{ id: "__quickload", label: armed ? t.quickLoadArmed : t.quickLoad, onSelect: quickLoad }] : []),
-    { id: "__exit", label: t.exit, onSelect: () => setStep("exit") },
-  ];
-  const exitIndex = rows.length - 1;
-
-  // 開啟時記住原本焦點，關閉時歸還
+  // 開啟時把焦點移進卡片，關閉時還給原本的元素
   useEffect(() => {
     if (!open) return;
-    setNow(Date.now());
-    setStep("main");
-    setActive(0);
-    const prev = document.activeElement as HTMLElement | null;
-    const raf = autoFocus ? requestAnimationFrame(() => rowRefs.current[0]?.focus()) : 0;
-    return () => {
-      cancelAnimationFrame(raf);
-      if (armTimer.current) clearTimeout(armTimer.current);
-      if (autoFocus) prev?.focus?.();
+    returnFocus.current = document.activeElement as HTMLElement | null;
+    return () => returnFocus.current?.focus?.();
+  }, [open]);
+  useEffect(() => {
+    if (open) cardRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+  }, [open, confirmingExit]);
+
+  // Esc 關閉選單（原作同一個鍵開關暫停）
+  const resumeRef = useRef(onResume);
+  resumeRef.current = onResume;
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      e.preventDefault();
+      resumeRef.current();
     };
-  }, [open, autoFocus]);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
-  // 切換步驟後移動焦點：進入確認頁到主要按鈕，返回時回到「離開」
-  useEffect(() => {
-    if (!open) return;
-    if (step === "exit") primaryRef.current?.focus();
-    else if (returning.current) {
-      returning.current = false;
-      setActive(exitIndex);
-      rowRefs.current[exitIndex]?.focus();
-    }
-  }, [step, open, exitIndex]);
-
-  const back = () => {
-    returning.current = true;
-    setStep("main");
-  };
-
-  const move = (to: number) => {
-    const n = rows.length;
-    for (let k = 0; k < n; k++) {
-      const i = (((to + (to < active ? -k : k)) % n) + n) % n;
-      if (rows[i].disabled) continue;
-      setActive(i);
-      rowRefs.current[i]?.focus();
-      return;
-    }
-  };
-
-  const navKeys: Record<string, number> = { ArrowDown: active + 1, ArrowUp: active - 1, Home: 0, End: rows.length - 1 };
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      if (step === "exit") back();
-      else onResume?.();
-    } else if (e.key === "Tab" && panelRef.current) {
-      // 焦點限制在面板內
-      const f = [...panelRef.current.querySelectorAll<HTMLElement>("button:not([disabled])")];
-      if (!f.length) return;
-      e.preventDefault();
-      const i = f.indexOf(document.activeElement as HTMLElement);
-      f[e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i + 1) % f.length].focus();
-    } else if (step === "main" && e.key in navKeys) {
-      e.preventDefault();
-      move(navKeys[e.key]);
-    }
-  };
-
-  const themeVars = (typeof theme === "string" ? storyThemes[theme] : theme) as CSSProperties;
-  const fade = reduce ? { duration: 0 } : { duration: 0.22, ease };
-  const ago = lastSave && now !== null ? relative(lastSave.at, now, locale) : null;
-  const panelStyle: CSSProperties = {
-    background: "var(--story-panel)",
-    borderColor: "var(--story-line)",
-    color: "var(--story-text)",
-    boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06), var(--story-shadow)",
-  };
-  const exitButtons = [
-    { label: t.saveAndExit, onClick: onSaveAndExit, primary: true },
-    { label: t.exitWithoutSaving, onClick: onExit },
-    { label: t.back, onClick: back, quiet: true },
-  ];
+  const vars = storyThemes[theme] as unknown as CSSProperties;
 
   return (
-    <AnimatePresence>
+    <div
+      className={cn("spm-root inset-0", fixed ? "fixed" : "absolute", !open && "pointer-events-none", className)}
+      style={{ ...vars, zIndex: 60, fontFamily: "var(--story-font)", color: "var(--story-text)" }}
+    >
+      <style>{storyMenuCss}</style>
+      <SaveErrorBanner message={saveError} labels={labelsProp} />
       {open && (
-        <motion.div
-          key="pause"
-          className={cn("absolute inset-0 z-20 flex items-center justify-center p-4 font-sans", className)}
-          style={{ ...themeVars, background: "color-mix(in srgb, var(--story-bg) 62%, transparent)" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={fade}
-          onKeyDown={onKeyDown}
-        >
-          <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className="w-full max-w-xs rounded-[3px] border p-5" style={panelStyle}>
-            {step === "main" ? (
-              <motion.div key="main" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={fade}>
-                <h2 id={titleId} className="text-[11px] font-medium tracking-[0.18em] uppercase" style={{ color: "var(--story-muted)" }}>{t.title}</h2>
+        <div className="spm-overlay absolute inset-0">
+          <div ref={cardRef} className="spm-card" role="dialog" aria-modal="true" aria-label={confirmingExit ? l.confirmDialog : l.dialog}>
+            {confirmingExit ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ fontSize: "1.1rem", letterSpacing: "0.2em", textAlign: "center", color: "var(--story-accent-bright)", fontFamily: "var(--story-font-display)" }}>
+                  {l.confirmTitle}
+                </div>
+                <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.7 }}>{l.confirmBody}</p>
+                {lastAutosave ? (
+                  <p style={{ margin: 0, fontSize: "0.85rem", lineHeight: 1.7, color: "var(--story-secondary)" }}>
+                    {l.autosaveAt}
+                    {lastAutosave}
+                  </p>
+                ) : (
+                  <p style={{ margin: 0, fontSize: "0.85rem", lineHeight: 1.7, color: "var(--story-accent-bright)" }}>{l.noAutosave}</p>
+                )}
+                <button
+                  type="button"
+                  className="spm-btn-primary"
+                  onClick={() => {
+                    setConfirmingExit(false);
+                    onOpenSave();
+                  }}
+                >
+                  {l.saveFirst}
+                </button>
+                <button
+                  type="button"
+                  className="spm-btn"
+                  onClick={() => {
+                    setConfirmingExit(false);
+                    onExitToMenu();
+                  }}
+                >
+                  {l.discardAndExit}
+                </button>
+                <button type="button" className="spm-btn" onClick={() => setConfirmingExit(false)}>
+                  {l.cancel}
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="spm-title">{l.title}</div>
                 {objective && (
-                  <p className="mt-2 font-serif text-[15px] leading-relaxed">
-                    <span className="sr-only">{t.objective}: </span>
+                  <p className="spm-objective">
+                    {l.objective}
                     {objective}
                   </p>
                 )}
-                <ul className="mt-4 border-t pt-2" style={{ borderColor: "var(--story-line)" }}>
-                  {rows.map((row, i) => {
-                    const on = i === active && !row.disabled;
-                    return (
-                      <li key={row.id}>
-                        <button
-                          ref={(el) => void (rowRefs.current[i] = el)}
-                          type="button"
-                          tabIndex={i === active ? 0 : -1}
-                          disabled={row.disabled}
-                          onFocus={() => setActive(i)}
-                          onMouseEnter={() => !row.disabled && setActive(i)}
-                          onClick={() => row.onSelect?.()}
-                          className="relative flex w-full items-center py-2 pr-2 pl-4 text-left text-[15px] tracking-[0.06em] outline-none disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          {/* 選中列：光條由左往右展開 */}
-                          <motion.span
-                            aria-hidden="true"
-                            className="absolute inset-0 origin-left rounded-[2px] border-l-2"
-                            style={{ background: "color-mix(in srgb, var(--story-accent) 16%, transparent)", borderColor: "var(--story-accent)" }}
-                            initial={false}
-                            animate={{ scaleX: on ? 1 : 0, opacity: on ? 1 : 0 }}
-                            transition={reduce ? { duration: 0 } : { duration: 0.18, ease }}
-                          />
-                          <motion.span
-                            className="relative"
-                            initial={false}
-                            animate={{ x: on && !reduce ? 6 : 0 }}
-                            transition={snappy}
-                            style={{ color: on ? "var(--story-accent)" : "var(--story-text)" }}
-                          >
-                            {row.label}
-                          </motion.span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </motion.div>
-            ) : (
-              <motion.div key="exit" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={fade}>
-                <h2 id={titleId} className="font-serif text-lg tracking-[0.04em]">{t.exitTitle}</h2>
-                <p className="mt-2 font-serif text-sm leading-relaxed" style={{ color: "var(--story-muted)" }}>
-                  {lastSave ? t.lastSave(lastSave.chapter, lastSave.scene, ago) : t.noSave}
-                </p>
-                <div className="mt-5 flex flex-col gap-2">
-                  {exitButtons.map((b, i) => (
-                    <button
-                      key={i}
-                      ref={b.primary ? primaryRef : undefined}
-                      type="button"
-                      onClick={() => b.onClick?.()}
-                      className={cn(
-                        "rounded-[3px] px-3 py-2 text-sm tracking-[0.06em] outline-none focus-visible:ring-2 focus-visible:ring-[var(--story-accent)]",
-                        b.primary && "font-medium focus-visible:ring-[var(--story-text)]",
-                        !b.primary && !b.quiet && "border",
-                        b.quiet && "underline-offset-4 hover:underline",
-                      )}
-                      style={
-                        b.primary
-                          ? { background: "var(--story-accent)", color: "var(--story-bg)" }
-                          : { borderColor: "var(--story-line)", color: b.quiet ? "var(--story-muted)" : "var(--story-danger)" }
-                      }
-                    >
-                      {b.label}
+                {summary}
+                <nav className="spm-nav" aria-label={l.nav}>
+                  <button type="button" className="spm-item spm-item--resume" onClick={onResume}>
+                    <span>{l.resume}</span>
+                  </button>
+                  {onOpenJournal && (
+                    <button type="button" className="spm-item" onClick={onOpenJournal}>
+                      <span>{l.journal}</span>
                     </button>
-                  ))}
-                </div>
-              </motion.div>
+                  )}
+                  <button type="button" className="spm-item" onClick={onOpenSave}>
+                    <span>{l.save}</span>
+                  </button>
+                  <button type="button" className="spm-item" onClick={onOpenLoad}>
+                    <span>{l.load}</span>
+                  </button>
+                  <button type="button" className="spm-item" onClick={onOpenSettings}>
+                    <span>{l.settings}</span>
+                  </button>
+                  <button type="button" className="spm-item" onClick={() => setConfirmingExit(true)}>
+                    <span>{l.exit}</span>
+                  </button>
+                </nav>
+              </>
             )}
-            <span className="sr-only" role="status" aria-live="polite">{announcement}</span>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </div>
   );
 }

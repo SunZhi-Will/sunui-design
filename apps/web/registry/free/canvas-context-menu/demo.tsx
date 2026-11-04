@@ -75,18 +75,9 @@ export default function CanvasContextMenuDemo() {
     <div className="w-full max-w-xl min-w-0">
       <div
         ref={areaRef}
-        tabIndex={0}
-        aria-label="Canvas. Right-click, or press Shift+F10, for actions."
         onContextMenu={onContextMenu}
-        onMouseDown={(e) => e.target === e.currentTarget && setSelected(new Set())}
-        onKeyDown={(e) => {
-          if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
-            e.preventDefault();
-            const r = e.currentTarget.getBoundingClientRect();
-            openAt(r.left + r.width / 2 - MENU_W / 2, r.top + 40);
-          }
-        }}
-        className="relative h-80 w-full overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+        onPointerDown={(e) => e.target === e.currentTarget && e.button === 0 && setSelected(new Set())}
+        className="relative h-80 w-full overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100"
         style={{
           backgroundImage:
             "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
@@ -100,6 +91,15 @@ export default function CanvasContextMenuDemo() {
             aria-pressed={selected.has(card.id)}
             onClick={(e) => pick(card.id, e.shiftKey || e.metaKey || e.ctrlKey)}
             onContextMenu={() => !selected.has(card.id) && setSelected(new Set([card.id]))}
+            onKeyDown={(e) => {
+              // 鍵盤開啟選單：Shift+F10 或選單鍵
+              if (e.key !== "ContextMenu" && !(e.shiftKey && e.key === "F10")) return;
+              e.preventDefault();
+              if (!selected.has(card.id)) setSelected(new Set([card.id]));
+              const r = e.currentTarget.getBoundingClientRect();
+              openAt(r.left + 12, r.bottom + 4);
+            }}
+            aria-keyshortcuts="Shift+F10"
             className={cn(
               "absolute w-32 rounded-xl border border-gray-200 bg-white p-2.5 text-left shadow-sm outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-blue-300",
               selected.has(card.id) && "ring-2 ring-blue-500",
@@ -112,7 +112,7 @@ export default function CanvasContextMenuDemo() {
         ))}
 
         <p className="pointer-events-none absolute bottom-2 left-3 right-3 text-[11px] text-gray-400">
-          Shift-click to select more, right-click for actions.
+          Shift-click to select more, right-click or Shift+F10 for actions.
         </p>
 
         {menu && (

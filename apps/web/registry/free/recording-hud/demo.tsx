@@ -1,73 +1,103 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { RecordingHud } from "./recording-hud";
+import { RecordingHud, VolumeBar } from "./recording-hud";
+
+// 模擬音訊引擎：每 80ms 推一次系統聲音與麥克風音量（0 到 100）
+type Listener = (sys: number, mic: number) => void;
+const listeners = new Set<Listener>();
+let engine: ReturnType<typeof setInterval> | null = null;
+let sys = 40;
+let mic = 20;
+function subscribeVolume(cb: Listener) {
+  listeners.add(cb);
+  if (!engine) {
+    engine = setInterval(() => {
+      sys = Math.max(5, Math.min(95, sys + (Math.random() - 0.5) * 30));
+      mic = Math.random() < 0.3 ? Math.random() * 80 : mic * 0.6;
+      listeners.forEach((l) => l(sys, mic));
+    }, 80);
+  }
+  return () => {
+    listeners.delete(cb);
+    if (!listeners.size && engine) {
+      clearInterval(engine);
+      engine = null;
+    }
+  };
+}
 
 export default function RecordingHudDemo() {
-  const [elapsed, setElapsed] = useState(0);
+  const [seconds, setSeconds] = useState(83);
   const [paused, setPaused] = useState(false);
-  const [saved, setSaved] = useState<number | null>(null);
-  const [pen, setPen] = useState<string | null>(null);
+  const [stopped, setStopped] = useState(false);
+  const [pen, setPen] = useState(false);
+  const [color, setColor] = useState("#ef4444");
+  const [strokes, setStrokes] = useState(true);
 
-  // 錄影中每 250ms 前進；暫停或停止時凍結
+  // 主視窗每秒推一次計時給 HUD
   useEffect(() => {
-    if (paused || saved !== null) return;
-    const id = setInterval(() => setElapsed((ms) => ms + 250), 250);
+    if (paused || stopped) return;
+    const id = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(id);
-  }, [paused, saved]);
+  }, [paused, stopped]);
 
-  const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
+  const subSystem = useCallback((cb: (v: number) => void) => subscribeVolume((s) => cb(s)), []);
+  const subMic = useCallback((cb: (v: number) => void) => subscribeVolume((_, m) => cb(m)), []);
 
   return (
-    <div className="w-full max-w-3xl space-y-3">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Record a product walkthrough</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Show your team how the new returns flow works. Drag the controls out of the way.</p>
-      </div>
-
-      <div className="relative h-80 overflow-hidden rounded-xl border border-border bg-muted/40">
-        {/* 被錄的畫面 */}
-        <div className="absolute inset-4 rounded-lg border border-border bg-card p-4 text-sm">
-          <p className="text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">Returns</p>
-          <p className="mt-1 font-semibold">Order SU-48213</p>
-          <div className="mt-3 space-y-2">
-            {["Stoneware Mug, damaged", "Canvas Tote, wrong size"].map((row) => (
-              <div key={row} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-                <span>{row}</span>
-                <span className="text-xs text-muted-foreground">Refund to card</span>
-              </div>
+    <div className="w-full max-w-3xl overflow-hidden rounded-[14px] border border-white/5 bg-[#111111] text-[#e5e5e5]">
+      {/* 正在錄的畫面 */}
+      <div className="relative h-80 overflow-hidden bg-[#1c1c1c]">
+        <div className="absolute inset-4 rounded-lg bg-[#252525] p-4">
+          <div className="h-3 w-24 rounded bg-white/15" />
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-16 min-w-0 rounded-md bg-white/5" />
             ))}
           </div>
-          {pen && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              Pen <span className="inline-block size-2 rounded-full align-middle" style={{ backgroundColor: pen }} /> ready
-            </p>
+          {strokes && pen && (
+            <svg viewBox="0 0 200 60" className="absolute top-10 left-6 h-16 w-48" fill="none" aria-hidden="true">
+              <path d="M6 40c30-30 60-34 90-14s60 18 98-12" stroke={color} strokeWidth="4" strokeLinecap="round" />
+            </svg>
           )}
         </div>
 
-        {saved === null ? (
+        {stopped ? (
+          <p role="status" className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-[rgba(15,15,15,0.88)] px-4 py-2.5 text-sm backdrop-blur-[8px]">
+            Saved recording, {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
+          </p>
+        ) : (
           <RecordingHud
             fixed={false}
-            elapsed={elapsed}
+            seconds={seconds}
             paused={paused}
-            onPause={() => setPaused(true)}
-            onResume={() => setPaused(false)}
-            onStop={() => setSaved(elapsed)}
-            onSwatch={setPen}
-            onClear={() => setPen(null)}
+            onPauseToggle={() => setPaused((p) => !p)}
+            onStop={() => setStopped(true)}
+            drawEnabled
+            penActive={pen}
+            onPenActiveChange={(a) => {
+              setPen(a);
+              if (a) setStrokes(true);
+            }}
+            color={color}
+            onColorChange={setColor}
+            onClear={() => setStrokes(false)}
           />
-        ) : (
-          <div
-            role="status"
-            className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm shadow-sm"
-          >
-            <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-            <span>
-              Saved, <span className="font-mono tabular-nums">{clock(saved)}</span>
-            </span>
-          </div>
         )}
+      </div>
+
+      {/* 錄製控制列的音量條 */}
+      <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-white/5 bg-[#0F0F0F] px-6 py-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="text-xs font-medium text-slate-400">System audio</span>
+          <VolumeBar gain={0.8} enabled color="#eab308" subscribe={subSystem} label="System audio level" />
+        </div>
+        <div className="flex min-w-0 flex-col gap-1">
+          <span className="text-xs font-medium text-slate-400">Microphone</span>
+          <VolumeBar gain={1} enabled color="#d4d4d4" subscribe={subMic} label="Microphone level" />
+        </div>
       </div>
     </div>
   );

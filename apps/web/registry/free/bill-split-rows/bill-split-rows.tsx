@@ -1,11 +1,14 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useId, useRef, useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface SplitPerson {
+// 移植自 spliteat-web 的餐點頁（items-page-client.tsx、ui.tsx 的 Section 與 MemberToggle），
+// 新增一列的浮現動畫取自 dinner-split 的 ItemCard（.pop-in）。
+
+export interface SplitMember {
   id: string;
   name: string;
 }
@@ -13,282 +16,353 @@ export interface SplitPerson {
 export interface SplitItem {
   id: string;
   name: string;
-  amount: number;
-  /** 分攤這一項的成員 id */
-  sharedBy: string[];
+  /** 使用者輸入的原始字串，驗證前不轉數字（空白不能悄悄變成 0） */
+  price: string;
+  qty: string;
+  /** 吃了這道的人 */
+  eaters: string[];
 }
 
 export interface BillSplitRowsLabels {
-  itemName?: string;
-  amount?: string;
-  sharedBy?: string;
-  all?: ReactNode;
-  addItem?: ReactNode;
-  remove?: ReactNode;
-  newItem?: string;
-  perPerson?: (count: number, each: string, exact: boolean) => ReactNode;
-  leftover?: (amount: string, name: string) => ReactNode;
-  noOne?: ReactNode;
-  invalidAmount?: ReactNode;
-  itemsTotal?: ReactNode;
-  billTotal?: ReactNode;
-  matches?: ReactNode;
-  difference?: (amount: string, over: boolean) => ReactNode;
+  title?: ReactNode;
+  meta?: (items: number, counted: number) => ReactNode;
+  name?: ReactNode;
+  namePlaceholder?: (n: number) => string;
+  price?: ReactNode;
+  qty?: ReactNode;
+  remove?: (name: string) => string;
+  fallbackName?: (n: number) => string;
+  whoAte?: ReactNode;
+  selectAll?: ReactNode;
+  clearAll?: ReactNode;
+  addAnother?: ReactNode;
+  emptyTitle?: ReactNode;
+  emptyBody?: ReactNode;
+  notCounted?: (problems: string[]) => ReactNode;
+  solo?: (total: string) => ReactNode;
+  shared?: (total: string, count: number, each: string, remainder: boolean) => ReactNode;
+  problemName?: string;
+  problemPrice?: string;
+  problemQty?: string;
+  problemEaters?: string;
 }
 
 export interface BillSplitRowsProps {
-  people: SplitPerson[];
+  members: SplitMember[];
   items?: SplitItem[];
   defaultItems?: SplitItem[];
   onItemsChange?: (items: SplitItem[]) => void;
-  /** 帳單上的總額，用來和品項合計對帳 */
-  billTotal?: number;
-  currency?: string;
-  locale?: string;
+  /** 給了就交給父層刪除（例如搭配復原提示）；沒給就直接刪 */
+  onRemove?: (item: SplitItem, index: number) => void;
+  newId?: () => string;
+  formatAmount?: (n: number) => string;
+  /** 成員識別色，只上在小圓點 */
+  colorOf?: (index: number) => string;
   labels?: BillSplitRowsLabels;
   className?: string;
 }
 
 const defaultLabels: Required<BillSplitRowsLabels> = {
-  itemName: "Item name",
-  amount: "Amount",
-  sharedBy: "Shared by",
-  all: "All",
-  addItem: "Add item",
-  remove: "Remove",
-  newItem: "New item",
-  perPerson: (n, each, exact) => (
-    <>
-      {n} {n === 1 ? "person" : "people"} · {exact ? "" : "about "}
-      {each} each
-    </>
-  ),
-  leftover: (amount, name) => <>{amount} left over goes to {name}</>,
-  noOne: "Pick who shared this item.",
-  invalidAmount: "Enter an amount, like 12.50.",
-  itemsTotal: "Items total",
-  billTotal: "Bill total",
-  matches: "Matches the bill",
-  difference: (amount, over) => <>{amount} {over ? "more than" : "short of"} the bill</>,
+  title: "What we ate",
+  meta: (n, c) => `${n} ${n === 1 ? "dish" : "dishes"} · ${c} counted`,
+  name: "Dish",
+  namePlaceholder: (n) => `Dish ${n}, e.g. beef noodles`,
+  price: "Price",
+  qty: "Qty",
+  remove: (name) => `Delete ${name}`,
+  fallbackName: (n) => `dish ${n}`,
+  whoAte: "Who ate it",
+  selectAll: "Everyone",
+  clearAll: "Clear all",
+  addAnother: "Add another dish",
+  emptyTitle: "No dishes yet",
+  emptyBody: "Add them one by one and tick who ate each.",
+  notCounted: (p) => `Not counted yet: ${p.join(", ")}`,
+  solo: (total) => `${total}, one person, pays it all`,
+  shared: (total, n, each, rem) => `${total}, split ${n} ways, about ${each} each${rem ? ", leftover goes in list order" : ""}`,
+  problemName: "needs a name",
+  problemPrice: "price must be a whole number above 0",
+  problemQty: "quantity must be a whole number above 0",
+  problemEaters: "no one picked",
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const inkFill = "bg-[#1c1917] text-[#faf7f0] dark:bg-[#ece7dc] dark:text-[#1f1c18]";
+// spliteat-web 的成員色盤（employee-chip.tsx 的 fg），照名單順序從第 2 色開始
+const PALETTE = ["#2563EB", "#16A34A", "#D97706", "#DB2777", "#7C3AED", "#0891B2", "#E11D48", "#65A30D"];
+const paletteColor = (index: number) => PALETTE[(index + 1) % PALETTE.length];
 
-const springs = {
-  snappy: { type: "spring", stiffness: 520, damping: 34 },
-  gentle: { type: "spring", stiffness: 240, damping: 30 },
-} as const;
+/** 價格與數量只收正整數（允許千分位逗號與空白） */
+export function parsePositiveInt(raw: string): number | null {
+  const s = String(raw ?? "").replace(/[,，\s]/g, "");
+  if (!/^\d+$/.test(s)) return null;
+  const n = Number(s);
+  return n > 0 && n <= 10_000_000 ? n : null;
+}
 
-/** 依 id 算出固定色相，只用在小圓點上 */
-export function personHue(id: string) {
-  let h = 0;
-  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return h % 360;
+const defaultFormat = (n: number) => `NT$${n.toLocaleString("en-US")}`;
+let seq = 0;
+const defaultNewId = () => `i-${Date.now().toString(36)}-${++seq}`;
+
+const focusRing = "outline-none focus-visible:ring-3 focus-visible:ring-[#71717A]/50";
+const inputCls = cn(
+  "h-10 w-full min-w-0 rounded-lg border border-[#D4D4D8] bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground md:text-sm dark:border-white/12 dark:bg-white/[0.036]",
+  "focus-visible:border-[#71717A] focus-visible:ring-3 focus-visible:ring-[#71717A]/50",
+  "aria-invalid:border-[#DC2626] aria-invalid:ring-3 aria-invalid:ring-[#DC2626]/20 dark:aria-invalid:border-[#F87171]/50",
+);
+const labelCls = "mb-1.5 flex items-center gap-2 text-xs leading-none font-medium text-muted-foreground select-none";
+
+/** 可點的成員標籤：選到時反白（前景色底） */
+export function MemberToggle({
+  name,
+  color,
+  on,
+  onClick,
+}: {
+  name: string;
+  /** 識別色，只上在小圓點 */
+  color: string;
+  on: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-2.5 text-sm font-medium whitespace-nowrap transition-colors",
+        focusRing,
+        on
+          ? "border-foreground bg-foreground text-background hover:bg-foreground/90"
+          : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:bg-muted hover:text-foreground",
+      )}
+    >
+      <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: on ? "currentColor" : color }} />
+      {name}
+    </button>
+  );
+}
+
+function PlusIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={cn("size-4 shrink-0", className)}>
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
 }
 
 export function BillSplitRows({
-  people,
+  members,
   items: itemsProp,
   defaultItems = [],
   onItemsChange,
-  billTotal,
-  currency = "USD",
-  locale = "en-US",
+  onRemove,
+  newId = defaultNewId,
+  formatAmount = defaultFormat,
+  colorOf = paletteColor,
   labels,
   className,
 }: BillSplitRowsProps) {
-  const t = { ...defaultLabels, ...labels };
+  const l = { ...defaultLabels, ...labels };
   const reduce = useReducedMotion() ?? false;
-  const uid = useId();
-  const counter = useRef(0);
+  const titleId = useId();
   const [inner, setInner] = useState(defaultItems);
   const items = itemsProp ?? inner;
-  // 金額輸入中的草稿；無效時保留原字串並提示
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
-
-  const fmt = new Intl.NumberFormat(locale, { style: "currency", currency });
-  const unit = 10 ** (fmt.resolvedOptions().maximumFractionDigits ?? 2);
-  const money = (units: number) => fmt.format(units / unit);
-  const nameOf = (id: string) => people.find((p) => p.id === id)?.name ?? id;
+  const focusRef = useRef<string | null>(null);
+  // 只有之後新增的列才播浮現動畫
+  const fresh = useRef(new Set<string>());
+  const memberIds = members.map((m) => m.id);
 
   const commit = (next: SplitItem[]) => {
     if (itemsProp === undefined) setInner(next);
     onItemsChange?.(next);
   };
-  const patch = (id: string, change: Partial<SplitItem>) => commit(items.map((it) => (it.id === id ? { ...it, ...change } : it)));
 
-  const setAmount = (id: string, raw: string) => {
-    setDrafts((d) => ({ ...d, [id]: raw }));
-    const n = Number(raw.replace(/,/g, ""));
-    if (raw.trim() !== "" && Number.isFinite(n) && n >= 0) patch(id, { amount: n });
-  };
+  // 新增一道之後，游標直接放在品名
+  useEffect(() => {
+    if (!focusRef.current) return;
+    document.getElementById(`${focusRef.current}-name`)?.focus();
+    focusRef.current = null;
+  });
 
-  const isInvalid = (it: SplitItem) => {
-    const d = drafts[it.id];
-    if (d === undefined) return !Number.isFinite(it.amount) || it.amount < 0;
-    const n = Number(d.replace(/,/g, ""));
-    return d.trim() === "" || !Number.isFinite(n) || n < 0;
-  };
+  const update = (id: string, patch: Partial<SplitItem>) => commit(items.map((it) => (it.id === id ? { ...it, ...patch } : it)));
 
   const add = () => {
-    counter.current += 1;
-    commit([...items, { id: `${uid}-${counter.current}`, name: t.newItem, amount: 0, sharedBy: people.map((p) => p.id) }]);
+    const id = newId();
+    focusRef.current = id;
+    fresh.current.add(id);
+    commit([...items, { id, name: "", price: "", qty: "1", eaters: [] }]);
   };
 
-  const validUnits = items.reduce((sum, it) => (isInvalid(it) ? sum : sum + Math.round(it.amount * unit)), 0);
-  const billUnits = billTotal === undefined ? null : Math.round(billTotal * unit);
-  const diff = billUnits === null ? 0 : validUnits - billUnits;
+  const toggle = (item: SplitItem, memberId: string) =>
+    update(item.id, { eaters: item.eaters.includes(memberId) ? item.eaters.filter((x) => x !== memberId) : [...item.eaters, memberId] });
+
+  const problemsOf = (item: SplitItem) => {
+    const out: string[] = [];
+    if (!item.name.trim()) out.push(l.problemName);
+    if (parsePositiveInt(item.price) === null) out.push(l.problemPrice);
+    if (parsePositiveInt(item.qty) === null) out.push(l.problemQty);
+    if (!item.eaters.some((id) => memberIds.includes(id))) out.push(l.problemEaters);
+    return out;
+  };
+  const counted = items.filter((it) => problemsOf(it).length === 0).length;
 
   return (
-    <div className={cn("w-full rounded-md border font-sans", paper, edge, ink, className)}>
-      <ul className={cn("divide-y divide-dashed px-4", "divide-[#e7e0d0] dark:divide-[#38332b]")}>
-        <AnimatePresence initial={false}>
-          {items.map((it) => {
-            const invalid = isInvalid(it);
-            const shared = people.filter((p) => it.sharedBy.includes(p.id));
-            const all = shared.length === people.length && people.length > 0;
-            const units = Math.round(it.amount * unit);
-            const each = shared.length ? Math.floor(units / shared.length) : 0;
-            const rest = units - each * shared.length;
+    <section aria-labelledby={titleId} className={cn("w-full min-w-0 overflow-hidden rounded-xl border border-border bg-card text-sm text-card-foreground", className)}>
+      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+        <h2 id={titleId} className="text-sm font-semibold">
+          {l.title}
+        </h2>
+        <span className="text-xs text-muted-foreground tabular-nums">{l.meta(items.length, counted)}</span>
+      </div>
 
+      {items.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-6 text-muted-foreground">
+            <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+            <path d="M12 17.5v-11" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium">{l.emptyTitle}</p>
+            <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">{l.emptyBody}</p>
+          </div>
+        </div>
+      ) : (
+        <ul className="divide-y divide-border">
+          {items.map((it, i) => {
+            const problems = problemsOf(it);
+            const total = (parsePositiveInt(it.price) ?? 0) * (parsePositiveInt(it.qty) ?? 0);
+            const sharing = it.eaters.filter((x) => memberIds.includes(x)).length;
+            const allOn = members.length > 0 && members.every((m) => it.eaters.includes(m.id));
+            const badPrice = it.price.trim() !== "" && parsePositiveInt(it.price) === null;
+            const badQty = it.qty.trim() !== "" && parsePositiveInt(it.qty) === null;
+            const pop = fresh.current.has(it.id) && !reduce;
             return (
               <motion.li
                 key={it.id}
-                initial={reduce ? false : { opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, height: 0 }}
-                transition={springs.gentle}
-                className="overflow-hidden"
+                className="p-4"
+                initial={pop ? { opacity: 0, y: 6, scale: 0.98 } : false}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.26, ease: [0.2, 0.8, 0.2, 1] }}
               >
-                <div className="py-3">
-                  <div className="flex items-center gap-3">
+                <div className="grid grid-cols-[minmax(0,1fr)_5.5rem_4rem_auto] items-end gap-2">
+                  <div className="min-w-0">
+                    <label htmlFor={`${it.id}-name`} className={labelCls}>
+                      {l.name}
+                    </label>
                     <input
-                      aria-label={t.itemName}
+                      id={`${it.id}-name`}
                       value={it.name}
-                      onChange={(e) => patch(it.id, { name: e.target.value })}
-                      className="min-w-0 flex-1 rounded-sm bg-transparent text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    />
-                    <input
-                      aria-label={`${it.name} ${t.amount}`}
-                      aria-invalid={invalid || undefined}
-                      inputMode="decimal"
+                      onChange={(e) => update(it.id, { name: e.target.value })}
+                      placeholder={l.namePlaceholder(i + 1)}
+                      maxLength={20}
                       autoComplete="off"
-                      value={drafts[it.id] ?? String(it.amount)}
-                      onChange={(e) => setAmount(it.id, e.target.value)}
-                      onBlur={() => !invalid && setDrafts(({ [it.id]: _, ...d }) => d)}
-                      className={cn(
-                        "w-24 rounded-sm border-b border-dashed bg-transparent text-right text-sm font-semibold tracking-tight tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        edge,
-                      )}
+                      className={inputCls}
                     />
                   </div>
-
-                  <div role="group" aria-label={`${it.name}: ${t.sharedBy}`} className="mt-2 flex flex-wrap gap-1.5">
-                    <Chip pressed={all} onClick={() => patch(it.id, { sharedBy: all ? [] : people.map((p) => p.id) })}>
-                      {t.all}
-                    </Chip>
-                    {people.map((p) => {
-                      const on = it.sharedBy.includes(p.id);
-                      return (
-                        <Chip
-                          key={p.id}
-                          pressed={on}
-                          hue={personHue(p.id)}
-                          onClick={() =>
-                            patch(it.id, { sharedBy: on ? it.sharedBy.filter((x) => x !== p.id) : [...it.sharedBy, p.id] })
-                          }
-                        >
-                          {p.name}
-                        </Chip>
-                      );
-                    })}
+                  <div className="min-w-0">
+                    <label htmlFor={`${it.id}-price`} className={labelCls}>
+                      {l.price}
+                    </label>
+                    <input
+                      id={`${it.id}-price`}
+                      value={it.price}
+                      onChange={(e) => update(it.id, { price: e.target.value })}
+                      inputMode="numeric"
+                      placeholder="0"
+                      autoComplete="off"
+                      aria-invalid={badPrice || undefined}
+                      className={cn(inputCls, "text-right font-semibold tabular-nums")}
+                    />
                   </div>
-
-                  <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-xs tabular-nums">
-                    {invalid ? (
-                      <span className="text-destructive">{t.invalidAmount}</span>
-                    ) : !shared.length ? (
-                      <span className="text-destructive">{t.noOne}</span>
-                    ) : (
-                      <span className={inkMuted}>
-                        {t.perPerson(shared.length, money(each), rest === 0)}
-                        {rest > 0 && <>, {t.leftover(money(rest), shared[0].name)}</>}
-                      </span>
+                  <div className="min-w-0">
+                    <label htmlFor={`${it.id}-qty`} className={labelCls}>
+                      {l.qty}
+                    </label>
+                    <input
+                      id={`${it.id}-qty`}
+                      value={it.qty}
+                      onChange={(e) => update(it.id, { qty: e.target.value })}
+                      inputMode="numeric"
+                      placeholder="1"
+                      autoComplete="off"
+                      aria-invalid={badQty || undefined}
+                      className={cn(inputCls, "text-right font-semibold tabular-nums")}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    aria-label={l.remove(it.name.trim() || l.fallbackName(i + 1))}
+                    onClick={() => (onRemove ? onRemove(it, i) : commit(items.filter((x) => x.id !== it.id)))}
+                    className={cn(
+                      "flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:translate-y-px",
+                      focusRing,
                     )}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-4">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">{l.whoAte}</span>
+                  {members.length > 1 ? (
                     <button
                       type="button"
-                      onClick={() => commit(items.filter((x) => x.id !== it.id))}
-                      aria-label={`${typeof t.remove === "string" ? t.remove : "Remove"} ${it.name}`}
-                      className={cn("underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none", inkMuted)}
+                      className={cn("cursor-pointer rounded-sm text-xs font-medium text-muted-foreground hover:text-foreground", focusRing)}
+                      onClick={() => update(it.id, { eaters: allOn ? [] : [...memberIds] })}
                     >
-                      {t.remove}
+                      {allOn ? l.clearAll : l.selectAll}
                     </button>
-                  </div>
+                  ) : null}
                 </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {members.map((m, k) => (
+                    <MemberToggle key={m.id} name={m.name} color={colorOf(k)} on={it.eaters.includes(m.id)} onClick={() => toggle(it, m.id)} />
+                  ))}
+                </div>
+
+                <p
+                  className={cn(
+                    "mt-3 flex items-center gap-1.5 text-xs",
+                    problems.length ? "text-[#DC2626] dark:text-[#F87171]" : "text-muted-foreground",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn("size-1.5 shrink-0 rounded-full", problems.length ? "bg-[#DC2626] dark:bg-[#F87171]" : "bg-[#15803D] dark:bg-[#4ADE80]")}
+                  />
+                  <span className="min-w-0 tabular-nums">
+                    {problems.length
+                      ? l.notCounted(problems)
+                      : sharing === 1
+                        ? l.solo(formatAmount(total))
+                        : l.shared(formatAmount(total), sharing, formatAmount(Math.floor(total / sharing)), total % sharing !== 0)}
+                  </span>
+                </p>
               </motion.li>
             );
           })}
-        </AnimatePresence>
-      </ul>
+        </ul>
+      )}
 
-      <div className={cn("border-t border-dashed px-4 py-2", edge)}>
-        <button
-          type="button"
-          onClick={add}
-          className="inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-        >
-          <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <path d="M8 3v10M3 8h10" strokeLinecap="round" />
-          </svg>
-          {t.addItem}
-        </button>
-      </div>
-
-      <div className={cn("space-y-1 border-t px-4 py-3 text-sm tabular-nums", edge)} aria-live="polite">
-        <p className="flex justify-between">
-          <span className={inkMuted}>{t.itemsTotal}</span>
-          <span className="font-semibold tracking-tight">{money(validUnits)}</span>
-        </p>
-        {billUnits !== null && (
-          <>
-            <p className="flex justify-between">
-              <span className={inkMuted}>{t.billTotal}</span>
-              <span className="font-semibold tracking-tight">{money(billUnits)}</span>
-            </p>
-            <p className={cn("flex items-center gap-1.5 text-xs", diff === 0 ? "text-emerald-700 dark:text-emerald-400" : "text-destructive")}>
-              <span aria-hidden="true">{diff === 0 ? "✓" : "!"}</span>
-              {diff === 0 ? t.matches : t.difference(money(Math.abs(diff)), diff > 0)}
-            </p>
-          </>
+      <button
+        type="button"
+        onClick={add}
+        className={cn(
+          "flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 border-t border-border text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+          focusRing,
         )}
-      </div>
-    </div>
-  );
-}
-
-function Chip({ pressed, hue, onClick, children }: { pressed: boolean; hue?: number; onClick: () => void; children: ReactNode }) {
-  const reduce = useReducedMotion() ?? false;
-  return (
-    <motion.button
-      type="button"
-      aria-pressed={pressed}
-      onClick={onClick}
-      whileTap={reduce ? undefined : { scale: 0.94 }}
-      transition={springs.snappy}
-      className={cn(
-        "inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-none",
-        pressed ? cn(inkFill, "border-transparent") : cn(edge, "bg-transparent hover:bg-[#1c1917]/5 dark:hover:bg-[#ece7dc]/5"),
-      )}
-    >
-      {hue !== undefined && (
-        <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: `hsl(${hue} 55% 52%)` }} />
-      )}
-      {children}
-    </motion.button>
+      >
+        <PlusIcon />
+        {l.addAnother}
+      </button>
+    </section>
   );
 }
