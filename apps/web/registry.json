@@ -138,6 +138,55 @@
       ]
     },
     {
+      "name": "animation-editor",
+      "type": "registry:block",
+      "title": "Animation Editor",
+      "description": "Keyframe timeline from CardFlow: capture canvas snapshots, drag or type keyframe times, copy and delete them from a context menu or shortcuts, and play them back in a scroll-driven preview. The value is controlled, and helpers turn keyframes into framer-motion props or CSS @keyframes. Markers are focusable buttons with arrow-key time nudging, the context menu is keyboard reachable, and reduced motion removes the panel slide and fades.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "editor",
+        "timeline"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Canvas or whiteboard apps where users capture layout states as keyframes and play them back",
+            "Scroll-driven storytelling where each keyframe is a full scene snapshot"
+          ],
+          "watchOut": [
+            "The default window-level Delete/Backspace shortcut deletes the selected keyframe; use shortcutScope=\"panel\" or shortcutsEnabled={false} when the page has other editable content or canvas selection",
+            "Copying a keyframe renames its element ids (original behaviour), so the copy cross-fades rather than interpolates"
+          ],
+          "aliases": [
+            "keyframe timeline",
+            "canvas animation editor",
+            "scroll animation preview",
+            "motion timeline"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/animation-editor/animation-editor.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/animation-editor/animation-preview.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "announcement-strip",
       "type": "registry:block",
       "title": "Announcement Strip",
@@ -231,7 +280,7 @@
       "name": "bill-split-rows",
       "type": "registry:block",
       "title": "Bill Split Rows",
-      "description": "Paper rows for splitting a bill item by item: an editable name and tabular amount, toggle chips for who shared each item (with an All toggle and tiny identity dots), and a live hint like '3 people · about $3.33 each' plus who takes the leftover cent. Rows with no one picked or an invalid amount show inline problem text instead of blocking, and the footer checks the items total against the bill. Chips use aria-pressed, totals update via aria-live, and row add or remove is instant under reduced motion.",
+      "description": "An editable dish list for splitting a bill. Each row has dish, price and quantity fields, a delete button, Who ate it member toggles with an Everyone / Clear all switch, and a status line that shows the per-person share or why the dish isn't counted yet. Inputs are labelled, toggles use aria-pressed, bad numbers set aria-invalid, and the new-row pop-in is skipped under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -239,28 +288,29 @@
         "utils"
       ],
       "categories": [
+        "forms",
         "commerce",
-        "form",
-        "payment"
+        "finance"
       ],
       "meta": {
         "tier": "free",
-        "interaction": "press",
+        "series": "product",
+        "interaction": "type",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Bill splitting apps where each dish is shared by different people",
-            "Group orders that need a per-item who-pays breakdown"
+            "Entering shared items (dishes, groceries, trip costs) and assigning who shares each",
+            "Any list of priced lines that are split evenly among chosen people"
           ],
           "watchOut": [
-            "Pair it with settlement-receipt for the final result; this block only edits items",
-            "Amounts are split in the currency's minor unit, so leftover cents go to the first person sharing the item"
+            "Price and quantity are kept as raw strings and only whole numbers above 0 count, so parse them the same way downstream",
+            "Pass onRemove to route deletion through an undo flow; without it rows are deleted at once"
           ],
           "aliases": [
-            "split bill items",
-            "expense splitter",
-            "who shared what",
-            "itemized split"
+            "split items",
+            "who ate what",
+            "expense rows",
+            "shared items editor"
           ]
         }
       },
@@ -272,10 +322,53 @@
       ]
     },
     {
+      "name": "canvas-context-menu",
+      "type": "registry:block",
+      "title": "Canvas Context Menu",
+      "description": "A right-click menu for selected canvas objects with group or ungroup, layout, duplicate and delete, in CardFlow's frosted white glass with emoji icons and shortcut hints. It closes on an outside click or Escape, works as a keyboard menu (arrow keys, Home and End, focus returns on close), and only animates colour, which reduced motion turns off.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "menu",
+        "canvas",
+        "editor"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Right-click actions on selected objects in a whiteboard, canvas or design editor",
+            "Showing selection-aware actions such as grouping that only appear when they apply"
+          ],
+          "watchOut": [
+            "Keep the menu inside the viewport or container yourself: like the original, it opens exactly at x and y",
+            "Pass fixed={false} when it lives inside a relative container instead of the page"
+          ],
+          "aliases": [
+            "right-click menu",
+            "canvas menu",
+            "selection actions",
+            "glass context menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/canvas-context-menu/canvas-context-menu.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "capsule-nav",
       "type": "registry:block",
       "title": "Capsule Nav",
-      "description": "A centered floating pill navigation that gains a backing once you scroll past a small threshold, can tuck away while scrolling down and returns on scroll up (never while focus is inside), and highlights the current section via IntersectionObserver with a sliding active pill. On mobile it collapses to the logo and a menu button whose sheet traps focus, closes on Escape and locks scrolling. Links carry aria-current=location, scrolling is rAF throttled, and smooth scrolling and pill motion become instant under reduced motion.",
+      "description": "A full-width blurred header that becomes a floating pill after you scroll past a threshold. It can hide while you scroll down, highlights the section in view and has a mobile menu panel. The menu traps focus, closes on Escape and the backdrop, and locks scroll. With reduced motion the morph and hide transitions switch instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -284,8 +377,7 @@
       ],
       "categories": [
         "navigation",
-        "header",
-        "scroll"
+        "header"
       ],
       "meta": {
         "tier": "free",
@@ -294,18 +386,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Landing and product pages with a handful of in-page sections",
-            "Docs or long-form pages that need a compact, always reachable nav"
+            "Marketing or portfolio pages with a few top-level links and one main call to action",
+            "Long single pages where the nav should show the current section"
           ],
           "watchOut": [
-            "Give each section the same id as its nav item or the active pill never moves",
-            "Pass scrollContainer when the page scrolls inside an element instead of the window"
+            "Give target sections scroll-margin so the bar does not cover headings after an anchor jump",
+            "Inside a scroll container pass fixed={false} and scrollContainer, otherwise it listens to window"
           ],
           "aliases": [
-            "floating nav",
-            "dynamic island nav",
-            "pill navbar",
-            "sticky header"
+            "dynamic island",
+            "floating header",
+            "pill nav",
+            "sticky navbar"
           ]
         }
       },
@@ -317,17 +409,58 @@
       ]
     },
     {
+      "name": "cardflow-loader",
+      "type": "registry:block",
+      "title": "CardFlow Loader",
+      "description": "A white loading screen with a circular progress ring, a percentage, a title and a rotating status line. It runs CardFlow's staged loading sequence by default or takes controlled progress. It fills its container by default, with an optional fullScreen prop. It exposes a progressbar with aria-valuenow and a polite live region; reduced motion turns off the ring transition.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "loading",
+        "progress"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A short boot screen before a canvas or app shell becomes interactive",
+            "Showing staged setup progress when you can report real percentages"
+          ],
+          "watchOut": [
+            "The default scripted sequence is about 0.9 s of fake progress; pass progress for real work",
+            "The status line changes every 10 s by default, so on short loads only the first message is seen"
+          ],
+          "aliases": [
+            "boot screen",
+            "progress ring loader",
+            "splash loader",
+            "loading screen"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cardflow-loader/cardflow-loader.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "chapter-seekbar",
       "type": "registry:block",
       "title": "Chapter Seekbar",
-      "description": "A media seek bar that draws chapters as separate segments with small gaps, swells on hover with the hovered chapter tallest, and shows a time chip with the chapter or marker name. Markers snap clicks to their time. Dragging uses pointer capture and writes positions straight to the DOM, and it shows the buffered range. It is a role=slider with arrow keys for 5 seconds, PageUp/PageDown for chapters, Home/End, and an aria-valuetext naming the time and chapter; the swell is instant under reduced motion.",
+      "description": "A video seek bar split into chapter segments with 3px gaps. Segments sit at scaleY 0.6, grow to 1 on hover and to 1.7 under the pointer. It has a knob ringed in the accent colour, a hover chip with optional thumbnail, chapter title and time, and coloured markers with tooltips. It is a keyboard-operable slider (arrows 5 s, Shift 30 s, Home and End), and its transitions are disabled under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "media",
-        "video",
         "input"
       ],
       "meta": {
@@ -337,17 +470,17 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Course and tutorial video players with named chapters",
-            "Podcast or long recording players where listeners jump between sections"
+            "Long videos with named chapters or episodes",
+            "Showing bookmarks, clips or sponsor points on the timeline"
           ],
           "watchOut": [
-            "Pause playback in onScrubStart and resume in onScrubEnd so time updates do not fight the drag",
-            "Keep chapter starts sorted and inside the duration"
+            "It is designed for a dark video overlay; the gap colours assume a dark backdrop",
+            "The hover chip stays 100px from each edge, so very narrow bars show it offset"
           ],
           "aliases": [
-            "video progress bar",
-            "chapter scrubber",
-            "media timeline",
+            "video scrubber",
+            "chapter progress bar",
+            "timeline seek",
             "video chapters"
           ]
         }
@@ -363,7 +496,7 @@
       "name": "checkin-streak",
       "type": "registry:block",
       "title": "Check-in Streak",
-      "description": "A seven-day check-in card showing done, missed, today and upcoming days with their point rewards, a streak count and a points total. Checking in calls an async onCheckIn with checking and retry states, then presses a vermilion stamp into today's circle. The reward is announced via aria-live, and under reduced motion the stamp appears instantly.",
+      "description": "Daily check-in card with the last 7 days as circles (done filled, today outlined, missed dashed), a streak count, a reward toast, and a window event that tells quota displays to refresh. Days carry aria labels, the toast is a live region with a close button, and under reduced motion the spinner and toast motion are turned off.",
       "dependencies": [
         "framer-motion"
       ],
@@ -371,28 +504,28 @@
         "utils"
       ],
       "categories": [
-        "commerce",
-        "loyalty",
-        "rewards"
+        "rewards",
+        "engagement"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Daily login rewards in shop apps and member centers",
-            "Loyalty programs that pay points for coming back"
+            "Daily login or check-in rewards that add credits or quota",
+            "Showing a week of attendance next to a single claim action"
           ],
           "watchOut": [
-            "Compute todayIndex and checked days on the server in the shopper's time zone",
-            "Make onCheckIn idempotent so a double tap does not grant points twice"
+            "Pass today as a local YYYY-MM-DD so the 7-day window matches the server",
+            "Keep refreshEvent the same as the one your quota display listens to"
           ],
           "aliases": [
             "daily check-in",
-            "login streak",
-            "daily reward",
-            "sign-in bonus"
+            "streak",
+            "login reward",
+            "attendance"
           ]
         }
       },
@@ -407,36 +540,34 @@
       "name": "checkout-steps",
       "type": "registry:block",
       "title": "Checkout Steps",
-      "description": "A checkout progress indicator built on a semantic ordered list: completed steps draw a check and can jump back when onStepClick is given, the current step carries aria-current=\"step\", and connectors fill with the theme primary as steps complete. Below the sm breakpoint it collapses to a single 'Step 2 of 4' row with a segmented bar; with reduced motion the fills and checks switch instantly.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Compact checkout step row from the V窩 checkout: numbered pills that turn accent-filled with a check once done, plus a NumberedSteps instruction list. Uses an ordered list with aria-current=\"step\", screen-reader text for completed steps and sr-only step prefixes; it is static, so nothing animates under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
-        "navigation",
-        "checkout"
+        "checkout",
+        "navigation"
       ],
       "meta": {
         "tier": "free",
-        "interaction": "press",
+        "series": "product",
+        "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Multi page or multi section checkout flows",
-            "Any short linear wizard where users may go back to edit an earlier step"
+            "Showing where a buyer is in a short 2 to 4 step checkout above the step content",
+            "Numbered how-to instructions next to a payment or setup action"
           ],
           "watchOut": [
-            "Keep it to five steps or fewer so labels fit on one row",
-            "Only let users jump back to completed steps, never skip ahead"
+            "Step names are used as React keys, so keep them unique",
+            "The theme follows prefers-color-scheme by default; pass theme=\"light\" or \"dark\" if your site uses a class toggle"
           ],
           "aliases": [
-            "stepper",
             "checkout progress",
-            "wizard steps",
-            "progress tracker"
+            "stepper",
+            "order steps",
+            "numbered steps"
           ]
         }
       },
@@ -451,36 +582,34 @@
       "name": "choice-cards",
       "type": "registry:block",
       "title": "Choice Cards",
-      "description": "A radio group of equal-height paper cards for picking a delivery method, bundle or plan, where each card spells out its gains, its trade-offs and what it includes automatically. The selected card gets an ink border and lifts slightly, and a line below explains what the choice means. It is a proper radiogroup with roving tabindex, arrow, Home/End and digit-key selection; disabled cards state their reason, the explanation is announced via aria-live, and the lift is instant under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "World-choice dialogue from voxel-world. Equal-height portrait cards deal in one by one, each with a path colour, an art slot, a name banner, a brief, green gains and red costs. Below them a dialogue box with a name plate shows what the selected card means. Supports roving focus, arrow keys and WASD, digit keys, Enter or Space to pick, Escape or gamepad B to close, and gamepad d-pad and A. Disabled cards stay readable with their reason, and reduced motion turns off the deal-in, glow and float.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
-        "form",
-        "checkout"
+        "selection",
+        "game-ui"
       ],
       "meta": {
         "tier": "free",
+        "series": "story",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Delivery, bundle or plan choices where each option has real trade-offs",
-            "Onboarding picks where users should see what a choice turns on before committing"
+            "Story branch points with two to three paths, each with clear gains and costs",
+            "Choices that need art and a one-line explanation of what picking each means"
           ],
           "watchOut": [
-            "Keep it to four options or fewer; more cards stop being comparable",
-            "Write costs honestly; hiding the downside defeats the point of the layout"
+            "Picking happens on click, Enter or a digit key, with no extra confirm step, so use it only where the pick is the action",
+            "Keep gains and costs to one short visible fact per line; long reasons wrap inside the card"
           ],
           "aliases": [
-            "plan picker",
-            "delivery options",
-            "radio cards",
-            "trade-off cards"
+            "choice dialogue",
+            "branch cards",
+            "path picker",
+            "decision cards"
           ]
         }
       },
@@ -536,10 +665,10 @@
       ]
     },
     {
-      "name": "compare-slider",
+      "name": "classic-card",
       "type": "registry:block",
-      "title": "Compare Slider",
-      "description": "A before/after comparison where a transparent native range input on top drives the divider, so click-to-jump, arrow keys, Home/End and screen readers all work, with aria-valuetext reading the before and after percentages. The after layer is revealed with clip-path, the paper grip moves by transform, and an opt-in one-time demo sweep plays on first view, stops on any interaction and is skipped under reduced motion.",
+      "title": "Classic Card",
+      "description": "The original SunUI card with five variants (outlined, filled, elevated, glass, gradient), six colour themes, light and dark modes, four sizes, an optional hover glow, and skeleton, shimmer and overlay loading states. Clickable cards act as buttons you can focus and trigger with Enter or Space, loading sets aria-busy and announces itself, and reduced motion turns off the entrance, hover and tap animations.",
       "dependencies": [
         "framer-motion"
       ],
@@ -547,28 +676,381 @@
         "utils"
       ],
       "categories": [
+        "cards",
+        "layout",
+        "loading"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product, article or feature tiles that need a themed, decorative surface such as glass, gradient or glow",
+            "Content blocks that load asynchronously and need a skeleton, shimmer or spinner state in place"
+          ],
+          "watchOut": [
+            "Glass and gradient variants are semi-transparent: put them over a coloured or busy background or they look washed out",
+            "Add the group class to the Card if you want the CardImage hover zoom and overlay to fire"
+          ],
+          "aliases": [
+            "glass card",
+            "gradient card",
+            "themed card",
+            "content card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-card/classic-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-countdown-banner",
+      "type": "registry:block",
+      "title": "Classic Countdown Banner",
+      "description": "The original SunUI promo countdown: a discount headline, struck-through price, four flipping time boxes, drifting particles and a glowing CTA, in 5 themes, 3 layouts (default, spacious, modern), 3 variants (card, banner, floating), light and dark modes, and zh/en labels. The timer exposes role=\"timer\" with a summary down to the minute, and decorative parts are aria-hidden. With reduced motion, the entrance, digit flips, particles and pulse loops all switch instantly or stay still.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
         "commerce",
+        "countdown"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero or mid-page promo for a time-limited sale with a clear discount and price drop",
+            "A floating sale card that stays visible while a product page scrolls"
+          ],
+          "watchOut": [
+            "The modern card layout is tall and visually loud, so use one per page",
+            "Countdown labels are short (Hrs, Min); override them with labels for other locales"
+          ],
+          "aliases": [
+            "sale countdown",
+            "promo timer banner",
+            "flash sale banner",
+            "limited offer card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-countdown-banner/classic-countdown-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-file-upload",
+      "type": "registry:block",
+      "title": "Classic File Upload",
+      "description": "SunUI's original animated drop zone: violet, cyan, orange or custom themes, a bobbing upload icon, a drag-over prompt, image thumbnails or compact rows, a shimmering progress overlay, and size and type checks with an error toast. It works as a keyboard-operable button, reports progress through a progressbar with a polite live region, and stops all looping motion when reduced motion is on.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "forms",
+        "upload"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Attaching images, PDFs or documents to a form or project with a visible preview",
+            "A single focused upload area where drag and drop and click to browse should both work"
+          ],
+          "watchOut": [
+            "By default progress is simulated (0 to 100 in about 330 ms) before onFileUpload resolves; pass simulateProgress={false} and call onProgress to show real progress",
+            "PDF thumbnails need a renderPdfPreview function (for example built on pdfjs-dist); without one PDFs show a file icon"
+          ],
+          "aliases": [
+            "dropzone",
+            "file dropper",
+            "drag and drop upload",
+            "attachment uploader"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-file-upload/classic-file-upload.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-filter-grid",
+      "type": "registry:block",
+      "title": "Classic Filter Grid",
+      "description": "SunUI's original skill and icon wall: hexagon, square or circle tiles in light, dark, blue, green or purple themes, with category pills, pagination or infinite scroll, pulsing loading skeletons and a springy hover tilt. Category pills use aria-pressed, pagination is a labelled nav with aria-current, clickable tiles are keyboard buttons, and reduced motion removes the spring entrance, hover tilt and skeleton pulse.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "data-display",
+        "portfolio"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Portfolio skill or tech-stack walls grouped by category",
+            "Icon catalogs or integration lists that need lightweight filtering and paging"
+          ],
+          "watchOut": [
+            "The blue, green, purple and dark themes use light text and assume a dark page background",
+            "Only GridItem children are rendered; anything else passed as a child is ignored"
+          ],
+          "aliases": [
+            "skills grid",
+            "hexagon grid",
+            "tech stack wall",
+            "icon filter grid"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-filter-grid/classic-filter-grid.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-floating-button",
+      "type": "registry:block",
+      "title": "Classic Floating Button",
+      "description": "The original SunUI floating action button. Its gradient links fan out as petals, stack vertically or spread as a grid from any corner, and it supports controlled or uncontrolled state, a mode without the toggle button, and dragging with position memory. The toggle has an accessible name and aria-expanded, links are labelled, and springs and pops switch instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "buttons",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Social or share links on a portfolio or blog that should stay one tap away",
+            "A compact cluster of quick actions in a page corner that the user may want to move aside"
+          ],
+          "watchOut": [
+            "The petal radius grows 56px per layer, so many links need room around the corner",
+            "Links open in a new tab; give buttons a title or type so each one has an accessible name"
+          ],
+          "aliases": [
+            "fab",
+            "speed dial",
+            "social share",
+            "action menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-floating-button/classic-floating-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-gradient-background",
+      "type": "registry:block",
+      "title": "Classic Gradient Background",
+      "description": "An animated radial gradient with two glow layers that breathe on offset timings and a fine grid overlay, from the original SunUI package. By default it fills its relative parent; fullScreen pins it behind the whole viewport. It is aria-hidden and ignores the pointer, and reduced motion freezes the glows on their first frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "backgrounds",
+        "hero"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero sections and landing headers that need a dark, glowing backdrop",
+            "Feature panels or tiles that should feel lit from behind"
+          ],
+          "watchOut": [
+            "Colours must be 6-digit hex, because the glow and grid layers add a two-digit alpha suffix",
+            "The parent needs relative (and isolate or overflow-hidden) or the background escapes it"
+          ],
+          "aliases": [
+            "animated gradient",
+            "glow background",
+            "grid background",
+            "aurora background"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-gradient-background/classic-gradient-background.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-side-panel",
+      "type": "registry:block",
+      "title": "Classic Side Panel",
+      "description": "The original SunUI slide-in side panel: left or right, six color themes in light and dark, an edge toggle button, Escape and outside-click closing, an optional overlay, a built-in date range selector, and a provider so several panels can share state. It is a labelled dialog with focus moved in and restored, and slides switch instantly under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "overlay"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Dashboard filters or settings that slide in from the edge without leaving the page",
+            "Several independent drawers (left and right) that should not show competing toggle buttons"
+          ],
+          "watchOut": [
+            "The edge toggle button is hidden below the sm breakpoint, so give small screens an in-page trigger",
+            "Wrap multiple panels in SidePanelProvider, otherwise hideButtonsWhenAnyOpen has no effect"
+          ],
+          "aliases": [
+            "drawer",
+            "sidebar",
+            "off-canvas",
+            "slide-over"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-side-panel/classic-side-panel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "classic-social-button",
+      "type": "registry:block",
+      "title": "Classic Social Button",
+      "description": "Round gradient social link buttons with tooltips (always, on hover or hidden; top, right, bottom or left), a main-button mode, and a SocialButtonGroup that fans the links out in petal, vertical or grid layouts. Each link takes its accessible name from the title, tooltips also show on keyboard focus, the main button reports aria-expanded, and reduced motion turns the scale and spring animations into instant changes.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "buttons",
+        "social",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "classic",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Profile cards and footers that link to social accounts",
+            "A compact expandable cluster of contact links in a page corner"
+          ],
+          "watchOut": [
+            "Each SocialButton link is absolutely positioned, so wrap it in a relative h-10 w-10 box when you place it in normal layout",
+            "Expanded petal and vertical groups reach about 150 to 230px from the corner, so leave room or the parent will clip them"
+          ],
+          "aliases": [
+            "social links",
+            "floating social menu",
+            "share buttons",
+            "petal menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/classic-social-button/classic-social-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "compare-slider",
+      "type": "registry:block",
+      "title": "Compare Slider",
+      "description": "Before and after comparison with a draggable divider over a transparent native range input, so click to jump, arrow keys and screen readers all work. An optional demo sweep runs once when the slider first scrolls into view and stops the moment the user touches it. It is skipped under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
         "media",
         "comparison"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "drag",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Product pages showing wear, patina or before and after care",
-            "Print proofs, retouching or restoration results"
+            "Showing an uploaded original next to a generated or edited result",
+            "Retouch, upscale or restyle previews where the difference is spatial"
           ],
           "watchOut": [
-            "Both layers must share the same framing or the comparison misleads",
-            "Keep demoSweep for one hero instance; several sweeping at once is noise"
+            "The frame follows the result's ratio; a before image with another ratio is letterboxed, not cropped",
+            "Keep the demo sweep to one slider per screen"
           ],
           "aliases": [
-            "before after slider",
-            "image comparison",
-            "compare images",
-            "reveal slider"
+            "before after",
+            "image compare",
+            "reveal slider",
+            "diff slider"
           ]
         }
       },
@@ -583,36 +1065,34 @@
       "name": "confirm-button",
       "type": "registry:block",
       "title": "Confirm Button",
-      "description": "A two-press button for light destructive actions that replaces confirm dialogs: the first press arms it and swaps the label to the outcome (e.g. Press again to remove) while a hairline drains over the confirm window, and a second press within that window runs an async onConfirm with busy, error and done states. Escape, blur or timeout disarm it; the instruction is wired through aria-describedby, results are announced via aria-live, and label swaps are instant under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Press-twice confirm with no modal. The first press arms the button, swaps its label to the outcome and shows a short notice. A second press within 2.5 s runs the action, and the result appears in a polite status line. It uses usermeld's shadcn button variants and sizes, Escape disarms it, and the spinner respects reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "form",
-        "button",
-        "feedback"
+        "buttons",
+        "forms"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Removing saved addresses, payment methods or list items without opening a dialog",
-            "Cancelling an order or subscription where an accidental single click must not count"
+            "Irreversible row actions in admin tables where a dialog would be too heavy",
+            "Actions that lose progress, such as quick load, where one misclick should not commit"
           ],
           "watchOut": [
-            "Write armedLabel as the outcome, not a generic OK, so the second press is unambiguous",
-            "For actions that can be held back a few seconds, prefer undo-toast over asking twice"
+            "Name confirmLabel after the outcome (\"Remove signup\"), not \"Confirm\"",
+            "The notice line reserves a little height under the button; account for it in dense tables"
           ],
           "aliases": [
-            "double press confirm",
+            "double press",
             "press again to confirm",
-            "two step delete",
-            "inline confirm"
+            "two-step button",
+            "arm and confirm"
           ]
         }
       },
@@ -627,36 +1107,35 @@
       "name": "content-gate",
       "type": "registry:block",
       "title": "Content Gate",
-      "description": "Gates paid content after the first free items (or a preview height) with an opaque paper panel that overlaps the locked content along a perforated tear line, no blur or gradient. Copy differs for signed-out shoppers and members without access, with a vermilion price, primary and secondary actions, and a Later button that collapses the panel to a slim reminder bar. Locked content is inert and aria-hidden, unlocking expands it with a spring and is announced via aria-live, and reduced motion makes it instant.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Locked-course gate in three forms: an inline lock card, a designed dark modal (165 degree gradient panel, gradient top line, two blurred glows, gradient title) and a free-preview paywall overlay. Copy differs for logged-out and no-access. The modal traps focus, closes on Escape and the backdrop, locks scroll and gives focus back when it closes. The sign-in spinner only spins when reduced motion is off.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "commerce",
-        "paywall",
-        "content"
+        "auth",
+        "overlay"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Courses, guides or articles with a free preview and a paid remainder",
-            "Member-only sections inside an otherwise public page"
+            "A paid course or members page reached by someone signed out or without a purchase",
+            "Capping a free preview of slides or episodes and sending people to buy"
           ],
           "watchOut": [
-            "Gate on the server too; locked content is still in the DOM and only hidden from the UI",
-            "In previewHeight mode the whole content is inert while locked, so put the free summary outside the gate"
+            "The modal is dark only by design; put the inline gate on themed pages",
+            "Pass fixed={false} only when a relative parent should hold the modal (no portal, no scroll lock)"
           ],
           "aliases": [
             "paywall",
-            "locked content",
-            "members only",
-            "free preview gate"
+            "course gate",
+            "access modal",
+            "locked content"
           ]
         }
       },
@@ -803,17 +1282,14 @@
       "name": "dialogue-box",
       "type": "registry:block",
       "title": "Dialogue Box",
-      "description": "A visual novel dialogue box with a narration style that floats without a box and a dialogue style with an accent-bordered speaker plate. Text types out at a set characters-per-second rate: the first click, Enter or Space completes the line and the next one advances, while a breathing next glyph stays attached to the last character so it never wraps alone. An optional autoplay ring drains before advancing, and choice mode shows numbered choices (digit keys pick them) with locked choices tagged by their requirement. Screen readers get each whole line once via aria-live, colours come from --story-* variables, and reduced motion shows full text with a still glyph.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A visual-novel narration overlay. Narration floats without a box; spoken lines get a seal-dot name plate. Text types out at a jitter-free reserved height, with a kinsoku-safe next-line cue (caret, or a feather in the moon theme) that turns into an autoplay countdown ring. It also has choices with 【requirement】 tags, a log, autoplay and fast-forward controls, and number-key, Enter/Space, A, L and held-Ctrl shortcuts. Screen readers hear each whole line once; with reduced motion the cue and choice animations stop and the ring becomes a static dot.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "story",
-        "dialogue",
-        "game"
+        "overlay"
       ],
       "meta": {
         "tier": "free",
@@ -822,18 +1298,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Visual novels, interactive fiction and narrative game scenes",
-            "Onboarding or product tours told as a short scripted conversation"
+            "Ink, Yarn or custom-script visual novels and narrative RPG scenes over a background",
+            "Branching choices that show stat requirements, locked options and already-picked marks"
           ],
           "watchOut": [
-            "Change the text prop for each new line; the typewriter restarts whenever the text changes",
-            "Digit-key shortcuts listen on the window while choices are shown, so avoid two choice boxes on one page at once"
+            "Place it inside a relative container with a real height; all layers are absolutely positioned",
+            "Pass a stable lineId per line so read state, fast-forward and the typewriter reset correctly"
           ],
           "aliases": [
-            "visual novel textbox",
+            "narration overlay",
+            "VN textbox",
             "typewriter dialogue",
-            "branching choices",
-            "speech box"
+            "choice menu"
           ]
         }
       },
@@ -848,42 +1324,88 @@
       "name": "dot-badge",
       "type": "registry:block",
       "title": "Dot Badge",
-      "description": "Status and people chips where colour lives only on a 6px dot and the text stays ink, so a column of statuses never turns into a rainbow. Ships StatusDot, DotBadge (with a screen-reader hint), PersonChip (CJK-aware initials, deterministic low-chroma hue per person, aria-pressed toggle with inverted ink, muted and locked states) plus initialOf and personHue helpers. Only the live tone breathes, and it stays still under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A family of dot-led labels: StatusDot (colour only on the dot), PersonChip/EmployeeChip and AppChip (stable colours keyed to an id), and the Synvize black-and-gold WorkBadge/StatusBadge with an optional live breathing dot. Dots are aria-hidden so the text carries the meaning, clickable chips use aria-pressed, the lock icon and paid mark are labelled, and the breathing dot runs only 3 times and never under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "feedback",
+        "badge",
         "status",
-        "avatar"
+        "data-display"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Order, payment and fulfilment status columns in admin tables",
-            "Staff or member filters where each person needs a stable, recognisable mark"
+            "Status columns in tables and queues where a row of states should not turn into a rainbow",
+            "Tagging people or projects with a colour that stays the same on every screen"
           ],
           "watchOut": [
-            "Keep the label text meaningful on its own; the dot colour is a supplement, not the message",
-            "Use the live tone only for things actually in progress, or the breathing loses its meaning"
+            "WorkBadge defaults to Synvize's dark palette; put it on a dark surface or pass theme=\"light\"",
+            "personColor cycles 8 colours by id modulo, so different ids can share a colour; never use colour as the only identifier"
           ],
           "aliases": [
-            "status badge",
             "status dot",
             "person chip",
-            "member avatar chip"
+            "status badge",
+            "pill"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/dot-badge/dot-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "drawing-toolbar",
+      "type": "registry:block",
+      "title": "Drawing Toolbar",
+      "description": "CardFlow's glass drawing rail (pen, line, rectangle, circle, arrow) with the P and 1 to 4 shortcuts, plus a DrawingSurface that draws freehand strokes and shapes with a live preview, and the colour and width DrawingPanel. Tools use aria-pressed and aria-keyshortcuts, Escape leaves drawing mode, and reduced motion removes the slide and hover scale.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "toolbar",
+        "canvas",
+        "drawing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Adding a sketch or annotation mode to a canvas, whiteboard or screenshot markup tool",
+            "Letting people circle and point at things with quick shape tools"
+          ],
+          "watchOut": [
+            "The global shortcuts are on while the toolbar is open; set shortcuts={false} if other keyboard handlers clash",
+            "Strokes use the surface's own pixel coordinates; pan and zoom are not handled, so transform the points yourself on a zoomable canvas"
+          ],
+          "aliases": [
+            "sketch toolbar",
+            "pen tools",
+            "annotation toolbar",
+            "freehand drawing"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/drawing-toolbar/drawing-toolbar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/drawing-toolbar/drawing-surface.tsx",
           "type": "registry:component"
         }
       ]
@@ -937,7 +1459,7 @@
       "name": "explain-panel",
       "type": "registry:block",
       "title": "Explain Panel",
-      "description": "Review AI or solver suggestions with the reasons behind them: each card lists what changes and where, met, caveat and conflict reasons, a confidence bar and the impact, with Accept and Reject that collapse it to a one-line receipt with Undo. A header counts accepted items and offers Accept safe ones, which never includes suggestions marked for review, plus Reject all; an optional candidate list adds Pick actions. Reason glyphs carry screen-reader prefixes, decisions are announced via aria-live, and transitions are instant under reduced motion.",
+      "description": "Two explanation surfaces. AssignmentExplainSheet is the \"why this person\" side sheet: reasons, other candidates, a lock switch, and a find-replacement list with assign buttons. DirectorReviewPanel is a dark suggestion review: confidence and risk on each card, batch accept-safe or reject-all, and edits that change video length must be accepted one at a time. The sheet is a labelled dialog with a role=switch lock, Escape to close and a polite live region for notices; reduced motion drops the slide and fades instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -946,8 +1468,9 @@
       ],
       "categories": [
         "ai",
+        "explainability",
         "review",
-        "feedback"
+        "panel"
       ],
       "meta": {
         "tier": "free",
@@ -956,18 +1479,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Applying AI cleanup or auto-scheduling suggestions only after a person reviews them",
-            "Explaining why a solver picked one candidate over others"
+            "Explaining why an automated scheduler or optimizer chose an item, with the alternatives it considered",
+            "Letting users review AI edit suggestions where safe ones are preselected and destructive ones need explicit consent"
           ],
           "watchOut": [
-            "Mark anything that changes orders, money or length as needsReview so bulk accept skips it",
-            "Write reasons as checkable facts, not marketing copy, or the confidence number means nothing"
+            "The sheet calls onFindReplacement and treats replacement=null as loading; your callbacks may throw to show an error notice",
+            "Director decisions are uncontrolled unless you pass decisions with onDecisionsChange; appliedKinds decides which cards say \"preview only\""
           ],
           "aliases": [
-            "ai suggestions review",
-            "accept reject list",
-            "explainable ai",
-            "suggestion queue"
+            "why panel",
+            "assignment detail",
+            "suggestion review",
+            "director plan"
           ]
         }
       },
@@ -1024,10 +1547,10 @@
       ]
     },
     {
-      "name": "hold-to-redeem",
+      "name": "flip-profile-card",
       "type": "registry:block",
-      "title": "Hold To Redeem",
-      "description": "A press-and-hold button for irreversible spends such as redeeming points: a fill grows linearly while held (pointer or Space/Enter), rewinds with a hint if released early, then calls an async onConfirm and turns into a paper voucher line with a vermilion Redeemed stamp and optional code. The hold instruction is wired through aria-describedby and the result is announced via aria-live; under reduced motion the rewind and stamp are instant while the time-based fill still shows progress.",
+      "title": "Flip Profile Card",
+      "description": "A gradient profile card that tilts in 3D toward the mouse and flips on click to a details back, with seven light effect modes and seven colour themes, plus matching theme and light effect pickers. A focusable flip button with aria-pressed, inert on the hidden face, and radiogroup pickers with arrow keys; pointer effects run only on fine pointers, and reduced motion disables tilt and makes the flip instant.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1035,28 +1558,120 @@
         "utils"
       ],
       "categories": [
-        "commerce",
-        "button",
-        "loyalty"
+        "cards",
+        "profile",
+        "3d"
       ],
       "meta": {
         "tier": "free",
+        "series": "cardflow",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A personal or team member business card that people can flip for bio, skills and links",
+            "A profile card editor where users preview colour themes and lighting live"
+          ],
+          "watchOut": [
+            "Keep back-face content short: the card is a fixed 384px tall and the back does not scroll",
+            "The glassmorphism theme is white on translucent glass, so it needs a coloured or busy backdrop to read"
+          ],
+          "aliases": [
+            "3d profile card",
+            "business card flip",
+            "tilt card",
+            "holographic card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/flip-profile-card/flip-profile-card.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/flip-profile-card/flip-profile-card-styles.ts",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "floating-toolbar",
+      "type": "registry:block",
+      "title": "Floating Toolbar",
+      "description": "CardFlow's vertical glass tool rail with dark tooltips, a selected state and a 300ms slide in and out, set up as the AI actions toolbar: Generate calls an async onAction and shows a spinner while it runs. It also exports the logo FloatingMenu, which expands into a pill of nav links on hover or focus. Escape goes back or collapses, tools use aria-pressed, and reduced motion removes the slide, scale and expand transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "toolbar",
+        "canvas",
+        "ai"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Redeeming points, vouchers or one-time rewards that can't be undone",
-            "Any spend where an accidental tap would cost the shopper something"
+            "A side tool rail in a canvas or editor that swaps to a mode-specific toolbar such as AI actions",
+            "Running an async AI action from a toolbar button with built-in pending feedback"
           ],
           "watchOut": [
-            "Keep holdMs around one second; longer holds feel broken, not safe",
-            "Use it only for irreversible actions, or it becomes friction on ordinary buttons"
+            "Handle errors inside onAction: the toolbar only clears its pending state and selection",
+            "Two toolbars swap by passing open to each; the canvas needs overflow hidden so the hidden one slides off-screen"
           ],
           "aliases": [
-            "long press button",
+            "tool rail",
+            "AI toolbar",
+            "glass toolbar",
+            "logo menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/floating-toolbar/floating-toolbar.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hold-to-redeem",
+      "type": "registry:block",
+      "title": "Hold to Redeem",
+      "description": "Press-and-hold confirm drawn as the voxel-world HUD ring around a gold keycap. It fills while held, rewinds when released, and turns red and rewinds if the confirm fails. An optional warning zone flashes the ring, shows a \"!\" and asks you to release. Works with pointer and keyboard (Space, Enter or the keycap letter) and has a polite live region. With reduced motion the rewind is instant and there is no pulse or flashing.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "buttons",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Spending in-game currency or another irreversible redeem where a held press shows intent",
+            "Game-styled confirms where a last-chance warning near the end of the hold helps"
+          ],
+          "watchOut": [
+            "Holding is harder for some motor abilities; keep holdMs short (default 700 ms, as in the source) and keep keyboard support",
+            "The look is a dark pixel panel built for game UI, not neutral app chrome"
+          ],
+          "aliases": [
+            "hold ring",
             "press and hold",
-            "redeem points",
-            "hold to confirm"
+            "charge ring",
+            "long press confirm"
           ]
         }
       },
@@ -1071,36 +1686,34 @@
       "name": "honest-countdown",
       "type": "registry:block",
       "title": "Honest Countdown",
-      "description": "A sale or launch countdown that never hides the real deadline: the server renders only the absolute end date in a time element, then the browser adds day, hour and minute tiles, with seconds only inside the final hour and digits turning vermilion in that hour. It stops ticking while the tab is hidden and resyncs on return, and on expiry calls onEnd once and presses an ink Ended stamp. The tiles are a role=timer group with a spoken label, only the end is announced, and digit changes are instant under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Countdown to a real start time (a live stream or event) in mono day/hour/min/sec cells. It shows only the date before hydration, switches to a pulsing \"Live now\" and then an ended line, and never invents a deadline. Screen readers get one static sentence (status role when live) instead of a ticking number, and the pulse stops under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
-        "countdown",
-        "campaign"
+        "marketing",
+        "events"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Sale, launch or registration deadlines that are real",
-            "Campaign pages where shoppers need the exact end time"
+            "Hero of an event or live-stream landing page",
+            "Session lists that should show upcoming, live and ended states from the same data"
           ],
           "watchOut": [
-            "Pass a timeZone when the deadline is tied to one region, or the absolute date follows the viewer's zone",
-            "Never reset the target on reload to fake urgency"
+            "Built for dark surfaces (white-alpha cells, gold accent); put it on a dark hero",
+            "Pass the real start and end times from your backend; it counts to the start, not to a sign-up cutoff"
           ],
           "aliases": [
-            "sale countdown",
+            "event countdown",
+            "live countdown",
             "launch timer",
-            "deadline timer",
-            "ends in"
+            "time until start"
           ]
         }
       },
@@ -1157,10 +1770,53 @@
       ]
     },
     {
+      "name": "infinite-avatar-grid",
+      "type": "registry:block",
+      "title": "Infinite Avatar Grid",
+      "description": "A pannable, zoomable infinite canvas of round avatars that only renders the visible cells. Avatars bubble in with a spring curve, and selecting one opens a gradient profile card. Keyboard accessible (arrow keys pan, plus and minus zoom, Enter opens, Escape closes the dialog); reduced motion skips the bubble and card transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "canvas",
+        "avatars",
+        "modal"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Browsing a large or unbounded directory of people as a spatial wall rather than a list",
+            "Playful discovery screens where users drag around and tap faces to see a profile card"
+          ],
+          "watchOut": [
+            "The wheel listener calls preventDefault, so page scroll stops while the pointer is over the grid; give it a bounded height",
+            "getUser must be deterministic per coordinate and cheap, since it runs for every visible cell on each pan or zoom settle"
+          ],
+          "aliases": [
+            "people wall",
+            "infinite canvas",
+            "pan zoom grid",
+            "avatar explorer"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/infinite-avatar-grid/infinite-avatar-grid.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "job-progress",
       "type": "registry:block",
       "title": "Job Progress",
-      "description": "A paper work-order slip for long jobs such as custom prints, AI generation or exports: named steps with checks, a non-linear progress bar from the exported jobPercent helper (queued 2%, steps 15 to 95, finishing 97, done 100), queue position, ETA and an honest reason line for slow paths, with Cancel, Retry and a vermilion Done stamp plus result action. A compact single-line row variant suits job lists; only state and step changes are announced via aria-live, and the bar and stamp are instant under reduced motion.",
+      "description": "Progress UI for an AI generation job: a grid tile with shimmer over a blurred reference image, a side panel with named steps, non-linear percent, queue position and cancel or retry actions, and a compact console row with a status dot. It has progressbar roles, live status headings, aria-current on the current step and alert-role errors; under reduced motion the shimmer, spinner and pulse stop.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1168,28 +1824,28 @@
         "utils"
       ],
       "categories": [
-        "commerce",
         "status",
-        "progress"
+        "ai"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Print-on-demand, personalization or AI generation orders that take minutes",
-            "Export or render queues where users can leave and come back"
+            "Image or video generation jobs with queue, model loading and sampling stages",
+            "A dashboard list of jobs in flight that link to their detail page"
           ],
           "watchOut": [
-            "Drive status from your real job record; never animate fake progress",
-            "Give a reason line when a job takes the slow path so users don't think it is stuck"
+            "Keep the non-linear percent mapping so sampling covers most of the bar",
+            "Remove a finished job's tile and show the result image in its place"
           ],
           "aliases": [
-            "job status",
-            "render progress",
             "generation progress",
-            "order production tracker"
+            "render queue",
+            "task status",
+            "job tile"
           ]
         }
       },
@@ -1204,7 +1860,7 @@
       "name": "jobs-tray",
       "type": "registry:block",
       "title": "Jobs Tray",
-      "description": "A bottom-right stack of named background jobs that replaces blocking full-screen overlays: running jobs show a progress bar and percent, finished ones collapse on their own after a few seconds, and failed ones stay with the reason plus Retry and Dismiss. A collapsible header summarises '3 tasks · 1 failed', the tray takes no space when empty, and a useJobs hook manages the list. Only completions and failures are announced via aria-live, and slides become instant under reduced motion.",
+      "description": "A bottom-right stack of background job rows, with a pulsing dot, a percent or state label, a cancel button on running jobs and a dismiss button on failed ones. It comes with a background jobs hook and a companion update banner. The list is a polite live region, and the pulse, slide-in and progress transitions are switched off under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1213,8 +1869,7 @@
       ],
       "categories": [
         "feedback",
-        "status",
-        "notification"
+        "status"
       ],
       "meta": {
         "tier": "free",
@@ -1223,18 +1878,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Exports, imports and bulk edits that run while the user keeps working",
-            "Replacing full-screen 'please wait' overlays in admin tools"
+            "Saving, encoding or exporting continues after the user is allowed back into the editor",
+            "Telling the user an app update is ready to download or install"
           ],
           "watchOut": [
-            "Keep failed jobs until the user dismisses them; silent failures are worse than slow ones",
-            "Give each job a label that still makes sense out of context, like 'Export orders.csv'"
+            "Successful jobs are removed after 8 s and quick ones are never shown, so do not rely on the tray as a log",
+            "Keep failed rows until dismissed; they are the reason the tray exists"
           ],
           "aliases": [
-            "background tasks",
+            "background jobs panel",
             "task tray",
-            "job queue panel",
-            "upload manager"
+            "job queue",
+            "update banner"
           ]
         }
       },
@@ -1249,7 +1904,7 @@
       "name": "karaoke-caption",
       "type": "registry:block",
       "title": "Karaoke Caption",
-      "description": "Time-synced captions that highlight as speech plays: Chinese, Japanese and Korean text is timed per character and Latin text per word, with spoken words in full colour, the current one in the accent and upcoming ones dimmed. The font size steps down for long lines, and a useMediaTime hook reads the time from an audio or video element. Screen readers hear each cue once rather than per word, colour changes are instant under reduced motion, and all colours come from --story-* theme variables.",
+      "description": "A dark rounded caption pill that lights up the token being spoken: one Chinese character or one Latin word at a time. Spoken tokens turn white, the active one gold, and upcoming ones dim. The font size adjusts to the sentence length. Screen readers hear each sentence once through a polite live region, and reduced motion removes the colour transitions.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1258,7 +1913,6 @@
       ],
       "categories": [
         "media",
-        "story",
         "captions"
       ],
       "meta": {
@@ -1268,18 +1922,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Product voiceovers, narrated stories and short videos with burned-in style captions",
-            "Language learning or read-along pages that follow audio"
+            "Narrated videos, podcasts or slide decks where viewers follow the voice word by word",
+            "Two-speaker shows where each speaker gets their own accent colour"
           ],
           "watchOut": [
-            "Cue start and end times must match the audio; the per-word timing inside a cue is only an estimate",
-            "Keep cues to one or two short lines, or the plate covers too much of the video"
+            "Token timing is spread evenly across the sentence, so it only roughly matches the speech",
+            "In a gap between sentences it keeps showing the nearest one; set holdNearest={false} to hide it instead"
           ],
           "aliases": [
             "karaoke subtitles",
             "word highlight captions",
-            "read along text",
-            "synced captions"
+            "podcast captions",
+            "burned-in subtitles"
           ]
         }
       },
@@ -1291,46 +1945,90 @@
       ]
     },
     {
+      "name": "link-preview-card",
+      "type": "registry:block",
+      "title": "Link Preview Card",
+      "description": "CardFlow link card: shows the Open Graph site name, title, description and image, with a loading overlay, empty and invalid-URL states, and an optional iframe web view that falls back to the card when the site blocks framing. Opens on double-click, right-click or Enter/Space; the hover toolbar also appears on keyboard focus, icon buttons have aria-labels, and transitions turn off under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "cards",
+        "media"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Turning a pasted URL into a rich card on a board, canvas or feed",
+            "Showing bookmarks where the metadata comes from your own Open Graph endpoint"
+          ],
+          "watchOut": [
+            "fetchPreview must call your own server route; browsers cannot read another site's HTML because of CORS",
+            "The iframe view only works for sites that allow framing; turn it off with allowEmbed={false} for untrusted URLs"
+          ],
+          "aliases": [
+            "link card",
+            "url preview",
+            "open graph card",
+            "bookmark card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/link-preview-card/link-preview-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "live-bento",
       "type": "registry:block",
       "title": "Live Bento",
-      "description": "A bento grid of feature tiles with 1x1, 2x1, 1x2 and 2x2 spans, where every tile's mini visual runs off one shared useTicker beat instead of separate timers. The beat stops when the grid leaves the viewport or the tab is hidden, and under reduced motion it stays at tick 0 so every tile shows a still frame. The visuals are decorative and hidden from screen readers; each tile's title and body carry the content.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A feature bento grid whose tiles blur in on scroll, lift on hover and each run a small looping animation only while visible. It ships ready visuals: version timeline, matching hash runs, gap alert, comparison bars, phone list, lock grid, stamp card, strike list and consent toggle. Visuals are aria-hidden so the tile title and body carry the meaning, and with reduced motion tiles appear instantly and loops stop on a finished frame.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "marketing",
-        "grid",
-        "section"
+        "landing",
+        "features"
       ],
       "meta": {
         "tier": "free",
         "series": "product",
-        "interaction": "section",
+        "interaction": "scroll",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Feature overviews on SaaS landing pages",
-            "Showing several small product behaviours side by side"
+            "A 'more features' section where each feature needs a tiny living illustration",
+            "Showing secondary capabilities below a hero without heavy media"
           ],
           "watchOut": [
-            "Choose spans that fill the 4-column grid, or desktop leaves holes",
-            "Draw a complete frame at tick 0, since reduced motion never advances past it"
+            "Each visual runs its own observer and timer, so keep one grid to around 6 to 9 tiles",
+            "Visuals must sit inside <LiveBento>, which injects the lb-* keyframes"
           ],
           "aliases": [
             "bento grid",
             "feature grid",
             "animated feature tiles",
-            "live tiles"
+            "more features"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/live-bento/live-bento.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/live-bento/bento-visuals.tsx",
           "type": "registry:component"
         }
       ]
@@ -1380,10 +2078,54 @@
       ]
     },
     {
+      "name": "markdown-card",
+      "type": "registry:block",
+      "title": "Markdown Card",
+      "description": "Notion-style markdown card from CardFlow: selecting it switches to a monospace textarea after 100 ms, and Escape or blurring outside the card returns to the rendered preview with Notion-like heading, list, code, quote and link styles. The preview can be focused and opens the editor with Enter, Escape hands focus back to the preview, the textarea has a label, and transitions turn off under reduced motion.",
+      "dependencies": [
+        "react-markdown"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "editor",
+        "cards"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Sticky-note or document cards on a canvas that edit in place",
+            "Short notes where users write markdown and read the formatted result"
+          ],
+          "watchOut": [
+            "The editor is a plain textarea with no toolbar or syntax highlighting",
+            "Escape is listened for on window while editing, so it can clash with other Escape handlers such as dialogs"
+          ],
+          "aliases": [
+            "markdown editor",
+            "note card",
+            "notion block",
+            "sticky note"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/markdown-card/markdown-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "media-picker",
       "type": "registry:block",
       "title": "Media Picker",
-      "description": "An inline panel for picking which images and videos of a post to download: a thumbnail grid with numbered badges in pick order, duration chips on videos, select all or none, a remembered 'Include caption text' option, and locked Pro options shown with their reason. The button reads 'Download file' for one pick and 'Download 3 as ZIP' for several. The grid is a multi-select listbox with arrow keys and Space, the summary is announced via aria-live, and badges switch instantly under reduced motion.",
+      "description": "Dark dialog for choosing which images and videos of a post to download. Everything starts selected, there are check badges and a play badge, an include-text option that is remembered, and a single-item shortcut that skips the dialog. A companion combine dialog shows a stitched preview with layout chips, a locked chip for paid layouts, a gap option and thumbnails you can leave out. Tiles are toggle buttons with aria-pressed, Escape closes, and the entrance animation is turned off under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1392,8 +2134,7 @@
       ],
       "categories": [
         "media",
-        "form",
-        "download"
+        "dialogs"
       ],
       "meta": {
         "tier": "free",
@@ -1402,24 +2143,28 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Downloading or exporting selected media from a post, album or message",
-            "Choosing which attachments to share or archive"
+            "Saving only some media from a post, carousel or gallery",
+            "Stitching several images into one postable image or a PDF"
           ],
           "watchOut": [
-            "Give each item meaningful alt text; the grid has no visible captions",
-            "Download a single pick directly instead of zipping one file"
+            "Give the combine dialog real width and height for each image or the layout math cannot work",
+            "Use resolveMediaPick first so a post with one item downloads directly without opening the dialog"
           ],
           "aliases": [
-            "media download picker",
-            "attachment selector",
-            "photo picker",
-            "bulk media download"
+            "download picker",
+            "select media",
+            "combine images",
+            "stitch images"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/media-picker/media-picker.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/media-picker/combine-dialog.tsx",
           "type": "registry:component"
         }
       ]
@@ -1428,37 +2173,34 @@
       "name": "notice-queue",
       "type": "registry:block",
       "title": "Notice Queue",
-      "description": "A first-in-first-out queue of story notices (clue, item, bond, stat) that shows one single-line notice at a time in the top-right of its container, wiping in like ink and retracting to the left after 4.2 seconds. The timer pauses on hover, focus and while the tab is hidden, Escape dismisses the current notice and clicking opens it; a useNoticeQueue hook manages push and dismiss. Each notice is announced once via aria-live, all colours come from --story-* variables with ink, rice and moon themes, and the wipe becomes a plain fade under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A first-in, first-out story notice lane that shows one notice at a time: compact found-item cards with a glyph, kicker, shimmering title and +N queue count, or one-line bond notices with an optional seal. Each lives 4.2s, ink-bleeds in and retracts over the last 280ms, pauses on hover or focus, closes with Esc and can open a detail view. It is a polite live region; with reduced motion there is no exit animation, bleed or shimmer.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "story",
-        "notification",
-        "game"
+        "feedback",
+        "story"
       ],
       "meta": {
         "tier": "free",
         "series": "story",
-        "interaction": "loading",
+        "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Narrative games and interactive fiction that award clues, items or relationship changes",
-            "Any story reader that needs quiet, one-at-a-time feedback without covering the text"
+            "Announcing clues, items, stat growth or relationship changes in a narrative game without interrupting reading",
+            "A single top-right feedback lane fed by several producers that must never cover each other"
           ],
           "watchOut": [
-            "Keep titles to one short line; long text is truncated",
-            "Escape is listened to on the window, so stop it from bubbling if a modal also uses Escape"
+            "Hold the queue (holding prop) while a detail view opened from a notice is showing, so it is not dismissed underneath",
+            "Keep titles short; long titles are cut off with an ellipsis at 17rem"
           ],
           "aliases": [
-            "achievement toast",
-            "reward notice",
-            "game notification",
-            "clue popup"
+            "reward toast",
+            "discovery notice",
+            "bond notice",
+            "story toast"
           ]
         }
       },
@@ -1607,17 +2349,15 @@
       "name": "pause-menu",
       "type": "registry:block",
       "title": "Pause Menu",
-      "description": "An in-stage pause panel for story games: an objective line, a vertical menu whose focused row gets an accent light bar that sweeps in from the left, a quick load that needs a second press within 2.5 seconds, and an honest two-step exit that says exactly what will be lost since the last save and offers Save and exit, Exit without saving or Back. Arrow keys, Home/End and Esc work, focus is trapped in the dialog and returned on close, and under reduced motion the bar and nudge switch instantly. All colours come from --story-* variables, so ink, rice and moon themes reskin it.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "An in-game system menu: a faded ink band with brush-sweep hover items (resume, journal, save, load, settings, exit), the current objective line, and an exit confirmation that names the last autosave and offers a third save-first option. It ships with a save-error banner and a save/load panel that confirms overwrite and delete in place. Dialogs are modal, take focus and close with Esc; with reduced motion the entrance animations are dropped.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "game",
         "story",
-        "menu"
+        "overlay",
+        "navigation"
       ],
       "meta": {
         "tier": "free",
@@ -1626,24 +2366,28 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Pause and exit flows in narrative or visual novel style web games",
-            "Any in-app session where leaving can lose unsaved progress"
+            "Pause or system menu in a narrative or exploration game",
+            "Any destructive exit that should say exactly what progress will be lost and where the player can resume"
           ],
           "watchOut": [
-            "Place it inside a position: relative stage; it covers its parent, not the viewport",
-            "Pass lastSave so the exit warning can say what will actually be lost"
+            "Pass lastAutosave as a readable chapter · scene · time line, never an internal id",
+            "Close the pause menu when opening the save panel so the two Esc handlers do not both fire"
           ],
           "aliases": [
-            "game pause menu",
-            "exit confirmation",
-            "save before exit",
-            "quick load"
+            "system menu",
+            "game menu",
+            "escape menu",
+            "save and quit"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/pause-menu/pause-menu.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/pause-menu/save-load-panel.tsx",
           "type": "registry:component"
         }
       ]
@@ -1652,36 +2396,34 @@
       "name": "payment-status-banner",
       "type": "registry:block",
       "title": "Payment Status Banner",
-      "description": "A paper receipt banner for the page shoppers land on after an external payment redirect. While pending it polls a check() function on an interval, pausing while the tab is hidden, then turns paid with a vermilion stamp, failed with a retry, or an honest timeout with a Check again button. Status changes are announced via aria-live, and under reduced motion the stamp and text swaps are instant.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Frosted full-width banner shown when a buyer returns from checkout: pending polls every 3 s up to 8 times and turns into success once access is unlocked, success stays and links to the course, failed and error close themselves after 8 s. Uses role=\"status\" for pending and success and role=\"alert\" for failures, has a labelled close button, and the spinner stops under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
         "checkout",
-        "status"
+        "feedback"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Order confirmation pages after Stripe, PayPal or bank redirects",
-            "Any purchase where the webhook can arrive after the shopper returns"
+            "Landing page after a hosted payment redirect (?checkout=success|pending|failed|error)",
+            "Payments where a webhook unlocks access some seconds after the redirect"
           ],
           "watchOut": [
-            "check() should read your own order record, not trust URL query params",
-            "Keep the timeout copy honest so shoppers do not pay twice"
+            "onRefresh must actually refetch and update the unlocked prop, otherwise pending never turns into success",
+            "Colours are tuned for dark pages; set fixed={false} when placing it inside a layout"
           ],
           "aliases": [
-            "payment confirmation",
-            "checkout result",
-            "order status banner",
-            "webhook pending"
+            "checkout banner",
+            "payment result",
+            "order confirmation bar",
+            "payment pending notice"
           ]
         }
       },
@@ -1695,38 +2437,35 @@
     {
       "name": "preflight-checklist",
       "type": "registry:block",
-      "title": "Preflight Checklist",
-      "description": "Shows readiness checks and permissions right next to the main call to action instead of in a dialog: each row has a severity dot, a message and an inline fix, and a summary line says whether anything blocks. The CTA stays disabled only while a blocking check or required permission is unresolved, and then explains which fix comes first via aria-describedby. Rows can be rechecked with a per-row spinner, the summary is a polite live region, and the spinner stays still under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "title": "Recording Preflight",
+      "description": "Pre-recording screen in the KapZoom dark style. Live checks sit beside the Start button: warnings and blockers always show, passing items fold into a 'N look fine' popover, and each issue can carry a fix action. It also includes an audio, camera and countdown sidebar with a mic level meter, source cards, a Screen, Window and Region tab bar, and a macOS permission center. The checks are a polite live region, the tabs use arrow-key roving focus, toggles are switches, and transitions and spinners stop under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "onboarding",
-        "status",
-        "form"
+        "media",
+        "status"
       ],
       "meta": {
         "tier": "free",
         "series": "product",
-        "interaction": "loading",
+        "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Go-live, publish or record screens that depend on devices, permissions or storage",
-            "First-run setup where the user should see everything that is missing in one place"
+            "The last screen before starting a screen, camera or audio recording",
+            "Showing missing permissions, disk space and privacy risks without a blocking dialog"
           ],
           "watchOut": [
-            "Only use block for problems that really stop the action; warnings should never disable the CTA",
-            "Give every non-ok row a concrete fix action instead of telling the user to look elsewhere"
+            "Only blockers should disable Start; keep disk estimates and mic warnings at warning level",
+            "Pass the mic level as a subscription, not as React state, so the meter does not re-render the whole screen"
           ],
           "aliases": [
-            "readiness check",
-            "pre-flight check",
+            "preflight",
+            "pre-recording check",
             "permission center",
-            "setup checklist"
+            "ready check"
           ]
         }
       },
@@ -1734,41 +2473,45 @@
         {
           "path": "registry/free/preflight-checklist/preflight-checklist.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/free/preflight-checklist/preflight-sidebar.tsx",
+          "type": "registry:component"
         }
       ]
     },
     {
       "name": "print-preview",
       "type": "registry:block",
-      "title": "Print Preview",
-      "description": "Lays a list of blocks such as invoice headers, line item groups and totals onto stacked A4 or Letter paper pages, splitting pages only between blocks so no block is ever cut, and giving any block taller than a page its own page. Pages scale to the container width, carry an optional header and a Page 1 of 2 footer, and include print CSS that maps each preview page to a real printed page with the rest of the site hidden.",
+      "title": "A4 Print Preview",
+      "description": "Stacks content on real-size A4 sheets and puts each page break at the nearest block boundary, so headings and list items are not cut. Each page is a labelled group, duplicate page copies are hidden from assistive tech, and there is no animation, so it is reduced-motion safe.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
-        "print",
-        "document"
+        "document",
+        "print"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Invoice, receipt and packing slip previews before printing",
-            "Order or report pages that must print cleanly without split rows"
+            "Resume or document builders with a live A4 preview",
+            "Showing how a report will paginate before PDF export"
           ],
           "watchOut": [
-            "Split long tables into several child blocks; one giant block cannot be paginated",
-            "Children render twice, once hidden for measuring, so keep them free of side effects"
+            "Content is rendered once per page, so avoid ids or heavy widgets inside it",
+            "Blocks taller than one page are still cut at the page height"
           ],
           "aliases": [
-            "invoice print",
             "a4 preview",
-            "paged document",
-            "printable invoice"
+            "page preview",
+            "resume preview",
+            "pagination"
           ]
         }
       },
@@ -1828,36 +2571,34 @@
       "name": "quota-meter",
       "type": "registry:block",
       "title": "Quota Meter",
-      "description": "A paper usage meter that talks in outcomes, not points: 'About 42 photos left' from the remaining credits and cost per unit, a hairline bar, percent used and the reset date. An optional nudge such as an unclaimed check-in replaces the second line, and the remaining number turns vermilion when credits run low. Comes as a card or a compact header pill; the bar is a labelled meter and its fill is instant under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Remaining quota as a percent plus about how many images are left, in three forms: sidebar ring, mobile sheet bar, and plans-page card. When today's check-in is unclaimed, the second line becomes a check-in nudge. The included hook refetches on window focus, on route or job-count change, and on the rewards event. It uses progressbar roles, an aria-labelled link and a focus-reachable tooltip when the sidebar is collapsed, and drops transitions under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
-        "status",
-        "loyalty"
+        "billing",
+        "usage"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Credit based AI tools and plans with monthly allowances",
-            "Headers that show how much of a quota is left at a glance"
+            "Showing remaining generation quota in an app sidebar or account sheet",
+            "A plans page summary with a nudge toward a daily reward"
           ],
           "watchOut": [
-            "Refetch used and total after each job so the estimate stays honest",
-            "Pick a unitLabel the shopper understands, never raw credits"
+            "Show images and percent, never raw credits, to match the source wording",
+            "Pass a refreshKey that changes when a job finishes so the meter updates"
           ],
           "aliases": [
             "usage meter",
             "credits left",
-            "quota bar",
-            "plan usage"
+            "quota ring",
+            "remaining balance"
           ]
         }
       },
@@ -1872,17 +2613,14 @@
       "name": "recording-hud",
       "type": "registry:block",
       "title": "Recording HUD",
-      "description": "A draggable floating pill for screen or audio recording with a blinking red rec dot that turns amber when paused, a mono elapsed timer written straight to the DOM, pause, stop and a draw tool that pops a pen colour row with Clear. Dragging uses pointer capture and stays inside the parent or viewport. It is a labelled toolbar where Space toggles pause when focused, and the dot holds steady under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A floating dark glass pill for screen recording: a blinking record dot, a mono timer, pause/resume, an optional pen with draw swatches and Clear, and stop. It is draggable within its bounds, and a ref-driven VolumeBar level meter is included. Buttons have aria labels and pressed states, Esc closes the pen, and the blink and palette transitions stop under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "media",
-        "toolbar",
-        "recording"
+        "toolbar"
       ],
       "meta": {
         "tier": "free",
@@ -1891,18 +2629,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Screen recorders, walkthrough tools and voice memo apps",
-            "Any long capture where users need pause and stop without leaving the screen"
+            "Controls that float over content being screen recorded",
+            "Live audio input meters that update many times a second without re-rendering"
           ],
           "watchOut": [
-            "Pass elapsed from your recorder clock so pauses are exact; startedAt alone cannot know about pauses",
-            "Keep it out of the recorded area or exclude it from capture"
+            "Only enable the pen when recording a whole screen; it means nothing for a single window",
+            "Push seconds from the recorder; the HUD's own 1 s count is only a fallback"
           ],
           "aliases": [
-            "recording controls",
-            "screen recorder toolbar",
-            "rec pill",
-            "capture hud"
+            "recorder hud",
+            "recording pill",
+            "capture toolbar",
+            "volume meter"
           ]
         }
       },
@@ -1916,38 +2654,35 @@
     {
       "name": "redeem-key-input",
       "type": "registry:block",
-      "title": "Redeem Key Input",
-      "description": "A printed-voucher card for redeeming gift cards, license keys and promo codes: the mono input uppercases, strips stray characters and groups the code with dashes as you type or paste, optionally detects the key type, and shows server errors inline. On success the field becomes the printed code with a vermilion Redeemed stamp; results are announced via aria-live and the stamp appears instantly under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "title": "License and Redeem Panel",
+      "description": "Dark license panel with one input that tells a 12-character supporter code from a Lemon Squeezy UUID key and sends each the right way. It shows the free, trial, basic, pro and supporter tiers, explains grace, expired and invalid states, and offers activate, deactivate and revalidate. Provider errors become messages that say what to do next. The input is labelled, results are announced in a polite live region, and spinners stop spinning under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "commerce",
-        "form",
-        "input",
-        "coupon"
+        "forms"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "type",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Account pages where customers redeem gift cards or store credit",
-            "Activating a license or supporter key in an app"
+            "License or plan screen in a desktop app or browser extension",
+            "Activating a purchased key and redeeming a supporter code in the same place"
           ],
           "watchOut": [
-            "Throw an Error with an actionable message from onRedeem; the message is shown as is",
-            "Match length and groupSize to your real code format or valid codes cannot be completed"
+            "Decide hasKey from stored key state, not from tier, or users offline past the grace period lose their deactivate button",
+            "Return provider error codes or raw text from onActivate so the mapping can show the next step"
           ],
           "aliases": [
-            "gift card input",
-            "license key activation",
-            "promo code field",
-            "voucher redeem"
+            "license dialog",
+            "activate license key",
+            "redeem code",
+            "supporter code"
           ]
         }
       },
@@ -1962,30 +2697,28 @@
       "name": "reservation-timer",
       "type": "registry:block",
       "title": "Reservation Timer",
-      "description": "A paper slip that shows how long a limited item or ticket is held for you, with a mono countdown, a hairline bar for the remaining hold and a slot for the item summary. It renders a placeholder until mounted, resyncs with real time when the tab returns, turns vermilion inside the warning window, and on expiry calls onExpire, fades and presses an ink Released stamp with an optional Hold again action. Screen readers hear only the warning crossing and the expiry, and reduced motion skips the stamp animation.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "The \"held for you\" panel from the V窩 checkout: deadline date, a live hr/min/sec countdown that updates every second, and an honest note about what happens on expiry, plus an expired-state panel. The remaining time has role=\"timer\" (not read aloud every second), the expired panel is role=\"status\", and nothing animates, so reduced motion needs no change.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
         "checkout",
-        "countdown"
+        "commerce"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Ticket, seat or limited drop checkouts that hold stock for a few minutes",
-            "Cart sidebars where an item is reserved until payment"
+            "Exclusive or limited items held for one buyer during checkout",
+            "Any pending order with a real server-side expiry"
           ],
           "watchOut": [
-            "Only show a hold the server actually enforces; never fake urgency",
-            "Release the stock on the server too, the onExpire callback is only the UI side"
+            "onExpire fires once when time reaches zero; refetch the order there instead of trusting the client clock",
+            "Only show it for a real hold; never use it to invent urgency"
           ],
           "aliases": [
             "hold timer",
@@ -2005,18 +2738,15 @@
     {
       "name": "scan-report",
       "type": "registry:block",
-      "title": "Scan Report",
-      "description": "A report view for code, accessibility or SEO scans: a 0 to 100 health score with a reason line, severity chips whose colour lives only on a dot and that toggle a filter, and issue cards that expand into a line-numbered code excerpt with the problem lines highlighted plus a fix with steps, difficulty, ETA and a copyable before and after. Chips use aria-pressed, the issue count is a polite live region, and the expand animation is instant under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "title": "Code Scan Report",
+      "description": "Code scan results: stat cards, a severity summary you can filter by, and issue cards with severity, category and AI badges, an expandable fix suggestion with before and after, and a code viewer that highlights the problem lines. Toggle buttons use aria-pressed and aria-expanded, and reduced motion removes the press and hover transitions.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "report",
         "developer",
-        "feedback"
+        "dashboard"
       ],
       "meta": {
         "tier": "free",
@@ -2025,18 +2755,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Accessibility, performance or code quality scan results",
-            "Audit pages where each finding needs location, evidence and a fix"
+            "Static analysis or security scan result pages",
+            "Code review dashboards listing issues with suggested fixes"
           ],
           "watchOut": [
-            "Explain the score in scoreReason, a bare number gives no next step",
-            "Keep excerpts short; the highlight range should point at the exact lines to change"
+            "Ignore asks for confirmation through window.confirm unless you pass confirmIgnore",
+            "The Before and After boxes use light red and green backgrounds even in dark mode, as in the original"
           ],
           "aliases": [
-            "audit report",
+            "scan results",
             "issue list",
-            "code scan results",
-            "lint report"
+            "code audit",
+            "tech debt report"
           ]
         }
       },
@@ -2051,15 +2781,15 @@
       "name": "schedule-grid",
       "type": "registry:block",
       "title": "Schedule Grid",
-      "description": "A weekly staff schedule with shifts as rows and days as columns, a sticky shift column, person chips whose colour lives only on a dot, dashed amber Short N buttons on understaffed cells, amber outlines on cells changed since the last version, and a focus mode that fades everyone but one person. It renders a real table with th scopes and aria-current on today, selection uses aria-pressed, and below md it becomes a snap-scrolling one-day-per-view strip with dot navigation.",
+      "description": "Weekly shift grid with one row per shift and one column per day; 14 days split into stacked weeks, and screens under 768px switch to a date strip with a day list you can swipe. Chips are real buttons with aria-pressed, the today column has aria-current=\"date\", shortage badges have descriptive aria-labels, and reduced motion turns off transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "data",
-        "calendar",
-        "team"
+        "scheduling",
+        "data-display",
+        "table"
       ],
       "meta": {
         "tier": "free",
@@ -2068,18 +2798,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Shift planning for shops, cafes and clinics",
-            "Any week view where gaps and changes must stand out at a glance"
+            "Showing a roster of who works which shift over a week or two",
+            "Manager views that need to show missing headcount and let someone fill it in one click"
           ],
           "watchOut": [
-            "Keys for required and changedKeys are day:row, keep ids stable",
-            "Keep row colours as identity marks only, never as status"
+            "Dates must be local \"YYYY-MM-DD\" strings, and today is read from the client clock (pass `today` to pin it)",
+            "layout=\"auto\" uses a viewport media query, not a container query; force \"week\" or \"day\" when embedding in a narrow panel"
           ],
           "aliases": [
-            "shift schedule",
-            "weekly roster",
-            "staff rota",
-            "schedule table"
+            "roster",
+            "shift table",
+            "weekly schedule",
+            "rota"
           ]
         }
       },
@@ -2094,16 +2824,14 @@
       "name": "scripted-demo",
       "type": "registry:block",
       "title": "Scripted Demo",
-      "description": "A landing-page product demo that plays fake-UI scenes on timers, grouped into chapter tabs whose progress bars fill as each chapter runs; a fake cursor glides to each scene's data-demo-target element and shows a click ripple. It only plays while in view and while the tab is visible, has a play, pause and replay button, and lets you click a chapter to jump. The mock stage is inert so keyboard focus skips it; under reduced motion nothing auto-advances and the button steps through static scenes.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "An auto-playing product walkthrough in a browser frame: a fake cursor glides to targets, click ripples, chapter tabs show progress bars, and a typed log, count-ups, chip pops, a slide-in notice and an explanation popover play along. It runs only while on screen and the tab is visible, has a labelled play/pause button and chapter buttons with aria-current, and with reduced motion scenes switch instantly with no cursor travel or ripple.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "marketing",
-        "hero",
+        "landing",
         "demo"
       ],
       "meta": {
@@ -2113,18 +2841,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Landing page heroes that show the product working without a video",
-            "Feature pages that walk through a short flow in chapters"
+            "Landing hero that shows a full product flow without a video",
+            "Explaining a multi-step workflow in short chapters people can jump between"
           ],
           "watchOut": [
-            "Give each scene's target a data-demo-target attribute or the cursor hides for that scene",
-            "Keep the whole loop under about 15 seconds; longer demos lose people before the payoff"
+            "Cursor and popover targets are measured on scene change and resize, so keep target elements' layout stable",
+            "Scene content is decorative, so put the real claims in the surrounding copy"
           ],
           "aliases": [
-            "product demo player",
-            "animated product tour",
+            "product demo",
             "fake cursor demo",
-            "interactive hero demo"
+            "interactive walkthrough",
+            "autoplay showcase"
           ]
         }
       },
@@ -2226,17 +2954,15 @@
       "name": "scroll-story",
       "type": "registry:block",
       "title": "Scroll Story",
-      "description": "A feature story with text steps on the left and a sticky visual stage on the right, where an IntersectionObserver on the viewport's center line picks the active step and only that step's visual is mounted and animating. On mobile, and on the server before mount, each step renders its visual inline under its text and plays once when scrolled into view. Steps expose aria-current and a spoken step count, the stage is decorative and hidden from screen readers, and reduced motion renders every visual in its final frame.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "A feature story where copy scrolls on the left and a sticky panel on the right crossfades between per-step looping scenes, with anchor tabs underneath. On mobile each scene sits under its text and plays when in view. Only the active scene animates, the tabs are a labelled nav with aria-current, and with reduced motion scenes switch instantly and loops hold their final frame.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "marketing",
-        "scroll",
-        "section"
+        "landing",
+        "storytelling"
       ],
       "meta": {
         "tier": "free",
@@ -2245,18 +2971,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Explaining a process in 3 to 5 steps on a landing or help page",
-            "How-it-works sections where each step has its own illustration"
+            "Walking through 3 to 5 core features, each with its own small demo",
+            "Long-form landing sections where scroll position should drive the visual"
           ],
           "watchOut": [
-            "visual(false) must draw the finished frame because the server, mobile and reduced motion all use it",
-            "Keep the important information in the step text; the stage is decorative and hidden from screen readers"
+            "The sticky panel needs no overflow-hidden ancestor, or it will not stick",
+            "Each step's Visual gets an active prop and must stop its timers when it is false (useLoop does this)"
           ],
           "aliases": [
-            "sticky scroll section",
+            "sticky scroll story",
             "scrollytelling",
             "feature story",
-            "how it works"
+            "pinned feature panel"
           ]
         }
       },
@@ -2271,34 +2997,34 @@
       "name": "seeded-cover",
       "type": "registry:block",
       "title": "Seeded Cover",
-      "description": "A zero-asset placeholder cover for products, books and courses without images: the seed picks a low-chroma paper tint and a thin SVG line, dot or grid texture, so the same item always gets the same cover in light and dark. Chinese titles on book-shaped covers set vertically in a serif, everything else sets horizontally with a subtitle and an optional corner label. Rendered as role=img with the title as its accessible name; it has no motion.",
+      "description": "A text-only book cover generated from a seed. A hash picks one of 12 traditional book-cover hues and one of four textures (lines, dots, weave, concentric arcs), and up to four title characters run vertically in serif. Only the hue is fixed; the colours are mixed from the theme's surface and text colours, so night, day and rice-paper themes all land at the right brightness. Also exports CharacterGlyph, a seeded avatar for characters without artwork. It is decorative (aria-hidden) unless a label is given, and it has no motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "commerce",
         "media",
-        "placeholder"
+        "story"
       ],
       "meta": {
         "tier": "free",
+        "series": "story",
         "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Catalog items, ebooks or courses that have no cover image yet",
-            "Seed data and empty storefronts that should still look intentional"
+            "Catalogs of stories or books where most items have no cover art",
+            "Character avatars that must keep the same colour on every screen without images"
           ],
           "watchOut": [
-            "Use a stable id as the seed, not the title, so renaming does not repaint the cover",
-            "Replace it with real product photos once they exist; it is a placeholder, not branding"
+            "Only the first four title characters are shown; Latin titles become initials, so pass glyphs to override",
+            "The colours rely on CSS color-mix and oklab, so very old browsers will not show the tint"
           ],
           "aliases": [
-            "placeholder cover",
             "generated book cover",
-            "fallback thumbnail",
-            "image placeholder"
+            "placeholder cover",
+            "deterministic cover",
+            "text cover"
           ]
         }
       },
@@ -2355,39 +3081,79 @@
       ]
     },
     {
+      "name": "selection-bounds",
+      "type": "registry:block",
+      "title": "Selection Bounds",
+      "description": "CardFlow's canvas selection box: blue frame, eight round resize handles, grab strips on the edges and an optional rotate knob, for any element with x, y, width, height and rotation. Selecting several elements scales them together. Arrow keys move, Alt plus arrows resize and [ ] rotate, and the frame is described for screen readers; nothing animates, so reduced motion needs no change.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "canvas",
+        "editor"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Whiteboard, moodboard or slide editors where users move, resize and rotate positioned cards",
+            "Multi-select editing where a group of elements should scale together"
+          ],
+          "watchOut": [
+            "Rotation only applies to a single selection; a group frame ignores rotation",
+            "Pass the canvas scale so pointer deltas map to canvas units when zoomed"
+          ],
+          "aliases": [
+            "transform handles",
+            "resize box",
+            "bounding box",
+            "marquee select"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/selection-bounds/selection-bounds.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "sensitive-image",
       "type": "registry:block",
       "title": "Sensitive Image",
-      "description": "An image that is covered by an opaque paper panel from the very first frame when flagged, so the original never flashes, with a rating chip, a one-line reason and a Show button that reveals it for this view only. The alt text stays neutral until revealed, the Show button is never nested inside the image button, and the reveal fades gently or instantly under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
+      "description": "Rated image that is blurred from the first frame, with a neutral alt text, an amber Sensitive or red 18+ chip and a Show button that reveals it only for the current page visit. A privacy curtain can cover every image at once, and the blur transition is turned off under reduced motion.",
+      "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "media",
-        "review",
-        "content"
+        "safety"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Customer photo reviews that may contain spoilers or graphic content",
-            "User uploaded images that need a content rating before display"
+            "Galleries of user-generated or AI-generated images with content ratings",
+            "Feeds where viewers opt in to sensitive media one image at a time"
           ],
           "watchOut": [
-            "Flag on the server so the cover is in the first render",
-            "Do not persist the reveal unless users explicitly opt in"
+            "Reveals are kept in memory only; persist a setting yourself if users want it remembered",
+            "Use the same revealKey for a thumbnail and its full view so one reveal unblurs both"
           ],
           "aliases": [
-            "spoiler image",
-            "content warning image",
-            "nsfw cover",
-            "hidden image reveal"
+            "nsfw blur",
+            "rated image",
+            "content warning",
+            "spoiler image"
           ]
         }
       },
@@ -2401,8 +3167,8 @@
     {
       "name": "settlement-receipt",
       "type": "registry:block",
-      "title": "Settlement Receipt",
-      "description": "A torn-edge paper receipt for split bills: per-person subtotals with a line breakdown and payer tag, a balance check against the bill total, and a transfer list where each row is a checkbox to mark as sent. When every transfer is ticked a vermilion Settled stamp presses on, and a Copy summary button copies a plain-text recap. Settling is announced via aria-live and the stamp is instant under reduced motion.",
+      "title": "Settlement Result",
+      "description": "The bill-split result page. A metric strip with the whole bill in the accent colour and a balance dot, a not-counted warning row, per-person rows (avatar, Paid pill, what each person ate), a sum-check footer with remainder notes, a transfer list, and Copy to LINE (clipboard with a textarea fallback) plus Print. Labelled sections, screen-reader text on the transfer arrow, and the copied toast shows instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2411,27 +3177,28 @@
       ],
       "categories": [
         "commerce",
-        "receipt",
-        "payment"
+        "finance",
+        "data-display"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Bill splitting and group order results",
-            "Showing who owes whom after a shared purchase"
+            "Final step of a bill-splitting or group-expense flow: who owes what and who pays whom",
+            "Any settlement summary that should be copied into a chat or printed"
           ],
           "watchOut": [
-            "Pass the real bill total so mismatches surface instead of hiding rounding errors",
-            "Transfers reference people by id; unknown ids fall back to the raw id"
+            "The block does no maths: pass owe, lines, transfers and grand already computed, with integer amounts so the balance check is exact",
+            "Labels default to English and NT$; pass formatAmount and labels for other currencies and languages"
           ],
           "aliases": [
-            "split bill",
-            "bill splitter result",
-            "expense settlement",
-            "group payment receipt"
+            "bill result",
+            "split summary",
+            "settle up",
+            "who owes whom"
           ]
         }
       },
@@ -2575,18 +3342,59 @@
       ]
     },
     {
-      "name": "speed-reader",
+      "name": "snap-guides",
       "type": "registry:block",
-      "title": "Speed Reader",
-      "description": "An RSVP reader that flashes one word at a time at a set words per minute, aligned on a highlighted recognition letter, pausing longer on punctuation and chunking Chinese or Japanese into two to three character groups. It has play and pause, skip back or forward ten words, a WPM stepper, a scrubbable progress slider, elapsed and remaining time, a context strip, an optional symbol filter and a shortcut sheet. Shortcuts only work while the reader has focus, it pauses when the tab is hidden, the paused position is announced via aria-live, and there is no animation beyond instant word swaps.",
+      "title": "Snap Guides",
+      "description": "Dashed blue alignment lines from CardFlow's canvas, plus snapMove and snapResize helpers. Edges and centres snap within 5px, and resizing can also snap to a neighbour's width or height. The lines are aria-hidden decoration with no animation, so reduced motion needs no change.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "content",
+        "canvas",
+        "editor"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Freeform layout editors that need Figma-style smart alignment while dragging",
+            "Resizing cards to match a neighbour's width or height"
+          ],
+          "watchOut": [
+            "Render the guides outside the scaled layer and pass scale and offset",
+            "Snap from the drag start bounds, not the live position, or snapping drifts"
+          ],
+          "aliases": [
+            "smart guides",
+            "alignment lines",
+            "snap to edges",
+            "magnetic guides"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/snap-guides/snap-guides.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "speed-reader",
+      "type": "registry:block",
+      "title": "Flash Reader",
+      "description": "RSVP flash reader that shows one word or CJK character at a time. It has a red progress scrubber, a speed menu, a symbol filter, a light or dark theme, a full-text start picker, and a fullscreen mode whose controls hide when idle, with a help overlay and keyboard shortcuts. Controls have aria labels, the scrubber is a labelled range, and reduced motion removes the transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
         "reading",
-        "tool"
+        "tools"
       ],
       "meta": {
         "tier": "free",
@@ -2595,18 +3403,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Blog or course pages that offer a fast-read mode",
-            "Reading practice and accessibility tools"
+            "Speed-reading or focus-reading tools",
+            "Previewing long text one word at a time"
           ],
           "watchOut": [
-            "Keep the full text available elsewhere on the page; RSVP hides context",
-            "Remount with a key when the text changes, so reading restarts from the first word"
+            "Keyboard shortcuts are only active in fullscreen, as in the original",
+            "Speed is stored as milliseconds per word, so the custom slider reads fast on the left"
           ],
           "aliases": [
-            "rsvp reader",
+            "rsvp",
             "flash reader",
             "speed reading",
-            "word by word reader"
+            "spritz"
           ]
         }
       },
@@ -2666,33 +3474,33 @@
       "name": "state-panels",
       "type": "registry:block",
       "title": "State Panels",
-      "description": "Three companion panels for empty, error and loading states. EmptyState offers a primary action plus a Load an example link. ErrorState never shows raw exceptions, tucks technical detail into a collapsible section and retries with a pending state. LoadingState draws static skeleton rows that match the real layout and adds a still-loading note after a delay. Errors use role=alert, loading is an aria-busy polite status, and there are no looping animations.",
+      "description": "Empty, error and loading panels. The empty state is a dashed card with a 1.5-stroke icon and a Load example plus outline button pair; the error state shows a friendly message with a Retry button; the loading state is skeleton rows. The panels use role=status and role=alert, and the skeleton pulse stops under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
         "feedback",
-        "empty-state",
-        "loading"
+        "states"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "loading",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Order, return or invoice lists that can be empty, fail or load slowly",
-            "Any data panel that needs consistent empty, error and loading states"
+            "Lists and dashboards that need consistent empty, error and loading views",
+            "First-run screens where loading an example teaches the product faster than an empty form"
           ],
           "watchOut": [
-            "Match the skeleton row count to the real content so it doesn't jump when it loads",
-            "Put request IDs in detail, never raw stack traces"
+            "Never pass raw exceptions as the error message; map them to friendly text first",
+            "Match the skeleton row count to the real content so the layout does not jump"
           ],
           "aliases": [
             "empty state",
             "error state",
-            "loading skeleton",
+            "skeleton",
             "zero state"
           ]
         }
@@ -2708,7 +3516,7 @@
       "name": "story-player",
       "type": "registry:block",
       "title": "Story Player",
-      "description": "A full-bleed story viewer with segmented progress bars driven by requestAnimationFrame. Tap the left third to go back and elsewhere to go forward, press and hold to pause, and per-slide durations let closing slides linger. Slides move with direction-aware transitions and end on a screen of staggered actions plus replay. It is a focusable region with arrow-key and Space control, a pause button and polite slide announcements; it pauses when off screen or the tab is hidden, and under reduced motion it only crossfades and does not auto-advance unless autoPlay is set.",
+      "description": "Full-bleed recap story player: segmented progress bar, tap the left or right third to step, long-press to pause, slides with x plus or minus 100 and scale 0.95, and an end-of-story action dock on the last two slides. Keyboard arrows and Space work, live region announces position, and reduced motion swaps slides instantly and stops the arrow pulse.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2717,8 +3525,7 @@
       ],
       "categories": [
         "media",
-        "story",
-        "recap"
+        "storytelling"
       ],
       "meta": {
         "tier": "free",
@@ -2727,18 +3534,18 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Year-in-review or monthly recap screens for shops and creators",
-            "Short onboarding or product tours told as a sequence of cards"
+            "Yearly or monthly recap stories (Wrapped style)",
+            "Short full-screen onboarding or highlight reels"
           ],
           "watchOut": [
-            "Keep each slide readable within its duration, and give dense slides a longer duration",
-            "Do not hide essential information inside a story; offer a plain page as well"
+            "The last two slides stay 5x longer by design, so put summary content there",
+            "The side arrows sit outside the card and only show from md up"
           ],
           "aliases": [
-            "stories viewer",
-            "instagram stories",
-            "year in review",
-            "recap player"
+            "stories",
+            "wrapped",
+            "recap",
+            "instagram stories"
           ]
         }
       },
@@ -2929,7 +3736,7 @@
       "name": "undo-toast",
       "type": "registry:block",
       "title": "Undo Toast",
-      "description": "Replaces confirm dialogs with undo: a useUndo hook keeps one pending action and commits the previous one when a new one starts, and UndoToast shows a paper slip with an Undo button and a hairline that runs out over the duration, then commits. The timer pauses on hover, focus or when the tab is hidden; Escape commits, Cmd/Ctrl+Z undoes (except while typing in a field), and the slip lives in an aria-live polite status region with instant transitions under reduced motion.",
+      "description": "Undo instead of a confirm dialog. useUndoable applies the change at once and shows a toast with an Undo action that never auto-dismisses. A built-in toaster gives the sonner look and behaviour: top-center stack, hover to expand, close button, swipe up to dismiss, alt+T to focus. It has live-region status semantics, and enter, exit and stack animations become instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2938,27 +3745,27 @@
       ],
       "categories": [
         "feedback",
-        "notification",
-        "cart"
+        "overlay"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "press",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Removing cart items, saved addresses or wishlist entries without a confirm dialog",
-            "Any destructive action you can hold back for a few seconds before committing"
+            "Deleting rows or replacing or clearing a whole document, where Undo is better than Are you sure",
+            "Apps that want sonner-style toasts without adding sonner"
           ],
           "watchOut": [
-            "Apply the change optimistically in the UI and only call the server in onCommit",
-            "Don't use it for actions that can't be held back, such as payments"
+            "Undo puts back the whole snapshot from before that change, so undoing an older toast also drops later edits (same as the original)",
+            "Undo toasts stay until closed; use isEmpty so changes to empty state show a plain 4 second success toast instead"
           ],
           "aliases": [
             "undo snackbar",
-            "undo instead of confirm",
-            "undoable delete",
-            "restore toast"
+            "toast with action",
+            "sonner toast",
+            "undoable delete"
           ]
         }
       },
@@ -3018,33 +3825,34 @@
       "name": "window-frame",
       "type": "registry:block",
       "title": "Window Frame",
-      "description": "A presentation frame for screenshots and live demos in mac, browser and phone variants, with neutral outline dots instead of colored traffic lights, a mono title or address bar, a right slot and a content area that scrolls inside a fixed height. Demo state is shown only through a 1px tone border plus an optional caption icon, and the frame is a figure with figcaption for assistive tech.",
+      "description": "Mock device frames for showing UI: a macOS window with red, yellow and green lights and a tone ring, a browser with a pill address bar, a phone with island and status bar, and a dotted Stage backdrop. The chrome is hidden from assistive tech and each frame is a labelled figure. Nothing animates, so there is nothing to reduce.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
       ],
       "categories": [
-        "section",
-        "media",
-        "docs"
+        "marketing",
+        "presentation",
+        "layout"
       ],
       "meta": {
         "tier": "free",
+        "series": "product",
         "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Landing and docs sections that show your store or app in context",
-            "Side by side desktop and mobile previews"
+            "Showing screenshots or live demos inside an article, landing page or slide",
+            "Comparing a failing and a passing example side by side with the danger and success tones"
           ],
           "watchOut": [
-            "Use tone only for real demo states such as passed or failed, not decoration",
-            "Set height when content is long so the page does not jump"
+            "These frames are mockups; pass badge (for example Simulated) when the content is drawn, not recorded",
+            "PhoneFrame has a fixed pixel width that shrinks to 100% in narrow containers; set height so long content scrolls inside the screen"
           ],
           "aliases": [
             "browser mockup",
             "device frame",
-            "window chrome",
+            "mac window",
             "phone mockup"
           ]
         }
@@ -3052,6 +3860,90 @@
       "files": [
         {
           "path": "registry/free/window-frame/window-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "youtube-card",
+      "type": "registry:block",
+      "title": "YouTube Card",
+      "description": "CardFlow YouTube card: reads watch, youtu.be or embed URLs or a bare 11-character ID, shows a thumbnail with a YouTube-style play button, and loads the player only after a click. The empty state lists the supported formats. The play button is a real button with an aria-label and a focus ring, and the hover transition turns off under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "cards"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Embedding videos in boards or feeds without loading YouTube until someone asks to play",
+            "Canvas widgets that need edge and corner drag handles around an interactive player"
+          ],
+          "watchOut": [
+            "The default thumbnail loads from i.ytimg.com; pass thumbnail for no third-party requests",
+            "Autoplay with sound may be blocked by some browsers even after the click"
+          ],
+          "aliases": [
+            "video embed",
+            "youtube embed",
+            "lite youtube",
+            "video card"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/youtube-card/youtube-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "zoom-controls",
+      "type": "registry:block",
+      "title": "Zoom Controls",
+      "description": "CardFlow's frosted-glass zoom pill (undo, redo, zoom in, percentage, zoom out, optional Animation toggle), a read-only zoom indicator, and a useCanvasZoom hook for button and wheel zoom. Buttons have labels and focus rings and the percentage is announced politely; only colour transitions are used, so reduced motion needs no change.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "canvas",
+        "toolbar"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "cardflow",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Infinite canvas or board views that need zoom and history controls in a corner",
+            "Showing the current zoom level on a read-only pan and zoom view"
+          ],
+          "watchOut": [
+            "Set fixed={false} when it sits inside a bounded container",
+            "Glass blur needs something behind it; on a flat background it reads as plain white"
+          ],
+          "aliases": [
+            "zoom pill",
+            "zoom toolbar",
+            "canvas zoom",
+            "zoom indicator"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/zoom-controls/zoom-controls.tsx",
           "type": "registry:component"
         }
       ]

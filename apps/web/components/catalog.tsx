@@ -149,7 +149,8 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
 
         <div role="group" aria-label="Filter by series" className="flex flex-wrap items-center gap-2">
           <FilterChip active={series === "all"} onClick={() => setSeries("all")} label="All series" count={items.length} />
-          {seriesKeys.map((key) => (
+          {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
+          {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
             <FilterChip
               key={key}
               active={series === key}

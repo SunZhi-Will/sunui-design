@@ -682,7 +682,7 @@ function Controls(p: {
           </div>
 
           {/* 右側：設定 */}
-          <div className="ml-auto flex items-center gap-3 pl-3">
+          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-3 pl-3">
             <div className="relative" ref={speedRef}>
               <button
                 type="button"

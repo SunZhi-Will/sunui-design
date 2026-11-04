@@ -8,6 +8,9 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-subtle sm:px-6">
         <p>SunUI by Sun. Free blocks are MIT licensed.</p>
         <nav className="flex gap-4">
+          <Link href="/icons" className="hover:text-fg">
+            Icons
+          </Link>
           <Link href="/docs" className="hover:text-fg">
             Docs
           </Link>

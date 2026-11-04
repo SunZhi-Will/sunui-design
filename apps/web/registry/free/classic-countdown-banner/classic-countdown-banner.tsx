@@ -46,8 +46,8 @@ export interface ClassicCountdownBannerProps {
   discount?: string;
   originalPrice?: string;
   discountedPrice?: string;
-  /** 結束時間；未給則為掛載後一週 */
-  endDate?: Date | string;
+  /** 真實的結束時間（必填）。不提供預設值，避免每次載入都重新倒數的假稀缺 */
+  endDate: Date | string;
   ctaText?: string;
   onCtaClick?: () => void;
   theme?: CountdownTheme;
@@ -310,14 +310,11 @@ export function ClassicCountdownBanner({
   const [isHovering, setIsHovering] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [glowPulse, setGlowPulse] = useState(false);
-  // 預設結束時間只在掛載時算一次（原版預設一週後）
-  const [fallbackEnd] = useState(() => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString());
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: false, amount: 0.3 });
 
   const t = { ...translations[language], ...labels };
-  const end = endDate ?? fallbackEnd;
-  const endMs = new Date(end).getTime();
+  const endMs = new Date(endDate).getTime();
 
   // 每秒更新倒數計時
   useEffect(() => {

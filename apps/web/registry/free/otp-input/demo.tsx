@@ -11,7 +11,7 @@ export default function OtpInputDemo() {
   const [status, setStatus] = useState<OtpStatus>("idle");
 
   return (
-    <div className="grid w-full max-w-3xl items-start gap-5 md:grid-cols-[1fr_15rem]">
+    <div className="grid w-full max-w-3xl grid-cols-[minmax(0,1fr)] items-start gap-5 md:grid-cols-[1fr_15rem]">
       <section aria-labelledby="otp-heading" className="rounded-md border border-border bg-card p-5 text-card-foreground sm:p-7">
         <h2 id="otp-heading" className="text-lg font-semibold tracking-tight">
           Confirm it&apos;s you

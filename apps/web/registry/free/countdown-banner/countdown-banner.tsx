@@ -14,8 +14,8 @@ export interface CountdownBannerProps {
   discount?: string;
   originalPrice?: string;
   discountedPrice?: string;
-  /** 結束時間；省略時為掛載後 7 天 */
-  endDate?: Date | string;
+  /** 真實的結束時間（必填）。不提供預設值，避免每次載入都重新倒數的假稀缺 */
+  endDate: Date | string;
   ctaText?: string;
   /** 提供時 CTA 為連結 */
   ctaHref?: string;
@@ -43,8 +43,6 @@ const springs = {
   stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
-const WEEK = 7 * 86_400_000;
-
 export function CountdownBanner({
   title = "限時優惠活動",
   subtitle = "倒數結束，錯過不再",
@@ -61,13 +59,16 @@ export function CountdownBanner({
 }: CountdownBannerProps) {
   const t = translations[language];
   const reduceMotion = !!useReducedMotion();
-  const endKey = endDate === undefined ? null : new Date(endDate).getTime();
+  const endTime = new Date(endDate).getTime();
+  const endKey = Number.isNaN(endTime) ? null : endTime;
 
   // 剩餘時間只在瀏覽器計算；SSR 時顯示 --
   const [remaining, setRemaining] = useState<number | null>(null);
   const [wasRunning, setWasRunning] = useState(false);
   useEffect(() => {
-    const end = endKey ?? Date.now() + WEEK;
+    // 結束時間無效時不倒數，維持顯示 --，絕不自行編造期限
+    if (endKey === null) return;
+    const end = endKey;
     const tick = () => {
       const left = Math.max(0, end - Date.now());
       setRemaining(left);

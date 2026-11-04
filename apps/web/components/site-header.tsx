@@ -5,22 +5,22 @@ import { githubUrl } from "@/lib/site";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
+        <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
           <SunMark />
           SunUI
         </Link>
-        <nav className="flex items-center gap-1 text-sm">
-          <Link href="/" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+        <nav className="flex items-center gap-0.5 text-sm sm:gap-1">
+          <Link href="/" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
             Blocks
           </Link>
-          <Link href="/icons" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+          <Link href="/icons" className="hidden rounded-md px-2 py-1.5 text-subtle hover:text-fg min-[400px]:block sm:px-3">
             Icons
           </Link>
-          <Link href="/docs" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+          <Link href="/docs" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
             Docs
           </Link>
-          <Link href="/pricing" className="rounded-md px-3 py-1.5 text-subtle hover:text-fg">
+          <Link href="/pricing" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
             Pricing
           </Link>
           <a href={githubUrl} className="hidden rounded-md px-3 py-1.5 text-subtle hover:text-fg sm:block">

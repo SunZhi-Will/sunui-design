@@ -12,7 +12,7 @@ import type { SVGProps } from "react";
  */
 
 type Shape = { accent?: boolean; fill?: boolean; dash?: string };
-type IconNode =
+export type IconNode =
   | string
   | (Shape & { d: string })
   | (Shape & { c: [cx: number, cy: number, r: number] })
