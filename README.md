@@ -146,9 +146,10 @@ npm run build
 npm run pack
 ```
 
-5. Publish the package:
+5. Release (bump all packages, then push the tag; GitHub Actions publishes to npm via Trusted Publishing):
 ```bash
-npm run publish
+npx lerna version 0.0.56 --exact --force-publish --no-push --yes
+git push origin master v0.0.56
 ```
 
 ### Common Commands
@@ -159,7 +160,6 @@ npm run publish
 - `npm run storybook` - Start Storybook
 - `npm run build-storybook` - Build Storybook
 - `npm run pack:all` - Pack all packages
-- `npm run publish` - Publish packages
 - `npm run clean` - Clean build files
 - `npm run lint` - Run linting
 

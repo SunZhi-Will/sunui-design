@@ -150,9 +150,10 @@ npm run build
 npm run pack
 ```
 
-5. 發布包：
+5. 發版（升版所有套件後推送 tag，GitHub Actions 會透過 Trusted Publishing 發佈到 npm）：
 ```bash
-npm run publish
+npx lerna version 0.0.56 --exact --force-publish --no-push --yes
+git push origin master v0.0.56
 ```
 
 ### 常用命令
@@ -163,7 +164,6 @@ npm run publish
 - `npm run storybook` - 啟動 Storybook
 - `npm run build-storybook` - 構建 Storybook
 - `npm run pack:all` - 打包所有包
-- `npm run publish` - 發布包
 - `npm run clean` - 清理構建文件
 - `npm run lint` - 運行代碼檢查
 

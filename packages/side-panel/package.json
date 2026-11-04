@@ -23,6 +23,11 @@
   ],
   "author": "Sunzhi",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SunZhi-Will/sunui-design.git",
+    "directory": "packages/side-panel"
+  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"

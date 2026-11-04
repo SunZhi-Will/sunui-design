@@ -24,6 +24,11 @@
   ],
   "author": "Sunzhi",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SunZhi-Will/sunui-design.git",
+    "directory": "packages/all"
+  },
   "dependencies": {
     "@sunui-design/card": "0.0.55",
     "@sunui-design/core": "0.0.55",

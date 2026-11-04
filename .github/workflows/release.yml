@@ -1,45 +1,41 @@
 name: Release
 
+# 用 npm Trusted Publishing（OIDC）發佈，不需要 NPM_TOKEN。
+# 每個套件都要先在 npmjs.com 的 Settings > Trusted Publisher 設定此 repo 與 release.yml。
+# 觸發方式：推送 v* tag，或在 Actions 頁面手動執行。只會發佈 npm 上還沒有的版本。
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to release (e.g., v1.0.0)'
-        required: true
-        type: string
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: refs/heads/master
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
-          
-      - name: Configure Git
+
+      # Trusted Publishing 需要 npm 11.5.1 以上
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies and build
         run: |
-          git config --global user.email "sun055676@gmail.com"
-          git config --global user.name "SunZhi-Will"
-          git checkout -B master origin/master
-          
-      - name: Install dependencies
-        run: |
-          npm install
+          npm install --no-audit --no-fund
           npm run build:packages
-          
-      - name: Reset working directory
-        run: git reset --hard HEAD
-          
-      - name: Publish to NPM
-        run: npx lerna publish from-package --force-publish --exact --yes
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test
+        run: npm test
+
+      - name: Publish to npm
+        run: node scripts/publish-unpublished.mjs

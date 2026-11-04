@@ -20,6 +20,11 @@
     ],
     "author": "SunUI Design",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SunZhi-Will/sunui-design.git",
+        "directory": "packages/countdown-banner"
+    },
     "dependencies": {
         "clsx": "^2.1.0",
         "tailwind-merge": "^3.3.0"
