@@ -11,13 +11,13 @@
     <i>Built with React, TailwindCSS, and TypeScript</i>
   </p>
   <p align="center">
-    <a href="https://www.npmjs.com/package/@sunui-design/all">
-      <img src="https://img.shields.io/npm/v/@sunui-design/all.svg?style=flat-square" alt="npm version" />
+    <a href="https://www.npmjs.com/package/@sunui-design/react">
+      <img src="https://img.shields.io/npm/v/@sunui-design/react.svg?style=flat-square" alt="npm version" />
     </a>
-    <a href="https://www.npmjs.com/package/@sunui-design/all">
-      <img src="https://img.shields.io/npm/dm/@sunui-design/all.svg?style=flat-square" alt="npm downloads" />
+    <a href="https://www.npmjs.com/package/@sunui-design/react">
+      <img src="https://img.shields.io/npm/dm/@sunui-design/react.svg?style=flat-square" alt="npm downloads" />
     </a>
-    <a href="https://github.com/yourusername/sun-ui-design/blob/main/LICENSE">
+    <a href="https://github.com/SunZhi-Will/sunui-design/blob/master/LICENSE">
       <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license" />
     </a>
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
@@ -65,11 +65,11 @@ Sun UI Design provides a collection of modern and customizable components. Each 
 ### All-in-one Package
 
 ```bash
-npm install @sunui-design/all
+npm install @sunui-design/react
 # or
-yarn add @sunui-design/all
+yarn add @sunui-design/react
 # or
-pnpm add @sunui-design/all
+pnpm add @sunui-design/react
 ```
 
 ### Individual Packages
@@ -95,8 +95,8 @@ npm install @sunui-design/countdown-banner
 
 1. Clone the project:
 ```bash
-git clone https://github.com/yourusername/sun-ui-design.git
-cd sun-ui-design
+git clone https://github.com/SunZhi-Will/sunui-design.git
+cd sunui-design
 ```
 
 2. Install all dependencies:
@@ -197,7 +197,7 @@ import {
   SidePanel,
   SocialButton,
   CountdownBanner
-} from '@sunui-design/all';
+} from '@sunui-design/react';
 
 export default function App() {
   return (
