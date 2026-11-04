@@ -3,6 +3,7 @@
 > `meta.series: "story"` 的 block 遵守這份文件。
 > 來源：山河未歸（WTMA）、DeathsBlessing、互動小說平台、方界：破碎祭壇、Vozmira 字幕（見 reports/UIUX 蒸餾報告-2026-11-05.md）。
 > WTMA 與 DeathsBlessing 用同一套結構只換 token（金墨 ↔ 月光藍），所以本系列**一律用 CSS 變數上色**，讓買家換皮。
+> **移植優先**：以 PORTING.md 為準，`ink` 主題的預設值就是原作的顏色、字體與時序。
 
 ## 一句話
 

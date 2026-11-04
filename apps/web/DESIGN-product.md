@@ -1,6 +1,7 @@
 # SunUI 產品介面系列（product）
 
 > `meta.series: "product"` 的 block 遵守這份文件，不套用 DESIGN.md 的紙與朱紅。
+> **移植優先**：從原始專案搬來的 block 以 PORTING.md 為準，原本的顏色、時序與行為優先於本文件的通則；本文件只用於原始碼沒有規定的部分。
 > 來源：從 Schedary、usermeld、spliteat-web、ComfyUI、autolens、PostVault、VideoAligner、voxcpm、Synvize 蒸餾（見 reports/UIUX 蒸餾報告-2026-11-05.md 第 1 節）。
 
 ## 一句話
