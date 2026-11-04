@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "sunui",
+  "homepage": "https://github.com/SunZhi-Will/sunui-design",
+  "items": [
+    {
+      "name": "countdown-banner",
+      "type": "registry:block",
+      "title": "Countdown Banner",
+      "description": "A limited-time offer banner with a live countdown, price drop and a glowing call to action.",
+      "dependencies": ["framer-motion"],
+      "registryDependencies": ["utils"],
+      "categories": ["section", "commerce"],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-04"
+      },
+      "files": [
+        {
+          "path": "registry/free/countdown-banner/countdown-banner.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

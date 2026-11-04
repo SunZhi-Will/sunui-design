@@ -5,10 +5,13 @@
   "type": "module",
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "dev": "next dev",
+    "web:dev": "npm run dev -w @sunui-design/web",
+    "web:build": "npm run build -w @sunui-design/web",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
