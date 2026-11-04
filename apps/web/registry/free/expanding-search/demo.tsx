@@ -2,77 +2,80 @@
 
 import { useState } from "react";
 
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
+
 import { ExpandingSearch, type ExpandingSearchSuggestion } from "./expanding-search";
 
-const suggestions: ExpandingSearchSuggestion[] = [
-  { id: "button", label: "Magnetic Button", hint: "Block" },
-  { id: "otp", label: "OTP Input", hint: "Block" },
-  { id: "toast", label: "Toast Stack", hint: "Block" },
-  { id: "palette", label: "Command Palette", hint: "Block" },
-  { id: "install", label: "Installing with the shadcn CLI", hint: "Docs" },
-  { id: "theming", label: "Theming and design tokens", hint: "Docs" },
-  { id: "motion", label: "Reduced motion support", hint: "Docs" },
-  { id: "pricing", label: "Pricing", hint: "Page" },
+const catalog: { kind: ProductKind; category: string; price: string }[] = [
+  { kind: "sneaker", category: "Shoes", price: "$88" },
+  { kind: "jacket", category: "Outerwear", price: "$148" },
+  { kind: "tote", category: "Bags", price: "$36" },
+  { kind: "mug", category: "Kitchen", price: "$24" },
+  { kind: "bottle", category: "Kitchen", price: "$32" },
+  { kind: "lamp", category: "Home", price: "$96" },
+  { kind: "headphones", category: "Audio", price: "$210" },
+  { kind: "watch", category: "Accessories", price: "$185" },
 ];
 
+const suggestions: ExpandingSearchSuggestion[] = catalog.map((p) => ({
+  id: p.kind,
+  label: productNames[p.kind],
+  description: p.category,
+  hint: p.price,
+  thumbnail: <ProductArt kind={p.kind} />,
+}));
+
 export default function ExpandingSearchDemo() {
-  const [withSuggestions, setWithSuggestions] = useState(true);
-  const [slash, setSlash] = useState(true);
-  const [result, setResult] = useState<string | null>(null);
+  const [query, setQuery] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
+  const q = query?.toLowerCase() ?? "";
+  const shown = catalog.filter((p) => !q || productNames[p.kind].toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 4);
 
   return (
-    <div className="w-full max-w-3xl space-y-4">
-      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={withSuggestions}
-            onChange={(e) => setWithSuggestions(e.target.checked)}
-            className="size-4 accent-current"
+    <div className="w-full max-w-3xl rounded-md border border-border bg-background text-foreground">
+      <header className="flex h-16 items-center gap-6 border-b border-border px-4 sm:px-5">
+        <span className={searching ? "hidden text-sm font-semibold tracking-tight whitespace-nowrap sm:inline" : "text-sm font-semibold tracking-tight whitespace-nowrap"}>
+          Northwind Supply
+        </span>
+        <nav aria-label="Main" className="hidden gap-5 text-sm text-muted-foreground md:flex">
+          {["New", "Shop", "Sale"].map((l) => (
+            <a key={l} href={`#${l.toLowerCase()}`} className="rounded outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+              {l}
+            </a>
+          ))}
+        </nav>
+        <div className="ml-auto flex min-w-0 flex-1 items-center justify-end gap-1">
+          <ExpandingSearch
+            suggestions={suggestions}
+            slashShortcut
+            onOpenChange={setSearching}
+            expandedWidth={300}
+            placeholder="Search products"
+            onSubmit={setQuery}
+            onSuggestionSelect={(s) => setQuery(s.label)}
           />
-          Suggestions
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" checked={slash} onChange={(e) => setSlash(e.target.checked)} className="size-4 accent-current" />
-          Press <kbd className="rounded border border-border bg-muted px-1 text-[11px]">/</kbd> to open
-        </label>
-      </div>
-
-      <div className="overflow-visible rounded-2xl border border-border bg-background">
-        <header className="flex h-16 items-center gap-6 border-b border-border px-5">
-          <span className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
-            <span className="size-6 rounded-lg bg-primary" aria-hidden="true" />
-            Northwind
-          </span>
-          <nav aria-label="Main" className="hidden gap-5 text-sm text-muted-foreground sm:flex">
-            {["Blocks", "Docs", "Pricing"].map((l) => (
-              <a key={l} href="#" onClick={(e) => e.preventDefault()} className="rounded outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-                {l}
-              </a>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <ExpandingSearch
-              suggestions={withSuggestions ? suggestions : undefined}
-              slashShortcut={slash}
-              expandedWidth={260}
-              placeholder="Search blocks and docs…"
-              onSubmit={(q) => setResult(`Searched for “${q}”`)}
-              onSuggestionSelect={(s) => setResult(`Opened ${s.label}`)}
-            />
-            <span className="size-8 rounded-full bg-muted" aria-hidden="true" />
-          </div>
-        </header>
-        <div className="space-y-3 p-5">
-          <div className="h-3 w-2/3 rounded bg-muted" />
-          <div className="h-3 w-1/2 rounded bg-muted" />
-          <div className="h-3 w-3/5 rounded bg-muted" />
+          <a href="#cart" aria-label="Cart, 2 items" className="flex size-10 shrink-0 items-center justify-center rounded-md outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
+            <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 8h14l-1.2 11H6.2Z" />
+              <path d="M9 8a3 3 0 0 1 6 0" />
+            </svg>
+          </a>
         </div>
-      </div>
+      </header>
 
-      <p className="text-sm text-muted-foreground" role="status">
-        {result ?? "Click the search icon, or press / when nothing else is focused."}
-      </p>
+      <main className="p-4 sm:p-5">
+        <h2 className="text-base font-semibold tracking-tight">{query ? `Results for "${query}"` : "New this week"}</h2>
+        <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {shown.map((p) => (
+            <li key={p.kind}>
+              <ProductArt kind={p.kind} className="rounded-[3px]" />
+              <p className="mt-2 truncate text-sm">{productNames[p.kind]}</p>
+              <p className="text-sm font-medium tracking-tight tabular-nums">{p.price}</p>
+            </li>
+          ))}
+        </ul>
+        {shown.length === 0 && <p className="mt-3 text-sm text-muted-foreground">No products match. Try a shorter word.</p>}
+      </main>
     </div>
   );
 }

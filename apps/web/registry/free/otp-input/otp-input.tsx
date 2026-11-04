@@ -206,7 +206,7 @@ export function OtpInput({
                     )}
                   />
                   {/* 墨線游標：印刷表格上的填寫位置 */}
-                  {focused === i && !disabled && (
+                  {focused === i && !disabled && status !== "success" && (
                     <span aria-hidden="true" className="pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 bg-current sm:inset-x-3" />
                   )}
                 </span>
@@ -221,7 +221,7 @@ export function OtpInput({
               key="stamp"
               aria-hidden="true"
               className={cn(
-                "pointer-events-none absolute -top-3 -right-2 rounded-[3px] border-2 border-current px-2 py-0.5 text-xs font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
+                "pointer-events-none absolute top-full right-1 mt-2 rounded-[3px] border-2 border-current bg-transparent px-2.5 py-1 text-sm leading-none font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
                 vermilion,
               )}
               initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}

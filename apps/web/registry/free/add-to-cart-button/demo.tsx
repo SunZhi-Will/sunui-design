@@ -2,52 +2,42 @@
 
 import { useRef, useState } from "react";
 
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
+
 import { AddToCartButton, CartIcon } from "./add-to-cart-button";
 
-const products = [
-  { name: "Linen Shirt", price: "$58", from: "#f59e0b", to: "#ef4444" },
-  { name: "Canvas Tote", price: "$24", from: "#10b981", to: "#0ea5e9" },
-  { name: "Wool Beanie", price: "$32", from: "#8b5cf6", to: "#ec4899" },
+const products: { kind: ProductKind; price: string }[] = [
+  { kind: "mug", price: "$24" },
+  { kind: "tote", price: "$38" },
+  { kind: "lamp", price: "$124" },
 ];
-
-function Swatch({ from, to }: { from: string; to: string }) {
-  return <span className="block size-full" style={{ background: `linear-gradient(135deg, ${from}, ${to})` }} />;
-}
 
 export default function AddToCartButtonDemo() {
   const cartRef = useRef<HTMLButtonElement>(null);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(1);
 
   return (
     <div className="w-full max-w-3xl space-y-6">
-      <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-3 text-card-foreground">
-        <span className="text-sm font-semibold tracking-tight">Northwind Supply</span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setCount(0)}
-            className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-          >
-            Empty cart
-          </button>
-          <CartIcon ref={cartRef} count={count} />
-        </div>
-      </div>
+      <header className="flex items-center justify-between border-b border-border pb-3">
+        <span className="text-sm font-semibold tracking-tight">Workroom Goods</span>
+        <CartIcon ref={cartRef} count={count} />
+      </header>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3">
         {products.map((p) => (
-          <div key={p.name} className="rounded-2xl border border-border bg-card p-4 text-card-foreground">
-            <div className="mb-3 aspect-[4/3] overflow-hidden rounded-xl">
-              <Swatch from={p.from} to={p.to} />
+          <div key={p.kind} className="flex flex-col gap-3">
+            <div className="overflow-hidden rounded-md border border-[#e7e0d0] dark:border-[#38332b]">
+              <ProductArt kind={p.kind} />
             </div>
-            <div className="mb-3 flex items-baseline justify-between">
-              <span className="text-sm font-medium">{p.name}</span>
-              <span className="text-sm text-muted-foreground tabular-nums">{p.price}</span>
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="font-medium">{productNames[p.kind]}</span>
+              <span className="text-muted-foreground tabular-nums">{p.price}</span>
             </div>
             <AddToCartButton
               cartRef={cartRef}
-              thumbnail={<Swatch from={p.from} to={p.to} />}
-              onAdd={() => new Promise((r) => setTimeout(r, 300))}
+              thumbnail={<ProductArt kind={p.kind} />}
+              tag={p.price}
+              onAdd={() => new Promise((r) => setTimeout(r, 250))}
               onLand={() => setCount((c) => c + 1)}
               className="w-full"
             />

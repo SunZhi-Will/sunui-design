@@ -19,7 +19,7 @@ export default function AnimatedNumberDemo() {
 
   return (
     <div className="grid w-full max-w-2xl gap-6 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[14rem_1fr] sm:p-5">
-      <ProductArt kind="headphones" className="rounded-md" />
+      <ProductArt kind="headphones" className="aspect-[3/2] rounded-md sm:aspect-square" />
 
       <div className="flex min-w-0 flex-col gap-4">
         <div>

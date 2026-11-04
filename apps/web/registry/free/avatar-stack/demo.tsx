@@ -1,92 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { ProductArt, productNames, type ProductKind } from "@/registry/_demo/product-art";
 
-import { AvatarStack, type AvatarStackPerson, type AvatarStackProps } from "./avatar-stack";
+import { AvatarStack, type AvatarStackPerson } from "./avatar-stack";
 
-const team: AvatarStackPerson[] = [
-  { id: "1", name: "Mina Park", presence: "online" },
-  { id: "2", name: "Leo Chen", presence: "away" },
-  { id: "3", name: "Ava Lin", presence: "online" },
-  { id: "4", name: "Noah Wu", presence: "busy" },
-  { id: "5", name: "Sara Kim", presence: "offline" },
+const buyers: AvatarStackPerson[] = [
+  { id: "1", name: "Mina P.", note: "Taipei, 2 hours ago" },
+  { id: "2", name: "Leo C.", note: "Osaka, 5 hours ago" },
+  { id: "3", name: "Ava L.", note: "Seoul, yesterday" },
+  { id: "4", name: "Noah W.", note: "Taichung, yesterday" },
+  { id: "5", name: "Sara K.", note: "Singapore, 2 days ago" },
 ];
 
-const pool = ["Kai Tan", "Iris Ho", "Theo Lee", "June Sato", "Omar Aziz", "Lena Wolf"];
-const presences: AvatarStackPerson["presence"][] = ["online", "away", "busy", "offline"];
-
-type Size = NonNullable<AvatarStackProps["size"]>;
+const related: { kind: ProductKind; price: string; buyers: number }[] = [
+  { kind: "mug", price: "$24", buyers: 412 },
+  { kind: "tote", price: "$36", buyers: 96 },
+];
 
 export default function AvatarStackDemo() {
-  const [people, setPeople] = useState(team);
-  const [size, setSize] = useState<Size>("md");
-  const [presence, setPresence] = useState(true);
-  const [expanded, setExpanded] = useState(false);
-
-  const add = () => {
-    const name = pool[(people.length - team.length) % pool.length];
-    setPeople((prev) => [
-      ...prev,
-      { id: `p-${prev.length + 1}`, name, presence: presences[prev.length % presences.length] },
-    ]);
-  };
-
   return (
-    <div className="w-full max-w-2xl space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <div role="radiogroup" aria-label="Avatar size" className="flex gap-2">
-          {(["sm", "md", "lg"] as Size[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              role="radio"
-              aria-checked={size === s}
-              onClick={() => setSize(s)}
-              className={
-                size === s
-                  ? "rounded-full bg-primary px-3 py-1 text-sm text-primary-foreground"
-                  : "rounded-full border border-border bg-card px-3 py-1 text-sm text-card-foreground hover:bg-muted"
-              }
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          <input type="checkbox" checked={presence} onChange={(e) => setPresence(e.target.checked)} className="accent-primary" />
-          Presence
-        </label>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5">
-        <div>
-          <p className="text-sm font-semibold text-card-foreground">Design team</p>
-          <p className="text-xs text-muted-foreground">{people.length} members</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <AvatarStack
-            people={people}
-            max={expanded ? people.length : 4}
-            size={size}
-            showPresence={presence}
-            label="Design team"
-            onOverflowClick={() => setExpanded(true)}
-          />
+    <div className="grid w-full max-w-3xl gap-6 text-foreground md:grid-cols-[1.4fr_1fr]">
+      <article className="grid gap-5 rounded-md border border-border bg-card p-4 sm:grid-cols-[9rem_1fr] sm:p-5">
+        <ProductArt kind="bottle" className="rounded-[3px] max-sm:aspect-[16/9]" />
+        <div className="flex flex-col">
+          <h2 className="text-lg font-semibold tracking-tight">{productNames.bottle}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Double-wall steel, keeps drinks cold for 24 hours.</p>
+          <p className="mt-3 text-xl font-semibold tracking-tight tabular-nums">$32</p>
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-dashed border-border pt-4">
+            <AvatarStack people={buyers} total={1284} max={4} label="Recent buyers" />
+            <p className="min-w-[9rem] flex-1 text-xs leading-snug text-muted-foreground">
+              <span className="font-medium text-foreground tabular-nums">1,284</span> bought in the last 30 days
+            </p>
+          </div>
           <button
             type="button"
-            onClick={add}
-            className="rounded-full border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="mt-5 h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-fit"
           >
-            + Add teammate
+            Add to cart
           </button>
         </div>
-      </div>
+      </article>
 
-      {expanded && (
-        <button type="button" onClick={() => setExpanded(false)} className="text-sm text-muted-foreground underline hover:text-foreground">
-          Collapse
-        </button>
-      )}
+      <section aria-labelledby="related-heading" className="space-y-3">
+        <h3 id="related-heading" className="text-sm font-semibold">
+          Often bought together
+        </h3>
+        <ul className="space-y-3">
+          {related.map((r) => (
+            <li key={r.kind} className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+              <ProductArt kind={r.kind} className="size-14 shrink-0 rounded-[3px]" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{productNames[r.kind]}</p>
+                <p className="text-sm tracking-tight tabular-nums">{r.price}</p>
+              </div>
+              <AvatarStack people={buyers.slice(r.kind === "mug" ? 1 : 3, r.kind === "mug" ? 4 : 5)} total={r.buyers} max={2} size="sm" label={`Buyers of ${productNames[r.kind]}`} />
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

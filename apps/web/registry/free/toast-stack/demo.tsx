@@ -54,17 +54,17 @@ export default function ToastStackDemo() {
                 onClick={() =>
                   push({ title: "We'll email you", description: `When the ${productNames[p.kind]} is back in M.`, tone: "success" })
                 }
-                className="w-28 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="min-w-[4.5rem] shrink-0 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors sm:w-28 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
-                Notify me
+                Notify<span className="hidden sm:inline"> me</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => add(p.kind, p.variant)}
-                className="w-28 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="min-w-[4.5rem] shrink-0 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground sm:w-28 transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
               >
-                Add to cart
+                Add<span className="hidden sm:inline"> to cart</span>
               </button>
             )}
           </li>

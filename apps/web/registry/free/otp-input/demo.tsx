@@ -30,7 +30,7 @@ export default function OtpInputDemo() {
           }}
           onComplete={(v) => setStatus(v === SENT ? "success" : "error")}
         />
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className={status === "success" ? "invisible mt-2 text-sm" : "mt-2 text-sm text-muted-foreground"}>
           Didn&apos;t get it?{" "}
           <button type="button" className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
             Resend code

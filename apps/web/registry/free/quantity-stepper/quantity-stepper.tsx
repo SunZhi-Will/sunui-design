@@ -44,6 +44,7 @@ const defaultLabels = {
 const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
 const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const dashed = "border-[#1c1917]/20 dark:border-[#ece7dc]/20";
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
 const sizeClass: Record<QuantityStepperSize, { root: string; button: string; field: string }> = {
@@ -196,7 +197,7 @@ export function QuantityStepper({
       )}
 
       {/* 數字欄：左右虛線，像收據上的數量格 */}
-      <div className={cn("relative border-x border-dashed", edge, s.field)}>
+      <div className={cn("relative border-x border-dashed", dashed, s.field)}>
         <input
           type="text"
           inputMode="decimal"

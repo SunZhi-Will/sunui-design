@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  type MotionValue,
-} from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, type MotionValue } from "framer-motion";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 
 import { cn } from "@/lib/utils";
@@ -21,15 +14,15 @@ export type ScrollSection = {
 export interface ScrollProgressProps {
   /** 捲動容器；省略時追蹤 window */
   container?: RefObject<HTMLElement | null>;
-  /** 章節標記，點擊可跳轉 */
+  /** 章節刻度，點擊可跳轉 */
   sections?: ScrollSection[];
-  /** fixed 固定在視窗頂端；sticky 黏在容器頂端；static 由父層排版 */
+  /** fixed 固定在視窗頂端；sticky 黏在容器頂端；static 由父層排版。fixed 時刻度不印文字 */
   position?: "fixed" | "sticky" | "static";
-  /** 進度條粗細（px） */
+  /** 墨線粗細（px） */
   thickness?: number;
-  /** 進度條顏色 class */
+  /** 墨線顏色 class */
   barClassName?: string;
-  /** 顯示百分比數字 */
+  /** 在尺規右上方印出百分比 */
   showPercent?: boolean;
   /** 平滑跟隨；減少動態時自動關閉 */
   smooth?: boolean;
@@ -45,13 +38,19 @@ const defaultLabels = {
   jumpTo: (label: string) => `Jump to ${label}`,
 };
 
+// 設計語言（DESIGN.md）：紙邊作底線，墨色作進度
+const edgeLine = "bg-[#e7e0d0] dark:bg-[#38332b]";
+const inkLine = "bg-[#1c1917] dark:bg-[#ece7dc]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const inkMuted = "text-[#1c1917]/50 dark:text-[#ece7dc]/50";
+
 type Marker = ScrollSection & { at: number; top: number };
 
 export function ScrollProgress({
   container,
   sections = [],
   position = "fixed",
-  thickness = 4,
+  thickness = 2,
   barClassName,
   showPercent = false,
   smooth = true,
@@ -60,8 +59,9 @@ export function ScrollProgress({
 }: ScrollProgressProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...defaultLabels, ...labels };
-  const { scrollYProgress } = useScroll(container ? { container } : undefined);
-  const spring = useSpring(scrollYProgress, { stiffness: 220, damping: 32, restDelta: 0.001 });
+  // layoutEffect: false，等父層的 container ref 掛上後才綁定，否則會退回追蹤 window
+  const { scrollYProgress } = useScroll(container ? { container, layoutEffect: false } : undefined);
+  const spring = useSpring(scrollYProgress, { stiffness: 240, damping: 30, restDelta: 0.001 });
   const value: MotionValue<number> = smooth && !reduceMotion ? spring : scrollYProgress;
 
   // 只在整數百分比變化時更新 state，避免每個 scroll frame 都重繪
@@ -79,17 +79,14 @@ export function ScrollProgress({
 
   const measure = useCallback(() => {
     const root = container?.current ?? null;
-    const max = root
-      ? root.scrollHeight - root.clientHeight
-      : document.documentElement.scrollHeight - window.innerHeight;
+    const max = root ? root.scrollHeight - root.clientHeight : document.documentElement.scrollHeight - window.innerHeight;
     const rootTop = root ? root.getBoundingClientRect().top - root.scrollTop : -window.scrollY;
     const next: Marker[] = [];
     for (const s of sectionsRef.current) {
-      const el = root
-        ? root.querySelector<HTMLElement>(`#${CSS.escape(s.id)}`)
-        : document.getElementById(s.id);
+      const el = root ? root.querySelector<HTMLElement>(`#${CSS.escape(s.id)}`) : document.getElementById(s.id);
       if (!el) continue;
-      const top = el.getBoundingClientRect().top - rootTop;
+      // 尊重 scroll-margin-top，跳轉後標題不會貼齊邊緣
+      const top = el.getBoundingClientRect().top - rootTop - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0);
       next.push({ ...s, top, at: max > 0 ? Math.min(Math.max(top / max, 0), 1) : 0 });
     }
     setMarkers(next);
@@ -114,6 +111,8 @@ export function ScrollProgress({
     target.scrollTo({ top: m.top, behavior: reduceMotion ? "auto" : "smooth" });
   };
 
+  const printLabels = position !== "fixed" && markers.length > 0;
+
   return (
     <div
       className={cn(
@@ -121,6 +120,7 @@ export function ScrollProgress({
         position === "fixed" && "fixed",
         position === "sticky" && "sticky",
         position === "static" && "relative",
+        printLabels && "pb-5",
         className,
       )}
     >
@@ -131,44 +131,62 @@ export function ScrollProgress({
         aria-valuemax={100}
         aria-valuenow={percent}
         aria-valuetext={`${percent}%`}
-        className="relative w-full bg-muted"
+        className="relative flex w-full items-end"
         style={{ height: thickness }}
       >
-        <motion.div
-          className={cn("absolute inset-0 origin-left bg-primary", barClassName)}
+        <span aria-hidden="true" className={cn("absolute inset-x-0 bottom-0 h-px", edgeLine)} />
+        <motion.span
+          aria-hidden="true"
+          className={cn("absolute inset-0 origin-left", inkLine, barClassName)}
           style={{ scaleX: value }}
         />
       </div>
 
       {markers.length > 0 && (
-        <nav aria-label={text.progress} className="pointer-events-none absolute inset-x-0" style={{ top: thickness / 2 }}>
+        <nav aria-label={text.progress} className="absolute inset-x-0 top-0">
           <ul>
-            {markers.map((m) => {
-              const passed = percent / 100 >= m.at - 0.001;
+            {markers.map((m, i) => {
+              // percent 已四捨五入到整數，容許 1% 誤差，跳轉後該刻度立即算已讀
+              const passed = percent / 100 >= m.at - 0.01;
+              // 靠近尾端的刻度把字印在刻痕左側，並與前一格平分空間，避免擠成一點
+              const flip = (k: number) => k > 0 && k < markers.length && (markers[k + 1]?.at ?? 1) - markers[k].at < 0.15;
+              const room = flip(i)
+                ? (m.at - markers[i - 1].at) / 2
+                : ((markers[i + 1]?.at ?? 1) - m.at) / (flip(i + 1) ? 2 : 1);
               return (
-                <li key={m.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${m.at * 100}%` }}>
+                <li
+                  key={m.id}
+                  className="@container absolute top-0 flex"
+                  style={{
+                    [flip(i) ? "right" : "left"]: `${(flip(i) ? 1 - m.at : m.at) * 100}%`,
+                    width: `${room * 100}%`,
+                    justifyContent: flip(i) ? "flex-end" : "flex-start",
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => jump(m)}
                     aria-label={text.jumpTo(m.label)}
-                    className="group pointer-events-auto relative grid size-6 place-items-center rounded-full outline-none"
+                    title={printLabels ? undefined : m.label}
+                    className={cn(
+                      "group flex max-w-full items-start gap-1.5 rounded-[2px] outline-none transition-colors focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current",
+                      flip(i) ? "flex-row-reverse pl-2 text-right" : "pr-2 text-left",
+                      passed ? ink : inkMuted,
+                    )}
+                    style={{ height: thickness + 18 }}
                   >
-                    <span
-                      className={cn(
-                        "block size-2.5 rounded-full border-2 transition-colors duration-200",
-                        passed ? "border-primary bg-primary" : "border-muted-foreground/50 bg-background",
-                        "group-hover:scale-125 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-1 motion-reduce:group-hover:scale-100",
-                      )}
-                    />
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "pointer-events-none absolute top-full mt-1 whitespace-nowrap rounded-md border border-border bg-card px-2 py-0.5 text-xs text-card-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100",
-                        m.at < 0.1 ? "left-0" : m.at > 0.9 ? "right-0" : "left-1/2 -translate-x-1/2",
-                      )}
-                    >
-                      {m.label}
-                    </span>
+                    {/* 刻度：像尺規上的一道刻痕 */}
+                    <span aria-hidden="true" className="h-[9px] w-px shrink-0 bg-current" style={{ marginTop: thickness }} />
+                    {/* 空間不夠時只留刻痕，不印被截成一兩個字母的標籤 */}
+                    {printLabels && (
+                      <span
+                        aria-hidden="true"
+                        className="mt-[3px] hidden truncate text-[11px] @min-[4rem]:block leading-[14px] tracking-[0.04em] decoration-1 underline-offset-[3px] group-hover:underline group-focus-visible:underline"
+                        style={{ paddingTop: thickness }}
+                      >
+                        {m.label}
+                      </span>
+                    )}
                   </button>
                 </li>
               );
@@ -180,8 +198,7 @@ export function ScrollProgress({
       {showPercent && (
         <span
           aria-hidden="true"
-          className="absolute right-2 mt-1.5 rounded-full border border-border bg-background/90 px-2 py-0.5 text-xs tabular-nums text-muted-foreground backdrop-blur"
-          style={{ top: thickness }}
+          className={cn("absolute right-0 bottom-full mb-1.5 text-[11px] leading-none tabular-nums", inkMuted)}
         >
           {percent}%
         </span>

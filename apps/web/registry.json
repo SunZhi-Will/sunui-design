@@ -7,7 +7,7 @@
       "name": "add-to-cart-button",
       "type": "registry:block",
       "title": "Add To Cart Button",
-      "description": "An add-to-cart button whose product thumbnail flies along an arc into a cart icon (via ref or a screen corner), with idle, adding and added states and a companion CartIcon whose badge bumps on each add. Announces the result via aria-live; with reduced motion the flight is skipped and states switch instantly.",
+      "description": "Add-to-cart button that sends a small paper price tag along an arc into the cart; the cart badge bumps like a stamp. Use on product cards and detail pages. Reduced motion skips the flight.",
       "dependencies": [
         "framer-motion"
       ],
@@ -51,7 +51,7 @@
       "name": "animated-number",
       "type": "registry:block",
       "title": "Animated Number",
-      "description": "An odometer-style number that rolls digit by digit with Intl currency or number formatting and a brief green or red hint plus arrow when the value rises or falls. Use for prices, totals and counters; screen readers get the formatted text, and reduced motion swaps instantly.",
+      "description": "Mechanical odometer for prices and counts: each digit wheel turns in the direction the value moved, with Intl currency formatting and an optional small ink trend arrow. Screen readers get the formatted value.",
       "dependencies": [
         "framer-motion"
       ],
@@ -96,7 +96,7 @@
       "name": "avatar-stack",
       "type": "registry:block",
       "title": "Avatar Stack",
-      "description": "Overlapping avatars with image or deterministic initials fallback, a max visible count with a +N overflow chip, three sizes, optional ring color and presence dots, where hover or focus lifts an avatar and shows its name. Rendered as a labelled list with named avatars so screen readers hear every member; reduced motion keeps avatars still and fades tooltips instantly.",
+      "description": "Recent buyers social proof: initials on paper discs with an ink outline, a +N count and hover or focus tooltips. Use near add-to-cart to show real purchase activity.",
       "dependencies": [
         "framer-motion"
       ],
@@ -229,7 +229,7 @@
       "name": "cjk-heading",
       "type": "registry:block",
       "title": "CJK Heading",
-      "description": "Headline for Traditional Chinese and Japanese with optional vertical writing (vertical-rl with tate-chu-yoko digits), punctuation compression via text-spacing-trim with palt/halt font-feature fallbacks, automatic thin spacing between CJK and Latin text, and a staggered per-character blur-in that keeps native line breaking rules. Screen readers read the original text; reduced motion uses an instant fade.",
+      "description": "Typeset Traditional Chinese and Japanese campaign headlines: punctuation compression, CJK and Latin spacing, optional vertical writing and a vermilion seal highlight for one key word. No motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -273,7 +273,7 @@
       "name": "copy-code-button",
       "type": "registry:block",
       "title": "Copy Code Button",
-      "description": "A dashed coupon chip that copies a promo code to the clipboard, morphs its icon into a check and pops a Copied toast. Keyboard operable, announces success or failure via aria-live, keeps the code selectable as a fallback, and drops motion when reduced motion is preferred.",
+      "description": "Printed promo code slip with a dashed outline; copying presses a small vermilion COPIED stamp and announces the result. Falls back when the clipboard API is unavailable.",
       "dependencies": [
         "framer-motion"
       ],
@@ -317,7 +317,7 @@
       "name": "countdown-banner",
       "type": "registry:block",
       "title": "Countdown Banner",
-      "description": "A limited-time offer banner with a live countdown, price drop and a glowing call to action.",
+      "description": "Paper sale banner with discount, prices and a printed flip-card countdown to a real end date; shows an ended stamp when time is up. Supports English and Chinese copy.",
       "dependencies": [
         "framer-motion"
       ],
@@ -360,7 +360,7 @@
       "name": "expanding-search",
       "type": "registry:block",
       "title": "Expanding Search",
-      "description": "A search icon button that grows into a field with autofocus, a clear button and an optional suggestions dropdown, collapsing on Escape or when it loses focus while empty. The dropdown follows the ARIA combobox pattern with arrow, Home/End and Enter keys, an opt-in \"/\" shortcut ignores typing elsewhere, and the width animation is instant under reduced motion.",
+      "description": "Store search field that expands into a paper slip of product suggestions with thumbnails, prices and keyboard navigation (combobox pattern, / shortcut).",
       "dependencies": [
         "framer-motion"
       ],
@@ -405,7 +405,7 @@
       "name": "favorite-button",
       "type": "registry:block",
       "title": "Favorite Button",
-      "description": "A heart toggle for wishlists with a burst ring, small particles and an optional rolling count. Uses aria-pressed with descriptive labels, works controlled or uncontrolled, and skips the burst and bounce under reduced motion.",
+      "description": "Wishlist heart in ink that fills vermilion with a stamp-like press when saved. aria-pressed toggle with optional count.",
       "dependencies": [
         "framer-motion"
       ],
@@ -494,7 +494,7 @@
       "name": "low-stock-indicator",
       "type": "registry:block",
       "title": "Low Stock Indicator",
-      "description": "An honest scarcity indicator that shows the real remaining stock with a ticking count and a draining meter, shifting from emerald to amber to rose at configurable thresholds. It never fakes a countdown; changes are announced via role=status, and reduced motion removes the pulse and animation.",
+      "description": "Honest printed stock tag: one slip per unit when stock is small, otherwise a thin ink line; vermilion only at the critical level and a stamp when sold out. Never counts down on its own.",
       "dependencies": [
         "framer-motion"
       ],
@@ -538,7 +538,7 @@
       "name": "otp-input",
       "type": "registry:block",
       "title": "OTP Input",
-      "description": "One-time code input with N cells, auto-advance, backspace to previous cell, paste that fills every cell, numeric inputMode and autocomplete=\"one-time-code\" for SMS autofill. Shows success and error states (error shakes the row); each cell is labelled, arrow/Home/End keys navigate, and the shake is skipped under reduced motion.",
+      "description": "One-time code entry styled like boxes on a printed form: auto-advance, paste to fill, keyboard navigation, a short error shake and a VERIFIED stamp.",
       "dependencies": [
         "framer-motion"
       ],
@@ -626,7 +626,7 @@
       "name": "quantity-stepper",
       "type": "registry:block",
       "title": "Quantity Stepper",
-      "description": "A minus, number and plus control for carts with min, max and step, long-press to repeat with acceleration, direct typing clamped on blur, a rolling number animation and an optional trash button at the minimum. Exposes ARIA spinbutton semantics (ArrowUp/Down, PageUp/Down, Home/End) with a polite live region, and the roll animation is skipped under reduced motion.",
+      "description": "Receipt-style quantity stepper with tabular count, long-press repeat, typed input, min and max limits and a remove action at the minimum.",
       "dependencies": [
         "framer-motion"
       ],
@@ -760,7 +760,7 @@
       "name": "scroll-progress",
       "type": "registry:block",
       "title": "Scroll Progress",
-      "description": "Reading progress bar tied to the window or any scroll container, with optional section markers that show progress and jump to each section on click. Exposes a progressbar role with percent values, markers are keyboard-focusable buttons, and smoothing and smooth scrolling are turned off under reduced motion.",
+      "description": "Hairline ink reading progress rule for the window or a scroll container, with optional section ticks you can jump to.",
       "dependencies": [
         "framer-motion"
       ],
@@ -803,7 +803,7 @@
       "name": "scroll-reveal-text",
       "type": "registry:block",
       "title": "Scroll Reveal Text",
-      "description": "A paragraph whose words light up one by one as it scrolls through the viewport or a scroll container, splitting per character for Chinese, Japanese and Korean and per word for Latin text, with optional accent words. Screen readers get the full text once; under reduced motion the text is shown fully lit.",
+      "description": "Paragraph whose characters (CJK) or words (Latin) darken from faint to full ink as the reader scrolls. Accent phrases can print in vermilion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -847,7 +847,7 @@
       "name": "segmented-control",
       "type": "registry:block",
       "title": "Segmented Control",
-      "description": "Joined segments with a pill that springs to the selected option, supporting sm, md and lg sizes, optional icons or icon-only mode, and controlled or uncontrolled use. Built as a radiogroup with roving tabindex and arrow, Home and End keys; reduced motion moves the pill instantly.",
+      "description": "Product variant picker: sizes or colors as typographic chips with one shared ink outline that slides between them, sold-out options struck through. Radio group semantics.",
       "dependencies": [
         "framer-motion"
       ],
@@ -936,7 +936,7 @@
       "name": "side-panel",
       "type": "registry:block",
       "title": "Side Panel",
-      "description": "A modal drawer that slides in from the left, right or bottom with a title, description, scrollable body and sticky footer. Traps focus, closes on Escape or overlay click, locks page scroll and restores focus to the trigger; it fades instead of sliding under reduced motion.",
+      "description": "Paper sheet drawer from the left, right or bottom over a flat ink scrim, with focus trap, Escape to close, scroll lock and focus return.",
       "dependencies": [
         "framer-motion"
       ],
@@ -980,7 +980,7 @@
       "name": "skeleton-set",
       "type": "registry:block",
       "title": "Skeleton Set",
-      "description": "Skeleton loading primitives (line, circle, text, card, product card, list) with wave, pulse or no shimmer, plus a SkeletonSet wrapper that crossfades from the placeholder to real content when loaded. The region sets aria-busy and announces loading state via a visually hidden status; shimmer is disabled under reduced motion.",
+      "description": "Paper placeholders for product cards, lists and text with a slow opacity pulse while loading, crossfading to real content. Sets aria-busy and announces when loaded.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1023,7 +1023,7 @@
       "name": "star-rating",
       "type": "registry:block",
       "title": "Star Rating",
-      "description": "Rating input with hover preview, optional half stars, a word label under the stars, custom icons and an emoji mood variant whose chosen face scales up, plus a read-only mode with fractional fill for averages like 4.3. Uses radiogroup semantics with arrow, Home/End and Delete keys; under reduced motion the pop and scale effects are skipped.",
+      "description": "Ink star rating with half stars, keyboard roving focus, optional clear and a hidden form input; read-only mode for review summaries.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1068,7 +1068,7 @@
       "name": "toast-stack",
       "type": "registry:block",
       "title": "Toast Stack",
-      "description": "Stacked notifications that fan out on hover or keyboard focus, dismiss by swipe, close button or Escape, and auto-dismiss with timers that pause while hovered or focused. Ships a useToasts hook; toasts render in a labelled region with an aria-live polite list, and springs become instant under reduced motion.",
+      "description": "Paper slip notifications that stack, fan out on hover or focus and dismiss by swipe or Escape, with optional product thumbnail and undo action. Includes a useToasts hook.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1111,7 +1111,7 @@
       "name": "typewriter",
       "type": "registry:block",
       "title": "Typewriter",
-      "description": "Typing and deleting rotating phrases with a blinking caret (bar, block or underscore), grapheme-accurate via Intl.Segmenter and CJK-aware pacing with longer pauses after punctuation; starts when scrolled into view. Screen readers get the full text once from a visually hidden copy (aria-live off), and reduced motion swaps whole phrases without typing.",
+      "description": "Types phrases once with grapheme-correct CJK timing and rests on the last one (loop optional). Thin ink caret; screen readers get the full text once.",
       "dependencies": [
         "framer-motion"
       ],

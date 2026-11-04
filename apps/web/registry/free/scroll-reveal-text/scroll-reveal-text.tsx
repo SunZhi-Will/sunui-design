@@ -8,19 +8,19 @@ import { cn } from "@/lib/utils";
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
 export interface ScrollRevealTextProps {
-  /** 段落文字；中文、日文會逐字點亮，英文逐詞點亮 */
+  /** 段落文字；中文、日文逐字由淡墨轉為實墨，英文逐詞 */
   text: string;
-  /** 捲動容器；省略時追蹤 window */
+  /** 捲動容器；省略時追蹤 window。容器需為定位元素（relative），位置才量得準 */
   container?: RefObject<HTMLElement | null>;
   as?: ElementType;
   /** 強制切分方式；auto 依文字自動判斷 */
   splitBy?: "auto" | "word" | "char";
-  /** 尚未點亮時的不透明度 */
+  /** 尚未讀到時的墨色濃度（0 到 1） */
   dimOpacity?: number;
-  /** 需要強調的詞，點亮後套用 accentClassName */
+  /** 需要強調的字詞（可多字），讀到時以朱紅印出 */
   accentWords?: string[];
   accentClassName?: string;
-  /** framer-motion useScroll offset，決定何時開始與結束點亮 */
+  /** framer-motion useScroll offset，決定何時開始與結束 */
   offset?: ScrollOffset;
   /** 語言標記，例如 zh-Hant、ja；影響字型與斷行 */
   lang?: string;
@@ -46,46 +46,62 @@ export function ScrollRevealText({
   container,
   as: Tag = "p",
   splitBy = "auto",
-  dimOpacity = 0.18,
+  dimOpacity = 0.2,
   accentWords = NO_WORDS,
-  accentClassName = "text-primary",
+  accentClassName = "text-[#c8361d] dark:text-[#ec6a4f]",
   offset = ["start 0.85", "end 0.45"],
   lang,
   className,
 }: ScrollRevealTextProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, container, offset });
-  const tokens = useMemo(() => splitReveal(text, splitBy), [text, splitBy]);
-  const accent = useMemo(() => new Set(accentWords), [accentWords]);
+  // layoutEffect: false，等父層的 container ref 掛上後才綁定，否則會退回追蹤 window
+  const { scrollYProgress } = useScroll({ target: ref, container, offset, layoutEffect: false });
+  const accentKey = accentWords.join("\u0000");
+
+  const tokens = useMemo(() => {
+    // 先在原文標出強調字詞的位置，多字的中文詞也能整詞上色
+    const marked = new Set<number>();
+    for (const w of accentKey.split("\u0000")) {
+      if (!w) continue;
+      for (let at = text.indexOf(w); at !== -1; at = text.indexOf(w, at + w.length)) {
+        for (let i = at; i < at + w.length; i++) marked.add(i);
+      }
+    }
+    let pos = 0;
+    return splitReveal(text, splitBy).map((t) => {
+      const start = pos;
+      pos += t.length;
+      // 以 token 起點判斷，英文詞後接標點（例如 "ready,"）也能命中
+      return { text: t, accent: t.trim() !== "" && marked.has(start) };
+    });
+  }, [text, splitBy, accentKey]);
 
   // 只有非空白 token 參與進度分配
-  const visibleCount = tokens.filter((t) => t.trim()).length || 1;
+  const visibleCount = tokens.filter((t) => t.text.trim()).length || 1;
   let cursor = 0;
 
   return (
-    <Tag ref={ref} lang={lang} className={cn("relative text-2xl font-semibold leading-relaxed text-foreground sm:text-3xl", className)}>
+    <Tag
+      ref={ref}
+      lang={lang}
+      className={cn("text-2xl leading-relaxed font-semibold text-[#1c1917] sm:text-3xl dark:text-[#ece7dc]", className)}
+    >
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">
         {tokens.map((token, i) => {
-          if (!token.trim()) return <span key={i}>{token}</span>;
+          if (!token.text.trim()) return <span key={i}>{token.text}</span>;
           const start = cursor / visibleCount;
           cursor += 1;
           const end = cursor / visibleCount;
-          const isAccent = accent.has(token.replace(/[.,!?;:，。！？；：、]+$/u, ""));
+          const tone = cn(token.accent && accentClassName);
           return reduceMotion ? (
-            <span key={i} className={cn(isAccent && accentClassName)}>
-              {token}
+            <span key={i} className={tone}>
+              {token.text}
             </span>
           ) : (
-            <Token
-              key={i}
-              progress={scrollYProgress}
-              range={[start, end]}
-              dim={dimOpacity}
-              className={cn(isAccent && accentClassName)}
-            >
-              {token}
+            <Token key={i} progress={scrollYProgress} range={[start, end]} dim={dimOpacity} className={tone}>
+              {token.text}
             </Token>
           );
         })}
@@ -107,6 +123,7 @@ function Token({
   className?: string;
   children: string;
 }) {
+  // 墨色由淡轉濃：只調濃度，不掃色、不模糊
   const opacity = useTransform(progress, range, [dim, 1]);
   return (
     <motion.span className={className} style={{ opacity }}>

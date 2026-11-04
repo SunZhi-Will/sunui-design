@@ -76,7 +76,7 @@ const springs = {
 const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
   success: <path d="m3.5 8.5 3 3 6-7" className="text-emerald-700 dark:text-emerald-400" />,
-  error: <path d="M8 4.5v4.5M8 11.5v.01M8 1.75 14.5 13.5h-13Z" className="text-destructive" />,
+  error: <path d="M8 4.5v4.5M8 11.5v.01M8 1.75 14.5 13.5h-13Z" className="text-[#c8361d] dark:text-[#ec6a4f]" />,
   info: <path d="M8 7v4.5M8 4.5v.01M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13Z" />,
 };
 

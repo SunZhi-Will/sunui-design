@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 export interface SegmentedOption<T extends string = string> {
   value: T;
   label: ReactNode;
-  /** 顯示在文字前的圖示 */
+  /** 顯示在文字前的圖示，例如顏色色票 */
   icon?: ReactNode;
   /** 只顯示圖示時，提供給螢幕閱讀器的名稱 */
   ariaLabel?: string;
+  /** 停用（例如售完），文字會劃線 */
   disabled?: boolean;
 }
 
@@ -22,9 +23,8 @@ export interface SegmentedControlProps<T extends string = string> {
   /** 非受控時的初始值，預設為第一個可用選項 */
   defaultValue?: T;
   onValueChange?: (value: T) => void;
-  /** 尺寸 */
   size?: "sm" | "md" | "lg";
-  /** 撐滿父層寬度，各段等寬 */
+  /** 撐滿父層寬度，各選項等寬 */
   fullWidth?: boolean;
   /** 只顯示圖示，文字改為 aria-label */
   iconOnly?: boolean;
@@ -34,10 +34,14 @@ export interface SegmentedControlProps<T extends string = string> {
   className?: string;
 }
 
+// 設計語言（DESIGN.md）：墨色外框標示選取，snappy 彈簧滑動
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
+
 const sizes = {
-  sm: { root: "h-8 p-0.5 text-xs", item: "px-2.5 gap-1.5", icon: "[&_svg]:size-3.5", iconOnly: "w-7" },
-  md: { root: "h-10 p-1 text-sm", item: "px-3.5 gap-2", icon: "[&_svg]:size-4", iconOnly: "w-8" },
-  lg: { root: "h-12 p-1 text-base", item: "px-5 gap-2", icon: "[&_svg]:size-5", iconOnly: "w-10" },
+  sm: { item: "h-8 min-w-9 px-2.5 gap-1.5 text-xs", icon: "[&_svg]:size-3.5", iconOnly: "size-8" },
+  md: { item: "h-10 min-w-11 px-3.5 gap-2 text-sm", icon: "[&_svg]:size-4", iconOnly: "size-10" },
+  lg: { item: "h-12 min-w-14 px-5 gap-2 text-base", icon: "[&_svg]:size-5", iconOnly: "size-12" },
 };
 
 export function SegmentedControl<T extends string = string>({
@@ -81,16 +85,16 @@ export function SegmentedControl<T extends string = string>({
     }
   };
 
+  const keyMap: Record<string, 1 | -1 | "first" | "last"> = {
+    ArrowRight: 1,
+    ArrowDown: 1,
+    ArrowLeft: -1,
+    ArrowUp: -1,
+    Home: "first",
+    End: "last",
+  };
   const handleKeyDown = (i: number, e: KeyboardEvent<HTMLButtonElement>) => {
-    const map: Record<string, 1 | -1 | "first" | "last"> = {
-      ArrowRight: 1,
-      ArrowDown: 1,
-      ArrowLeft: -1,
-      ArrowUp: -1,
-      Home: "first",
-      End: "last",
-    };
-    const dir = map[e.key];
+    const dir = keyMap[e.key];
     if (dir === undefined) return;
     e.preventDefault();
     move(i, dir);
@@ -106,9 +110,9 @@ export function SegmentedControl<T extends string = string>({
         aria-label={ariaLabel}
         aria-disabled={disabled || undefined}
         className={cn(
-          "relative isolate inline-flex items-stretch rounded-xl bg-muted text-muted-foreground",
-          s.root,
-          fullWidth && "flex w-full",
+          "flex-wrap gap-2",
+          fullWidth ? "flex w-full" : "inline-flex",
+          ink,
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
@@ -131,24 +135,29 @@ export function SegmentedControl<T extends string = string>({
               onClick={() => select(o.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
               className={cn(
-                "relative inline-flex items-center justify-center rounded-[calc(0.75rem-0.25rem)] font-medium whitespace-nowrap transition-colors outline-none select-none",
-                "focus-visible:ring-2 focus-visible:ring-ring",
-                "disabled:cursor-not-allowed disabled:opacity-50",
+                "relative inline-flex shrink-0 items-center justify-center rounded-md border border-border font-medium whitespace-nowrap tabular-nums transition-colors outline-none select-none",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "disabled:cursor-not-allowed disabled:text-current/35 disabled:line-through disabled:decoration-1",
                 iconOnly ? s.iconOnly : s.item,
                 s.icon,
                 fullWidth && "flex-1",
-                active ? "text-foreground" : "hover:text-foreground",
+                active ? "text-current" : "text-current/70 enabled:hover:border-current/40 enabled:hover:text-current",
               )}
             >
+              {/* 唯一一個選取外框，在選項之間滑動 */}
               {active && (
                 <motion.span
-                  layoutId="segmented-pill"
+                  layoutId="variant-outline"
                   aria-hidden="true"
-                  className="absolute inset-0 -z-10 rounded-[inherit] bg-background shadow-sm ring-1 ring-border/60"
-                  transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }}
+                  className="pointer-events-none absolute -inset-px rounded-[inherit] border-[1.5px] border-current"
+                  transition={reduceMotion ? { duration: 0 } : snappy}
                 />
               )}
-              {o.icon && <span aria-hidden="true" className="inline-flex shrink-0">{o.icon}</span>}
+              {o.icon && (
+                <span aria-hidden="true" className="inline-flex shrink-0">
+                  {o.icon}
+                </span>
+              )}
               {!iconOnly && <span>{o.label}</span>}
             </button>
           );

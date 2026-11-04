@@ -65,7 +65,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
 /** 排版稿上的圖片版位：細線打叉的方框 */
 export function SkeletonImage({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={cn("relative w-full text-[#e2d9c6] dark:text-[#37322a]", block, className)}>
+    <div aria-hidden="true" className={cn("relative w-full bg-[#f3eee3] text-[#e7e0d0] dark:bg-[#26221d] dark:text-[#38332b]", className)}>
       <svg className="absolute inset-0 size-full" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
         <path d="M0 0 100 100M100 0 0 100" vectorEffect="non-scaling-stroke" />
       </svg>
@@ -98,8 +98,8 @@ export function SkeletonProductCard({ className }: { className?: string }) {
         <SkeletonLine width="70%" className="h-3.5" />
         <SkeletonLine width="40%" className="h-2.5" />
         <div className="flex items-center justify-between pt-2">
-          <SkeletonLine width={52} className="h-4" />
-          <Skeleton className="h-8 w-20 rounded-md" />
+          <SkeletonLine width={40} className="h-4" />
+          <Skeleton className="h-8 w-14 rounded-md" />
         </div>
       </div>
     </div>
@@ -167,7 +167,7 @@ export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pu
         <span className="sr-only" role="status">
           {loaded ? text.loaded : text.loading}
         </span>
-        <div aria-busy={!loaded} className="grid">
+        <div aria-busy={!loaded} className="grid grid-cols-[minmax(0,1fr)]">
           <AnimatePresence initial={false}>
             <motion.div
               key={loaded ? "content" : "skeleton"}

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  AnimatePresence,
-  animate,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  type Variants,
-} from "framer-motion";
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode, type Ref, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
@@ -18,15 +11,17 @@ export type AddToCartState = "idle" | "adding" | "added";
 export type FlyCorner = "top-right" | "top-left" | "bottom-right" | "bottom-left";
 
 export interface AddToCartButtonProps {
-  /** 飛行中的縮圖，通常是商品圖片 */
-  thumbnail: ReactNode;
+  /** 印在飛行吊牌上的商品小圖 */
+  thumbnail?: ReactNode;
+  /** 吊牌上的文字，通常是價格 */
+  tag?: ReactNode;
   /** 目標購物車元素；沒給時飛向 fallbackCorner */
   cartRef?: RefObject<HTMLElement | null>;
   /** 沒有 cartRef 時的飛行終點 */
   fallbackCorner?: FlyCorner;
   /** 點擊後呼叫，可回傳 Promise；完成後才進入 added 狀態 */
   onAdd?: () => void | Promise<void>;
-  /** 縮圖抵達購物車的那一刻呼叫（減少動態時立即呼叫），適合在此更新數量 */
+  /** 吊牌抵達購物車的那一刻呼叫（減少動態時立即呼叫），適合在此更新數量 */
   onLand?: () => void;
   /** 飛行秒數 */
   flightDuration?: number;
@@ -52,34 +47,38 @@ const defaultLabels = {
   announce: "Item added to cart",
 };
 
-type Flight = { id: number; from: DOMRect; to: { x: number; y: number } };
+// 設計語言（DESIGN.md）：飛出去的是一張紙吊牌
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 
-const labelVariants: Variants = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
-};
+const springs = {
+  snappy: { type: "spring", stiffness: 520, damping: 34 },
+  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
+} as const;
+
+type Flight = { id: number; from: DOMRect; to: { x: number; y: number } };
 
 export function AddToCartButton({
   thumbnail,
+  tag,
   cartRef,
   fallbackCorner = "top-right",
   onAdd,
   onLand,
-  flightDuration = 0.75,
-  arcHeight = 140,
+  flightDuration = 0.6,
+  arcHeight = 120,
   resetAfter = 1600,
   disabled,
   labels,
   className,
 }: AddToCartButtonProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const t = { ...defaultLabels, ...labels };
   const [state, setState] = useState<AddToCartState>("idle");
   const [flights, setFlights] = useState<Flight[]>([]);
   const [announcement, setAnnouncement] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const thumbRef = useRef<HTMLSpanElement>(null);
   const flightId = useRef(0);
   const landResolvers = useRef(new Map<number, () => void>());
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -93,16 +92,12 @@ export function AddToCartButton({
   }, []);
 
   function targetPoint() {
-    const el = cartRef?.current;
-    if (el) {
-      const r = el.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    }
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const x = fallbackCorner.endsWith("right") ? w - 32 : 32;
-    const y = fallbackCorner.startsWith("top") ? 32 : h - 32;
-    return { x, y };
+    const r = cartRef?.current?.getBoundingClientRect();
+    if (r) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    return {
+      x: fallbackCorner.endsWith("right") ? window.innerWidth - 32 : 32,
+      y: fallbackCorner.startsWith("top") ? 32 : window.innerHeight - 32,
+    };
   }
 
   async function handleClick() {
@@ -111,22 +106,20 @@ export function AddToCartButton({
     setState("adding");
     setAnnouncement("");
 
-    let flightDone: Promise<void> = Promise.resolve();
-    const from = reduceMotion ? null : (thumbRef.current ?? buttonRef.current)?.getBoundingClientRect();
+    let landed: Promise<void> = Promise.resolve();
+    const from = reduceMotion ? null : buttonRef.current?.getBoundingClientRect();
     if (from) {
       const id = ++flightId.current;
-      flightDone = new Promise((resolve) => {
-        landResolvers.current.set(id, resolve);
-      });
+      landed = new Promise((resolve) => landResolvers.current.set(id, resolve));
       setFlights((f) => [...f, { id, from, to: targetPoint() }]);
     } else {
       onLand?.();
     }
 
     try {
-      await Promise.all([onAdd?.(), flightDone]);
+      await Promise.all([onAdd?.(), landed]);
       setState("added");
-      setAnnouncement(text.announce);
+      setAnnouncement(t.announce);
       resetTimer.current = setTimeout(() => setState("idle"), resetAfter);
     } catch {
       setState("idle");
@@ -135,80 +128,33 @@ export function AddToCartButton({
 
   return (
     <>
-      <button
+      <motion.button
         ref={buttonRef}
         type="button"
         onClick={handleClick}
         disabled={disabled}
         aria-busy={state === "adding"}
+        whileTap={reduceMotion || disabled ? undefined : { scale: 0.97 }}
+        transition={springs.snappy}
         className={cn(
-          "group relative inline-flex h-11 items-center gap-2.5 overflow-hidden rounded-full pr-5 pl-1.5 text-sm font-medium transition-colors",
+          "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          state === "added"
-            ? "bg-emerald-600 text-white"
-            : "bg-primary text-primary-foreground hover:bg-primary/90",
+          "disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
           className,
         )}
       >
-        <span
-          ref={thumbRef}
-          className="relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-full bg-background/20 [&>img]:size-full [&>img]:object-cover"
-          aria-hidden="true"
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {state === "added" ? (
-              <motion.svg
-                key="check"
-                viewBox="0 0 24 24"
-                className="size-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                initial={reduceMotion ? false : { scale: 0.4, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={reduceMotion ? undefined : { scale: 0.4, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <motion.path
-                  d="M5 12.5l4.5 4.5L19 7.5"
-                  initial={reduceMotion ? false : { pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.3, delay: 0.05 }}
-                />
-              </motion.svg>
-            ) : (
-              <motion.span
-                key="thumb"
-                className="grid size-full place-items-center"
-                initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
-                animate={{ scale: state === "adding" ? 0.85 : 1, opacity: state === "adding" ? 0.5 : 1 }}
-                exit={reduceMotion ? undefined : { scale: 0.6, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {thumbnail}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </span>
-        <span className="relative grid">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={state}
-              variants={labelVariants}
-              initial={reduceMotion ? false : "initial"}
-              animate="animate"
-              exit={reduceMotion ? undefined : "exit"}
-              transition={{ duration: 0.18 }}
-              className="whitespace-nowrap"
-            >
-              {state === "idle" ? text.idle : state === "adding" ? text.adding : text.added}
-            </motion.span>
-          </AnimatePresence>
-        </span>
-      </button>
+        <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          {state === "added" ? (
+            <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+          ) : (
+            <>
+              <path d="M4 6.5h12l-1 10.5H5z" />
+              <path d="M7.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3" />
+            </>
+          )}
+        </svg>
+        <span className="whitespace-nowrap">{state === "idle" ? t.idle : state === "adding" ? t.adding : t.added}</span>
+      </motion.button>
 
       <span className="sr-only" role="status" aria-live="polite">
         {announcement}
@@ -217,20 +163,20 @@ export function AddToCartButton({
       {mounted &&
         createPortal(
           flights.map((f) => (
-            <Flyer
+            <FlyingTag
               key={f.id}
               flight={f}
               duration={flightDuration}
               arcHeight={arcHeight}
+              thumbnail={thumbnail}
+              tag={tag}
               onDone={() => {
                 setFlights((all) => all.filter((x) => x.id !== f.id));
                 onLand?.();
                 landResolvers.current.get(f.id)?.();
                 landResolvers.current.delete(f.id);
               }}
-            >
-              {thumbnail}
-            </Flyer>
+            />
           )),
           document.body,
         )}
@@ -238,43 +184,49 @@ export function AddToCartButton({
   );
 }
 
-function Flyer({
+const TAG_W = 44;
+const TAG_H = 60;
+
+/** 沿二次貝茲曲線飛向購物車的紙吊牌，途中隨速度方向擺動 */
+function FlyingTag({
   flight,
   duration,
   arcHeight,
+  thumbnail,
+  tag,
   onDone,
-  children,
 }: {
   flight: Flight;
   duration: number;
   arcHeight: number;
+  thumbnail?: ReactNode;
+  tag?: ReactNode;
   onDone: () => void;
-  children: ReactNode;
 }) {
-  const size = 40;
-  const startX = flight.from.left + flight.from.width / 2 - size / 2;
-  const startY = flight.from.top + flight.from.height / 2 - size / 2;
-  const endX = flight.to.x - size / 2;
-  const endY = flight.to.y - size / 2;
-  // 二次貝茲曲線的控制點：取中點再往上拉
-  const ctrlX = (startX + endX) / 2;
-  const ctrlY = Math.min(startY, endY) - arcHeight;
+  const sx = flight.from.left + flight.from.width / 2 - TAG_W / 2;
+  const sy = flight.from.top - TAG_H / 2;
+  const ex = flight.to.x - TAG_W / 2;
+  const ey = flight.to.y - TAG_H / 2;
+  const cx = (sx + ex) / 2;
+  const cy = Math.min(sy, ey) - arcHeight;
 
-  const x = useMotionValue(startX);
-  const y = useMotionValue(startY);
+  const x = useMotionValue(sx);
+  const y = useMotionValue(sy);
+  const rotate = useMotionValue(-6);
   const scale = useMotionValue(1);
   const opacity = useMotionValue(1);
 
   useEffect(() => {
     const controls = animate(0, 1, {
       duration,
-      ease: [0.45, 0, 0.55, 1],
-      onUpdate: (t) => {
-        const u = 1 - t;
-        x.set(u * u * startX + 2 * u * t * ctrlX + t * t * endX);
-        y.set(u * u * startY + 2 * u * t * ctrlY + t * t * endY);
-        scale.set(1 - t * 0.6);
-        opacity.set(t > 0.85 ? (1 - t) / 0.15 : 1);
+      ease: [0.4, 0, 0.6, 1],
+      onUpdate: (p) => {
+        const u = 1 - p;
+        x.set(u * u * sx + 2 * u * p * cx + p * p * ex);
+        y.set(u * u * sy + 2 * u * p * cy + p * p * ey);
+        rotate.set(-6 + p * 18);
+        scale.set(1 - p * 0.55);
+        opacity.set(p > 0.85 ? (1 - p) / 0.15 : 1);
       },
       onComplete: onDone,
     });
@@ -285,16 +237,24 @@ function Flyer({
   return (
     <motion.span
       aria-hidden="true"
-      className="pointer-events-none fixed top-0 left-0 z-[100] grid place-items-center overflow-hidden rounded-full border-2 border-background bg-card shadow-lg [&>img]:size-full [&>img]:object-cover"
-      style={{ x, y, scale, opacity, width: size, height: size }}
+      className={cn(
+        "pointer-events-none fixed top-0 left-0 z-[100] flex origin-top flex-col items-center gap-1 rounded-[3px] border px-1 pt-3.5 pb-1 font-mono text-[9px] leading-none font-semibold tracking-tight tabular-nums shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+        paper,
+        edge,
+        ink,
+      )}
+      style={{ x, y, rotate, scale, opacity, width: TAG_W, height: TAG_H }}
     >
-      {children}
+      {/* 吊牌打孔 */}
+      <span className={cn("absolute top-1.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full border", edge)} />
+      {thumbnail && <span className="size-7 overflow-hidden [&>*]:size-full [&>img]:object-cover">{thumbnail}</span>}
+      {tag}
     </motion.span>
   );
 }
 
 export interface CartIconProps {
-  /** 購物車內數量；變動時徽章會跳一下 */
+  /** 購物車內數量；變動時徽章像蓋章一樣壓一下 */
   count: number;
   /** 超過時顯示 99+ */
   max?: number;
@@ -304,10 +264,9 @@ export interface CartIconProps {
   className?: string;
 }
 
-/** 搭配 AddToCartButton 的購物車目標，數量改變時徽章彈跳 */
+/** 搭配 AddToCartButton 的購物車目標 */
 export function CartIcon({ count, max = 99, label = "Cart", ref, onClick, className }: CartIconProps) {
   const reduceMotion = useReducedMotion();
-  const shown = count > max ? `${max}+` : String(count);
 
   return (
     <button
@@ -316,50 +275,28 @@ export function CartIcon({ count, max = 99, label = "Cart", ref, onClick, classN
       onClick={onClick}
       aria-label={`${label}, ${count} ${count === 1 ? "item" : "items"}`}
       className={cn(
-        "relative grid size-11 place-items-center rounded-full border border-border bg-card text-card-foreground transition-colors hover:bg-muted",
+        "relative grid size-10 place-items-center rounded-md border border-border text-foreground transition-colors hover:border-foreground",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         className,
       )}
     >
-      <motion.svg
-        key={reduceMotion ? "static" : `cart-${count}`}
-        viewBox="0 0 24 24"
-        className="size-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={reduceMotion || count === 0 ? false : { rotate: -12 }}
-        animate={{ rotate: 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 12 }}
-        aria-hidden="true"
-      >
-        <path d="M3 4h2l2.2 10.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
-        <circle cx="9.5" cy="19.5" r="1.3" />
-        <circle cx="17" cy="19.5" r="1.3" />
-      </motion.svg>
+      <svg viewBox="0 0 20 20" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
+        <path d="M4 6.5h12l-1 10.5H5z" />
+        <path d="M7.5 8.5V5.5a2.5 2.5 0 0 1 5 0v3" strokeLinecap="round" />
+      </svg>
       <AnimatePresence initial={false}>
         {count > 0 && (
+          // 以 count 當 key 重新掛載，每次加入都重新「壓」一次
           <motion.span
-            key="badge"
+            key={count}
             aria-hidden="true"
-            className="absolute -top-1 -right-1"
-            initial={reduceMotion ? false : { scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={reduceMotion ? undefined : { scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 600, damping: 18 }}
+            className="absolute -top-1.5 -right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-foreground px-1 font-mono text-[10px] leading-none font-semibold text-background tabular-nums ring-2 ring-background"
+            initial={reduceMotion ? false : { scale: 1.5, opacity: 0.4 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0 } }}
+            transition={springs.stamp}
           >
-            {/* 以 count 當 key 重新掛載，觸發每次加入時的彈跳 */}
-            <motion.span
-              key={count}
-              className="grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[11px] leading-none font-semibold text-white tabular-nums ring-2 ring-background"
-              initial={reduceMotion ? false : { scale: 1.45 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 600, damping: 14 }}
-            >
-              {shown}
-            </motion.span>
+            {count > max ? `${max}+` : count}
           </motion.span>
         )}
       </AnimatePresence>

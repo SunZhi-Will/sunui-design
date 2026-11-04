@@ -37,7 +37,7 @@ export default function SkeletonSetDemo() {
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {picks.map((p, i) => (
-            <SkeletonSet key={p.kind} loaded={arrived > i} skeleton="product" className={i === 2 ? "hidden sm:block" : undefined}>
+            <SkeletonSet key={p.kind} loaded={arrived > i} skeleton="product" className={i === 2 ? "hidden min-w-0 sm:block" : "min-w-0"}>
               <article className="overflow-hidden rounded-md border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
                 <ProductArt kind={p.kind} />
                 <div className="p-4">

@@ -39,8 +39,15 @@ const sizeClass: Record<SidePanelSide, Record<"sm" | "md" | "lg", string>> = {
 const sideClass: Record<SidePanelSide, string> = {
   left: "inset-y-0 left-0 max-w-[calc(100%-3rem)] border-r",
   right: "inset-y-0 right-0 max-w-[calc(100%-3rem)] border-l",
-  bottom: "inset-x-0 bottom-0 rounded-t-2xl border-t",
+  bottom: "inset-x-0 bottom-0 rounded-t-md border-t",
 };
+
+// 設計語言（DESIGN.md）：一張紙從邊緣滑進來，紙面、紙邊、墨色
+const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 
 const offscreen: Record<SidePanelSide, { x?: string; y?: string }> = {
   left: { x: "-100%" },
@@ -50,12 +57,14 @@ const offscreen: Record<SidePanelSide, { x?: string; y?: string }> = {
 
 const panelVariants: Variants = {
   hidden: (c: { side: SidePanelSide; reduce: boolean }) =>
-    c.reduce ? { opacity: 0 } : { ...offscreen[c.side], opacity: 1 },
+    c.reduce
+      ? { opacity: 0, transition: { duration: 0 } }
+      : { ...offscreen[c.side], opacity: 1, transition: gentle },
   visible: (c: { reduce: boolean }) => ({
     x: 0,
     y: 0,
     opacity: 1,
-    transition: c.reduce ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 38 },
+    transition: c.reduce ? { duration: 0 } : gentle,
   }),
 };
 
@@ -149,11 +158,11 @@ export function SidePanel({
         <div className={cn(portal ? "fixed" : "absolute", "inset-0 z-50")} onKeyDown={onKeyDown}>
           <motion.div
             aria-hidden="true"
-            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-[#1c1917]/30 dark:bg-black/55"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.2 }}
+            transition={{ duration: reduce ? 0 : 0.2, ease: "easeOut" }}
             onClick={() => dismissOnOverlay && onOpenChange(false)}
           />
           <motion.div
@@ -169,22 +178,22 @@ export function SidePanel({
             animate="visible"
             exit="hidden"
             className={cn(
-              "absolute flex flex-col border-border bg-background text-foreground shadow-2xl outline-none",
+              "absolute flex flex-col shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none",
+              paper,
+              edge,
+              ink,
               sideClass[side],
               sizeClass[side][size],
               className,
             )}
           >
-            {side === "bottom" && (
-              <span aria-hidden="true" className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-muted" />
-            )}
-            <header className="flex items-start gap-4 border-b border-border px-5 py-4">
+            <header className={cn("flex items-start gap-4 border-b px-5 py-4", edge)}>
               <div className="min-w-0 flex-1">
-                <h2 id={titleId} className="text-base font-semibold leading-tight">
+                <h2 id={titleId} className="text-base leading-tight font-semibold tracking-tight">
                   {title}
                 </h2>
                 {description && (
-                  <p id={descId} className="mt-1 text-sm text-muted-foreground">
+                  <p id={descId} className={cn("mt-1 text-sm", inkMuted)}>
                     {description}
                   </p>
                 )}
@@ -193,15 +202,18 @@ export function SidePanel({
                 type="button"
                 onClick={() => onOpenChange(false)}
                 aria-label={closeLabel}
-                className="-mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                className={cn(
+                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-[#1c1917] focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-[#ece7dc]",
+                  inkMuted,
+                )}
               >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6L6 18" />
+                <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                  <path d="m4 4 8 8M12 4l-8 8" />
                 </svg>
               </button>
             </header>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">{children}</div>
-            {footer && <footer className="border-t border-border bg-muted/40 px-5 py-3">{footer}</footer>}
+            {footer && <footer className={cn("border-t px-5 py-3", edge)}>{footer}</footer>}
           </motion.div>
         </div>
       )}

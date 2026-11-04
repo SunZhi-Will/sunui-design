@@ -38,7 +38,7 @@ const defaultLabels = ["Terrible", "Poor", "Okay", "Good", "Great"];
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const stampSpring = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 
-const starSize: Record<StarRatingSize, string> = { sm: "size-3.5", md: "size-6", lg: "size-8" };
+const starSize: Record<StarRatingSize, string> = { sm: "size-4", md: "size-6", lg: "size-8" };
 const labelSize: Record<StarRatingSize, string> = { sm: "text-xs", md: "text-sm", lg: "text-base" };
 
 const STAR = "M12 3.2l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6-4.4-4.2 6-.8z";

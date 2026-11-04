@@ -7,7 +7,7 @@ import { CopyCodeButton } from "./copy-code-button";
 export default function CopyCodeButtonDemo() {
   return (
     <div className="grid w-full max-w-2xl gap-5 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[13rem_1fr] sm:p-5">
-      <ProductArt kind="tote" className="rounded-md" />
+      <ProductArt kind="tote" className="aspect-[3/2] rounded-md sm:aspect-square" />
 
       <div className="flex min-w-0 flex-col gap-4">
         <div>

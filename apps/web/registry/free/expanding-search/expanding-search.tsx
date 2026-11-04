@@ -228,7 +228,7 @@ export function ExpandingSearch({
         setListOpen(false);
         if (!value.trim()) collapse(false);
       }}
-      className={cn("relative inline-flex max-w-full", ink, className)}
+      className={cn("relative inline-flex max-w-full min-w-0", ink, className)}
     >
       <motion.div
         initial={false}

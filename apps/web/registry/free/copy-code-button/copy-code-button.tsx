@@ -39,7 +39,8 @@ const defaultLabels = {
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
 const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+// 虛線用淡墨色，紙邊色在紙面上幾乎看不見
+const edge = "border-[#1c1917]/25 dark:border-[#ece7dc]/25";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
 const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
@@ -52,15 +53,16 @@ const springs = {
 const sizes = {
   sm: { root: "h-9 text-xs", code: "px-3 text-sm", caption: "px-2.5 text-[10px]", button: "px-2.5", stamp: "text-[10px]" },
   md: { root: "h-11 text-sm", code: "px-4 text-base", caption: "px-3 text-[11px]", button: "px-3.5", stamp: "text-xs" },
-  lg: { root: "h-14 text-sm", code: "px-5 text-xl", caption: "px-4 text-xs", button: "px-4", stamp: "text-sm" },
+  lg: { root: "h-14 text-sm", code: "px-4 text-lg sm:px-5 sm:text-xl", caption: "px-4 text-xs", button: "px-4", stamp: "text-sm" },
 };
 
 async function writeClipboard(text: string) {
-  if (navigator.clipboard?.writeText) {
+  try {
     await navigator.clipboard.writeText(text);
     return;
+  } catch {
+    // 沒有權限、舊瀏覽器或非安全環境時改用下面的備案
   }
-  // 舊瀏覽器或非安全環境的備案
   const el = document.createElement("textarea");
   el.value = text;
   el.setAttribute("readonly", "");
@@ -118,21 +120,46 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
       {caption && (
         <span
           className={cn(
-            "flex shrink-0 items-center border-r border-dashed font-medium tracking-[0.14em] whitespace-nowrap uppercase",
+            "flex min-w-0 items-center border-r border-dashed font-medium tracking-[0.14em] whitespace-nowrap uppercase",
             edge,
             inkMuted,
             s.caption,
           )}
         >
-          {caption}
+          <span className="truncate">{caption}</span>
         </span>
       )}
-      {/* 代碼可直接選取，作為剪貼簿失敗時的退路 */}
-      <span
-        id={codeId}
-        className={cn("flex min-w-0 items-center truncate font-mono font-semibold tracking-[0.12em] uppercase select-all", s.code)}
-      >
-        {code}
+      {/* 代碼可直接選取，作為剪貼簿失敗時的退路；複製後印章蓋在代碼上，代碼淡成墨印 */}
+      <span className={cn("relative flex shrink-0 items-center", s.code)}>
+        <span
+          id={codeId}
+          className={cn(
+            "font-mono font-semibold tracking-[0.12em] uppercase transition-opacity select-all",
+            copied && "opacity-20",
+          )}
+        >
+          {code}
+        </span>
+        <AnimatePresence>
+          {copied && (
+            <motion.span
+              key={stampKey}
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute top-1/2 left-1/2 rounded-[3px] border-2 border-current px-1.5 py-px font-sans font-bold tracking-[0.2em] whitespace-nowrap uppercase",
+                vermilion,
+                s.stamp,
+              )}
+              style={{ x: "-50%", y: "-50%" }}
+              initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
+              animate={{ scale: 1, opacity: 0.9, rotate: -8 }}
+              exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.2 } }}
+              transition={springs.stamp}
+            >
+              {t.stamp}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </span>
       <motion.button
         type="button"
@@ -152,28 +179,6 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         {copied ? <CheckIcon /> : <CopyIcon />}
         <span className={cn(size === "sm" && "sr-only")}>{t.button}</span>
       </motion.button>
-
-      {/* 複製成功：在紙條上蓋一個小印章 */}
-      <AnimatePresence>
-        {copied && (
-          <motion.span
-            key={stampKey}
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute top-1/2 right-[18%] rounded-[3px] border-2 border-current px-1.5 py-px font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-              vermilion,
-              s.stamp,
-            )}
-            style={{ translateY: "-50%" }}
-            initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-            animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-            exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.2 } }}
-            transition={springs.stamp}
-          >
-            {t.stamp}
-          </motion.span>
-        )}
-      </AnimatePresence>
 
       <span className="sr-only" role="status" aria-live="polite">
         {status === "copied" ? t.copied : status === "failed" ? t.failed : ""}

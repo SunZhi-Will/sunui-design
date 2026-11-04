@@ -37,7 +37,7 @@ function ProductCard({ kind, price, saved = false }: (typeof products)[number]) 
       <div className="relative">
         <ProductArt kind={kind} className="rounded-md" />
         <FavoriteButton
-          size="sm"
+          size="md"
           pressed={pressed}
           onPressedChange={setPressed}
           labels={{ add: `Save ${name}`, remove: `Remove ${name} from saved` }}
