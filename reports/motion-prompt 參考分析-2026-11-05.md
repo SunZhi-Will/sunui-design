@@ -9,11 +9,11 @@
 
 | 包 | 編號 | 內容 | 跟 SunUI 的關係 |
 |---|---|---|---|
-| motion / motion2 | 001–024、121–144 | 動態設計手法（Pop-in、Stagger、Overshoot、Glitch…） | 文字與進場效果，另一個 session 正在做 `text-effects`、`animate-presets` |
-| camera / camera2 | 025–048、169–192 | 運鏡與剪接（Dolly zoom、J-cut…） | 影片語彙，不是 UI 元件 |
-| photo | 097–120 | 攝影光線與調色 | 影像風格，不是 UI 元件 |
-| ui | 049–072 | UI 元件名稱 | **主要參考對象** |
-| lp / lp2 | 073–096、145–168 | 著陸頁與網頁效果 | **主要參考對象** |
+| motion / motion2 | 001 至 024、121 至 144 | 動態設計手法（Pop-in、Stagger、Overshoot、Glitch…） | 文字與進場效果，另一個 session 正在做 `text-effects`、`animate-presets` |
+| camera / camera2 | 025 至 048、169 至 192 | 運鏡與剪接（Dolly zoom、J-cut…） | 影片語彙，不是 UI 元件 |
+| photo | 097 至 120 | 攝影光線與調色 | 影像風格，不是 UI 元件 |
+| ui | 049 至 072 | UI 元件名稱 | **主要參考對象** |
+| lp / lp2 | 073 至 096、145 至 168 | 著陸頁與網頁效果 | **主要參考對象** |
 
 ### 值得學的結構
 
@@ -28,7 +28,7 @@
 
 標記：✅ SunUI 已有　🆕 本次新增　🔄 其他 session 進行中　⛔ 違反 DESIGN.md 不做　➖ 不適合做成 block
 
-### UI 元件（049–072）
+### UI 元件（049 至 072）
 
 | # | 名稱 | 判斷 | 對應 |
 |---|---|---|---|
@@ -57,7 +57,7 @@
 | 071 | Badge | 🆕 | `notify-badge` |
 | 072 | Empty state | ✅ | `empty-state` |
 
-### 著陸頁與網頁效果（073–096、145–168）
+### 著陸頁與網頁效果（073 至 096、145 至 168）
 
 | # | 名稱 | 判斷 | 對應 |
 |---|---|---|---|
@@ -135,3 +135,17 @@
 
 - **把 tags 直接併入 aliases**：motion-prompt 每個條目的 tags（例如 `magnetic, magnetic-button, cta`）可補到既有 block 的 `meta.usage.aliases`，讓搜尋更準。
 - **規格欄位**：參考它的 Motion spec，在 `/docs/motion` 每個名詞旁寫出 SunUI 的實際數值（彈簧參數、時長），代理人才有依據。
+
+## 5. 動畫本身：motion 系列補上的 5 個 block
+
+第一輪只處理了 UI 元件。這一輪補上站上真正的主體：動態手法、運鏡轉場與影像風格，共 120 個名稱。這些效果放在 `meta.series: "motion"`，遵守 `DESIGN-motion.md`（允許漸層、光暈、循環），不受紙感系列限制。
+
+| Block | 對應編號 | 內容 |
+|---|---|---|
+| `scene-transitions` | 017 至 020、043 至 046、137 至 142、186 至 188 | 21 種轉場：cut、cross-dissolve、fade-to-black、morph-cut、wipe、push、cover、whip-pan、smash-cut、iris、circle-reveal、star-reveal、blinds、bands、liquid、zoom-through、cube、page-curl、doors、pixelate、shatter。`SceneTransition` 換 `activeKey` 就轉場，`SceneSlideshow` 自動輪播 |
+| `camera-moves` | 025 至 036、169 至 170、173、176 至 178、183 至 184、191 | 21 種運鏡，套在使用者自己分層的場景上（`CameraLayer depth`），近景與遠景依深度產生正確視差；dolly-zoom 主體大小不變、背景逼近；可用 `progress` 接捲動 |
+| `photo-looks` | 097 至 120 | 24 種攝影光線與調色，套在任何圖片或元素上：逆光、輪廓光、剪影、林布蘭光、黃金時刻、散景、移軸、長曝光、鏡頭眩光、魚眼、色差、暗角、雙色調、青橙、底片顆粒、漏光、雙重曝光等 |
+| `motion-principles` | 002、003、009 至 011、014、024、121 至 128、134 至 136、143 | 動畫原理包在任何子元素外：擠壓伸展、預備動作、跟隨動作、回彈、晃動、殘影、重複器、萬花筒、線條抖動、爆炸圖等 |
+| `type-motion` | 131 至 133 | 文字沿路徑、可變字重、文字遮罩 |
+
+既有 motion block 已涵蓋的（Pop-in、Line draw、Mask reveal、Typewriter、Count-up、Shape morph、Glitch、Scramble、Wave text、Motion path、Particles、Ken Burns 等）沒有重做。剪接概念裡無法變成網頁元件的（J-cut、L-cut、Long take、Cross-cutting、Montage、POV、Over-the-shoulder 這類敘事與音訊用語）不做。

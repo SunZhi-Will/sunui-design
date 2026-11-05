@@ -56,6 +56,8 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
     target: listRef,
     container,
     offset: [`start ${anchor}`, `end ${anchor}`],
+    // 讓父層的 container ref 先掛上，否則在容器裡會讀成視窗捲動
+    layoutEffect: false,
   });
   const smooth = useSpring(scrollYProgress, reduce ? { stiffness: 10000, damping: 1000 } : springs.gentle);
   const [reachedCount, setReachedCount] = useState(0);

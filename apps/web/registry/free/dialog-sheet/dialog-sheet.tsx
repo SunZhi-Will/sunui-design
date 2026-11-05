@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useDragControls, useReducedMotion, type PanInfo, type Variants } from "framer-motion";
-import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { cloneElement, isValidElement, useCallback, useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
@@ -61,7 +61,9 @@ export function useExitIntent(onIntent: () => void, { enabled = true, delay = 30
     if (!enabled || window.matchMedia("(pointer: coarse)").matches) return;
     try {
       if (storageKey && sessionStorage.getItem(storageKey)) return;
-    } catch {}
+    } catch {
+      // 無痕模式等情況讀不到 sessionStorage，照常觸發
+    }
     let armed = false;
     const timer = window.setTimeout(() => (armed = true), delay);
     const onLeave = (e: MouseEvent) => {
@@ -69,7 +71,9 @@ export function useExitIntent(onIntent: () => void, { enabled = true, delay = 30
       fired.current = true;
       try {
         if (storageKey) sessionStorage.setItem(storageKey, "1");
-      } catch {}
+      } catch {
+        // 寫不進去也沒關係，只是同一個分頁可能再觸發一次
+      }
       cb.current();
     };
     document.addEventListener("mouseout", onLeave);
@@ -238,11 +242,16 @@ export function DialogSheet({
 
   return (
     <>
-      {trigger && (
-        <span className="contents" onClick={() => setOpen(true)}>
-          {trigger}
-        </span>
-      )}
+      {isValidElement<{ onClick?: (e: ReactMouseEvent) => void }>(trigger)
+        ? cloneElement(trigger, {
+            "aria-haspopup": "dialog",
+            "aria-expanded": open,
+            onClick: (e: ReactMouseEvent) => {
+              trigger.props.onClick?.(e);
+              setOpen(true);
+            },
+          } as Record<string, unknown>)
+        : trigger}
       {position === "fixed" ? (mounted ? createPortal(layer, document.body) : null) : layer}
     </>
   );

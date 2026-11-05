@@ -28,7 +28,7 @@ const C = 2 * Math.PI * R;
 
 export function BackToTop({ container, threshold = 400, showProgress = true, position = "fixed", label = "Back to top", className }: BackToTopProps) {
   const reduce = useReducedMotion();
-  const { scrollY, scrollYProgress } = useScroll(container ? { container } : undefined);
+  const { scrollY, scrollYProgress } = useScroll(container ? { container, layoutEffect: false } : undefined);
   const [shown, setShown] = useState(false);
   const [progress, setProgress] = useState(0);
 

@@ -89,9 +89,9 @@ export default function HoverMotionDemo() {
         />
         <div className="mt-8 flex justify-center">
           <Magnetic>
-            <a href="#" onClick={(e) => e.preventDefault()} className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground">
+            <button type="button" className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground">
               <TextRoll>{t.cta}</TextRoll>
-            </a>
+            </button>
           </Magnetic>
         </div>
       </div>

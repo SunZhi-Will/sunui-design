@@ -110,31 +110,33 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
       })}
       <AnimatePresence>
         {open && (
-          <motion.div
+          <div
             key={open.id}
-            id={`${uid}-card`}
-            role="region"
-            aria-label={typeof open.title === "string" ? open.title : undefined}
-            className="absolute z-20"
+            className="pointer-events-none absolute z-20"
             style={{
               left: `${open.x}%`,
               top: `${open.y}%`,
               width: cardWidth,
               maxWidth: "calc(100% - 1rem)",
-              translateX: place(open).side === "left" ? "calc(-100% - 22px)" : "22px",
-              translateY: place(open).vertical === "up" ? "calc(-100% + 14px)" : "-14px",
+              transform: `translate(${place(open).side === "left" ? "calc(-100% - 22px)" : "22px"}, ${place(open).vertical === "up" ? "calc(-100% + 14px)" : "-14px"})`,
             }}
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.12 } }}
-            transition={reduce ? { duration: 0 } : springs.gentle}
           >
-            <div className="rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-3.5 text-[#1c1917] shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
+            <motion.div
+              id={`${uid}-card`}
+              role="region"
+              aria-label={typeof open.title === "string" ? open.title : undefined}
+              className="pointer-events-auto rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-3.5 text-[#1c1917] shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]"
+              style={{ originX: place(open).side === "left" ? 1 : 0, originY: place(open).vertical === "up" ? 1 : 0 }}
+              initial={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              transition={reduce ? { duration: 0 } : springs.gentle}
+            >
               <p className="text-sm font-semibold tracking-tight">{open.title}</p>
               {open.description && <p className="mt-1 text-xs leading-relaxed text-[#1c1917]/70 dark:text-[#ece7dc]/70">{open.description}</p>}
               {open.action && <div className="mt-3 border-t border-dashed border-[#e7e0d0] pt-3 dark:border-[#38332b]">{open.action}</div>}
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

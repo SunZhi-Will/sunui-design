@@ -91,7 +91,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
           aria-label={props["aria-label"]}
           className={cn(
             "relative flex max-w-full",
-            variant === "underline" && "gap-1 overflow-x-auto border-b border-[#e7e0d0] dark:border-[#38332b]",
+            variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-[#e7e0d0] dark:border-[#38332b]",
             variant === "segment" && cn("rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-1 dark:border-[#38332b] dark:bg-[#1f1c18]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
           )}
@@ -123,7 +123,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                 )}
               >
                 {on && variant === "underline" && (
-                  <motion.span layoutId="ind" transition={t} className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-[#1c1917] dark:bg-[#ece7dc]" />
+                  <motion.span layoutId="ind" transition={t} className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-[#1c1917] dark:bg-[#ece7dc]" />
                 )}
                 {on && variant === "segment" && (
                   <motion.span

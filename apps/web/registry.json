@@ -4613,6 +4613,347 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "scene-transitions",
+      "type": "registry:block",
+      "title": "Scene Transitions",
+      "description": "Twenty-one film and motion graphics transitions between any two pieces of content, switched with the transition prop: cut, cross dissolve, fade to black, morph cut, wipe, push, cover, whip pan, smash cut, iris, circle and star reveal from a point, blinds, colour bands, liquid drip, zoom through, cube, page curl, doors, pixelate and glass shatter. SceneTransition swaps whatever you render when activeKey changes; SceneSlideshow cycles a list of scenes with optional controls, pauses off-screen and in hidden tabs, and every transition becomes a plain cut under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "transition",
+        "media"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero banners and campaign slides that change between scenes",
+            "Step-by-step product stories, onboarding screens or before and after reveals",
+            "Any place a plain fade feels flat and you want a named film transition"
+          ],
+          "watchOut": [
+            "Shatter and doors render the outgoing scene several times while they run, so keep heavy video out of those scenes",
+            "Pixelate uses an SVG filter on HTML, which Safari renders less smoothly than Chrome",
+            "Give the stage a fixed size or aspect ratio; scenes are stacked absolutely inside it"
+          ],
+          "aliases": [
+            "scene transition",
+            "slide transition",
+            "page transition",
+            "cross dissolve",
+            "fade to black",
+            "wipe transition",
+            "iris out",
+            "whip pan",
+            "smash cut",
+            "cube transition",
+            "page curl",
+            "glass shatter",
+            "pixelate transition",
+            "liquid transition",
+            "blinds transition",
+            "mask transition",
+            "zoom transition",
+            "slideshow"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/scene-transitions/scene-transitions.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "camera-moves",
+      "type": "registry:block",
+      "title": "Camera Moves",
+      "description": "21 film camera moves (pan, tilt, dolly in, zoom, tracking, orbit, crane, dolly zoom, rack focus, handheld, FPV, Dutch angle, pedestal, barrel roll, Steadicam, fly-through, low and high angle, establishing shot, extreme close-up, bullet time) applied to a scene built from your own layers. Wrap content in CameraStage and give each CameraLayer a depth from 0 (far) to 1 (near); every move computes per-layer shift, scale and blur from depth, so parallax behaves like a real camera and the subject layer stays fixed in a dolly zoom. Triggers are loop, mount, inView, hover and click, or pass a progress number or MotionValue to drive the move from scroll. Loops pause off screen and in hidden tabs, and reduced motion shows the final frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Campaign and product heroes that should feel filmed, such as a slow push in, a dolly zoom or an orbit around a product",
+            "Scroll stories where a scene of layered illustrations or cutout photos should move like a camera",
+            "Showing cinematography vocabulary on a page, for example a storyboard or a video brief"
+          ],
+          "watchOut": [
+            "Layers move and scale, so give background layers art larger than the frame or keep the default bleed; transparent cutouts work best for mid and near layers",
+            "Handheld, FPV and barrel roll are energetic; use one per view and never behind body text",
+            "Rack focus and extreme close-up use CSS blur, which costs more on large frames; keep those stages small or few"
+          ],
+          "aliases": [
+            "camera move",
+            "cinematic camera",
+            "parallax camera",
+            "parallax scene",
+            "pan",
+            "tilt",
+            "dolly in",
+            "push in",
+            "dolly out",
+            "zoom in",
+            "tracking shot",
+            "truck",
+            "orbit",
+            "arc shot",
+            "crane shot",
+            "jib",
+            "dolly zoom",
+            "vertigo effect",
+            "zolly",
+            "rack focus",
+            "focus pull",
+            "handheld",
+            "camera shake",
+            "fpv drone",
+            "dutch angle",
+            "canted angle",
+            "pedestal",
+            "barrel roll",
+            "steadicam",
+            "gimbal",
+            "fly-through",
+            "low angle",
+            "high angle",
+            "establishing shot",
+            "extreme close-up",
+            "ken burns",
+            "bullet time",
+            "frozen moment"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/camera-moves/camera-moves.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "photo-looks",
+      "type": "registry:block",
+      "title": "Photo Looks",
+      "description": "A library of 24 photography looks and lighting styles applied to any image or element with the effect prop on PhotoLook: backlighting, rim light, silhouette, split, Rembrandt and butterfly lighting, golden hour, blue hour, bokeh, tilt-shift, long exposure, panning shot, lens flare, fisheye, chromatic aberration, vignette, high-key, low-key, black and white, duotone, teal and orange, film grain, light leak and double exposure. The look fades in on mount, in view, on hover or in a loop, and invert turns it into a colour-on-hover pattern that shows the original. Built with CSS filters, blend-mode overlays and per-instance SVG filters; colors, lightAngle, lightPosition, focusPoint and focusBand tune tints and light direction. With reduced motion the final look shows at once and grain and leak animations stop.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product photos, portfolios and campaign pages that need one consistent colour grade or mood",
+            "Image grids with a colour-on-hover or filter-on-hover interaction",
+            "Hero images that want a lighting mood such as golden hour, backlight or lens flare without editing the photo"
+          ],
+          "watchOut": [
+            "On children, bokeh, tilt-shift, panning shot, long exposure and rim light duplicate the content as an overlay layer; avoid video or stateful content inside",
+            "Many SVG filters running at once cost GPU time; in large grids prefer the hover trigger",
+            "Lighting looks are gradient overlays, not real relighting; set lightAngle to match the subject"
+          ],
+          "aliases": [
+            "photo filter",
+            "instagram filter",
+            "image filter",
+            "color grading",
+            "colour grading",
+            "film look",
+            "duotone",
+            "black and white",
+            "grayscale",
+            "sepia",
+            "teal and orange",
+            "film grain",
+            "light leak",
+            "lens flare",
+            "vignette",
+            "bokeh",
+            "tilt shift",
+            "fisheye",
+            "chromatic aberration",
+            "double exposure",
+            "golden hour",
+            "blue hour",
+            "rim light",
+            "rembrandt lighting",
+            "silhouette",
+            "high key",
+            "low key",
+            "long exposure",
+            "motion blur",
+            "color on hover"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/photo-looks/photo-looks.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "motion-principles",
+      "type": "registry:block",
+      "title": "Motion Principles",
+      "description": "Eighteen classic animation principles as one wrapper that animates any child, such as an icon, badge, button or product image: burst, easing, overshoot, squash and stretch, motion trail, impact shake, anticipation, follow-through, bounce, wiggle, pulse, ping-pong, stop-motion, repeater, kaleidoscope, line boil, exploded view and stagger. Pick one with the effect prop and play it on mount, in view, hover, click or loop, with intensity, duration, distance, count and color to tune it. Named easing curves, Stagger, ExplodedView, Repeater and Kaleidoscope are exported too. Loops pause off screen and in hidden tabs, and reduced motion shows the child at rest.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "effects"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Give an icon, badge or add-to-cart button a physical reaction, such as a burst on like, a pulse on a new item or a bounce on drop-in",
+            "Explain how a product is built with an exploded view, or reveal a list or chart with a stagger"
+          ],
+          "watchOut": [
+            "Travel effects (easing, anticipation, ping-pong, motion trail, stop-motion) move the child outside its box, so leave room around it",
+            "Repeater, kaleidoscope, motion trail and stop-motion duplicate the child; pass decorative content, not links or form fields",
+            "Use one principle per element; stacking several on a page gets noisy fast"
+          ],
+          "aliases": [
+            "12 principles of animation",
+            "animation principles",
+            "squash and stretch",
+            "anticipation",
+            "follow-through",
+            "overlapping action",
+            "overshoot",
+            "easing curves",
+            "bounce",
+            "wiggle",
+            "jiggle",
+            "shake",
+            "heartbeat pulse",
+            "ping-pong loop",
+            "yoyo",
+            "stop motion",
+            "onion skin",
+            "motion trail",
+            "echo",
+            "burst",
+            "like burst",
+            "impact shake",
+            "repeater",
+            "radial repeat",
+            "kaleidoscope",
+            "line boil",
+            "hand-drawn wobble",
+            "exploded view",
+            "stagger",
+            "staggered list"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/motion-principles/motion-principles.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "type-motion",
+      "type": "registry:block",
+      "title": "Type Motion",
+      "description": "Three typographic effects behind one effect prop. text-on-path flows a line of text along any SVG path, with wave, circle and arc presets, and each letter turns to follow the curve. variable-font animates font weight, width or any variable axis between from and to, for the whole word or as a per-letter wave, and falls back to the nearest static weight. text-mask cuts heavy text out of an image, video or drifting theme gradient, with an optional reveal of the full picture at the end.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "text"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Campaign headlines and hero words that should carry a picture or brand gradient inside the letters",
+            "Badges, stamps and banners with text running around a circle or along a wave, or a headline that breathes between thin and bold"
+          ],
+          "watchOut": [
+            "variable-font only animates smoothly with a variable font; static fonts jump between their available weights",
+            "text-mask scales the word to fill its container width, so set the width rather than a font size, and keep the word short",
+            "Video masks use an SVG foreignObject; test in Safari before relying on them"
+          ],
+          "aliases": [
+            "text along path",
+            "text on path",
+            "curved text",
+            "circular text",
+            "text on a circle",
+            "wavy text",
+            "variable font animation",
+            "font weight animation",
+            "breathing text",
+            "font-variation-settings",
+            "text mask",
+            "knockout text",
+            "image inside text",
+            "video text",
+            "clipping mask text",
+            "background clip text"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/type-motion/type-motion.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
