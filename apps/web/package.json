@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start -p 3100",
     "pretypecheck": "node scripts/generate-previews.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/*.test.ts\""
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",
