@@ -566,12 +566,13 @@ export interface TinyChartProps {
   className?: string;
 }
 
-const INK = "stroke-[#1c1917] dark:stroke-[#ece7dc]";
-const RED = "stroke-[#c8361d] dark:stroke-[#ec6a4f]";
-const PAPER = "fill-[#faf7f0] dark:fill-[#1f1c18]";
+const INK = "stroke-[#171717] dark:stroke-[#ededed]";
+const RED = "stroke-[#171717] dark:stroke-[#ededed]";
+const PAPER = "fill-[#f7f7f7] dark:fill-[#1c1c1c]";
+const MUTED = "stroke-[#a3a3a3] dark:stroke-[#737373]";
 // 等角方塊的兩個側面：同一張紙的兩階明度，平塗，不用漸層
-const FACE_FRONT = "fill-[#efe8da] dark:fill-[#2a2620]";
-const FACE_SIDE = "fill-[#e3dbc9] dark:fill-[#15130f]";
+const FACE_FRONT = "fill-[#e8e8e8] dark:fill-[#272727]";
+const FACE_SIDE = "fill-[#dbdbdb] dark:fill-[#131313]";
 const poly = (p: Pt[]) => p.map((q) => q.join(",")).join(" ");
 
 export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = true, showLogic = true, copy: copyProp, onStateChange, walker = true, className }: TinyChartProps) {
@@ -707,15 +708,15 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const arrow = (tone: "ink" | "red") => `url(#${uid}-${tone})`;
 
   return (
-    <figure className={cn("min-w-0 rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-4 text-[#1c1917] sm:p-5 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]", className)}>
+    <figure className={cn("min-w-0 rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-4 text-[#171717] sm:p-5 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <figcaption className="text-lg font-semibold leading-tight tracking-tight">{title}</figcaption>
-          {subtitle && <p className="mt-1 text-sm text-[#1c1917]/60 dark:text-[#ece7dc]/60">{subtitle}</p>}
+          {subtitle && <p className="mt-1 text-sm text-[#171717]/60 dark:text-[#ededed]/60">{subtitle}</p>}
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-mono text-[11px] tabular-nums text-[#1c1917]/55 dark:text-[#ece7dc]/55">{copy.step(chart.step, chart.total)}</p>
-          <p className="mt-0.5 text-base font-semibold text-[#c8361d] dark:text-[#ec6a4f]">{chart.state?.label}</p>
+          <p className="font-mono text-[11px] tabular-nums text-[#171717]/55 dark:text-[#ededed]/55">{copy.step(chart.step, chart.total)}</p>
+          <p className="mt-0.5 text-base font-semibold text-[#171717] dark:text-[#ededed]">{chart.state?.label}</p>
         </div>
       </div>
 
@@ -737,14 +738,14 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           </defs>
 
           {/* 起點：實心圓點加短箭頭 */}
-          <circle cx={shape.start[0][0]} cy={shape.start[0][1]} r="4.5" className="fill-[#1c1917] dark:fill-[#ece7dc]" />
+          <circle cx={shape.start[0][0]} cy={shape.start[0][1]} r="4.5" className="fill-[#171717] dark:fill-[#ededed]" />
           <line x1={shape.start[0][0]} y1={shape.start[0][1]} x2={shape.start[1][0]} y2={shape.start[1][1]} strokeWidth="1.3" className={INK} markerEnd={arrow("ink")} />
 
-          {shape.iso && <path d={shape.iso.floor} fill="none" strokeWidth="0.8" className="stroke-[#e7e0d0] dark:stroke-[#38332b]" />}
+          {shape.iso && <path d={shape.iso.floor} fill="none" strokeWidth="0.8" className="stroke-[#e2e2e2] dark:stroke-[#333333]" />}
 
           {shape.tick && (() => {
             const ys = [...shape.nodes.values()].map((b) => b.y);
-            return <line x1={0} x2={0} y1={Math.min(...ys)} y2={Math.max(...ys)} strokeWidth="5" strokeLinecap="round" className="stroke-[#e7e0d0] dark:stroke-[#38332b]" />;
+            return <line x1={0} x2={0} y1={Math.min(...ys)} y2={Math.max(...ys)} strokeWidth="5" strokeLinecap="round" className="stroke-[#e2e2e2] dark:stroke-[#333333]" />;
           })()}
 
           {shape.edges.map((e, i) => (
@@ -759,7 +760,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 markerEnd={e.tape ? undefined : arrow("ink")}
               />
               {e.text && !shape.iso && (
-                <text x={e.lx} y={e.ly} textAnchor={e.anchor} fontSize={EDGE_FONT} className="fill-[#1c1917]/60 font-mono dark:fill-[#ece7dc]/60">
+                <text x={e.lx} y={e.ly} textAnchor={e.anchor} fontSize={EDGE_FONT} className="fill-[#171717]/60 font-mono dark:fill-[#ededed]/60">
                   {e.text}
                 </text>
               )}
@@ -787,12 +788,12 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 if (scene) return <g key={`scene-${s.id}`}><SceneParts parts={scene.parts} /></g>;
                 const k = shape.iso!.blocks.get(s.id)!;
                 const here = s.id === at;
-                const labelCls = cn("font-mono uppercase", here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]");
+                const labelCls = cn("font-mono uppercase", here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]");
                 if (s.final)
                   return (
                     <g key={s.id}>
-                      <ellipse cx={k.label[0]} cy={k.label[1]} rx={DISC * ISO_C * 1.4} ry={DISC * 0.7} strokeWidth="1.4" className={cn(PAPER, here ? RED : INK)} />
-                      <ellipse cx={k.label[0]} cy={k.label[1]} rx={DISC * ISO_C * 0.75} ry={DISC * 0.38} className={here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]"} />
+                      <ellipse cx={k.label[0]} cy={k.label[1]} rx={DISC * ISO_C * 1.4} ry={DISC * 0.7} strokeWidth="1.4" className={cn(PAPER, here ? RED : MUTED)} />
+                      <ellipse cx={k.label[0]} cy={k.label[1]} rx={DISC * ISO_C * 0.75} ry={DISC * 0.38} className={here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]"} />
                       <text x={k.label[0]} y={k.label[1] + 24} textAnchor="middle" fontSize={NODE_FONT} letterSpacing="0.08em" className={labelCls}>
                         {s.label}
                       </text>
@@ -803,13 +804,13 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                   <motion.g key={s.id} animate={{ y: here ? -7 : 0 }} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 34 }}>
                     <polygon points={poly(k.side)} strokeWidth="1.2" strokeLinejoin="round" className={cn(FACE_SIDE, INK)} />
                     <polygon points={poly(k.front)} strokeWidth="1.2" strokeLinejoin="round" className={cn(FACE_FRONT, INK)} />
-                    <polygon points={poly(k.top)} strokeWidth={here ? 2 : 1.2} strokeLinejoin="round" className={cn(PAPER, here ? RED : INK)} />
+                    <polygon points={poly(k.top)} strokeWidth={here ? 2 : 1.2} strokeLinejoin="round" className={cn(PAPER, here ? RED : MUTED)} />
                     {/* 名稱印在正面，跟著面一起斜 */}
                     <text transform={`matrix(${ISO_C} ${-ISO_S} 0 1 ${k.label[0]} ${k.label[1]})`} textAnchor="middle" fontSize={ISO_FONT} letterSpacing="0.08em" className={labelCls}>
                       {s.label}
                     </text>
                     {s.note && (
-                      <text x={k.note[0]} y={k.note[1] + 16} textAnchor="middle" fontSize={EDGE_FONT} className="fill-[#1c1917]/55 dark:fill-[#ece7dc]/55">
+                      <text x={k.note[0]} y={k.note[1] + 16} textAnchor="middle" fontSize={EDGE_FONT} className="fill-[#171717]/55 dark:fill-[#ededed]/55">
                         {s.note}
                       </text>
                     )}
@@ -821,7 +822,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             shape.edges.map(
               (e, i) =>
                 e.text && (
-                  <text key={i} x={e.lx} y={e.ly} fontSize={EDGE_FONT} strokeWidth="3" paintOrder="stroke" className="fill-[#1c1917]/65 stroke-[#faf7f0] font-mono dark:fill-[#ece7dc]/65 dark:stroke-[#1f1c18]">
+                  <text key={i} x={e.lx} y={e.ly} fontSize={EDGE_FONT} strokeWidth="3" paintOrder="stroke" className="fill-[#171717]/65 stroke-[#f7f7f7] font-mono dark:fill-[#ededed]/65 dark:stroke-[#1c1c1c]">
                     {e.text}
                   </text>
                 ),
@@ -843,17 +844,17 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 <g key={s.id}>
                   {s.final ? (
                     <>
-                      <circle cx={b.x} cy={b.y} r="7.5" strokeWidth="1.4" className={cn(PAPER, here ? RED : INK)} />
-                      <circle cx={b.x} cy={b.y} r="4" className={here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]"} />
+                      <circle cx={b.x} cy={b.y} r="7.5" strokeWidth="1.4" className={cn(PAPER, here ? RED : MUTED)} />
+                      <circle cx={b.x} cy={b.y} r="4" className={here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]"} />
                     </>
                   ) : (
-                    <circle cx={b.x} cy={b.y} r={here ? 7 : 5.5} strokeWidth="1.5" className={cn(here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : PAPER, seen ? RED : INK)} />
+                    <circle cx={b.x} cy={b.y} r={here ? 7 : 5.5} strokeWidth="1.5" className={cn(here ? "fill-[#171717] dark:fill-[#ededed]" : PAPER, seen ? INK : MUTED)} />
                   )}
-                  <text x={b.x + 18} y={b.y + 4} fontSize={NODE_FONT} letterSpacing="0.08em" className={cn("font-mono uppercase", here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]")}>
+                  <text x={b.x + 18} y={b.y + 4} fontSize={NODE_FONT} letterSpacing="0.08em" className={cn("font-mono uppercase", here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]")}>
                     {s.label}
                   </text>
                   {s.note && (
-                    <text x={b.x + 18} y={b.y + 20} fontSize={EDGE_FONT} className="fill-[#1c1917]/55 dark:fill-[#ece7dc]/55">
+                    <text x={b.x + 18} y={b.y + 20} fontSize={EDGE_FONT} className="fill-[#171717]/55 dark:fill-[#ededed]/55">
                       {s.note}
                     </text>
                   )}
@@ -863,9 +864,9 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
               <g key={s.id}>
                 {s.final ? (
                   <>
-                    <circle cx={b.x} cy={b.y} r="9" strokeWidth="1.4" className={cn(PAPER, here ? RED : INK)} />
-                    <circle cx={b.x} cy={b.y} r="5" className={here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]"} />
-                    <text x={b.x} y={b.y + 26} textAnchor="middle" fontSize={NODE_FONT} letterSpacing="0.08em" className={cn("font-mono uppercase", here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]")}>
+                    <circle cx={b.x} cy={b.y} r="9" strokeWidth="1.4" className={cn(PAPER, here ? RED : MUTED)} />
+                    <circle cx={b.x} cy={b.y} r="5" className={here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]"} />
+                    <text x={b.x} y={b.y + 26} textAnchor="middle" fontSize={NODE_FONT} letterSpacing="0.08em" className={cn("font-mono uppercase", here ? "fill-[#171717] dark:fill-[#ededed]" : "fill-[#a3a3a3] dark:fill-[#737373]")}>
                       {s.label}
                     </text>
                   </>
@@ -894,11 +895,11 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                         transition={{ type: "spring", stiffness: 520, damping: 34 }}
                       />
                     )}
-                    <text x={b.x} y={b.y + 4} textAnchor="middle" fontSize={NODE_FONT} letterSpacing="0.08em" className="fill-[#1c1917] font-mono uppercase dark:fill-[#ece7dc]">
+                    <text x={b.x} y={b.y + 4} textAnchor="middle" fontSize={NODE_FONT} letterSpacing="0.08em" className="fill-[#171717] font-mono uppercase dark:fill-[#ededed]">
                       {s.label}
                     </text>
                     {s.note && (
-                      <text x={b.x} y={b.y + b.h / 2 + 15} textAnchor="middle" fontSize={EDGE_FONT} className="fill-[#1c1917]/55 dark:fill-[#ece7dc]/55">
+                      <text x={b.x} y={b.y + b.h / 2 + 15} textAnchor="middle" fontSize={EDGE_FONT} className="fill-[#171717]/55 dark:fill-[#ededed]/55">
                         {s.note}
                       </text>
                     )}
@@ -908,7 +909,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             );
           })}
 
-          {moved > 0 && !isIso && <motion.circle r="4.5" cx={tx} cy={ty} strokeWidth="2" className="fill-[#c8361d] stroke-[#faf7f0] dark:fill-[#ec6a4f] dark:stroke-[#1f1c18]" />}
+          {moved > 0 && !isIso && <motion.circle r="4.5" cx={tx} cy={ty} strokeWidth="2" className="fill-[#171717] stroke-[#f7f7f7] dark:fill-[#ededed] dark:stroke-[#1c1c1c]" />}
         </svg>
       </div>
 
@@ -919,7 +920,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           </svg>
           {copy.play}
         </button>
-        <button type="button" onClick={() => press(NEXT)} className="inline-flex h-8 items-center rounded-md border border-[#1c1917]/70 px-3 text-sm transition-colors hover:bg-[#1c1917]/5 active:scale-[0.97] dark:border-[#ece7dc]/70 dark:hover:bg-[#ece7dc]/10">
+        <button type="button" onClick={() => press(NEXT)} className="inline-flex h-8 items-center rounded-md border border-[#171717]/70 px-3 text-sm transition-colors hover:bg-[#171717]/5 active:scale-[0.97] dark:border-[#ededed]/70 dark:hover:bg-[#ededed]/10">
           {chart.eventLabel(NEXT)} →
         </button>
         {chart.events.map((e) => (
@@ -930,22 +931,22 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             className={cn(
               "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors active:scale-[0.97]",
               can(e)
-                ? "border-[#1c1917]/70 dark:border-[#ece7dc]/70"
-                : "border-[#e7e0d0] text-[#1c1917]/50 dark:border-[#38332b] dark:text-[#ece7dc]/50",
+                ? "border-[#171717]/70 dark:border-[#ededed]/70"
+                : "border-[#e2e2e2] text-[#171717]/50 dark:border-[#333333] dark:text-[#ededed]/50",
             )}
           >
-            {can(e) && <span aria-hidden className="size-1.5 rounded-full bg-[#c8361d] dark:bg-[#ec6a4f]" />}
+            {can(e) && <span aria-hidden className="size-1.5 rounded-full bg-[#171717] dark:bg-[#ededed]" />}
             {chart.eventLabel(e)}
           </button>
         ))}
         {showLogic && (
-          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls={`${uid}-logic`} className="ml-auto inline-flex h-8 items-center px-1 text-sm text-[#1c1917]/65 underline decoration-dotted underline-offset-4 hover:text-[#1c1917] dark:text-[#ece7dc]/65 dark:hover:text-[#ece7dc]">
+          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls={`${uid}-logic`} className="ml-auto inline-flex h-8 items-center px-1 text-sm text-[#171717]/65 underline decoration-dotted underline-offset-4 hover:text-[#171717] dark:text-[#ededed]/65 dark:hover:text-[#ededed]">
             {copy.logic}
           </button>
         )}
       </div>
 
-      <p ref={lineRef} aria-live="polite" className={cn("mt-2 min-h-5 text-sm", message.refused ? "text-[#1c1917] dark:text-[#ece7dc]" : "text-[#1c1917]/65 dark:text-[#ece7dc]/65")}>
+      <p ref={lineRef} aria-live="polite" className={cn("mt-2 min-h-5 text-sm", message.refused ? "text-[#171717] dark:text-[#ededed]" : "text-[#171717]/65 dark:text-[#ededed]/65")}>
         {message.text}
       </p>
 
@@ -957,7 +958,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           transition={{ type: "spring", stiffness: 240, damping: 30 }}
           className="overflow-hidden"
         >
-          <div className="mt-3 space-y-4 border-t border-dashed border-[#e7e0d0] pt-3 text-sm dark:border-[#38332b]">
+          <div className="mt-3 space-y-4 border-t border-dashed border-[#e2e2e2] pt-3 text-sm dark:border-[#333333]">
             <ul className="space-y-1.5">
               {checks.map((c) => (
                 <li key={c.id} className="flex gap-2">
@@ -966,7 +967,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                   </svg>
                   <span>
                     {copy.checks[c.id]}
-                    {!c.ok && <span className="block font-mono text-xs text-[#1c1917]/60 dark:text-[#ece7dc]/60">{c.detail.join(", ")}</span>}
+                    {!c.ok && <span className="block font-mono text-xs text-[#171717]/60 dark:text-[#ededed]/60">{c.detail.join(", ")}</span>}
                   </span>
                 </li>
               ))}
@@ -976,18 +977,18 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 {machine.rules.map((r) => (
                   <li key={r.rule}>
                     <span className="font-medium">{r.rule}</span>
-                    {r.says && <span className="block text-[#1c1917]/60 dark:text-[#ece7dc]/60">{r.says}</span>}
+                    {r.says && <span className="block text-[#171717]/60 dark:text-[#ededed]/60">{r.says}</span>}
                   </li>
                 ))}
               </ul>
             ) : null}
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#1c1917]/55 dark:text-[#ece7dc]/55">{copy.moves}</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#171717]/55 dark:text-[#ededed]/55">{copy.moves}</p>
               <ul className="mt-1.5 space-y-1 font-mono text-xs">
                 {machine.transitions.map((t, i) => (
-                  <li key={i} className={cn(path.includes(i) && "text-[#c8361d] dark:text-[#ec6a4f]")}>
+                  <li key={i} className={cn(path.includes(i) && "text-[#171717] dark:text-[#ededed]")}>
                     {chart.name(t.from)} → {chart.name(t.to)}
-                    <span className="text-[#1c1917]/55 dark:text-[#ece7dc]/55">
+                    <span className="text-[#171717]/55 dark:text-[#ededed]/55">
                       {" · "}
                       {chart.eventLabel(t.on ?? NEXT)}
                       {t.guard && ` [${t.guard}]`}

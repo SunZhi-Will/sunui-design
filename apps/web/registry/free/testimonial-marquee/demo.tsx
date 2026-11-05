@@ -108,10 +108,10 @@ export default function TestimonialMarqueeDemo() {
   const locale = useDemoLocale();
   const c = useDemoText(copy);
   return (
-    <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-[#0c0a09] py-12">
+    <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-[#0a0a0a] py-12">
       <div className="mb-6 px-6 text-center">
         <p className="mb-2 text-[12px] font-semibold tracking-[0.2em] text-[#d4a24c] uppercase">{c.eyebrow}</p>
-        <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-[#f5f5f4] sm:text-[30px]">{c.heading}</h2>
+        <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-[#f5f5f5] sm:text-[30px]">{c.heading}</h2>
       </div>
       <TestimonialMarquee testimonials={buildTestimonials(c)} rows={2} fixed={false} locale={locale} />
     </section>

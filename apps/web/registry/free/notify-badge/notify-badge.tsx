@@ -29,8 +29,8 @@ export interface NotifyBadgeProps {
 }
 
 const tones = {
-  accent: "bg-[#c8361d] text-white dark:bg-[#ec6a4f] dark:text-[#1f1c18]",
-  ink: "bg-[#1c1917] text-[#faf7f0] dark:bg-[#ece7dc] dark:text-[#1f1c18]",
+  accent: "bg-[#171717] text-white dark:bg-[#ededed] dark:text-[#1c1c1c]",
+  ink: "bg-[#171717] text-[#f7f7f7] dark:bg-[#ededed] dark:text-[#1c1c1c]",
   primary: "bg-primary text-primary-foreground",
 };
 

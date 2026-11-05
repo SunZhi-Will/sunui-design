@@ -11,9 +11,9 @@ export type ShimmerStyle = "pulse" | "none";
 const ShimmerContext = createContext<ShimmerStyle>("pulse");
 
 // 設計語言（DESIGN.md）：紙、紙邊。色塊比紙面深一階，像還沒印上去的版位
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const block = "bg-[#eee7d8] dark:bg-[#2c2822]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const block = "bg-[#e7e7e7] dark:bg-[#292929]";
 
 export interface SkeletonProps {
   className?: string;
@@ -65,7 +65,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
 /** 排版稿上的圖片版位：細線打叉的方框 */
 export function SkeletonImage({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={cn("relative w-full bg-[#f3eee3] text-[#e7e0d0] dark:bg-[#26221d] dark:text-[#38332b]", className)}>
+    <div aria-hidden="true" className={cn("relative w-full bg-[#f1f1f1] text-[#e2e2e2] dark:bg-[#232323] dark:text-[#333333]", className)}>
       <svg className="absolute inset-0 size-full" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
         <path d="M0 0 100 100M100 0 0 100" vectorEffect="non-scaling-stroke" />
       </svg>
@@ -108,7 +108,7 @@ export function SkeletonProductCard({ className }: { className?: string }) {
 
 export function SkeletonList({ rows = 4, className }: { rows?: number; className?: string }) {
   return (
-    <ul className={cn(surface, "divide-y divide-dashed divide-[#e7e0d0] dark:divide-[#38332b]", className)}>
+    <ul className={cn(surface, "divide-y divide-dashed divide-[#e2e2e2] dark:divide-[#333333]", className)}>
       {Array.from({ length: rows }, (_, i) => (
         <li key={i} className="flex items-center gap-3 px-4 py-3.5">
           <Skeleton className="size-10 shrink-0" />

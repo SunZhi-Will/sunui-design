@@ -104,10 +104,10 @@ const MESSAGES: Record<SunLocale, Required<CookieConsentLabels>> = {
   },
 };
 
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/65 dark:text-[#ece7dc]/65";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/65 dark:text-[#ededed]/65";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -205,7 +205,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
                     animate={{ height: "auto", opacity: 1 }}
                     exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
                     transition={springs.gentle}
-                    className={cn("divide-y divide-dashed overflow-hidden border-y border-dashed", edge, "divide-[#e7e0d0] dark:divide-[#38332b]")}
+                    className={cn("divide-y divide-dashed overflow-hidden border-y border-dashed", edge, "divide-[#e2e2e2] dark:divide-[#333333]")}
                   >
                     {categories.map((c) => (
                       <li key={c.id} className="flex items-start justify-between gap-4 py-3">

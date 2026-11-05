@@ -65,10 +65,10 @@ const sideClass: Record<SidePanelSide, string> = {
 };
 
 // 設計語言（DESIGN.md）：一張紙從邊緣滑進來，紙面、紙邊、墨色
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 
 const offscreen: Record<SidePanelSide, { x?: string; y?: string }> = {
@@ -181,7 +181,7 @@ export function SidePanel({
         <div className={cn(portal ? "fixed" : "absolute", "inset-0 z-50")} onKeyDown={onKeyDown}>
           <motion.div
             aria-hidden="true"
-            className="absolute inset-0 bg-[#1c1917]/30 dark:bg-black/55"
+            className="absolute inset-0 bg-[#171717]/30 dark:bg-black/55"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -226,7 +226,7 @@ export function SidePanel({
                 onClick={() => onOpenChange(false)}
                 aria-label={closeLabel}
                 className={cn(
-                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-[#1c1917] focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-[#ece7dc]",
+                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-[#171717] focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-[#ededed]",
                   inkMuted,
                 )}
               >

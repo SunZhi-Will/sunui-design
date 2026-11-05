@@ -134,7 +134,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       if (!svg) return;
       // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor
       value = svg.outerHTML
-        .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#c8361d" : "currentColor")
+        .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
         .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
         .replace(/ data-icon="[^"]*"/, "");
     }
@@ -274,11 +274,11 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         ))}
       </div>
 
-      <aside className="rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-5 text-[#1c1917] lg:sticky lg:top-20 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
-        <p className="text-[11px] font-medium tracking-[0.14em] text-[#1c1917]/60 uppercase dark:text-[#ece7dc]/60">
+      <aside className="rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-5 text-[#171717] lg:sticky lg:top-20 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+        <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">
           {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : isPixel ? t.pixelSelected : t.selected}
         </p>
-        <div ref={previewRef} className="mt-4 grid place-items-center rounded-sm border border-dashed border-[#e7e0d0] py-8 dark:border-[#38332b]">
+        <div ref={previewRef} className="mt-4 grid place-items-center rounded-sm border border-dashed border-[#e2e2e2] py-8 dark:border-[#333333]">
           {renderIcon(selected, isPixel ? 64 : 72)}
         </div>
         {isAnimated ? (
@@ -289,7 +289,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
                 type="button"
                 onClick={() => toggle(selected)}
                 aria-pressed={Boolean(toggled[selected])}
-                className="h-8 shrink-0 rounded-md border border-[#e7e0d0] px-3 font-mono text-[11px] dark:border-[#38332b]"
+                className="h-8 shrink-0 rounded-md border border-[#e2e2e2] px-3 font-mono text-[11px] dark:border-[#333333]"
               >
                 active={String(Boolean(toggled[selected]))}
               </button>
@@ -306,7 +306,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           </div>
         )}
         <p className="mt-5 font-mono text-sm tracking-[0.04em]">{selected}</p>
-        <pre className="mt-2 overflow-x-auto rounded-sm bg-[#1c1917]/[0.05] px-3 py-2 font-mono text-[12px] dark:bg-[#ece7dc]/[0.07]">
+        <pre className="mt-2 overflow-x-auto rounded-sm bg-[#171717]/[0.05] px-3 py-2 font-mono text-[12px] dark:bg-[#ededed]/[0.07]">
           {jsx}
         </pre>
         <div className={cn("mt-3 grid gap-2", isAnimated ? "grid-cols-1" : "grid-cols-2")}>
@@ -322,7 +322,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             <button
               type="button"
               onClick={() => copy("svg")}
-              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#e7e0d0] text-xs font-medium dark:border-[#38332b]"
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#e2e2e2] text-xs font-medium dark:border-[#333333]"
             >
               <Icon name={copied === "svg" ? "check" : "copy"} size={14} />
               {copied === "svg" ? t.copied : t.copySvg}

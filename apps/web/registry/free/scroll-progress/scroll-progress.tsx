@@ -56,10 +56,10 @@ const MESSAGES: Record<SunLocale, ScrollProgressLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙邊作底線，墨色作進度
-const edgeLine = "bg-[#e7e0d0] dark:bg-[#38332b]";
-const inkLine = "bg-[#1c1917] dark:bg-[#ece7dc]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/50 dark:text-[#ece7dc]/50";
+const edgeLine = "bg-[#e2e2e2] dark:bg-[#333333]";
+const inkLine = "bg-[#171717] dark:bg-[#ededed]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/50 dark:text-[#ededed]/50";
 
 type Marker = ScrollSection & { at: number; top: number };
 

@@ -43,8 +43,8 @@ const MESSAGES: Record<SunLocale, FavoriteButtonLabels> = {
 };
 
 // 設計語言（DESIGN.md）：墨色外框，收藏時朱紅實心
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },

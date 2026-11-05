@@ -59,11 +59,11 @@ const MESSAGES: Record<SunLocale, ShippingOptionsLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -158,7 +158,7 @@ export function ShippingOptions({
                 "absolute inset-0 -z-10 rounded-md border",
                 paper,
                 on ? "border-current" : edge,
-                !on && !o.disabled && "group-hover:border-[#1c1917]/30 dark:group-hover:border-[#ece7dc]/30",
+                !on && !o.disabled && "group-hover:border-[#171717]/30 dark:group-hover:border-[#ededed]/30",
               )}
             />
             {/* 票根：配送方式與選取圈 */}

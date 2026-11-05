@@ -10,7 +10,7 @@ export const PERSON_PALETTE = [
   { bg: "#DBEAFE", fg: "#2563EB", ring: "#93C5FD" }, // blue
   { bg: "#DCFCE7", fg: "#16A34A", ring: "#86EFAC" }, // green
   { bg: "#FEF3C7", fg: "#D97706", ring: "#FCD34D" }, // amber
-  { bg: "#F5F5F4", fg: "#78716C", ring: "#D6D3D1" }, // stone
+  { bg: "#f5f5f5", fg: "#737373", ring: "#d4d4d4" }, // stone
   { bg: "#CCFBF1", fg: "#0F766E", ring: "#5EEAD4" }, // teal
   { bg: "#CFFAFE", fg: "#0891B2", ring: "#67E8F9" }, // cyan
   { bg: "#FFE4E6", fg: "#E11D48", ring: "#FDA4AF" }, // rose

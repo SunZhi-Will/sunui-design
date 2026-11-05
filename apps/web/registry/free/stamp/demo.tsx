@@ -100,12 +100,12 @@ export default function StampDemo() {
   ];
 
   return (
-    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-dashed divide-[#e7e0d0] rounded-md border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:divide-[#38332b] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
+    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-dashed divide-[#e2e2e2] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:divide-[#333333] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
       {t.rows.map(([title, examples], i) => (
         <div key={title} className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[1fr_auto]">
           <div>
             <p className="text-sm font-medium">{title}</p>
-            <p className="text-xs text-[#1c1917]/60 dark:text-[#ece7dc]/60">{examples}</p>
+            <p className="text-xs text-[#171717]/60 dark:text-[#ededed]/60">{examples}</p>
           </div>
           <div className="flex min-h-12 items-center sm:justify-end">{samples[i]}</div>
         </div>

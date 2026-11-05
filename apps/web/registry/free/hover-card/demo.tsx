@@ -6,7 +6,7 @@ import { HoverCard } from "./hover-card";
 
 function Sketch({ d }: { d: string }) {
   return (
-    <svg viewBox="0 0 120 90" className="size-full bg-[#f1ece1] text-[#1c1917]/45 dark:bg-[#2a2620] dark:text-[#ece7dc]/40" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <svg viewBox="0 0 120 90" className="size-full bg-[#ececec] text-[#171717]/45 dark:bg-[#272727] dark:text-[#ededed]/40" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
       <path d={d} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );

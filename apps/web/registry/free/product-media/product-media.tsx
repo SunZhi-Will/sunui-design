@@ -51,8 +51,8 @@ const MESSAGES: Record<SunLocale, Required<ProductMediaLabels>> = {
   ja: { region: "商品画像", zoomIn: "拡大", zoomOut: "縮小", show: (n, total) => `${total}枚中${n}枚目を表示` },
 };
 
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "bg-[#1c1917] dark:bg-[#ece7dc]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "bg-[#171717] dark:bg-[#ededed]";
 
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 

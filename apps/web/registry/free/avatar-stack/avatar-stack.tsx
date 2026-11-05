@@ -81,9 +81,9 @@ const MESSAGES: Record<SunLocale, AvatarStackLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkOutline = "border-[#1c1917]/70 dark:border-[#ece7dc]/70";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkOutline = "border-[#171717]/70 dark:border-[#ededed]/70";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -142,7 +142,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
           <motion.li key="overflow" className="relative" style={{ marginLeft: s.overlap, zIndex: 1 }}>
             <Lift title={hiddenNames || t.more(compact(extra, locale), "")} reduce={reduce}>
               {onOverflowClick ? (
-                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-[#f1ebdd] dark:hover:bg-[#29251f]")} style={{ minWidth: s.box, height: s.box }}>
+                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-[#efefef] dark:hover:bg-[#262626]")} style={{ minWidth: s.box, height: s.box }}>
                   {extraText}
                 </button>
               ) : (
@@ -176,7 +176,7 @@ function Lift({ title, note, reduce, children }: { title: string; note?: string;
       {active && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-52 -translate-x-1/2 rounded-[3px] bg-[#1c1917] px-2 py-1 text-xs text-[#faf7f0] dark:bg-[#ece7dc] dark:text-[#1c1917]"
+          className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-52 -translate-x-1/2 rounded-[3px] bg-[#171717] px-2 py-1 text-xs text-[#f7f7f7] dark:bg-[#ededed] dark:text-[#171717]"
         >
           <span className="block truncate font-medium">{title}</span>
           {note && <span className="block truncate opacity-70">{note}</span>}

@@ -210,7 +210,7 @@ export function SpineShelf({
                   </span>
                   {/* page block on the left-hand side, seen while turning */}
                   <span
-                    className="absolute top-[3px] bg-[#f4f1ea] dark:bg-[#d9d4c8]"
+                    className="absolute top-[3px] bg-[#f2f2f2] dark:bg-[#d9d4c8]"
                     style={{
                       width: coverWidth - 4,
                       height: height - 6,

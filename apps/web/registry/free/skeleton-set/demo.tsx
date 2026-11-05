@@ -46,7 +46,7 @@ export function ProductPick({ kind, price }: { kind: ProductKind; price: string 
   const t = useDemoText(copy);
   const names = useProductNames();
   return (
-    <article className="overflow-hidden rounded-md border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
+    <article className="overflow-hidden rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
       <ProductArt kind={kind} />
       <div className="p-4">
         <p className="truncate text-sm font-medium">{names[kind]}</p>
@@ -69,7 +69,7 @@ export function OrderList() {
   const t = useDemoText(copy);
   const { date } = useDate();
   return (
-    <ul className="divide-y divide-dashed divide-[#e7e0d0] rounded-md border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:divide-[#38332b] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
+    <ul className="divide-y divide-dashed divide-[#e2e2e2] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:divide-[#333333] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
       {orders.map((o) => (
         <li key={o.no} className="flex items-center gap-3 px-4 py-3.5">
           <ProductArt kind={o.kind} className="size-10 shrink-0 rounded-[3px]" />
@@ -94,7 +94,7 @@ export function TrackingList() {
       {t.events.map((e, i) => (
         <li
           key={e}
-          className="flex h-11 items-center justify-between gap-3 rounded-md border border-[#e7e0d0] bg-[#faf7f0] px-4 text-sm text-[#1c1917] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]"
+          className="flex h-11 items-center justify-between gap-3 rounded-md border border-[#e2e2e2] bg-[#f7f7f7] px-4 text-sm text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]"
         >
           <span className={i === 0 ? "truncate font-medium" : "truncate text-current/70"}>{e}</span>
           <span className="shrink-0 text-xs text-current/60 tabular-nums">

@@ -95,12 +95,12 @@ export default function OtpInputDemo() {
       {/* 收件匣裡的那封信，買家照著輸入 */}
       <aside
         aria-label={t.preview}
-        className="rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-4 text-[#1c1917] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]"
+        className="rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-4 text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]"
       >
         <p className="text-[11px] font-medium tracking-[0.14em] text-current/60 uppercase">{t.inbox}</p>
         <p className="mt-2 text-sm font-medium">{t.subject}</p>
         <p className="mt-1 text-xs text-current/60">{t.body}</p>
-        <p className="mt-3 border-t border-dashed border-[#e7e0d0] pt-3 font-mono text-xl font-semibold tracking-[0.12em] tabular-nums select-all dark:border-[#38332b]">
+        <p className="mt-3 border-t border-dashed border-[#e2e2e2] pt-3 font-mono text-xl font-semibold tracking-[0.12em] tabular-nums select-all dark:border-[#333333]">
           246 810
         </p>
       </aside>

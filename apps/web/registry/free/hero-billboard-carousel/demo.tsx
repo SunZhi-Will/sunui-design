@@ -8,10 +8,10 @@ import { HeroBillboardCarousel, type HeroBillboardSlide } from "./hero-billboard
 type PosterKind = "kiln" | "type" | "run" | "books";
 
 function PosterArt({ kind }: { kind: PosterKind }) {
-  const ink = "#e7e5e4";
+  const ink = "#e5e5e5";
   return (
     <svg viewBox="0 0 160 90" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <rect width="160" height="90" fill={kind === "type" ? "#1c1a17" : kind === "run" ? "#23211e" : kind === "books" ? "#201d1a" : "#262320"} />
+      <rect width="160" height="90" fill={kind === "type" ? "#1a1a1a" : kind === "run" ? "#23211e" : kind === "books" ? "#201d1a" : "#262320"} />
       {kind === "kiln" && (
         <g fill="none" stroke={ink} strokeWidth="0.6" opacity="0.55">
           <path d="M104 18 C96 30 92 44 98 60 C102 70 126 70 130 60 C136 44 132 30 124 18 Z" />
@@ -114,7 +114,7 @@ export default function HeroBillboardCarouselDemo() {
         intro={
           <>
             <h1 className="font-serif text-xl font-normal tracking-[-0.01em] md:text-2xl">{t.heading}</h1>
-            <a href="#calendar" className="text-[14px] font-medium text-[#a8a29e] no-underline underline-offset-4 hover:underline">
+            <a href="#calendar" className="text-[14px] font-medium text-[#a3a3a3] no-underline underline-offset-4 hover:underline">
               {t.browse}
             </a>
           </>

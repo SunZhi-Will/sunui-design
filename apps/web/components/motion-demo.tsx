@@ -10,8 +10,8 @@ import { listItem, panel, press, roll, scrim, springs, stamp, useShake } from "@
 // 動效辭典的小示範：只有使用者按「播放」或直接操作時才動，符合 DESIGN.md 第 4 節。
 // 全部用 sunui-motion 本身實作，順便驗證這個 lib。
 
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18] border-[#e7e0d0] dark:border-[#38332b] text-[#1c1917] dark:text-[#ece7dc]";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c] border-[#e2e2e2] dark:border-[#333333] text-[#171717] dark:text-[#ededed]";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 export function MotionDemo({ demo, playLabel }: { demo: DemoKey; playLabel: string }) {
   const [run, setRun] = useState(0);

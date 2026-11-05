@@ -28,7 +28,7 @@ const verdicts: Verdict[] = ["allow", "limit", "avoid"];
 const badge: Record<Verdict, string> = {
   allow: "border-fg/70 text-fg",
   limit: "border-dashed border-subtle text-subtle",
-  avoid: "border-[#c8361d]/60 text-[#c8361d] dark:border-[#ec6a4f]/60 dark:text-[#ec6a4f]",
+  avoid: "border-[#171717]/60 text-[#171717] dark:border-[#ededed]/60 dark:text-[#ededed]",
 };
 
 export function MotionDictionary({ groups, copy }: { groups: DictionaryGroup[]; copy: Copy }) {

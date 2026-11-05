@@ -130,8 +130,8 @@ export function ProductArt({
   return (
     <div
       className={cn(
-        "flex aspect-square w-full items-center justify-center text-[#1c1917] dark:text-[#ece7dc]",
-        tone === "paper" ? "bg-[#f3eee3] dark:bg-[#26221d]" : "bg-[#e9dfcc] dark:bg-[#2f2a22]",
+        "flex aspect-square w-full items-center justify-center text-[#171717] dark:text-[#ededed]",
+        tone === "paper" ? "bg-[#f1f1f1] dark:bg-[#232323]" : "bg-[#e0e0e0] dark:bg-[#2b2b2b]",
         className,
       )}
     >

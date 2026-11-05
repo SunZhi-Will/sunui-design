@@ -33,7 +33,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const reference =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><rect width="200" height="300" fill="#e7e5e4"/><circle cx="150" cy="60" r="26" fill="#fafaf9"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a8a29e"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><rect width="200" height="300" fill="#e5e5e5"/><circle cx="150" cy="60" r="26" fill="#fafafa"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a3a3a3"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
   );
 
 const copy = {

@@ -82,7 +82,7 @@ export function FloatingField({
   };
 
   const fieldClass = cn(
-    "peer w-full bg-transparent px-3 text-sm text-[#1c1917] outline-none dark:text-[#ece7dc]",
+    "peer w-full bg-transparent px-3 text-sm text-[#171717] outline-none dark:text-[#ededed]",
     multiline ? "min-h-24 resize-y pb-2 pt-6" : "h-14 pb-2 pt-6",
     trailing && "pr-10",
   );
@@ -113,8 +113,8 @@ export function FloatingField({
       <div
         ref={scope}
         className={cn(
-          "relative rounded-md border bg-[#faf7f0] transition-colors dark:bg-[#1f1c18]",
-          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? "border-[#1c1917] dark:border-[#ece7dc]" : "border-[#e7e0d0] dark:border-[#38332b]",
+          "relative rounded-md border bg-[#f7f7f7] transition-colors dark:bg-[#1c1c1c]",
+          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? "border-[#171717] dark:border-[#ededed]" : "border-[#e2e2e2] dark:border-[#333333]",
         )}
       >
         {multiline ? <textarea rows={rows} {...common} /> : <input {...common} />}
@@ -127,7 +127,7 @@ export function FloatingField({
           className={cn(
             "pointer-events-none absolute left-3 text-sm",
             multiline ? "top-4" : "top-[1.05rem]",
-            error ? "text-destructive" : floated ? "text-[#1c1917]/70 dark:text-[#ece7dc]/70" : "text-[#1c1917]/50 dark:text-[#ece7dc]/50",
+            error ? "text-destructive" : floated ? "text-[#171717]/70 dark:text-[#ededed]/70" : "text-[#171717]/50 dark:text-[#ededed]/50",
           )}
         >
           {label}

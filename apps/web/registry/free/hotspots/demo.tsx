@@ -54,14 +54,14 @@ const copy = {
 function Jacket() {
   return (
     <svg viewBox="0 0 400 400" className="block h-auto w-full" role="img" aria-hidden="true">
-      <rect width="400" height="400" className="fill-[#f1ece1] dark:fill-[#2a2621]" />
-      <g className="fill-[#b9ab8c] stroke-[#1c1917]/50 dark:fill-[#6b5f49] dark:stroke-[#ece7dc]/40" strokeWidth="1.5" strokeLinejoin="round">
+      <rect width="400" height="400" className="fill-[#ececec] dark:fill-[#272727]" />
+      <g className="fill-[#acacac] stroke-[#171717]/50 dark:fill-[#606060] dark:stroke-[#ededed]/40" strokeWidth="1.5" strokeLinejoin="round">
         <path d="M150 60 L120 72 L70 110 L40 300 L70 330 L95 330 L105 180 L110 360 L290 360 L295 180 L305 330 L330 330 L360 300 L330 110 L280 72 L250 60 Z" />
-        <path d="M150 60 L200 120 L250 60 L235 45 L200 70 L165 45 Z" className="fill-[#7a5a3a] dark:fill-[#4a3726]" />
+        <path d="M150 60 L200 120 L250 60 L235 45 L200 70 L165 45 Z" className="fill-[#7a5a3a] dark:fill-[#3b3b3b]" />
         <path d="M200 120 L200 360" fill="none" />
         <rect x="225" y="240" width="55" height="60" rx="4" />
         <rect x="120" y="240" width="55" height="60" rx="4" />
-        <path d="M330 300 L360 300 L355 322 L330 330 Z" className="fill-[#5a4a36] dark:fill-[#3d3226]" />
+        <path d="M330 300 L360 300 L355 322 L330 330 Z" className="fill-[#4d4d4d] dark:fill-[#343434]" />
       </g>
     </svg>
   );

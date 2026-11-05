@@ -98,11 +98,11 @@ const MESSAGES: Record<SunLocale, ExpandingSearchLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const paperUnder = "bg-[#f1ebdd] dark:bg-[#29251f]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -281,7 +281,7 @@ export function ExpandingSearch({
         transition={reduce ? { duration: 0 } : springs.gentle}
         className={cn(
           "relative flex h-10 max-w-full items-center overflow-hidden rounded-md border transition-colors",
-          open ? cn(paper, edge, "focus-within:border-[#1c1917]/40 dark:focus-within:border-[#ece7dc]/40") : "border-transparent",
+          open ? cn(paper, edge, "focus-within:border-[#171717]/40 dark:focus-within:border-[#ededed]/40") : "border-transparent",
         )}
       >
         {open ? (

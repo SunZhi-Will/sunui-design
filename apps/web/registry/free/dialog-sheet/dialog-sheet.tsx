@@ -172,7 +172,7 @@ export function DialogSheet({
         <div className={cn("inset-0 z-50 flex", position === "fixed" ? "fixed" : "absolute", mode === "sheet" ? "items-end" : "items-center justify-center p-4")}>
           <motion.div
             aria-hidden="true"
-            className="absolute inset-0 bg-[#1c1917]/40"
+            className="absolute inset-0 bg-[#171717]/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.18 } }}
@@ -196,7 +196,7 @@ export function DialogSheet({
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={onDragEnd}
             className={cn(
-              "relative flex max-h-[85%] w-full flex-col border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] outline-none dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]",
+              "relative flex max-h-[85%] w-full flex-col border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] outline-none dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]",
               mode === "sheet" ? "rounded-t-lg border-b-0" : "max-w-md rounded-md",
               className,
             )}
@@ -206,7 +206,7 @@ export function DialogSheet({
                 className={cn("flex justify-center pb-1 pt-2.5", draggable && "cursor-grab touch-none active:cursor-grabbing")}
                 onPointerDown={(e) => draggable && drag.start(e)}
               >
-                <span aria-hidden="true" className="h-1 w-10 rounded-full bg-[#e7e0d0] dark:bg-[#38332b]" />
+                <span aria-hidden="true" className="h-1 w-10 rounded-full bg-[#e2e2e2] dark:bg-[#333333]" />
               </div>
             )}
             <div className={cn("flex items-start gap-3 px-5", mode === "sheet" ? "pt-2" : "pt-5")}>
@@ -215,7 +215,7 @@ export function DialogSheet({
                   {title}
                 </h2>
                 {description && (
-                  <p id={descId} className="mt-1 text-sm text-[#1c1917]/65 dark:text-[#ece7dc]/65">
+                  <p id={descId} className="mt-1 text-sm text-[#171717]/65 dark:text-[#ededed]/65">
                     {description}
                   </p>
                 )}
@@ -224,7 +224,7 @@ export function DialogSheet({
                 type="button"
                 aria-label={closeLabel}
                 onClick={() => setOpen(false)}
-                className="-mr-1.5 -mt-1 grid size-8 shrink-0 place-items-center rounded-md text-[#1c1917]/60 transition-colors hover:bg-[#e7e0d0]/60 hover:text-[#1c1917] focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-[#ece7dc]/60 dark:hover:bg-[#38332b]/60 dark:hover:text-[#ece7dc]"
+                className="-mr-1.5 -mt-1 grid size-8 shrink-0 place-items-center rounded-md text-[#171717]/60 transition-colors hover:bg-[#e2e2e2]/60 hover:text-[#171717] focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-[#ededed]/60 dark:hover:bg-[#333333]/60 dark:hover:text-[#ededed]"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="size-4" aria-hidden="true">
                   <path d="M6 6l12 12M18 6L6 18" />
@@ -232,7 +232,7 @@ export function DialogSheet({
               </button>
             </div>
             {children && <div className="min-h-0 overflow-y-auto px-5 pt-4 text-sm">{children}</div>}
-            {footer && <div className="mt-2 flex flex-wrap justify-end gap-2 border-t border-dashed border-[#e7e0d0] px-5 py-4 dark:border-[#38332b]">{footer}</div>}
+            {footer && <div className="mt-2 flex flex-wrap justify-end gap-2 border-t border-dashed border-[#e2e2e2] px-5 py-4 dark:border-[#333333]">{footer}</div>}
             {!footer && <div className="h-5" />}
           </motion.div>
         </div>

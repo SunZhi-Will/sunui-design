@@ -19,12 +19,12 @@ function tile(bg: string, fg: string, shape: "crew" | "detail" | "fold" | "flat"
 }
 
 const sources = [
-  tile("#ece6da", "#9c8d72", "crew"),
-  tile("#e3dccd", "#b5a688", "detail"),
-  tile("#efe9de", "#8a7b62", "fold"),
-  tile("#e8e1d3", "#6f6350", "flat"),
-  tile("#ebe4d7", "#a59578", "cuff"),
-  tile("#e6dfd1", "#c8361d", "tag"),
+  tile("#e6e6e6", "#8e8e8e", "crew"),
+  tile("#dcdcdc", "#a7a7a7", "detail"),
+  tile("#eaeaea", "#7d7d7d", "fold"),
+  tile("#e1e1e1", "#646464", "flat"),
+  tile("#e5e5e5", "#969696", "cuff"),
+  tile("#e3e3e3", "#171717", "tag"),
 ];
 
 const copy = {

@@ -80,7 +80,7 @@ export default async function IconsPage() {
 <Icon name="stamp-check" title="Claimed" />
 
 // Turn on the vermilion accent for one subtree
-<div className="[--sunui-icon-accent:#c8361d] dark:[--sunui-icon-accent:#ec6a4f]">
+<div className="[--sunui-icon-accent:#171717] dark:[--sunui-icon-accent:#ededed]">
   <Icon name="punch-card" />
 </div>`}
           />

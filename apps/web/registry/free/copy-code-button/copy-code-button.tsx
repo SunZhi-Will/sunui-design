@@ -77,11 +77,11 @@ const MESSAGES: Record<SunLocale, CopyCodeButtonLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 // 虛線用淡墨色，紙邊色在紙面上幾乎看不見
-const edge = "border-[#1c1917]/25 dark:border-[#ece7dc]/25";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const edge = "border-[#171717]/25 dark:border-[#ededed]/25";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -196,7 +196,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         transition={springs.snappy}
         className={cn(
           "flex shrink-0 items-center gap-1.5 rounded-r-[5px] border-l border-dashed font-medium transition-colors",
-          "hover:bg-[#1c1917]/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset dark:hover:bg-[#ece7dc]/[0.06]",
+          "hover:bg-[#171717]/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset dark:hover:bg-[#ededed]/[0.06]",
           edge,
           copied ? ink : inkMuted,
           s.button,

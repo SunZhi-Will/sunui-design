@@ -8,14 +8,14 @@ import { ProductArt, useProductNames } from "@/registry/_demo/product-art";
 import { OptionChips, VariantPicker, type VariantColor, type VariantValue } from "./variant-picker";
 
 const teeSwatches = [
-  { id: "oat", swatch: "#d9cdb8" },
+  { id: "oat", swatch: "#cecece" },
   { id: "navy", swatch: "#2b3448" },
   { id: "moss", swatch: "#6b7354" },
   { id: "rust", swatch: "#9a4a2e" },
 ];
 
 const jacketSwatches = [
-  { id: "oat", swatch: "#d8ccb2" },
+  { id: "oat", swatch: "#cdcdcd" },
   { id: "clay", swatch: "#a5634a" },
   { id: "ink", swatch: "#2b2926" },
 ];
@@ -89,13 +89,13 @@ export default function VariantPickerDemo() {
   const [tee, setTee] = useState<VariantValue>({ color: "oat", size: "M" });
   const [jacket, setJacket] = useState<VariantValue>({ color: "clay", size: "M" });
   const [fit, setFit] = useState<Fit>("regular");
-  const teeSwatch = teeSwatches.find((c) => c.id === tee.color)?.swatch ?? "#d9cdb8";
+  const teeSwatch = teeSwatches.find((c) => c.id === tee.color)?.swatch ?? "#cecece";
 
   return (
     <div className="grid w-full max-w-[52rem] min-w-0 items-start gap-6 md:grid-cols-2">
       <section aria-labelledby="vp-tee" className="min-w-0 space-y-4">
         {/* 中性實物插圖：上衣輪廓跟著所選顏色換色 */}
-        <div className="grid aspect-[4/3] place-items-center rounded-md border border-[#e7e0d0] bg-[#faf7f0] dark:border-[#38332b] dark:bg-[#1f1c18]">
+        <div className="grid aspect-[4/3] place-items-center rounded-md border border-[#e2e2e2] bg-[#f7f7f7] dark:border-[#333333] dark:bg-[#1c1c1c]">
           <svg viewBox="0 0 120 120" className="w-2/5" aria-hidden="true">
             <path
               d="M44 18 30 24 12 40l12 16 10-7v53h52V49l10 7 12-16-18-16-14-6c-2 7-8 11-16 11s-14-4-16-11Z"
@@ -126,7 +126,7 @@ export default function VariantPickerDemo() {
           <p className="mt-0.5 text-lg font-semibold tracking-tight tabular-nums">$128.00</p>
         </div>
         <div className="space-y-2.5">
-          <p className="text-sm text-[#1c1917]/60 dark:text-[#ece7dc]/60">{t.fit}</p>
+          <p className="text-sm text-[#171717]/60 dark:text-[#ededed]/60">{t.fit}</p>
           <OptionChips<Fit>
             locale={locale}
             aria-label={t.fit}

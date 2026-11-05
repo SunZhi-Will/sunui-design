@@ -20,7 +20,7 @@ export default function CjkHeadingCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   return (
-    <div lang={t.lang} className={cn("mx-auto w-72 space-y-3 rounded-md border p-5", "border-[#e7e0d0] bg-[#faf7f0] dark:border-[#38332b] dark:bg-[#1f1c18]")}>
+    <div lang={t.lang} className={cn("mx-auto w-72 space-y-3 rounded-md border p-5", "border-[#e2e2e2] bg-[#f7f7f7] dark:border-[#333333] dark:bg-[#1c1c1c]")}>
       <CjkHeading as="h2" locale={locale} text={t.title} highlight={[t.titleSeal]} className="text-2xl" />
       <CjkHeading as="p" locale={locale} text={t.sub} highlight={[t.subSeal]} className="text-base font-semibold" />
     </div>

@@ -13,12 +13,12 @@ import { resolveLocale, type SunLocale } from "./story-player";
 
 /** 年度回顧投影片的暗色色票（showcase 系列）。accent 只是預設值，各元件都能用 accent prop 換掉。 */
 export const recapPalette = {
-  base: "#0c0a09",
-  surface: "#161412",
+  base: "#0a0a0a",
+  surface: "#141414",
   line: "rgb(255 255 255 / 0.08)",
-  text: "#f5f5f4",
-  soft: "#d6d3d1",
-  muted: "#a8a29e",
+  text: "#f5f5f5",
+  soft: "#d4d4d4",
+  muted: "#a3a3a3",
   accent: "#d4a24c",
 } as const;
 
@@ -44,7 +44,7 @@ export interface RecapFrameProps {
 }
 
 /**
- * 四張回顧投影片共用的外框：#0c0a09 底、上方小標、下方一句話，整體淡入一次。
+ * 四張回顧投影片共用的外框：#0a0a0a 底、上方小標、下方一句話，整體淡入一次。
  * 自己做封面或結尾張時也可以直接用它，版面就會跟其他張一致。
  */
 export function RecapFrame({ title, footer, accent = recapPalette.accent, className, style, children }: RecapFrameProps) {
@@ -384,7 +384,7 @@ export function formatPercentile(rank: number | null): string {
  * color 與 glow 為舊版 API 保留的欄位，元件本身已不使用，一律回傳中性值。
  */
 export function getRankLevel(rank: number | null): { level: RecapRankLevel; color: string; glow: string } {
-  const neutral = { color: "from-stone-400 to-stone-300", glow: "transparent" };
+  const neutral = { color: "from-neutral-400 to-neutral-300", glow: "transparent" };
   if (rank === null || rank === undefined) return { level: "unknown", ...neutral };
   if (rank <= 0.1) return { level: "top01", ...neutral };
   if (rank <= 1) return { level: "top1", ...neutral };

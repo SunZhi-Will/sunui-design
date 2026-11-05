@@ -93,11 +93,11 @@ const MESSAGES: Record<SunLocale, Required<TermsConsentLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -144,7 +144,7 @@ export function TermsConsent({
         </p>
       </header>
 
-      <ul className="divide-y divide-dashed divide-[#e7e0d0] dark:divide-[#38332b]">
+      <ul className="divide-y divide-dashed divide-[#e2e2e2] dark:divide-[#333333]">
         {items.map((item) => {
           const on = checked.includes(item.id);
           const inputId = `${uid}-${item.id}`;
@@ -164,7 +164,7 @@ export function TermsConsent({
                   className={cn(
                     "mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-[4px] border transition-colors",
                     "peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
-                    on ? "border-primary bg-primary text-primary-foreground" : "border-[#1c1917]/30 dark:border-[#ece7dc]/30",
+                    on ? "border-primary bg-primary text-primary-foreground" : "border-[#171717]/30 dark:border-[#ededed]/30",
                   )}
                 >
                   <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">

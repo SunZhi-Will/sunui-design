@@ -42,8 +42,8 @@ export interface StampProps {
 }
 
 const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
-const ink = "text-[#1c1917]/70 dark:text-[#ece7dc]/70";
-const paperText = "text-[#faf7f0] dark:text-[#1f1c18]";
+const ink = "text-[#171717]/70 dark:text-[#ededed]/70";
+const paperText = "text-[#f7f7f7] dark:text-[#1c1c1c]";
 
 const stampSpring = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 const heavySpring = { type: "spring", stiffness: 520, damping: 22, mass: 1.1 } as const;
@@ -131,7 +131,7 @@ export function Stamp({
         exit={exit}
         transition={reduce ? { duration: 0 } : { duration: 0.12, delay }}
         style={style}
-        className={cn("pointer-events-none inline-flex items-center gap-1 font-medium whitespace-nowrap", TEXT[size], tone === "vermilion" ? vermilion : "text-[#1c1917] dark:text-[#ece7dc]", className)}
+        className={cn("pointer-events-none inline-flex items-center gap-1 font-medium whitespace-nowrap", TEXT[size], tone === "vermilion" ? vermilion : "text-[#171717] dark:text-[#ededed]", className)}
       >
         <svg viewBox="0 0 24 24" className={TICK[size]} fill="none" stroke="currentColor" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round">
           <motion.path

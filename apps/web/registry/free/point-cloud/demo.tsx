@@ -101,9 +101,9 @@ export default function PointCloudDemo() {
         <PointCloud shape={shape} label={t.label} count={1400} className="mx-auto max-w-[420px] text-foreground" />
       </section>
       <div className="grid gap-5 sm:grid-cols-2">
-        <figure className="overflow-hidden rounded-xl border border-border bg-[#1c1917]">
-          <PointCloud shape="text" text={t.sale} count={1800} pointSize={1.3} color="#f5f5f4" label={t.saleNote} className="aspect-[2/1]" />
-          <figcaption className="border-t border-white/10 px-4 py-2 text-sm text-stone-300">{t.saleNote}</figcaption>
+        <figure className="overflow-hidden rounded-xl border border-border bg-[#171717]">
+          <PointCloud shape="text" text={t.sale} count={1800} pointSize={1.3} color="#f5f5f5" label={t.saleNote} className="aspect-[2/1]" />
+          <figcaption className="border-t border-white/10 px-4 py-2 text-sm text-neutral-300">{t.saleNote}</figcaption>
         </figure>
         <figure className="overflow-hidden rounded-xl border border-border">
           <PointCloud shape="wave" count={1600} pointSize={1.4} label={t.wave} className="aspect-[2/1] text-foreground" />

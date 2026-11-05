@@ -141,7 +141,7 @@ export default function SlidingTabsDemo() {
         </div>
         <div aria-hidden="true" className="mt-4 flex h-24 items-end gap-2">
           {bars[period].map((h, i) => (
-            <div key={i} className="flex-1 rounded-sm bg-[#1c1917]/80 transition-[height] duration-300 ease-out motion-reduce:transition-none dark:bg-[#ece7dc]/80" style={{ height: `${h}%` }} />
+            <div key={i} className="flex-1 rounded-sm bg-[#171717]/80 transition-[height] duration-300 ease-out motion-reduce:transition-none dark:bg-[#ededed]/80" style={{ height: `${h}%` }} />
           ))}
         </div>
       </div>

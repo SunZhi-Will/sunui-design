@@ -114,7 +114,7 @@ export function LoadingButton({
         "relative inline-flex h-10 items-center justify-center overflow-hidden whitespace-nowrap text-sm font-medium outline-offset-2 focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-50",
         shrunk ? "w-10 px-0" : "px-4",
         variant === "primary" && "bg-primary text-primary-foreground",
-        variant === "paper" && "border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]",
+        variant === "paper" && "border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]",
         state === "error" && "bg-destructive text-white",
         className,
       )}

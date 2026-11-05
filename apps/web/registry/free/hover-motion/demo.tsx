@@ -57,7 +57,7 @@ const copy = {
   },
 };
 
-const tones = ["bg-[#e7e0d0]", "bg-[#d6cdb8]", "bg-[#c9bfa8]", "bg-[#ddd4c0]"];
+const tones = ["bg-[#e2e2e2]", "bg-[#cdcdcd]", "bg-[#bfbfbf]", "bg-[#d4d4d4]"];
 
 export default function HoverMotionDemo() {
   const t = useDemoText(copy);
@@ -81,7 +81,7 @@ export default function HoverMotionDemo() {
           items={t.rows.map((row, i) => ({
             ...row,
             preview: (
-              <div className={`flex h-full items-end p-3 text-xs text-[#1c1917]/70 dark:text-[#1c1917]/70 ${tones[i]}`}>
+              <div className={`flex h-full items-end p-3 text-xs text-[#171717]/70 dark:text-[#171717]/70 ${tones[i]}`}>
                 <span>{row.meta}</span>
               </div>
             ),

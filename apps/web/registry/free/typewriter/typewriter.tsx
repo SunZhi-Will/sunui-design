@@ -167,7 +167,7 @@ export function Typewriter({
       ref={ref}
       lang={lang}
       aria-live="off"
-      className={cn("grid text-3xl font-semibold tracking-tight text-[#1c1917] dark:text-[#ece7dc]", className)}
+      className={cn("grid text-3xl font-semibold tracking-tight text-[#171717] dark:text-[#ededed]", className)}
     >
       <span className="sr-only">{fullText}</span>
       {/* 以最長的句子先撐出高度，打字時下方版面不會跳動 */}

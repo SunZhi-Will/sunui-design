@@ -17,7 +17,7 @@ export default function AddToCartButtonCard() {
   return (
     <div className="mx-auto flex w-60 items-end gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <div className="h-28 overflow-hidden rounded-md border border-[#e7e0d0] dark:border-[#38332b] [&>*]:h-full">
+        <div className="h-28 overflow-hidden rounded-md border border-[#e2e2e2] dark:border-[#333333] [&>*]:h-full">
           <ProductArt kind="mug" />
         </div>
         <div className="flex items-baseline justify-between gap-2 text-sm">

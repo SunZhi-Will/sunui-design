@@ -28,7 +28,7 @@ import {
 /** Ink to lamp gold to white: the story series' accent as a pixel ramp. */
 export const GOLD_RAMP = ["#0b0e14", "#2a1f12", "#5a4122", "#8a6a3a", "#c9a063", "#e2c28a", "#f3e3c0", "#ffffff"] as const;
 /** Vermilion, gold and paper: SunUI's brand colors as confetti. */
-export const PAPER_CONFETTI = ["#c8361d", "#c9a063", "#faf7f0", "#e2c28a", "#ec6a4f", "#eae4d6", "#8a6a3a"] as const;
+export const PAPER_CONFETTI = ["#171717", "#a3a3a3", "#f7f7f7", "#d4d4d4", "#ededed", "#e6e6e6", "#525252"] as const;
 
 /**
  * The moment of a pickup: a white flash and a cross of light, a thin ring snapping out ahead of a softer one,

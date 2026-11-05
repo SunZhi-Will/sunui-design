@@ -30,7 +30,7 @@ export default function AddToCartButtonDemo() {
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3">
         {products.map((p) => (
           <div key={p.kind} className="flex flex-col gap-3">
-            <div className="overflow-hidden rounded-md border border-[#e7e0d0] dark:border-[#38332b]">
+            <div className="overflow-hidden rounded-md border border-[#e2e2e2] dark:border-[#333333]">
               <ProductArt kind={p.kind} />
             </div>
             <div className="flex items-baseline justify-between gap-2 text-sm">

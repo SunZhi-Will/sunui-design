@@ -147,17 +147,17 @@ export interface TestimonialMarqueeProps {
 /* ───────── 暗色 token（元件自帶，不依賴網站主題） ───────── */
 
 const THEME = {
-  "--tm-text-primary": "#f5f5f4",
-  "--tm-text-secondary": "#d6d3d1",
-  "--tm-text-muted": "#a8a29e",
-  "--tm-text-dim": "#78716c",
-  "--tm-card-subtle": "#161412",
-  "--tm-card": "#1c1a17",
-  "--tm-card-raised": "#1c1a17",
+  "--tm-text-primary": "#f5f5f5",
+  "--tm-text-secondary": "#d4d4d4",
+  "--tm-text-muted": "#a3a3a3",
+  "--tm-text-dim": "#737373",
+  "--tm-card-subtle": "#141414",
+  "--tm-card": "#1a1a1a",
+  "--tm-card-raised": "#1a1a1a",
   "--tm-border-subtle": "rgb(255 255 255 / 0.08)",
   "--tm-border": "rgb(255 255 255 / 0.12)",
   "--tm-border-hover": "rgb(255 255 255 / 0.16)",
-  "--tm-dropdown-bg": "#161412",
+  "--tm-dropdown-bg": "#141414",
   "--tm-backdrop": "rgba(12,10,9,0.82)",
   "--tm-gold": "#d4a24c",
 } as CSSProperties;
@@ -441,7 +441,7 @@ function TestimonialCard({
           size={28}
           fontSize={12}
           background={avatarTone(t.author.name)}
-          color="#e7e5e4"
+          color="#e5e5e5"
           border="1px solid var(--tm-border-subtle)"
         />
         <div className="min-w-0 flex-1">
@@ -601,7 +601,7 @@ function ExpandedDialog({
               size={44}
               fontSize={16}
               background={avatarTone(t.author.name)}
-              color="#e7e5e4"
+              color="#e5e5e5"
               border="1px solid var(--tm-border-subtle)"
             />
             <div className="min-w-0 flex-1">

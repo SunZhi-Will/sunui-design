@@ -125,9 +125,9 @@ const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙邊、墨、朱紅
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },

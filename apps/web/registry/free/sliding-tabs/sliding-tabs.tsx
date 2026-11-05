@@ -91,8 +91,8 @@ export function SlidingTabs(props: SlidingTabsProps) {
           aria-label={props["aria-label"]}
           className={cn(
             "relative flex max-w-full",
-            variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-[#e7e0d0] dark:border-[#38332b]",
-            variant === "segment" && cn("rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-1 dark:border-[#38332b] dark:bg-[#1f1c18]", fullWidth ? "w-full" : "w-fit"),
+            variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-[#e2e2e2] dark:border-[#333333]",
+            variant === "segment" && cn("rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-1 dark:border-[#333333] dark:bg-[#1c1c1c]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
           )}
         >
@@ -118,18 +118,18 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
                   variant === "chips" ? "rounded-full border" : "rounded-md",
-                  variant === "chips" && (on ? "border-[#1c1917] dark:border-[#ece7dc]" : "border-[#e7e0d0] hover:border-[#1c1917]/40 dark:border-[#38332b]"),
-                  on ? (variant === "chips" ? "text-[#faf7f0] dark:text-[#1f1c18]" : "text-[#1c1917] dark:text-[#ece7dc]") : "text-[#1c1917]/55 hover:text-[#1c1917] dark:text-[#ece7dc]/55 dark:hover:text-[#ece7dc]",
+                  variant === "chips" && (on ? "border-[#171717] dark:border-[#ededed]" : "border-[#e2e2e2] hover:border-[#171717]/40 dark:border-[#333333]"),
+                  on ? (variant === "chips" ? "text-[#f7f7f7] dark:text-[#1c1c1c]" : "text-[#171717] dark:text-[#ededed]") : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
                 )}
               >
                 {on && variant === "underline" && (
-                  <motion.span layoutId="ind" transition={t} className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-[#1c1917] dark:bg-[#ece7dc]" />
+                  <motion.span layoutId="ind" transition={t} className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-[#171717] dark:bg-[#ededed]" />
                 )}
                 {on && variant === "segment" && (
                   <motion.span
                     layoutId="ind"
                     transition={t}
-                    className="absolute inset-0 rounded-[5px] border border-[#e7e0d0] bg-background shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#38332b]"
+                    className="absolute inset-0 rounded-[5px] border border-[#e2e2e2] bg-background shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#333333]"
                   />
                 )}
                 {variant === "chips" && (
@@ -137,7 +137,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                     initial={false}
                     animate={{ opacity: on ? 1 : 0 }}
                     transition={{ duration: reduce ? 0 : 0.15 }}
-                    className="absolute inset-0 rounded-full bg-[#1c1917] dark:bg-[#ece7dc]"
+                    className="absolute inset-0 rounded-full bg-[#171717] dark:bg-[#ededed]"
                   />
                 )}
                 <AnimatePresence initial={false}>

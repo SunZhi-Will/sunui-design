@@ -36,7 +36,7 @@ export default function SkeletonSetCard() {
   return (
     <div className="mx-auto w-72 space-y-2.5">
       <SkeletonSet loaded={loaded} skeleton="list" count={2} locale={locale}>
-        <ul className="divide-y divide-dashed divide-[#e7e0d0] rounded-md border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] dark:divide-[#38332b] dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
+        <ul className="divide-y divide-dashed divide-[#e2e2e2] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:divide-[#333333] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
           {orders.map((o) => (
             <li key={o.no} className="flex items-center gap-3 px-4 py-3.5">
               <ProductArt kind={o.kind} className="size-10 shrink-0 rounded-[3px]" />

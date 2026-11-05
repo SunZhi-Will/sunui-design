@@ -933,7 +933,7 @@ const BOOK_CSS = `
 }
 .m3d-edge {
   position: absolute;
-  background: repeating-linear-gradient(to bottom, #ece3cd 0, #ece3cd 2px, #d6c9a6 2px, #d6c9a6 3px);
+  background: repeating-linear-gradient(to bottom, #e8e8e8 0, #e8e8e8 2px, #d6c9a6 2px, #d6c9a6 3px);
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 .m3d-edge-right {
@@ -947,7 +947,7 @@ const BOOK_CSS = `
   left: 0;
   width: 100%;
   height: var(--m3d-d);
-  background: repeating-linear-gradient(to right, #ece3cd 0, #ece3cd 2px, #d6c9a6 2px, #d6c9a6 3px);
+  background: repeating-linear-gradient(to right, #e8e8e8 0, #e8e8e8 2px, #d6c9a6 2px, #d6c9a6 3px);
 }
 .m3d-edge-top { top: 0; transform: rotateX(90deg) translateZ(calc(var(--m3d-d) / 2)); }
 .m3d-edge-bottom { bottom: 0; transform: rotateX(-90deg) translateZ(calc(var(--m3d-d) / 2)); }

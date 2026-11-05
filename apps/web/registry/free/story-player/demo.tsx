@@ -86,7 +86,7 @@ type Copy = (typeof copy)["en"];
 // 封面：跟回顧投影片共用 RecapFrame，版面一致
 function CoverSlide({ t }: { t: Copy }) {
   return (
-    <RecapFrame title={t.coverTitle} footer={<p className="text-[15px] text-[#a8a29e]">{t.tap}</p>}>
+    <RecapFrame title={t.coverTitle} footer={<p className="text-[15px] text-[#a3a3a3]">{t.tap}</p>}>
       <div className="flex flex-1 flex-col justify-center">
         <div className="mb-6 flex size-12 items-center justify-center rounded-full text-lg font-semibold" style={{ background: recapPalette.surface, color: recapPalette.soft }}>
           M
@@ -110,7 +110,7 @@ function OutroSlide({ t }: { t: Copy }) {
     { label: t.topWord, value: t.words[0] },
   ];
   return (
-    <RecapFrame title={t.outroTitle} footer={<p className="text-[15px] leading-relaxed text-[#d6d3d1]">{t.thanks}</p>}>
+    <RecapFrame title={t.outroTitle} footer={<p className="text-[15px] leading-relaxed text-[#d4d4d4]">{t.thanks}</p>}>
       <dl className="flex flex-1 flex-col justify-center">
         {rows.map((r) => (
           <div key={r.label} className="flex items-baseline justify-between gap-4 border-b py-4" style={{ borderColor: recapPalette.line }}>

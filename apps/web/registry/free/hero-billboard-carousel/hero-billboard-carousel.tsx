@@ -160,7 +160,7 @@ function SlideMedia({ slide }: { slide: HeroBillboardSlide }) {
             <div className="line-clamp-1 font-semibold uppercase tracking-[0.2em]" style={{ fontSize: "clamp(9px,1.6cqw,14px)", marginBottom: "1cqw", color: slide.overlayColor ?? "var(--accent-gold)" }}>
               {slide.subtitle}
             </div>
-            <div className="line-clamp-2 font-serif font-normal leading-tight tracking-[-0.01em]" style={{ fontSize: "clamp(16px,3.6cqw,38px)", color: "#f5f5f4" }}>
+            <div className="line-clamp-2 font-serif font-normal leading-tight tracking-[-0.01em]" style={{ fontSize: "clamp(16px,3.6cqw,38px)", color: "#f5f5f5" }}>
               {slide.title}
             </div>
           </div>
@@ -350,7 +350,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                   <div className="hbc-panel-text">
                     <div className="hbc-meta-row">
                       {slide.badge && (
-                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style={{ background: "var(--accent-gold)", color: "#0c0a09" }}>
+                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style={{ background: "var(--accent-gold)", color: "#0a0a0a" }}>
                           {slide.badge}
                         </span>
                       )}
@@ -433,14 +433,14 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
 // 放在任何寬度的容器裡都以容器寬度計算；@media 768px 改成 @container。
 const BILLBOARD_CSS = `
 .hbc-root {
-  --bg: #0c0a09;
-  --text-primary: #f5f5f4;
-  --text-secondary: #a8a29e;
-  --card: #161412;
-  --card-raised: #1c1a17;
+  --bg: #0a0a0a;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --card: #141414;
+  --card-raised: #1a1a1a;
   --border: rgb(255 255 255 / 0.08);
   --accent-gold: #d4a24c;
-  --hero-bg: #0c0a09;
+  --hero-bg: #0a0a0a;
   --gap: 28px;
   --side-scale: 0.86;
   --side-dim: brightness(0.5) saturate(0.75);
@@ -455,14 +455,14 @@ const BILLBOARD_CSS = `
   color: var(--text-primary);
 }
 .hbc-root[data-theme="light"] {
-  --bg: #fafaf9;
-  --text-primary: #1c1917;
-  --text-secondary: #57534e;
+  --bg: #fafafa;
+  --text-primary: #171717;
+  --text-secondary: #525252;
   --card: #ffffff;
-  --card-raised: #f5f5f4;
+  --card-raised: #f5f5f5;
   --border: rgba(28, 25, 23, 0.08);
   --accent-gold: #a8741f;
-  --hero-bg: #fafaf9;
+  --hero-bg: #fafafa;
   --side-dim: saturate(0.7) opacity(0.55);
   --side-dim-hover: saturate(0.9) opacity(0.8);
   --ambient-opacity: 0.16;
@@ -644,7 +644,7 @@ const BILLBOARD_CSS = `
   border-radius: 999px;
   border: 1px solid rgb(255 255 255 / 0.14);
   background: rgba(22, 20, 18, 0.92);
-  color: #f5f5f4;
+  color: #f5f5f5;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
 }

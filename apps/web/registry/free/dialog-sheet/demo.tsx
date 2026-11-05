@@ -68,7 +68,7 @@ const copy = {
 };
 
 const buttonClass =
-  "rounded-md border border-[#e7e0d0] bg-[#faf7f0] px-3 py-2 text-sm font-medium text-[#1c1917] transition-colors hover:bg-[#e7e0d0]/60 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]";
+  "rounded-md border border-[#e2e2e2] bg-[#f7f7f7] px-3 py-2 text-sm font-medium text-[#171717] transition-colors hover:bg-[#e2e2e2]/60 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]";
 
 export default function DialogSheetDemo() {
   const t = useDemoText(copy);
@@ -90,14 +90,14 @@ export default function DialogSheetDemo() {
             >
               <table className="w-full text-left tabular-nums">
                 <thead>
-                  <tr className="border-b border-dashed border-[#e7e0d0] text-xs text-[#1c1917]/60 dark:border-[#38332b] dark:text-[#ece7dc]/60">
+                  <tr className="border-b border-dashed border-[#e2e2e2] text-xs text-[#171717]/60 dark:border-[#333333] dark:text-[#ededed]/60">
                     <th className="py-2 font-medium" />
                     <th className="py-2 font-medium">{t.chest}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {t.rows.map(([size, chest]) => (
-                    <tr key={size} className="border-b border-dashed border-[#e7e0d0] last:border-0 dark:border-[#38332b]">
+                    <tr key={size} className="border-b border-dashed border-[#e2e2e2] last:border-0 dark:border-[#333333]">
                       <td className="py-2 font-medium">{size}</td>
                       <td className="py-2">{chest}</td>
                     </tr>

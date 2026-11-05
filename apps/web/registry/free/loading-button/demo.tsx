@@ -39,7 +39,7 @@ export default function LoadingButtonDemo() {
       </LoadingButton>
 
       <div className="flex items-center gap-3">
-        <span className="rounded-md border border-dashed border-[#e7e0d0] px-3 py-2 font-mono text-sm tracking-[0.12em] dark:border-[#38332b]">SUMMER24</span>
+        <span className="rounded-md border border-dashed border-[#e2e2e2] px-3 py-2 font-mono text-sm tracking-[0.12em] dark:border-[#333333]">SUMMER24</span>
         <LoadingButton variant="paper" onClick={() => wait(1000, true)} errorLabel={t.invalid} loadingLabel={t.loading}>
           {t.apply}
         </LoadingButton>

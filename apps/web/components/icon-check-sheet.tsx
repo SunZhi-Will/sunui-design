@@ -39,8 +39,8 @@ type Props = {
 };
 
 const themes = {
-  light: { background: "#faf9f6", ink: "#1c1b19", muted: "#8a867e", guide: "#d9d5cc", accent: "#c8361d" },
-  dark: { background: "#161513", ink: "#ece9e2", muted: "#8a867e", guide: "#3a3732", accent: "#ec6a4f" },
+  light: { background: "#faf9f6", ink: "#1c1b19", muted: "#8a867e", guide: "#d9d5cc", accent: "#171717" },
+  dark: { background: "#161513", ink: "#ece9e2", muted: "#8a867e", guide: "#3a3732", accent: "#ededed" },
 } as const;
 
 const LINE_SIZES = [16, 24, 48];

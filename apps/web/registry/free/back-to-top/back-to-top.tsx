@@ -52,7 +52,7 @@ export function BackToTop({ container, threshold = 400, showProgress = true, pos
           exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16, transition: { duration: 0.15 } }}
           whileTap={reduce ? undefined : { scale: 0.94, transition: springs.snappy }}
           className={cn(
-            "z-40 grid size-12 place-items-center rounded-full border border-[#e7e0d0] bg-[#faf7f0] text-[#1c1917] outline-offset-2 focus-visible:outline-2 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]",
+            "z-40 grid size-12 place-items-center rounded-full border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] outline-offset-2 focus-visible:outline-2 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]",
             position === "fixed" ? "fixed bottom-6 right-6" : "absolute bottom-4 right-4",
             className,
           )}

@@ -32,7 +32,7 @@ export default function PixelFxDemo() {
 
   return (
     <div
-      className="relative w-full max-w-sm min-w-0 overflow-hidden rounded-[3px] border border-[rgb(234_228_214/0.14)] bg-[#0b0e14] p-4 text-[#eae4d6] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-5"
+      className="relative w-full max-w-sm min-w-0 overflow-hidden rounded-[3px] border border-[rgb(234_228_214/0.14)] bg-[#0b0e14] p-4 text-[#e6e6e6] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] sm:p-5"
     >
       <p className="text-[11px] font-medium tracking-[0.18em] text-[#c9a063] uppercase">{t.eyebrow}</p>
 

@@ -125,13 +125,13 @@ export function Lightbox({
       {current && index !== null && (
         <div role="dialog" aria-modal="true" aria-label={current.alt} className={cn("inset-0 z-50 flex flex-col", position === "fixed" ? "fixed" : "absolute")}>
           <motion.div
-            className="absolute inset-0 bg-[#1c1917]/90"
+            className="absolute inset-0 bg-[#171717]/90"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.18 } }}
             onClick={() => set(null)}
           />
-          <div className="relative flex items-center justify-between p-3 text-[#faf7f0]">
+          <div className="relative flex items-center justify-between p-3 text-[#f7f7f7]">
             <span className="px-2 text-xs tabular-nums opacity-70">
               {index + 1} / {images.length}
             </span>
@@ -158,16 +158,16 @@ export function Lightbox({
             </AnimatePresence>
             {images.length > 1 && (
               <>
-                <button type="button" aria-label={L.previous} onClick={() => step(-1)} className="pointer-events-auto absolute left-2 grid size-10 place-items-center rounded-full text-[#faf7f0] outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
+                <button type="button" aria-label={L.previous} onClick={() => step(-1)} className="pointer-events-auto absolute left-2 grid size-10 place-items-center rounded-full text-[#f7f7f7] outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
                   <Icon d="M15 6l-6 6 6 6" />
                 </button>
-                <button type="button" aria-label={L.next} onClick={() => step(1)} className="pointer-events-auto absolute right-2 grid size-10 place-items-center rounded-full text-[#faf7f0] outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
+                <button type="button" aria-label={L.next} onClick={() => step(1)} className="pointer-events-auto absolute right-2 grid size-10 place-items-center rounded-full text-[#f7f7f7] outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
                   <Icon d="M9 6l6 6-6 6" />
                 </button>
               </>
             )}
           </div>
-          <div className="relative min-h-12 px-4 py-3 text-center text-sm text-[#faf7f0]/80">{current.caption}</div>
+          <div className="relative min-h-12 px-4 py-3 text-center text-sm text-[#f7f7f7]/80">{current.caption}</div>
         </div>
       )}
     </AnimatePresence>

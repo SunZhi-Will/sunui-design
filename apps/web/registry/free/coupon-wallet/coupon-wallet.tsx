@@ -86,10 +86,10 @@ const MESSAGES: Record<SunLocale, Required<CouponWalletLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },

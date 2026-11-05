@@ -100,7 +100,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
   return (
     <nav aria-label={typeof title === "string" ? title : "Table of contents"} className={cn("text-sm", className)}>
       {title && <p className="mb-3 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{title}</p>}
-      <ul className="relative border-l border-[#e7e0d0] dark:border-[#38332b]">
+      <ul className="relative border-l border-[#e2e2e2] dark:border-[#333333]">
         {items.map((item) => {
           const on = item.id === active;
           return (
@@ -109,7 +109,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
                 <motion.span
                   layoutId={`${group}-bar`}
                   transition={reduce ? { duration: 0 } : springs.snappy}
-                  className="absolute -left-px inset-y-0 w-0.5 bg-[#1c1917] dark:bg-[#ece7dc]"
+                  className="absolute -left-px inset-y-0 w-0.5 bg-[#171717] dark:bg-[#ededed]"
                 />
               )}
               <a
@@ -122,7 +122,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
                 className={cn(
                   "block py-1.5 pr-2 outline-offset-2 transition-colors focus-visible:outline-2",
                   item.level === 2 ? "pl-7" : "pl-4",
-                  on ? "font-medium text-[#1c1917] dark:text-[#ece7dc]" : "text-[#1c1917]/55 hover:text-[#1c1917] dark:text-[#ece7dc]/55 dark:hover:text-[#ece7dc]",
+                  on ? "font-medium text-[#171717] dark:text-[#ededed]" : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
                 )}
               >
                 {item.label}

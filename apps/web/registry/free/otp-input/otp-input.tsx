@@ -85,11 +85,11 @@ const MESSAGES: Record<SunLocale, OtpInputLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 
 // 游標不在選取狀態時，新輸入會與舊字元並存，先去掉舊字元
@@ -238,8 +238,8 @@ export function OtpInput({
                       "block h-14 w-10 rounded-[3px] border text-center font-mono text-2xl font-medium tabular-nums caret-transparent outline-none transition-colors sm:w-12",
                       paper,
                       edge,
-                      "focus:border-[#1c1917]/45 dark:focus:border-[#ece7dc]/45 selection:bg-transparent",
-                      status === "error" && "border-[#c8361d]/50 dark:border-[#ec6a4f]/50",
+                      "focus:border-[#171717]/45 dark:focus:border-[#ededed]/45 selection:bg-transparent",
+                      status === "error" && "border-[#171717]/50 dark:border-[#ededed]/50",
                       disabled && "cursor-not-allowed opacity-50",
                     )}
                   />

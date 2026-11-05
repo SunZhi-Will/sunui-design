@@ -81,7 +81,7 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
 };
 
 // 設計語言（DESIGN.md）：墨線星星，不用金色
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const ink = "text-[#171717] dark:text-[#ededed]";
 const stampSpring = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 
 const starSize: Record<StarRatingSize, string> = { sm: "size-4", md: "size-6", lg: "size-8" };

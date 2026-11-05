@@ -7,7 +7,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { OptionChips, VariantPicker, type VariantColor, type VariantValue } from "./variant-picker";
 
 const swatches = [
-  { id: "oat", swatch: "#d9cdb8" },
+  { id: "oat", swatch: "#cecece" },
   { id: "navy", swatch: "#2b3448" },
   { id: "moss", swatch: "#6b7354" },
   { id: "rust", swatch: "#9a4a2e" },

@@ -56,10 +56,10 @@ const MESSAGES: Record<SunLocale, QuantityStepperLabels> = {
 };
 
 // 設計語言（DESIGN.md）：收據紙、紙邊虛線、墨色數字
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const dashed = "border-[#1c1917]/20 dark:border-[#ece7dc]/20";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const dashed = "border-[#171717]/20 dark:border-[#ededed]/20";
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
 const sizeClass: Record<QuantityStepperSize, { root: string; button: string; field: string }> = {
@@ -198,7 +198,7 @@ export function QuantityStepper({
           aria-label={t.remove}
           disabled={disabled}
           onClick={() => onRemove?.()}
-          className={cn(buttonClass, "hover:text-[#c8361d] focus-visible:text-[#c8361d] dark:hover:text-[#ec6a4f] dark:focus-visible:text-[#ec6a4f]")}
+          className={cn(buttonClass, "hover:text-[#171717] focus-visible:text-[#171717] dark:hover:text-[#ededed] dark:focus-visible:text-[#ededed]")}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4.5 7h15M9.5 7V5.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7" />

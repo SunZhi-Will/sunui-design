@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
 
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const paperUnder = "bg-[#f1ebdd] dark:bg-[#29251f]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 
 const prices = [128, 96, 84, 42];
 const bagPrices = [128, 84];
@@ -177,7 +177,7 @@ export default function SidePanelDemo() {
           <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.size}</legend>
           <div className="flex flex-wrap gap-1.5">
             {sizes.map((s) => (
-              <label key={s} className={cn("relative cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#1c1917] has-[:checked]:bg-[#1c1917] has-[:checked]:text-[#faf7f0] dark:has-[:checked]:border-[#ece7dc] dark:has-[:checked]:bg-[#ece7dc] dark:has-[:checked]:text-[#1f1c18] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring", edge)}>
+              <label key={s} className={cn("relative cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#171717] has-[:checked]:bg-[#171717] has-[:checked]:text-[#f7f7f7] dark:has-[:checked]:border-[#ededed] dark:has-[:checked]:bg-[#ededed] dark:has-[:checked]:text-[#1c1c1c] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring", edge)}>
                 <input type="checkbox" checked={picked.includes(s)} onChange={() => toggle(s)} className="sr-only" />
                 {s}
               </label>
@@ -189,7 +189,7 @@ export default function SidePanelDemo() {
           <div className="space-y-2 text-sm">
             {colorIds.map((id, i) => (
               <label key={id} className="flex cursor-pointer items-center gap-2.5">
-                <input type="checkbox" checked={picked.includes(id)} onChange={() => toggle(id)} className="size-4 accent-[#1c1917] dark:accent-[#ece7dc]" />
+                <input type="checkbox" checked={picked.includes(id)} onChange={() => toggle(id)} className="size-4 accent-[#171717] dark:accent-[#ededed]" />
                 {t.colors[i]}
               </label>
             ))}
@@ -218,7 +218,7 @@ export default function SidePanelDemo() {
           </div>
         }
       >
-        <ul className={cn("divide-y", "divide-[#e7e0d0] dark:divide-[#38332b]")}>
+        <ul className={cn("divide-y", "divide-[#e2e2e2] dark:divide-[#333333]")}>
           {t.bag.map((b, i) => (
             <li key={i} className="flex gap-3 py-3 first:pt-0">
               <div aria-hidden="true" className={cn("h-16 w-13 shrink-0 rounded-[3px]", paperUnder)} />

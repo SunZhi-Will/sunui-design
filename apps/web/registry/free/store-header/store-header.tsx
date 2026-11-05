@@ -53,7 +53,7 @@ const MESSAGES: Record<SunLocale, Required<StoreHeaderLabels>> = {
   ja: { nav: "メイン", menu: "メニュー", cart: (n) => `カート、${n}点` },
 };
 
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },

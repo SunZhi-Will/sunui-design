@@ -162,12 +162,12 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const paperUnder = "bg-[#f1ebdd] dark:bg-[#29251f]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
-const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
+const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -365,7 +365,7 @@ function FlipCard({ value, reduceMotion }: { value: string; reduceMotion: boolea
     <span className="relative block h-9 w-[1.6rem] [perspective:300px]">
       <Half top value={state.cur} />
       <Half value={flipping ? state.prev : state.cur} />
-      <span className="absolute inset-x-0 top-1/2 z-10 h-px bg-[#1c1917]/15 dark:bg-black/50" />
+      <span className="absolute inset-x-0 top-1/2 z-10 h-px bg-[#171717]/15 dark:bg-black/50" />
       {flipping && (
         <>
           {[true, false].map((top) => (

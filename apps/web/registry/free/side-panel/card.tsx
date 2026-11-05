@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
 
-const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
-const paperUnder = "bg-[#f1ebdd] dark:bg-[#29251f]";
-const edge = "border-[#e7e0d0] dark:border-[#38332b]";
-const ink = "text-[#1c1917] dark:text-[#ece7dc]";
+const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
+const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const ink = "text-[#171717] dark:text-[#ededed]";
 const sizes = ["S", "M", "L", "XL"];
 
 const copy = {
@@ -52,7 +52,7 @@ export default function SidePanelCard() {
             <label
               key={s}
               className={cn(
-                "cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#1c1917] has-[:checked]:bg-[#1c1917] has-[:checked]:text-[#faf7f0] dark:has-[:checked]:border-[#ece7dc] dark:has-[:checked]:bg-[#ece7dc] dark:has-[:checked]:text-[#1f1c18] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
+                "cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#171717] has-[:checked]:bg-[#171717] has-[:checked]:text-[#f7f7f7] dark:has-[:checked]:border-[#ededed] dark:has-[:checked]:bg-[#ededed] dark:has-[:checked]:text-[#1c1c1c] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
                 edge,
               )}
             >

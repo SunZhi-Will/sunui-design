@@ -15,8 +15,8 @@ const copy = {
 function Sketch({ label }: { label: string }) {
   return (
     <svg viewBox="0 0 300 300" className="size-full" role="img" aria-label={label}>
-      <rect width="300" height="300" fill="#f4f1ea" />
-      <g fill="none" stroke="#57534e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="300" height="300" fill="#f2f2f2" />
+      <g fill="none" stroke="#525252" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M30 220c40-8 80-6 120 0s80 8 120 0" />
         <path d="M130 220 140 110h20l10 110" />
         <path d="M136 160h28M133 190h34" />
