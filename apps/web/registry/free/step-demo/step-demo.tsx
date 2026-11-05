@@ -65,13 +65,14 @@ export const held = (t: number, from: number, to: number) => t >= from && t < to
 export const blink = (t: number, hz = 1) => Math.floor(t * hz * 2) % 2 === 0;
 
 const graphemeCache = new Map<string, string[]>();
+let segmenter: Intl.Segmenter | null | undefined;
 function graphemes(text: string) {
   let g = graphemeCache.get(text);
   if (!g) {
-    g =
-      typeof Intl !== "undefined" && "Segmenter" in Intl
-        ? Array.from(new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text), (s) => s.segment)
-        : Array.from(text);
+    if (segmenter === undefined) {
+      segmenter = typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
+    }
+    g = segmenter ? Array.from(segmenter.segment(text), (s) => s.segment) : Array.from(text);
     graphemeCache.set(text, g);
   }
   return g;
@@ -193,22 +194,40 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).p
 
 const PRESS = 0.18;
 
-function Cursor({ keys, t, stage, size }: { keys: CursorKey[]; t: number; stage: RefObject<HTMLDivElement | null>; size: readonly [number, number] }) {
+/** 目標在舞台座標的中心。用 offset 量，不受縮放與進場 transform 影響，也不必除以縮放比。 */
+function aimCenter(root: HTMLElement, name: string): [number, number] | null {
+  const target = root.querySelector<HTMLElement>(`[data-stp-layer="current"] [data-aim="${name}"]`);
+  if (!target) return null;
+  let x = target.offsetWidth / 2;
+  let y = target.offsetHeight / 2;
+  for (let el: HTMLElement | null = target; el && el !== root; el = el.offsetParent as HTMLElement | null) {
+    x += el.offsetLeft;
+    y += el.offsetTop;
+  }
+  return [x, y];
+}
+
+function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number; stage: RefObject<HTMLDivElement | null>; size: readonly [number, number]; layout: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLSpanElement>(null);
+  // 每一步、每次版面變動（縮放、字型載入）只量一次；還沒出現的目標不快取，下一格再量。
+  const cache = useRef({ layout: "", points: new Map<string, [number, number]>() });
 
   useLayoutEffect(() => {
     const el = ref.current;
     const root = stage.current;
     if (!el || !root || keys.length === 0) return;
-    const box = root.getBoundingClientRect();
-    const k = box.width / size[0] || 1;
+    if (cache.current.layout !== layout) cache.current = { layout, points: new Map() };
+    const { points } = cache.current;
     const point = (aim: Aim): [number, number] => {
       if (typeof aim !== "string") return [aim[0], aim[1]];
-      const target = root.querySelector(`[data-stp-layer="current"] [data-aim="${aim}"]`);
-      if (!target) return [size[0] / 2, size[1] / 2];
-      const r = target.getBoundingClientRect();
-      return [(r.left - box.left + r.width / 2) / k, (r.top - box.top + r.height / 2) / k];
+      let p = points.get(aim);
+      if (!p) {
+        const measured = aimCenter(root, aim);
+        if (!measured) return [size[0] / 2, size[1] / 2];
+        points.set(aim, (p = measured));
+      }
+      return p;
     };
     const pts = keys.map((key) => point(key.to));
 
@@ -258,9 +277,11 @@ function Cursor({ keys, t, stage, size }: { keys: CursorKey[]; t: number; stage:
 
 /* ---------- 主元件 ---------- */
 
+const DEFAULT_SIZE = [1200, 750] as const;
+
 export function StepDemo({
   steps,
-  size = [1200, 750],
+  size = DEFAULT_SIZE,
   chrome = "browser",
   url,
   title,
@@ -283,7 +304,8 @@ export function StepDemo({
   const [inner, setInner] = useState(0);
   const [playing, setPlaying] = useState(autoPlay);
   const [inView, setInView] = useState(false);
-  const [, bump] = useState(0);
+  const [fonts, bump] = useState(0);
+  const [w, h] = size;
 
   const starts = steps.map((_, i) => steps.slice(0, i).reduce((s, x) => s + x.dur, 0));
   const total = steps.reduce((s, x) => s + x.dur, 0);
@@ -304,11 +326,17 @@ export function StepDemo({
   useLayoutEffect(() => {
     const el = frameRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setK(el.clientWidth / size[0]));
+    const measure = () => setK(el.clientWidth / w);
+    measure(); // 同步量一次，第一格就顯示，不等 ResizeObserver
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    document.fonts?.ready.then(() => bump((n) => n + 1));
-    return () => ro.disconnect();
-  }, [size]);
+    let alive = true;
+    document.fonts?.ready.then(() => alive && bump((n) => n + 1));
+    return () => {
+      alive = false;
+      ro.disconnect();
+    };
+  }, [w]);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -362,17 +390,17 @@ export function StepDemo({
             <span className="w-10" />
           </div>
         ) : null}
-        <div ref={frameRef} className="relative w-full overflow-hidden" style={{ aspectRatio: `${size[0]} / ${size[1]}` }}>
+        <div ref={frameRef} className="relative w-full overflow-hidden" style={{ aspectRatio: `${w} / ${h}` }}>
           <div
             ref={stageRef}
             role="img"
             aria-label={`${msg.demo}: ${steps.map((s, i) => `${i + 1}. ${s.name}`).join(", ")}`}
             className={cn("pointer-events-none absolute top-0 left-0 origin-top-left select-none bg-background", stageClassName)}
-            style={{ width: size[0], height: size[1], transform: `scale(${k})`, visibility: k ? "visible" : "hidden" }}
+            style={{ width: w, height: h, transform: `scale(${k})`, visibility: k ? "visible" : "hidden" }}
           >
             {prev ? layer(prev, prev.dur, false, 1 - t / 0.3) : null}
             {layer(step, t, true, reduced ? 1 : ease(t, 0, 0.45, "fade"))}
-            <Cursor keys={reduced ? [] : (step.cursor ?? [])} t={t} stage={stageRef} size={size} />
+            <Cursor keys={reduced ? [] : (step.cursor ?? [])} t={t} stage={stageRef} size={size} layout={`${step.id}|${k}|${fonts}`} />
           </div>
         </div>
       </div>
