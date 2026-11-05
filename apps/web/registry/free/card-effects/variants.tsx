@@ -19,6 +19,9 @@ import { copy, demoArt } from "./demo";
 
 export const variants = [...cardEffects, ...cardGroupEffects];
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "tilt-3d";
+
 /** 首頁型錄：一種卡片效果一張卡，設定與 demo 的同名格子一致，下方標出怎麼觸發。 */
 export default function CardEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

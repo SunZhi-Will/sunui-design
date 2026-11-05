@@ -22,6 +22,9 @@ import { Art, copy } from "./demo";
 
 export const variants = scrollEffects;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "stacking-cards";
+
 const STAGE = "220px";
 
 /** 首頁型錄：一種捲動效果一張卡。跟型錄縮圖一樣用自動來回的進度代替捲動，靜態卡片也看得到 */

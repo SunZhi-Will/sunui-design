@@ -10,6 +10,9 @@ import { copy, OrderList, picks, ProductPick, TrackingList } from "./demo";
 // demo 用到的三種骨架形狀，各一張卡
 export const variants = ["product", "list", "rows"] as const;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "product";
+
 /** 首頁型錄：骨架與真實內容輪流出現，看得到交叉淡入。 */
 export default function SkeletonSetVariant({ variant }: { variant: string }) {
   const locale = useDemoLocale();

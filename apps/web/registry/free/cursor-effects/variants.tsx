@@ -7,6 +7,9 @@ import { copy, CursorEffectArea } from "./demo";
 
 export const variants = cursorEffects;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "spotlight";
+
 /** 首頁型錄：一種游標效果一張卡，互動區和示範頁共用 */
 export default function CursorEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

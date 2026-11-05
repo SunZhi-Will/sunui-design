@@ -23,6 +23,9 @@ import { copy } from "./demo";
 // iconMorphs 與 liquidShapes 是 icon-morph、liquid-fill 的子選項，demo 也放在同一格，所以不拆卡
 export const variants = svgEffects;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "animated-beam";
+
 /** 首頁型錄：一種 SVG 效果一張卡，內容與 demo 的同名格子一致。 */
 export default function SvgEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

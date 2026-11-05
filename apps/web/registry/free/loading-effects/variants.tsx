@@ -10,6 +10,9 @@ import { copy, smallBtn, VALUES } from "./demo";
 // loaderVariants 是 loadingEffects 的子集（Loader 的 variant），另外三個是獨立元件，合起來每種一張卡
 export const variants = loadingEffects;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "equalizer";
+
 const isLoader = (v: string): v is LoaderVariant => (loaderVariants as readonly string[]).includes(v);
 
 /** 首頁型錄：一種載入效果一張卡。 */

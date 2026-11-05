@@ -8,6 +8,7 @@ import type { Messages } from "@/lib/messages";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
+import { variantFeatured } from "@/registry/__generated__/variants";
 
 const seriesKeys: Series[] = ["paper", "product", "story", "showcase", "motion"];
 const interactionKeys: Interaction[] = ["press", "hover", "drag", "type", "loading", "scroll", "section"];
@@ -20,6 +21,8 @@ export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | 
   /** 效果庫本身的標題與樣式數，收合成一張卡時使用 */
   libraryTitle?: string;
   styleCount?: number;
+  /** 收合的效果庫卡片：卡片預覽這一種樣式，連結仍指向整個庫 */
+  preview?: string;
 };
 
 export type CatalogMessages = Pick<Messages, "catalog" | "interactions" | "series" | "tier">;
@@ -33,7 +36,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   const searchRef = useRef<HTMLInputElement>(null);
   const cardLabels = { livePreview: t.livePreview, expand: t.expand, pro: tierLabels.pro };
 
-  // 效果庫平常收合成一張卡（以第一種樣式預覽），選了 Motion 系列或搜尋時才展開成一種樣式一張
+  // 效果庫平常收合成一張卡，選了 Motion 系列或搜尋時才展開成一種樣式一張。
+  // 收合的卡預覽代表樣式（variants.tsx 的 featured），點開是整個庫的樣式格子，不是單一樣式
   const expandStyles = series === "motion" || query.trim() !== "";
   const collapsed = useMemo(() => {
     const seen = new Set<string>();
@@ -41,7 +45,14 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       if (!item.variant) return [item];
       if (seen.has(item.name)) return [];
       seen.add(item.name);
-      return [{ ...item, title: item.libraryTitle ?? item.title }];
+      return [
+        {
+          ...item,
+          variant: undefined,
+          preview: variantFeatured[item.name] ?? item.variant,
+          title: item.libraryTitle ?? item.title,
+        },
+      ];
     });
   }, [items]);
   const viewItems = expandStyles ? items : collapsed;
@@ -223,6 +234,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
             key={item.variant ? `${item.name}~${item.variant}` : item.name}
             name={item.name}
             variant={item.variant}
+            preview={item.preview}
             title={item.title}
             note={!expandStyles && item.styleCount ? format(t.styles, { n: item.styleCount }) : undefined}
             tier={item.meta.tier}

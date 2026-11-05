@@ -17,6 +17,7 @@ export type BlockCardLabels = { livePreview: string; expand: string; pro: string
 export function BlockCard({
   name,
   variant,
+  preview,
   title,
   note,
   tier,
@@ -26,6 +27,8 @@ export function BlockCard({
   name: string;
   /** 效果庫拆開後的單一樣式：卡片只跑這一種，展開時面板也帶著它 */
   variant?: string;
+  /** 只換預覽、不換連結：收合的效果庫卡片跑代表樣式，點開仍是整個庫 */
+  preview?: string;
   title: string;
   /** 標題旁的小字，例如效果庫收合時的樣式數 */
   note?: string;
@@ -51,7 +54,7 @@ export function BlockCard({
       >
         <LivePreview
           name={name}
-          variant={variant}
+          variant={variant ?? preview}
           title={format(labels.livePreview, { title })}
           locale={locale}
           onExpand={() => router.push(href, { scroll: false })}

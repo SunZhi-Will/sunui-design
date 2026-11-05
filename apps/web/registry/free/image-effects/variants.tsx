@@ -9,6 +9,9 @@ import { copy, demoArt, kinds } from "./demo";
 
 export const variants = [...imageEffects, ...imageGroupEffects];
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "ken-burns";
+
 /** 首頁型錄：一種圖片效果一張卡，設定與 demo 的同名格子一致；進場類附重播鈕。 */
 export default function ImageEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

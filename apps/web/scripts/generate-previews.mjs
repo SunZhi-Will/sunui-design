@@ -10,6 +10,7 @@ const entries = [];
 const cardEntries = [];
 const variantEntries = [];
 const variantIds = {};
+const variantFeatured = {};
 
 // variants.tsx：效果庫把每種樣式拆成首頁的一張卡。
 // 樣式清單寫成 `export const variants = <陣列>`，可以是字串陣列、block 檔裡的陣列名稱，或 [...a, ...b]。
@@ -59,6 +60,10 @@ for (const tier of tiers) {
     if (existsSync(path.join(dir, name, "variants.tsx"))) {
       variantEntries.push(`  "${name}": dynamic(() => import("../${tier}/${name}/variants"), { ssr: false }),`);
       variantIds[name] = readVariantIds(dir, name);
+      // featured：首頁預設只放這一種當效果庫的代表，沒寫就用第一種
+      const featured = readFileSync(path.join(dir, name, "variants.tsx"), "utf8").match(/export const featured\s*=\s*"([^"]+)"/)?.[1];
+      if (featured && !variantIds[name].includes(featured)) throw new Error(`[previews] ${name}/variants.tsx: featured "${featured}" is not a variant`);
+      variantFeatured[name] = featured ?? variantIds[name][0];
     }
   }
 }
@@ -86,6 +91,9 @@ const idsOut = `// 自動產生，請勿手動修改（scripts/generate-previews
 // 每個效果庫的樣式清單，首頁把每種樣式拆成一張卡。
 
 export const variantIds: Record<string, readonly string[]> = ${JSON.stringify(variantIds, null, 2)};
+
+// 首頁預設顯示的代表樣式（variants.tsx 的 featured）
+export const variantFeatured: Record<string, string> = ${JSON.stringify(variantFeatured, null, 2)};
 `;
 
 mkdirSync(path.join(root, "registry", "__generated__"), { recursive: true });

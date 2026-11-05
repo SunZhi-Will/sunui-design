@@ -7,6 +7,9 @@ import { copy, Subject } from "./demo";
 
 export const variants = [...entrancePresets, ...exitPresets, ...emphasisPresets] as const;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "jackInTheBox";
+
 /** 首頁型錄：一個預設一張卡。全部用 loop 觸發，進場與退場會來回播放，強調類照示範頁的節奏循環 */
 export default function AnimatePresetsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

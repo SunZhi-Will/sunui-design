@@ -25,6 +25,9 @@ import { copy } from "./demo";
 
 export const variants = microInteractions;
 
+// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+export const featured = "slide-to-confirm";
+
 // 卡片下方的操作提示（demo 沒有這組文案，四語都在這裡）；滑動與長按的按鈕文字本身就是提示，不另外標
 const hintCopy = {
   en: { click: "Click", type: "Click and type", swipe: "Swipe a row left" },
