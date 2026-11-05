@@ -2413,6 +2413,7 @@
             "Explaining a multi-step workflow in short chapters people can jump between"
           ],
           "watchOut": [
+            "Scenes run on timers, so they cannot be scrubbed or frozen on a frame; use step-demo when you need jump-to-any-second, screenshots or a fixed stage that scales on phones",
             "Cursor and popover targets are measured on scene change and resize, so keep target elements' layout stable",
             "Scene content is decorative, so put the real claims in the surrounding copy"
           ],
