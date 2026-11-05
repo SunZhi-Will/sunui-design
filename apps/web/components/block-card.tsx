@@ -18,6 +18,7 @@ export function BlockCard({
   name,
   variant,
   title,
+  note,
   tier,
   locale,
   labels,
@@ -26,6 +27,8 @@ export function BlockCard({
   /** 效果庫拆開後的單一樣式：卡片只跑這一種，展開時面板也帶著它 */
   variant?: string;
   title: string;
+  /** 標題旁的小字，例如效果庫收合時的樣式數 */
+  note?: string;
   tier: Tier;
   locale: Locale;
   labels: BlockCardLabels;
@@ -79,6 +82,7 @@ export function BlockCard({
         >
           {title}
         </Link>
+        {note && <span className="ml-2 text-xs font-normal text-subtle">{note}</span>}
       </h3>
     </li>
   );

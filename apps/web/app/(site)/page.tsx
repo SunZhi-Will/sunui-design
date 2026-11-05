@@ -5,7 +5,8 @@ import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
-import { getItems, installCommand } from "@/lib/registry";
+import { getItems, installCommand, type Series } from "@/lib/registry";
+import { seriesOf } from "@/lib/series";
 import { localizeItem } from "@/lib/registry-i18n";
 import { variantIds } from "@/registry/__generated__/variants";
 
@@ -17,16 +18,31 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const { locale, m } = await getI18n();
   const all = getItems();
+  // 紙感電商是主線，排最前面，其中 Pro 先出現；動效庫排最後，免得首頁第一眼只看到特效
+  const seriesRank: Record<Series, number> = { paper: 0, story: 1, showcase: 2, product: 3, motion: 4 };
   const items = [...all]
-    .sort((a, b) => b.meta.addedAt.localeCompare(a.meta.addedAt) || a.title.localeCompare(b.title))
+    .sort(
+      (a, b) =>
+        seriesRank[seriesOf(a)] - seriesRank[seriesOf(b)] ||
+        Number(b.meta.tier === "pro") - Number(a.meta.tier === "pro") ||
+        b.meta.addedAt.localeCompare(a.meta.addedAt) ||
+        a.title.localeCompare(b.title),
+    )
     .flatMap((item) => {
       const { name, title, description, meta, categories } = localizeItem(item, locale);
       // 保留英文標題與描述給搜尋用
       const base = { name, title, description, meta, categories, search: `${item.title} ${item.description}` };
-      // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚
+      // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚；型錄預設會收合成一張
       const variants = variantIds[name];
       if (!variants) return [base];
-      return variants.map((variant) => ({ ...base, variant, title: `${title} · ${variant}`, search: `${base.search} ${variant}` }));
+      return variants.map((variant) => ({
+        ...base,
+        variant,
+        title: `${title} · ${variant}`,
+        libraryTitle: title,
+        styleCount: variants.length,
+        search: `${base.search} ${variant}`,
+      }));
     });
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;

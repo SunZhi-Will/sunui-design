@@ -17,6 +17,9 @@ export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | 
   search: string;
   /** 效果庫拆開後的單一樣式；一般 block 沒有 */
   variant?: string;
+  /** 效果庫本身的標題與樣式數，收合成一張卡時使用 */
+  libraryTitle?: string;
+  styleCount?: number;
 };
 
 export type CatalogMessages = Pick<Messages, "catalog" | "interactions" | "series" | "tier">;
@@ -29,6 +32,19 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const cardLabels = { livePreview: t.livePreview, expand: t.expand, pro: tierLabels.pro };
+
+  // 效果庫平常收合成一張卡（以第一種樣式預覽），選了 Motion 系列或搜尋時才展開成一種樣式一張
+  const expandStyles = series === "motion" || query.trim() !== "";
+  const collapsed = useMemo(() => {
+    const seen = new Set<string>();
+    return items.flatMap((item) => {
+      if (!item.variant) return [item];
+      if (seen.has(item.name)) return [];
+      seen.add(item.name);
+      return [{ ...item, title: item.libraryTitle ?? item.title }];
+    });
+  }, [items]);
+  const viewItems = expandStyles ? items : collapsed;
 
   // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入
   useEffect(() => {
@@ -67,10 +83,10 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   // 互動數字跟著目前的系列與方案篩選，避免顯示點下去才發現是 0 的數字
   const scoped = useMemo(
     () =>
-      items.filter(
+      viewItems.filter(
         (item) => (tier === "all" || item.meta.tier === tier) && (series === "all" || seriesOf(item) === series),
       ),
-    [items, tier, series],
+    [viewItems, tier, series],
   );
 
   const counts = useMemo(() => {
@@ -79,15 +95,19 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     return map;
   }, [scoped]);
 
+  // 數字對應點下去會看到的卡片數：Motion 會展開樣式，其他系列與「全部」是收合後的數量
   const seriesCounts = useMemo(() => {
     const map = new Map<Series, number>();
-    for (const item of items) map.set(seriesOf(item), (map.get(seriesOf(item)) ?? 0) + 1);
+    for (const item of collapsed) {
+      if (seriesOf(item) !== "motion") map.set(seriesOf(item), (map.get(seriesOf(item)) ?? 0) + 1);
+    }
+    map.set("motion", items.filter((item) => seriesOf(item) === "motion").length);
     return map;
-  }, [items]);
+  }, [items, collapsed]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return items.filter((item) => {
+    return viewItems.filter((item) => {
       if (interaction !== "all" && item.meta.interaction !== interaction) return false;
       if (tier !== "all" && item.meta.tier !== tier) return false;
       if (series !== "all" && seriesOf(item) !== series) return false;
@@ -104,7 +124,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [items, interaction, tier, series, query]);
+  }, [viewItems, interaction, tier, series, query]);
 
   return (
     <section id="blocks" aria-label={t.sectionLabel} className="scroll-mt-24">
@@ -158,7 +178,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
         </div>
 
         <div role="group" aria-label={t.filterSeries} className="flex flex-wrap items-center gap-2">
-          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label={t.allSeries} count={items.length} />
+          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label={t.allSeries} count={collapsed.length} />
           {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
           {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
             <FilterChip
@@ -204,6 +224,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
             name={item.name}
             variant={item.variant}
             title={item.title}
+            note={!expandStyles && item.styleCount ? format(t.styles, { n: item.styleCount }) : undefined}
             tier={item.meta.tier}
             locale={locale}
             labels={cardLabels}
