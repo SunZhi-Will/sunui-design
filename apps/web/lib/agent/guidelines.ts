@@ -7,7 +7,7 @@ import { siteUrl } from "@/lib/site";
 // 改了那幾份文件，這裡要一起改。MCP、SKILL.md、llms-full.txt 都從這裡取，保持單一來源。
 
 export const seriesSummary: Record<Series, string> = {
-  paper: "Paper commerce: coupons, receipts, stamp cards and tickets on neutral gray paper with ink text; vermilion appears only on stamps.",
+  paper: "Paper commerce: coupons, receipts, stamp cards and tickets on neutral gray paper with ink text and no accent colour.",
   product: "Quiet tool UI: neutral shadcn tokens, one accent color, status shown only as small dots, the reason written on screen.",
   story: "Ink and lamp: near-black panels, warm white serif text, one gold accent, all colors through --story-* CSS variables.",
   showcase: "Landing-page signature visuals in a quiet editorial dark, ported from real launch pages.",
@@ -54,13 +54,12 @@ ${seriesSummary.paper}
 | Paper edge | #e2e2e2 | #333333 | \`border-[#e2e2e2] dark:border-[#333333]\` |
 | Ink | #171717 | #ededed | \`text-[#171717] dark:text-[#ededed]\` |
 | Muted ink | #a3a3a3 | #737373 | \`text-[#a3a3a3] dark:text-[#737373]\` |
-| Vermilion (stamps only) | #c8361d | #ec6a4f | inside \`Stamp\` only |
 
 - Paper and ink are neutral grays with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
-- Vermilion appears only on stamps (\`Stamp\` with \`tone="vermilion"\`). Discount values, promo emphasis and the current step use ink, set apart by weight, size and contrast; when "current" must differ from "others", draw the others in muted ink. Do not pick an accent color per block; tell coupons apart with copy and layout.
+- No accent colour. Discount values, promo emphasis and the current step use ink, set apart by weight, size and contrast; when "current" must differ from "others", draw the others in muted ink. Do not pick an accent color per block; tell coupons apart with copy and layout.
 - Paper is flat: 1px paper edge, no shadow or at most \`shadow-[0_1px_0_rgb(0_0_0/0.04)]\`, radius \`rounded-md\` or less.
-- Results are shown with the shared \`Stamp\` component (install \`stamp\` from the SunUI registry, import from \`@/components/ui/stamp\`). Never hand-write a stamp. The stamp is the only celebration in the whole library, and its shape follows what the result means: \`tick\` for small confirmations (copied, saved, verified, added), \`box\` for transaction status (claimed, applied, sold out, ended), \`seal\` for wins and achievements, \`date\` for dated records such as paid or a postmark (pass \`date\`), \`chop\` for personal marks such as an invitation.
-- Use \`tone="vermilion"\` for positive results and \`tone="ink"\` for expired, sold out, ended or no prize. Always pass a \`seed\` (order, coupon or step id) so each stamp gets its own stable angle and ink texture. Labels that are not results (Recommended, Popular) must not be stamps.
+- Results are shown with the shared \`Stamp\` component (install \`stamp\` from the SunUI registry, import from \`@/components/ui/stamp\`). Despite the name it is not a rubber stamp: it is one upright line of ink with a check for positive results and faded ink for negative ones. Place it where the action happened (for example where the button was), never absolutely positioned over other content. \`shape\` only adds detail: \`date\` adds a printed date, \`seal\` adds a second line; the look is the same.
+- Use the default tone for positive results and \`tone="ink"\` for expired, sold out, ended or no prize; \`void\` adds a strikethrough. Never tilt it, add ink texture, mix-blend, double borders, wide uppercase tracking or colour. There is no celebration: results fade in over 150ms. Labels that are not results (Recommended, Popular) must not use it.
 - Springs: snappy \`{ stiffness: 520, damping: 34 }\`, gentle \`{ stiffness: 240, damping: 30 }\`, stamp \`{ stiffness: 620, damping: 20, mass: 0.8 }\`. Single animations stay under 400ms.`;
 
 const product = `## Series: product

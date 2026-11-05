@@ -7,7 +7,7 @@
       "name": "add-to-cart-button",
       "type": "registry:block",
       "title": "Add To Cart Button",
-      "description": "Add-to-cart button that sends a small paper price tag along an arc into the cart; the cart badge bumps like a stamp. Use on product cards and detail pages. Reduced motion skips the flight.",
+      "description": "Add-to-cart button that sends a small paper price tag along an arc into the cart; the cart badge gives a small bump. Use on product cards and detail pages. Reduced motion skips the flight.",
       "dependencies": [
         "framer-motion"
       ],
@@ -861,7 +861,7 @@
       "name": "cjk-heading",
       "type": "registry:block",
       "title": "CJK Heading",
-      "description": "Typeset Traditional Chinese and Japanese campaign headlines: punctuation compression, CJK and Latin spacing, optional vertical writing and a vermilion seal highlight for one key word. No motion.",
+      "description": "Typeset Traditional Chinese and Japanese campaign headlines: punctuation compression, CJK and Latin spacing, optional vertical writing and a solid ink highlight for one key word. No motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1181,7 +1181,7 @@
       "name": "countdown-banner",
       "type": "registry:block",
       "title": "Countdown Banner",
-      "description": "Paper sale banner with discount, prices and a printed flip-card countdown to a real end date, or to the start of a live event followed by a Live now state; shows an ended stamp when time is up. Hydration safe (the server prints only the date text), pauses while the tab is hidden and resyncs on return, in English, Chinese and Japanese.",
+      "description": "Paper sale banner with discount, prices and a printed flip-card countdown to a real end date, or to the start of a live event followed by a Live now state; shows a quiet Ended line when time is up. Hydration safe (the server prints only the date text), pauses while the tab is hidden and resyncs on return, in English, Chinese and Japanese.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1227,7 +1227,7 @@
       "name": "coupon-wallet",
       "type": "registry:block",
       "title": "Coupon Wallet",
-      "description": "A stack of owned coupons that fans out on hover, keyboard focus or a first tap, so shoppers can compare and pick one to apply, which stamps it Applied. It is a radiogroup with roving focus (arrow keys, Home, End, Escape to collapse), ineligible coupons explain why in their label, and the fan snaps into place without motion under reduced motion.",
+      "description": "A stack of owned coupons that fans out on hover, keyboard focus or a first tap, so shoppers can compare and pick one to apply, which marks it Applied. It is a radiogroup with roving focus (arrow keys, Home, End, Escape to collapse), ineligible coupons explain why in their label, and the fan snaps into place without motion under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1609,7 +1609,7 @@
       "name": "favorite-button",
       "type": "registry:block",
       "title": "Favorite Button",
-      "description": "Wishlist heart in ink that fills vermilion with a stamp-like press when saved. aria-pressed toggle with optional count.",
+      "description": "Wishlist heart in ink that fills solid ink with a short press when saved. aria-pressed toggle with optional count.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2159,7 +2159,7 @@
             "Any form submit where people press twice because nothing seemed to happen"
           ],
           "watchOut": [
-            "The success check is not a celebration; use a stamp block for rewards",
+            "The success check is the whole confirmation; do not add a celebration on top",
             "Pass state yourself if the result arrives through a websocket or polling instead of the click Promise"
           ],
           "aliases": [
@@ -2235,7 +2235,7 @@
       "name": "low-stock-indicator",
       "type": "registry:block",
       "title": "Low Stock Indicator",
-      "description": "Honest printed stock tag: one slip per unit when stock is small, otherwise a thin ink line; vermilion only at the critical level and a stamp when sold out. Never counts down on its own.",
+      "description": "Honest printed stock tag: one slip per unit when stock is small, otherwise a thin ink line; heavier ink at the critical level and a plain Sold out line when it runs out. Never counts down on its own.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2332,7 +2332,7 @@
       "name": "notify-badge",
       "type": "registry:block",
       "title": "Notify Badge",
-      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It presses in like a stamp when the count rises and stays still when it falls, sits in one of three corners, and offers vermilion, ink or theme primary tones with a screen reader label you phrase yourself.",
+      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It gives a small bump when the count rises and stays still when it falls, sits in one of three corners, and offers ink or theme primary tones with a screen reader label you phrase yourself.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2353,7 +2353,7 @@
             "Cart counts, unread messages and new notifications in a store header"
           ],
           "watchOut": [
-            "Keep vermilion for one badge per header; use ink or primary for the rest",
+            "Keep one emphasized badge per header; use the quieter tone for the rest",
             "The wrapper is a span, so put the button around it, not inside"
           ],
           "aliases": [
@@ -2432,7 +2432,7 @@
       "name": "order-history",
       "type": "registry:block",
       "title": "Order History",
-      "description": "A receipt-style list of past orders with small status stamps, expandable line items with dotted leaders and totals, an actions slot for buy again or track, and an empty state. Each row is a disclosure button with aria-expanded and aria-controls, and the expand and collapse are instant under reduced motion.",
+      "description": "A receipt-style list of past orders with small upright status labels, expandable line items with dotted leaders and totals, an actions slot for buy again or track, and an empty state. Each row is a disclosure button with aria-expanded and aria-controls, and the expand and collapse are instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2698,7 +2698,7 @@
       "name": "pixel-fx",
       "type": "registry:block",
       "title": "Pixel FX",
-      "description": "Code-drawn pixel art effects on a canvas that sits over any element: a collect burst for claiming a reward, two party poppers of paper confetti, and a block dissolve that covers a screen or unveils what is underneath. Ported from the MIT pixelfx engine (two buffers, opaque pixels with ordered dither plus additive light, seeded so each play is repeatable). Effects take a palette and default to the story series' gold and SunUI's vermilion. The canvas ignores the pointer and runs only while playing; with reduced motion nothing animates and onDone fires at once.",
+      "description": "Code-drawn pixel art effects on a canvas that sits over any element: a collect burst for claiming a reward, two party poppers of paper confetti, and a block dissolve that covers a screen or unveils what is underneath. Ported from the MIT pixelfx engine (two buffers, opaque pixels with ordered dither plus additive light, seeded so each play is repeatable). Effects take a palette and default to the story series' gold and SunUI's neutral grays. The canvas ignores the pointer and runs only while playing; with reduced motion nothing animates and onDone fires at once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2723,7 +2723,7 @@
             "A screen-to-screen transition in a pixel or retro styled game UI"
           ],
           "watchOut": [
-            "It is a celebration language for game UI. Paper-series commerce pages celebrate with a stamp, not particles",
+            "It is a celebration language for game UI. Paper-series commerce pages confirm with a quiet status line, not particles",
             "Play it in response to a user action, never on a loop or on page load",
             "Content under pixelReveal is visible to the DOM; mark it inert and aria-hidden until onDone, as the demo does",
             "Effects are drawn in art pixels: a very large box at pixelSize 1 costs more per frame, keep pixelSize at 2 or more"
@@ -3411,7 +3411,7 @@
       "name": "scroll-reveal-text",
       "type": "registry:block",
       "title": "Scroll Reveal Text",
-      "description": "Paragraph whose characters (CJK) or words (Latin) darken from faint to full ink as the reader scrolls. Accent phrases can print in vermilion.",
+      "description": "Paragraph whose characters (CJK) or words (Latin) darken from faint to full ink as the reader scrolls. Accent phrases can print in heavier ink.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3546,7 +3546,7 @@
       "name": "scroll-timeline",
       "type": "registry:block",
       "title": "Scroll Timeline",
-      "description": "Vertical timeline in two modes: scroll mode draws an ink line down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in vermilion. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
+      "description": "Vertical timeline in two modes: scroll mode draws an ink line down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in full ink and earlier ones in muted ink. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3592,7 +3592,7 @@
       "name": "shipping-options",
       "type": "registry:block",
       "title": "Shipping Options",
-      "description": "Ticket-stub radio cards for delivery methods: a perforated stub holds the method name and radio dot, the body shows the arrival date, note and fee, and free shipping is printed in vermilion. Works as a radiogroup with arrow keys and roving focus, skips disabled methods, wraps to a single column on narrow screens, and the dot switches instantly under reduced motion.",
+      "description": "Ticket-stub radio cards for delivery methods: a perforated stub holds the method name and radio dot, the body shows the arrival date, note and fee, and free shipping is printed in bold ink. Works as a radiogroup with arrow keys and roving focus, skips disabled methods, wraps to a single column on narrow screens, and the dot switches instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3885,8 +3885,8 @@
     {
       "name": "stamp",
       "type": "registry:ui",
-      "title": "Stamp",
-      "description": "The one celebration in SunUI, in five shapes chosen by what the result means: tick for small confirmations, box for transaction status, seal for wins and achievements, date for dated records such as paid or a postmark, and chop for personal marks such as an invitation. Each stamp gets a stable angle, offset and uneven ink texture from its seed, so two stamps on one page never look cloned. Vermilion for positive results and faded ink for ended or sold out, an optional void line, a heavier press for large stamps, and instant display under reduced motion.",
+      "title": "Result mark",
+      "description": "SunUI's result mark: an upright line of ink where the result happened, with a check for positive results and faded ink for ended, sold out or no prize. The shape picks what extra detail it carries (date adds a printed date, seal adds a second line) rather than how it looks. No tilt, no texture, no colour; it fades in over 150ms and appears instantly under reduced motion. Kept under the name stamp so existing installs keep working.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3905,24 +3905,22 @@
         "usage": {
           "whenToUse": [
             "Showing the result of a shopper action: claimed, paid, won, sold out, ended",
-            "Building your own block that needs a SunUI style result mark without copying stamp code"
+            "Building your own block that needs a SunUI style result line without copying code"
           ],
           "watchOut": [
-            "Pick the shape by meaning: tick for minor confirmations, box for status, seal for wins, date for receipts, chop for personal invitations",
-            "Do not use a stamp for labels that are not results, such as Recommended or Popular",
-            "Pass a seed (order id, coupon id) so the angle and ink stay the same across renders"
+            "Place it in the layout where the action was (for example where the button stood), never on top of other content",
+            "Do not use it for labels that are not results, such as Recommended or Popular",
+            "One result line per card; do not repeat the same status on every item of a list when the list already says it"
           ],
           "aliases": [
-            "rubber stamp",
-            "stamp badge",
-            "status stamp",
-            "claimed stamp",
-            "paid stamp",
-            "postmark",
-            "hanko",
-            "seal",
+            "status label",
+            "result label",
+            "claimed label",
+            "paid label",
             "success checkmark",
-            "result badge"
+            "result badge",
+            "stamp",
+            "status stamp"
           ]
         }
       },
@@ -4360,7 +4358,7 @@
       "name": "tier-progress",
       "type": "registry:block",
       "title": "Tier Progress",
-      "description": "A membership card with a half ring gauge showing points toward the next tier, a tier ladder and the perks the next tier unlocks, with a round seal once the top tier is reached. The gauge is a labelled progressbar with readable value text, SVG ids come from useId, and the arc moves only when points change, instantly under reduced motion.",
+      "description": "A membership card with a half ring gauge showing points toward the next tier, a tier ladder and the perks the next tier unlocks, with a quiet Top tier line once the top tier is reached. The gauge is a labelled progressbar with readable value text, SVG ids come from useId, and the arc moves only when points change, instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4405,7 +4403,7 @@
       "name": "tiny-chart",
       "type": "registry:block",
       "title": "Tiny Chart",
-      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks on an isometric floor, each with an optional code-drawn scene such as a desk, counter, shelf, warehouse, truck, house or post box, and a character who hops onto the current step), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
+      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks on an isometric floor, each with an optional code-drawn scene such as a desk, counter, shelf, warehouse, truck, house or post box, and a character who hops onto the current step), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in full ink while the rest stays muted, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4605,7 +4603,7 @@
       "name": "variant-picker",
       "type": "registry:block",
       "title": "Variant Picker",
-      "description": "Product colour swatches and size options driven by per-combination stock, with sizes shown either as paper chips carrying a faded ink Sold out stamp or, with sizeStyle=\"chips\", as typographic chips with one ink outline that slides between them and sold-out sizes struck through; OptionChips exports that chip row on its own for any single choice such as fit. Every row is a labelled radiogroup with arrow, Home and End keys that skip sold-out options, stock changes are announced politely, and press feedback and the sliding outline are instant under reduced motion.",
+      "description": "Product colour swatches and size options driven by per-combination stock, with sizes shown either as paper chips carrying a faded ink Sold out label or, with sizeStyle=\"chips\", as typographic chips with one ink outline that slides between them and sold-out sizes struck through; OptionChips exports that chip row on its own for any single choice such as fit. Every row is a labelled radiogroup with arrow, Home and End keys that skip sold-out options, stock changes are announced politely, and press feedback and the sliding outline are instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],

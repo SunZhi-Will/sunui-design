@@ -49,7 +49,7 @@ const en = {
       motion: "Motion",
     } as Record<Series, string>,
     descriptions: {
-      paper: "Paper, ink and vermilion stamps for storefronts and campaigns.",
+      paper: "Paper and ink for storefronts and campaigns: coupons, receipts and loyalty cards.",
       product: "Quiet tool UI: neutral surfaces, one accent, status on dots.",
       story: "Signature pieces in ink and lantern light: a readable 3D book and a WebGL cloth curtain for launch reveals.",
       showcase: "Landing-page signature visuals in a quiet editorial dark: tilts, carousels, marquees and recap slides.",
@@ -59,7 +59,7 @@ const en = {
   home: {
     metaTitle: "SunUI: paper-feel commerce blocks for React",
     eyebrow: "Paper-feel commerce blocks for React",
-    title: "Coupons, receipts and stamps your shoppers can feel.",
+    title: "Coupons, receipts and loyalty cards your shoppers can feel.",
     lead: "Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign, plus free motion libraries for when you want more of a show. Accessible by default, installed with one command and owned by you.",
     statBlocks: "blocks",
     statFree: "free, MIT",
@@ -68,7 +68,7 @@ const en = {
     reasons: [
       {
         title: "A material, not a theme",
-        body: "Paper, ink and one vermilion seal. Coupons tear along the perforation, receipts print, results get stamped. A look AI generators do not hand out by default.",
+        body: "Paper and ink, nothing else. Coupons tear along the perforation, receipts print, and a result is one quiet line of ink where the button was. No gradients, no glow, no confetti.",
       },
       {
         title: "Built for sales moments",
@@ -347,7 +347,7 @@ const en = {
   icons: {
     metaTitle: "Icons",
     metaDescription:
-      "SunUI stroke icons on a 24px grid: notched coupons, zigzag receipts, tilted stamps and the everyday controls, with one optional vermilion accent.",
+      "SunUI stroke icons on a 24px grid: notched coupons, zigzag receipts, tilted stamps and the everyday controls, with one optional accent part you can point at your theme color.",
     eyebrow: "SunUI Icons",
     title: "Icons cut from the same paper.",
     lead: "One stroke set for every SunUI series. Coupons with real notches, receipts that tear, stamps that land a little crooked, and the plain controls around them. Every icon comes static, and the ones with something to say also come animated.",
@@ -358,7 +358,7 @@ const en = {
     rules: [
       { title: "24px grid, 2px margin", body: "Shapes live between 3 and 21. Circles reach 8.5, squares 7 from center." },
       { title: "1.5 stroke, round caps", body: "Matches the 1px paper edge at 24px. Drop to 1.25 above 32px." },
-      { title: "One vermilion spot", body: "Each icon marks at most one accent part. It stays ink until you set the variable." },
+      { title: "One accent spot", body: "Each icon marks at most one accent part. It stays ink until you set the variable." },
       { title: "Real paper details", body: "Notches, perforations, zigzag tears and a stamp tilted about 10°." },
       {
         title: "Motion that means something",
@@ -382,7 +382,7 @@ const en = {
     searchPlaceholder: "Search {n} icons, e.g. coupon, 印章",
     size: "Size",
     stroke: "Stroke",
-    accent: "Vermilion accent",
+    accent: "Accent part",
     animatedHint: "Hover a tile to play it. Toggle and loading icons switch state when you click.",
     pixelHint: "16px sprites with fill, shade and a white shine. Use multiples of 16 so every pixel stays sharp.",
     noMatch: "No icon matches “{q}”.",
@@ -452,7 +452,7 @@ const zhTW: Messages = {
       motion: "動效",
     },
     descriptions: {
-      paper: "紙張、墨色與朱紅印章，為商店與檔期活動而做。",
+      paper: "紙張與墨色，為商店與檔期活動而做：優惠券、收據、集點卡。",
       product: "安靜的工具介面：中性底色、單一強調色，用圓點表示狀態。",
       story: "墨色與燈籠風格的招牌作品：可以翻閱的 3D 書、用於新品揭幕的 WebGL 布簾。",
       showcase: "形象頁的招牌視覺：3D 傾斜、輪播、跑馬燈與回顧投影片。",
@@ -462,7 +462,7 @@ const zhTW: Messages = {
   home: {
     metaTitle: "SunUI：有紙感的 React 電商區塊",
     eyebrow: "有紙感的 React 電商區塊",
-    title: "讓顧客摸得到的優惠券、收據與印章。",
+    title: "讓顧客摸得到的優惠券、收據與集點卡。",
     lead: "撕得開的優惠券、印出來的收據、集點章與促銷海報，下一檔活動直接用；想要更多舞台感時，還有免費的動效庫。預設無障礙，一行指令安裝，程式碼完全屬於你。",
     statBlocks: "個區塊",
     statFree: "個免費，MIT",
@@ -471,7 +471,7 @@ const zhTW: Messages = {
     reasons: [
       {
         title: "是一種材質，不只是主題",
-        body: "紙張、墨色，加上一枚朱紅印章。優惠券沿著齒孔撕開，收據一張張印出，結果蓋章確認。這是 AI 產生器不會預設給你的樣子。",
+        body: "只有紙和墨。優惠券沿著齒孔撕開，收據一張張印出，結果就在按鈕原本的位置，安靜地寫成一行字。沒有漸層、光暈，也沒有彩帶。",
       },
       {
         title: "為促銷時刻而生",
@@ -731,7 +731,7 @@ const zhTW: Messages = {
   },
   icons: {
     metaTitle: "圖示",
-    metaDescription: "建立在 24px 格線上的 SunUI 線條圖示：有缺口的優惠券、鋸齒收據、微斜的印章與日常控制項，可選用一個朱紅強調色。",
+    metaDescription: "建立在 24px 格線上的 SunUI 線條圖示：有缺口的優惠券、鋸齒收據、微斜的印章與日常控制項，可把一個部位設成你的主題色。",
     eyebrow: "SunUI 圖示",
     title: "從同一張紙裁出來的圖示。",
     lead: "一套線條圖示，適用每個 SunUI 系列。有真實缺口的優惠券、撕得開的收據、蓋得有點歪的印章，以及周圍那些樸素的控制項。每個圖示都有靜態版，值得動起來的也有動態版。",
@@ -742,7 +742,7 @@ const zhTW: Messages = {
     rules: [
       { title: "24px 格線，2px 邊距", body: "圖形落在 3 到 21 之間。圓形半徑 8.5，方形距中心 7。" },
       { title: "1.5 線寬，圓頭端點", body: "在 24px 時與 1px 的紙張邊線一致。超過 32px 時降為 1.25。" },
-      { title: "只有一處朱紅", body: "每個圖示最多標示一個強調部位。設定變數之前，它維持墨色。" },
+      { title: "只有一處強調", body: "每個圖示最多標示一個強調部位。設定變數之前，它維持墨色。" },
       { title: "真實的紙張細節", body: "缺口、齒孔、鋸齒撕邊，還有一枚傾斜約 10° 的印章。" },
       { title: "有意義的動態", body: "優惠券沿齒孔撕開、印章壓下、鈴鐺擺動。只在懸停、聚焦或狀態改變時發生。" },
     ],
@@ -763,7 +763,7 @@ const zhTW: Messages = {
     searchPlaceholder: "搜尋 {n} 個圖示，例如 coupon、印章",
     size: "尺寸",
     stroke: "線寬",
-    accent: "朱紅強調色",
+    accent: "強調部位",
     animatedHint: "把游標移到圖示上即可播放。切換與載入類圖示點一下就會切換狀態。",
     pixelHint: "16px 小精靈圖，有填色、陰影與白色亮點。用 16 的整數倍顯示，每一格才會銳利。",
     noMatch: "沒有符合「{q}」的圖示。",
@@ -831,7 +831,7 @@ const zhCN: Messages = {
       motion: "动效",
     },
     descriptions: {
-      paper: "纸张、墨色与朱红印章，为店铺与大促活动而做。",
+      paper: "纸张与墨色，为店铺与大促活动而做：优惠券、小票、集点卡。",
       product: "安静的工具界面：中性底色、单一强调色，用圆点表示状态。",
       story: "墨色与灯笼风格的招牌作品：可以翻阅的 3D 书、用于新品揭幕的 WebGL 布帘。",
       showcase: "落地页的招牌视觉：3D 倾斜、轮播、跑马灯与回顾幻灯片。",
@@ -841,7 +841,7 @@ const zhCN: Messages = {
   home: {
     metaTitle: "SunUI：有纸感的 React 电商区块",
     eyebrow: "有纸感的 React 电商区块",
-    title: "让顾客摸得到的优惠券、小票与印章。",
+    title: "让顾客摸得到的优惠券、小票与集点卡。",
     lead: "撕得开的优惠券、打印出来的小票、集点章与促销海报，下一场活动直接用；想要更多舞台感时，还有免费的动效库。默认无障碍，一行命令安装，代码完全归你所有。",
     statBlocks: "个区块",
     statFree: "个免费，MIT",
@@ -850,7 +850,7 @@ const zhCN: Messages = {
     reasons: [
       {
         title: "是一种材质，不只是主题",
-        body: "纸张、墨色，再加一枚朱红印章。优惠券沿着齿孔撕开，小票一张张打印出来，结果盖章确认。这是 AI 生成器不会默认给你的样子。",
+        body: "只有纸和墨。优惠券沿着齿孔撕开，小票一张张打印出来，结果就在按钮原来的位置，安静地写成一行字。没有渐变、光晕，也没有彩带。",
       },
       {
         title: "为大促时刻而生",
@@ -1103,7 +1103,7 @@ const zhCN: Messages = {
   },
   icons: {
     metaTitle: "图标",
-    metaDescription: "基于 24px 网格的 SunUI 线性图标：带缺口的优惠券、锯齿小票、微斜的印章与日常控件，可选一个朱红强调色。",
+    metaDescription: "基于 24px 网格的 SunUI 线性图标：带缺口的优惠券、锯齿小票、微斜的印章与日常控件，可把一个部位设成你的主题色。",
     eyebrow: "SunUI 图标",
     title: "从同一张纸上裁下来的图标。",
     lead: "一套线性图标，适用于每个 SunUI 系列。带真实缺口的优惠券、撕得开的小票、盖得有点歪的印章，以及周围那些朴素的控件。每个图标都有静态版，值得动起来的还有动效版。",
@@ -1114,7 +1114,7 @@ const zhCN: Messages = {
     rules: [
       { title: "24px 网格，2px 边距", body: "图形落在 3 到 21 之间。圆形半径 8.5，方形距中心 7。" },
       { title: "1.5 线宽，圆头端点", body: "在 24px 时与 1px 的纸张边线一致。超过 32px 时降到 1.25。" },
-      { title: "只有一处朱红", body: "每个图标最多标记一个强调部位。设置变量之前，它保持墨色。" },
+      { title: "只有一处强调", body: "每个图标最多标记一个强调部位。设置变量之前，它保持墨色。" },
       { title: "真实的纸张细节", body: "缺口、齿孔、锯齿撕边，还有一枚倾斜约 10° 的印章。" },
       { title: "有意义的动效", body: "优惠券沿齿孔撕开、印章压下、铃铛摆动。只在悬停、聚焦或状态变化时发生。" },
     ],
@@ -1135,7 +1135,7 @@ const zhCN: Messages = {
     searchPlaceholder: "搜索 {n} 个图标，例如 coupon、印章",
     size: "尺寸",
     stroke: "线宽",
-    accent: "朱红强调色",
+    accent: "强调部位",
     animatedHint: "把鼠标移到图标上即可播放。切换与加载类图标点一下就会切换状态。",
     pixelHint: "16px 小精灵图，有填色、阴影与白色高光。用 16 的整数倍显示，每一格才会锐利。",
     noMatch: "没有匹配“{q}”的图标。",
@@ -1203,7 +1203,7 @@ const ja: Messages = {
       motion: "モーション",
     },
     descriptions: {
-      paper: "紙とインクと朱色のスタンプ。ストアやキャンペーンのために。",
+      paper: "紙とインク。ストアやキャンペーンのための、クーポン、レシート、スタンプカード。",
       product: "静かなツール UI。ニュートラルな面、アクセントは一色、状態はドットで。",
       story: "墨と灯籠の看板作品。めくれる 3D の本と、新商品のお披露目に使える WebGL のカーテン。",
       showcase: "LP の見せ場になるビジュアル。3D チルト、カルーセル、マーキー、振り返りスライド。",
@@ -1213,7 +1213,7 @@ const ja: Messages = {
   home: {
     metaTitle: "SunUI：紙の手ざわりを持つ React コマースブロック",
     eyebrow: "紙の手ざわりを持つ React コマースブロック",
-    title: "手ざわりまで伝わる、クーポンとレシートとスタンプ。",
+    title: "手ざわりまで伝わる、クーポンとレシートとスタンプカード。",
     lead: "切り取れるクーポン、印字されるレシート、スタンプカード、セールポスターを次のキャンペーンに。もっと演出がほしいときは、無料のモーションライブラリもあります。最初からアクセシブルで、コマンドひとつで導入でき、コードはすべてあなたのものです。",
     statBlocks: "ブロック",
     statFree: "無料（MIT）",
@@ -1222,7 +1222,7 @@ const ja: Messages = {
     reasons: [
       {
         title: "テーマではなく、素材",
-        body: "紙とインクと、朱色の印がひとつ。クーポンはミシン目で切れ、レシートは印字され、結果にはスタンプが押されます。AI ジェネレーターがふつうは出してこない表情です。",
+        body: "紙とインクだけ。クーポンはミシン目で切れ、レシートは印字され、結果はボタンのあった場所に一行のインクで静かに表示されます。グラデーションも光も紙吹雪もありません。",
       },
       {
         title: "セールの瞬間のために",
@@ -1487,7 +1487,7 @@ const ja: Messages = {
   icons: {
     metaTitle: "アイコン",
     metaDescription:
-      "24px グリッドの SunUI 線アイコン。切り欠きのあるクーポン、ギザギザのレシート、傾いたスタンプと日常的なコントロール。朱色のアクセントは任意で一色。",
+      "24px グリッドの SunUI 線アイコン。切り欠きのあるクーポン、ギザギザのレシート、傾いたスタンプと日常的なコントロール。アクセントにする 1 パーツはテーマの色に設定できます。",
     eyebrow: "SunUI Icons",
     title: "同じ紙から切り出したアイコン。",
     lead: "すべての SunUI シリーズに使える線アイコンのセット。本物の切り欠きがあるクーポン、切り取れるレシート、少し曲がって押されたスタンプ、そしてそのまわりの素朴なコントロール。すべてのアイコンに静止版があり、語るべき動きがあるものにはアニメーション版もあります。",
@@ -1498,7 +1498,7 @@ const ja: Messages = {
     rules: [
       { title: "24px グリッド、余白 2px", body: "図形は 3 から 21 の範囲に収まります。円は中心から 8.5、正方形は 7。" },
       { title: "線幅 1.5、丸い線端", body: "24px で 1px の紙の縁と揃います。32px を超えたら 1.25 に。" },
-      { title: "朱色は一か所だけ", body: "アクセントにするのは各アイコン最大 1 パーツ。変数を設定するまではインクの色のままです。" },
+      { title: "アクセントは一か所だけ", body: "アクセントにするのは各アイコン最大 1 パーツ。変数を設定するまではインクの色のままです。" },
       { title: "本物の紙のディテール", body: "切り欠き、ミシン目、ギザギザの切り口、約 10° 傾いたスタンプ。" },
       {
         title: "意味のある動き",
@@ -1522,7 +1522,7 @@ const ja: Messages = {
     searchPlaceholder: "{n} 個のアイコンを検索（例：coupon、印章）",
     size: "サイズ",
     stroke: "線幅",
-    accent: "朱色アクセント",
+    accent: "アクセント部位",
     animatedHint: "タイルにカーソルを合わせると再生されます。トグル型とローディング型はクリックで状態が切り替わります。",
     pixelHint: "塗り、影、白いハイライト付きの 16px スプライト。16 の倍数で表示するとくっきり見えます。",
     noMatch: "「{q}」に一致するアイコンはありません。",

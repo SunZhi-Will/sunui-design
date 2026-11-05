@@ -31,14 +31,14 @@ export function press(reduce?: boolean | null) {
 }
 
 /**
- * 蓋章的底層 variants。block 裡顯示結果請直接用 `Stamp`（registry/free/stamp），它依結果選形狀、帶 seed 與墨色紋理；
- * 這組 variants 只留給需要自訂印章外觀的特殊情況。
+ * 結果出現：150ms 淡入，不縮放、不旋轉。block 裡顯示結果請直接用 `Stamp`（registry/free/stamp）；
+ * 這組 variants 只留給需要自訂結果樣式的特殊情況。名稱沿用 stamp 以相容舊程式。
  * 用法：<motion.span variants={stamp} initial={reduce ? false : "lifted"} animate="pressed" exit="gone" />
  */
 export const stamp: Variants = {
-  lifted: { scale: 1.6, opacity: 0, rotate: -4 },
-  pressed: { scale: 1, opacity: 0.9, rotate: -10, transition: springs.stamp },
-  gone: { opacity: 0, transition: { duration: 0.15 } },
+  lifted: { opacity: 0 },
+  pressed: { opacity: 1, transition: { duration: 0.15, ease: "easeOut" } },
+  gone: { opacity: 0, transition: { duration: 0.12 } },
 };
 
 /** 錯誤輕搖的關鍵影格，像紙被推回來 */

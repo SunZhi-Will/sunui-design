@@ -46,9 +46,9 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 
 ## Do not
 
-- Add gradients, glows, blur, colored shadows, particles or confetti next to a block. The stamp is the only celebration.
+- Add gradients, glows, blur, colored shadows, particles or confetti next to a block. There is no celebration: a result is one quiet line of ink where the action happened.
 - Add entrance animations or idle loops to the page around a block.
-- Pick a new accent color per block. Paper blocks share one vermilion; product blocks use the theme primary.
+- Pick a new accent color per block. Paper blocks use ink only; product blocks use the theme primary.
 - Remove \`useReducedMotion\` branches or \`aria-live\` regions while editing.
 - Invent block names. If a name is not in search results, it does not exist.
 

@@ -11,7 +11,6 @@ import { listItem, panel, press, roll, scrim, springs, stamp, useShake } from "@
 // 全部用 sunui-motion 本身實作，順便驗證這個 lib。
 
 const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c] border-[#e2e2e2] dark:border-[#333333] text-[#171717] dark:text-[#ededed]";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
 
 export function MotionDemo({ demo, playLabel }: { demo: DemoKey; playLabel: string }) {
   const [run, setRun] = useState(0);
@@ -64,11 +63,11 @@ function StampDemo({ run }: DemoProps) {
             initial={reduce ? false : "lifted"}
             animate="pressed"
             exit="gone"
-            className={cn(
-              "pointer-events-none absolute right-2 bottom-2 rounded-[3px] border-2 border-current px-1.5 py-0.5 text-[11px] font-bold tracking-[0.2em] uppercase mix-blend-multiply dark:mix-blend-screen",
-              vermilion,
-            )}
+            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium"
           >
+            <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
             Claimed
           </motion.span>
         )}

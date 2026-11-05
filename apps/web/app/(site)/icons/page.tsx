@@ -79,8 +79,8 @@ export default async function IconsPage() {
 // Standalone, announced as "Claimed"
 <Icon name="stamp-check" title="Claimed" />
 
-// Turn on the vermilion accent for one subtree
-<div className="[--sunui-icon-accent:#171717] dark:[--sunui-icon-accent:#ededed]">
+// Point the accent part at your theme color for one subtree
+<div className="[--sunui-icon-accent:var(--primary)]">
   <Icon name="punch-card" />
 </div>`}
           />
@@ -103,7 +103,7 @@ export default async function IconsPage() {
   <AnimatedIcon name="menu" active={open} title={open ? "Close menu" : "Open menu"} />
 </button>
 
-// Fills like a stamp pressing down
+// Fills with a short press
 <AnimatedIcon name="heart" active={saved} />
 
 // Spins only while loading
