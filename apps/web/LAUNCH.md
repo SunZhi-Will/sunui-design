@@ -23,7 +23,9 @@
 
 ### 2. Pro 私有 repo
 
-Pro 目前只在本機（`registry/pro` 沒有 remote），Vercel 拿不到。在 GitHub 建一個 **private** repo（例如 `sunui-design-pro`），然後：
+已完成（2026-11-06）：private repo `SunZhi-Will/sunui-design-pro` 已建立並推送，Vercel 已設 `SUNUI_PRO_REPO`。剩下 token：建好後在 Vercel 加 `SUNUI_PRO_TOKEN`（Secret、Production），再重新部署。
+
+原本的步驟（留作紀錄）：
 
 ```bash
 git -C apps/web/registry/pro remote add origin https://github.com/SunZhi-Will/sunui-design-pro.git
