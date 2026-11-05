@@ -19,11 +19,12 @@ export default async function BlockSheetPage({ params, searchParams }: Props) {
   // ?style= 來自效果庫的單一樣式卡片；不認得的樣式就退回完整 demo
   const style = (await searchParams).style;
   const variant = style && variantIds[item.name]?.includes(style) ? style : undefined;
-  const { locale } = await getI18n();
+  const { locale, m } = await getI18n();
   const localized = localizeItem(item, locale);
 
   return (
     <BlockSheet
+      labels={m.sheet}
       item={{
         name: item.name,
         variant,

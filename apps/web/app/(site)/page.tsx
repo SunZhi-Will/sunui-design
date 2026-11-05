@@ -120,12 +120,10 @@ export default async function HomePage() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
+    // dt 在前符合 dl 結構，視覺上用 order 讓數字排在前面，標籤只寫一次
     <div className="flex items-baseline gap-2">
-      <dt className="sr-only">{label}</dt>
-      <dd className="text-3xl font-semibold tabular-nums tracking-tight">{value}</dd>
-      <span className="text-subtle" aria-hidden="true">
-        {label}
-      </span>
+      <dt className="order-2 text-subtle">{label}</dt>
+      <dd className="order-1 text-3xl font-semibold tabular-nums tracking-tight">{value}</dd>
     </div>
   );
 }

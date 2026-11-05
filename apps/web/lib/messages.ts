@@ -63,7 +63,7 @@ const en = {
     lead: "Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign, plus free motion libraries for when you want more of a show. Accessible by default, installed with one command and owned by you.",
     statBlocks: "blocks",
     statFree: "free, MIT",
-    statPro: "Pro sections",
+    statPro: "Pro blocks",
     whyTitle: "Why SunUI",
     reasons: [
       {
@@ -82,7 +82,7 @@ const en = {
     proEyebrow: "SunUI Pro",
     proTitle: "Every campaign section, one payment, yours forever.",
     proBody: (n: number) =>
-      `${n} Pro sections today, new ones every week. Founding members get lifetime access for $79.`,
+      `${n} Pro blocks today, new ones every week. Founding members get lifetime access for $79.`,
   },
   catalog: {
     sectionLabel: "Blocks",
@@ -131,6 +131,14 @@ const en = {
     mobile: "Mobile",
     replay: "Replay",
     frameTitle: "{name} preview",
+  },
+  sheet: {
+    replay: "Replay",
+    copyLink: "Copy link",
+    close: "Close",
+    docs: "Docs & code",
+    getPro: "Get Pro",
+    frameTitle: "{title} preview",
   },
   waitlist: {
     email: "Email",
@@ -285,6 +293,7 @@ const en = {
       cta: "Get Team",
     },
     joinWaitlist: "Join the waitlist",
+    opensCta: (date: string) => `Opens ${date}, get notified`,
     footnote: (n: number) =>
       `${n} Pro ${n === 1 ? "block" : "blocks"} today, new ones every week. Prices in USD, taxes handled at checkout.`,
     waitlistBody: "One email when Pro opens. No spam.",
@@ -457,7 +466,7 @@ const zhTW: Messages = {
     lead: "撕得開的優惠券、印出來的收據、集點章與促銷海報，下一檔活動直接用；想要更多舞台感時，還有免費的動效庫。預設無障礙，一行指令安裝，程式碼完全屬於你。",
     statBlocks: "個區塊",
     statFree: "個免費，MIT",
-    statPro: "個 Pro 區段",
+    statPro: "個 Pro 區塊",
     whyTitle: "為什麼選 SunUI",
     reasons: [
       {
@@ -475,7 +484,7 @@ const zhTW: Messages = {
     ],
     proEyebrow: "SunUI Pro",
     proTitle: "所有活動區段，一次付費，永久擁有。",
-    proBody: (n) => `目前有 ${n} 個 Pro 區段，每週持續新增。創始會員只要 $79 即可終身使用。`,
+    proBody: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。創始會員只要 $79 即可終身使用。`,
   },
   catalog: {
     sectionLabel: "區塊",
@@ -523,6 +532,14 @@ const zhTW: Messages = {
     mobile: "手機",
     replay: "重播",
     frameTitle: "{name} 預覽",
+  },
+  sheet: {
+    replay: "重播",
+    copyLink: "複製連結",
+    close: "關閉",
+    docs: "說明與程式碼",
+    getPro: "取得 Pro",
+    frameTitle: "{title} 預覽",
   },
   waitlist: {
     email: "電子郵件",
@@ -669,6 +686,7 @@ const zhTW: Messages = {
       cta: "購買團隊方案",
     },
     joinWaitlist: "加入候補名單",
+    opensCta: (date) => `${date} 開賣，通知我`,
     footnote: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。價格以美元計，稅金於結帳時處理。`,
     waitlistBody: "Pro 開賣時寄一封信給你，不會有垃圾郵件。",
     faqTitle: "常見問題",
@@ -827,7 +845,7 @@ const zhCN: Messages = {
     lead: "撕得开的优惠券、打印出来的小票、集点章与促销海报，下一场活动直接用；想要更多舞台感时，还有免费的动效库。默认无障碍，一行命令安装，代码完全归你所有。",
     statBlocks: "个区块",
     statFree: "个免费，MIT",
-    statPro: "个 Pro 模块",
+    statPro: "个 Pro 区块",
     whyTitle: "为什么选 SunUI",
     reasons: [
       {
@@ -845,7 +863,7 @@ const zhCN: Messages = {
     ],
     proEyebrow: "SunUI Pro",
     proTitle: "所有活动模块，一次付费，永久拥有。",
-    proBody: (n) => `目前有 ${n} 个 Pro 模块，每周持续新增。创始会员只需 $79 即可终身使用。`,
+    proBody: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。创始会员只需 $79 即可终身使用。`,
   },
   catalog: {
     sectionLabel: "区块",
@@ -893,6 +911,14 @@ const zhCN: Messages = {
     mobile: "手机",
     replay: "重播",
     frameTitle: "{name} 预览",
+  },
+  sheet: {
+    replay: "重播",
+    copyLink: "复制链接",
+    close: "关闭",
+    docs: "说明与代码",
+    getPro: "获取 Pro",
+    frameTitle: "{title} 预览",
   },
   waitlist: {
     email: "邮箱",
@@ -1032,6 +1058,7 @@ const zhCN: Messages = {
       cta: "购买团队版",
     },
     joinWaitlist: "加入候补名单",
+    opensCta: (date) => `${date} 开卖，通知我`,
     footnote: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。价格以美元计，税费在结算时处理。`,
     waitlistBody: "Pro 开售时发一封邮件给你，绝不发垃圾邮件。",
     faqTitle: "常见问题",
@@ -1190,7 +1217,7 @@ const ja: Messages = {
     lead: "切り取れるクーポン、印字されるレシート、スタンプカード、セールポスターを次のキャンペーンに。もっと演出がほしいときは、無料のモーションライブラリもあります。最初からアクセシブルで、コマンドひとつで導入でき、コードはすべてあなたのものです。",
     statBlocks: "ブロック",
     statFree: "無料（MIT）",
-    statPro: "Pro セクション",
+    statPro: "Pro ブロック",
     whyTitle: "SunUI を選ぶ理由",
     reasons: [
       {
@@ -1208,7 +1235,7 @@ const ja: Messages = {
     ],
     proEyebrow: "SunUI Pro",
     proTitle: "キャンペーン用セクションをすべて、一度の支払いでずっと。",
-    proBody: (n) => `現在 ${n} 個の Pro セクション、毎週追加中。創設メンバーは $79 で永久に使えます。`,
+    proBody: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。創設メンバーは $79 で永久に使えます。`,
   },
   catalog: {
     sectionLabel: "ブロック",
@@ -1256,6 +1283,14 @@ const ja: Messages = {
     mobile: "モバイル",
     replay: "再生",
     frameTitle: "{name} のプレビュー",
+  },
+  sheet: {
+    replay: "再生",
+    copyLink: "リンクをコピー",
+    close: "閉じる",
+    docs: "ドキュメントとコード",
+    getPro: "Pro を入手",
+    frameTitle: "{title} のプレビュー",
   },
   waitlist: {
     email: "メールアドレス",
@@ -1403,6 +1438,7 @@ const ja: Messages = {
       cta: "チームプランを購入",
     },
     joinWaitlist: "ウェイトリストに登録",
+    opensCta: (date) => `${date} 発売、通知を受け取る`,
     footnote: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。価格は米ドル、税金はチェックアウト時に計算されます。`,
     waitlistBody: "Pro の販売開始時にメールを 1 通お送りします。迷惑メールは送りません。",
     faqTitle: "よくある質問",

@@ -106,15 +106,13 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     return map;
   }, [scoped]);
 
-  // 數字對應點下去會看到的卡片數：Motion 會展開樣式，其他系列與「全部」是收合後的數量
+  // 系列數字一律算收合後的卡片（一個效果庫算一個），才不會出現「動效」比「全部」還多；
+  // 選了 Motion 展開成樣式時，下方的數量列改用「N 種樣式」說明
   const seriesCounts = useMemo(() => {
     const map = new Map<Series, number>();
-    for (const item of collapsed) {
-      if (seriesOf(item) !== "motion") map.set(seriesOf(item), (map.get(seriesOf(item)) ?? 0) + 1);
-    }
-    map.set("motion", items.filter((item) => seriesOf(item) === "motion").length);
+    for (const item of collapsed) map.set(seriesOf(item), (map.get(seriesOf(item)) ?? 0) + 1);
     return map;
-  }, [items, collapsed]);
+  }, [collapsed]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -219,7 +217,11 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
       <div className="mb-4 flex items-center gap-3 text-sm text-subtle">
         <p aria-live="polite">
-          {visible.length === 1 ? t.countOne : format(t.count, { n: visible.length })}
+          {series === "motion"
+            ? format(t.styles, { n: visible.length })
+            : visible.length === 1
+              ? t.countOne
+              : format(t.count, { n: visible.length })}
         </p>
         {filtered && (
           <button type="button" onClick={reset} className="underline-offset-4 hover:text-fg hover:underline">

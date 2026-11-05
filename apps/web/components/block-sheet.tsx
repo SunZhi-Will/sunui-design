@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { CopyButton } from "@/components/copy-button";
+import { format } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 
 export type BlockSheetItem = {
   name: string;
@@ -23,7 +25,7 @@ const spring = { type: "spring", stiffness: 240, damping: 30 } as const;
  * 從型錄點卡片時，卡片就地展開成這個面板，網址同時變成 /blocks/<name>。
  * 直接打開或重新整理該網址時不會經過這裡，而是完整的 block 頁，方便分享。
  */
-export function BlockSheet({ item }: { item: BlockSheetItem }) {
+export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Messages["sheet"] }) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(true);
@@ -91,18 +93,18 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
                   )}
                 </h2>
               </div>
-              <IconButton label="Replay" onClick={() => { setLoaded(false); setRun((n) => n + 1); }}>
+              <IconButton label={labels.replay} onClick={() => { setLoaded(false); setRun((n) => n + 1); }}>
                 <path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" />
               </IconButton>
-              <CopyLink />
+              <CopyLink label={labels.copyLink} />
               {/* 用一般連結強制整頁載入，才會離開彈窗、進到完整的 block 頁 */}
               <a
                 href={`/blocks/${item.name}`}
                 className="hidden rounded-full px-3 py-1.5 text-sm text-subtle transition-colors hover:bg-stage hover:text-fg sm:inline-block"
               >
-                Docs &amp; code
+                {labels.docs}
               </a>
-              <IconButton label="Close" onClick={close}>
+              <IconButton label={labels.close} onClick={close}>
                 <path d="M6 6l12 12M18 6 6 18" />
               </IconButton>
             </header>
@@ -115,7 +117,7 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
                     ? `/preview/${item.name}/v/${encodeURIComponent(item.variant)}?mode=sheet`
                     : `/preview/${item.name}/sheet`
                 }
-                title={`${item.title} preview`}
+                title={format(labels.frameTitle, { title: item.title })}
                 onLoad={() => setLoaded(true)}
                 className="size-full border-0 transition-opacity duration-300"
                 style={{ opacity: loaded ? 1 : 0 }}
@@ -124,6 +126,13 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
 
             <footer className="flex flex-col gap-3 border-t border-line px-4 py-3 sm:flex-row sm:items-center sm:px-5">
               <p className="line-clamp-2 min-w-0 flex-1 text-sm text-pretty text-subtle">{item.description}</p>
+              {/* 窄螢幕的頂部列放不下說明連結，改放這裡，手機才有路到程式碼與用法 */}
+              <a
+                href={`/blocks/${item.name}`}
+                className="text-sm font-medium text-fg underline underline-offset-4 sm:hidden"
+              >
+                {labels.docs}
+              </a>
               {item.install ? (
                 <div className="flex min-w-0 items-center gap-2 rounded-xl border border-line bg-bg py-1.5 pr-1.5 pl-3 sm:max-w-md">
                   <code className="min-w-0 flex-1 overflow-x-auto font-mono text-xs whitespace-nowrap">{item.install}</code>
@@ -134,7 +143,7 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
                   href="/pricing"
                   className="shrink-0 rounded-full bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
                 >
-                  Get Pro
+                  {labels.getPro}
                 </Link>
               )}
             </footer>
@@ -162,13 +171,13 @@ function IconButton({ label, onClick, children }: { label: string; onClick: () =
 }
 
 // 複製目前網址，分享出去的人會直接看到完整的 block 頁
-function CopyLink() {
+function CopyLink({ label }: { label: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
       type="button"
-      aria-label="Copy link"
-      title="Copy link"
+      aria-label={label}
+      title={label}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(window.location.href);

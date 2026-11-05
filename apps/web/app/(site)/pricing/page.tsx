@@ -27,6 +27,13 @@ export default async function PricingPage() {
   // 動效庫一組含十幾種效果，和一般 block 分開列（見 reports/免費與付費切分規劃-2026-11-05.md）
   const motionCount = freeItems.filter((item) => seriesOf(item) === "motion").length;
   const freeCount = freeItems.length - motionCount;
+  // 開賣前整頁只留一個候補表單：創始方案區塊有表單時用它，否則才在下方放一個
+  const foundingHasForm = state !== "closed" && !(state === "open" && checkoutUrls.founding);
+  // 還不能結帳的方案按鈕寫出開賣日，點了捲到那唯一的表單，而不是再放一個一樣的「加入候補名單」
+  const waitlistCta =
+    state === "upcoming"
+      ? { label: t.opensCta(dateFormat.format(foundingWindow.opensAt)), href: "#waitlist" }
+      : { label: t.joinWaitlist, href: "#waitlist" };
 
   const plans = [
     {
@@ -42,14 +49,14 @@ export default async function PricingPage() {
       note: t.pro.note,
       highlight: true,
       features: t.pro.features,
-      cta: checkoutUrls.pro ? { label: t.pro.cta, href: checkoutUrls.pro } : { label: t.joinWaitlist, href: "#waitlist" },
+      cta: checkoutUrls.pro ? { label: t.pro.cta, href: checkoutUrls.pro } : waitlistCta,
     },
     {
       name: t.team.name,
       price: `$${prices.team}`,
       note: t.team.note,
       features: t.team.features,
-      cta: checkoutUrls.team ? { label: t.team.cta, href: checkoutUrls.team } : { label: t.joinWaitlist, href: "#waitlist" },
+      cta: checkoutUrls.team ? { label: t.team.cta, href: checkoutUrls.team } : waitlistCta,
     },
   ];
 
@@ -62,8 +69,9 @@ export default async function PricingPage() {
 
       {state !== "closed" && (
         <section
+          id={foundingHasForm ? "waitlist" : undefined}
           aria-labelledby="founding-title"
-          className="mx-auto mt-12 max-w-3xl rounded-2xl border border-accent/40 bg-accent-soft/40 p-6 sm:p-8"
+          className="mx-auto mt-12 max-w-3xl scroll-mt-24 rounded-2xl border border-accent/40 bg-accent-soft/40 p-6 sm:p-8"
         >
           <p className="text-sm font-medium text-accent">{t.foundingEyebrow}</p>
           <h2 id="founding-title" className="mt-1 text-2xl font-semibold tracking-tight">
@@ -133,13 +141,15 @@ export default async function PricingPage() {
         {t.footnote(proCount)}
       </p>
 
-      <section id="waitlist" aria-labelledby="waitlist-title" className="mx-auto mt-20 max-w-md scroll-mt-24 text-center">
-        <h2 id="waitlist-title" className="text-xl font-semibold tracking-tight">
-          {m.common.launchUpdates}
-        </h2>
-        <p className="mt-2 mb-5 text-sm text-subtle">{t.waitlistBody}</p>
-        <WaitlistForm source="pricing" messages={m.waitlist} />
-      </section>
+      {!foundingHasForm && (
+        <section id="waitlist" aria-labelledby="waitlist-title" className="mx-auto mt-20 max-w-md scroll-mt-24 text-center">
+          <h2 id="waitlist-title" className="text-xl font-semibold tracking-tight">
+            {m.common.launchUpdates}
+          </h2>
+          <p className="mt-2 mb-5 text-sm text-subtle">{t.waitlistBody}</p>
+          <WaitlistForm source="pricing" messages={m.waitlist} />
+        </section>
+      )}
 
       <section aria-labelledby="faq-title" className="mx-auto mt-20 max-w-2xl">
         <h2 id="faq-title" className="mb-6 text-xl font-semibold tracking-tight">
