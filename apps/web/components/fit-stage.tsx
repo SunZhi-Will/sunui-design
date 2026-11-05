@@ -3,6 +3,8 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 const GUTTER = { card: 20, sheet: 32 } as const;
+// 卡片排版的最小寬度：375 手機扣掉頁面左右留白，demo 本來就要在這個寬度下好看
+const MIN_LAYOUT_WIDTH = 360;
 
 /**
  * 型錄卡片 iframe 內的舞台：block 以原尺寸置中顯示。
@@ -24,11 +26,21 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
     if (!content) return;
 
     const update = () => {
-      // 寬度用 scrollWidth 抓出撐破版面的固定寬元素；高度用版面高度，
+      const available = window.innerWidth - gutter * 2;
+      if (mode === "card") {
+        // 卡片比手機還窄，直接用卡片寬排版會把流動寬度的 demo 擠扁（文字斷成一字一行、欄位疊不下）。
+        // 至少給手機寬排版，block 真的用到這麼寬時再整體等比縮小，看起來就是縮圖而不是被壓扁
+        content.style.width = `${Math.max(available, MIN_LAYOUT_WIDTH)}px`;
+      }
+      // block 根元素是置中的 flex 子項，寬度就是它實際用到的寬；按鈕這類小元件維持 1:1。
+      // scrollWidth 再抓出撐破版面的固定寬元素；高度用版面高度，
       // 避免 hover 浮層或內部捲動區被裁掉的部分也算進去而無故縮小
-      const width = Math.max(content.scrollWidth, 1);
+      const root = content.firstElementChild?.firstElementChild;
+      const used = root instanceof HTMLElement ? root.offsetWidth : 0;
+      const overflow = content.scrollWidth > content.clientWidth ? content.scrollWidth : 0;
+      const width = Math.max(used, overflow, 1);
       const height = Math.max(content.offsetHeight, 1);
-      const byWidth = (window.innerWidth - gutter * 2) / width;
+      const byWidth = available / width;
       const byHeight = (window.innerHeight - gutter * 2) / height;
       setScale(mode === "sheet" ? 1 : Math.min(byWidth, byHeight, 1));
       setSurface(findSurface(content));
@@ -84,9 +96,8 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
       <style>{BLEED_CSS}</style>
       <div
         ref={contentRef}
-        className="w-full shrink-0 origin-center"
+        className="shrink-0 origin-center"
         style={{
-          maxWidth: `calc(100vw - ${gutter * 2}px)`,
           transform: `scale(${scale})`,
           opacity: scale ? 1 : 0,
         }}
