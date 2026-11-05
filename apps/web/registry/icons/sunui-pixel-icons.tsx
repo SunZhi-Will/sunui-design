@@ -1649,8 +1649,8 @@ export const pixelTones = [
 
 export type PixelPaths = Record<string, string>;
 
-/** 把點陣轉成每種字元一條路徑：同一列相鄰的同色格合併成一段，路徑短、縮放不留縫 */
-export function toPixelPaths(rows: readonly string[]): PixelPaths {
+/** 把點陣轉成每種字元一條路徑：同一列相鄰的同色格合併成一段，路徑短、縮放不留縫。origin 是左上角的座標偏移 */
+export function toPixelPaths(rows: readonly string[], origin = 0): PixelPaths {
   const paths: PixelPaths = {};
   rows.forEach((row, y) => {
     let x = 0;
@@ -1658,7 +1658,7 @@ export function toPixelPaths(rows: readonly string[]): PixelPaths {
       const ch = row[x];
       let end = x;
       while (row[end + 1] === ch) end += 1;
-      if (ch !== ".") paths[ch] = (paths[ch] ?? "") + `M${x} ${y}h${end - x + 1}v1h-${end - x + 1}z`;
+      if (ch !== ".") paths[ch] = (paths[ch] ?? "") + `M${x + origin} ${y + origin}h${end - x + 1}v1h-${end - x + 1}z`;
       x = end + 1;
     }
   });
