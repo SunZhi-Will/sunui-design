@@ -95,6 +95,58 @@
       ]
     },
     {
+      "name": "animate-presets",
+      "type": "registry:block",
+      "title": "Animate Presets",
+      "description": "A typed preset library for framer-motion with 62 named animations in three families: 30 entrances, 16 exits and 16 emphasis effects. Pick one with the preset prop, choose a trigger (mount, inView, hover, click or loop), and use Stagger to play a preset across a list; with reduced motion, entrances and exits jump to their end state and loops stop.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "entrance"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing sections, cards and lists as they scroll into view",
+            "Drawing attention to a badge, button or error with a short emphasis effect"
+          ],
+          "watchOut": [
+            "Use one or two entrance presets per page so motion stays consistent",
+            "Keep emphasis loops rare; a constantly moving element competes with content"
+          ],
+          "aliases": [
+            "animate.css",
+            "fade in",
+            "slide in",
+            "bounce in",
+            "zoom in",
+            "flip",
+            "clip reveal",
+            "stagger",
+            "entrance animation",
+            "exit animation",
+            "attention seeker",
+            "shake"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/animate-presets/animate-presets.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "animated-number",
       "type": "registry:block",
       "title": "Animated Number",
@@ -281,6 +333,101 @@
       ]
     },
     {
+      "name": "background-effects",
+      "type": "registry:block",
+      "title": "Background Effects",
+      "description": "A library of 13 animated section backgrounds (aurora, mesh gradient, grid pattern, dot glow, retro grid, beams, meteors, particles, starfield, waves, ripple rings, noise grain, spotlight) switched with the effect prop on EffectBackground, which fills its positioned parent and renders children on top. Loops pause off screen or in a hidden tab, and with reduced motion each effect shows a static frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "background"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero sections, launch banners and feature panels that need a living backdrop",
+            "Empty areas behind a headline or call to action that feel too flat"
+          ],
+          "watchOut": [
+            "Keep text contrast high: add a scrim or pick a quieter effect behind long copy",
+            "Use one animated background per screen; several at once compete and cost battery"
+          ],
+          "aliases": [
+            "animated background",
+            "aurora background",
+            "mesh gradient",
+            "grid pattern",
+            "retro grid",
+            "background beams",
+            "meteors",
+            "particles background",
+            "starfield",
+            "animated waves",
+            "film grain",
+            "spotlight effect"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/background-effects/background-effects.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "book-3d",
+      "type": "registry:block",
+      "title": "3D Book",
+      "description": "A 3D book you can actually read: it opens from the cover, turns pages with a leaf that folds around the spine, and closes onto the back cover after the last page. The text is split into pages by measuring CSS columns. The 3D scene is aria-hidden, a hidden linear copy of the text is what screen readers read, and the control bar's page counter is announced politely. With reduced motion, the page turn is skipped and the 3D transitions switch instantly.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "story",
+        "media",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "End-of-chapter memoirs, journey recaps or short stories you want to present as a physical object",
+            "Long-form text that should be paged by real layout rather than a fixed paragraph count"
+          ],
+          "watchOut": [
+            "children render once per visible page plus a measuring copy and a screen-reader copy, so avoid ids or stateful widgets inside the content",
+            "Keyboard defaults to window-level arrow and PageUp/PageDown keys like the original; use keyboard=\"self\" when several readers share a page"
+          ],
+          "aliases": [
+            "memoir book",
+            "page flip",
+            "flipbook",
+            "3d book reader"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/book-3d/book-3d.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "browser-frame",
       "type": "registry:block",
       "title": "Browser Frame",
@@ -319,6 +466,58 @@
       "files": [
         {
           "path": "registry/free/browser-frame/browser-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "button-effects",
+      "type": "registry:block",
+      "title": "Button Effects",
+      "description": "A library of 16 hover and press effects for a real button element, from rolling text and ripple to magnetic pull, 3D press and a send-to-check morph. Switch them with the effect prop; with reduced motion the movement is dropped and only color changes remain.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "button"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Primary calls to action on landing and marketing pages",
+            "Submit buttons that should confirm the action with a spinner and check"
+          ],
+          "watchOut": [
+            "Use one effect style per page so buttons feel consistent",
+            "Hover-only effects are invisible on touch screens, so keep the label clear without them"
+          ],
+          "aliases": [
+            "button animation",
+            "hover button",
+            "ripple button",
+            "magnetic button",
+            "shine button",
+            "glow button",
+            "3d button",
+            "rolling text button",
+            "animated border button",
+            "loading button",
+            "submit button",
+            "neon button"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/button-effects/button-effects.tsx",
           "type": "registry:component"
         }
       ]
@@ -365,6 +564,109 @@
       "files": [
         {
           "path": "registry/free/capsule-nav/capsule-nav.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "card-effects",
+      "type": "registry:block",
+      "title": "Card Effects",
+      "description": "A library of 13 hover effects for cards: 8 single-card effects switched with the effect prop on EffectCard (lift, spotlight, 3D tilt, glare, flip, info slide-up, wobble, curl) plus 5 group components (FocusGrid, StackFan, SpotlightGrid, ExpandingPanels, BentoExpand) that take an items array. With reduced motion the cards stay still, only colors change, and flip backs and info panels remain reachable.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "card"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product, article or destination grids that need a responsive hover state",
+            "Feature showcases and galleries where one card should stand out"
+          ],
+          "watchOut": [
+            "Hover does not exist on touch screens, so keep key info visible without it",
+            "Use one effect per grid; mixing tilt, glare and wobble on one page feels noisy"
+          ],
+          "aliases": [
+            "hover card",
+            "tilt card",
+            "3d card",
+            "holographic card",
+            "glare card",
+            "flip card",
+            "spotlight card",
+            "card hover effect",
+            "expanding cards",
+            "bento grid",
+            "card stack",
+            "page curl"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/card-effects/card-effects.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "chart-effects",
+      "type": "registry:block",
+      "title": "Chart Effects",
+      "description": "Seven animated SVG chart pieces with no chart library: bar grow, donut segments, line draw, number counter, bar race, radial progress and sparkline, switched with one variant prop and played when scrolled into view by default. Under reduced motion the charts render their final values at once and the bar race stops on its last frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "chart"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing pages and reports that reveal a few key numbers as the reader scrolls",
+            "Dashboard cards that need a light, dependency free chart with an entrance"
+          ],
+          "watchOut": [
+            "Built for small data sets; use a real chart library for axes, tooltips or thousands of points",
+            "Always pass a label so the chart summary read by screen readers makes sense"
+          ],
+          "aliases": [
+            "animated chart",
+            "bar chart animation",
+            "donut chart",
+            "line chart draw",
+            "count up",
+            "number counter",
+            "bar chart race",
+            "radial progress",
+            "progress ring",
+            "sparkline",
+            "svg chart"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/chart-effects/chart-effects.tsx",
           "type": "registry:component"
         }
       ]
@@ -501,6 +803,59 @@
       ]
     },
     {
+      "name": "cloth-curtain",
+      "type": "registry:block",
+      "title": "Cloth Curtain",
+      "description": "A real WebGL cloth curtain on a rail: a Verlet mass-spring grid with anime cel shading in a deep wine-red by default (pass tones to recolour) that sways in the breeze, gathers into folds as it draws aside (single panel or a centre-parting pair), can follow a dragging hand, and has an adjustable see-through amount. The canvas is aria-hidden and pauses when off screen or the tab is hidden. Under prefers-reduced-motion, or without WebGL, it shows a static striped curtain that switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "canvas",
+        "transition"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing a scene, chapter or hero behind a curtain that opens on a button or a story beat",
+            "Drag-to-reveal moments where the user pulls the cloth aside with a pointer (pass handRef)"
+          ],
+          "watchOut": [
+            "Each instance uses its own WebGL context, so avoid many curtains on one page",
+            "sheer is fixed when the simulation is built; use 0 when the curtain must fully hide a scene change"
+          ],
+          "aliases": [
+            "curtain reveal",
+            "fabric simulation",
+            "drape transition",
+            "stage curtain"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cloth-curtain/cloth-curtain.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/cloth-curtain/cloth-simulation.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/cloth-curtain/cloth-renderer.ts",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "compare-slider",
       "type": "registry:block",
       "title": "Compare Slider",
@@ -625,6 +980,52 @@
       "files": [
         {
           "path": "registry/free/content-gate/content-gate.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cookie-consent",
+      "type": "registry:block",
+      "title": "Cookie Consent",
+      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice presses a small SAVED stamp before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "form",
+        "notification",
+        "compliance"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Stores in regions that require opt-in consent for analytics or marketing cookies",
+            "Any site that needs a reject option as easy as accept"
+          ],
+          "watchOut": [
+            "The component only reports the choice; load analytics or ad scripts yourself after onChange",
+            "Change storageKey when your categories change so returning visitors are asked again"
+          ],
+          "aliases": [
+            "cookie banner",
+            "gdpr banner",
+            "consent banner",
+            "cookie notice",
+            "privacy preferences",
+            "cookie settings"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cookie-consent/cookie-consent.tsx",
           "type": "registry:component"
         }
       ]
@@ -761,6 +1162,56 @@
       "files": [
         {
           "path": "registry/free/coupon-wallet/coupon-wallet.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cursor-effects",
+      "type": "registry:block",
+      "title": "Cursor Effects",
+      "description": "A library of 7 pointer effects: follower, trail, spotlight, blend circle, crosshair, image hover preview and magnetic area. Switch them with the effect prop; they stay inside their container unless global is set, hide on touch screens, and drop lag and trails when reduced motion is on.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "cursor"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Portfolio and agency pages that want a playful pointer",
+            "Project lists that preview an image while hovering each row"
+          ],
+          "watchOut": [
+            "Do not hide the system cursor on forms or dense interfaces",
+            "Prefer the scoped container over global so the rest of the page stays calm"
+          ],
+          "aliases": [
+            "custom cursor",
+            "cursor follower",
+            "cursor trail",
+            "mouse trail",
+            "spotlight cursor",
+            "blend mode cursor",
+            "crosshair cursor",
+            "image hover reveal",
+            "hover preview",
+            "magnetic hover"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cursor-effects/cursor-effects.tsx",
           "type": "registry:component"
         }
       ]
@@ -941,6 +1392,104 @@
       ]
     },
     {
+      "name": "gradient-backdrop",
+      "type": "registry:block",
+      "title": "Gradient Backdrop",
+      "description": "A code-drawn gradient background with nine presets: mesh, grain, silk, aurora, color flow, floral, horizon, line maze and a real-time plasma shader on Canvas 2D. Pick a named palette or pass your own colors (hex, oklch or var(--token)), add film grain and an optional pointer light, and put any content on top as children. No image files. Loops pause off screen and in hidden tabs; with reduced motion it draws a still frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "background",
+        "hero",
+        "animation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Behind a landing page hero, launch banner or pricing header that needs atmosphere without image assets",
+            "A branded backdrop for cards, empty states or section dividers, using the brand colors through the colors prop",
+            "Picking a background style quickly: switch preset and palette instead of exporting a new image"
+          ],
+          "watchOut": [
+            "It is a motion series piece. Paper and product series pages stay flat, without gradients",
+            "Check text contrast on top: light palettes (pastel, meadow) need dark text, the rest need light text",
+            "colors[0] is the base color; the rest are accents, so put the background color first",
+            "Keep one animated backdrop per screen; for many small cards set animate={false}"
+          ],
+          "aliases": [
+            "gradient background",
+            "mesh gradient",
+            "grainy gradient",
+            "noise gradient",
+            "aurora background",
+            "animated gradient",
+            "silk gradient",
+            "shader background",
+            "hero background",
+            "blob background"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/gradient-backdrop/gradient-backdrop.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hero-billboard-carousel",
+      "type": "registry:block",
+      "title": "Hero Billboard Carousel",
+      "description": "A full-width billboard carousel: a large centre cover with the previous and next slides peeking at the sides, a blurred ambient glow behind, swipe or drag to change, arrows, and dot indicators where the current dot becomes a 6.5 s progress bar. It follows the W3C APG carousel pattern (pauses on hover, on keyboard focus and when the tab is hidden; arrow keys; slide roles and labels); reduced motion turns off autoplay, Ken Burns and slide motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "carousel",
+        "hero",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "First screen of a landing page promoting a few events, courses or launches",
+            "Featuring 3 to 7 items where each needs a title, meta line and call to action"
+          ],
+          "watchOut": [
+            "Use at least 3 slides so both sides have a peeking card",
+            "Sizes come from the container width and viewport height, so give it a full-width parent"
+          ],
+          "aliases": [
+            "billboard",
+            "hero slider",
+            "featured carousel",
+            "netflix style hero"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hero-billboard-carousel/hero-billboard-carousel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "hover-card",
       "type": "registry:block",
       "title": "Hover Card",
@@ -981,6 +1530,58 @@
       "files": [
         {
           "path": "registry/free/hover-card/hover-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "image-effects",
+      "type": "registry:block",
+      "title": "Image Effects",
+      "description": "A library of 11 image effects: 9 switched with the effect prop on ImageEffect (Ken Burns, clip reveal, soft mask, hover zoom, zoom lens, image swap, glitch, saturate, parallax frame) plus SliceSlideshow and Lightbox for several images. With reduced motion images appear in their final state, loops and autoplay stop, and every image keeps its alt text.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product photos, portfolios and editorial images that need a hover or reveal effect",
+            "Hero and gallery sections that benefit from slow motion or a zoom view"
+          ],
+          "watchOut": [
+            "Zoom lens and parallax need images larger than their frame to stay sharp",
+            "Glitch and Ken Burns draw attention; use them on one image, not a whole grid"
+          ],
+          "aliases": [
+            "ken burns",
+            "image reveal",
+            "clip path reveal",
+            "image hover zoom",
+            "zoom lens",
+            "magnifier",
+            "image swap",
+            "glitch effect",
+            "grayscale hover",
+            "parallax image",
+            "slice slideshow",
+            "lightbox"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/image-effects/image-effects.tsx",
           "type": "registry:component"
         }
       ]
@@ -1033,6 +1634,58 @@
       ]
     },
     {
+      "name": "loading-effects",
+      "type": "registry:block",
+      "title": "Loading Effects",
+      "description": "Thirteen loading indicators: a Loader with ten variants (bouncing dots, equalizer, ring spinner, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader and Skeleton. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "feedback"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Waiting states for fetches, uploads and route changes, from inline spinners to a top page bar",
+            "Long jobs with known stages or percentages, shown with the multi-step list, progress ring or liquid fill"
+          ],
+          "watchOut": [
+            "Prefer skeletons or determinate progress when the wait is longer than a second or two",
+            "Pass a localized label so screen readers announce what is loading"
+          ],
+          "aliases": [
+            "spinner",
+            "loader",
+            "loading dots",
+            "progress bar",
+            "progress ring",
+            "circular progress",
+            "nprogress",
+            "top loading bar",
+            "typing indicator",
+            "skeleton",
+            "shimmer",
+            "multi step loader"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/loading-effects/loading-effects.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "low-stock-indicator",
       "type": "registry:block",
       "title": "Low Stock Indicator",
@@ -1072,6 +1725,58 @@
       "files": [
         {
           "path": "registry/free/low-stock-indicator/low-stock-indicator.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "micro-interactions",
+      "type": "registry:block",
+      "title": "Micro Interactions",
+      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "feedback"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Confirming small actions such as liking, copying, sending or toggling a setting",
+            "Guarding destructive or payment actions with slide, hold or swipe gestures"
+          ],
+          "watchOut": [
+            "Always keep the keyboard and visible button alternatives for gesture controls",
+            "Do not stack several celebratory effects on one action"
+          ],
+          "aliases": [
+            "like button",
+            "confetti",
+            "success animation",
+            "animated checkbox",
+            "toggle switch",
+            "copy to clipboard",
+            "notification badge",
+            "floating label",
+            "slide to confirm",
+            "hold to confirm",
+            "swipe to delete",
+            "password toggle"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/micro-interactions/micro-interactions.tsx",
           "type": "registry:component"
         }
       ]
@@ -1340,6 +2045,114 @@
       ]
     },
     {
+      "name": "pixel-fx",
+      "type": "registry:block",
+      "title": "Pixel FX",
+      "description": "Code-drawn pixel art effects on a canvas that sits over any element: a collect burst for claiming a reward, two party poppers of paper confetti, and a block dissolve that covers a screen or unveils what is underneath. Ported from the MIT pixelfx engine (two buffers, opaque pixels with ordered dither plus additive light, seeded so each play is repeatable). Effects take a palette and default to the story series' gold and SunUI's vermilion. The canvas ignores the pointer and runs only while playing; with reduced motion nothing animates and onDone fires at once.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "game-ui",
+        "animation",
+        "canvas",
+        "rewards"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The moment a player claims a daily reward, a drop or in-game currency",
+            "Unveiling a prize, a gift code or a gacha result after the player asks for it",
+            "A screen-to-screen transition in a pixel or retro styled game UI"
+          ],
+          "watchOut": [
+            "It is a celebration language for game UI. Paper-series commerce pages celebrate with a stamp, not particles",
+            "Play it in response to a user action, never on a loop or on page load",
+            "Content under pixelReveal is visible to the DOM; mark it inert and aria-hidden until onDone, as the demo does",
+            "Effects are drawn in art pixels: a very large box at pixelSize 1 costs more per frame, keep pixelSize at 2 or more"
+          ],
+          "aliases": [
+            "pixel effects",
+            "particles",
+            "confetti",
+            "reward burst",
+            "sparkle",
+            "pixel transition",
+            "dissolve",
+            "gacha reveal",
+            "game vfx"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/pixel-fx/pixel-fx.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/pixel-fx/pixel-fx-core.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/pixel-fx/pixel-fx-effects.ts",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "product-media",
+      "type": "registry:block",
+      "title": "Product Media",
+      "description": "The image slot for a product card or page: on desktop hovering swaps to the second angle and a click zooms in and pans with the pointer; on touch it swipes left and right instead. Dots and a 1/3 counter sit below, arrow keys change images, Escape leaves zoom, and renderImage accepts next/image. Under reduced motion images switch instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product cards that should show a second angle on hover",
+            "Product pages where shoppers need to inspect texture or detail without opening a lightbox"
+          ],
+          "watchOut": [
+            "Provide images of the same aspect ratio; they are cropped with object-cover",
+            "Zoom uses the displayed image, so pass a large enough source for zoomScale"
+          ],
+          "aliases": [
+            "image swap on hover",
+            "hover zoom",
+            "zoom and pan",
+            "magnifier",
+            "product image carousel",
+            "swipe gallery",
+            "second image hover"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/product-media/product-media.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "quantity-stepper",
       "type": "registry:block",
       "title": "Quantity Stepper",
@@ -1556,6 +2369,58 @@
       ]
     },
     {
+      "name": "scroll-effects",
+      "type": "registry:block",
+      "title": "Scroll Effects",
+      "description": "Nine scroll-driven effects as separate components: parallax layers, horizontal scroll, zoom on scroll, velocity skew, scroll marquee, circle reveal, split doors, stacking cards and a self-drawing path. Each tracks its own section with useScroll and accepts a scroll container ref, and under reduced motion shows the final readable layout with normal scrolling.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "scroll"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing and product story pages where scrolling should move the narrative forward",
+            "Section transitions that reveal the next block, such as a circle reveal or split doors"
+          ],
+          "watchOut": [
+            "Pinned effects add scroll length; use one or two per page so readers are not stuck scrolling",
+            "Inside a scrolling box, pass its ref as container and its height as stageHeight"
+          ],
+          "aliases": [
+            "parallax",
+            "horizontal scroll",
+            "scroll zoom",
+            "velocity skew",
+            "scroll marquee",
+            "circle reveal",
+            "split doors",
+            "stacking cards",
+            "sticky cards",
+            "scroll draw svg",
+            "scroll animation",
+            "scrollytelling"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-effects/scroll-effects.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "scroll-progress",
       "type": "registry:block",
       "title": "Scroll Progress",
@@ -1688,6 +2553,49 @@
       "files": [
         {
           "path": "registry/free/scroll-story/scroll-story.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "scroll-tilt-stage",
+      "type": "registry:block",
+      "title": "Scroll Tilt Stage",
+      "description": "A 3D stage that lays its content tilted back (rotateX 28deg) and stands it upright as it scrolls into view, with a soft black shadow and a thin gold ground line underneath. The shadow and line are aria-hidden, and with reduced motion the content sits flat with no animation.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "scroll",
+        "showcase"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing a product demo or app window below the hero",
+            "Giving a screenshot or embedded demo a dramatic entrance on scroll"
+          ],
+          "watchOut": [
+            "Inside a custom scroll area, pass scrollContainer or progress follows the window",
+            "The wrapper uses overflow-x clip; leave vertical room for the shadow below"
+          ],
+          "aliases": [
+            "scroll 3d reveal",
+            "tilt on scroll",
+            "perspective stage",
+            "stand-up demo window"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-tilt-stage/scroll-tilt-stage.tsx",
           "type": "registry:component"
         }
       ]
@@ -1917,6 +2825,53 @@
       ]
     },
     {
+      "name": "store-header",
+      "type": "registry:block",
+      "title": "Store Header",
+      "description": "A sticky store header that tucks away when you scroll down past a threshold and slides back the moment you scroll up, shrinking from 64 to 52 px with a paper hairline once it leaves the top. The cart button takes a cartRef so add-to-cart-button can fly into it, an announcement slot rides along, and a mobile menu collapses by height. It never hides while keyboard focus is inside or the menu is open, and under reduced motion it only shrinks.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "section",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The top bar of a store with brand, a few category links and a cart count",
+            "Long product listing pages where the header should get out of the way while browsing"
+          ],
+          "watchOut": [
+            "Pass scrollContainer when the page scrolls inside a div instead of the window, or the header will not react",
+            "Keep links to four or five; the rest belong in the mobile menu or a mega menu"
+          ],
+          "aliases": [
+            "headroom",
+            "hide on scroll header",
+            "sticky header shrink",
+            "navbar",
+            "site header",
+            "shop header",
+            "cart icon header"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/store-header/store-header.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "story-player",
       "type": "registry:block",
       "title": "Story Player",
@@ -1965,6 +2920,58 @@
       ]
     },
     {
+      "name": "svg-effects",
+      "type": "registry:block",
+      "title": "SVG Effects",
+      "description": "A library of 10 SVG effects (line draw, blob morph, gooey, orbiting circles, motion path, icon morph, animated beam, flowing connectors, radar sweep, liquid fill) switched with the effect prop on SvgEffect, each also exported as its own component with full props. Loops pause off screen, and with reduced motion paths show fully drawn and loops hold still.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "svg"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Feature and integration sections that show how data or services connect",
+            "Signatures, logos, toggles and progress gauges that benefit from vector motion"
+          ],
+          "watchOut": [
+            "Line draw children need stroke-based shapes as direct children of the SVG",
+            "Liquid fill is a meter: always pass a label so screen readers know what it measures"
+          ],
+          "aliases": [
+            "svg animation",
+            "line drawing",
+            "path animation",
+            "blob animation",
+            "gooey effect",
+            "orbiting circles",
+            "icon morph",
+            "hamburger to close",
+            "animated beam",
+            "radar",
+            "liquid progress",
+            "wave fill"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/svg-effects/svg-effects.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "terms-consent",
       "type": "registry:block",
       "title": "Terms Consent",
@@ -2005,6 +3012,103 @@
       "files": [
         {
           "path": "registry/free/terms-consent/terms-consent.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "testimonial-marquee",
+      "type": "registry:block",
+      "title": "Testimonial Marquee",
+      "description": "Rows of review cards that scroll in opposite directions, with faded edges, 3D tilt on hover, and a pause on hover or keyboard focus. Clicking a card opens a detail dialog with a focus trap, Escape to close, and a rating breakdown. On narrow screens or with reduced motion, each row becomes a static horizontal scroller.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "testimonials",
+        "social-proof",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A social-proof section on a course or product landing page with many short reviews",
+            "When each review has extra detail (rating breakdown, course, role) worth opening on demand"
+          ],
+          "watchOut": [
+            "accentColor must be a hex value, because transparency suffixes are appended to it",
+            "Below 768px it switches to static scroll rows on purpose; this is not a bug"
+          ],
+          "aliases": [
+            "review marquee",
+            "testimonial wall",
+            "scrolling reviews",
+            "quote carousel",
+            "marquee",
+            "infinite card wall"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/testimonial-marquee/testimonial-marquee.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "text-effects",
+      "type": "registry:block",
+      "title": "Text Effects",
+      "description": "A library of 21 animated text effects, from wave and blur-in to scramble, split-flap, glitch and circle text, switched with one effect prop and played on mount, in view, hover, click or loop. Under reduced motion every effect shows its final, fully readable text and loops stop.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "text"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero headlines and section titles that need a memorable entrance",
+            "Short labels or badges that loop to draw attention, such as a rotating keyword"
+          ],
+          "watchOut": [
+            "Keep animated text short; long paragraphs split into letters get slow and noisy",
+            "Use one strong effect per screen rather than mixing many at once"
+          ],
+          "aliases": [
+            "text animation",
+            "kinetic typography",
+            "letter animation",
+            "scramble text",
+            "split flap",
+            "glitch text",
+            "neon text",
+            "shimmer text",
+            "gradient text",
+            "word rotate",
+            "blur in text",
+            "circular text"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/text-effects/text-effects.tsx",
           "type": "registry:component"
         }
       ]
@@ -2182,489 +3286,6 @@
       "files": [
         {
           "path": "registry/free/variant-picker/variant-picker.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "book-3d",
-      "type": "registry:block",
-      "title": "3D Book",
-      "description": "A 3D book you can actually read: it opens from the cover, turns pages with a leaf that folds around the spine, and closes onto the back cover after the last page. The text is split into pages by measuring CSS columns. The 3D scene is aria-hidden, a hidden linear copy of the text is what screen readers read, and the control bar's page counter is announced politely. With reduced motion, the page turn is skipped and the 3D transitions switch instantly.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "media",
-        "navigation"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "End-of-chapter memoirs, journey recaps or short stories you want to present as a physical object",
-            "Long-form text that should be paged by real layout rather than a fixed paragraph count"
-          ],
-          "watchOut": [
-            "children render once per visible page plus a measuring copy and a screen-reader copy, so avoid ids or stateful widgets inside the content",
-            "Keyboard defaults to window-level arrow and PageUp/PageDown keys like the original; use keyboard=\"self\" when several readers share a page"
-          ],
-          "aliases": [
-            "memoir book",
-            "page flip",
-            "flipbook",
-            "3d book reader"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/book-3d/book-3d.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "cloth-curtain",
-      "type": "registry:block",
-      "title": "Cloth Curtain",
-      "description": "A real WebGL cloth curtain on a rail: a Verlet mass-spring grid with anime cel shading in a deep wine-red by default (pass tones to recolour) that sways in the breeze, gathers into folds as it draws aside (single panel or a centre-parting pair), can follow a dragging hand, and has an adjustable see-through amount. The canvas is aria-hidden and pauses when off screen or the tab is hidden. Under prefers-reduced-motion, or without WebGL, it shows a static striped curtain that switches instantly.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "animation",
-        "canvas",
-        "transition"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Revealing a scene, chapter or hero behind a curtain that opens on a button or a story beat",
-            "Drag-to-reveal moments where the user pulls the cloth aside with a pointer (pass handRef)"
-          ],
-          "watchOut": [
-            "Each instance uses its own WebGL context, so avoid many curtains on one page",
-            "sheer is fixed when the simulation is built; use 0 when the curtain must fully hide a scene change"
-          ],
-          "aliases": [
-            "curtain reveal",
-            "fabric simulation",
-            "drape transition",
-            "stage curtain"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/cloth-curtain/cloth-curtain.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/cloth-curtain/cloth-simulation.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/cloth-curtain/cloth-renderer.ts",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "hero-billboard-carousel",
-      "type": "registry:block",
-      "title": "Hero Billboard Carousel",
-      "description": "A full-width billboard carousel: a large centre cover with the previous and next slides peeking at the sides, a blurred ambient glow behind, swipe or drag to change, arrows, and dot indicators where the current dot becomes a 6.5 s progress bar. It follows the W3C APG carousel pattern (pauses on hover, on keyboard focus and when the tab is hidden; arrow keys; slide roles and labels); reduced motion turns off autoplay, Ken Burns and slide motion.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "carousel",
-        "hero",
-        "marketing"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "showcase",
-        "interaction": "drag",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "First screen of a landing page promoting a few events, courses or launches",
-            "Featuring 3 to 7 items where each needs a title, meta line and call to action"
-          ],
-          "watchOut": [
-            "Use at least 3 slides so both sides have a peeking card",
-            "Sizes come from the container width and viewport height, so give it a full-width parent"
-          ],
-          "aliases": [
-            "billboard",
-            "hero slider",
-            "featured carousel",
-            "netflix style hero"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/hero-billboard-carousel/hero-billboard-carousel.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "scroll-tilt-stage",
-      "type": "registry:block",
-      "title": "Scroll Tilt Stage",
-      "description": "A 3D stage that lays its content tilted back (rotateX 28deg) and stands it upright as it scrolls into view, with a soft black shadow and a thin gold ground line underneath. The shadow and line are aria-hidden, and with reduced motion the content sits flat with no animation.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "marketing",
-        "scroll",
-        "showcase"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "showcase",
-        "interaction": "scroll",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Revealing a product demo or app window below the hero",
-            "Giving a screenshot or embedded demo a dramatic entrance on scroll"
-          ],
-          "watchOut": [
-            "Inside a custom scroll area, pass scrollContainer or progress follows the window",
-            "The wrapper uses overflow-x clip; leave vertical room for the shadow below"
-          ],
-          "aliases": [
-            "scroll 3d reveal",
-            "tilt on scroll",
-            "perspective stage",
-            "stand-up demo window"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/scroll-tilt-stage/scroll-tilt-stage.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "testimonial-marquee",
-      "type": "registry:block",
-      "title": "Testimonial Marquee",
-      "description": "Rows of review cards that scroll in opposite directions, with faded edges, 3D tilt on hover, and a pause on hover or keyboard focus. Clicking a card opens a detail dialog with a focus trap, Escape to close, and a rating breakdown. On narrow screens or with reduced motion, each row becomes a static horizontal scroller.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "testimonials",
-        "social-proof",
-        "marketing"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "showcase",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "A social-proof section on a course or product landing page with many short reviews",
-            "When each review has extra detail (rating breakdown, course, role) worth opening on demand"
-          ],
-          "watchOut": [
-            "accentColor must be a hex value, because transparency suffixes are appended to it",
-            "Below 768px it switches to static scroll rows on purpose; this is not a bug"
-          ],
-          "aliases": [
-            "review marquee",
-            "testimonial wall",
-            "scrolling reviews",
-            "quote carousel",
-            "marquee",
-            "infinite card wall"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/testimonial-marquee/testimonial-marquee.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "pixel-fx",
-      "type": "registry:block",
-      "title": "Pixel FX",
-      "description": "Code-drawn pixel art effects on a canvas that sits over any element: a collect burst for claiming a reward, two party poppers of paper confetti, and a block dissolve that covers a screen or unveils what is underneath. Ported from the MIT pixelfx engine (two buffers, opaque pixels with ordered dither plus additive light, seeded so each play is repeatable). Effects take a palette and default to the story series' gold and SunUI's vermilion. The canvas ignores the pointer and runs only while playing; with reduced motion nothing animates and onDone fires at once.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "game-ui",
-        "animation",
-        "canvas",
-        "rewards"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "The moment a player claims a daily reward, a drop or in-game currency",
-            "Unveiling a prize, a gift code or a gacha result after the player asks for it",
-            "A screen-to-screen transition in a pixel or retro styled game UI"
-          ],
-          "watchOut": [
-            "It is a celebration language for game UI. Paper-series commerce pages celebrate with a stamp, not particles",
-            "Play it in response to a user action, never on a loop or on page load",
-            "Content under pixelReveal is visible to the DOM; mark it inert and aria-hidden until onDone, as the demo does",
-            "Effects are drawn in art pixels: a very large box at pixelSize 1 costs more per frame, keep pixelSize at 2 or more"
-          ],
-          "aliases": [
-            "pixel effects",
-            "particles",
-            "confetti",
-            "reward burst",
-            "sparkle",
-            "pixel transition",
-            "dissolve",
-            "gacha reveal",
-            "game vfx"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/pixel-fx/pixel-fx.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/pixel-fx/pixel-fx-core.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/free/pixel-fx/pixel-fx-effects.ts",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "store-header",
-      "type": "registry:block",
-      "title": "Store Header",
-      "description": "A sticky store header that tucks away when you scroll down past a threshold and slides back the moment you scroll up, shrinking from 64 to 52 px with a paper hairline once it leaves the top. The cart button takes a cartRef so add-to-cart-button can fly into it, an announcement slot rides along, and a mobile menu collapses by height. It never hides while keyboard focus is inside or the menu is open, and under reduced motion it only shrinks.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "navigation",
-        "section",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "scroll",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "The top bar of a store with brand, a few category links and a cart count",
-            "Long product listing pages where the header should get out of the way while browsing"
-          ],
-          "watchOut": [
-            "Pass scrollContainer when the page scrolls inside a div instead of the window, or the header will not react",
-            "Keep links to four or five; the rest belong in the mobile menu or a mega menu"
-          ],
-          "aliases": [
-            "headroom",
-            "hide on scroll header",
-            "sticky header shrink",
-            "navbar",
-            "site header",
-            "shop header",
-            "cart icon header"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/store-header/store-header.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "product-media",
-      "type": "registry:block",
-      "title": "Product Media",
-      "description": "The image slot for a product card or page: on desktop hovering swaps to the second angle and a click zooms in and pans with the pointer; on touch it swipes left and right instead. Dots and a 1/3 counter sit below, arrow keys change images, Escape leaves zoom, and renderImage accepts next/image. Under reduced motion images switch instantly.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "media",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Product cards that should show a second angle on hover",
-            "Product pages where shoppers need to inspect texture or detail without opening a lightbox"
-          ],
-          "watchOut": [
-            "Provide images of the same aspect ratio; they are cropped with object-cover",
-            "Zoom uses the displayed image, so pass a large enough source for zoomScale"
-          ],
-          "aliases": [
-            "image swap on hover",
-            "hover zoom",
-            "zoom and pan",
-            "magnifier",
-            "product image carousel",
-            "swipe gallery",
-            "second image hover"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/product-media/product-media.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "cookie-consent",
-      "type": "registry:block",
-      "title": "Cookie Consent",
-      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice presses a small SAVED stamp before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "form",
-        "notification",
-        "compliance"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "section",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Stores in regions that require opt-in consent for analytics or marketing cookies",
-            "Any site that needs a reject option as easy as accept"
-          ],
-          "watchOut": [
-            "The component only reports the choice; load analytics or ad scripts yourself after onChange",
-            "Change storageKey when your categories change so returning visitors are asked again"
-          ],
-          "aliases": [
-            "cookie banner",
-            "gdpr banner",
-            "consent banner",
-            "cookie notice",
-            "privacy preferences",
-            "cookie settings"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/cookie-consent/cookie-consent.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "gradient-backdrop",
-      "type": "registry:block",
-      "title": "Gradient Backdrop",
-      "description": "A code-drawn gradient background with nine presets: mesh, grain, silk, aurora, color flow, floral, horizon, line maze and a real-time plasma shader on Canvas 2D. Pick a named palette or pass your own colors (hex, oklch or var(--token)), add film grain and an optional pointer light, and put any content on top as children. No image files. Loops pause off screen and in hidden tabs; with reduced motion it draws a still frame.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "background",
-        "hero",
-        "animation",
-        "marketing"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "motion",
-        "interaction": "section",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Behind a landing page hero, launch banner or pricing header that needs atmosphere without image assets",
-            "A branded backdrop for cards, empty states or section dividers, using the brand colors through the colors prop",
-            "Picking a background style quickly: switch preset and palette instead of exporting a new image"
-          ],
-          "watchOut": [
-            "It is a motion series piece. Paper and product series pages stay flat, without gradients",
-            "Check text contrast on top: light palettes (pastel, meadow) need dark text, the rest need light text",
-            "colors[0] is the base color; the rest are accents, so put the background color first",
-            "Keep one animated backdrop per screen; for many small cards set animate={false}"
-          ],
-          "aliases": [
-            "gradient background",
-            "mesh gradient",
-            "grainy gradient",
-            "noise gradient",
-            "aurora background",
-            "animated gradient",
-            "silk gradient",
-            "shader background",
-            "hero background",
-            "blob background"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/gradient-backdrop/gradient-backdrop.tsx",
           "type": "registry:component"
         }
       ]

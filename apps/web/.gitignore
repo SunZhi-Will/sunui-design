@@ -6,3 +6,6 @@ registry/pro/
 
 # 本機 waitlist 暫存
 .data/
+
+# 圖示自檢截圖（scripts/check-icons.mjs）
+check-out/
