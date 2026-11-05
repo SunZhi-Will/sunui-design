@@ -1,7 +1,7 @@
 {
   "zh-TW": {
     "title": "繪圖工具列",
-    "description": "CardFlow 的玻璃質感繪圖工具列（畫筆、直線、矩形、圓形、箭頭），支援 P 與 1 到 4 快捷鍵；附帶可即時預覽手繪與形狀的 DrawingSurface，以及調整顏色與粗細的 DrawingPanel。工具使用 aria-pressed 與 aria-keyshortcuts，Escape 離開繪圖模式，減少動態時取消滑入與滑過放大。",
+    "description": "CardFlow 的實底卡片質感繪圖工具列（畫筆、直線、矩形、圓形、箭頭），支援 P 與 1 到 4 快捷鍵；附帶可即時預覽手繪與形狀的 DrawingSurface，以及調整顏色與粗細的 DrawingPanel。工具使用 aria-pressed 與 aria-keyshortcuts，Escape 離開繪圖模式，減少動態時取消滑入與滑過放大。",
     "whenToUse": [
       "為畫布、白板或截圖標註工具加入手繪標註模式",
       "讓使用者用快速形狀工具圈出、指出重點"
@@ -13,7 +13,7 @@
   },
   "zh-CN": {
     "title": "绘图工具栏",
-    "description": "CardFlow 的玻璃质感绘图工具栏（画笔、直线、矩形、圆形、箭头），支持 P 与 1 到 4 快捷键；附带可实时预览手绘与形状的 DrawingSurface，以及调整颜色与粗细的 DrawingPanel。工具使用 aria-pressed 与 aria-keyshortcuts，Escape 退出绘图模式，减少动态效果时取消滑入与悬停放大。",
+    "description": "CardFlow 的实底卡片质感绘图工具栏（画笔、直线、矩形、圆形、箭头），支持 P 与 1 到 4 快捷键；附带可实时预览手绘与形状的 DrawingSurface，以及调整颜色与粗细的 DrawingPanel。工具使用 aria-pressed 与 aria-keyshortcuts，Escape 退出绘图模式，减少动态效果时取消滑入与悬停放大。",
     "whenToUse": [
       "为画布、白板或截图标注工具加入手绘标注模式",
       "让用户用快捷形状工具圈出、指出重点"
@@ -25,7 +25,7 @@
   },
   "ja": {
     "title": "描画ツールバー",
-    "description": "CardFlow のガラス調描画レール（ペン、直線、四角形、円、矢印）。P と 1〜4 のショートカットに対応し、手描きと図形をライブプレビューする DrawingSurface、色と太さを調整する DrawingPanel も付属します。ツールは aria-pressed と aria-keyshortcuts を使い、Escape で描画モードを終了、視差効果を減らす設定ではスライドとホバー拡大を無効にします。",
+    "description": "CardFlow の不透明なカード面の描画レール（ペン、直線、四角形、円、矢印）。P と 1〜4 のショートカットに対応し、手描きと図形をライブプレビューする DrawingSurface、色と太さを調整する DrawingPanel も付属します。ツールは aria-pressed と aria-keyshortcuts を使い、Escape で描画モードを終了、視差効果を減らす設定ではスライドとホバー拡大を無効にします。",
     "whenToUse": [
       "キャンバス、ホワイトボード、スクリーンショット注釈ツールに手描きモードを加える",
       "図形ツールで素早く丸で囲んだり指し示したりできるようにする"

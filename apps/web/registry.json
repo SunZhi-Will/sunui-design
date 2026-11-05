@@ -457,7 +457,7 @@
       "name": "canvas-context-menu",
       "type": "registry:block",
       "title": "Canvas Context Menu",
-      "description": "A right-click menu for selected canvas objects with group or ungroup, layout, duplicate and delete, in CardFlow's frosted white glass with emoji icons and shortcut hints. It closes on an outside click or Escape, works as a keyboard menu (arrow keys, Home and End, focus returns on close), and only animates colour, which reduced motion turns off.",
+      "description": "A right-click menu for selected canvas objects with group or ungroup, layout, duplicate and delete, on CardFlow's plain card surface with 1.5px line icons and shortcut hints. It closes on an outside click or Escape, works as a keyboard menu (arrow keys, Home and End, focus returns on close), and only animates colour, which reduced motion turns off.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -756,7 +756,7 @@
       "name": "choice-cards",
       "type": "registry:block",
       "title": "Choice Cards",
-      "description": "World-choice dialogue from voxel-world. Equal-height portrait cards deal in one by one, each with a path colour, an art slot, a name banner, a brief, green gains and red costs. Below them a dialogue box with a name plate shows what the selected card means. Supports roving focus, arrow keys and WASD, digit keys, Enter or Space to pick, Escape or gamepad B to close, and gamepad d-pad and A. Disabled cards stay readable with their reason, and reduced motion turns off the deal-in, glow and float.",
+      "description": "World-choice dialogue from voxel-world. Equal-height portrait cards deal in one by one, each with a path colour, an art slot, a name banner, a brief, green gains and red costs. Below them a dialogue box with a name plate shows what the selected card means. Supports roving focus, arrow keys and WASD, digit keys, Enter or Space to pick, Escape or gamepad B to close, and gamepad d-pad and A. Disabled cards stay readable with their reason, and reduced motion turns off the deal-in.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -842,7 +842,7 @@
       "name": "classic-card",
       "type": "registry:block",
       "title": "Classic Card",
-      "description": "The original SunUI card with five variants (outlined, filled, elevated, glass, gradient), six colour themes, light and dark modes, four sizes, an optional hover glow, and skeleton, shimmer and overlay loading states. Clickable cards act as buttons you can focus and trigger with Enter or Space, loading sets aria-busy and announces itself, and reduced motion turns off the entrance, hover and tap animations.",
+      "description": "The original SunUI card with five variants (outlined, filled, elevated, glass, gradient) on neutral card tokens, six theme names that now only pick the accent colour, light and dark modes, four sizes, an optional stronger hover border, and skeleton, shimmer and overlay loading states. Clickable cards act as buttons you can focus and trigger with Enter or Space, loading sets aria-busy and announces itself, and reduced motion turns off the entrance, hover and tap animations.",
       "dependencies": [
         "framer-motion"
       ],
@@ -861,11 +861,11 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Product, article or feature tiles that need a themed, decorative surface such as glass, gradient or glow",
+            "Product, article or feature tiles that need a neutral card surface with a choice of outline, fill, shadow, light glass or soft gradient",
             "Content blocks that load asynchronously and need a skeleton, shimmer or spinner state in place"
           ],
           "watchOut": [
-            "Glass and gradient variants are semi-transparent: put them over a coloured or busy background or they look washed out",
+            "Glass and gradient variants are subtle: glass is a 90% opaque card with a light blur, gradient fades from card to muted, and the colour themes no longer recolour the surface",
             "Add the group class to the Card if you want the CardImage hover zoom and overlay to fire"
           ],
           "aliases": [
@@ -887,7 +887,7 @@
       "name": "classic-countdown-banner",
       "type": "registry:block",
       "title": "Classic Countdown Banner",
-      "description": "The original SunUI promo countdown: a discount headline, struck-through price, four flipping time boxes, drifting particles and a glowing CTA, in 5 themes, 3 layouts (default, spacious, modern), 3 variants (card, banner, floating), light and dark modes, and zh/en labels. The timer exposes role=\"timer\" with a summary down to the minute, and decorative parts are aria-hidden. With reduced motion, the entrance, digit flips, particles and pulse loops all switch instantly or stay still.",
+      "description": "The original SunUI promo countdown: a discount headline in a single vermilion accent, struck-through price, four neutral time boxes whose digits slide on change and a solid primary CTA, in 3 layouts (default, spacious, modern), 3 variants (card, banner, floating), light and dark modes, and en, zh-TW, zh-CN and ja labels. The legacy theme, particles and CTA glow props are still accepted but no longer drawn. The timer exposes role=\"timer\" with a summary down to the minute, and decorative parts are aria-hidden. With reduced motion, the entrance and digit changes switch instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -932,7 +932,7 @@
       "name": "classic-file-upload",
       "type": "registry:block",
       "title": "Classic File Upload",
-      "description": "SunUI's original animated drop zone: violet, cyan, orange or custom themes, a bobbing upload icon, a drag-over prompt, image thumbnails or compact rows, a shimmering progress overlay, and size and type checks with an error toast. It works as a keyboard-operable button, reports progress through a progressbar with a polite live region, and stops all looping motion when reduced motion is on.",
+      "description": "SunUI's original drop zone, restyled with neutral card tokens and a single accent colour on the progress bar (vermilion by default, or the cyan or custom theme colour): a still upload icon that only shows falling lines while uploading, a drag-over prompt, image thumbnails or compact rows, an opaque progress overlay, and size and type checks with an error toast. It works as a keyboard-operable button, reports progress through a progressbar with a polite live region, and stops all looping motion when reduced motion is on.",
       "dependencies": [
         "framer-motion"
       ],
@@ -976,7 +976,7 @@
       "name": "classic-filter-grid",
       "type": "registry:block",
       "title": "Classic Filter Grid",
-      "description": "SunUI's original skill and icon wall: hexagon, square or circle tiles in light, dark, blue, green or purple themes, with category pills, pagination or infinite scroll, pulsing loading skeletons and a springy hover tilt. Category pills use aria-pressed, pagination is a labelled nav with aria-current, clickable tiles are keyboard buttons, and reduced motion removes the spring entrance, hover tilt and skeleton pulse.",
+      "description": "SunUI's original skill and icon wall: hexagon, square or circle tiles in one neutral style that follows the site's light or dark mode (the five theme names are kept for compatibility), with category pills, pagination or infinite scroll, softly pulsing loading skeletons and a border highlight on hover. Category pills use aria-pressed, pagination is a labelled nav with aria-current, clickable tiles are keyboard buttons, and reduced motion removes the fade-up entrance and skeleton pulse.",
       "dependencies": [
         "framer-motion"
       ],
@@ -998,7 +998,7 @@
             "Icon catalogs or integration lists that need lightweight filtering and paging"
           ],
           "watchOut": [
-            "The blue, green, purple and dark themes use light text and assume a dark page background",
+            "All five theme values render the same neutral style built on shadcn tokens, so the grid follows the page's light or dark mode",
             "Only GridItem children are rendered; anything else passed as a child is ignored"
           ],
           "aliases": [
@@ -1020,7 +1020,7 @@
       "name": "classic-floating-button",
       "type": "registry:block",
       "title": "Classic Floating Button",
-      "description": "The original SunUI floating action button. Its gradient links fan out as petals, stack vertically or spread as a grid from any corner, and it supports controlled or uncontrolled state, a mode without the toggle button, and dragging with position memory. The toggle has an accessible name and aria-expanded, links are labelled, and springs and pops switch instantly under reduced motion.",
+      "description": "The original SunUI floating action button. Its round neutral link buttons fan out as petals, stack vertically or spread as a grid from any corner, and it supports controlled or uncontrolled state, a mode without the toggle button, and dragging with position memory. The toggle has an accessible name and aria-expanded, links are labelled, and springs and pops switch instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1064,7 +1064,7 @@
       "name": "classic-gradient-background",
       "type": "registry:block",
       "title": "Classic Gradient Background",
-      "description": "An animated radial gradient with two glow layers that breathe on offset timings and a fine grid overlay, from the original SunUI package. By default it fills its relative parent; fullScreen pins it behind the whole viewport. It is aria-hidden and ignores the pointer, and reduced motion freezes the glows on their first frame.",
+      "description": "A quiet backdrop from the original SunUI package: a soft top-to-bottom fade of the site's neutral colours, a very faint single-hue wash from the top edge and a fine grid that fades downward. It is still by default; set animated for a slow breathing wash. By default it fills its relative parent; fullScreen pins it behind the whole viewport. It is aria-hidden and ignores the pointer, and reduced motion keeps the wash still even when animated.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1082,11 +1082,11 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Hero sections and landing headers that need a dark, glowing backdrop",
-            "Feature panels or tiles that should feel lit from behind"
+            "Hero sections and landing headers that need a calm, lightly tinted backdrop",
+            "Feature panels or tiles that need a faint tint and grid"
           ],
           "watchOut": [
-            "Colours must be 6-digit hex, because the glow and grid layers add a two-digit alpha suffix",
+            "The wash and grid colours are mixed with transparency at very low strength, so any CSS colour works but the effect stays subtle",
             "The parent needs relative (and isolate or overflow-hidden) or the background escapes it"
           ],
           "aliases": [
@@ -1152,7 +1152,7 @@
       "name": "classic-social-button",
       "type": "registry:block",
       "title": "Classic Social Button",
-      "description": "Round gradient social link buttons with tooltips (always, on hover or hidden; top, right, bottom or left), a main-button mode, and a SocialButtonGroup that fans the links out in petal, vertical or grid layouts. Each link takes its accessible name from the title, tooltips also show on keyboard focus, the main button reports aria-expanded, and reduced motion turns the scale and spring animations into instant changes.",
+      "description": "Round neutral social link buttons with tooltips (always, on hover or hidden; top, right, bottom or left), a main-button mode, and a SocialButtonGroup that fans the links out in petal, vertical or grid layouts. Each link takes its accessible name from the title, tooltips also show on keyboard focus, the main button reports aria-expanded, and reduced motion turns the scale and spring animations into instant changes.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1325,7 +1325,7 @@
       "name": "content-gate",
       "type": "registry:block",
       "title": "Content Gate",
-      "description": "Inline locked-course card with a glow, lock badge, gradient title and a sign-in button that shows a spinner and disables itself after one press, with different copy for signed-out and no-access visitors. Follows light and dark themes, announces the sign-in state politely to screen readers, and the spinner only spins when reduced motion is off.",
+      "description": "Inline locked-course card with a plain bordered surface, an outlined lock badge and a solid sign-in button that shows a spinner and disables itself after one press, with different copy for signed-out and no-access visitors. Follows light and dark themes, announces the sign-in state politely to screen readers, and the spinner only spins when reduced motion is off.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -1585,7 +1585,7 @@
       "name": "drawing-toolbar",
       "type": "registry:block",
       "title": "Drawing Toolbar",
-      "description": "CardFlow's glass drawing rail (pen, line, rectangle, circle, arrow) with the P and 1 to 4 shortcuts, plus a DrawingSurface that draws freehand strokes and shapes with a live preview, and the colour and width DrawingPanel. Tools use aria-pressed and aria-keyshortcuts, Escape leaves drawing mode, and reduced motion removes the slide and hover scale.",
+      "description": "CardFlow's drawing rail on a solid card surface (pen, line, rectangle, circle, arrow) with the P and 1 to 4 shortcuts, plus a DrawingSurface that draws freehand strokes and shapes with a live preview, and the colour and width DrawingPanel. Tools use aria-pressed and aria-keyshortcuts, Escape leaves drawing mode, and reduced motion removes the slide and hover scale.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -1806,7 +1806,7 @@
       "name": "flip-profile-card",
       "type": "registry:block",
       "title": "Flip Profile Card",
-      "description": "A gradient profile card that tilts in 3D toward the mouse and flips on click to a details back, with seven light effect modes and seven colour themes, plus matching theme and light effect pickers. A focusable flip button with aria-pressed, inert on the hidden face, and radiogroup pickers with arrow keys; pointer effects run only on fine pointers, and reduced motion disables tilt and makes the flip instant.",
+      "description": "A profile card that tilts in 3D toward the mouse and flips on click to a details back, with seven light effect modes and eight themes (a neutral paper card that follows the site theme by default, plus seven opt-in gradient palettes), plus matching theme and light effect pickers. A focusable flip button with aria-pressed, inert on the hidden face, and radiogroup pickers with arrow keys; pointer effects run only on fine pointers, and reduced motion disables tilt and makes the flip instant.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1855,7 +1855,7 @@
       "name": "floating-toolbar",
       "type": "registry:block",
       "title": "Floating Toolbar",
-      "description": "CardFlow's vertical glass tool rail with dark tooltips, a selected state and a 300ms slide in and out, set up as the AI actions toolbar: Generate calls an async onAction and shows a spinner while it runs. Tools use aria-pressed and aria-keyshortcuts, Escape goes back when onClose is set, and reduced motion removes the slide and scale transitions.",
+      "description": "CardFlow's vertical tool rail on a solid card surface with dark tooltips, a selected state and a 300ms slide in and out, set up as the AI actions toolbar: Generate calls an async onAction and shows a spinner while it runs. Tools use aria-pressed and aria-keyshortcuts, Escape goes back when onClose is set, and reduced motion removes the slide and scale transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -1898,7 +1898,7 @@
       "name": "gate-modal",
       "type": "registry:block",
       "title": "Gate Modal",
-      "description": "Designed dark access modal (165 degree gradient panel, gradient top line, two blurred glows, gradient title, note box and gradient sign-in button) for locked lessons, with signed-out and no-access copy. It traps focus, closes on Escape and the backdrop, locks scroll and returns focus to the trigger; it uses no motion, so it is safe under reduced motion.",
+      "description": "Designed dark access modal (flat dark panel with a thin border and soft shadow, note box and a single solid accent sign-in button) for locked lessons, with signed-out and no-access copy. It traps focus, closes on Escape and the backdrop, locks scroll and returns focus to the trigger; it uses no motion, so it is safe under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2072,7 +2072,7 @@
       "name": "infinite-avatar-grid",
       "type": "registry:block",
       "title": "Infinite Avatar Grid",
-      "description": "A pannable, zoomable infinite canvas of round avatars that only renders the visible cells. Avatars bubble in with a spring curve, and selecting one opens a gradient profile card. Keyboard accessible (arrow keys pan, plus and minus zoom, Enter opens, Escape closes the dialog); reduced motion skips the bubble and card transitions.",
+      "description": "A pannable, zoomable infinite canvas of round avatars that only renders the visible cells. Avatars fade and scale in with staggered delays (initials on a muted tint when there is no image), and selecting one opens a plain profile card. Keyboard accessible (arrow keys pan, plus and minus zoom, Enter opens, Escape closes the dialog); reduced motion skips the bubble and card transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -3144,7 +3144,7 @@
       "name": "preview-paywall",
       "type": "registry:block",
       "title": "Preview Paywall",
-      "description": "Blurred gradient overlay with a lock, preview-count message and gold gradient call to action, placed over a player when a free preview of slides or episodes runs out. It is a labelled region whose call to action is a real link or button, and it has no animation, so reduced motion needs no change.",
+      "description": "Blurred gradient overlay with a lock, preview-count message and a solid primary call to action (pass ctaFrom for a custom colour), placed over a player when a free preview of slides or episodes runs out. It is a labelled region whose call to action is a real link or button, and it has no animation, so reduced motion needs no change.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -4909,7 +4909,7 @@
       "name": "zoom-controls",
       "type": "registry:block",
       "title": "Zoom Controls",
-      "description": "CardFlow's frosted-glass zoom pill (undo, redo, zoom in, percentage, zoom out, optional Animation toggle), a read-only zoom indicator, and a useCanvasZoom hook for button and wheel zoom. Buttons have labels and focus rings and the percentage is announced politely; only colour transitions are used, so reduced motion needs no change.",
+      "description": "CardFlow's solid card-surface zoom pill (undo, redo, zoom in, percentage, zoom out, optional Animation toggle), a read-only zoom indicator, and a useCanvasZoom hook for button and wheel zoom. Buttons have labels and focus rings and the percentage is announced politely; only colour transitions are used, so reduced motion needs no change.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -4930,7 +4930,7 @@
           ],
           "watchOut": [
             "Set fixed={false} when it sits inside a bounded container",
-            "Glass blur needs something behind it; on a flat background it reads as plain white"
+            "It uses the theme's card surface, so it follows the page's light or dark mode"
           ],
           "aliases": [
             "zoom pill",
@@ -5080,7 +5080,7 @@
       "name": "browser-showcase-3d",
       "type": "registry:block",
       "title": "Browser Showcase 3D",
-      "description": "A browser window tilted in 3D with two decoy windows stacked behind it. It cross-fades through slides (images or ReactNode) with the URL bar updating, and on hover it tilts toward the cursor, shows a gold glow on the border and pauses. It is decorative by default (aria-hidden) or becomes role=img when given a label; under reduced motion it stops auto-advancing and drops its transitions.",
+      "description": "A browser window tilted in 3D with two decoy windows stacked behind it. It cross-fades through slides (images or ReactNode) with the URL bar updating, and on hover it tilts toward the cursor, shows a thin gold highlight on the border that follows the cursor, and pauses. It is decorative by default (aria-hidden) or becomes role=img when given a label; under reduced motion it stops auto-advancing and drops its transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -5165,7 +5165,7 @@
       "name": "cloth-curtain",
       "type": "registry:block",
       "title": "Cloth Curtain",
-      "description": "A real WebGL cloth curtain on a rail: a Verlet mass-spring grid with anime cel shading that sways in the breeze, gathers into folds as it draws aside (single panel or a centre-parting pair), can follow a dragging hand, and has an adjustable see-through amount. The canvas is aria-hidden and pauses when off screen or the tab is hidden. Under prefers-reduced-motion, or without WebGL, it shows a static striped curtain that switches instantly.",
+      "description": "A real WebGL cloth curtain on a rail: a Verlet mass-spring grid with anime cel shading in a deep wine-red by default (pass tones to recolour) that sways in the breeze, gathers into folds as it draws aside (single panel or a centre-parting pair), can follow a dragging hand, and has an adjustable see-through amount. The canvas is aria-hidden and pauses when off screen or the tab is hidden. Under prefers-reduced-motion, or without WebGL, it shows a static striped curtain that switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5303,7 +5303,7 @@
       "name": "ink-fate-dial",
       "type": "registry:block",
       "title": "Ink Fate Dial",
-      "description": "An ink-wash SVG dial. The needle spins several turns and stops on the raw roll, then a glowing arc steps through each modifier to the final score, and a blue ink drop lands in the outcome segment. Esc or clicking the dial skips the roll, an optional aria-label gives it a role of img, and with reduced motion it skips the spin and shows the result with a 200ms fade.",
+      "description": "An ink-wash SVG dial. The needle spins several turns and stops on the raw roll, then an accent-coloured arc steps through each modifier to the final score, and an ink drop in the same accent colour lands in the outcome segment. Esc or clicking the dial skips the roll, an optional aria-label gives it a role of img, and with reduced motion it skips the spin and shows the result with a 200ms fade.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -5475,7 +5475,7 @@
       "name": "portal-threshold",
       "type": "registry:block",
       "title": "Portal Threshold",
-      "description": "A decorative hero visual where three nested rounded squares settle into alignment and open a glowing gold aperture over a perspective grid floor. It is aria-hidden and pointer-events none, all idle motion stops after about 12 seconds, and under prefers-reduced-motion it shows the aligned final frame with no sparks, sweep or pulse.",
+      "description": "A decorative hero visual where three nested rounded squares settle into alignment and open a dark aperture ringed in a thin gold line over a perspective grid floor. It is aria-hidden and pointer-events none, it plays once and then stays still, and under prefers-reduced-motion it shows the aligned final frame.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -5518,7 +5518,7 @@
       "name": "recap-active-month",
       "type": "registry:block",
       "title": "Recap Most Active Month",
-      "description": "A 9:16 recap story slide for the most active month: a frosted glass month card that flips in over a slowly rotating ring of 12 month dots, with a per-month gradient background. The ring is aria-hidden and reduced motion stops the rotation and pulses.",
+      "description": "A 9:16 recap story slide for the most active month: a dark magazine-style layout with the month name and post count in large serif type above a 12-cell month strip that marks the active month in the accent colour. It fades in once with no looping motion, and reduced motion shows it instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5537,11 +5537,11 @@
         "usage": {
           "whenToUse": [
             "A recap story highlighting the busiest month of the year",
-            "A vertical share card showing a monthly count with a seasonal colour"
+            "A vertical share card showing a monthly count in large serif type"
           ],
           "watchOut": [
             "Long month names such as September wrap at text-5xl in frames under about 400px; pass short monthNames if that matters",
-            "monthIndex is 0 to 11 and selects both the name and the background gradient"
+            "monthIndex is 0 to 11 and selects both the name and the highlighted cell in the month strip"
           ],
           "aliases": [
             "most active month",
@@ -5562,7 +5562,7 @@
       "name": "recap-keyword-cloud",
       "type": "registry:block",
       "title": "Recap Keyword Cloud",
-      "description": "A 9:16 recap story slide that springs in the user's top keywords as tilted gradient chips, sized and coloured by frequency, each gently bobbing. Rendered as a list for screen readers; reduced motion removes the spring, bob and hover tilt.",
+      "description": "A 9:16 recap story slide that sets the user's top keywords as serif words sized by frequency in one warm grey scale, with only the most frequent word in the accent colour. Rendered as a list for screen readers; it fades in once, hover adds an accent underline, and reduced motion shows it instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5581,7 +5581,7 @@
         "usage": {
           "whenToUse": [
             "A recap story showing the words someone used most",
-            "A playful vertical card summarising tags or topics by frequency"
+            "A vertical card summarising tags or topics by frequency"
           ],
           "watchOut": [
             "Keep it to about 6 to 10 keywords so the cloud fits the 9:16 frame",
@@ -5606,7 +5606,7 @@
       "name": "recap-percentile-ring",
       "type": "registry:block",
       "title": "Recap Percentile Ring",
-      "description": "A 9:16 year-in-review story slide that shows a creator's top-percentile rank inside a 100-dot ring, with a tier gradient, pulsing glow and a twinkling particle halo. Decorative layers are aria-hidden and reduced motion settles every animation instantly.",
+      "description": "A 9:16 year-in-review story slide that shows a creator's top-percentile rank in large serif numerals inside a 100-dot ring, where the filled dots use the accent colour and a label names the rank level. It fades in once with no glow, particles or looping motion, and reduced motion shows it instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5650,7 +5650,7 @@
       "name": "recap-streak-flame",
       "type": "registry:block",
       "title": "Recap Streak Flame",
-      "description": "A 9:16 recap story slide for the longest posting streak: a glowing number over spinning rings and rising flame particles, with a background and comment that scale with the streak. Particles are aria-hidden and are not rendered under reduced motion.",
+      "description": "A 9:16 recap story slide for the longest posting streak: a large serif number above a four-week grid of 28 day cells, with the streak days filled in the accent colour and a comment that scales with the streak. It fades in once with no flame or particles, and reduced motion shows it instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5672,7 +5672,7 @@
             "A vertical share card for habit or streak milestones"
           ],
           "watchOut": [
-            "Background and comment tiers switch at 3, 7 and 14 days; override labels.comments to match your copy",
+            "Comment tiers switch at 3, 7 and 14 days; override labels.comments to match your copy",
             "The 128px number assumes up to 3 digits in a 340px frame"
           ],
           "aliases": [
@@ -5694,7 +5694,7 @@
       "name": "records-thread-board",
       "type": "registry:block",
       "title": "Records Thread Board",
-      "description": "An endings and achievements board. Case files on the left get a tab and a tilted archived stamp once reached; on the right a glowing soul thread snakes through diamond knots, and only finished links glow. Arrow keys move through the grid as laid out on screen with a single tab stop, a polite live readout bar describes the selection, and entrance animations are turned off under reduced motion.",
+      "description": "An endings and achievements board. Case files on the left get a tab and a tilted archived stamp once reached; on the right a thin thread snakes through diamond knots, and only finished links are drawn in the thread colour. Arrow keys move through the grid as laid out on screen with a single tab stop, a polite live readout bar describes the selection, and entrance animations are turned off under reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -5716,7 +5716,7 @@
           ],
           "watchOut": [
             "Achievements are laid out three per row in snake order (top row left to right, next row right to left), so array order is thread order",
-            "The first thread link glows only when the first ending is seen and the first achievement is done, as in the source"
+            "The first thread link lights up only when the first ending is seen and the first achievement is done, as in the source"
           ],
           "aliases": [
             "achievement board",
@@ -5737,7 +5737,7 @@
       "name": "scroll-tilt-stage",
       "type": "registry:block",
       "title": "Scroll Tilt Stage",
-      "description": "A 3D stage that lays its content tilted back (rotateX 28deg) and stands it upright as it scrolls into view, with a gold reflection glow underneath. The glow is aria-hidden, and with reduced motion the content sits flat with no animation.",
+      "description": "A 3D stage that lays its content tilted back (rotateX 28deg) and stands it upright as it scrolls into view, with a soft black shadow and a thin gold ground line underneath. The shadow and line are aria-hidden, and with reduced motion the content sits flat with no animation.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -5759,7 +5759,7 @@
           ],
           "watchOut": [
             "Inside a custom scroll area, pass scrollContainer or progress follows the window",
-            "The wrapper uses overflow-x clip; leave vertical room for the glow below"
+            "The wrapper uses overflow-x clip; leave vertical room for the shadow below"
           ],
           "aliases": [
             "scroll 3d reveal",
@@ -5825,7 +5825,7 @@
       "name": "stacked-preview-carousel",
       "type": "registry:block",
       "title": "Stacked Preview Carousel",
-      "description": "A 3D stack of preview cards: each deeper card moves back in translateZ, rotates further in Y and fades, and the top card cycles to the back every few seconds. With a mouse, the top card tilts toward the cursor, lifts, and shows a soft glare and a conic border glow. Only the top card is focusable and announced; reduced motion turns off autoplay, tilt and transitions.",
+      "description": "A 3D stack of preview cards: each deeper card moves back in translateZ, rotates further in Y and fades, and the top card cycles to the back every few seconds. With a mouse, the top card tilts toward the cursor, lifts, and shows a soft sheen and a thin accent border line that points at the cursor. Only the top card is focusable and announced; reduced motion turns off autoplay, tilt and transitions.",
       "dependencies": [],
       "registryDependencies": [
         "utils"

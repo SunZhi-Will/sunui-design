@@ -1,37 +1,37 @@
 {
   "zh-TW": {
     "title": "經典卡片",
-    "description": "SunUI 最初的卡片：五種樣式（outlined、filled、elevated、glass、gradient）、六種色彩主題、亮色與暗色模式、四種尺寸、可選的滑過光暈，以及 skeleton、shimmer、overlay 三種載入狀態。可點擊的卡片就像按鈕，能聚焦並以 Enter 或空白鍵觸發；載入時設定 aria-busy 並主動播報；減少動態時關閉進場、滑過與點擊動畫。",
+    "description": "SunUI 最初的卡片：五種樣式（outlined、filled、elevated、glass、gradient，皆為中性卡片底色）、六個主題名稱（現在只決定強調色）、亮色與暗色模式、四種尺寸、可選的加強滑過邊框，以及 skeleton、shimmer、overlay 三種載入狀態。可點擊的卡片就像按鈕，能聚焦並以 Enter 或空白鍵觸發；載入時設定 aria-busy 並主動播報；減少動態時關閉進場、滑過與點擊動畫。",
     "whenToUse": [
-      "需要玻璃、漸層或光暈等主題裝飾表面的商品、文章或功能磚",
+      "需要中性卡片表面，並可選外框、填色、陰影、淡玻璃或柔和漸層的商品、文章或功能磚",
       "非同步載入、需要就地顯示骨架、閃光或轉圈狀態的內容區塊"
     ],
     "watchOut": [
-      "glass 與 gradient 樣式是半透明的，請放在有色或豐富的背景上，否則看起來會發白",
+      "glass 與 gradient 樣式很低調：glass 是 90% 不透明的卡片加輕微模糊，gradient 從卡片色淡變到 muted，色彩主題不再改變表面顏色",
       "想讓 CardImage 的滑過放大與遮罩生效，請在 Card 加上 group class"
     ]
   },
   "zh-CN": {
     "title": "经典卡片",
-    "description": "SunUI 最初的卡片：五种样式（outlined、filled、elevated、glass、gradient）、六种配色主题、亮色与暗色模式、四种尺寸、可选的悬停光晕，以及 skeleton、shimmer、overlay 三种加载状态。可点击的卡片就像按钮，可聚焦并用 Enter 或空格键触发；加载时设置 aria-busy 并主动播报；减少动态效果时关闭入场、悬停与点击动画。",
+    "description": "SunUI 最初的卡片：五种样式（outlined、filled、elevated、glass、gradient，均为中性卡片底色）、六个主题名称（现在只决定强调色）、亮色与暗色模式、四种尺寸、可选的加强悬停边框，以及 skeleton、shimmer、overlay 三种加载状态。可点击的卡片就像按钮，可聚焦并用 Enter 或空格键触发；加载时设置 aria-busy 并主动播报；减少动态效果时关闭入场、悬停与点击动画。",
     "whenToUse": [
-      "需要玻璃、渐变或光晕等主题装饰表面的商品、文章或功能卡片",
+      "需要中性卡片表面，并可选外框、填色、阴影、淡玻璃或柔和渐变的商品、文章或功能卡片",
       "异步加载、需要就地显示骨架屏、闪光或加载圈的内容区块"
     ],
     "watchOut": [
-      "glass 和 gradient 样式是半透明的，请放在有色或丰富的背景上，否则会显得发白",
+      "glass 和 gradient 样式很低调：glass 是 90% 不透明的卡片加轻微模糊，gradient 从卡片色淡变到 muted，配色主题不再改变表面颜色",
       "想让 CardImage 的悬停放大和遮罩生效，请给 Card 加上 group class"
     ]
   },
   "ja": {
     "title": "クラシックカード",
-    "description": "SunUI の原点となるカード。5 つのバリアント（outlined、filled、elevated、glass、gradient）、6 つのカラーテーマ、ライトとダーク、4 サイズ、ホバー時のグロー、そして skeleton、shimmer、overlay の 3 種類の読み込み状態を備えます。クリック可能なカードはボタンとしてフォーカスでき、Enter や Space で操作できます。読み込み中は aria-busy を設定して読み上げ、視差効果を減らす設定では登場、ホバー、タップのアニメーションを止めます。",
+    "description": "SunUI の原点となるカード。5 つのバリアント（outlined、filled、elevated、glass、gradient。いずれもニュートラルなカード面）、6 つのテーマ名（現在はアクセント色だけを決定）、ライトとダーク、4 サイズ、ホバー時に強まる枠線、そして skeleton、shimmer、overlay の 3 種類の読み込み状態を備えます。クリック可能なカードはボタンとしてフォーカスでき、Enter や Space で操作できます。読み込み中は aria-busy を設定して読み上げ、視差効果を減らす設定では登場、ホバー、タップのアニメーションを止めます。",
     "whenToUse": [
-      "ガラス、グラデーション、グローなどテーマ性のある面が欲しい商品、記事、機能のタイル",
+      "枠線、塗り、影、淡いガラス、やわらかなグラデーションから選べるニュートラルなカード面が欲しい商品、記事、機能のタイル",
       "非同期で読み込み、その場でスケルトンやシマー、スピナーを見せたいコンテンツ"
     ],
     "watchOut": [
-      "glass と gradient は半透明なので、色や柄のある背景に置かないと白っぽく見えます",
+      "glass と gradient は控えめです。glass は不透明度 90% のカードに軽いぼかし、gradient はカード色から muted へのなだらかな変化で、カラーテーマは面の色を変えません",
       "CardImage のホバーズームとオーバーレイを効かせるには Card に group クラスを付ける"
     ]
   }
