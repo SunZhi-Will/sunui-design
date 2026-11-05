@@ -275,6 +275,55 @@
       ]
     },
     {
+      "name": "app-shell",
+      "type": "registry:block",
+      "title": "App Shell",
+      "description": "The app frame: a grouped left sidebar on desktop that collapses to an icon rail (Cmd/Ctrl + B), with second-level sections that expand in place or fly out to the right when collapsed. Below 768px it becomes a top bar whose title fades in once you scroll past the page's large heading (with Back on detail pages), a bottom tab bar for pages that set tabLabel, and a More sheet holding every page, the workspace switcher and the account row. Switches on its own width by default, so it works inside any container. Links use aria-current, sections use aria-expanded, menus support arrow keys and Esc, the sheet traps focus and can be dragged down to close, and reduced motion turns animations into instant changes.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "layout",
+        "menu"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The outer frame of a dashboard or tool: sidebar on desktop, tab bar on phones, from one nav config",
+            "Apps whose pages fall into groups and where a few pages deserve a thumb-reach tab on mobile"
+          ],
+          "watchOut": [
+            "breakpoint=\"container\" (default) needs the shell to have a height, such as h-dvh, and scrolls content inside it; use breakpoint=\"viewport\" for page-level scrolling with a fixed tab bar",
+            "Keep tabLabel on four pages or fewer; everything else lands in More",
+            "Container queries need Tailwind v4 (or the container-queries plugin on v3)",
+            "Pass renderLink and call preventDefault in onNavigate to use your framework's router"
+          ],
+          "aliases": [
+            "sidebar",
+            "bottom navigation",
+            "tab bar",
+            "app layout",
+            "dashboard shell",
+            "responsive nav"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/app-shell/app-shell.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "assignment-sheet",
       "type": "registry:block",
       "title": "Assignment Sheet",
