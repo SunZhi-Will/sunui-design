@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { ScaledPreview } from "@/components/scaled-preview";
-import { TierBadge } from "@/components/tier-badge";
+import { LivePreview } from "@/components/live-preview";
 import { interactionLabels } from "@/lib/interactions";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
 import { seriesDescriptions, seriesLabels, seriesOf } from "@/lib/series";
@@ -187,32 +186,36 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
         )}
       </div>
 
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((item) => (
-          <li
-            key={item.name}
-            className="group relative overflow-hidden rounded-2xl border border-line bg-card transition-colors focus-within:border-accent hover:border-accent/60"
-          >
-            {/* 預覽不包在連結裡：block 自己也可能有連結，巢狀 <a> 不合法 */}
-            <ScaledPreview name={item.name} />
-            <div className="flex items-start justify-between gap-3 border-t border-line p-4">
-              <div className="min-w-0">
-                <h3 className="font-medium tracking-tight">
-                  <Link href={`/blocks/${item.name}`} className="outline-none after:absolute after:inset-0">
-                    {item.title}
-                  </Link>
-                </h3>
-                <p className="mt-1 line-clamp-2 text-sm text-subtle">{item.description}</p>
-              </div>
-              <div className="flex shrink-0 flex-col items-end gap-1.5">
-                <TierBadge tier={item.meta.tier} />
-                {seriesOf(item) !== "paper" && (
-                  <span className="text-[11px] font-medium tracking-wide text-subtle uppercase">
-                    {seriesLabels[seriesOf(item)]}
-                  </span>
-                )}
-              </div>
+          <li key={item.name} className="group">
+            {/* 卡片裡只有元件本身，原尺寸、可以直接操作；名稱放在卡片外，描述留給詳細頁 */}
+            <div className="relative aspect-[5/4] overflow-hidden rounded-[20px] bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line">
+              <LivePreview name={item.name} title={item.title} />
+              {item.meta.tier === "pro" && (
+                <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
+                  Pro
+                </span>
+              )}
+              <Link
+                href={`/blocks/${item.name}`}
+                aria-hidden="true"
+                tabIndex={-1}
+                className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-fg text-bg opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path d="M7 17 17 7M9 7h8v8" />
+                </svg>
+              </Link>
             </div>
+            <h3 className="mt-3 px-1 text-sm font-medium tracking-tight">
+              <Link
+                href={`/blocks/${item.name}`}
+                className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {item.title}
+              </Link>
+            </h3>
           </li>
         ))}
       </ul>

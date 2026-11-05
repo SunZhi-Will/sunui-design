@@ -7,6 +7,7 @@ import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const tiers = ["free", "pro"];
 const entries = [];
+const cardEntries = [];
 
 for (const tier of tiers) {
   const dir = path.join(root, "registry", tier);
@@ -14,6 +15,10 @@ for (const tier of tiers) {
   for (const name of readdirSync(dir).sort()) {
     if (existsSync(path.join(dir, name, "demo.tsx"))) {
       entries.push(`  "${name}": dynamic(() => import("../${tier}/${name}/demo"), { ssr: false }),`);
+    }
+    // card.tsx：型錄卡片專用的精簡 demo，只放核心互動；沒有就沿用 demo.tsx
+    if (existsSync(path.join(dir, name, "card.tsx"))) {
+      cardEntries.push(`  "${name}": dynamic(() => import("../${tier}/${name}/card"), { ssr: false }),`);
     }
   }
 }
@@ -27,8 +32,12 @@ import type { ComponentType } from "react";
 export const previews: Record<string, ComponentType> = {
 ${entries.join("\n")}
 };
+
+export const cardPreviews: Record<string, ComponentType> = {
+${cardEntries.join("\n")}
+};
 `;
 
 mkdirSync(path.join(root, "registry", "__generated__"), { recursive: true });
 writeFileSync(path.join(root, "registry", "__generated__", "previews.tsx"), out);
-console.log(`[previews] ${entries.length} demo(s)`);
+console.log(`[previews] ${entries.length} demo(s), ${cardEntries.length} card(s)`);
