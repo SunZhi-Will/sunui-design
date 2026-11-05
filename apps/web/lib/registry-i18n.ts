@@ -14,13 +14,14 @@ export type ItemTranslation = {
 
 type TranslationFile = Partial<Record<Exclude<Locale, "en">, ItemTranslation>>;
 
-const dir = path.join(process.cwd(), "content", "registry-i18n");
+// 免費 block 的翻譯在公開 repo；Pro 的放在私有的 registry/pro/i18n
+const dirs = [path.join(process.cwd(), "content", "registry-i18n"), path.join(process.cwd(), "registry", "pro", "i18n")];
 const cache = new Map<string, TranslationFile | null>();
 
 function load(name: string): TranslationFile | null {
   if (!cache.has(name)) {
-    const file = path.join(dir, `${name}.json`);
-    cache.set(name, existsSync(file) ? (JSON.parse(readFileSync(file, "utf8")) as TranslationFile) : null);
+    const file = dirs.map((dir) => path.join(dir, `${name}.json`)).find((f) => existsSync(f));
+    cache.set(name, file ? (JSON.parse(readFileSync(file, "utf8")) as TranslationFile) : null);
   }
   return cache.get(name) ?? null;
 }
