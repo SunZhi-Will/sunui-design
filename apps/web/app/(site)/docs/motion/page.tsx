@@ -58,6 +58,9 @@ export default async function MotionPage() {
           </li>
         ))}
       </ul>
+      <p>
+        <RichText text={t.seriesNote} />
+      </p>
 
       <MotionDictionary groups={groups} copy={t} />
 

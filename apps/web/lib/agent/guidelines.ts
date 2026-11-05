@@ -11,6 +11,7 @@ export const seriesSummary: Record<Series, string> = {
   product: "Quiet tool UI: neutral shadcn tokens, one accent color, status shown only as small dots, the reason written on screen.",
   story: "Ink and lamp: near-black panels, warm white serif text, one gold accent, all colors through --story-* CSS variables.",
   showcase: "Landing-page signature visuals in a quiet editorial dark, ported from real launch pages.",
+  motion: "Motion effect libraries: one block per family (text, entrances, buttons, cards, backgrounds, scroll, cursor, loaders), each switching between many effects with an `effect` or `preset` prop.",
 };
 
 const shared = `## Rules for every block
@@ -87,10 +88,19 @@ ${seriesSummary.showcase}
 - Use on landing pages for one signature moment, not repeated down the page.
 - Follow the product rules for motion: play only while visible, pause on hidden tabs, keep reduced motion complete.`;
 
-const bySeries: Record<Series, string> = { paper, product, story, showcase };
+const motion = `## Series: motion
+
+${seriesSummary.motion}
+
+- The paper rules do not apply: gradients, glows, entrance animations and loops are allowed here. Colors still come from theme tokens, \`currentColor\` or a \`colors\` prop, never hard-coded purple or pink.
+- Pick the effect with the \`effect\` (or \`preset\`) prop and the timing with \`trigger\`: mount, inView, hover, click or loop.
+- Reduced motion shows the final state, stops loops and keeps every word readable. Loops pause off screen and on hidden tabs.
+- Do not put motion blocks inside paper or product blocks; use them on landing pages, heroes and marketing sections.`;
+
+const bySeries: Record<Series, string> = { paper, product, story, showcase, motion };
 
 /** 單一系列或全部系列的設計規則（Markdown）。 */
 export function designRules(series?: Series) {
-  const sections = series ? [bySeries[series]] : [paper, product, story, showcase];
+  const sections = series ? [bySeries[series]] : [paper, product, story, showcase, motion];
   return [`# SunUI design rules`, shared, motionRequests(), ...sections].join("\n\n");
 }

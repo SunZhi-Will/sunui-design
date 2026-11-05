@@ -13,7 +13,7 @@ import { siteUrl } from "@/lib/site";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const series = z.enum(["paper", "product", "story", "showcase"]);
+const series = z.enum(["paper", "product", "story", "showcase", "motion"]);
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }] });

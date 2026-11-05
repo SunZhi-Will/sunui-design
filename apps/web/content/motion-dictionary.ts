@@ -809,6 +809,7 @@ export type MotionPageCopy = {
   libUsage: string;
   sourcesTitle: string;
   sourcesBody: string;
+  seriesNote: string;
 };
 
 export const motionPageCopy: Record<Locale, MotionPageCopy> = {
@@ -842,6 +843,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "Installs to `lib/sunui-motion.ts`. Import `springs`, `press`, `stamp`, `useShake`, `panel`, `listItem` or `roll`.",
     sourcesTitle: "Further reading",
     sourcesBody: "Two public collections are good for learning motion names and seeing them play. Most of their effects fall under Avoided here; use them as a vocabulary, not a shopping list.",
+    seriesNote: "These verdicts apply to the paper and product blocks. For landing pages and marketing sections that want the full range (gradients, entrances, loops, cursor and background effects), use the [Motion series](/?series=motion#blocks).",
   },
   "zh-TW": {
     title: "動效辭典",
@@ -873,6 +875,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "安裝到 `lib/sunui-motion.ts`。可匯入 `springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll`。",
     sourcesTitle: "延伸閱讀",
     sourcesBody: "這兩個公開收藏適合用來認識動效名稱、看實際效果。它們大部分的效果在這裡屬於「不用」；請當成詞彙表，不是採購清單。",
+    seriesNote: "這些立場適用於紙感與產品介面系列的 block。形象頁與行銷區塊若需要完整的動效（漸層、進場、循環、游標與背景特效），請用[動效系列](/?series=motion#blocks)。",
   },
   "zh-CN": {
     title: "动效辞典",
@@ -904,6 +907,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "安装到 `lib/sunui-motion.ts`。可导入 `springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll`。",
     sourcesTitle: "延伸阅读",
     sourcesBody: "这两个公开收藏适合用来认识动效名称、看实际效果。它们大部分的效果在这里属于“不用”；请当成词汇表，不是采购清单。",
+    seriesNote: "这些立场适用于纸感与产品界面系列的 block。落地页与营销区块若需要完整的动效（渐变、进场、循环、光标与背景特效），请用[动效系列](/?series=motion#blocks)。",
   },
   ja: {
     title: "モーション辞典",
@@ -935,6 +939,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "`lib/sunui-motion.ts` に入ります。`springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll` を import できます。",
     sourcesTitle: "参考資料",
     sourcesBody: "次の 2 つの公開コレクションは、モーションの名前を覚えたり動きを見たりするのに便利です。効果の多くはここでは「使わない」に当たります。買い物リストではなく語彙集として使ってください。",
+    seriesNote: "この判定は紙とプロダクト UI シリーズのブロックに適用されます。LP やマーケティング用のセクションで、グラデーション、登場、ループ、カーソルや背景の演出まで使いたい場合は[モーションシリーズ](/?series=motion#blocks)を使ってください。",
   },
 };
 

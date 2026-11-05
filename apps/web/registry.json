@@ -2474,6 +2474,145 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "store-header",
+      "type": "registry:block",
+      "title": "Store Header",
+      "description": "A sticky store header that tucks away when you scroll down past a threshold and slides back the moment you scroll up, shrinking from 64 to 52 px with a paper hairline once it leaves the top. The cart button takes a cartRef so add-to-cart-button can fly into it, an announcement slot rides along, and a mobile menu collapses by height. It never hides while keyboard focus is inside or the menu is open, and under reduced motion it only shrinks.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "section",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The top bar of a store with brand, a few category links and a cart count",
+            "Long product listing pages where the header should get out of the way while browsing"
+          ],
+          "watchOut": [
+            "Pass scrollContainer when the page scrolls inside a div instead of the window, or the header will not react",
+            "Keep links to four or five; the rest belong in the mobile menu or a mega menu"
+          ],
+          "aliases": [
+            "headroom",
+            "hide on scroll header",
+            "sticky header shrink",
+            "navbar",
+            "site header",
+            "shop header",
+            "cart icon header"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/store-header/store-header.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "product-media",
+      "type": "registry:block",
+      "title": "Product Media",
+      "description": "The image slot for a product card or page: on desktop hovering swaps to the second angle and a click zooms in and pans with the pointer; on touch it swipes left and right instead. Dots and a 1/3 counter sit below, arrow keys change images, Escape leaves zoom, and renderImage accepts next/image. Under reduced motion images switch instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product cards that should show a second angle on hover",
+            "Product pages where shoppers need to inspect texture or detail without opening a lightbox"
+          ],
+          "watchOut": [
+            "Provide images of the same aspect ratio; they are cropped with object-cover",
+            "Zoom uses the displayed image, so pass a large enough source for zoomScale"
+          ],
+          "aliases": [
+            "image swap on hover",
+            "hover zoom",
+            "zoom and pan",
+            "magnifier",
+            "product image carousel",
+            "swipe gallery",
+            "second image hover"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/product-media/product-media.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cookie-consent",
+      "type": "registry:block",
+      "title": "Cookie Consent",
+      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice presses a small SAVED stamp before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "form",
+        "notification",
+        "compliance"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Stores in regions that require opt-in consent for analytics or marketing cookies",
+            "Any site that needs a reject option as easy as accept"
+          ],
+          "watchOut": [
+            "The component only reports the choice; load analytics or ad scripts yourself after onChange",
+            "Change storageKey when your categories change so returning visitors are asked again"
+          ],
+          "aliases": [
+            "cookie banner",
+            "gdpr banner",
+            "consent banner",
+            "cookie notice",
+            "privacy preferences",
+            "cookie settings"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cookie-consent/cookie-consent.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

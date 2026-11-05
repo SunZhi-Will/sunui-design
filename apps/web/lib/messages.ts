@@ -46,12 +46,14 @@ const en = {
       product: "Product UI",
       story: "Story",
       showcase: "Showcase",
+      motion: "Motion",
     } as Record<Series, string>,
     descriptions: {
       paper: "Paper, ink and vermilion stamps for storefronts and campaigns.",
       product: "Quiet tool UI: neutral surfaces, one accent, status on dots.",
       story: "Signature pieces in ink and lantern light: a readable 3D book and a WebGL cloth curtain for launch reveals.",
       showcase: "Landing-page signature visuals in a quiet editorial dark: tilts, carousels, marquees and recap slides.",
+      motion: "Motion effect libraries: text, entrances, buttons, cards, backgrounds, scroll, cursor, loaders and more, each with many variants.",
     } as Record<Series, string>,
   },
   home: {
@@ -434,12 +436,14 @@ const zhTW: Messages = {
       product: "產品介面",
       story: "故事",
       showcase: "展示",
+      motion: "動效",
     },
     descriptions: {
       paper: "紙張、墨色與朱紅印章，為商店與檔期活動而做。",
       product: "安靜的工具介面：中性底色、單一強調色，用圓點表示狀態。",
       story: "墨色與燈籠風格的招牌作品：可以翻閱的 3D 書、用於新品揭幕的 WebGL 布簾。",
       showcase: "形象頁的招牌視覺：3D 傾斜、輪播、跑馬燈與回顧投影片。",
+      motion: "動效庫：文字、進出場、按鈕、卡片、背景、捲動、游標、載入等，每個都有多種變化。",
     },
   },
   home: {
@@ -800,12 +804,14 @@ const zhCN: Messages = {
       product: "产品界面",
       story: "故事",
       showcase: "展示",
+      motion: "动效",
     },
     descriptions: {
       paper: "纸张、墨色与朱红印章，为店铺与大促活动而做。",
       product: "安静的工具界面：中性底色、单一强调色，用圆点表示状态。",
       story: "墨色与灯笼风格的招牌作品：可以翻阅的 3D 书、用于新品揭幕的 WebGL 布帘。",
       showcase: "落地页的招牌视觉：3D 倾斜、轮播、跑马灯与回顾幻灯片。",
+      motion: "动效库：文字、进出场、按钮、卡片、背景、滚动、光标、加载等，每个都有多种变化。",
     },
   },
   home: {
@@ -1159,12 +1165,14 @@ const ja: Messages = {
       product: "プロダクト UI",
       story: "ストーリー",
       showcase: "ショーケース",
+      motion: "モーション",
     },
     descriptions: {
       paper: "紙とインクと朱色のスタンプ。ストアやキャンペーンのために。",
       product: "静かなツール UI。ニュートラルな面、アクセントは一色、状態はドットで。",
       story: "墨と灯籠の看板作品。めくれる 3D の本と、新商品のお披露目に使える WebGL のカーテン。",
       showcase: "LP の見せ場になるビジュアル。3D チルト、カルーセル、マーキー、振り返りスライド。",
+      motion: "モーション集：テキスト、登場、ボタン、カード、背景、スクロール、カーソル、ローディングなど、それぞれ多数のバリエーション。",
     },
   },
   home: {

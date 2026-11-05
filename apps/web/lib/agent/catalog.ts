@@ -210,7 +210,7 @@ export function catalogMarkdown() {
     const series = seriesOf(item);
     groups.set(series, [...(groups.get(series) ?? []), item]);
   }
-  const order: Series[] = ["paper", "product", "story", "showcase"];
+  const order: Series[] = ["paper", "product", "story", "showcase", "motion"];
   return [
     "# SunUI block catalog",
     `Generated from the live registry. ${getItems().length} blocks. Tier is free (MIT) or pro (license).`,
