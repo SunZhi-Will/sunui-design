@@ -15,7 +15,7 @@ import {
   type ExitPreset,
 } from "./animate-presets";
 
-const copy = {
+export const copy = {
   en: {
     entrance: "Entrance",
     entranceHint: "Plays once when the tile mounts. Press Replay to see it again.",
@@ -58,7 +58,7 @@ const copy = {
   },
 };
 
-function Subject({ label }: { label: string }) {
+export function Subject({ label }: { label: string }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm">
       <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden="true">

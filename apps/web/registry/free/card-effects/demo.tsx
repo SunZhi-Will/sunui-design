@@ -33,7 +33,7 @@ export function demoArt(i: number) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-const copy = {
+export const copy = {
   en: {
     hover: "Hover",
     click: "Click",

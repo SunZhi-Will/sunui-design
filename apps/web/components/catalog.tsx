@@ -15,6 +15,8 @@ const interactionKeys: Interaction[] = ["press", "hover", "drag", "type", "loadi
 /** title、description 已換成目前語言；search 保留英文標題與描述，讓英文關鍵字也搜得到。 */
 export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | "meta" | "categories"> & {
   search: string;
+  /** 效果庫拆開後的單一樣式；一般 block 沒有 */
+  variant?: string;
 };
 
 export type CatalogMessages = Pick<Messages, "catalog" | "interactions" | "series" | "tier">;
@@ -198,8 +200,9 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((item) => (
           <BlockCard
-            key={item.name}
+            key={item.variant ? `${item.name}~${item.variant}` : item.name}
             name={item.name}
+            variant={item.variant}
             title={item.title}
             tier={item.meta.tier}
             locale={locale}

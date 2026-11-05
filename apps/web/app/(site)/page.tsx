@@ -7,6 +7,7 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { getItems, installCommand } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
+import { variantIds } from "@/registry/__generated__/variants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
@@ -18,10 +19,14 @@ export default async function HomePage() {
   const all = getItems();
   const items = [...all]
     .sort((a, b) => b.meta.addedAt.localeCompare(a.meta.addedAt) || a.title.localeCompare(b.title))
-    .map((item) => {
+    .flatMap((item) => {
       const { name, title, description, meta, categories } = localizeItem(item, locale);
       // 保留英文標題與描述給搜尋用
-      return { name, title, description, meta, categories, search: `${item.title} ${item.description}` };
+      const base = { name, title, description, meta, categories, search: `${item.title} ${item.description}` };
+      // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚
+      const variants = variantIds[name];
+      if (!variants) return [base];
+      return variants.map((variant) => ({ ...base, variant, title: `${title} · ${variant}`, search: `${base.search} ${variant}` }));
     });
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;

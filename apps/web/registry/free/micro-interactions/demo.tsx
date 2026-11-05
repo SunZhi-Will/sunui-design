@@ -21,7 +21,7 @@ import {
   type MicroInteractionId,
 } from "./micro-interactions";
 
-const copy = {
+export const copy = {
   en: {
     replay: "Replay",
     like: "Like",

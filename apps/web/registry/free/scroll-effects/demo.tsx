@@ -19,7 +19,7 @@ import {
 
 const STAGE = "520px";
 
-const copy = {
+export const copy = {
   en: {
     hint: "Scroll inside the frame",
     names: {
@@ -149,7 +149,7 @@ function Labeled({ name, children }: { name: string; children: ReactNode }) {
 }
 
 /** 純 CSS / SVG 的佔位畫面 */
-function Art({ variant = 0 }: { variant?: number }) {
+export function Art({ variant = 0 }: { variant?: number }) {
   const a = variant % 2 === 0 ? 80 : 30;
   const b = variant % 2 === 0 ? 25 : 70;
   const id = useId();

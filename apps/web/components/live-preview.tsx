@@ -12,11 +12,13 @@ import { cn } from "@/lib/utils";
  */
 export function LivePreview({
   name,
+  variant,
   title,
   locale,
   onExpand,
 }: {
   name: string;
+  variant?: string;
   title: string;
   locale: Locale;
   onExpand?: () => void;
@@ -60,7 +62,7 @@ export function LivePreview({
         <iframe
           key={locale}
           ref={iframeRef}
-          src={`/preview/${name}/card`}
+          src={variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`}
           title={title}
           onLoad={() => setLoadedLocale(locale)}
           className={cn("size-full border-0 transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}

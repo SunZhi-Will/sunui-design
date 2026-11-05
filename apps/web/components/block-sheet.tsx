@@ -9,6 +9,8 @@ import { CopyButton } from "@/components/copy-button";
 
 export type BlockSheetItem = {
   name: string;
+  /** 從效果庫的單一樣式卡片展開時帶著它，面板只跑這一種 */
+  variant?: string;
   title: string;
   description: string;
   tier: "free" | "pro";
@@ -75,7 +77,7 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
             aria-modal="true"
             aria-labelledby="block-sheet-title"
             tabIndex={-1}
-            layoutId={reduce ? undefined : `block-card-${item.name}`}
+            layoutId={reduce ? undefined : `block-card-${item.variant ? `${item.name}~${item.variant}` : item.name}`}
             transition={spring}
             style={{ borderRadius: 24 }}
             className="relative flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden bg-card shadow-2xl ring-1 ring-line outline-none"
@@ -108,7 +110,11 @@ export function BlockSheet({ item }: { item: BlockSheetItem }) {
             <div className="relative min-h-0 flex-1">
               <iframe
                 key={run}
-                src={`/preview/${item.name}/sheet`}
+                src={
+                  item.variant
+                    ? `/preview/${item.name}/v/${encodeURIComponent(item.variant)}?mode=sheet`
+                    : `/preview/${item.name}/sheet`
+                }
                 title={`${item.title} preview`}
                 onLoad={() => setLoaded(true)}
                 className="size-full border-0 transition-opacity duration-300"

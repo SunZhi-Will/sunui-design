@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { LivePreview } from "@/components/live-preview";
 import { format, type Locale } from "@/lib/i18n";
@@ -16,12 +16,15 @@ export type BlockCardLabels = { livePreview: string; expand: string; pro: string
  */
 export function BlockCard({
   name,
+  variant,
   title,
   tier,
   locale,
   labels,
 }: {
   name: string;
+  /** 效果庫拆開後的單一樣式：卡片只跑這一種，展開時面板也帶著它 */
+  variant?: string;
   title: string;
   tier: Tier;
   locale: Locale;
@@ -29,20 +32,23 @@ export function BlockCard({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const href = `/blocks/${name}`;
+  const searchParams = useSearchParams();
+  const path = `/blocks/${name}`;
+  const href = variant ? `${path}?style=${encodeURIComponent(variant)}` : path;
   // 展開中的卡片先藏起來，面板會從它的位置長出來、關閉時再縮回去
-  const expanded = pathname === href;
+  const expanded = pathname === path && (searchParams.get("style") ?? undefined) === variant;
 
   return (
     <li className="group">
       <motion.div
-        layoutId={`block-card-${name}`}
+        layoutId={`block-card-${variant ? `${name}~${variant}` : name}`}
         transition={{ type: "spring", stiffness: 240, damping: 30 }}
         style={{ borderRadius: 20, opacity: expanded ? 0 : 1 }}
         className="relative aspect-[5/4] overflow-hidden bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line"
       >
         <LivePreview
           name={name}
+          variant={variant}
           title={format(labels.livePreview, { title })}
           locale={locale}
           onExpand={() => router.push(href, { scroll: false })}

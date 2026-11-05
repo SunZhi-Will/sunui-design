@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, type LoadingEffectId } from "./loading-effects";
 
-const copy = {
+export const copy = {
   en: {
     loading: "Loading",
     replay: "Replay",
@@ -101,7 +101,7 @@ const copy = {
   },
 };
 
-const VALUES = [12, 38, 64, 87, 100];
+export const VALUES = [12, 38, 64, 87, 100];
 
 function Tile({ name, action, children }: { name: string; action?: ReactNode; children: ReactNode }) {
   return (
@@ -115,7 +115,7 @@ function Tile({ name, action, children }: { name: string; action?: ReactNode; ch
   );
 }
 
-const smallBtn =
+export const smallBtn =
   "rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
 export default function LoadingEffectsDemo() {

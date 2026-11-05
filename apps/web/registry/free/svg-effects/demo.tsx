@@ -26,7 +26,7 @@ type Copy = {
   icons: { menu: [string, string]; play: [string, string]; plus: [string, string] };
 };
 
-const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
+export const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
   en: {
     replay: "Replay",
     tap: "Tap the icons",

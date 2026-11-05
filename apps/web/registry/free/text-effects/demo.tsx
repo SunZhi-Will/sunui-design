@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { isLoopingTextEffect, TextEffect, textEffects, type TextEffectName } from "./text-effects";
 
-const copy = {
+export const copy = {
   en: {
     replay: "Replay",
     headline: "Make it move",
@@ -60,7 +60,7 @@ const copy = {
 
 type Copy = (typeof copy)["en"];
 
-function sampleFor(effect: TextEffectName, t: Copy) {
+export function sampleFor(effect: TextEffectName, t: Copy) {
   switch (effect) {
     case "mask-reveal":
       return t.lines;

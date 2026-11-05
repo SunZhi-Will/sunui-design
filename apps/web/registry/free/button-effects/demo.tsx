@@ -6,7 +6,7 @@ import { buttonEffects, EffectButton, type ButtonEffect } from "./button-effects
 
 type Hint = "hover" | "press" | "near" | "loop";
 
-const hints: Record<ButtonEffect, Hint> = {
+export const hints: Record<ButtonEffect, Hint> = {
   "rolling-text": "hover",
   "direction-fill": "hover",
   "shine-sweep": "loop",
@@ -25,7 +25,7 @@ const hints: Record<ButtonEffect, Hint> = {
   "send-feedback": "press",
 };
 
-const copy = {
+export const copy = {
   en: {
     title: "Button effects",
     intro: "16 hover and press effects on a real button. Switch them with the effect prop.",

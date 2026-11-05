@@ -23,7 +23,7 @@ export function demoArt(i: number) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-const copy = {
+export const copy = {
   en: {
     hover: "Hover",
     scroll: "Scroll",
@@ -71,7 +71,7 @@ const copy = {
 };
 
 type Kind = "hover" | "scroll" | "loop" | "entrance" | "click";
-const kinds: Record<ImageEffectName, Kind> = {
+export const kinds: Record<ImageEffectName, Kind> = {
   "ken-burns": "loop",
   "clip-reveal": "entrance",
   "soft-mask": "entrance",

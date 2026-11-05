@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { cn } from "@/lib/utils";
 
-import { ChartEffect, chartEffects, type ChartDatum, type ChartEffectVariant } from "./chart-effects";
+import { ChartEffect, chartEffects, type ChartDatum, type ChartEffectTrigger, type ChartEffectVariant } from "./chart-effects";
 
 const copy = {
   en: {
@@ -76,28 +76,32 @@ const raceValues = [
 
 const zip = (labels: string[], values: number[]): ChartDatum[] => values.map((value, i) => ({ label: labels[i] ?? String(i + 1), value }));
 
-function Tile({ variant, t, locale }: { variant: ChartEffectVariant; t: Copy; locale: string }) {
-  const [key, setKey] = useState(0);
+/** 單一圖表效果，含 demo 的在地化資料；首頁型錄的 variants.tsx 也用它 */
+export function DemoChart({ variant, trigger }: { variant: ChartEffectVariant; trigger?: ChartEffectTrigger }) {
+  const t = useDemoText(copy);
+  const locale = useDemoLocale();
   const money = (n: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-  const chart = (() => {
-    switch (variant) {
-      case "bar-grow":
-        return <ChartEffect variant="bar-grow" data={zip(t.days, weekly)} label={t.weekly} />;
-      case "donut-segments":
-        return <ChartEffect variant="donut-segments" data={zip(t.channels, [420, 310, 180, 90])} label={t.traffic} />;
-      case "line-draw":
-        return <ChartEffect variant="line-draw" data={zip(t.days, revenue)} label={t.revenue} />;
-      case "number-counter":
-        return <ChartEffect variant="number-counter" value={12840} max={15000} label={t.raised} format={money} />;
-      case "bar-race":
-        return <ChartEffect variant="bar-race" frames={raceValues.map((v) => zip(t.regions, v))} label={t.race} />;
-      case "radial-progress":
-        return <ChartEffect variant="radial-progress" value={72} label={t.goal} />;
-      case "sparkline":
-        return <ChartEffect variant="sparkline" data={signups.map((value, i) => ({ label: String(i + 1), value }))} label={t.signups} />;
-    }
-  })();
+  switch (variant) {
+    case "bar-grow":
+      return <ChartEffect variant="bar-grow" trigger={trigger} data={zip(t.days, weekly)} label={t.weekly} />;
+    case "donut-segments":
+      return <ChartEffect variant="donut-segments" trigger={trigger} data={zip(t.channels, [420, 310, 180, 90])} label={t.traffic} />;
+    case "line-draw":
+      return <ChartEffect variant="line-draw" trigger={trigger} data={zip(t.days, revenue)} label={t.revenue} />;
+    case "number-counter":
+      return <ChartEffect variant="number-counter" trigger={trigger} value={12840} max={15000} label={t.raised} format={money} />;
+    case "bar-race":
+      return <ChartEffect variant="bar-race" trigger={trigger} frames={raceValues.map((v) => zip(t.regions, v))} label={t.race} />;
+    case "radial-progress":
+      return <ChartEffect variant="radial-progress" trigger={trigger} value={72} label={t.goal} />;
+    case "sparkline":
+      return <ChartEffect variant="sparkline" trigger={trigger} data={signups.map((value, i) => ({ label: String(i + 1), value }))} label={t.signups} />;
+  }
+}
+
+function Tile({ variant, t }: { variant: ChartEffectVariant; t: Copy }) {
+  const [key, setKey] = useState(0);
 
   return (
     <div className="relative flex min-h-64 flex-col rounded-md border border-border bg-card p-4 text-card-foreground">
@@ -114,7 +118,7 @@ function Tile({ variant, t, locale }: { variant: ChartEffectVariant; t: Copy; lo
         </button>
       )}
       <div key={key} className={cn("flex flex-1 items-center pb-3", variant === "sparkline" ? "pt-8" : "pt-9")}>
-        {chart}
+        <DemoChart variant={variant} />
       </div>
       <p className="font-mono text-xs text-muted-foreground">{variant}</p>
     </div>
@@ -123,11 +127,10 @@ function Tile({ variant, t, locale }: { variant: ChartEffectVariant; t: Copy; lo
 
 export default function ChartEffectsDemo() {
   const t = useDemoText(copy);
-  const locale = useDemoLocale();
   return (
     <div className="grid w-full max-w-5xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {chartEffects.map((variant) => (
-        <Tile key={variant} variant={variant} t={t} locale={locale} />
+        <Tile key={variant} variant={variant} t={t} />
       ))}
     </div>
   );

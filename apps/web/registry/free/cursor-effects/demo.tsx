@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { CursorEffect, cursorEffects, type CursorEffectName, type CursorPreviewItem } from "./cursor-effects";
 
-const copy = {
+export const copy = {
   en: {
     title: "Cursor effects",
     intro: "7 pointer effects scoped to their own container (or the whole page with global). Hidden on touch screens.",
@@ -81,7 +81,8 @@ function Tile({ name, children }: { name: CursorEffectName; children: ReactNode 
   );
 }
 
-export default function CursorEffectsDemo() {
+/** 單一效果的互動區，示範頁與首頁型錄的單張卡共用 */
+export function CursorEffectArea({ effect }: { effect: CursorEffectName }) {
   const t = useDemoText(copy);
   const area = "flex h-52 flex-col items-center justify-center gap-3 rounded-md bg-muted/40 p-4 text-center text-sm text-muted-foreground";
   const items: CursorPreviewItem[] = t.projects.map((title, i) => ({
@@ -91,72 +92,73 @@ export default function CursorEffectsDemo() {
     preview: <Art variant={i} />,
   }));
 
-  const content = (effect: CursorEffectName) => {
-    switch (effect) {
-      case "follower":
-        return (
-          <CursorEffect effect="follower" hideCursor idle={{ x: 0.5, y: 0.62 }} className={area}>
-            <p>{t.move}</p>
-            <button type="button" className="rounded-md border border-border bg-background px-3 py-1.5 text-foreground">
-              {t.chips[0]}
-            </button>
-          </CursorEffect>
-        );
-      case "trail":
-        return (
-          <CursorEffect effect="trail" className={area}>
-            <p>{t.move}</p>
-          </CursorEffect>
-        );
-      case "spotlight":
-        return (
-          <CursorEffect effect="spotlight" idle={{ x: 0.3, y: 0.4 }} className={area}>
-            <p className="max-w-56 text-base font-medium text-foreground">{t.spotlight}</p>
-            <div className="grid w-full max-w-56 grid-cols-3 gap-2">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-10 rounded-sm bg-primary/20" />
-              ))}
-            </div>
-          </CursorEffect>
-        );
-      case "blend-circle":
-        return (
-          <CursorEffect effect="blend-circle" hideCursor idle={{ x: 0.42, y: 0.5 }} className={area}>
-            <p className="text-3xl font-semibold tracking-tight text-foreground">{t.blend}</p>
-            <p>{t.move}</p>
-          </CursorEffect>
-        );
-      case "crosshair":
-        return (
-          <CursorEffect effect="crosshair" idle={{ x: 0.35, y: 0.4 }} className={area}>
-            <p>{t.move}</p>
-          </CursorEffect>
-        );
-      case "image-hover":
-        return (
-          <CursorEffect effect="image-hover" items={items} className="rounded-md bg-muted/40 px-3 py-2" />
-        );
-      case "magnetic-area":
-        return (
-          <CursorEffect effect="magnetic-area" className={area}>
-            <div className="flex flex-wrap justify-center gap-3">
-              {t.chips.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  data-magnetic
-                  className="inline-block rounded-full bg-primary px-4 py-2 text-primary-foreground"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-            <p>{t.move}</p>
-          </CursorEffect>
-        );
-    }
-  };
+  switch (effect) {
+    case "follower":
+      return (
+        <CursorEffect effect="follower" hideCursor idle={{ x: 0.5, y: 0.62 }} className={area}>
+          <p>{t.move}</p>
+          <button type="button" className="rounded-md border border-border bg-background px-3 py-1.5 text-foreground">
+            {t.chips[0]}
+          </button>
+        </CursorEffect>
+      );
+    case "trail":
+      return (
+        <CursorEffect effect="trail" className={area}>
+          <p>{t.move}</p>
+        </CursorEffect>
+      );
+    case "spotlight":
+      return (
+        <CursorEffect effect="spotlight" idle={{ x: 0.3, y: 0.4 }} className={area}>
+          <p className="max-w-56 text-base font-medium text-foreground">{t.spotlight}</p>
+          <div className="grid w-full max-w-56 grid-cols-3 gap-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-10 rounded-sm bg-primary/20" />
+            ))}
+          </div>
+        </CursorEffect>
+      );
+    case "blend-circle":
+      return (
+        <CursorEffect effect="blend-circle" hideCursor idle={{ x: 0.42, y: 0.5 }} className={area}>
+          <p className="text-3xl font-semibold tracking-tight text-foreground">{t.blend}</p>
+          <p>{t.move}</p>
+        </CursorEffect>
+      );
+    case "crosshair":
+      return (
+        <CursorEffect effect="crosshair" idle={{ x: 0.35, y: 0.4 }} className={area}>
+          <p>{t.move}</p>
+        </CursorEffect>
+      );
+    case "image-hover":
+      return (
+        <CursorEffect effect="image-hover" items={items} className="rounded-md bg-muted/40 px-3 py-2" />
+      );
+    case "magnetic-area":
+      return (
+        <CursorEffect effect="magnetic-area" className={area}>
+          <div className="flex flex-wrap justify-center gap-3">
+            {t.chips.map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                data-magnetic
+                className="inline-block rounded-full bg-primary px-4 py-2 text-primary-foreground"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+          <p>{t.move}</p>
+        </CursorEffect>
+      );
+  }
+}
 
+export default function CursorEffectsDemo() {
+  const t = useDemoText(copy);
   return (
     <div className="w-full max-w-5xl space-y-5">
       <div>
@@ -167,7 +169,7 @@ export default function CursorEffectsDemo() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cursorEffects.map((effect) => (
           <Tile key={effect} name={effect}>
-            {content(effect)}
+            <CursorEffectArea effect={effect} />
           </Tile>
         ))}
       </div>

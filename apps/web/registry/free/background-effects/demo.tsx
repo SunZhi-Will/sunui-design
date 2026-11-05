@@ -6,7 +6,7 @@ import { backgroundEffects, EffectBackground, type BackgroundEffect } from "./ba
 
 type Names = Record<BackgroundEffect, string>;
 
-const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { names: Names; pointer: string }> = {
+export const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { names: Names; pointer: string }> = {
   en: {
     pointer: "Move your pointer here",
     names: {
@@ -81,7 +81,7 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { names: Names; pointer: str
   },
 };
 
-const interactive: BackgroundEffect[] = ["particles", "spotlight"];
+export const interactive: BackgroundEffect[] = ["particles", "spotlight"];
 
 export default function BackgroundEffectsDemo() {
   const t = useDemoText(copy);
