@@ -12,7 +12,7 @@ export async function CodeBlock({ code, lang, title }: { code: string; lang: str
   });
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-card">
+    <div className="overflow-hidden rounded-md border border-line bg-card">
       <div className="flex items-center justify-between border-b border-line px-4 py-2">
         <span className="font-mono text-xs text-subtle">{title ?? lang}</span>
         <CopyButton value={code} labels={m.common} />

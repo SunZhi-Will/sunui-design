@@ -81,7 +81,7 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
             tabIndex={-1}
             layoutId={reduce ? undefined : `block-card-${item.variant ? `${item.name}~${item.variant}` : item.name}`}
             transition={spring}
-            style={{ borderRadius: 24 }}
+            style={{ borderRadius: 12 }}
             className="relative flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden bg-card shadow-2xl ring-1 ring-line outline-none"
           >
             <header className="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-5">
@@ -89,7 +89,7 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
                 <h2 id="block-sheet-title" className="flex items-center gap-2 font-medium tracking-tight">
                   <span className="truncate">{item.title}</span>
                   {item.tier === "pro" && (
-                    <span className="rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">Pro</span>
+                    <span className="rounded-sm bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">Pro</span>
                   )}
                 </h2>
               </div>
@@ -100,7 +100,7 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
               {/* 用一般連結強制整頁載入，才會離開彈窗、進到完整的 block 頁 */}
               <a
                 href={`/blocks/${item.name}`}
-                className="hidden rounded-full px-3 py-1.5 text-sm text-subtle transition-colors hover:bg-stage hover:text-fg sm:inline-block"
+                className="hidden rounded-sm px-3 py-1.5 text-sm text-subtle transition-colors hover:bg-stage hover:text-fg sm:inline-block"
               >
                 {labels.docs}
               </a>
@@ -134,14 +134,14 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
                 {labels.docs}
               </a>
               {item.install ? (
-                <div className="flex min-w-0 items-center gap-2 rounded-xl border border-line bg-bg py-1.5 pr-1.5 pl-3 sm:max-w-md">
+                <div className="flex min-w-0 items-center gap-2 rounded-md border border-line bg-bg py-1.5 pr-1.5 pl-3 sm:max-w-md">
                   <code className="min-w-0 flex-1 overflow-x-auto font-mono text-xs whitespace-nowrap">{item.install}</code>
                   <CopyButton value={item.install} />
                 </div>
               ) : (
                 <Link
                   href="/pricing"
-                  className="shrink-0 rounded-full bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+                  className="shrink-0 rounded-sm bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
                 >
                   {labels.getPro}
                 </Link>
@@ -161,7 +161,7 @@ function IconButton({ label, onClick, children }: { label: string; onClick: () =
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid size-8 shrink-0 place-items-center rounded-full text-subtle transition-colors hover:bg-stage hover:text-fg"
+      className="grid size-8 shrink-0 place-items-center rounded-sm text-subtle transition-colors hover:bg-stage hover:text-fg"
     >
       <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         {children}
@@ -187,7 +187,7 @@ function CopyLink({ label }: { label: string }) {
           // 剪貼簿被瀏覽器拒絕時不顯示勾勾，使用者仍可從網址列複製
         }
       }}
-      className="grid size-8 shrink-0 place-items-center rounded-full text-subtle transition-colors hover:bg-stage hover:text-fg"
+      className="grid size-8 shrink-0 place-items-center rounded-sm text-subtle transition-colors hover:bg-stage hover:text-fg"
     >
       <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         {copied ? <path d="m5 12 4.5 4.5L19 7" /> : <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />}

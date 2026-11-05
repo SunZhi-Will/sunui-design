@@ -69,7 +69,7 @@ export function MotionDictionary({ groups, copy }: { groups: DictionaryGroup[]; 
               aria-pressed={filter === v}
               onClick={() => setFilter(v)}
               className={cn(
-                "rounded-full border px-3 py-1 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                "rounded-sm border px-3 py-1 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                 filter === v ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
               )}
             >
@@ -121,12 +121,12 @@ export function MotionDictionary({ groups, copy }: { groups: DictionaryGroup[]; 
                   <p className="!mt-2 flex flex-wrap items-center gap-1.5 text-xs text-subtle">
                     <span>{copy.blocks}:</span>
                     {entry.blocks.map((b) => (
-                      <Link key={b.name} href={`/blocks/${b.name}`} className="rounded-full border border-line px-2 py-0.5 !no-underline text-fg hover:bg-stage">
+                      <Link key={b.name} href={`/blocks/${b.name}`} className="rounded-sm border border-line px-2 py-0.5 !no-underline text-fg hover:bg-stage">
                         {b.title}
                       </Link>
                     ))}
                     {entry.planned && (
-                      <span className="rounded-full border border-dashed border-line px-2 py-0.5 font-mono">
+                      <span className="rounded-sm border border-dashed border-line px-2 py-0.5 font-mono">
                         {entry.planned} · {copy.planned}
                       </span>
                     )}

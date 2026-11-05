@@ -49,7 +49,7 @@ export function BlockCard({
       <motion.div
         layoutId={`block-card-${variant ? `${name}~${variant}` : name}`}
         transition={{ type: "spring", stiffness: 240, damping: 30 }}
-        style={{ borderRadius: 20, opacity: expanded ? 0 : 1 }}
+        style={{ borderRadius: 10, opacity: expanded ? 0 : 1 }}
         className="relative aspect-[5/4] overflow-hidden bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line"
       >
         <LivePreview
@@ -60,7 +60,7 @@ export function BlockCard({
           onExpand={() => router.push(href, { scroll: false })}
         />
         {tier === "pro" && (
-          <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
+          <span className="pointer-events-none absolute top-3 left-3 rounded-sm bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
             {labels.pro}
           </span>
         )}
@@ -70,7 +70,7 @@ export function BlockCard({
           aria-hidden="true"
           tabIndex={-1}
           title={labels.expand}
-          className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-fg/90 text-bg opacity-0 shadow-sm transition-opacity group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+          className="absolute top-3 right-3 grid size-8 place-items-center rounded-sm bg-fg/90 text-bg opacity-0 shadow-sm transition-opacity group-hover:opacity-100 [@media(hover:none)]:opacity-100"
         >
           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
             <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />

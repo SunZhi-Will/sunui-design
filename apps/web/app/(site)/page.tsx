@@ -82,7 +82,7 @@ export default async function HomePage() {
         </h2>
         <div className="mt-6 grid gap-5 md:grid-cols-3">
           {m.home.reasons.map((reason) => (
-            <div key={reason.title} className="rounded-2xl border border-line bg-card p-6">
+            <div key={reason.title} className="rounded-lg border border-line bg-card p-6">
               <h3 className="font-medium">{reason.title}</h3>
               <p className="mt-2 text-sm text-pretty text-subtle">{reason.body}</p>
             </div>
@@ -92,7 +92,7 @@ export default async function HomePage() {
 
       <section
         aria-labelledby="pro-title"
-        className="mt-24 grid gap-8 rounded-3xl border border-accent/40 bg-accent-soft/40 p-8 md:grid-cols-[1.2fr_1fr] md:items-center sm:p-10"
+        className="mt-24 grid gap-8 rounded-lg border border-fg/80 bg-card p-8 md:grid-cols-[1.2fr_1fr] md:items-center sm:p-10"
       >
         <div>
           <p className="text-sm font-medium text-accent">{m.home.proEyebrow}</p>
@@ -104,7 +104,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/pricing"
-            className="mt-6 inline-flex rounded-xl bg-fg px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90"
+            className="mt-6 inline-flex rounded-md bg-fg px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90"
           >
             {m.common.seePricing}
           </Link>

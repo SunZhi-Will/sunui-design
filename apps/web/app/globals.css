@@ -4,15 +4,16 @@
 @source "../registry/pro";
 
 :root {
-  --bg: #fafaf9;
-  --fg: #1c1917;
-  --subtle: #78716c;
-  --line: #e7e5e4;
+  /* 黑白灰：純中性灰，不帶暖色或冷色偏移。強調靠字重、尺寸、明度，不靠色相 */
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --subtle: #6b6b6b;
+  --line: #e4e4e4;
   --card: #ffffff;
-  --stage: #f5f5f4;
-  /* 招牌朱紅（DESIGN.md） */
-  --accent: #c8361d;
-  --accent-soft: #f6e4dc;
+  --stage: #f4f4f4;
+  /* 站台不設彩色強調：accent 就是墨色，accent-soft 是最淺的灰 */
+  --accent: #0a0a0a;
+  --accent-soft: #f0f0f0;
   --accent-fg: #ffffff;
   color-scheme: light;
 
@@ -20,31 +21,32 @@
   --background: var(--bg);
   --foreground: var(--fg);
   --card-foreground: var(--fg);
-  --muted: #f5f5f4;
-  --muted-foreground: #78716c;
-  --primary: #1c1917;
-  --primary-foreground: #fafaf9;
+  --muted: #f4f4f4;
+  --muted-foreground: #6b6b6b;
+  --primary: #0a0a0a;
+  --primary-foreground: #ffffff;
   --border: var(--line);
-  --ring: var(--accent);
+  --ring: #0a0a0a;
   --destructive: #b42318;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0c0a09;
-    --fg: #f5f5f4;
-    --subtle: #a8a29e;
-    --line: #292524;
-    --card: #151311;
-    --stage: #1c1917;
-    --accent: #ec6a4f;
-    --accent-soft: #3a1d16;
-    --accent-fg: #1c1917;
+    --bg: #0a0a0a;
+    --fg: #ededed;
+    --subtle: #8f8f8f;
+    --line: #262626;
+    --card: #111111;
+    --stage: #171717;
+    --accent: #ededed;
+    --accent-soft: #1c1c1c;
+    --accent-fg: #0a0a0a;
     color-scheme: dark;
-    --muted: #292524;
-    --muted-foreground: #a8a29e;
-    --primary: #f5f5f4;
-    --primary-foreground: #1c1917;
+    --muted: #1c1c1c;
+    --muted-foreground: #8f8f8f;
+    --primary: #ededed;
+    --primary-foreground: #0a0a0a;
+    --ring: #ededed;
     --destructive: #f97066;
   }
 }
@@ -103,17 +105,17 @@ body {
 
 /* Tablet / Mobile 預覽時，裝置寬度以外的區域：斜線底紋，和舞台的點狀底明顯區隔 */
 .stage-surround {
-  --surround: #d6d3d1;
-  --surround-stripe: rgb(28 25 23 / 0.09);
-  --device-edge: #a8a29e;
+  --surround: #d4d4d4;
+  --surround-stripe: rgb(10 10 10 / 0.08);
+  --device-edge: #a3a3a3;
   background-color: var(--surround);
   background-image: repeating-linear-gradient(-45deg, var(--surround-stripe) 0 1px, transparent 1px 9px);
 }
 @media (prefers-color-scheme: dark) {
   .stage-surround {
-    --surround: #050404;
-    --surround-stripe: rgb(245 245 244 / 0.07);
-    --device-edge: #57534e;
+    --surround: #050505;
+    --surround-stripe: rgb(237 237 237 / 0.07);
+    --device-edge: #525252;
   }
 }
 /* 裝置左右邊緣：實線加外側陰影，不佔高度 */

@@ -40,7 +40,7 @@ export function PreviewFrame({ name, locale, labels }: { name: string; locale: L
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-card">
+    <div className="overflow-hidden rounded-lg border border-line bg-card">
       <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
         <div role="radiogroup" aria-label={labels.viewport} className="flex gap-1">
           {viewports.map((v) => (

@@ -53,7 +53,7 @@ export function WaitlistForm({
 
   if (status === "done") {
     return (
-      <p role="status" className={cn("rounded-xl border border-line bg-card px-4 py-3 text-sm", className)}>
+      <p role="status" className={cn("rounded-md border border-line bg-card px-4 py-3 text-sm", className)}>
         {message}
       </p>
     );
@@ -72,14 +72,14 @@ export function WaitlistForm({
           required
           autoComplete="email"
           placeholder={t.placeholder}
-          className="min-w-0 flex-1 rounded-xl border border-line bg-card px-4 py-2.5 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
+          className="min-w-0 flex-1 rounded-md border border-line bg-card px-4 py-2.5 text-sm outline-none placeholder:text-subtle focus-visible:border-fg"
         />
         {/* 防機器人：真人看不到這個欄位 */}
         <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
         <button
           type="submit"
           disabled={status === "sending"}
-          className="shrink-0 rounded-xl bg-fg px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="shrink-0 rounded-md bg-fg px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {status === "sending" ? t.joining : t.join}
         </button>

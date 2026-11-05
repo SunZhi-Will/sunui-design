@@ -29,14 +29,14 @@ export default async function BlockOpengraphImage({ params }: { params: Promise<
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#faf7f0",
-          color: "#1c1917",
+          background: "#ffffff",
+          color: "#0a0a0a",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 34, fontWeight: 700 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 999, background: "#c8361d" }} />
+            <div style={{ width: 36, height: 36, borderRadius: 999, background: "#0a0a0a" }} />
             SunUI
           </div>
           <div
@@ -44,8 +44,8 @@ export default async function BlockOpengraphImage({ params }: { params: Promise<
               display: "flex",
               padding: "8px 22px",
               borderRadius: 999,
-              border: `3px solid ${isPro ? "#c8361d" : "#a8a29e"}`,
-              color: isPro ? "#c8361d" : "#57534e",
+              border: `3px solid ${isPro ? "#0a0a0a" : "#a3a3a3"}`,
+              color: isPro ? "#0a0a0a" : "#525252",
               fontSize: 26,
               fontWeight: 700,
               letterSpacing: 2,
@@ -57,14 +57,14 @@ export default async function BlockOpengraphImage({ params }: { params: Promise<
 
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ fontSize: 84, fontWeight: 700, lineHeight: 1.02, letterSpacing: -2 }}>{title}</div>
-          <div style={{ display: "flex", fontSize: 34, lineHeight: 1.3, color: "#57534e", maxWidth: 1000 }}>
+          <div style={{ display: "flex", fontSize: 34, lineHeight: 1.3, color: "#525252", maxWidth: 1000 }}>
             {description.length > 140 ? `${description.slice(0, 137)}...` : description}
           </div>
           {whenToUse.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
               {whenToUse.map((line) => (
-                <div key={line} style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 26, color: "#78716c" }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 999, background: "#c8361d" }} />
+                <div key={line} style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 26, color: "#6b6b6b" }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 999, background: "#0a0a0a" }} />
                   {line.length > 80 ? `${line.slice(0, 77)}...` : line}
                 </div>
               ))}
@@ -72,7 +72,7 @@ export default async function BlockOpengraphImage({ params }: { params: Promise<
           )}
         </div>
 
-        <div style={{ display: "flex", fontSize: 24, color: "#a8a29e" }}>
+        <div style={{ display: "flex", fontSize: 24, color: "#a3a3a3" }}>
           {`npx shadcn add · paper-feel React + Tailwind blocks for commerce and campaign pages`}
         </div>
       </div>

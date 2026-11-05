@@ -76,12 +76,12 @@ export default async function BlockPage({ params }: Props) {
           {seriesOf(item) !== "paper" && (
             <Link
               href={`/?series=${seriesOf(item)}#blocks`}
-              className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:text-fg"
+              className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:text-fg"
             >
               {m.series.labels[seriesOf(item)]}
             </Link>
           )}
-          <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
+          <span className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
             {m.interactions[item.meta.interaction]}
           </span>
           <TierBadge tier={item.meta.tier} />
@@ -116,9 +116,9 @@ function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
   return (
     <section aria-label={t.usageGuide} className="mt-8 grid gap-4 md:grid-cols-3">
       {whenToUse.length > 0 && (
-        <div className="rounded-2xl border border-line bg-card p-5">
+        <div className="rounded-lg border border-line bg-card p-5">
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-            <svg viewBox="0 0 24 24" className="size-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="size-4 text-fg" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m5 12 4.5 4.5L19 7" />
             </svg>
             {t.whenToUse}
@@ -134,9 +134,9 @@ function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
         </div>
       )}
       {watchOut.length > 0 && (
-        <div className="rounded-2xl border border-line bg-card p-5">
+        <div className="rounded-lg border border-line bg-card p-5">
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-            <svg viewBox="0 0 24 24" className="size-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="size-4 text-subtle" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
             </svg>
             {t.watchOut}
@@ -152,14 +152,14 @@ function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
         </div>
       )}
       {aliases.length > 0 && (
-        <div className="rounded-2xl border border-line bg-card p-5">
+        <div className="rounded-lg border border-line bg-card p-5">
           <h2 className="mb-3 text-sm font-semibold">{t.alsoCalled}</h2>
           <ul className="flex flex-wrap gap-1.5">
             {aliases.map((alias) => (
               <li key={alias}>
                 <Link
                   href={`/?q=${encodeURIComponent(alias)}`}
-                  className="inline-block rounded-full border border-line px-2.5 py-1 text-xs text-subtle transition-colors hover:border-accent/60 hover:text-fg"
+                  className="inline-block rounded-sm border border-line px-2.5 py-1 text-xs text-subtle transition-colors hover:border-fg hover:text-fg"
                 >
                   {alias}
                 </Link>
@@ -242,12 +242,12 @@ function FreeInstall({
 function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"]; seePricing: string }) {
   return (
     <section className="mt-12 grid gap-10">
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-accent/40 bg-accent-soft/40 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-fg/80 bg-card p-6">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">{t.proTitle}</h2>
           <p className="mt-1 text-sm text-subtle">{t.proBody}</p>
           <p className="mt-2 flex items-center gap-2 text-sm font-medium text-fg">
-            <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-fg" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m5 12 4.5 4.5L19 7" />
             </svg>
             {t.proTerms(prices.pro)}
@@ -255,7 +255,7 @@ function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"];
         </div>
         <Link
           href="/pricing"
-          className="rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
+          className="rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
         >
           {seePricing}
         </Link>

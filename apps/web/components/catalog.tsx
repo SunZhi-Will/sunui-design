@@ -159,7 +159,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t.searchPlaceholder}
               aria-keyshortcuts="/"
-              className="peer w-full rounded-full border border-line bg-card py-2 pr-10 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
+              className="peer w-full rounded-sm border border-line bg-card py-2 pr-10 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:border-fg"
             />
             <kbd
               aria-hidden="true"
@@ -168,7 +168,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
               /
             </kbd>
           </label>
-          <div role="group" aria-label={t.filterPlan} className="flex rounded-full border border-line p-0.5 text-sm">
+          <div role="group" aria-label={t.filterPlan} className="flex rounded-sm border border-line p-0.5 text-sm">
             {(["all", "free", "pro"] as const).map((value) => (
               <button
                 key={value}
@@ -176,7 +176,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
                 aria-pressed={tier === value}
                 onClick={() => setTier(value)}
                 className={cn(
-                  "rounded-full px-3 py-1 transition-colors",
+                  "rounded-sm px-3 py-1 transition-colors",
                   tier === value ? "bg-fg text-bg" : "text-subtle hover:text-fg",
                 )}
               >
@@ -247,12 +247,12 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       </ul>
 
       {visible.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-subtle">
+        <div className="rounded-lg border border-dashed border-line p-10 text-center text-sm text-subtle">
           <p>{t.empty}</p>
           <button
             type="button"
             onClick={reset}
-            className="mt-4 rounded-full border border-line px-4 py-1.5 text-fg transition-colors hover:border-accent/60"
+            className="mt-4 rounded-sm border border-line px-4 py-1.5 text-fg transition-colors hover:border-fg"
           >
             {t.clearFilters}
           </button>
@@ -279,7 +279,7 @@ function FilterChip({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors",
+        "flex items-center gap-1.5 rounded-sm border px-3 py-1 text-sm transition-colors",
         active ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
       )}
     >

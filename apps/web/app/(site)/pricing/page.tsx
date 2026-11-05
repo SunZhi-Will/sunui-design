@@ -71,7 +71,7 @@ export default async function PricingPage() {
         <section
           id={foundingHasForm ? "waitlist" : undefined}
           aria-labelledby="founding-title"
-          className="mx-auto mt-12 max-w-3xl scroll-mt-24 rounded-2xl border border-accent/40 bg-accent-soft/40 p-6 sm:p-8"
+          className="mx-auto mt-12 max-w-3xl scroll-mt-24 rounded-lg border border-fg/80 bg-card p-6 sm:p-8"
         >
           <p className="text-sm font-medium text-accent">{t.foundingEyebrow}</p>
           <h2 id="founding-title" className="mt-1 text-2xl font-semibold tracking-tight">
@@ -89,7 +89,7 @@ export default async function PricingPage() {
             {state === "open" && checkoutUrls.founding ? (
               <a
                 href={checkoutUrls.founding}
-                className="inline-flex rounded-xl bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg hover:opacity-90"
+                className="inline-flex rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg hover:opacity-90"
               >
                 {t.foundingCta}
               </a>
@@ -105,7 +105,7 @@ export default async function PricingPage() {
           <div
             key={plan.name}
             className={cn(
-              "flex flex-col rounded-2xl border bg-card p-6",
+              "flex flex-col rounded-lg border bg-card p-6",
               plan.highlight ? "border-fg" : "border-line",
             )}
           >
@@ -127,7 +127,7 @@ export default async function PricingPage() {
             <Link
               href={plan.cta.href}
               className={cn(
-                "mt-8 rounded-xl px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90",
+                "mt-8 rounded-md px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90",
                 plan.highlight ? "bg-fg text-bg" : "border border-line",
               )}
             >
