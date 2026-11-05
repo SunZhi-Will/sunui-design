@@ -31,7 +31,8 @@ export function press(reduce?: boolean | null) {
 }
 
 /**
- * 蓋章：從上方壓下、略轉、落定。用於已領取、已兌換、已售完這類結果。
+ * 蓋章的底層 variants。block 裡顯示結果請直接用 `Stamp`（registry/free/stamp），它依結果選形狀、帶 seed 與墨色紋理；
+ * 這組 variants 只留給需要自訂印章外觀的特殊情況。
  * 用法：<motion.span variants={stamp} initial={reduce ? false : "lifted"} animate="pressed" exit="gone" />
  */
 export const stamp: Variants = {

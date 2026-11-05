@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId, useState, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
@@ -123,7 +124,6 @@ const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
 const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -131,13 +131,6 @@ const springs = {
 } as const;
 
 /** 朱紅只留給「待付款」這個需要買家行動的狀態；取消用淡墨 */
-const stampTone: Record<OrderStatus, string> = {
-  pending: vermilion,
-  paid: ink,
-  shipped: ink,
-  delivered: ink,
-  cancelled: inkMuted,
-};
 
 export function OrderHistory({
   orders,
@@ -192,21 +185,9 @@ export function OrderHistory({
                       <span className="font-mono text-xs tracking-[0.12em]">#{o.number}</span>
                       <span className="relative inline-flex">
                         <AnimatePresence initial={false} mode="popLayout">
-                          <motion.span
-                            key={o.status}
-                            aria-hidden="true"
-                            className={cn(
-                              "inline-block rounded-[3px] border-[1.5px] border-current px-1.5 py-px text-[10px] font-bold tracking-[0.16em] whitespace-nowrap uppercase opacity-85 mix-blend-multiply dark:mix-blend-screen",
-                              stampTone[o.status],
-                              o.status === "cancelled" && "line-through decoration-1",
-                            )}
-                            initial={reduce ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-                            animate={{ scale: 1, opacity: 0.85, rotate: -8 }}
-                            exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12 } }}
-                            transition={springs.stamp}
-                          >
+                          <Stamp key={o.status} size="sm" seed={o.id} tone={o.status === "pending" ? "vermilion" : "ink"} void={o.status === "cancelled"}>
                             {t.status[o.status]}
-                          </motion.span>
+                          </Stamp>
                         </AnimatePresence>
                       </span>
                     </span>

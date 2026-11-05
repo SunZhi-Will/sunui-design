@@ -988,12 +988,13 @@
       "name": "cookie-consent",
       "type": "registry:block",
       "title": "Cookie Consent",
-      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice presses a small SAVED stamp before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
+      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice draws a small Saved check before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "form",
@@ -1034,12 +1035,13 @@
       "name": "copy-code-button",
       "type": "registry:block",
       "title": "Copy Code Button",
-      "description": "Printed promo code slip with a dashed outline; copying presses a small vermilion COPIED stamp and announces the result. Falls back when the clipboard API is unavailable.",
+      "description": "Printed promo code slip with a dashed outline; copying fades the code and draws an ink check with Copied over it, then announces the result. Falls back when the clipboard API is unavailable.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "commerce",
@@ -1085,7 +1087,8 @@
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "section",
@@ -1130,7 +1133,8 @@
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "coupon",
@@ -1447,6 +1451,62 @@
       ]
     },
     {
+      "name": "spring-rig",
+      "type": "registry:block",
+      "title": "Spring Rig",
+      "description": "Line drawings with springs inside: point at one and its parts lean, swing, pop and bounce, each part on its own spring (wobbly, snappy, gentle, or a falling drop with a bounce). Five ready-made drawings (shopping bag, price tag, gift box, desk lamp, card stack) switched with the preset prop, plus defineRig to rig your own SVG. Taps and long presses work on touch. Optional autoplay sends a ghost pointer across while on screen and hands over to a real pointer. Pauses off screen; with reduced motion it draws the resting pose.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "svg",
+        "illustration",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Feature grids, empty states and landing heroes that want a small drawing which reacts when people point at it",
+            "Category tiles in a shop (bags, gifts, deals) where a playful spot illustration replaces a static icon",
+            "Rigging your own SVG: write a rig that maps the pointer to channel goals and a draw function that turns channel values into paths"
+          ],
+          "watchOut": [
+            "It is a motion series piece; keep it out of paper and product blocks such as checkout or cart",
+            "Autoplay is a loop: use it for one hero drawing, not a whole grid, and leave it off where people need to read",
+            "Define custom rigs outside components so the springs are not reset on every render",
+            "Drawings use currentColor and fill-background; place them on the page background or a card so the overlaps read correctly"
+          ],
+          "aliases": [
+            "spring animation",
+            "elastic animation",
+            "interactive illustration",
+            "animated icon",
+            "hover illustration",
+            "rigged svg",
+            "physics icon",
+            "bouncy icon",
+            "follow pointer",
+            "jelly animation",
+            "isometric animation"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/spring-rig/spring-rig.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "hero-billboard-carousel",
       "type": "registry:block",
       "title": "Hero Billboard Carousel",
@@ -1694,7 +1754,8 @@
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "commerce",
@@ -1790,7 +1851,8 @@
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "commerce",
@@ -1830,12 +1892,13 @@
       "name": "otp-input",
       "type": "registry:block",
       "title": "OTP Input",
-      "description": "One-time code entry styled like boxes on a printed form: auto-advance, paste to fill, keyboard navigation, a short error shake and a VERIFIED stamp.",
+      "description": "One-time code entry styled like boxes on a printed form: auto-advance, paste to fill, keyboard navigation, a short error shake and an ink check with Verified on success.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "form",
@@ -2364,6 +2427,52 @@
       "files": [
         {
           "path": "registry/free/scripted-demo/scripted-demo.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "step-demo",
+      "type": "registry:block",
+      "title": "Step Demo",
+      "description": "A live product demo window where every frame is a pure function of one number: each step's View draws the app at a fixed design size (default 1200 × 750) from t, the seconds into that step, and the stage scales as one picture. That makes it scrubbable, jumpable and freezable through a controlled time prop. It ships time helpers (ease, typed, cue, held, glide curves) and a cursor that glides to data-aim targets measured from the DOM and presses on cue. It plays only on screen with the tab visible, never fast-forwards on return, labels the stage as an image listing the steps, uses real buttons with aria-current and a labelled range input, and with reduced motion shows each step's finished frame with no cursor.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "landing",
+        "demo"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing hero or feature section that shows an app working step by step without a video",
+            "Docs or launch pages that need the same demo frame in screenshots, with scrubbing or jump-to-step"
+          ],
+          "watchOut": [
+            "Derive all state from t inside each View; timers, effects or CSS keyframes break scrubbing and reduced motion",
+            "Draw at the fixed stage size with large type: on phones the whole stage shrinks instead of reflowing",
+            "Every step's final frame must read as a complete picture, because reduced motion shows only that frame"
+          ],
+          "aliases": [
+            "html demo",
+            "app demo window",
+            "product walkthrough",
+            "scrubbable demo",
+            "screen recording alternative",
+            "animated screenshot"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/step-demo/step-demo.tsx",
           "type": "registry:component"
         }
       ]
@@ -3117,12 +3226,13 @@
       "name": "tier-progress",
       "type": "registry:block",
       "title": "Tier Progress",
-      "description": "A membership card with a half ring gauge showing points toward the next tier, a tier ladder and the perks the next tier unlocks, with a stamp once the top tier is reached. The gauge is a labelled progressbar with readable value text, SVG ids come from useId, and the arc moves only when points change, instantly under reduced motion.",
+      "description": "A membership card with a half ring gauge showing points toward the next tier, a tier ladder and the perks the next tier unlocks, with a round seal once the top tier is reached. The gauge is a labelled progressbar with readable value text, SVG ids come from useId, and the arc moves only when points change, instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "loyalty",
@@ -3887,6 +3997,62 @@
       "files": [
         {
           "path": "registry/free/lightbox/lightbox.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "plush-portrait",
+      "type": "registry:block",
+      "title": "Plush Portrait",
+      "description": "A cut-out portrait visitors can grab and stretch like a soft toy. The skin is a damped spring mesh: a pull drags the cheek out, the head leans on a soft neck, and it wobbles back on release. Faces cross-fade on hover, grab, pull and release, the eyes follow the cursor and blink, and it yawns when the page goes quiet. The bust sits in a circle or square and the head pops out above it. One WebGL draw, no dependencies; without WebGL or with reduced motion it stays a still picture. Bring your own face images, all with the same framing.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "hero",
+        "avatar",
+        "animation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "An about page, personal site or founder section where the portrait should feel alive and playful",
+            "A brand mascot or creator profile on a campaign page that invites visitors to play",
+            "Team pages where each person gets a squishable avatar (one live portrait per screen works best)"
+          ],
+          "watchOut": [
+            "You supply the images: a transparent PNG or WebP per face, all the same size, square, and pixel-aligned, or the cross-fades will jump. Only faces.rest is required",
+            "Images must be same-origin or served with CORS headers; otherwise WebGL cannot read them",
+            "frameBox sets where the circle or square sits in image space; adjust it when the head is not centred like the demo",
+            "The canvas reaches about a third of the portrait's width past each side so skin can stretch. Near a viewport edge, give a parent overflow-x: clip",
+            "Uses WebGL. Keep one per screen, and do not use a real person's photo without their consent"
+          ],
+          "aliases": [
+            "squishy avatar",
+            "stretchy face",
+            "grabbable portrait",
+            "plushie photo",
+            "interactive avatar",
+            "face that follows cursor",
+            "jelly portrait",
+            "about me hero",
+            "founder portrait",
+            "soft body image"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/plush-portrait/plush-portrait.tsx",
           "type": "registry:component"
         }
       ]

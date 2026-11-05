@@ -73,6 +73,29 @@
         "NEXT_PUBLIC_SITE_URL": "http://localhost:3104",
         "SUNUI_DEV_LICENSE_KEYS": "sunui-dev-test-key-0001"
       }
+    },
+    {
+      "name": "web-mp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "@sunui-design/web",
+        "--",
+        "-p",
+        "3108"
+      ],
+      "port": 3108,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-mp"
+      }
+    },
+    {
+      "name": "web-alt-attach",
+      "url": "http://localhost:3102",
+      "port": 3102
     }
   ]
 }

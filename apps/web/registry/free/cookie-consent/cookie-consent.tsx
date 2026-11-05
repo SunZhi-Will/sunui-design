@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useId, useState, type CSSProperties, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface CookieCategory {
@@ -107,13 +108,10 @@ const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
 const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/65 dark:text-[#ece7dc]/65";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
-const vermilionEdge = "border-[#c8361d] dark:border-[#ec6a4f]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   gentle: { type: "spring", stiffness: 240, damping: 30 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
 /** 紙條頂端的打孔線兩端各挖一個半圓缺口 */
@@ -254,17 +252,14 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
 
             <AnimatePresence>
               {saved && (
-                <motion.span
-                  role="status"
-                  initial={reduce ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-                  animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-                  transition={springs.stamp}
-                  className={cn("pointer-events-none absolute top-3 right-5 rounded-sm border-2 px-2 py-0.5 text-xs font-bold tracking-[0.2em] uppercase", vermilion, vermilionEdge)}
-                >
+                <Stamp key="saved" shape="tick" seed="consent" className="absolute top-5 right-5">
                   {t.stamp}
-                </motion.span>
+                </Stamp>
               )}
             </AnimatePresence>
+            <span role="status" className="sr-only">
+              {saved ? t.stamp : ""}
+            </span>
           </div>
         </motion.section>
       )}

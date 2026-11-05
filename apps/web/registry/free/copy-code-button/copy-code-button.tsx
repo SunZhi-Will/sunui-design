@@ -82,11 +82,9 @@ const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
 const edge = "border-[#1c1917]/25 dark:border-[#ece7dc]/25";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
 const sizes = {
@@ -182,7 +180,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         <AnimatePresence>
           {copied && (
             <span key={stampKey} className="pointer-events-none absolute inset-0 grid place-items-center font-sans">
-              <Stamp shape="tick" seed={code} size={size === "lg" ? "lg" : size === "sm" ? "sm" : "md"}>
+              <Stamp shape="tick" seed={code} size={size}>
                 {t.stamp}
               </Stamp>
             </span>

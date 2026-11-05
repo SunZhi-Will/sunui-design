@@ -90,9 +90,6 @@ const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
 const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
 
-const springs = {
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
-} as const;
 
 // 游標不在選取狀態時，新輸入會與舊字元並存，先去掉舊字元
 function stripExisting(next: string, prev: string) {

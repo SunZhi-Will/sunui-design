@@ -90,11 +90,9 @@ const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
 const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
-const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
 /** 票根寬度與打孔缺口半徑 */

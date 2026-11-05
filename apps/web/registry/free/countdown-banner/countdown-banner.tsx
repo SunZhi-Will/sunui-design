@@ -171,7 +171,6 @@ const vermilion = "text-[#c8361d] dark:text-[#ec6a4f]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
-  stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
 export function CountdownBanner({
