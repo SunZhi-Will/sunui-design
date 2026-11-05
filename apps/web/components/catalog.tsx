@@ -1,11 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { LivePreview } from "@/components/live-preview";
+import { BlockCard } from "@/components/block-card";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
@@ -29,8 +26,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   const [series, setSeries] = useState<Series | "all">("all");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
-  const pathname = usePathname();
-  const router = useRouter();
+  const cardLabels = { livePreview: t.livePreview, expand: t.expand, pro: tierLabels.pro };
 
   // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入
   useEffect(() => {
@@ -200,55 +196,16 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       </div>
 
       <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((item) => {
-          const href = `/blocks/${item.name}`;
-          // 展開中的卡片先藏起來，面板會從它的位置長出來、關閉時再縮回去
-          const expanded = pathname === href;
-          return (
-            <li key={item.name} className="group">
-              {/* 卡片裡只有元件本身，原尺寸、可以直接操作；點空白處或右上角展開 */}
-              <motion.div
-                layoutId={`block-card-${item.name}`}
-                transition={{ type: "spring", stiffness: 240, damping: 30 }}
-                style={{ borderRadius: 20, opacity: expanded ? 0 : 1 }}
-                className="relative aspect-[5/4] overflow-hidden bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line"
-              >
-                <LivePreview
-                  name={item.name}
-                  title={format(t.livePreview, { title: item.title })}
-                  locale={locale}
-                  onExpand={() => router.push(href, { scroll: false })}
-                />
-                {item.meta.tier === "pro" && (
-                  <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
-                    {tierLabels.pro}
-                  </span>
-                )}
-                <Link
-                  href={href}
-                  scroll={false}
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  title={t.expand}
-                  className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-fg/90 text-bg opacity-0 shadow-sm transition-opacity group-hover:opacity-100 [@media(hover:none)]:opacity-100"
-                >
-                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-                    <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
-                  </svg>
-                </Link>
-              </motion.div>
-              <h3 className="mt-3 px-1 text-sm font-medium tracking-tight">
-                <Link
-                  href={href}
-                  scroll={false}
-                  className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
-                >
-                  {item.title}
-                </Link>
-              </h3>
-            </li>
-          );
-        })}
+        {visible.map((item) => (
+          <BlockCard
+            key={item.name}
+            name={item.name}
+            title={item.title}
+            tier={item.meta.tier}
+            locale={locale}
+            labels={cardLabels}
+          />
+        ))}
       </ul>
 
       {visible.length === 0 && (
