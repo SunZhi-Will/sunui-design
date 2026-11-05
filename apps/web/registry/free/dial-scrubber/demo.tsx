@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
+import { cn } from "@/lib/utils";
 
 import { DialScrubber } from "./dial-scrubber";
 
@@ -97,8 +98,21 @@ export default function DialScrubberDemo() {
           subdivisions={3}
           marks={t.milestones.map((m) => ({ value: m.year, label: m.short, text: m.short }))}
         />
-        <p className="mt-4 min-h-[3rem] text-sm leading-relaxed" aria-live="polite">
-          <span className="font-medium tabular-nums">{story.year}</span> {story.text}
+        {/* Every milestone sits in the same grid cell, so the card is always as
+            tall as the longest one and never changes height while scrubbing. */}
+        <div className="mt-4 grid text-sm leading-relaxed">
+          {t.milestones.map((m) => (
+            <p
+              key={m.year}
+              aria-hidden={m !== story}
+              className={cn("[grid-area:1/1] transition-opacity duration-200", m === story ? "opacity-100" : "invisible opacity-0")}
+            >
+              <span className="font-medium tabular-nums">{m.year}</span> {m.text}
+            </p>
+          ))}
+        </div>
+        <p className="sr-only" aria-live="polite">
+          {story.year} {story.text}
         </p>
       </section>
 

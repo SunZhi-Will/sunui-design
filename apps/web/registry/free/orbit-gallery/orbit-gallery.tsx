@@ -3,6 +3,7 @@
 import { useInView, useReducedMotion } from "framer-motion";
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -11,6 +12,8 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
+
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export type OrbitImage = { src: string; alt: string };
 
@@ -83,13 +86,15 @@ export function OrbitGallery({
     kick: () => {},
   });
 
-  // Fit the sphere to narrow containers.
-  useEffect(() => {
+  // Fit the sphere to narrow containers. Height comes from CSS (aspect-ratio
+  // on the sizer below), so this only scales the picture and never moves the
+  // page. Measured before paint so the first frame is already the right size.
+  useIsoLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setScale(Math.min(1, entry.contentRect.width / (radius * 2 + tileSize + 24)));
-    });
+    const fit = (w: number) => setScale(Math.min(1, w / (radius * 2 + tileSize + 24)));
+    fit(el.clientWidth);
+    const ro = new ResizeObserver(([entry]) => fit(entry.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
   }, [radius, tileSize]);
@@ -287,8 +292,8 @@ export function OrbitGallery({
         "relative mx-auto w-full cursor-grab touch-pan-y select-none overflow-hidden rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing",
         className,
       )}
-      style={{ height: box * scale + 24 }}
     >
+      <div aria-hidden className="pointer-events-none mx-auto my-3 w-full" style={{ maxWidth: box + 24, aspectRatio: `${box + 24} / ${box}` }} />
       <div
         className="absolute left-1/2 top-1/2"
         style={{ width: box, height: box, marginLeft: -box / 2, marginTop: -box / 2, transform: `scale(${scale})`, perspective: radius * 4 }}

@@ -77,10 +77,14 @@ export function RibbonCarousel({
   const indexOf = (p: number) => (loop ? ((Math.round(p) % n) + n) % n : Math.max(0, Math.min(n - 1, Math.round(p))));
 
   // Fit narrow containers.
-  useEffect(() => {
+  // Height comes from CSS (aspect-ratio on the sizer), so scaling never moves
+  // the page; measured before paint so the first frame is already right.
+  useIsoLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setScale(Math.min(1, entry.contentRect.width / (cardWidth * 1.55))));
+    const fit = (w: number) => setScale(Math.min(1, w / (cardWidth * 1.55)));
+    fit(el.clientWidth);
+    const ro = new ResizeObserver(([entry]) => fit(entry.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
   }, [cardWidth]);
@@ -217,8 +221,12 @@ export function RibbonCarousel({
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
         className="relative w-full cursor-grab touch-pan-y select-none overflow-hidden rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
-        style={{ height: cardHeight * scale + 32 }}
       >
+        <div
+          aria-hidden
+          className="pointer-events-none mx-auto my-4 w-full"
+          style={{ maxWidth: cardWidth * 1.55, aspectRatio: `${cardWidth * 1.55} / ${cardHeight}` }}
+        />
         <div
           className="absolute left-1/2 top-1/2"
           style={{
@@ -255,9 +263,10 @@ export function RibbonCarousel({
 
       <div className="mt-3 flex items-center justify-center gap-3">
         <RibbonArrow dir={-1} label={labels.previous} onClick={() => go(-1)} disabled={!loop && active === 0} />
-        <p aria-live={playing ? "off" : "polite"} className="min-w-[10rem] text-center text-sm">
-          <span className="font-medium text-foreground">{current?.title ?? current?.alt}</span>
-          <span className="ml-2 tabular-nums text-muted-foreground">
+        {/* Fixed width, one line: titles of different lengths never push the arrows. */}
+        <p aria-live={playing ? "off" : "polite"} className="flex w-[min(15rem,60vw)] items-baseline justify-center text-sm">
+          <span className="truncate font-medium text-foreground">{current?.title ?? current?.alt}</span>
+          <span className="ml-2 shrink-0 tabular-nums text-muted-foreground">
             {active + 1}/{n}
           </span>
         </p>

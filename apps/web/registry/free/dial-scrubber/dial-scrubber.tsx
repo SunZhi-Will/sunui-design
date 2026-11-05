@@ -234,7 +234,10 @@ export function DialScrubber({
       {!hideReadout && (
         <div aria-hidden className="mb-4 text-center">
           <div className="text-4xl font-semibold tabular-nums tracking-tight sm:text-5xl">{formatValue(current)}</div>
-          {currentMark ? <div className="mt-1 text-sm text-muted-foreground">{currentMark.label}</div> : null}
+          {/* The label line keeps its height between marks so nothing below jumps. */}
+          {marks?.length ? (
+            <div className="mt-1 h-5 truncate text-sm leading-5 text-muted-foreground">{currentMark?.label ?? " "}</div>
+          ) : null}
         </div>
       )}
       <div

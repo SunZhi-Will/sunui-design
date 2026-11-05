@@ -99,7 +99,7 @@ export default function InfiniteCanvasDemo() {
         onSelect={(_, i) => setPicked(i)}
         className="h-[420px] border border-border bg-muted/40 sm:h-[520px]"
       />
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p className="h-5 truncate text-sm leading-5 text-muted-foreground" aria-live="polite">
         {picked === null ? t.none : `${t.selected}: ${t.names[picked]}`}
       </p>
     </div>

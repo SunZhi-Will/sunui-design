@@ -12,6 +12,11 @@ import {
 
 import { cn } from "@/lib/utils";
 
+/** Row geometry: side padding, gap between spines, headroom for the lift. */
+const PAD = 24;
+const GAP = 3;
+const TOP = 40;
+
 export type SpineItem = {
   id: string;
   title: string;
@@ -67,6 +72,7 @@ export function SpineShelf({
   const [active, setActive] = useState(() => Math.min(Math.max(defaultIndex, 0), items.length - 1));
   const [hover, setHover] = useState<number | null>(null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const scroller = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
   const captionId = useId();
   const coverWidth = Math.round(height * coverRatio);
@@ -78,8 +84,12 @@ export function SpineShelf({
       firstRender.current = false;
       return;
     }
-    buttons.current[active]?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", inline: "center", block: "nearest" });
-  }, [active, reduce]);
+    // Scroll only the shelf sideways; scrollIntoView would also scroll the page.
+    const el = scroller.current;
+    if (!el || el.scrollWidth <= el.clientWidth) return;
+    const center = PAD + active * (spineWidth + GAP) + coverWidth / 2;
+    el.scrollTo({ left: center - el.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
+  }, [active, reduce, spineWidth, coverWidth]);
 
   const choose = (index: number, focus = false) => {
     const next = (index + items.length) % items.length;
@@ -110,11 +120,20 @@ export function SpineShelf({
         aria-orientation="horizontal"
         aria-describedby={captionId}
         onKeyDown={onKeyDown}
+        ref={scroller}
         className="relative overflow-x-auto overflow-y-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
+        {/* Fixed size: one cover plus the rest as spines, whichever is open.
+            Spines are placed absolutely and slide with transforms, so choosing
+            a book never reflows the row or anything around it. */}
         <div
-          className="mx-auto flex w-max items-end gap-[3px] px-6 pb-0 pt-10"
-          style={{ perspective: 1400, perspectiveOrigin: "50% 40%" }}
+          className="relative mx-auto"
+          style={{
+            width: PAD * 2 + (items.length - 1) * (spineWidth + GAP) + coverWidth,
+            height: TOP + height,
+            perspective: 1400,
+            perspectiveOrigin: "50% 40%",
+          }}
         >
           {items.map((entry, i) => {
             const open = i === active;
@@ -134,10 +153,10 @@ export function SpineShelf({
                 onPointerEnter={(e) => e.pointerType === "mouse" && setHover(i)}
                 onPointerLeave={() => setHover((h) => (h === i ? null : h))}
                 initial={false}
-                animate={{ width: open ? coverWidth : spineWidth }}
+                animate={{ width: open ? coverWidth : spineWidth, x: i > active ? coverWidth - spineWidth : 0 }}
                 transition={transition}
-                className="relative shrink-0 rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                style={{ height, transformStyle: "preserve-3d" }}
+                className="absolute rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                style={{ left: PAD + i * (spineWidth + GAP), top: TOP, height, transformStyle: "preserve-3d" }}
               >
                 <motion.span
                   aria-hidden
@@ -207,20 +226,27 @@ export function SpineShelf({
         <div aria-hidden className="mx-6 h-px bg-border" />
       </div>
 
-      <div id={captionId} aria-live="polite" className="mx-auto mt-5 max-w-md px-6 text-center">
-        {item && (
-          <motion.div
-            key={item.id}
-            initial={reduce ? false : { opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}
+      {/* All captions share one grid cell, so the area is as tall as the longest
+          caption and the arrows below never move. Only the active one shows. */}
+      <div aria-hidden className="mx-auto mt-5 grid max-w-md px-6 text-center">
+        {items.map((entry, i) => (
+          <div
+            key={entry.id}
+            className={cn(
+              "[grid-area:1/1] transition-opacity duration-200 ease-out",
+              i === active ? "opacity-100" : "invisible opacity-0",
+              reduce && "transition-none",
+            )}
           >
-            <p className="text-base font-semibold text-foreground">{item.title}</p>
-            {item.subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{item.subtitle}</p>}
-            {item.meta && <div className="mt-2 text-sm tabular-nums text-foreground">{item.meta}</div>}
-          </motion.div>
-        )}
+            <p className="text-base font-semibold text-foreground">{entry.title}</p>
+            {entry.subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{entry.subtitle}</p>}
+            {entry.meta && <div className="mt-2 text-sm tabular-nums text-foreground">{entry.meta}</div>}
+          </div>
+        ))}
       </div>
+      <p id={captionId} aria-live="polite" className="sr-only">
+        {item ? [item.title, item.subtitle].filter(Boolean).join(", ") : ""}
+      </p>
 
       <div className="mt-3 flex items-center justify-center gap-3">
         <ShelfArrow dir={-1} label={labels.previous} onClick={() => choose(active - 1)} />
