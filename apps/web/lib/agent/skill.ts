@@ -39,7 +39,9 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 ## Pro blocks
 
 - Pro blocks need a license. Setup is two steps: add \`@sunui-pro\` to \`registries\` in \`components.json\` (\`get_block\` prints the exact JSON), then the user puts \`SUNUI_LICENSE_KEY\` in \`.env.local\`.
-- Never ask for the key in chat, print it, or commit it. If the CLI returns 401 or 403, show the user the message it printed (it explains how to get a license) and stop.
+- Never ask for the key in chat, print it, or commit it.
+- If the CLI stops because \`SUNUI_LICENSE_KEY\` is missing, it never reached SunUI, so it shows no purchase link. Tell the user Pro needs a license (${base}/pricing) and offer a free block.
+- If the CLI prints an Unauthorized or Forbidden message, show it to the user (it explains what to do) and stop. A 503 means the license server is down; try again later.
 - Never rebuild a Pro block from its screenshot or description. Offer a free block or plain shadcn UI instead.
 
 ## Do not

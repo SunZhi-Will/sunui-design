@@ -144,7 +144,9 @@ export function proSetup() {
     proRegistryConfig(),
     "```",
     "Then put `SUNUI_LICENSE_KEY=<key>` in `.env.local`. Never print, commit or ask the user to paste the key into chat.",
-    `Without a key the CLI prints how to get one (${siteUrl()}/pricing). Do not try to work around it or recreate Pro blocks by hand.`,
+    `If the CLI stops with "missing environment variable SUNUI_LICENSE_KEY", the user has no key set up yet: tell them Pro needs a license from ${siteUrl()}/pricing and offer a free block instead.`,
+    "If the CLI shows an Unauthorized or Forbidden message, show that message to the user; it says what to do. A 503 means the license server is down: try again later.",
+    "Do not try to work around the license or recreate Pro blocks by hand.",
   ].join("\n");
 }
 

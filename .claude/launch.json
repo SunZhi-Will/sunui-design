@@ -30,6 +30,24 @@
       }
     },
     {
+      "name": "web-motion",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "@sunui-design/web",
+        "--",
+        "-p",
+        "3106"
+      ],
+      "port": 3106,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-motion"
+      }
+    },
+    {
       "name": "web-prod",
       "runtimeExecutable": "sh",
       "runtimeArgs": [
