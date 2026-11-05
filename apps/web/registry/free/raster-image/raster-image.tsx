@@ -284,10 +284,16 @@ export function RasterImage({
     const resample = () => {
       field = img && img.complete && w && h ? sampleImage(img, w, h, opts.current.cell, opts.current.fit) : null;
     };
+    // Resolved color, cached so pointer frames never force a style recalculation.
+    let ink = "";
     const paint = () => {
       if (!field) return ctx.clearRect(0, 0, w, h);
-      const color = getComputedStyle(root).color;
-      render(ctx, w, h, field, { ...opts.current, color }, p, sweep);
+      if (!ink) ink = getComputedStyle(root).color;
+      render(ctx, w, h, field, { ...opts.current, color: ink }, p, sweep);
+    };
+    const retheme = () => {
+      ink = "";
+      paint();
     };
     const frame = (now: number) => {
       raf = 0;
@@ -316,7 +322,7 @@ export function RasterImage({
       canvas.height = Math.max(1, Math.round(h * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       resample();
-      paint();
+      retheme();
     };
 
     img = new Image();
@@ -339,15 +345,15 @@ export function RasterImage({
     const onVisibility = () => kick();
     document.addEventListener("visibilitychange", onVisibility);
     // Repaint when the theme flips (class or attribute on <html>, or the OS scheme).
-    const mo = new MutationObserver(paint);
+    const mo = new MutationObserver(retheme);
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
     const scheme = window.matchMedia("(prefers-color-scheme: dark)");
-    scheme.addEventListener("change", paint);
+    scheme.addEventListener("change", retheme);
 
     api.current = {
       refresh: () => {
         resample();
-        paint();
+        retheme();
       },
       kick,
     };
@@ -356,7 +362,7 @@ export function RasterImage({
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
-      scheme.removeEventListener("change", paint);
+      scheme.removeEventListener("change", retheme);
       document.removeEventListener("visibilitychange", onVisibility);
       if (img) img.onload = null;
       api.current = null;

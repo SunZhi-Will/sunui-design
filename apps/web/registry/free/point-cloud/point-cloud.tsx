@@ -198,12 +198,16 @@ export function PointCloud({
     let raf = 0;
     let last = 0;
     let visible = false;
+    // Resolved color, read once and again only when the theme or props change,
+    // so frames never force a style recalculation.
+    let ink = "";
 
     const paint = () => {
       ctx.clearRect(0, 0, w, h);
       if (!s.n || !w) return;
       const P = props.current;
-      ctx.fillStyle = getComputedStyle(root).color;
+      if (!ink) ink = getComputedStyle(root).color;
+      ctx.fillStyle = ink;
       const cyaw = Math.cos(s.yaw);
       const syaw = Math.sin(s.yaw);
       const cp = Math.cos(s.pitch);
@@ -301,6 +305,10 @@ export function PointCloud({
       if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
     };
 
+    const retheme = () => {
+      ink = "";
+      paint();
+    };
     const resize = () => {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       w = root.clientWidth;
@@ -308,7 +316,7 @@ export function PointCloud({
       canvas.width = Math.max(1, Math.round(w * dpr));
       canvas.height = Math.max(1, Math.round(h * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      paint();
+      retheme();
     };
     const ro = new ResizeObserver(resize);
     ro.observe(root);
@@ -319,19 +327,19 @@ export function PointCloud({
     io.observe(root);
     const onVisibility = () => kick();
     document.addEventListener("visibilitychange", onVisibility);
-    const mo = new MutationObserver(paint);
+    const mo = new MutationObserver(retheme);
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
     const scheme = window.matchMedia("(prefers-color-scheme: dark)");
-    scheme.addEventListener("change", paint);
+    scheme.addEventListener("change", retheme);
 
-    api.current = { kick, paint };
+    api.current = { kick, paint: retheme };
     kick();
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
-      scheme.removeEventListener("change", paint);
+      scheme.removeEventListener("change", retheme);
       document.removeEventListener("visibilitychange", onVisibility);
       api.current = null;
     };

@@ -50,7 +50,7 @@ export type BrushRevealProps = {
 };
 
 const EMPTY = "linear-gradient(transparent, transparent)";
-const MAX_STAMPS = 900;
+const MAX_STAMPS = 400;
 
 type Stamp = { x: number; y: number; t: number; a: number; v: number };
 
@@ -149,6 +149,7 @@ export function BrushReveal({
     let full = false;
     let dirty = false;
     let count = 0;
+    let flushed = 0;
 
     const setMask = (value: string) => {
       layer.style.setProperty("mask-image", value);
@@ -161,7 +162,9 @@ export function BrushReveal({
     const resize = () => {
       w = root.clientWidth;
       h = root.clientHeight;
-      k = Math.min(0.25, 320 / Math.max(1, w));
+      // The mask is soft and scaled up, so a small bitmap is enough and keeps
+      // the per-frame PNG encode under a millisecond.
+      k = Math.min(0.2, 224 / Math.max(1, w));
       mask.width = Math.max(1, Math.ceil(w * k));
       mask.height = Math.max(1, Math.ceil(h * k));
       build();
@@ -187,10 +190,15 @@ export function BrushReveal({
       const { fade: life } = opts.current;
       if (life > 0) {
         while (stamps.length && now - stamps[0].t >= life) stamps.shift();
-        mctx.clearRect(0, 0, mask.width, mask.height);
-        for (const st of stamps) drawStamp(st, 1 - (now - st.t) / life);
-        if (stamps.length) flush();
-        else if (!full) setMask(EMPTY);
+        if (!stamps.length) {
+          if (!full) setMask(EMPTY);
+        } else if (now - flushed >= 15) {
+          // Cap the encode at about 60 per second on high refresh screens.
+          flushed = now;
+          mctx.clearRect(0, 0, mask.width, mask.height);
+          for (const st of stamps) drawStamp(st, 1 - (now - st.t) / life);
+          flush();
+        }
         if (stamps.length && !document.hidden) raf = requestAnimationFrame(frame);
       } else if (dirty) {
         dirty = false;
@@ -202,7 +210,7 @@ export function BrushReveal({
     };
 
     const stroke = (x: number, y: number) => {
-      const step = Math.max(2, opts.current.brushSize * 0.18);
+      const step = Math.max(2, opts.current.brushSize * 0.28);
       const from = last ?? { x, y };
       const dist = Math.hypot(x - from.x, y - from.y);
       const n = Math.max(1, Math.ceil(dist / step));
