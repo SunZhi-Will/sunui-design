@@ -2,7 +2,6 @@
 
 import {
   motion,
-  useAnimationFrame,
   useInView,
   useMotionValue,
   useReducedMotion,
@@ -433,12 +432,28 @@ function SquashStretch({ children, d, delay, dist, k, reduce }: InnerProps) {
   );
 }
 
+/** 只在 running 時排程逐幀回呼；停住時完全不佔用幀迴圈 */
+function useRunningFrame(running: boolean, cb: (deltaMs: number) => void) {
+  const cbRef = useRef(cb);
+  cbRef.current = cb;
+  useEffect(() => {
+    if (!running) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      cbRef.current(now - last);
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [running]);
+}
+
 // 014 動態殘影：沿 8 字軌跡移動，後面跟著逐漸淡出的分身
 function MotionTrail({ children, d, dist, count, running, reduce }: InnerProps) {
   const time = useMotionValue(0);
-  useAnimationFrame((_, delta) => {
-    if (running) time.set(time.get() + Math.min(delta, 64) / 1000);
-  });
+  useRunningFrame(!!running && !reduce, (delta) => time.set(time.get() + Math.min(delta, 64) / 1000));
   if (reduce) return <span className="inline-block">{children}</span>;
   const n = Math.max(2, count ?? 6);
   return (

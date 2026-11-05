@@ -3,7 +3,6 @@
 import {
   animate,
   motion,
-  useAnimationFrame,
   useInView,
   useMotionValue,
   useReducedMotion,
@@ -15,6 +14,24 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore, type HTMLAttr
 import { cn } from "@/lib/utils";
 
 /** 全部字體動效 id；demo 與文件都從這裡讀 */
+/** 只在 running 時排程逐幀回呼；停住時完全不佔用幀迴圈 */
+function useRunningFrame(running: boolean, cb: (deltaMs: number) => void) {
+  const cbRef = useRef(cb);
+  cbRef.current = cb;
+  useEffect(() => {
+    if (!running) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      cbRef.current(now - last);
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [running]);
+}
+
 export const typeMotions = ["text-on-path", "variable-font", "text-mask"] as const;
 
 export type TypeMotionName = (typeof typeMotions)[number];
@@ -182,8 +199,8 @@ export function TextOnPath({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, pathD, size, isClosed]);
 
-  useAnimationFrame((_, delta) => {
-    if (!t.running || pos.current === null) return;
+  useRunningFrame(t.running, (delta) => {
+    if (pos.current === null) return;
     const { path: L, text: T } = len.current;
     const period = isClosed ? L : L + T;
     if (!period) return;
