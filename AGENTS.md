@@ -1,0 +1,38 @@
+# SunUI: instructions for AI agents working in this repo
+
+SunUI is a shadcn registry of animated React + Tailwind blocks for commerce and campaign pages. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
+
+## Where things are
+
+| Path | What |
+|---|---|
+| `apps/web/registry/free/<name>/` | Free block source (`<name>.tsx`) and `demo.tsx` |
+| `apps/web/registry/pro/` | Pro blocks. A separate private git repo, gitignored here. May be missing; the build must still work |
+| `apps/web/registry.json` | Free registry manifest (shadcn format + `meta`: tier, series, interaction, usage) |
+| `apps/web/content/registry-i18n/<name>.json` | zh-TW, zh-CN, ja copy for each free block |
+| `apps/web/registry/lab/` | Blocks moved out of the catalog (off-strategy). Not served |
+| `apps/web/lib/agent/` | Everything AI-facing: search, install plans, design rules for agents, the SunUI skill |
+| `apps/web/app/mcp/route.ts` | SunUI MCP server (Streamable HTTP, read-only) |
+| `apps/web/app/llms.txt`, `llms-full.txt`, `r/`, `skills/` | Plain-text and registry endpoints |
+| `packages/*`, `src/`, `.cursorrules/` | Legacy npm packages and their old docs. Do not add new work there |
+| `reports/` | Strategy and design analyses (Chinese). Context, not specs |
+
+## Rules by task
+
+- **Adding or editing a block**: follow `apps/web/README.md` (steps) and the design doc for its series: `apps/web/DESIGN.md` (paper, default), `DESIGN-product.md`, `DESIGN-story.md`. Ported blocks follow `apps/web/PORTING.md`. Add `meta.usage` (`whenToUse`, `watchOut`, `aliases`): agents search on it.
+- **Changing a design doc**: update `apps/web/lib/agent/guidelines.ts` too. It is the English copy that the MCP server, the skill and `llms-full.txt` serve.
+- **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check.
+- **Copy**: user-facing copy lives in `apps/web/lib/messages.ts` in four locales (en, zh-TW, zh-CN, ja). Change all four.
+- Do not use em dashes in any copy or docs.
+
+## Commands (run from repo root)
+
+```bash
+npm run web:dev                          # http://localhost:3100
+npm run typecheck -w @sunui-design/web   # regenerates previews first
+npm run web:build
+```
+
+## MCP for working on this repo
+
+`.mcp.json` registers the local SunUI MCP server (`http://localhost:3100/mcp`, needs `npm run web:dev`) and the shadcn MCP server. Use `search_blocks` before creating a new block to check it does not already exist.

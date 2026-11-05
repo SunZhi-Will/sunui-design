@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "sunui-local": {
+      "type": "http",
+      "url": "http://localhost:3100/mcp"
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}

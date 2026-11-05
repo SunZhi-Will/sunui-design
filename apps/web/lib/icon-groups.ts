@@ -1,4 +1,5 @@
 import type { IconName } from "@/registry/icons/sunui-icons";
+import type { PixelIconName } from "@/registry/icons/sunui-pixel-icons";
 
 export type IconGroup = { id: string; title: string; note: string; icons: IconName[] };
 
@@ -14,7 +15,7 @@ export const iconGroups: IconGroup[] = [
     id: "commerce",
     title: "Commerce",
     note: "Carts, tags, shipping and payment.",
-    icons: ["cart", "bag", "tag", "percent", "gift", "truck", "package", "store", "card", "wallet", "scan", "flash", "timer"],
+    icons: ["cart", "bag", "tag", "percent", "gift", "truck", "package", "store", "card", "wallet", "scan", "flash", "timer", "coin"],
   },
   {
     id: "interface",
@@ -25,6 +26,7 @@ export const iconGroups: IconGroup[] = [
       "arrow-left", "arrow-right", "external", "search", "menu", "more", "sliders", "copy", "link", "undo",
       "retry", "download", "upload", "trash", "edit", "info", "alert", "lock", "unlock", "eye", "eye-off",
       "bell", "star", "heart", "share", "user", "calendar", "clock", "image", "file", "grid", "sun", "moon",
+      "home", "filter", "mail", "phone", "globe", "map-pin", "sparkle",
     ],
   },
   {
@@ -37,11 +39,49 @@ export const iconGroups: IconGroup[] = [
     id: "story",
     title: "Story",
     note: "Ink and lantern UI for narrative games.",
-    icons: ["play", "pause", "skip", "volume", "book", "bookmark", "dialogue", "lantern", "scroll", "quill", "map"],
+    icons: ["play", "pause", "skip", "volume", "book", "bookmark", "dialogue", "lantern", "scroll", "quill", "map", "gem", "trophy"],
   },
 ];
 
-export const iconKeywords: Partial<Record<IconName, string>> = {
+export type PixelIconGroup = { id: string; title: string; note: string; icons: PixelIconName[] };
+
+// 像素圖示的分組；標題與說明由字典 iconGallery.groups 的 pixel-* 覆蓋
+export const pixelIconGroups: PixelIconGroup[] = [
+  {
+    id: "pixel-interface",
+    title: "Interface",
+    note: "Controls drawn on a 16px grid, 2px strokes for glyphs.",
+    icons: [
+      "check", "close", "plus", "minus", "arrow-left", "arrow-right", "arrow-up", "arrow-down",
+      "chevron-left", "chevron-right", "chevron-up", "chevron-down", "search", "menu", "home", "user",
+      "lock", "settings", "trash", "mail", "download", "upload", "eye", "info", "alert", "bell",
+      "heart", "star", "clock", "calendar",
+    ],
+  },
+  {
+    id: "pixel-paper",
+    title: "Paper",
+    note: "The coupon, receipt and stamp signatures, in pixels.",
+    icons: ["coupon", "receipt", "stamp", "stamp-check", "punch-card", "envelope", "scissors"],
+  },
+  {
+    id: "pixel-commerce",
+    title: "Commerce",
+    note: "Carts, tags, shipping and payment.",
+    icons: ["cart", "bag", "tag", "gift", "truck", "package", "store", "card", "wallet", "coin"],
+  },
+  {
+    id: "pixel-game",
+    title: "Game",
+    note: "Loot, items and HUD bits for retro and story games.",
+    icons: [
+      "sword", "shield", "potion", "key", "gem", "crown", "chest", "trophy", "bomb", "flag",
+      "gamepad", "cursor", "hourglass", "sparkle", "battery", "flash", "book",
+    ],
+  },
+];
+
+export const iconKeywords: Partial<Record<IconName | PixelIconName, string>> = {
   coupon: "voucher discount promo 優惠券 折價",
   receipt: "invoice bill order 收據 發票",
   ticket: "stub admission event 票根",
@@ -82,4 +122,28 @@ export const iconKeywords: Partial<Record<IconName, string>> = {
   lantern: "light lamp 燈籠",
   quill: "feather write 羽毛筆",
   scroll: "parchment story 卷軸",
+  home: "house start 首頁",
+  filter: "funnel refine 篩選",
+  mail: "email message inbox 信件",
+  phone: "mobile device 手機",
+  globe: "world language web 語言 地球",
+  "map-pin": "location place address 地點",
+  sparkle: "new ai magic shine 閃亮 新",
+  coin: "money currency point 金幣 點數",
+  gem: "diamond jewel premium 寶石",
+  trophy: "award winner prize 獎盃",
+  settings: "gear preferences 設定",
+  user: "account profile 使用者",
+  sword: "weapon attack rpg 劍",
+  potion: "flask hp heal 藥水",
+  key: "unlock password 鑰匙",
+  crown: "king vip premium 皇冠",
+  chest: "treasure loot 寶箱",
+  bomb: "explode danger 炸彈",
+  flag: "goal checkpoint report 旗",
+  gamepad: "controller game play 手把",
+  cursor: "pointer mouse arrow 游標",
+  hourglass: "wait timer sand 沙漏",
+  battery: "energy power hp 電量",
+  book: "read story guide 書",
 };

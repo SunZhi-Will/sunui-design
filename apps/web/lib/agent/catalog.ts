@@ -175,8 +175,30 @@ export function planInstall(names: string[]): InstallPlan {
   return { found, missing, commands, npmDependencies, needsPro: pro.length > 0 };
 }
 
+function editDistance(a: string, b: string) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const next = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = row[j];
+      row[j] = next;
+    }
+  }
+  return row[b.length];
+}
+
+/** 名稱打錯時的建議：先找拼字接近的，再補上搜尋結果。 */
 export function suggestNames(name: string) {
-  return searchBlocks({ query: name.replace(/-/g, " "), limit: 3 }).map((hit) => hit.item.name);
+  const target = name.toLowerCase().replace(/^@sunui(-pro)?\//, "");
+  const typos = getItems()
+    .map((item) => ({ name: item.name, d: editDistance(target, item.name) }))
+    .filter((c) => c.d <= Math.max(2, Math.floor(target.length / 4)))
+    .sort((a, b) => a.d - b.d)
+    .map((c) => c.name);
+  const related = searchBlocks({ query: target.replace(/-/g, " "), limit: 3 }).map((hit) => hit.item.name);
+  return [...new Set([...typos, ...related])].slice(0, 3);
 }
 
 /** 依類別分組的精簡型錄，給 SKILL.md 的 references 與 MCP resource。 */
