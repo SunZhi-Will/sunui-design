@@ -227,7 +227,7 @@ export default function TinyChartDemo() {
 
   return (
     <div className="grid w-full max-w-5xl gap-4 lg:grid-cols-2">
-      <TinyChart machine={machines.order} title={t.order.title} subtitle={t.order.sub} copy={t.ui} className="lg:row-span-2" />
+      <TinyChart machine={machines.order} layout="isometric" title={t.order.title} subtitle={t.order.sub} copy={t.ui} className="lg:col-span-2" />
       <TinyChart machine={machines.pre} layout="timeline" title={t.pre.title} subtitle={t.pre.sub} copy={t.ui} />
       <TinyChart machine={machines.box} layout="cycle" title={t.box.title} subtitle={t.box.sub} copy={t.ui} />
     </div>

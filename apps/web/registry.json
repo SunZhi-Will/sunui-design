@@ -4062,7 +4062,7 @@
       "name": "tiny-chart",
       "type": "registry:block",
       "title": "Tiny Chart",
-      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, three layouts: flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
+      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks standing on an isometric floor, the current one lifted), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4104,7 +4104,10 @@
             "decision tree",
             "timeline to scale",
             "lifecycle diagram",
-            "explainer chart"
+            "explainer chart",
+            "isometric diagram",
+            "2.5D flowchart",
+            "isometric process"
           ]
         }
       },
