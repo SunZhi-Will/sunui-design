@@ -390,7 +390,9 @@ const en = {
       "pixel-interface": { title: "Interface", note: "Controls on a 16px grid, 2px strokes for glyphs." },
       "pixel-paper": { title: "Paper", note: "The coupon, receipt and stamp signatures, in pixels." },
       "pixel-commerce": { title: "Commerce", note: "Carts, tags, shipping and payment." },
-      "pixel-game": { title: "Game", note: "Loot, items and HUD bits for retro and story games." },
+      "pixel-gear": { title: "Gear", note: "Weapons, armor and trinkets for an inventory screen." },
+      "pixel-game": { title: "Items", note: "Loot, food and consumables." },
+      "pixel-world": { title: "World & HUD", note: "Monsters, elements and the bits of a game HUD." },
     } as Record<string, { title: string; note: string }>,
   },
 };
@@ -752,7 +754,9 @@ const zhTW: Messages = {
       "pixel-interface": { title: "介面", note: "16px 點陣的控制項，符號用 2 格粗線。" },
       "pixel-paper": { title: "紙感", note: "優惠券、收據、印章這些招牌，換成像素。" },
       "pixel-commerce": { title: "電商", note: "購物車、標籤、運送與付款。" },
-      "pixel-game": { title: "遊戲", note: "復古與敘事遊戲用的道具、寶物與 HUD。" },
+      "pixel-gear": { title: "裝備", note: "武器、防具與飾品，放進背包畫面剛好。" },
+      "pixel-game": { title: "道具", note: "寶物、食物與消耗品。" },
+      "pixel-world": { title: "世界與 HUD", note: "怪物、元素與遊戲 HUD 的零件。" },
     },
   },
 };
@@ -1105,7 +1109,9 @@ const zhCN: Messages = {
       "pixel-interface": { title: "界面", note: "16px 点阵的控件，符号用 2 格粗线。" },
       "pixel-paper": { title: "纸感", note: "优惠券、收据、印章这些招牌，换成像素。" },
       "pixel-commerce": { title: "电商", note: "购物车、标签、配送与付款。" },
-      "pixel-game": { title: "游戏", note: "复古与叙事游戏用的道具、宝物与 HUD。" },
+      "pixel-gear": { title: "装备", note: "武器、防具与饰品，放进背包画面刚好。" },
+      "pixel-game": { title: "道具", note: "宝物、食物与消耗品。" },
+      "pixel-world": { title: "世界与 HUD", note: "怪物、元素与游戏 HUD 的零件。" },
     },
   },
 };
@@ -1473,7 +1479,9 @@ const ja: Messages = {
       "pixel-interface": { title: "インターフェース", note: "16px 格子の操作アイコン。記号は 2 ドットの太線。" },
       "pixel-paper": { title: "ペーパー", note: "クーポン、レシート、スタンプの看板アイコンをドットで。" },
       "pixel-commerce": { title: "コマース", note: "カート、タグ、配送と支払い。" },
-      "pixel-game": { title: "ゲーム", note: "レトロゲームや物語ゲーム向けのアイテムと HUD。" },
+      "pixel-gear": { title: "装備", note: "武器、防具、アクセサリー。インベントリ画面向け。" },
+      "pixel-game": { title: "アイテム", note: "お宝、食べ物、消耗品。" },
+      "pixel-world": { title: "ワールドと HUD", note: "モンスター、属性、ゲーム HUD のパーツ。" },
     },
   },
 };

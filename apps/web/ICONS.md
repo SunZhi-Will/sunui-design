@@ -66,7 +66,11 @@
 3. **資料格式**：每個圖示是 16 列字串，`#` 墨色、`+` 朱紅點、`.` 留白。渲染時把同列相鄰格合併成一段矩形，墨色與朱紅各一條 path。
 4. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。24px 這類非整數倍會糊，展示頁因此只提供 16、32、48。
 5. **朱紅點**：沿用 `--sunui-icon-accent`，規則同線條版：每個圖示最多一個部位（印章、藥水、旗面這類整體就是主角的例外）。
-6. **分組**：Interface、Paper、Commerce、Game。Game 是像素版獨有，含劍、盾、藥水、寶石、皇冠、寶箱、炸彈、手把、游標、沙漏等。
+6. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
+   - Gear（裝備）：sword、dagger、axe、hammer、bow、wand、shield、helmet、armor、boots、ring、amulet
+   - Items（道具）：potion、key、gem、crown、chest、trophy、bomb、orb、scroll、map、apple、meat、fish、dice、hourglass、book、torch
+   - World & HUD（世界與 HUD）：skull、ghost、slime、fire、snowflake、door、flag、heart-half、sparkle、battery、flash、gamepad、cursor
+   - 遊戲圖示只畫通用物件，不仿任何現有遊戲的角色或造型。
 7. **不做動態版**：像素圖示的動態應該是逐格換圖，與 framer-motion 的補間不同，等真的有需要再設計。
 
 新增像素圖示：在 `sunui-pixel-icons.tsx` 的 `pixelIcons` 加一筆 16 × 16 字串，放進 `lib/icon-groups.ts` 的 `pixelIconGroups`，再到 `/icons` 的 Pixel 分頁用 16 與 48 檢查。
