@@ -4946,6 +4946,1098 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "archive-cabinet",
+      "type": "registry:block",
+      "title": "Archive Cabinet",
+      "description": "A metal filing cabinet with two pulled-out drawers. Each drawer holds folders in depth rows, front rows wider, with staggered index tabs and a title, date and stamp on each folder; empty slots show a numbered divider. Read and store modes are supported, and hovering or focusing a folder fires a preview callback. Every slot is a real button with a screen-reader name, and with reduced motion the folder lift happens instantly.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "story",
+        "library",
+        "3d"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A case-file or archive room where each finished run is filed as a folder",
+            "Picking a drawer slot to file something into, with the existing folder highlighted"
+          ],
+          "watchOut": [
+            "The cabinet needs a height (it defaults to clamp(11rem,48vh,22rem)); override it with a className such as h-64",
+            "At 700px wide or below, folder titles hide so the next folder's tab does not cover them; only the date and stamp stay"
+          ],
+          "aliases": [
+            "filing cabinet",
+            "file drawer",
+            "case files",
+            "歸檔櫃"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/archive-cabinet/archive-cabinet.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "book-3d",
+      "type": "registry:block",
+      "title": "3D Book",
+      "description": "A 3D book you can actually read: it opens from the cover, turns pages with a leaf that folds around the spine, and closes onto the back cover after the last page. The text is split into pages by measuring CSS columns. The 3D scene is aria-hidden, a hidden linear copy of the text is what screen readers read, and the control bar's page counter is announced politely. With reduced motion, the page turn is skipped and the 3D transitions switch instantly.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "story",
+        "media",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "End-of-chapter memoirs, journey recaps or short stories you want to present as a physical object",
+            "Long-form text that should be paged by real layout rather than a fixed paragraph count"
+          ],
+          "watchOut": [
+            "children render once per visible page plus a measuring copy and a screen-reader copy, so avoid ids or stateful widgets inside the content",
+            "Keyboard defaults to window-level arrow and PageUp/PageDown keys like the original; use keyboard=\"self\" when several readers share a page"
+          ],
+          "aliases": [
+            "memoir book",
+            "page flip",
+            "flipbook",
+            "3d book reader"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/book-3d/book-3d.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "bookshelf-3d",
+      "type": "registry:block",
+      "title": "3D Bookshelf",
+      "description": "One wooden shelf with a fixed number of slots. Each filled slot is a small 3D book (front, page edge and spine faces, with a title slip that shrinks to fit), and each empty slot is a faint outline. Read and store modes are supported, and hovering or focusing a slot fires a preview callback. Every slot is a real button with a screen-reader name, and with reduced motion the pull-out happens instantly.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "story",
+        "library",
+        "3d"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A save-slot style library where each finished playthrough or collected item sits on a shelf",
+            "Picking a slot to store something into, with the existing copy highlighted for overwrite"
+          ],
+          "watchOut": [
+            "Spines are narrow, so show the full title elsewhere using onPreview, as the demo footer does",
+            "Book size follows slot width (cqw); with many slots on a narrow screen the books get small"
+          ],
+          "aliases": [
+            "book shelf",
+            "memoir library",
+            "3D books",
+            "save slot shelf"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/bookshelf-3d/bookshelf-3d.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "browser-showcase-3d",
+      "type": "registry:block",
+      "title": "Browser Showcase 3D",
+      "description": "A browser window tilted in 3D with two decoy windows stacked behind it. It cross-fades through slides (images or ReactNode) with the URL bar updating, and on hover it tilts toward the cursor, shows a gold glow on the border and pauses. It is decorative by default (aria-hidden) or becomes role=img when given a label; under reduced motion it stops auto-advancing and drops its transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "hero",
+        "showcase"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Hero section of a portfolio or agency site showing real shipped projects",
+            "Landing page that cycles through product screenshots"
+          ],
+          "watchOut": [
+            "Decorative by default; put real links to the work elsewhere on the page",
+            "Slides use a 16:10 frame, so crop screenshots to match"
+          ],
+          "aliases": [
+            "3d browser mockup",
+            "tilted screenshot carousel",
+            "website showcase",
+            "browser frame slider"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/browser-showcase-3d/browser-showcase-3d.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cg-gallery",
+      "type": "registry:block",
+      "title": "CG Gallery",
+      "description": "A story CG gallery: a grid of 16:9 tiles with an unlocked x/y counter. Locked tiles show only a lock and 尚未解鎖, so nothing is spoiled. Opening a tile shows a viewer with the title and caption, closed by click, Enter, Space or Escape; focus moves into the viewer and back to the tile, and under reduced motion the fade-in and border transition are off.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "story"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Collectible CG or illustration galleries in visual novels and story games",
+            "Unlockable artwork lists where locked items must not reveal the image or title"
+          ],
+          "watchOut": [
+            "With fixed={false} the viewer covers only the gallery, so give the gallery enough height",
+            "Space and Escape are caught on window while the viewer is open; avoid other global shortcuts on those keys"
+          ],
+          "aliases": [
+            "cg gallery",
+            "art gallery",
+            "unlockable gallery",
+            "memoir gallery"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cg-gallery/cg-gallery.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cloth-curtain",
+      "type": "registry:block",
+      "title": "Cloth Curtain",
+      "description": "A real WebGL cloth curtain on a rail: a Verlet mass-spring grid with anime cel shading that sways in the breeze, gathers into folds as it draws aside (single panel or a centre-parting pair), can follow a dragging hand, and has an adjustable see-through amount. The canvas is aria-hidden and pauses when off screen or the tab is hidden. Under prefers-reduced-motion, or without WebGL, it shows a static striped curtain that switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "canvas",
+        "transition"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing a scene, chapter or hero behind a curtain that opens on a button or a story beat",
+            "Drag-to-reveal moments where the user pulls the cloth aside with a pointer (pass handRef)"
+          ],
+          "watchOut": [
+            "Each instance uses its own WebGL context, so avoid many curtains on one page",
+            "sheer is fixed when the simulation is built; use 0 when the curtain must fully hide a scene change"
+          ],
+          "aliases": [
+            "curtain reveal",
+            "fabric simulation",
+            "drape transition",
+            "stage curtain"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/cloth-curtain/cloth-curtain.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/cloth-curtain/cloth-simulation.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/cloth-curtain/cloth-renderer.ts",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "ember-particles",
+      "type": "registry:block",
+      "title": "Ember Particles",
+      "description": "Canvas embers that rise slowly and flicker, blended with lighter compositing for a warm lantern glow behind hero or CTA sections. The canvas is aria-hidden and ignores the pointer, stops drawing when off-screen or when the tab is hidden, and does not start at all under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "background",
+        "story"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Atmospheric backgrounds for dark hero or closing CTA sections",
+            "Night, fire or lantern scenes where you want subtle motion behind the text"
+          ],
+          "watchOut": [
+            "The parent needs position relative and the content above it needs a higher z-index (the canvas uses z-1)",
+            "Embers are redrawn on every resize, so very large density values cost more"
+          ],
+          "aliases": [
+            "embers",
+            "fire particles",
+            "floating sparks",
+            "lantern particles"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/ember-particles/ember-particles.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hero-billboard-carousel",
+      "type": "registry:block",
+      "title": "Hero Billboard Carousel",
+      "description": "A full-width billboard carousel: a large centre cover with the previous and next slides peeking at the sides, a blurred ambient glow behind, swipe or drag to change, arrows, and dot indicators where the current dot becomes a 6.5 s progress bar. It follows the W3C APG carousel pattern (pauses on hover, on keyboard focus and when the tab is hidden; arrow keys; slide roles and labels); reduced motion turns off autoplay, Ken Burns and slide motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "carousel",
+        "hero",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "First screen of a landing page promoting a few events, courses or launches",
+            "Featuring 3 to 7 items where each needs a title, meta line and call to action"
+          ],
+          "watchOut": [
+            "Use at least 3 slides so both sides have a peeking card",
+            "Sizes come from the container width and viewport height, so give it a full-width parent"
+          ],
+          "aliases": [
+            "billboard",
+            "hero slider",
+            "featured carousel",
+            "netflix style hero"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hero-billboard-carousel/hero-billboard-carousel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "ink-fate-dial",
+      "type": "registry:block",
+      "title": "Ink Fate Dial",
+      "description": "An ink-wash SVG dial. The needle spins several turns and stops on the raw roll, then a glowing arc steps through each modifier to the final score, and a blue ink drop lands in the outcome segment. Esc or clicking the dial skips the roll, an optional aria-label gives it a role of img, and with reduced motion it skips the spin and shows the result with a 200ms fade.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "game",
+        "feedback",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing the result of a chance check (skill roll, fate check, gacha) where the player should see the raw roll and each modifier",
+            "A static result dial showing which band a final score fell into, for example in a reroll comparison"
+          ],
+          "watchOut": [
+            "Change rollKey to start a new roll; while rolling it calls onFrame about every 33ms, and onSettle once at the end",
+            "Segments are [from, to) ranges on a 0 to scaleMax scale; the last segment gets the extra outer ring sweep"
+          ],
+          "aliases": [
+            "fate dice",
+            "roll dial",
+            "outcome wheel",
+            "skill check dial"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/ink-fate-dial/ink-fate-dial.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "instructor-card-3d",
+      "type": "registry:block",
+      "title": "Instructor Card 3D",
+      "description": "A landscape business card in a modal that tilts in 3D with a cursor-following gloss and flips to a bio back face on click or button. Accessible dialog with focus trap, Esc, focus restore and backdrop close; reduced motion disables the tilt, the pop-in and the flip animation.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "dialog",
+        "card"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Course or event pages where clicking an instructor portrait reveals their card",
+            "Speaker or team bios that deserve a premium, tactile reveal"
+          ],
+          "watchOut": [
+            "Keep the bio short; the back face is a fixed 1.62:1 card",
+            "Use fixed={false} inside a relative container when embedding it rather than covering the viewport"
+          ],
+          "aliases": [
+            "business card",
+            "flip card",
+            "speaker card",
+            "profile modal"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/instructor-card-3d/instructor-card-3d.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "motion-clip-tabs",
+      "type": "registry:block",
+      "title": "Motion Clip Tabs",
+      "description": "A gameplay clip showcase: a corner-framed screen, numbered clip tabs (壹, 貳, 參) with progress bars, and a caption panel. Only the active video gets a src and plays, the others pause, and clips without a video show a fallback slot timed by fallbackDuration. The tabs are an ARIA tablist with arrow-key navigation; the clips pause when off-screen, and under reduced motion nothing autoplays until the user presses play.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "story"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing pages that show several short muted gameplay clips in one spot",
+            "Feature tours where each step has a short video and a one-line caption"
+          ],
+          "watchOut": [
+            "Videos are muted and playsInline; keep clips short since the active one preloads fully",
+            "Below a 60rem container width the tabs become a horizontal scroll row under the screen"
+          ],
+          "aliases": [
+            "video tabs",
+            "clip carousel",
+            "gameplay showcase",
+            "feature video tabs"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/motion-clip-tabs/motion-clip-tabs.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "page-turn-book",
+      "type": "registry:block",
+      "title": "Page Turn Book",
+      "description": "A pure-CSS 3D book that opens from a closed leather cover (with an optional bookmark ribbon) to a title page, then turns leaves around the spine with rotateY(-180deg). Fast clicks stack the leaves as they fall. Pages are typed objects (text, a tucked note, a hand-drawn map with a bearing, end) or any ReactNode. Keyboard (arrows, A/D, Space, PageUp/PageDown, Esc), wheel and click navigation; labelled controls, a polite live region for the current spread, and reduced motion makes every turn instant.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "story"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "In-game or story readers for lore books, journals and found notes",
+            "Short narrative content that should feel like a physical book rather than a scroll"
+          ],
+          "watchOut": [
+            "Each page has a fixed size and clips anything that does not fit, so keep each page to a short paragraph, especially on narrow screens",
+            "With fixed the keyboard listens on window; embedded, the book must have focus, and wheel scrolling is only captured while there are pages left to turn in that direction"
+          ],
+          "aliases": [
+            "flip book",
+            "3d book reader",
+            "page flip",
+            "lore book"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/page-turn-book/page-turn-book.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "portal-threshold",
+      "type": "registry:block",
+      "title": "Portal Threshold",
+      "description": "A decorative hero visual where three nested rounded squares settle into alignment and open a glowing gold aperture over a perspective grid floor. It is aria-hidden and pointer-events none, all idle motion stops after about 12 seconds, and under prefers-reduced-motion it shows the aligned final frame with no sparks, sweep or pulse.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "hero",
+        "decorative",
+        "animation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The one signature visual next to a landing page hero headline when there are no real product screenshots yet",
+            "variant=\"still\" as quiet brand geometry on secondary pages such as About"
+          ],
+          "watchOut": [
+            "Use the signature variant once per site; repeating it weakens the moment",
+            "It is purely decorative, so never put information in it; gold on light backgrounds needs darker gold/goldBright props"
+          ],
+          "aliases": [
+            "portal",
+            "gateway visual",
+            "threshold",
+            "hero geometry"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/portal-threshold/portal-threshold.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "recap-active-month",
+      "type": "registry:block",
+      "title": "Recap Most Active Month",
+      "description": "A 9:16 recap story slide for the most active month: a frosted glass month card that flips in over a slowly rotating ring of 12 month dots, with a per-month gradient background. The ring is aria-hidden and reduced motion stops the rotation and pulses.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A recap story highlighting the busiest month of the year",
+            "A vertical share card showing a monthly count with a seasonal colour"
+          ],
+          "watchOut": [
+            "Long month names such as September wrap at text-5xl in frames under about 400px; pass short monthNames if that matters",
+            "monthIndex is 0 to 11 and selects both the name and the background gradient"
+          ],
+          "aliases": [
+            "most active month",
+            "month story",
+            "monthly recap",
+            "wrapped month"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/recap-active-month/recap-active-month.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "recap-keyword-cloud",
+      "type": "registry:block",
+      "title": "Recap Keyword Cloud",
+      "description": "A 9:16 recap story slide that springs in the user's top keywords as tilted gradient chips, sized and coloured by frequency, each gently bobbing. Rendered as a list for screen readers; reduced motion removes the spring, bob and hover tilt.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A recap story showing the words someone used most",
+            "A playful vertical card summarising tags or topics by frequency"
+          ],
+          "watchOut": [
+            "Keep it to about 6 to 10 keywords so the cloud fits the 9:16 frame",
+            "Size and colour tiers are relative to the highest count, so one outlier shrinks the rest"
+          ],
+          "aliases": [
+            "word cloud",
+            "keyword story",
+            "top words",
+            "tag cloud"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/recap-keyword-cloud/recap-keyword-cloud.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "recap-percentile-ring",
+      "type": "registry:block",
+      "title": "Recap Percentile Ring",
+      "description": "A 9:16 year-in-review story slide that shows a creator's top-percentile rank inside a 100-dot ring, with a tier gradient, pulsing glow and a twinkling particle halo. Decorative layers are aria-hidden and reduced motion settles every animation instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A year-in-review or recap story that ranks a user against everyone else",
+            "A shareable vertical card celebrating a percentile milestone"
+          ],
+          "watchOut": [
+            "Pass null when there is no comparison data; the slide switches to the noData message",
+            "The rank is lower-is-better (3.4 means top 3.4%); the ring fills 100 minus rank dots"
+          ],
+          "aliases": [
+            "percentile story",
+            "rank ring",
+            "top percent slide",
+            "wrapped rank"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/recap-percentile-ring/recap-percentile-ring.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "recap-streak-flame",
+      "type": "registry:block",
+      "title": "Recap Streak Flame",
+      "description": "A 9:16 recap story slide for the longest posting streak: a glowing number over spinning rings and rising flame particles, with a background and comment that scale with the streak. Particles are aria-hidden and are not rendered under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "data-display"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A recap or wrapped story celebrating consecutive days of activity",
+            "A vertical share card for habit or streak milestones"
+          ],
+          "watchOut": [
+            "Background and comment tiers switch at 3, 7 and 14 days; override labels.comments to match your copy",
+            "The 128px number assumes up to 3 digits in a 340px frame"
+          ],
+          "aliases": [
+            "streak story",
+            "posting streak",
+            "flame counter",
+            "wrapped streak"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/recap-streak-flame/recap-streak-flame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "records-thread-board",
+      "type": "registry:block",
+      "title": "Records Thread Board",
+      "description": "An endings and achievements board. Case files on the left get a tab and a tilted archived stamp once reached; on the right a glowing soul thread snakes through diamond knots, and only finished links glow. Arrow keys move through the grid as laid out on screen with a single tab stop, a polite live readout bar describes the selection, and entrance animations are turned off under reduced motion.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "game",
+        "data-display",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "An endings and achievements page in a story game or interactive fiction",
+            "Any milestone collection where locked items should show only a hint until earned"
+          ],
+          "watchOut": [
+            "Achievements are laid out three per row in snake order (top row left to right, next row right to left), so array order is thread order",
+            "The first thread link glows only when the first ending is seen and the first achievement is done, as in the source"
+          ],
+          "aliases": [
+            "achievement board",
+            "endings gallery",
+            "case files",
+            "milestone thread"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/records-thread-board/records-thread-board.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "scroll-tilt-stage",
+      "type": "registry:block",
+      "title": "Scroll Tilt Stage",
+      "description": "A 3D stage that lays its content tilted back (rotateX 28deg) and stands it upright as it scrolls into view, with a gold reflection glow underneath. The glow is aria-hidden, and with reduced motion the content sits flat with no animation.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "scroll",
+        "showcase"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Revealing a product demo or app window below the hero",
+            "Giving a screenshot or embedded demo a dramatic entrance on scroll"
+          ],
+          "watchOut": [
+            "Inside a custom scroll area, pass scrollContainer or progress follows the window",
+            "The wrapper uses overflow-x clip; leave vertical room for the glow below"
+          ],
+          "aliases": [
+            "scroll 3d reveal",
+            "tilt on scroll",
+            "perspective stage",
+            "stand-up demo window"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-tilt-stage/scroll-tilt-stage.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "soul-thread-title",
+      "type": "registry:block",
+      "title": "Soul Thread Title",
+      "description": "An animated title where a scythe swings in and pulls a glowing thread through the wordmark, revealing it left to right; afterwards the thread keeps drifting gently. All animation layers are aria-hidden and the default wordmark is role=\"img\" with the title as its label; with reduced motion the thread is drawn once, still, with no scythe or reveal mask.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "hero",
+        "typography",
+        "animation"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "loading",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Game or story title screens where the logo should be drawn in by a dramatic intro",
+            "Hero headings that need a living, ambient accent after the entrance"
+          ],
+          "watchOut": [
+            "Thread coordinates assume a 2038:531 wordmark box; a custom wordmark must fill that ratio or the thread will miss the glyphs",
+            "The scythe overflows the title box to the right and top during the intro, so leave padding or let the parent clip it"
+          ],
+          "aliases": [
+            "scythe title intro",
+            "thread wordmark",
+            "animated logo reveal",
+            "reaper title"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/soul-thread-title/soul-thread-title.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "stacked-preview-carousel",
+      "type": "registry:block",
+      "title": "Stacked Preview Carousel",
+      "description": "A 3D stack of preview cards: each deeper card moves back in translateZ, rotates further in Y and fades, and the top card cycles to the back every few seconds. With a mouse, the top card tilts toward the cursor, lifts, and shows a soft glare and a conic border glow. Only the top card is focusable and announced; reduced motion turns off autoplay, tilt and transitions.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "carousel",
+        "hero",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Right-hand visual in a landing hero that cycles through featured courses, decks or products",
+            "Showing several covers in little space while keeping a physical card-deck feel"
+          ],
+          "watchOut": [
+            "There are no manual controls, so put essential items in reachable navigation elsewhere",
+            "Dark theme card surfaces are translucent like the source, so set it on a dark hero background"
+          ],
+          "aliases": [
+            "card stack carousel",
+            "3d deck",
+            "fanned cards",
+            "hero preview stack"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/stacked-preview-carousel/stacked-preview-carousel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "testimonial-marquee",
+      "type": "registry:block",
+      "title": "Testimonial Marquee",
+      "description": "Rows of review cards that scroll in opposite directions, with faded edges, 3D tilt on hover, and a pause on hover or keyboard focus. Clicking a card opens a detail dialog with a focus trap, Escape to close, and a rating breakdown. On narrow screens or with reduced motion, each row becomes a static horizontal scroller.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "testimonials",
+        "social-proof",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A social-proof section on a course or product landing page with many short reviews",
+            "When each review has extra detail (rating breakdown, course, role) worth opening on demand"
+          ],
+          "watchOut": [
+            "accentColor must be a hex value, because transparency suffixes are appended to it",
+            "Below 768px it switches to static scroll rows on purpose; this is not a bug"
+          ],
+          "aliases": [
+            "review marquee",
+            "testimonial wall",
+            "scrolling reviews",
+            "quote carousel"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/testimonial-marquee/testimonial-marquee.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "tilted-marquee-background",
+      "type": "registry:block",
+      "title": "Tilted Marquee Background",
+      "description": "A three-row wall of 16:9 covers, rotated -8 degrees, scrolling in alternating directions behind a hero section. It is aria-hidden and ignores the pointer, and under reduced motion the rows stop.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "background",
+        "hero",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Background for a landing or membership hero that shows the size of a catalog",
+            "Behind a centered headline and call to action, with a gradient overlay on top"
+          ],
+          "watchOut": [
+            "The parent must be relative and overflow-hidden; the wall overflows its box by 30% vertically and 20% horizontally",
+            "Large cover images all load at once, so pass resized images"
+          ],
+          "aliases": [
+            "course wall",
+            "cover marquee",
+            "tilted logo wall",
+            "scrolling backdrop"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/tilted-marquee-background/tilted-marquee-background.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "tilted-phone-pair",
+      "type": "registry:block",
+      "title": "Tilted Phone Pair",
+      "description": "Two overlapping 3D-tilted phone mockups whose screens are ReactNode slots, with a cursor parallax tilt where the front phone follows at 0.7x for depth. Scales down to fit narrow containers; it is decorative unless you pass a label (then role img), and reduced motion freezes the pose and turns off the parallax.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "hero"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Right column of a landing hero showing an app's two key screens",
+            "Product pages where two phone screens should read as one product"
+          ],
+          "watchOut": [
+            "Screens are fixed-size (22x27.5rem and 17x22rem), so design content for that box",
+            "Parallax is mouse only; touch users see the static pose"
+          ],
+          "aliases": [
+            "phone mockup",
+            "device mockup",
+            "3d phones",
+            "hero phones"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/tilted-phone-pair/tilted-phone-pair.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "waterfall-showcase",
+      "type": "registry:block",
+      "title": "Waterfall Showcase",
+      "description": "A wall of artwork columns drifting up and down at different speeds that pauses on hover or focus; clicking a piece opens a lightbox showing the user's original sentence, the AI-rewritten prompt, the style and the model. The lightbox is a plain accessible dialog (focus trap, Escape, focus return, optional scroll lock via `fixed`), and under prefers-reduced-motion the wall stays still and the lightbox appears instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "gallery",
+        "landing",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A landing page section showing real outputs of a generative or creative tool",
+            "Portfolio or community galleries where each piece has a caption or prompt worth reading"
+          ],
+          "watchOut": [
+            "The motion is infinite and pauses only on hover or focus, so place it below the fold and keep it out of reading-heavy pages",
+            "Fewer than 10 works make the repetition obvious; mobile shows only 2 columns and tablet 4"
+          ],
+          "aliases": [
+            "masonry marquee",
+            "image wall",
+            "prompt gallery",
+            "infinite gallery"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/waterfall-showcase/waterfall-showcase.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

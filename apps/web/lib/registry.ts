@@ -17,7 +17,7 @@ export type Interaction =
   | "section";
 
 /** 設計語言系列：paper 見 DESIGN.md，product 與 story 見各自的 DESIGN 文件；product、story、classic、cardflow 依 PORTING.md 從原始專案移植 */
-export type Series = "paper" | "product" | "story" | "classic" | "cardflow";
+export type Series = "paper" | "product" | "story" | "showcase" | "classic" | "cardflow";
 
 export type RegistryFile = {
   path: string;
