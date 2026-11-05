@@ -67,8 +67,35 @@ export interface PhoneFrameProps {
   label?: ReactNode;
   scheme?: PhoneFrameScheme;
   badge?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<PhoneFrameLabels>;
   className?: string;
 }
+
+export interface PhoneFrameLabels {
+  /** label 不是字串時 figure 的無障礙名稱 */
+  screen: string;
+  url: (url: string) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PhoneFrameLabels> = {
+  en: { screen: "Phone screen", url: (u) => `URL ${u}` },
+  "zh-TW": { screen: "手機畫面", url: (u) => `網址 ${u}` },
+  "zh-CN": { screen: "手机画面", url: (u) => `网址 ${u}` },
+  ja: { screen: "スマートフォンの画面", url: (u) => `URL ${u}` },
+};
 
 export function PhoneFrame({
   children,
@@ -79,14 +106,17 @@ export function PhoneFrame({
   label,
   scheme = "auto",
   badge,
+  locale = "en",
+  labels,
   className,
 }: PhoneFrameProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   // 窄手機框：動態島縮小、狀態列收緊，不蓋到時間與電量
   const compact = width < 240;
   const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
   return (
     <figure
-      aria-label={typeof label === "string" ? label : "Phone screen"}
+      aria-label={typeof label === "string" ? label : t.screen}
       className={cn(
         "m-0 grid min-w-0 max-w-full justify-items-center gap-2",
         schemeVars[scheme],
@@ -162,7 +192,7 @@ export function PhoneFrame({
         </div>
         {url && (
           <div
-            aria-label={`URL ${url}`}
+            aria-label={t.url(url)}
             className="flex flex-none items-center gap-1.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3.5 py-1.5 text-xs text-[var(--wf-fg-muted)]"
           >
             <LockIcon size={11} />

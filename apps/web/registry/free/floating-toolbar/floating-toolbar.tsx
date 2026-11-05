@@ -62,13 +62,75 @@ export type ToolbarTool = {
 
 export type ToolbarEntry = ToolbarTool | "divider";
 
-/** 原版 AIToolbar 的四個工具；「生成內容」是動作 */
-export const aiTools: ToolbarEntry[] = [
-  { id: "generate", label: "Generate", shortcut: "G", icon: toolbarIcons.generate, action: true },
-  { id: "enhance", label: "Enhance", shortcut: "E", icon: toolbarIcons.enhance },
-  { id: "analyze", label: "Analyze", shortcut: "A", icon: toolbarIcons.analyze },
-  { id: "transform", label: "Transform", shortcut: "T", icon: toolbarIcons.transform },
+export type FloatingToolbarLabels = {
+  toolbar: string;
+  back: string;
+  busy: string;
+  /** 內建 AI 工具的名稱（只在沒傳 tools 時使用） */
+  generate: string;
+  enhance: string;
+  analyze: string;
+  transform: string;
+};
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, FloatingToolbarLabels> = {
+  en: {
+    toolbar: "AI tools",
+    back: "Back to main toolbar (ESC)",
+    busy: "working",
+    generate: "Generate",
+    enhance: "Enhance",
+    analyze: "Analyze",
+    transform: "Transform",
+  },
+  "zh-TW": {
+    toolbar: "AI 工具",
+    back: "返回主工具列 (ESC)",
+    busy: "處理中",
+    generate: "生成內容",
+    enhance: "優化",
+    analyze: "分析",
+    transform: "轉換",
+  },
+  "zh-CN": {
+    toolbar: "AI 工具",
+    back: "返回主工具栏 (ESC)",
+    busy: "处理中",
+    generate: "生成内容",
+    enhance: "优化",
+    analyze: "分析",
+    transform: "转换",
+  },
+  ja: {
+    toolbar: "AI ツール",
+    back: "メインツールバーに戻る (ESC)",
+    busy: "処理中",
+    generate: "生成",
+    enhance: "改善",
+    analyze: "分析",
+    transform: "変換",
+  },
+};
+
+const buildAiTools = (t: Pick<FloatingToolbarLabels, "generate" | "enhance" | "analyze" | "transform">): ToolbarEntry[] => [
+  { id: "generate", label: t.generate, shortcut: "G", icon: toolbarIcons.generate, action: true },
+  { id: "enhance", label: t.enhance, shortcut: "E", icon: toolbarIcons.enhance },
+  { id: "analyze", label: t.analyze, shortcut: "A", icon: toolbarIcons.analyze },
+  { id: "transform", label: t.transform, shortcut: "T", icon: toolbarIcons.transform },
 ];
+
+/** 原版 AIToolbar 的四個工具（英文）；「生成內容」是動作 */
+export const aiTools: ToolbarEntry[] = buildAiTools(MESSAGES.en);
 
 const defaultAccent = { soft: "rgba(59, 130, 246, 0.3)", strong: "#2563eb", hover: "rgba(59, 130, 246, 0.4)" };
 
@@ -85,36 +147,42 @@ export type FloatingToolbarProps = {
   open?: boolean;
   /** 原版為 fixed 貼齊視窗左側；放在相對容器裡時設 false */
   fixed?: boolean;
-  labels?: { toolbar?: string; back?: string; busy?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<FloatingToolbarLabels>;
   className?: string;
   style?: CSSProperties;
 };
 
 export function FloatingToolbar({
-  tools = aiTools,
+  tools: toolsProp,
   selectedTool = null,
   onSelectTool,
   onAction,
   onClose,
   open = true,
   fixed = true,
+  locale = "en",
   labels,
   className,
   style,
 }: FloatingToolbarProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const tools = toolsProp ?? buildAiTools(t);
   const [pending, setPending] = useState<string | null>(null);
   const closeRef = useRef(onClose);
   useEffect(() => {
     closeRef.current = onClose;
   });
-  const backLabel = labels?.back ?? "Back to main toolbar (ESC)";
+  const backLabel = t.back;
 
   // 原版在 AI 模式按 Escape 回主工具列
   useEffect(() => {
     if (!open || !onClose) return;
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (e.key !== "Escape" || t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable) return;
+      const el = e.target as HTMLElement;
+      if (e.key !== "Escape" || el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable) return;
       closeRef.current?.();
     };
     window.addEventListener("keydown", onKey);
@@ -146,7 +214,7 @@ export function FloatingToolbar({
       }}
       inert={!open}
     >
-      <div role="toolbar" aria-orientation="vertical" aria-label={labels?.toolbar ?? "AI tools"} className="cf-ft-glass flex flex-col gap-0.5 rounded-xl p-1.5">
+      <div role="toolbar" aria-orientation="vertical" aria-label={t.toolbar} className="cf-ft-glass flex flex-col gap-0.5 rounded-xl p-1.5">
         {onClose && (
           <>
             <button type="button" onClick={onClose} className="cf-ft-btn" aria-label={backLabel} title={backLabel}>
@@ -175,7 +243,7 @@ export function FloatingToolbar({
               data-accent-hover={(isSelected && accent.hover) || undefined}
               aria-pressed={tool.action ? undefined : isSelected}
               aria-busy={busy || undefined}
-              aria-label={busy ? `${tool.label}, ${labels?.busy ?? "working"}` : tool.label}
+              aria-label={busy ? `${tool.label}, ${t.busy}` : tool.label}
               aria-keyshortcuts={tool.shortcut}
               disabled={busy}
               title={label}

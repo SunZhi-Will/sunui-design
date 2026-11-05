@@ -100,13 +100,23 @@ export const WORK_STATUS_TONE: Record<WorkStatus, WorkTone> = {
   archived: "neutral",
 };
 
-const WORK_STATUS_LABEL: Record<WorkStatus, string> = {
-  available: "Available",
-  "public-beta": "Public beta",
-  "private-beta": "Private beta",
-  prototype: "Prototype",
-  paused: "Paused",
-  archived: "Archived",
+export type WorkStatusLabels = Record<WorkStatus, string>;
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, WorkStatusLabels> = {
+  en: { available: "Available", "public-beta": "Public beta", "private-beta": "Private beta", prototype: "Prototype", paused: "Paused", archived: "Archived" },
+  "zh-TW": { available: "已上線", "public-beta": "公開測試", "private-beta": "封閉測試", prototype: "原型", paused: "暫停", archived: "已封存" },
+  "zh-CN": { available: "已上线", "public-beta": "公开测试", "private-beta": "封闭测试", prototype: "原型", paused: "暂停", archived: "已归档" },
+  ja: { available: "公開中", "public-beta": "パブリックベータ", "private-beta": "クローズドベータ", prototype: "プロトタイプ", paused: "休止中", archived: "アーカイブ" },
 };
 
 export function StatusBadge({
@@ -114,12 +124,19 @@ export function StatusBadge({
   label,
   help,
   theme,
+  locale = "en",
+  labels,
 }: {
   status: WorkStatus;
   label?: string;
   /** 螢幕閱讀器的補充說明 */
   help?: string;
   theme?: "dark" | "light";
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建的狀態文字，優先於 locale */
+  labels?: Partial<WorkStatusLabels>;
 }) {
-  return <WorkBadge tone={WORK_STATUS_TONE[status]} label={label ?? WORK_STATUS_LABEL[status]} hint={help} theme={theme} />;
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  return <WorkBadge tone={WORK_STATUS_TONE[status]} label={label ?? t[status]} hint={help} theme={theme} />;
 }

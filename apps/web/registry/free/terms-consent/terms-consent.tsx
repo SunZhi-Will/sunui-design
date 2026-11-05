@@ -23,6 +23,8 @@ export interface TermsConsentLabels {
   /** 按鈕停用時的原因，會透過 aria-describedby 讀給螢幕閱讀器 */
   blocked?: (missing: number) => ReactNode;
   ready?: ReactNode;
+  /** 預設按鈕文字；submitLabel 優先 */
+  submit?: ReactNode;
 }
 
 export interface TermsConsentProps {
@@ -34,17 +36,60 @@ export interface TermsConsentProps {
   /** 必填全勾後點按鈕觸發，回傳所有勾選的 id（含選填） */
   onSubmit?: (checked: string[]) => void;
   submitLabel?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: TermsConsentLabels;
   className?: string;
 }
 
-const defaultLabels: Required<TermsConsentLabels> = {
-  eyebrow: "Before you pay",
-  required: "Required",
-  optional: "Optional",
-  counter: (done, total) => <>{done} / {total} required</>,
-  blocked: (missing) => <>Tick the {missing} required {missing === 1 ? "item" : "items"} above to continue.</>,
-  ready: "All set. Optional items can stay unticked.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<TermsConsentLabels>> = {
+  en: {
+    eyebrow: "Before you pay",
+    required: "Required",
+    optional: "Optional",
+    counter: (done, total) => <>{done} / {total} required</>,
+    blocked: (missing) => <>Tick the {missing} required {missing === 1 ? "item" : "items"} above to continue.</>,
+    ready: "All set. Optional items can stay unticked.",
+    submit: "Place order",
+  },
+  "zh-TW": {
+    eyebrow: "付款前確認",
+    required: "必填",
+    optional: "選填",
+    counter: (done, total) => <>必填 {done} / {total}</>,
+    blocked: (missing) => <>請勾選上方 {missing} 項必填項目後繼續。</>,
+    ready: "已完成，選填項目可以不勾。",
+    submit: "送出訂單",
+  },
+  "zh-CN": {
+    eyebrow: "付款前确认",
+    required: "必填",
+    optional: "选填",
+    counter: (done, total) => <>必填 {done} / {total}</>,
+    blocked: (missing) => <>请勾选上方 {missing} 项必填项后继续。</>,
+    ready: "已完成，选填项可以不勾选。",
+    submit: "提交订单",
+  },
+  ja: {
+    eyebrow: "お支払いの前に",
+    required: "必須",
+    optional: "任意",
+    counter: (done, total) => <>必須 {done} / {total}</>,
+    blocked: (missing) => <>続行するには、上の必須項目をあと {missing} 件チェックしてください。</>,
+    ready: "準備完了です。任意の項目はチェックしなくてもかまいません。",
+    submit: "注文を確定する",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -68,11 +113,12 @@ export function TermsConsent({
   defaultValue = [],
   onChange,
   onSubmit,
-  submitLabel = "Place order",
+  submitLabel,
+  locale = "en",
   labels,
   className,
 }: TermsConsentProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const uid = useId();
   const [inner, setInner] = useState<string[]>(defaultValue);
@@ -168,7 +214,7 @@ export function TermsConsent({
             !ready && "cursor-not-allowed opacity-45",
           )}
         >
-          {submitLabel}
+          {submitLabel ?? t.submit}
         </button>
         <p id={hintId} role="status" aria-live="polite" className={cn("text-xs tabular-nums", inkMuted)}>
           {ready ? t.ready : t.blocked(required.length - done)}

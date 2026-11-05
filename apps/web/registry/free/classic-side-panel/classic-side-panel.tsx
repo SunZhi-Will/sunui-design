@@ -182,15 +182,64 @@ function getThemeClasses(theme: SidePanelTheme, isDark: boolean): ThemeClasses {
   return map[theme];
 }
 
-const defaultLabels = {
-  open: "Open",
-  panel: "panel",
-  close: "Close panel",
-  dateRange: "Date range",
-  ranges: { day: "Day", week: "Week", "half-year": "Half year", year: "Year" } as Record<DateRangeOption, string>,
+interface SidePanelMessages {
+  /** 舊版寫法：給了就用「open + 標題」組成切換鈕名稱 */
+  open: string;
+  /** 切換鈕的無障礙名稱 */
+  openPanel: (title: string) => string;
+  /** 沒有文字標題時代替標題的字 */
+  panel: string;
+  close: string;
+  dateRange: string;
+  ranges: Record<DateRangeOption, string>;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SidePanelMessages> = {
+  en: {
+    open: "Open",
+    openPanel: (title) => `Open ${title}`,
+    panel: "panel",
+    close: "Close panel",
+    dateRange: "Date range",
+    ranges: { day: "Day", week: "Week", "half-year": "Half year", year: "Year" },
+  },
+  "zh-TW": {
+    open: "開啟",
+    openPanel: (title) => `開啟${title}`,
+    panel: "面板",
+    close: "關閉面板",
+    dateRange: "日期區間",
+    ranges: { day: "日", week: "週", "half-year": "半年", year: "年" },
+  },
+  "zh-CN": {
+    open: "打开",
+    openPanel: (title) => `打开${title}`,
+    panel: "面板",
+    close: "关闭面板",
+    dateRange: "日期范围",
+    ranges: { day: "日", week: "周", "half-year": "半年", year: "年" },
+  },
+  ja: {
+    open: "開く",
+    openPanel: (title) => `${title}を開く`,
+    panel: "パネル",
+    close: "パネルを閉じる",
+    dateRange: "期間",
+    ranges: { day: "日", week: "週", "half-year": "半年", year: "年" },
+  },
 };
 
-export type SidePanelLabels = Partial<Omit<typeof defaultLabels, "ranges">> & {
+export type SidePanelLabels = Partial<Omit<SidePanelMessages, "ranges">> & {
   ranges?: Partial<Record<DateRangeOption, string>>;
 };
 
@@ -242,6 +291,9 @@ export interface SidePanelProps {
   onDateRangeChange?: (range: DateRangeOption) => void;
   /** true 時相對視窗定位（原版行為）；false 時相對最近的 relative 容器 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: SidePanelLabels;
 }
 
@@ -285,12 +337,14 @@ export function SidePanel({
   selectedDateRange = "day",
   onDateRangeChange = () => {},
   fixed = true,
+  locale = "en",
   labels,
 }: SidePanelProps) {
   const autoId = useId();
   const panelId = id ?? `side-panel-${autoId}`;
   const titleId = `${panelId}-title`;
-  const l = { ...defaultLabels, ...labels, ranges: { ...defaultLabels.ranges, ...labels?.ranges } };
+  const base = MESSAGES[resolveLocale(locale)];
+  const l = { ...base, ...labels, ranges: { ...base.ranges, ...labels?.ranges } };
 
   const reduce = useReducedMotion() ?? false;
   const duration = reduce ? 0 : animationDuration;
@@ -397,7 +451,7 @@ export function SidePanel({
           onClick={handleToggle}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          aria-label={`${l.open} ${titleText}`}
+          aria-label={labels?.open !== undefined && labels.openPanel === undefined ? `${l.open} ${titleText}` : l.openPanel(titleText)}
           aria-expanded={false}
           aria-controls={panelId}
           className={cn(

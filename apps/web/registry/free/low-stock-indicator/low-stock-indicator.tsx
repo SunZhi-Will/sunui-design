@@ -18,35 +18,109 @@ export interface LowStockIndicatorProps {
   criticalAt?: number;
   /** 資料更新時間，例如 "Updated 2 min ago"，讓緊迫感有根據 */
   updatedLabel?: ReactNode;
-  labels?: {
-    inStock?: (n: number) => ReactNode;
-    low?: (n: number) => ReactNode;
-    critical?: (n: number) => ReactNode;
-    soldOut?: ReactNode;
-    /** 量表的無障礙名稱 */
-    meter?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<LowStockIndicatorLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  inStock: (n: number) => (
-    <>
-      <Count n={n} /> in stock
-    </>
-  ),
-  low: (n: number) => (
-    <>
-      Only <Count n={n} /> left
-    </>
-  ),
-  critical: (n: number) => (
-    <>
-      Last <Count n={n} /> in stock
-    </>
-  ),
-  soldOut: <>Sold out</>,
-  meter: "Stock level",
+export interface LowStockIndicatorLabels {
+  inStock: (n: number) => ReactNode;
+  low: (n: number) => ReactNode;
+  critical: (n: number) => ReactNode;
+  soldOut: ReactNode;
+  /** 量表的無障礙名稱 */
+  meter: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
+  en: {
+    inStock: (n) => (
+      <>
+        <Count n={n} /> in stock
+      </>
+    ),
+    low: (n) => (
+      <>
+        Only <Count n={n} /> left
+      </>
+    ),
+    critical: (n) => (
+      <>
+        Last <Count n={n} /> in stock
+      </>
+    ),
+    soldOut: <>Sold out</>,
+    meter: "Stock level",
+  },
+  "zh-TW": {
+    inStock: (n) => (
+      <>
+        尚有 <Count n={n} /> 件庫存
+      </>
+    ),
+    low: (n) => (
+      <>
+        只剩 <Count n={n} /> 件
+      </>
+    ),
+    critical: (n) => (
+      <>
+        最後 <Count n={n} /> 件
+      </>
+    ),
+    soldOut: <>已售完</>,
+    meter: "庫存量",
+  },
+  "zh-CN": {
+    inStock: (n) => (
+      <>
+        现有库存 <Count n={n} /> 件
+      </>
+    ),
+    low: (n) => (
+      <>
+        仅剩 <Count n={n} /> 件
+      </>
+    ),
+    critical: (n) => (
+      <>
+        最后 <Count n={n} /> 件
+      </>
+    ),
+    soldOut: <>已售罄</>,
+    meter: "库存量",
+  },
+  ja: {
+    inStock: (n) => (
+      <>
+        在庫 <Count n={n} /> 点
+      </>
+    ),
+    low: (n) => (
+      <>
+        残り <Count n={n} /> 点
+      </>
+    ),
+    critical: (n) => (
+      <>
+        残りわずか <Count n={n} /> 点
+      </>
+    ),
+    soldOut: <>売り切れ</>,
+    meter: "在庫量",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙邊、墨、朱紅
@@ -75,12 +149,13 @@ export function LowStockIndicator({
   lowAt = 10,
   criticalAt = 3,
   updatedLabel,
+  locale = "en",
   labels,
   className,
 }: LowStockIndicatorProps) {
   const reduceMotion = !!useReducedMotion();
   const labelId = useId();
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const safeStock = Math.max(0, Math.floor(stock));
   const level = getStockLevel(safeStock, lowAt, criticalAt);
   const critical = level === "critical";

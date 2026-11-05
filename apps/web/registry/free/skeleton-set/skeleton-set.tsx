@@ -134,11 +134,34 @@ export interface SkeletonSetProps {
   shimmer?: ShimmerStyle;
   /** preset 的行數或列數 */
   count?: number;
-  labels?: { loading?: string; loaded?: string };
+  /** 讀屏文字的語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SkeletonSetLabels>;
   className?: string;
 }
 
-const defaultLabels = { loading: "Loading content", loaded: "Content loaded" };
+export interface SkeletonSetLabels {
+  loading: string;
+  loaded: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SkeletonSetLabels> = {
+  en: { loading: "Loading content", loaded: "Content loaded" },
+  "zh-TW": { loading: "內容載入中", loaded: "內容已載入" },
+  "zh-CN": { loading: "内容加载中", loaded: "内容已加载" },
+  ja: { loading: "コンテンツを読み込み中", loaded: "コンテンツを読み込みました" },
+};
 const presets: SkeletonPreset[] = ["text", "card", "product", "list"];
 
 function renderPreset(preset: SkeletonPreset, count?: number) {
@@ -155,9 +178,9 @@ function renderPreset(preset: SkeletonPreset, count?: number) {
 }
 
 /** 包住真實內容：未載入時顯示骨架，載入後短暫交叉淡入 */
-export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, labels, className }: SkeletonSetProps) {
+export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, locale = "en", labels, className }: SkeletonSetProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const placeholder = typeof skeleton === "string" && presets.includes(skeleton as SkeletonPreset) ? renderPreset(skeleton as SkeletonPreset, count) : skeleton;
   const fade = { duration: reduceMotion ? 0 : 0.2, ease: "easeOut" as const };
 

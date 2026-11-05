@@ -237,27 +237,105 @@ export interface CombineDialogLabels {
   locked: string;
 }
 
-export const defaultCombineLabels: CombineDialogLabels = {
-  title: "Combine images",
-  subtitle: (n) => `${n} images. Tap a thumbnail to leave it out or add it back`,
-  layout: "Layout",
-  columns: (n) => `${n} columns`,
-  row: "Single row",
-  panorama: "Restore panorama",
-  panoramaHint: "These look like slices of one panorama, so \"Restore panorama\" is selected",
-  gap: "Space between images",
-  size: (w, h) => `${w} × ${h} px`,
-  split: (n) => `Too wide, will be split into ${n} images (posting limit is 10:1)`,
-  videosSkipped: "Videos are not included in the combined image",
-  needTwo: "Pick at least two images",
-  imageAlt: (i) => `Image ${i}`,
-  saveImage: "Save image",
-  saveImages: (n) => `Save ${n} images`,
-  savePdf: "Save as PDF",
-  working: "Working…",
-  cancel: "Cancel",
-  locked: "Supporter feature",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CombineDialogLabels> = {
+  en: {
+    title: "Combine images",
+    subtitle: (n) => `${n} images. Tap a thumbnail to leave it out or add it back`,
+    layout: "Layout",
+    columns: (n) => `${n} columns`,
+    row: "Single row",
+    panorama: "Restore panorama",
+    panoramaHint: "These look like slices of one panorama, so \"Restore panorama\" is selected",
+    gap: "Space between images",
+    size: (w, h) => `${w} × ${h} px`,
+    split: (n) => `Too wide, will be split into ${n} images (posting limit is 10:1)`,
+    videosSkipped: "Videos are not included in the combined image",
+    needTwo: "Pick at least two images",
+    imageAlt: (i) => `Image ${i}`,
+    saveImage: "Save image",
+    saveImages: (n) => `Save ${n} images`,
+    savePdf: "Save as PDF",
+    working: "Working…",
+    cancel: "Cancel",
+    locked: "Supporter feature",
+  },
+  "zh-TW": {
+    title: "合併圖片",
+    subtitle: (n) => `共 ${n} 張。點縮圖可以拿掉或加回來`,
+    layout: "版面",
+    columns: (n) => `${n} 欄`,
+    row: "橫向一排",
+    panorama: "還原全景",
+    panoramaHint: "這幾張看起來是同一張全景切開的，已選好「還原全景」",
+    gap: "圖片之間留白",
+    size: (w, h) => `${w} × ${h} px`,
+    split: (n) => `太寬了，會切成 ${n} 張（發文上限 10:1）`,
+    videosSkipped: "影片不會放進合併的圖片",
+    needTwo: "至少選兩張圖",
+    imageAlt: (i) => `第 ${i} 張圖`,
+    saveImage: "儲存圖片",
+    saveImages: (n) => `儲存 ${n} 張圖片`,
+    savePdf: "存成 PDF",
+    working: "處理中…",
+    cancel: "取消",
+    locked: "支持者功能",
+  },
+  "zh-CN": {
+    title: "合并图片",
+    subtitle: (n) => `共 ${n} 张。点缩略图可以移除或加回来`,
+    layout: "版式",
+    columns: (n) => `${n} 列`,
+    row: "横向一排",
+    panorama: "还原全景",
+    panoramaHint: "这几张看起来是同一张全景切开的，已选好“还原全景”",
+    gap: "图片之间留白",
+    size: (w, h) => `${w} × ${h} px`,
+    split: (n) => `太宽了，会切成 ${n} 张（发帖上限 10:1）`,
+    videosSkipped: "视频不会放进合并的图片",
+    needTwo: "至少选两张图",
+    imageAlt: (i) => `第 ${i} 张图`,
+    saveImage: "保存图片",
+    saveImages: (n) => `保存 ${n} 张图片`,
+    savePdf: "存为 PDF",
+    working: "处理中…",
+    cancel: "取消",
+    locked: "支持者功能",
+  },
+  ja: {
+    title: "画像を結合",
+    subtitle: (n) => `${n} 枚の画像。サムネイルをタップで除外・再追加できます`,
+    layout: "レイアウト",
+    columns: (n) => `${n} 列`,
+    row: "横一列",
+    panorama: "パノラマを復元",
+    panoramaHint: "1 枚のパノラマを分割した画像のようなので「パノラマを復元」を選択しています",
+    gap: "画像の間に余白を入れる",
+    size: (w, h) => `${w} × ${h} px`,
+    split: (n) => `横に長すぎるため ${n} 枚に分割されます（投稿の上限は 10:1）`,
+    videosSkipped: "動画は結合画像に含まれません",
+    needTwo: "2 枚以上選んでください",
+    imageAlt: (i) => `画像 ${i}`,
+    saveImage: "画像を保存",
+    saveImages: (n) => `${n} 枚の画像を保存`,
+    savePdf: "PDF で保存",
+    working: "処理中…",
+    cancel: "キャンセル",
+    locked: "サポーター限定機能",
+  },
 };
+
+/** 英文預設字串（保留舊的匯出名稱） */
+export const defaultCombineLabels: CombineDialogLabels = MESSAGES.en;
 
 export interface CombineDialogProps {
   open: boolean;
@@ -275,6 +353,9 @@ export interface CombineDialogProps {
   /** 成品底色 */
   background?: string;
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<CombineDialogLabels>;
   className?: string;
 }
@@ -297,10 +378,11 @@ export function CombineDialog({
   onClose,
   background = "#ffffff",
   fixed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: CombineDialogProps) {
-  const l = { ...defaultCombineLabels, ...labelsProp };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const reduce = useReducedMotion() ?? false;
   const titleId = useId();
   const saveRef = useRef<HTMLButtonElement>(null);

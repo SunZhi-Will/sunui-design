@@ -2,14 +2,23 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { VariantPicker, type VariantColor, type VariantValue } from "./variant-picker";
 
-const colors: VariantColor[] = [
-  { id: "oat", name: "Oat", swatch: "#d9cdb8" },
-  { id: "navy", name: "Navy", swatch: "#2b3448" },
-  { id: "moss", name: "Moss", swatch: "#6b7354" },
-  { id: "rust", name: "Rust", swatch: "#9a4a2e" },
+const swatches = [
+  { id: "oat", swatch: "#d9cdb8" },
+  { id: "navy", swatch: "#2b3448" },
+  { id: "moss", swatch: "#6b7354" },
+  { id: "rust", swatch: "#9a4a2e" },
 ];
+
+const copy = {
+  en: { oat: "Oat", navy: "Navy", moss: "Moss", rust: "Rust", title: "Heavyweight Cotton Tee", add: "Add to cart" },
+  "zh-TW": { oat: "燕麥", navy: "海軍藍", moss: "苔綠", rust: "鏽紅", title: "厚磅純棉 T 恤", add: "加入購物車" },
+  "zh-CN": { oat: "燕麦", navy: "海军蓝", moss: "苔绿", rust: "锈红", title: "重磅纯棉 T 恤", add: "加入购物车" },
+  ja: { oat: "オート", navy: "ネイビー", moss: "モス", rust: "ラスト", title: "ヘビーウェイト コットンT", add: "カートに追加" },
+};
 
 const sizes = ["XS", "S", "M", "L", "XL"].map((s) => ({ id: s, label: s }));
 
@@ -21,6 +30,9 @@ const stock: Record<string, number> = {
 };
 
 export default function VariantPickerDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
+  const colors: VariantColor[] = swatches.map((c) => ({ ...c, name: t[c.id as keyof typeof t] }));
   const [variant, setVariant] = useState<VariantValue>({ color: "oat", size: "M" });
   const swatch = colors.find((c) => c.id === variant.color)?.swatch ?? "#d9cdb8";
 
@@ -42,17 +54,17 @@ export default function VariantPickerDemo() {
       <div className="space-y-4">
         <div>
           <h2 id="variant-heading" className="text-xl font-semibold tracking-tight">
-            Heavyweight Cotton Tee
+            {t.title}
           </h2>
           <p className="mt-1 text-lg font-semibold tracking-tight tabular-nums">$38.00</p>
         </div>
-        <VariantPicker colors={colors} sizes={sizes} stock={stock} value={variant} onChange={setVariant} />
+        <VariantPicker locale={locale} colors={colors} sizes={sizes} stock={stock} value={variant} onChange={setVariant} />
         <button
           type="button"
           disabled={!variant.size}
           className="h-11 w-full max-w-sm rounded-md bg-primary text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
-          Add to cart
+          {t.add}
         </button>
       </div>
     </section>

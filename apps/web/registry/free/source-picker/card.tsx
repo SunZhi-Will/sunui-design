@@ -2,6 +2,8 @@
 
 import { useId, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { SourceCard, SourceKindBar, preflightTheme, type PreflightSource, type SourceKind } from "./source-picker";
 
 function Desk({ hue, bars }: { hue: number; bars: number }) {
@@ -15,15 +17,25 @@ function Desk({ hue, bars }: { hue: number; bars: number }) {
   );
 }
 
-const SOURCES: PreflightSource[] = [
-  { id: "screen:1", kind: "screen", name: "Screen 1", thumbnail: <Desk hue={220} bars={3} /> },
-  { id: "screen:2", kind: "screen", name: "Screen 2", thumbnail: <Desk hue={30} bars={2} /> },
-  { id: "window:figma", kind: "window", name: "Figma", thumbnail: <Desk hue={280} bars={1} /> },
-  { id: "window:code", kind: "window", name: "Code", thumbnail: <Desk hue={200} bars={2} /> },
-];
+const BASE = [
+  { id: "screen:1", kind: "screen", thumbnail: <Desk hue={220} bars={3} /> },
+  { id: "screen:2", kind: "screen", thumbnail: <Desk hue={30} bars={2} /> },
+  { id: "window:figma", kind: "window", thumbnail: <Desk hue={280} bars={1} /> },
+  { id: "window:code", kind: "window", thumbnail: <Desk hue={200} bars={2} /> },
+] as const;
+
+const copy = {
+  en: { names: ["Screen 1", "Screen 2", "Figma", "Code"], empty: "No sources found" },
+  "zh-TW": { names: ["螢幕 1", "螢幕 2", "Figma", "Code"], empty: "找不到來源" },
+  "zh-CN": { names: ["屏幕 1", "屏幕 2", "Figma", "Code"], empty: "未找到来源" },
+  ja: { names: ["画面 1", "画面 2", "Figma", "Code"], empty: "ソースが見つかりません" },
+};
 
 /** 型錄卡片：兩張來源縮圖可選取，底部分頁切換螢幕或視窗，並可搜尋。 */
 export default function SourcePickerCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
+  const SOURCES: PreflightSource[] = BASE.map((s, i) => ({ ...s, name: t.names[i] }));
   const panelId = useId();
   const [kind, setKind] = useState<SourceKind>("screen");
   const [query, setQuery] = useState("");
@@ -40,10 +52,10 @@ export default function SourcePickerCard() {
             <SourceCard source={s} selected={selectedId === s.id} onSelect={setSelectedId} />
           </div>
         ))}
-        {items.length === 0 && <p className="col-span-full text-center text-sm text-[var(--pf-text-2)]">No sources found</p>}
+        {items.length === 0 && <p className="col-span-full text-center text-sm text-[var(--pf-text-2)]">{t.empty}</p>}
       </div>
       <div className="border-t border-[var(--pf-border)] bg-[var(--pf-surface)]">
-        <SourceKindBar value={kind} onChange={setKind} query={query} onQueryChange={setQuery} panelId={panelId} />
+        <SourceKindBar locale={locale} value={kind} onChange={setKind} query={query} onQueryChange={setQuery} panelId={panelId} />
       </div>
     </div>
   );

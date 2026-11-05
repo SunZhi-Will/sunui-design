@@ -136,6 +136,32 @@ export function SourceCard({ source, selected, onSelect }: { source: PreflightSo
 
 export type SourceKind = "screen" | "window" | "region";
 
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+export interface SourceKindBarLabels {
+  toggle: string;
+  screen: string;
+  window: string;
+  region: string;
+  search: string;
+  refresh: string;
+}
+
+const MESSAGES: Record<SunLocale, SourceKindBarLabels> = {
+  en: { toggle: "Toggle Screen/Window/Region", screen: "Screen", window: "Window", region: "Region", search: "Search windows...", refresh: "Refresh" },
+  "zh-TW": { toggle: "切換螢幕／視窗／區域", screen: "螢幕", window: "視窗", region: "區域", search: "搜尋視窗...", refresh: "重新整理" },
+  "zh-CN": { toggle: "切换屏幕／窗口／区域", screen: "屏幕", window: "窗口", region: "区域", search: "搜索窗口...", refresh: "刷新" },
+  ja: { toggle: "画面／ウィンドウ／範囲を切り替え", screen: "画面", window: "ウィンドウ", region: "範囲", search: "ウィンドウを検索...", refresh: "更新" },
+};
+
 export interface SourceKindBarProps {
   value: SourceKind;
   onChange: (kind: SourceKind) => void;
@@ -145,7 +171,10 @@ export interface SourceKindBarProps {
   onRefresh?: () => void;
   /** tabpanel 的 id，用於 aria-controls */
   panelId: string;
-  labels?: Partial<{ toggle: string; screen: string; window: string; region: string; search: string; refresh: string }>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SourceKindBarLabels>;
 }
 
 const KIND_TABS = [
@@ -154,8 +183,8 @@ const KIND_TABS = [
   { value: "region", icon: Icons.Crop },
 ] as const;
 
-export function SourceKindBar({ value, onChange, query, onQueryChange, loading, onRefresh, panelId, labels }: SourceKindBarProps) {
-  const l = { toggle: "Toggle Screen/Window/Region", screen: "Screen", window: "Window", region: "Region", search: "Search windows...", refresh: "Refresh", ...labels };
+export function SourceKindBar({ value, onChange, query, onQueryChange, loading, onRefresh, panelId, locale = "en", labels }: SourceKindBarProps) {
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const current = KIND_TABS.findIndex((t) => t.value === value);
 

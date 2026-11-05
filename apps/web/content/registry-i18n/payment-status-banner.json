@@ -1,0 +1,20 @@
+{
+  "zh-TW": {
+    "title": "付款狀態橫幅",
+    "description": "買家從結帳頁回來時顯示的毛玻璃全寬橫幅：確認中每 3 秒輪詢一次、最多 8 次，開通後轉為成功；成功會保留並連到課程，失敗與錯誤 8 秒後自動關閉。確認中與成功使用 role=\"status\"，失敗使用 role=\"alert\"，關閉鈕有標籤，減少動態時轉圈會停止。",
+    "whenToUse": ["託管付款跳轉回來後的著陸頁（?checkout=success|pending|failed|error）", "跳轉後幾秒才由 webhook 開通權限的付款流程"],
+    "watchOut": ["onRefresh 必須真的重新取得資料並更新 unlocked prop，否則 pending 永遠不會變成 success", "配色針對深色頁面調整；放進版面中時請設定 fixed={false}"]
+  },
+  "zh-CN": {
+    "title": "支付状态横幅",
+    "description": "买家从结账页返回时显示的毛玻璃通栏横幅：确认中每 3 秒轮询一次、最多 8 次，开通后转为成功；成功会保留并链接到课程，失败与错误 8 秒后自动关闭。确认中与成功使用 role=\"status\"，失败使用 role=\"alert\"，关闭按钮带标签，减少动态效果时加载图标停止旋转。",
+    "whenToUse": ["托管支付跳转回来后的落地页（?checkout=success|pending|failed|error）", "跳转后几秒才由 webhook 开通权限的支付流程"],
+    "watchOut": ["onRefresh 必须真正重新获取数据并更新 unlocked prop，否则 pending 永远不会变成 success", "配色针对深色页面调校；放进布局中时请设置 fixed={false}"]
+  },
+  "ja": {
+    "title": "決済ステータスバナー",
+    "description": "購入者が決済から戻ったときに表示される、すりガラス風の全幅バナー。確認中は 3 秒ごとに最大 8 回ポーリングし、利用可能になると成功に切り替わります。成功は表示されたまま講座へのリンクを示し、失敗とエラーは 8 秒後に自動で閉じます。確認中と成功は role=\"status\"、失敗は role=\"alert\" を使い、閉じるボタンにはラベルがあり、モーション軽減時はスピナーが止まります。",
+    "whenToUse": ["ホスト型決済からリダイレクトされた後のランディングページ（?checkout=success|pending|failed|error）", "リダイレクトの数秒後に webhook でアクセスが解放される決済"],
+    "watchOut": ["onRefresh は実際に再取得して unlocked prop を更新すること。そうしないと pending が success に変わらない", "配色は暗いページ向けに調整されている。レイアウト内に置くときは fixed={false} を指定する"]
+  }
+}

@@ -50,16 +50,30 @@ export interface PaginationProps {
   siblings?: number;
   /** 只顯示「上一頁 3 / 12 下一頁」，適合窄欄 */
   compact?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: PaginationLabels;
   className?: string;
 }
 
-const defaultLabels: Required<PaginationLabels> = {
-  nav: "Pagination",
-  previous: "Previous",
-  next: "Next",
-  page: (n) => `Page ${n}`,
-  compact: (page, total) => <>{page} / {total}</>,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const compactText = (page: number, total: number) => <>{page} / {total}</>;
+
+const MESSAGES: Record<SunLocale, Required<PaginationLabels>> = {
+  en: { nav: "Pagination", previous: "Previous", next: "Next", page: (n) => `Page ${n}`, compact: compactText },
+  "zh-TW": { nav: "分頁", previous: "上一頁", next: "下一頁", page: (n) => `第 ${n} 頁`, compact: compactText },
+  "zh-CN": { nav: "分页", previous: "上一页", next: "下一页", page: (n) => `第 ${n} 页`, compact: compactText },
+  ja: { nav: "ページ送り", previous: "前へ", next: "次へ", page: (n) => `${n} ページ目`, compact: compactText },
 };
 
 const springs = {
@@ -89,10 +103,11 @@ export function Pagination({
   getHref,
   siblings = 1,
   compact = false,
+  locale = "en",
   labels,
   className,
 }: PaginationProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const layoutId = `${useId()}-indicator`;
   const [inner, setInner] = useState(defaultPage);

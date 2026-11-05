@@ -15,26 +15,64 @@ export interface CopyCodeButtonProps {
   /** 複製成功後呼叫 */
   onCopy?: (code: string) => void;
   size?: "sm" | "md" | "lg";
-  labels?: {
-    /** 按鈕可見文字 */
-    button?: ReactNode;
-    /** 按鈕的無障礙名稱 */
-    copy?: (code: string) => string;
-    /** 朗讀給螢幕閱讀器 */
-    copied?: string;
-    /** 複製後蓋在紙條上的印章字 */
-    stamp?: ReactNode;
-    failed?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CopyCodeButtonLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  button: "Copy",
-  copy: (code: string) => `Copy code ${code}`,
-  copied: "Code copied to clipboard",
-  stamp: "Copied",
-  failed: "Copy failed, select the code to copy manually",
+export interface CopyCodeButtonLabels {
+  /** 按鈕可見文字 */
+  button: ReactNode;
+  /** 按鈕的無障礙名稱 */
+  copy: (code: string) => string;
+  /** 朗讀給螢幕閱讀器 */
+  copied: string;
+  /** 複製後蓋在紙條上的印章字 */
+  stamp: ReactNode;
+  failed: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CopyCodeButtonLabels> = {
+  en: {
+    button: "Copy",
+    copy: (code) => `Copy code ${code}`,
+    copied: "Code copied to clipboard",
+    stamp: "Copied",
+    failed: "Copy failed, select the code to copy manually",
+  },
+  "zh-TW": {
+    button: "複製",
+    copy: (code) => `複製代碼 ${code}`,
+    copied: "代碼已複製到剪貼簿",
+    stamp: "已複製",
+    failed: "複製失敗，請選取代碼手動複製",
+  },
+  "zh-CN": {
+    button: "复制",
+    copy: (code) => `复制代码 ${code}`,
+    copied: "代码已复制到剪贴板",
+    stamp: "已复制",
+    failed: "复制失败，请选中代码手动复制",
+  },
+  ja: {
+    button: "コピー",
+    copy: (code) => `コード ${code} をコピー`,
+    copied: "コードをクリップボードにコピーしました",
+    stamp: "コピー済",
+    failed: "コピーできませんでした。コードを選択して手動でコピーしてください",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -75,9 +113,9 @@ async function writeClipboard(text: string) {
   if (!ok) throw new Error("copy failed");
 }
 
-export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size = "md", labels, className }: CopyCodeButtonProps) {
+export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size = "md", locale = "en", labels, className }: CopyCodeButtonProps) {
   const reduceMotion = useReducedMotion();
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
   const [stampKey, setStampKey] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { FloatingButton, type SocialButtonConfig } from "./classic-floating-button";
 
 // 與 demo 相同的社群按鈕配色
@@ -13,12 +15,14 @@ const socialButtons: SocialButtonConfig[] = [
 
 /** 型錄卡片：一顆可拖曳的浮動按鈕，點開後社群按鈕以花瓣狀展開。 */
 export default function ClassicFloatingButtonCard() {
+  const locale = useDemoLocale();
   const dragArea = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={dragArea} className="relative isolate mx-auto h-56 w-72 overflow-hidden rounded-xl bg-gray-50">
       <FloatingButton
         fixed={false}
+        locale={locale}
         buttons={socialButtons}
         position="bottom-right"
         variant="petal"

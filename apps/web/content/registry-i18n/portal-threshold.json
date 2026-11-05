@@ -1,0 +1,20 @@
+{
+  "zh-TW": {
+    "title": "門扉入口",
+    "description": "裝飾用的主視覺：三個巢狀圓角方框逐漸對齊，在透視網格地面上開啟發光的金色光圈。設為 aria-hidden 且 pointer-events none，所有待機動態約 12 秒後停止；在 prefers-reduced-motion 下直接顯示對齊後的最終畫面，不出現火花、掃光與脈動。",
+    "whenToUse": ["還沒有真正的產品截圖時，放在首頁主標題旁作為唯一的招牌視覺", "variant=\"still\" 可在關於我們等次要頁面作為安靜的品牌幾何圖形"],
+    "watchOut": ["signature 變體全站只用一次；重複使用會削弱效果", "它純粹是裝飾，絕不要放入資訊；淺色背景上的金色需要用 gold/goldBright props 調深"]
+  },
+  "zh-CN": {
+    "title": "门扉入口",
+    "description": "装饰用的主视觉：三个嵌套圆角方框逐渐对齐，在透视网格地面上打开发光的金色光圈。设为 aria-hidden 且 pointer-events none，所有待机动画约 12 秒后停止；在 prefers-reduced-motion 下直接显示对齐后的最终画面，不出现火花、扫光与脉动。",
+    "whenToUse": ["还没有真正的产品截图时，放在首页主标题旁作为唯一的招牌视觉", "variant=\"still\" 可在关于我们等次要页面作为安静的品牌几何图形"],
+    "watchOut": ["signature 变体全站只用一次；重复使用会削弱效果", "它纯粹是装饰，绝不要放入信息；浅色背景上的金色需要用 gold/goldBright props 调深"]
+  },
+  "ja": {
+    "title": "ポータル・スレッショルド",
+    "description": "装飾用のヒーロービジュアル。入れ子になった三つの角丸の四角形が揃っていき、パース付きグリッドの床の上に光る金色の開口部が開きます。aria-hidden かつ pointer-events none で、待機中の動きは約 12 秒ですべて止まります。prefers-reduced-motion では揃った最終フレームを表示し、火花、スイープ、パルスは出しません。",
+    "whenToUse": ["実際の製品スクリーンショットがまだないとき、ランディングのヒーロー見出しの横に置く唯一のシグネチャービジュアル", "variant=\"still\" で About などの二次ページに控えめなブランドジオメトリとして"],
+    "watchOut": ["signature バリアントはサイト内で 1 回だけ使う。繰り返すと印象が薄れる", "純粋な装飾なので情報は載せない。明るい背景の金色には、より濃い gold/goldBright props が必要"]
+  }
+}

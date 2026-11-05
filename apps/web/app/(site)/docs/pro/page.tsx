@@ -1,54 +1,57 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
+import { RichText } from "@/components/rich-text";
+import { getI18n } from "@/lib/i18n-server";
 import { proRegistryConfig } from "@/lib/registry";
 
-export const metadata: Metadata = { title: "Using Pro blocks", description: "Install SunUI Pro blocks with your license key." };
+export async function generateMetadata(): Promise<Metadata> {
+  const { m } = await getI18n();
+  return { title: m.docsPro.title, description: m.docsPro.metaDescription };
+}
 
-export default function ProDocsPage() {
+export default async function ProDocsPage() {
+  const { m } = await getI18n();
+  const t = m.docsPro;
   return (
     <>
-      <h1>Using Pro blocks</h1>
+      <h1>{t.title}</h1>
+      <p>{t.lead}</p>
+
+      <h2>{t.step1Title}</h2>
       <p>
-        Pro blocks are delivered through a private shadcn registry. Your license key authenticates each install, so
-        the source still lands in your repo like any other block.
+        <RichText text={t.step1Body} />
       </p>
 
-      <h2>1. Get a license</h2>
-      <p>
-        Buy Pro or Team on the <Link href="/pricing">pricing page</Link>. Your license key arrives by email right after
-        checkout.
-      </p>
-
-      <h2>2. Add the registry</h2>
+      <h2>{t.step2Title}</h2>
       <div className="block-gap">
         <CodeBlock code={proRegistryConfig()} lang="json" title="components.json" />
       </div>
 
-      <h2>3. Add your key</h2>
+      <h2>{t.step3Title}</h2>
       <p>
-        Put the key in <code>.env.local</code>. Keep it out of git; it is personal to your license.
+        <RichText text={t.step3Body} />
       </p>
       <div className="block-gap">
         <Command value="SUNUI_LICENSE_KEY=your-license-key" />
       </div>
 
-      <h2>4. Install</h2>
+      <h2>{t.step4Title}</h2>
       <div className="block-gap">
         <Command value="npx shadcn@latest add @sunui-pro/flash-sale-hero" />
       </div>
 
-      <h2>Troubleshooting</h2>
+      <h2>{t.troubleTitle}</h2>
       <ul>
-        <li>401: the key is missing. Check that SUNUI_LICENSE_KEY is set in the shell or .env.local.</li>
-        <li>403: the key was revoked or is being shared too widely. Contact support.</li>
-        <li>429: too many installs in a short time. Wait a few minutes and retry.</li>
+        {t.trouble.map((line) => (
+          <li key={line}>
+            <RichText text={line} />
+          </li>
+        ))}
       </ul>
       <p>
-        On CI, add <code>SUNUI_LICENSE_KEY</code> as a secret. Every installed file has a header with your license ID,
-        so please do not commit Pro source to public repositories.
+        <RichText text={t.ci} />
       </p>
     </>
   );

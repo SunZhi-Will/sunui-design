@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { CardFlowLoader } from "./cardflow-loader";
 
 /** 型錄卡片：進度圈跑到 100%，停一下再重播。 */
 export default function CardFlowLoaderCard() {
+  const locale = useDemoLocale();
   const [run, setRun] = useState(0);
   const [done, setDone] = useState(false);
 
@@ -21,7 +24,7 @@ export default function CardFlowLoaderCard() {
 
   return (
     <div className="relative mx-auto h-[230px] w-72 overflow-hidden rounded-xl border border-gray-200 bg-white">
-      <CardFlowLoader key={run} hideOnComplete={false} messageInterval={2500} onComplete={() => setDone(true)} />
+      <CardFlowLoader key={run} locale={locale} hideOnComplete={false} messageInterval={2500} onComplete={() => setDone(true)} />
     </div>
   );
 }

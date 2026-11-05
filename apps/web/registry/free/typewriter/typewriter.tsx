@@ -29,15 +29,41 @@ export interface TypewriterProps {
   srText?: string;
   phraseClassName?: string;
   lang?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤；影響字素切分與預設朗讀文字的分隔 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<TypewriterLabels>;
   className?: string;
 }
+
+export interface TypewriterLabels {
+  /** 預設 srText 串接各句時的分隔 */
+  separator: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, TypewriterLabels> = {
+  en: { separator: ", " },
+  "zh-TW": { separator: "、" },
+  "zh-CN": { separator: "、" },
+  ja: { separator: "、" },
+};
 
 const CJK_RE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
 const PUNCT_RE = /[.,!?;:，。！？；：、…]/u;
 
-function graphemes(text: string): string[] {
+function graphemes(text: string, locale?: string): string[] {
   if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
-    const seg = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+    const seg = new Intl.Segmenter(locale, { granularity: "grapheme" });
     return Array.from(seg.segment(text), (s) => s.segment);
   }
   return Array.from(text);
@@ -57,13 +83,16 @@ export function Typewriter({
   srText,
   phraseClassName,
   lang,
+  locale = "en",
+  labels,
   className,
 }: TypewriterProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   // 以內容當 key，父層每次傳新陣列也不會重置打字進度
   const phraseKey = phrases.join("\u0000");
-  const split = useMemo(() => phraseKey.split("\u0000").map(graphemes), [phraseKey]);
+  const split = useMemo(() => phraseKey.split("\u0000").map((p) => graphemes(p, locale)), [phraseKey, locale]);
   const [index, setIndex] = useState(0);
   const [count, setCount] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -131,7 +160,7 @@ export function Typewriter({
     : current.slice(0, count).join("");
   // 停在最後一句：游標收起，畫面安靜下來
   const resting = !loop && (reduceMotion || (isLast && count >= current.length && active));
-  const fullText = srText ?? [typeof prefix === "string" ? prefix : "", phrases.join(", ")].filter(Boolean).join(" ");
+  const fullText = srText ?? [typeof prefix === "string" ? prefix : "", phrases.join(t.separator)].filter(Boolean).join(" ");
 
   return (
     <Tag

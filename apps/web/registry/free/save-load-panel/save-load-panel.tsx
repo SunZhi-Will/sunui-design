@@ -103,22 +103,142 @@ export interface SaveSlot {
   playTimeSeconds: number;
 }
 
-export function formatSavedAt(value: Date | string | number) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "時間不明";
-  return date.toLocaleString("zh-TW", { hour12: false });
+export interface SaveLoadPanelLabels {
+  saveTitle: string;
+  loadTitle: string;
+  unknownTime: string;
+  playTime: (hours: number, minutes: number) => string;
+  writeFailed: (slotIndex: number) => string;
+  loadFailed: string;
+  slot: (slotIndex: number) => string;
+  overwriteTitle: (slotIndex: number) => string;
+  deleteTitle: (slotIndex: number) => string;
+  overwriteBody: string;
+  deleteBody: string;
+  confirmOverwrite: string;
+  confirmDelete: string;
+  cancel: string;
+  autosave: string;
+  quicksave: string;
+  empty: string;
+  delete: string;
+  deleteSlot: (label: string) => string;
 }
 
-export function formatPlayTime(seconds: number) {
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SaveLoadPanelLabels> = {
+  en: {
+    saveTitle: "Save",
+    loadTitle: "Load",
+    unknownTime: "Unknown time",
+    playTime: (h, m) => (h > 0 ? `${h} h ${m} min` : `${m} min`),
+    writeFailed: (n) => `Couldn't write Save ${n}. Your progress was not saved.`,
+    loadFailed: "Something went wrong loading this save. Your progress was not changed.",
+    slot: (n) => `Save ${n}`,
+    overwriteTitle: (n) => `Overwrite Save ${n}`,
+    deleteTitle: (n) => `Delete Save ${n}`,
+    overwriteBody: "The save in this slot will be replaced with your current progress. This can't be undone:",
+    deleteBody: "This save will be permanently deleted. This can't be undone:",
+    confirmOverwrite: "Overwrite",
+    confirmDelete: "Delete",
+    cancel: "Cancel",
+    autosave: "Autosave",
+    quicksave: "Quicksave",
+    empty: "Empty",
+    delete: "Delete",
+    deleteSlot: (label) => `Delete ${label}`,
+  },
+  "zh-TW": {
+    saveTitle: "存檔",
+    loadTitle: "讀取紀錄",
+    unknownTime: "時間不明",
+    playTime: (h, m) => (h > 0 ? `${h} 小時 ${m} 分` : `${m} 分鐘`),
+    writeFailed: (n) => `存檔 ${n} 寫入失敗，進度未被保存。`,
+    loadFailed: "讀取這個存檔時發生問題，進度未被更動。",
+    slot: (n) => `存檔 ${n}`,
+    overwriteTitle: (n) => `覆蓋存檔 ${n}`,
+    deleteTitle: (n) => `刪除存檔 ${n}`,
+    overwriteBody: "這個欄位目前的存檔會被現在的進度取代，且無法復原：",
+    deleteBody: "這份存檔會被永久刪除，且無法復原：",
+    confirmOverwrite: "確定覆蓋",
+    confirmDelete: "確定刪除",
+    cancel: "取消",
+    autosave: "自動存檔",
+    quicksave: "快速存檔",
+    empty: "空",
+    delete: "刪除",
+    deleteSlot: (label) => `刪除${label}`,
+  },
+  "zh-CN": {
+    saveTitle: "存档",
+    loadTitle: "读取记录",
+    unknownTime: "时间不明",
+    playTime: (h, m) => (h > 0 ? `${h} 小时 ${m} 分` : `${m} 分钟`),
+    writeFailed: (n) => `存档 ${n} 写入失败，进度未保存。`,
+    loadFailed: "读取这个存档时出现问题，进度未被改动。",
+    slot: (n) => `存档 ${n}`,
+    overwriteTitle: (n) => `覆盖存档 ${n}`,
+    deleteTitle: (n) => `删除存档 ${n}`,
+    overwriteBody: "这个存档位当前的存档会被现在的进度覆盖，且无法恢复：",
+    deleteBody: "这份存档会被永久删除，且无法恢复：",
+    confirmOverwrite: "确定覆盖",
+    confirmDelete: "确定删除",
+    cancel: "取消",
+    autosave: "自动存档",
+    quicksave: "快速存档",
+    empty: "空",
+    delete: "删除",
+    deleteSlot: (label) => `删除${label}`,
+  },
+  ja: {
+    saveTitle: "セーブ",
+    loadTitle: "ロード",
+    unknownTime: "日時不明",
+    playTime: (h, m) => (h > 0 ? `${h} 時間 ${m} 分` : `${m} 分`),
+    writeFailed: (n) => `セーブ ${n} への書き込みに失敗しました。進行状況は保存されていません。`,
+    loadFailed: "このセーブデータの読み込みに失敗しました。進行状況は変更されていません。",
+    slot: (n) => `セーブ ${n}`,
+    overwriteTitle: (n) => `セーブ ${n} を上書き`,
+    deleteTitle: (n) => `セーブ ${n} を削除`,
+    overwriteBody: "このスロットのセーブデータは現在の進行状況で置き換えられます。元に戻せません：",
+    deleteBody: "このセーブデータは完全に削除されます。元に戻せません：",
+    confirmOverwrite: "上書きする",
+    confirmDelete: "削除する",
+    cancel: "キャンセル",
+    autosave: "オートセーブ",
+    quicksave: "クイックセーブ",
+    empty: "空き",
+    delete: "削除",
+    deleteSlot: (label) => `${label}を削除`,
+  },
+};
+
+/** locale 同時決定日期格式與文字 */
+export function formatSavedAt(value: Date | string | number, locale = "en") {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return MESSAGES[resolveLocale(locale)].unknownTime;
+  return date.toLocaleString(locale, { hour12: false });
+}
+
+export function formatPlayTime(seconds: number, locale = "en") {
   const safe = Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
   const total = Math.floor(safe / 60);
   const hours = Math.floor(total / 60);
-  return hours > 0 ? `${hours} 小時 ${total % 60} 分` : `${total % 60} 分鐘`;
+  return MESSAGES[resolveLocale(locale)].playTime(hours, total % 60);
 }
 
 /** 破壞性確認裡用的一行描述：章 · 場景 · 時間，絕不留空 */
-export function saveSlotOneLineLabel(slot: SaveSlot) {
-  return [slot.chapter, slot.scene, formatSavedAt(slot.savedAt)].filter(Boolean).join(" · ");
+export function saveSlotOneLineLabel(slot: SaveSlot, locale = "en") {
+  return [slot.chapter, slot.scene, formatSavedAt(slot.savedAt, locale)].filter(Boolean).join(" · ");
 }
 
 export interface SaveLoadPanelProps {
@@ -137,6 +257,10 @@ export interface SaveLoadPanelProps {
   lastError?: string;
   theme?: StoryTheme;
   fixed?: boolean;
+  /** 介面語言與日期格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SaveLoadPanelLabels>;
   className?: string;
 }
 
@@ -154,8 +278,11 @@ export function SaveLoadPanel({
   lastError,
   theme = "ink",
   fixed = false,
+  locale = "en",
+  labels,
   className,
 }: SaveLoadPanelProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [pending, setPending] = useState<Pending>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
@@ -181,7 +308,7 @@ export function SaveLoadPanel({
       onSave?.(slotIndex);
       onClose();
     } catch (err) {
-      setError(err instanceof Error && err.message ? err.message : `存檔 ${slotIndex} 寫入失敗，進度未被保存。`);
+      setError(err instanceof Error && err.message ? err.message : t.writeFailed(slotIndex));
     }
   };
 
@@ -191,7 +318,7 @@ export function SaveLoadPanel({
     try {
       await onLoad?.(id);
     } catch (err) {
-      setError(err instanceof Error && err.message ? err.message : "讀取這個存檔時發生問題，進度未被更動。");
+      setError(err instanceof Error && err.message ? err.message : t.loadFailed);
     } finally {
       setBusy(false);
     }
@@ -210,7 +337,7 @@ export function SaveLoadPanel({
         ref={cardRef}
         role="dialog"
         aria-modal="true"
-        aria-label={mode === "save" ? "存檔" : "讀取紀錄"}
+        aria-label={mode === "save" ? t.saveTitle : t.loadTitle}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -227,7 +354,7 @@ export function SaveLoadPanel({
         }}
       >
         <div style={{ fontFamily: "var(--story-font-display)", fontSize: "1.2rem", letterSpacing: "0.2em", color: "var(--story-accent-bright)" }}>
-          {mode === "save" ? "存檔" : "讀取紀錄"}
+          {mode === "save" ? t.saveTitle : t.loadTitle}
         </div>
 
         {banner && (
@@ -239,12 +366,12 @@ export function SaveLoadPanel({
         {pending ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             <div style={{ fontSize: "1rem", letterSpacing: "0.15em", color: "var(--story-accent-bright)" }}>
-              {pending.kind === "overwrite" ? `覆蓋存檔 ${pending.slotIndex}` : `刪除存檔 ${pending.slotIndex}`}
+              {pending.kind === "overwrite" ? t.overwriteTitle(pending.slotIndex) : t.deleteTitle(pending.slotIndex)}
             </div>
             <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.7 }}>
-              {pending.kind === "overwrite" ? "這個欄位目前的存檔會被現在的進度取代，且無法復原：" : "這份存檔會被永久刪除，且無法復原："}
+              {pending.kind === "overwrite" ? t.overwriteBody : t.deleteBody}
             </p>
-            <SlotDescription slot={pending.slot} />
+            <SlotDescription slot={pending.slot} locale={locale} t={t} />
             <button
               type="button"
               className="spm-btn-primary"
@@ -254,27 +381,29 @@ export function SaveLoadPanel({
                 else onDelete?.(pending.slotIndex);
               }}
             >
-              {pending.kind === "overwrite" ? "確定覆蓋" : "確定刪除"}
+              {pending.kind === "overwrite" ? t.confirmOverwrite : t.confirmDelete}
             </button>
             <button type="button" className="spm-btn" onClick={() => setPending(undefined)}>
-              取消
+              {t.cancel}
             </button>
           </div>
         ) : (
           <>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {mode === "load" && (
-                <SlotRow label="自動存檔" slot={autosave} disabled={busy} onClick={autosave ? () => void load(autosave.id) : undefined} />
+                <SlotRow label={t.autosave} locale={locale} t={t} slot={autosave} disabled={busy} onClick={autosave ? () => void load(autosave.id) : undefined} />
               )}
               {mode === "load" && (
-                <SlotRow label="快速存檔" slot={quicksave} disabled={busy} onClick={quicksave ? () => void load(quicksave.id) : undefined} />
+                <SlotRow label={t.quicksave} locale={locale} t={t} slot={quicksave} disabled={busy} onClick={quicksave ? () => void load(quicksave.id) : undefined} />
               )}
               {manualSlots.map((slot, i) => {
                 const slotIndex = i + 1;
                 return (
                   <SlotRow
                     key={slotIndex}
-                    label={`存檔 ${slotIndex}`}
+                    label={t.slot(slotIndex)}
+                    locale={locale}
+                    t={t}
                     slot={slot}
                     disabled={busy}
                     onClick={
@@ -295,7 +424,7 @@ export function SaveLoadPanel({
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "0.5rem" }}>
               <button type="button" className="spm-btn" onClick={onClose}>
-                取消
+                {t.cancel}
               </button>
             </div>
           </>
@@ -305,20 +434,36 @@ export function SaveLoadPanel({
   );
 }
 
-function SlotDescription({ slot }: { slot: SaveSlot }) {
+function SlotDescription({ slot, locale, t }: { slot: SaveSlot; locale: string; t: SaveLoadPanelLabels }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.85rem", color: "var(--story-secondary)" }}>
       {slot.chapter && <span>{slot.chapter}</span>}
       {slot.scene && <span>{slot.scene}</span>}
       <span>
-        {formatSavedAt(slot.savedAt)} · {formatPlayTime(slot.playTimeSeconds)}
+        {formatSavedAt(slot.savedAt, locale)} · {formatPlayTime(slot.playTimeSeconds, locale)}
       </span>
     </div>
   );
 }
 
 // 選取與刪除是同一層的兩顆按鈕，不巢套
-function SlotRow({ label, slot, disabled, onClick, onDelete }: { label: string; slot?: SaveSlot; disabled?: boolean; onClick?: () => void; onDelete?: () => void }) {
+function SlotRow({
+  label,
+  locale,
+  t,
+  slot,
+  disabled,
+  onClick,
+  onDelete,
+}: {
+  label: string;
+  locale: string;
+  t: SaveLoadPanelLabels;
+  slot?: SaveSlot;
+  disabled?: boolean;
+  onClick?: () => void;
+  onDelete?: () => void;
+}) {
   return (
     <div style={{ display: "flex", alignItems: "stretch", gap: "0.4rem", minWidth: 0 }}>
       <button
@@ -335,24 +480,24 @@ function SlotRow({ label, slot, disabled, onClick, onDelete }: { label: string; 
               {slot.chapter && <span style={{ fontSize: "0.8rem", color: "var(--story-accent-dim)" }}>{slot.chapter}</span>}
               {slot.scene && <span style={{ fontSize: "0.8rem", color: "var(--story-secondary)" }}>{slot.scene}</span>}
               <span style={{ fontSize: "0.75rem", color: "var(--story-secondary)" }}>
-                {formatSavedAt(slot.savedAt)} · {formatPlayTime(slot.playTimeSeconds)}
+                {formatSavedAt(slot.savedAt, locale)} · {formatPlayTime(slot.playTimeSeconds, locale)}
               </span>
             </>
           ) : (
-            <span style={{ fontSize: "0.75rem", color: "var(--story-secondary)" }}>空</span>
+            <span style={{ fontSize: "0.75rem", color: "var(--story-secondary)" }}>{t.empty}</span>
           )}
         </span>
       </button>
       {onDelete && (
         <button
           type="button"
-          aria-label={`刪除${label}`}
+          aria-label={t.deleteSlot(label)}
           onClick={onDelete}
           disabled={disabled}
           className="hover:text-[var(--story-accent-bright)] focus-visible:text-[var(--story-accent-bright)] focus-visible:outline-none"
           style={{ flexShrink: 0, alignSelf: "center", fontSize: "0.75rem", color: "var(--story-secondary)", padding: "0.25rem 0.5rem", background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit" }}
         >
-          刪除
+          {t.delete}
         </button>
       )}
     </div>

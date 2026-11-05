@@ -108,45 +108,150 @@ export interface JobTileLabels {
   actionFailed?: string;
 }
 
-const defaultLabels: Required<JobTileLabels> = {
-  queued: (ahead) => `In queue, ${ahead} ahead of you`,
-  startingSoon: "Starting soon",
-  planning: "AI is reading your prompt",
-  loading: "Loading model",
-  sampling: (s, t) => `Generating ${s}/${t}`,
-  decoding: "Writing image",
-  refining: (s, t) => (t ? `Refining faces ${s}/${t}` : "Refining faces"),
-  checking: "Checking the result",
-  done: "Done",
-  held: "Waiting for manual review",
-  deleted: "Images deleted",
-  blocked: "Not run",
-  error: "Generation didn't finish",
-  canceled: "Canceled",
-  eta: (time) => `About ${time} left`,
-  seconds: (s) => {
-    const v = Math.max(0, Math.round(s));
-    if (v < 60) return `${v}s`;
-    const m = Math.floor(v / 60);
-    const r = v % 60;
-    return r ? `${m}m ${r}s` : `${m}m`;
-  },
-  progress: "Generation progress",
-  heldNote: "These images are waiting for manual review. They haven't been deleted and will come back once cleared. Your quota has been refunded.",
-  cancel: "Cancel",
-  cancelAria: "Cancel this generation",
-  remove: "Remove record",
-  removeAria: "Remove this record",
-  openAria: (p) => `View progress: ${p}`,
-  detailAria: (p) => `View details: ${p}`,
-  count: (n) => `${n} images`,
-  reference: "Reference",
-  previewAlt: "Preview while generating",
-  actionFailed: "That didn't work. Please try again.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+/** 秒數轉成「1m 20s」這類短字串，單位依語言 */
+const duration = (m: string, s: string, sep = " ") => (sec: number) => {
+  const v = Math.max(0, Math.round(sec));
+  if (v < 60) return `${v}${s}`;
+  const mm = Math.floor(v / 60);
+  const r = v % 60;
+  return r ? `${mm}${m}${sep}${r}${s}` : `${mm}${m}`;
 };
 
-export function jobStatusLabel(job: Job, labels?: JobTileLabels) {
-  const t = { ...defaultLabels, ...labels };
+const MESSAGES: Record<SunLocale, Required<JobTileLabels>> = {
+  en: {
+    queued: (ahead) => `In queue, ${ahead} ahead of you`,
+    startingSoon: "Starting soon",
+    planning: "AI is reading your prompt",
+    loading: "Loading model",
+    sampling: (s, t) => `Generating ${s}/${t}`,
+    decoding: "Writing image",
+    refining: (s, t) => (t ? `Refining faces ${s}/${t}` : "Refining faces"),
+    checking: "Checking the result",
+    done: "Done",
+    held: "Waiting for manual review",
+    deleted: "Images deleted",
+    blocked: "Not run",
+    error: "Generation didn't finish",
+    canceled: "Canceled",
+    eta: (time) => `About ${time} left`,
+    seconds: duration("m", "s"),
+    progress: "Generation progress",
+    heldNote: "These images are waiting for manual review. They haven't been deleted and will come back once cleared. Your quota has been refunded.",
+    cancel: "Cancel",
+    cancelAria: "Cancel this generation",
+    remove: "Remove record",
+    removeAria: "Remove this record",
+    openAria: (p) => `View progress: ${p}`,
+    detailAria: (p) => `View details: ${p}`,
+    count: (n) => `${n} images`,
+    reference: "Reference",
+    previewAlt: "Preview while generating",
+    actionFailed: "That didn't work. Please try again.",
+  },
+  "zh-TW": {
+    queued: (ahead) => `排隊中，前面還有 ${ahead} 位`,
+    startingSoon: "即將開始",
+    planning: "AI 正在理解你的描述",
+    loading: "載入模型中",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "輸出圖片中",
+    refining: (s, t) => (t ? `修飾臉部 ${s}/${t}` : "修飾臉部中"),
+    checking: "檢查結果中",
+    done: "完成",
+    held: "等待人工複查",
+    deleted: "圖片已刪除",
+    blocked: "未執行",
+    error: "生成沒有完成",
+    canceled: "已取消",
+    eta: (time) => `約剩 ${time}`,
+    seconds: duration(" 分", " 秒"),
+    progress: "生成進度",
+    heldNote: "這些圖片正在等待人工複查，並沒有被刪除，複查通過後就會回來。額度已退還。",
+    cancel: "取消",
+    cancelAria: "取消這次生成",
+    remove: "移除紀錄",
+    removeAria: "移除這筆紀錄",
+    openAria: (p) => `查看進度：${p}`,
+    detailAria: (p) => `查看詳情：${p}`,
+    count: (n) => `${n} 張`,
+    reference: "參考圖",
+    previewAlt: "生成中的預覽",
+    actionFailed: "操作失敗，請再試一次。",
+  },
+  "zh-CN": {
+    queued: (ahead) => `排队中，前面还有 ${ahead} 位`,
+    startingSoon: "即将开始",
+    planning: "AI 正在理解你的描述",
+    loading: "正在加载模型",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "正在输出图片",
+    refining: (s, t) => (t ? `修饰面部 ${s}/${t}` : "正在修饰面部"),
+    checking: "正在检查结果",
+    done: "完成",
+    held: "等待人工复审",
+    deleted: "图片已删除",
+    blocked: "未执行",
+    error: "生成未完成",
+    canceled: "已取消",
+    eta: (time) => `约剩 ${time}`,
+    seconds: duration(" 分", " 秒"),
+    progress: "生成进度",
+    heldNote: "这些图片正在等待人工复审，并没有被删除，复审通过后就会恢复。额度已退还。",
+    cancel: "取消",
+    cancelAria: "取消这次生成",
+    remove: "移除记录",
+    removeAria: "移除这条记录",
+    openAria: (p) => `查看进度：${p}`,
+    detailAria: (p) => `查看详情：${p}`,
+    count: (n) => `${n} 张`,
+    reference: "参考图",
+    previewAlt: "生成中的预览",
+    actionFailed: "操作失败，请重试。",
+  },
+  ja: {
+    queued: (ahead) => `順番待ち、前に ${ahead} 件`,
+    startingSoon: "まもなく開始",
+    planning: "AI がプロンプトを解析中",
+    loading: "モデルを読み込み中",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "画像を書き出し中",
+    refining: (s, t) => (t ? `顔を補正中 ${s}/${t}` : "顔を補正中"),
+    checking: "結果を確認中",
+    done: "完了",
+    held: "手動審査待ち",
+    deleted: "画像は削除されました",
+    blocked: "未実行",
+    error: "生成が完了しませんでした",
+    canceled: "キャンセル済み",
+    eta: (time) => `残り約 ${time}`,
+    seconds: duration("分", "秒", ""),
+    progress: "生成の進捗",
+    heldNote: "これらの画像は手動審査待ちです。削除されてはおらず、審査が終わると戻ります。クォータは返還済みです。",
+    cancel: "キャンセル",
+    cancelAria: "この生成をキャンセル",
+    remove: "記録を削除",
+    removeAria: "この記録を削除",
+    openAria: (p) => `進捗を見る：${p}`,
+    detailAria: (p) => `詳細を見る：${p}`,
+    count: (n) => `${n} 枚`,
+    reference: "参考画像",
+    previewAlt: "生成中のプレビュー",
+    actionFailed: "うまくいきませんでした。もう一度お試しください。",
+  },
+};
+
+export function jobStatusLabel(job: Job, labels?: JobTileLabels, locale = "en") {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const step = job.step ?? 0;
   const total = job.total ?? 0;
   switch (job.status) {
@@ -314,13 +419,16 @@ export interface JobTileProps {
   onOpen?: () => void;
   onCancel?: () => void | Promise<unknown>;
   onRemove?: () => void | Promise<unknown>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: JobTileLabels;
   className?: string;
 }
 
 /** 網格裡的格子：生成中、失敗或等待複查的一次生成，點一下到進度頁 */
-export function JobTile({ job, onOpen, onCancel, onRemove, labels, className }: JobTileProps) {
-  const t = { ...defaultLabels, ...labels };
+export function JobTile({ job, onOpen, onCancel, onRemove, locale = "en", labels, className }: JobTileProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const actions = useActions(t.actionFailed);
   const active = isActive(job);
 
@@ -361,7 +469,7 @@ export function JobTile({ job, onOpen, onCancel, onRemove, labels, className }: 
         ) : null}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col gap-1.5 bg-gradient-to-t from-[color-mix(in_oklab,var(--yc-bg)_95%,transparent)] via-[color-mix(in_oklab,var(--yc-bg)_75%,transparent)] to-transparent px-2.5 pt-8 pb-2.5">
           <p className="truncate text-xs font-medium" aria-live="polite">
-            {jobStatusLabel(job, labels)}
+            {jobStatusLabel(job, t)}
           </p>
           <ProgressBar value={jobPercent(job)} label={t.progress} />
           {job.etaSeconds != null ? <p className="text-[11px] text-[var(--yc-muted-fg)] tabular-nums">{t.eta(t.seconds(job.etaSeconds))}</p> : null}
@@ -390,7 +498,7 @@ export function JobTile({ job, onOpen, onCancel, onRemove, labels, className }: 
       />
       <div className="flex items-center gap-1.5 pr-7 text-xs font-medium">
         <Icon d={glyph} className={cn("size-3.5", tone)} />
-        <span className="truncate">{jobStatusLabel(job, labels)}</span>
+        <span className="truncate">{jobStatusLabel(job, t)}</span>
       </div>
       <p className="mt-2 line-clamp-3 text-xs text-[var(--yc-muted-fg)]">{held ? t.heldNote : job.status === "canceled" ? "" : job.error}</p>
       <div className="mt-auto flex items-end gap-2">

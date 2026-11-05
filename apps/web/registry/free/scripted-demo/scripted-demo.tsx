@@ -86,6 +86,9 @@ export interface ScriptedDemoProps<K extends string = string> {
   url?: string;
   /** 一開始是否自動播放 */
   autoPlay?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<ScriptedDemoLabels>;
   className?: string;
   children: ReactNode;
@@ -115,7 +118,22 @@ export function useScriptedDemo() {
   return ctx;
 }
 
-const defaultLabels: ScriptedDemoLabels = { group: "Animated product demo", play: "Play animation", pause: "Pause animation" };
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ScriptedDemoLabels> = {
+  en: { group: "Animated product demo", play: "Play animation", pause: "Pause animation" },
+  "zh-TW": { group: "產品動畫示範", play: "播放動畫", pause: "暫停動畫" },
+  "zh-CN": { group: "产品动画演示", play: "播放动画", pause: "暂停动画" },
+  ja: { group: "製品のアニメーションデモ", play: "アニメーションを再生", pause: "アニメーションを一時停止" },
+};
 
 /* ---------- 小工具 ---------- */
 
@@ -196,11 +214,12 @@ export function ScriptedDemo<K extends string = string>({
   chapters,
   url,
   autoPlay = true,
+  locale = "en",
   labels,
   className,
   children,
 }: ScriptedDemoProps<K>) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduced = useReducedMotionPref();
   const tabVisible = useTabVisible();
   const [scene, setScene] = useState(0);

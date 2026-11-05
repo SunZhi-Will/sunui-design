@@ -2,6 +2,7 @@
 // 不會被安裝到使用者專案；block 本身一律透過 props 接收圖片。
 import type { ReactNode } from "react";
 
+import { useDemoLocale, type Locale } from "@/lib/demo-locale";
 import { cn } from "@/lib/utils";
 
 export type ProductKind = "sneaker" | "headphones" | "bottle" | "lamp" | "mug" | "jacket" | "tote" | "watch";
@@ -16,6 +17,45 @@ export const productNames: Record<ProductKind, string> = {
   tote: "Market Tote",
   watch: "Field Watch 38 mm",
 };
+
+export const productNamesByLocale: Record<Locale, Record<ProductKind, string>> = {
+  en: productNames,
+  "zh-TW": {
+    sneaker: "帆布跑鞋",
+    headphones: "錄音室耳機",
+    bottle: "不鏽鋼水壺 750 ml",
+    lamp: "桌燈",
+    mug: "石陶馬克杯",
+    jacket: "工作外套",
+    tote: "市場托特包",
+    watch: "野戰錶 38 mm",
+  },
+  "zh-CN": {
+    sneaker: "帆布跑鞋",
+    headphones: "录音室耳机",
+    bottle: "不锈钢水壶 750 ml",
+    lamp: "台灯",
+    mug: "石陶马克杯",
+    jacket: "工装外套",
+    tote: "市集托特包",
+    watch: "野战表 38 mm",
+  },
+  ja: {
+    sneaker: "キャンバスランナー",
+    headphones: "スタジオヘッドホン",
+    bottle: "スチールボトル 750 ml",
+    lamp: "デスクランプ",
+    mug: "ストーンウェアマグ",
+    jacket: "チョアジャケット",
+    tote: "マーケットトート",
+    watch: "フィールドウォッチ 38 mm",
+  },
+};
+
+/** demo 用：依網站目前語言取商品名。 */
+export function useProductNames(): Record<ProductKind, string> {
+  return productNamesByLocale[useDemoLocale()];
+}
 
 const drawings: Record<ProductKind, ReactNode> = {
   sneaker: (
@@ -86,6 +126,7 @@ export function ProductArt({
   tone?: "paper" | "kraft";
   className?: string;
 }) {
+  const names = useProductNames();
   return (
     <div
       className={cn(
@@ -103,7 +144,7 @@ export function ProductArt({
         strokeLinecap="round"
         strokeLinejoin="round"
         role="img"
-        aria-label={productNames[kind]}
+        aria-label={names[kind]}
       >
         {drawings[kind]}
       </svg>

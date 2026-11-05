@@ -5,6 +5,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface CompareSliderLabels {
+  /** 左右兩邊的預設標籤；beforeLabel / afterLabel 優先 */
+  before?: string;
+  after?: string;
   /** range 的無障礙名稱 */
   slider?: (before: string, after: string) => string;
   valueText?: (before: string, after: string, pos: number) => string;
@@ -30,13 +33,48 @@ export interface CompareSliderProps {
   /** 由父層控制何時開始示範；給了就不看進入畫面 */
   play?: boolean;
   onChange?: (pos: number) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: CompareSliderLabels;
   className?: string;
 }
 
-const defaultLabels: Required<CompareSliderLabels> = {
-  slider: (b, a) => `Divider position between ${b} and ${a}`,
-  valueText: (b, a, pos) => `${b} ${pos}%, ${a} ${100 - pos}%`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<CompareSliderLabels>> = {
+  en: {
+    before: "Before",
+    after: "After",
+    slider: (b, a) => `Divider position between ${b} and ${a}`,
+    valueText: (b, a, pos) => `${b} ${pos}%, ${a} ${100 - pos}%`,
+  },
+  "zh-TW": {
+    before: "之前",
+    after: "之後",
+    slider: (b, a) => `${b}與${a}之間的分隔線位置`,
+    valueText: (b, a, pos) => `${b} ${pos}%，${a} ${100 - pos}%`,
+  },
+  "zh-CN": {
+    before: "之前",
+    after: "之后",
+    slider: (b, a) => `${b}与${a}之间的分隔线位置`,
+    valueText: (b, a, pos) => `${b} ${pos}%，${a} ${100 - pos}%`,
+  },
+  ja: {
+    before: "ビフォー",
+    after: "アフター",
+    slider: (b, a) => `${b}と${a}の境界線の位置`,
+    valueText: (b, a, pos) => `${b} ${pos}%、${a} ${100 - pos}%`,
+  },
 };
 
 const clamp = (v: number) => Math.max(0, Math.min(100, v));
@@ -88,18 +126,21 @@ export function CompareSlider({
   after,
   width = 4,
   height = 3,
-  beforeLabel = "Before",
-  afterLabel = "After",
+  beforeLabel: beforeLabelProp,
+  afterLabel: afterLabelProp,
   beforeFit = "contain",
   afterFit = "cover",
   initial = 50,
   demoSweep = false,
   play,
   onChange,
+  locale = "en",
   labels,
   className,
 }: CompareSliderProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const beforeLabel = beforeLabelProp ?? t.before;
+  const afterLabel = afterLabelProp ?? t.after;
   const home = clamp(initial);
   const [pos, setPos] = useState(home);
   const [inView, setInView] = useState(false);

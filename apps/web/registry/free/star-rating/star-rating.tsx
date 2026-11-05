@@ -19,8 +19,10 @@ export interface StarRatingProps {
   readOnly?: boolean;
   disabled?: boolean;
   size?: StarRatingSize;
-  /** 每個整數分數對應的文字，長度等於 max */
-  labels?: string[];
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串；傳陣列時視為每個整數分數的文字（長度等於 max） */
+  labels?: string[] | Partial<StarRatingLabels>;
   /** 是否在右側顯示文字標籤 */
   showLabel?: boolean;
   /** 再次點擊目前分數時清除為 0 */
@@ -32,7 +34,51 @@ export interface StarRatingProps {
   className?: string;
 }
 
-const defaultLabels = ["Terrible", "Poor", "Okay", "Good", "Great"];
+export interface StarRatingLabels {
+  /** 每個整數分數對應的文字 */
+  levels: string[];
+  /** 整組預設的無障礙名稱 */
+  group: string;
+  rated: (value: number, max: number) => string;
+  stars: (value: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, StarRatingLabels> = {
+  en: {
+    levels: ["Terrible", "Poor", "Okay", "Good", "Great"],
+    group: "Rating",
+    rated: (v, max) => `Rated ${v} out of ${max}`,
+    stars: (v) => `${v} ${v === 1 ? "star" : "stars"}`,
+  },
+  "zh-TW": {
+    levels: ["很差", "不太好", "普通", "不錯", "很棒"],
+    group: "評分",
+    rated: (v, max) => `評分 ${v} / ${max}`,
+    stars: (v) => `${v} 顆星`,
+  },
+  "zh-CN": {
+    levels: ["很差", "较差", "一般", "不错", "很棒"],
+    group: "评分",
+    rated: (v, max) => `评分 ${v} / ${max}`,
+    stars: (v) => `${v} 颗星`,
+  },
+  ja: {
+    levels: ["最悪", "いまいち", "ふつう", "良い", "最高"],
+    group: "評価",
+    rated: (v, max) => `${max} 点中 ${v} 点`,
+    stars: (v) => `星 ${v}`,
+  },
+};
 
 // 設計語言（DESIGN.md）：墨線星星，不用金色
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
@@ -70,13 +116,20 @@ export function StarRating({
   readOnly = false,
   disabled = false,
   size = "md",
-  labels = defaultLabels,
+  locale = "en",
+  labels: labelsProp,
   showLabel = true,
   allowClear = true,
   name,
-  "aria-label": ariaLabel = "Rating",
+  "aria-label": ariaLabelProp,
   className,
 }: StarRatingProps) {
+  const t = {
+    ...MESSAGES[resolveLocale(locale)],
+    ...(Array.isArray(labelsProp) ? { levels: labelsProp } : labelsProp),
+  };
+  const labels = t.levels;
+  const ariaLabel = ariaLabelProp ?? t.group;
   const reduce = useReducedMotion() ?? false;
   const labelId = useId();
   const [inner, setInner] = useState(defaultValue);
@@ -92,7 +145,7 @@ export function StarRating({
   if (readOnly) {
     const fixed = Math.round(value * 10) / 10;
     return (
-      <div role="img" aria-label={`Rated ${fixed} out of ${max}`} className={cn("inline-flex items-center gap-0.5", ink, className)}>
+      <div role="img" aria-label={t.rated(fixed, max)} className={cn("inline-flex items-center gap-0.5", ink, className)}>
         {Array.from({ length: max }, (_, i) => (
           <Star key={i} fill={fillOf(i)} className={starSize[size]} />
         ))}
@@ -133,7 +186,7 @@ export function StarRating({
     refs.current.get(r)?.focus();
   };
 
-  const radioLabel = (v: number) => `${v} ${v === 1 ? "star" : "stars"}${labelFor(v) ? `, ${labelFor(v)}` : ""}`;
+  const radioLabel = (v: number) => `${t.stars(v)}${labelFor(v) ? `, ${labelFor(v)}` : ""}`;
 
   return (
     <div className={cn("inline-flex items-center gap-3", ink, className)}>

@@ -43,16 +43,29 @@ export interface HoverCardProps {
   openDelay?: number;
   /** 滑鼠離開多久才關，讓指標能移進卡片 */
   closeDelay?: number;
+  /** 介面語言與貨幣格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   currency?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: HoverCardLabels;
   className?: string;
 }
 
-const defaultLabels: Required<HoverCardLabels> = {
-  addToCart: "Add to cart",
-  quickView: "Quick view",
-  off: (pct) => <>{pct}% off</>,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<HoverCardLabels>> = {
+  en: { addToCart: "Add to cart", quickView: "Quick view", off: (pct) => <>{pct}% off</> },
+  "zh-TW": { addToCart: "加入購物車", quickView: "快速預覽", off: (pct) => <>省 {pct}%</> },
+  "zh-CN": { addToCart: "加入购物车", quickView: "快速预览", off: (pct) => <>省 {pct}%</> },
+  ja: { addToCart: "カートに追加", quickView: "クイックビュー", off: (pct) => <>{pct}%オフ</> },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -82,7 +95,7 @@ export function HoverCard({
   labels,
   className,
 }: HoverCardProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const cardId = useId();
   const [open, setOpen] = useState(false);

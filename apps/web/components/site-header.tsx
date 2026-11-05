@@ -1,8 +1,11 @@
 import Link from "next/link";
 
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { getI18n } from "@/lib/i18n-server";
 import { githubUrl } from "@/lib/site";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const { locale, m } = await getI18n();
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
@@ -12,20 +15,21 @@ export function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-0.5 text-sm sm:gap-1">
           <Link href="/" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
-            Blocks
+            {m.nav.blocks}
           </Link>
           <Link href="/icons" className="hidden rounded-md px-2 py-1.5 text-subtle hover:text-fg min-[400px]:block sm:px-3">
-            Icons
+            {m.nav.icons}
           </Link>
           <Link href="/docs" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
-            Docs
+            {m.nav.docs}
           </Link>
           <Link href="/pricing" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
-            Pricing
+            {m.nav.pricing}
           </Link>
           <a href={githubUrl} className="hidden rounded-md px-3 py-1.5 text-subtle hover:text-fg sm:block">
-            GitHub
+            {m.nav.github}
           </a>
+          <LocaleSwitcher locale={locale} label={m.nav.language} />
         </nav>
       </div>
     </header>

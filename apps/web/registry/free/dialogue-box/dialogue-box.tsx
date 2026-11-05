@@ -89,14 +89,14 @@ export type StoryTheme = keyof typeof storyThemes;
 export interface DialogueChoice {
   id: string;
   text: ReactNode;
-  /** 屬性門檻，顯示成【膽識】前綴 */
+  /** 屬性門檻，顯示成【膽識】前綴（英文為 [Courage]） */
   requirement?: string;
   locked?: boolean;
-  /** 鎖住時接在門檻後的字，預設「不足」 */
+  /** 鎖住時接在門檻後的字，預設依語言（「不足」） */
   lockedSuffix?: string;
   /** 鎖住時的第二行說明 */
   lockedHint?: ReactNode;
-  /** 以前選過，標上「・曾選」 */
+  /** 以前選過，標上「・曾選」這類標記 */
   seen?: boolean;
 }
 
@@ -113,6 +113,10 @@ export interface DialogueBoxLabels {
   seen?: string;
   seenLabel?: string;
   separator?: string;
+  /** 門檻前綴，例如【膽識・不足】、[Courage · not enough] */
+  requirementTag?: (requirement: string, lockedSuffix?: string) => string;
+  /** 按鈕提示加上快捷鍵，例如「停止快轉（Ctrl）」 */
+  shortcut?: (label: string, key: string) => string;
 }
 
 export interface DialogueBoxProps {
@@ -146,23 +150,92 @@ export interface DialogueBoxProps {
   /** 右下控制列最前面的額外按鈕，例如快存、快讀 */
   quickControls?: ReactNode;
   theme?: StoryTheme;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: DialogueBoxLabels;
   className?: string;
 }
 
-const defaultLabels: Required<DialogueBoxLabels> = {
-  continue: "繼續",
-  openLog: "開啟劇情回顧",
-  autoPlayOn: "開始自動播放",
-  autoPlayOff: "停止自動播放",
-  fastForwardOn: "開始快轉",
-  fastForwardOff: "停止快轉",
-  choices: "選項",
-  needs: "需要",
-  lockedSuffix: "不足",
-  seen: "・曾選",
-  seenLabel: "以前選過",
-  separator: "：",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+// 中日文用全形括號與中點，英文用半形
+const cjkTag = (r: string, suffix?: string) => (suffix ? `【${r}・${suffix}】` : `【${r}】`);
+const cjkShortcut = (label: string, key: string) => `${label}（${key}）`;
+
+const MESSAGES: Record<SunLocale, Required<DialogueBoxLabels>> = {
+  en: {
+    continue: "Continue",
+    openLog: "Open story log",
+    autoPlayOn: "Start auto-play",
+    autoPlayOff: "Stop auto-play",
+    fastForwardOn: "Start fast-forward",
+    fastForwardOff: "Stop fast-forward",
+    choices: "Choices",
+    needs: "Requires ",
+    lockedSuffix: "not enough",
+    seen: "· chosen",
+    seenLabel: "Chosen before",
+    separator: ": ",
+    requirementTag: (r, suffix) => (suffix ? `[${r} · ${suffix}]` : `[${r}]`),
+    shortcut: (label, key) => `${label} (${key})`,
+  },
+  "zh-TW": {
+    continue: "繼續",
+    openLog: "開啟劇情回顧",
+    autoPlayOn: "開始自動播放",
+    autoPlayOff: "停止自動播放",
+    fastForwardOn: "開始快轉",
+    fastForwardOff: "停止快轉",
+    choices: "選項",
+    needs: "需要",
+    lockedSuffix: "不足",
+    seen: "・曾選",
+    seenLabel: "以前選過",
+    separator: "：",
+    requirementTag: cjkTag,
+    shortcut: cjkShortcut,
+  },
+  "zh-CN": {
+    continue: "继续",
+    openLog: "打开剧情回顾",
+    autoPlayOn: "开始自动播放",
+    autoPlayOff: "停止自动播放",
+    fastForwardOn: "开始快进",
+    fastForwardOff: "停止快进",
+    choices: "选项",
+    needs: "需要",
+    lockedSuffix: "不足",
+    seen: "・曾选",
+    seenLabel: "以前选过",
+    separator: "：",
+    requirementTag: cjkTag,
+    shortcut: cjkShortcut,
+  },
+  ja: {
+    continue: "次へ",
+    openLog: "バックログを開く",
+    autoPlayOn: "オート再生を開始",
+    autoPlayOff: "オート再生を停止",
+    fastForwardOn: "スキップを開始",
+    fastForwardOff: "スキップを停止",
+    choices: "選択肢",
+    needs: "必要：",
+    lockedSuffix: "不足",
+    seen: "・選択済み",
+    seenLabel: "以前に選んだ選択肢",
+    separator: "：",
+    requirementTag: cjkTag,
+    shortcut: cjkShortcut,
+  },
 };
 
 const CONTROLS_RIGHT = "1.25rem";
@@ -335,10 +408,11 @@ export function DialogueBox({
   cue,
   quickControls,
   theme = "ink",
+  locale = "en",
   labels: labelsProp,
   className,
 }: DialogueBoxProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const isNarrator = !speaker || speaker === "narrator";
   const speakerName = isNarrator ? "" : speaker;
   const hasChoices = choices.length > 0;
@@ -578,8 +652,7 @@ export function DialogueBox({
             >
               {choice.requirement && (
                 <span className="sdb-req">
-                  【{choice.requirement}
-                  {choice.locked ? `・${choice.lockedSuffix ?? labels.lockedSuffix}` : ""}】
+                  {labels.requirementTag(choice.requirement, choice.locked ? (choice.lockedSuffix ?? labels.lockedSuffix) : undefined)}
                 </span>
               )}
               {choice.text}
@@ -626,7 +699,7 @@ export function DialogueBox({
               type="button"
               className="sdb-btn"
               aria-label={labels.openLog}
-              title={`${labels.openLog}（L）`}
+              title={labels.shortcut(labels.openLog, "L")}
               aria-keyshortcuts="L"
               onClick={(e) => {
                 e.stopPropagation();
@@ -643,7 +716,7 @@ export function DialogueBox({
             className="sdb-btn"
             data-active={autoPlay}
             aria-label={autoPlay ? labels.autoPlayOff : labels.autoPlayOn}
-            title={`${autoPlay ? labels.autoPlayOff : labels.autoPlayOn}（A）`}
+            title={labels.shortcut(autoPlay ? labels.autoPlayOff : labels.autoPlayOn, "A")}
             aria-keyshortcuts="A"
             onClick={(e) => {
               e.stopPropagation();
@@ -665,7 +738,7 @@ export function DialogueBox({
             aria-pressed={ffButton}
             aria-keyshortcuts="Control"
             aria-label={ffButton ? labels.fastForwardOff : labels.fastForwardOn}
-            title={ffButton ? labels.fastForwardOff : `${labels.fastForwardOn}（Ctrl）`}
+            title={ffButton ? labels.fastForwardOff : labels.shortcut(labels.fastForwardOn, "Ctrl")}
             onClick={(e) => {
               e.stopPropagation();
               const next = !ffButton;

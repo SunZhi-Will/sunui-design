@@ -2,16 +2,25 @@
 
 import { useEffect } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { JobsTray, useBackgroundJobs } from "./jobs-tray";
 
 export default function JobsTrayDemo() {
+  const locale = useDemoLocale();
+  const exportLabel = useDemoText({
+    en: "Export · intro-take-3.mp4",
+    "zh-TW": "匯出 · intro-take-3.mp4",
+    "zh-CN": "导出 · intro-take-3.mp4",
+    ja: "書き出し · intro-take-3.mp4",
+  });
   const { jobs, startJob, updateJob, finishJob, dismissJob, cancelJob } = useBackgroundJobs();
 
   // 停止錄影後，編輯器立刻可用，匯出在背景跑
   useEffect(() => {
     let p = 0;
     let timer: ReturnType<typeof setInterval> | undefined;
-    const exp = startJob("export", "Export · intro-take-3.mp4", {
+    const exp = startJob("export", exportLabel, {
       onCancel: () => {
         clearInterval(timer);
         cancelJob(exp);
@@ -29,7 +38,7 @@ export default function JobsTrayDemo() {
       clearInterval(timer);
       dismissJob(exp);
     };
-  }, [cancelJob, dismissJob, finishJob, startJob, updateJob]);
+  }, [cancelJob, dismissJob, exportLabel, finishJob, startJob, updateJob]);
 
   return (
     <div className="relative h-80 w-full max-w-3xl overflow-hidden rounded-[14px] border border-white/5 bg-[#111111]">
@@ -44,7 +53,7 @@ export default function JobsTrayDemo() {
         </div>
       </div>
 
-      <JobsTray fixed={false} jobs={jobs} onDismiss={dismissJob} />
+      <JobsTray fixed={false} locale={locale} jobs={jobs} onDismiss={dismissJob} />
     </div>
   );
 }

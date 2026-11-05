@@ -5,10 +5,14 @@ import { notFound } from "next/navigation";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { PreviewFrame } from "@/components/preview-frame";
+import { RichText } from "@/components/rich-text";
 import { TierBadge } from "@/components/tier-badge";
-import { interactionLabels } from "@/lib/interactions";
+import { getI18n } from "@/lib/i18n-server";
+import type { Locale } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 import { getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
-import { seriesLabels, seriesOf } from "@/lib/series";
+import { localizeItem } from "@/lib/registry-i18n";
+import { seriesOf } from "@/lib/series";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -19,17 +23,21 @@ export function generateStaticParams() {
 export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const item = getItem((await params).slug);
-  if (!item) return {};
+  const found = getItem((await params).slug);
+  if (!found) return {};
+  const { locale, m } = await getI18n();
+  const item = localizeItem(found, locale);
   return {
-    title: `${item.title}, React Component`,
+    title: m.block.metaTitle(item.title),
     description: item.description,
   };
 }
 
 export default async function BlockPage({ params }: Props) {
-  const item = getItem((await params).slug);
-  if (!item) notFound();
+  const found = getItem((await params).slug);
+  if (!found) notFound();
+  const { locale, m } = await getI18n();
+  const item = localizeItem(found, locale);
 
   const isPro = item.meta.tier === "pro";
   // Pro 原始碼只透過授權過的 registry 發放，頁面上不顯示
@@ -41,9 +49,9 @@ export default async function BlockPage({ params }: Props) {
 
   return (
     <article className="py-10">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-subtle">
+      <nav aria-label={m.block.breadcrumb} className="mb-6 text-sm text-subtle">
         <Link href="/" className="hover:text-fg">
-          Blocks
+          {m.nav.blocks}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-fg">{item.title}</span>
@@ -60,23 +68,27 @@ export default async function BlockPage({ params }: Props) {
               href={`/?series=${seriesOf(item)}#blocks`}
               className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:text-fg"
             >
-              {seriesLabels[seriesOf(item)]}
+              {m.series.labels[seriesOf(item)]}
             </Link>
           )}
           <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
-            {interactionLabels[item.meta.interaction]}
+            {m.interactions[item.meta.interaction]}
           </span>
           <TierBadge tier={item.meta.tier} />
         </div>
       </header>
 
-      <PreviewFrame name={item.name} />
+      <PreviewFrame name={item.name} locale={locale} labels={m.preview} />
 
-      <UsageGuide item={item} />
+      <UsageGuide item={item} t={m.block} />
 
-      {isPro ? <ProInstall item={item} /> : <FreeInstall item={item} manualDeps={manualDeps} sources={sources} />}
+      {isPro ? (
+        <ProInstall item={item} t={m.block} seePricing={m.common.seePricing} />
+      ) : (
+        <FreeInstall item={item} manualDeps={manualDeps} sources={sources} t={m.block} />
+      )}
 
-      <RelatedBlocks item={item} />
+      <RelatedBlocks item={item} t={m.block} locale={locale} />
     </article>
   );
 }
@@ -84,7 +96,7 @@ export default async function BlockPage({ params }: Props) {
 type Item = NonNullable<ReturnType<typeof getItem>>;
 
 // 參考資料庫式的「何時用、注意什麼、別名」，幫讀者判斷這個 block 是否適合
-function UsageGuide({ item }: { item: Item }) {
+function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
   const usage = item.meta.usage;
   const whenToUse = usage?.whenToUse ?? [];
   const watchOut = usage?.watchOut ?? [];
@@ -92,14 +104,14 @@ function UsageGuide({ item }: { item: Item }) {
   if (whenToUse.length + watchOut.length + aliases.length === 0) return null;
 
   return (
-    <section aria-label="Usage guide" className="mt-8 grid gap-4 md:grid-cols-3">
+    <section aria-label={t.usageGuide} className="mt-8 grid gap-4 md:grid-cols-3">
       {whenToUse.length > 0 && (
         <div className="rounded-2xl border border-line bg-card p-5">
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
             <svg viewBox="0 0 24 24" className="size-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="m5 12 4.5 4.5L19 7" />
             </svg>
-            When to use it
+            {t.whenToUse}
           </h2>
           <ul className="grid gap-2 text-sm text-subtle">
             {whenToUse.map((line) => (
@@ -117,7 +129,7 @@ function UsageGuide({ item }: { item: Item }) {
             <svg viewBox="0 0 24 24" className="size-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
             </svg>
-            Watch out
+            {t.watchOut}
           </h2>
           <ul className="grid gap-2 text-sm text-subtle">
             {watchOut.map((line) => (
@@ -131,7 +143,7 @@ function UsageGuide({ item }: { item: Item }) {
       )}
       {aliases.length > 0 && (
         <div className="rounded-2xl border border-line bg-card p-5">
-          <h2 className="mb-3 text-sm font-semibold">Also called</h2>
+          <h2 className="mb-3 text-sm font-semibold">{t.alsoCalled}</h2>
           <ul className="flex flex-wrap gap-1.5">
             {aliases.map((alias) => (
               <li key={alias}>
@@ -150,7 +162,7 @@ function UsageGuide({ item }: { item: Item }) {
   );
 }
 
-function RelatedBlocks({ item }: { item: Item }) {
+function RelatedBlocks({ item, t, locale }: { item: Item; t: Messages["block"]; locale: Locale }) {
   const related = getItems()
     .filter((other) => other.name !== item.name)
     .map((other) => ({
@@ -164,14 +176,14 @@ function RelatedBlocks({ item }: { item: Item }) {
     }))
     .sort((a, b) => b.score - a.score || a.other.title.localeCompare(b.other.title))
     .slice(0, 6)
-    .map(({ other }) => other);
+    .map(({ other }) => localizeItem(other, locale));
 
   if (related.length === 0) return null;
 
   return (
     <section aria-labelledby="related-title" className="mt-16">
       <h2 id="related-title" className="mb-4 text-lg font-semibold tracking-tight">
-        Similar blocks
+        {t.similar}
       </h2>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((other) => (
@@ -197,32 +209,31 @@ function FreeInstall({
   item,
   manualDeps,
   sources,
+  t,
 }: {
   item: Item;
   manualDeps: string[];
   sources: { file: Item["files"][number]; code: string }[];
+  t: Messages["block"];
 }) {
   return (
     <section className="mt-12 grid gap-10">
       <div>
-        <h2 className="mb-3 text-lg font-semibold tracking-tight">Install with the CLI</h2>
-        <p className="mb-4 text-sm text-subtle">
-          Uses the shadcn CLI. The source is copied into your project, so you own every line.
-        </p>
+        <h2 className="mb-3 text-lg font-semibold tracking-tight">{t.cliTitle}</h2>
+        <p className="mb-4 text-sm text-subtle">{t.cliBody}</p>
         <Command value={installCommand(item)} />
       </div>
 
       <div>
-        <h2 className="mb-3 text-lg font-semibold tracking-tight">Or install manually</h2>
+        <h2 className="mb-3 text-lg font-semibold tracking-tight">{t.manualTitle}</h2>
         <ol className="grid gap-6 text-sm">
           <li className="grid gap-3">
-            <span className="text-subtle">1. Install the dependencies.</span>
+            <span className="text-subtle">{t.manualStep1}</span>
             <Command value={`npm install ${manualDeps.join(" ")}`} />
           </li>
           <li className="grid gap-3">
             <span className="text-subtle">
-              2. Add a <code className="font-mono text-fg">cn</code> helper at{" "}
-              <code className="font-mono text-fg">lib/utils.ts</code> if you do not have one, then copy the component.
+              <RichText text={t.manualStep2} codeClassName="font-mono text-fg" />
             </span>
             {sources.map(({ file, code }) => (
               <CodeBlock key={file.path} code={code} lang="tsx" title={file.path.split("/").pop()} />
@@ -234,41 +245,39 @@ function FreeInstall({
   );
 }
 
-function ProInstall({ item }: { item: Item }) {
+function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"]; seePricing: string }) {
   return (
     <section className="mt-12 grid gap-10">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-accent/40 bg-accent-soft/40 p-6">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">This is a Pro block</h2>
-          <p className="mt-1 text-sm text-subtle">
-            One license unlocks every Pro block, now and in the future.
-          </p>
+          <h2 className="text-lg font-semibold tracking-tight">{t.proTitle}</h2>
+          <p className="mt-1 text-sm text-subtle">{t.proBody}</p>
         </div>
         <Link
           href="/pricing"
           className="rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
         >
-          See pricing
+          {seePricing}
         </Link>
       </div>
 
       <div>
-        <h2 className="mb-3 text-lg font-semibold tracking-tight">Install with your license</h2>
+        <h2 className="mb-3 text-lg font-semibold tracking-tight">{t.proInstallTitle}</h2>
         <ol className="grid gap-6 text-sm">
           <li className="grid gap-3">
             <span className="text-subtle">
-              1. Add the SunUI Pro registry to <code className="font-mono text-fg">components.json</code>.
+              <RichText text={t.proStep1} codeClassName="font-mono text-fg" />
             </span>
             <CodeBlock code={proRegistryConfig()} lang="json" title="components.json" />
           </li>
           <li className="grid gap-3">
             <span className="text-subtle">
-              2. Put your license key in <code className="font-mono text-fg">.env.local</code>.
+              <RichText text={t.proStep2} codeClassName="font-mono text-fg" />
             </span>
             <Command value="SUNUI_LICENSE_KEY=your-license-key" />
           </li>
           <li className="grid gap-3">
-            <span className="text-subtle">3. Install the block.</span>
+            <span className="text-subtle">{t.proStep3}</span>
             <Command value={installCommand(item)} />
           </li>
         </ol>

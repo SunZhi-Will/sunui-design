@@ -2,14 +2,38 @@
 
 import { useRef } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { useCanvasZoom, ZoomControls } from "./zoom-controls";
 
-const cards = [
-  { id: "brief", title: "Campaign brief", body: "Spring drop, three hero looks, launch on the 14th.", x: 24, y: 28, w: 150, h: 104 },
-  { id: "shots", title: "Shot list", body: "Flat lay, on model, detail macro.", x: 190, y: 120, w: 150, h: 92 },
-];
+const layout = [
+  { id: "brief", x: 24, y: 28, w: 150, h: 104 },
+  { id: "shots", x: 190, y: 120, w: 150, h: 92 },
+] as const;
+
+const copy = {
+  en: {
+    brief: { title: "Campaign brief", body: "Spring drop, three hero looks, launch on the 14th." },
+    shots: { title: "Shot list", body: "Flat lay, on model, detail macro." },
+  },
+  "zh-TW": {
+    brief: { title: "活動企劃", body: "春季新品，三套主打造型，14 日上線。" },
+    shots: { title: "拍攝清單", body: "平拍、模特兒上身、細節微距。" },
+  },
+  "zh-CN": {
+    brief: { title: "活动策划", body: "春季上新，三套主打造型，14 日上线。" },
+    shots: { title: "拍摄清单", body: "平铺拍摄、模特上身、细节微距。" },
+  },
+  ja: {
+    brief: { title: "キャンペーン概要", body: "春の新作、主役ルック 3 点、14 日に公開。" },
+    shots: { title: "撮影リスト", body: "平置き、モデル着用、ディテールのマクロ。" },
+  },
+};
 
 export default function ZoomControlsDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
+  const cards = layout.map((c) => ({ ...c, ...t[c.id] }));
   const canvasRef = useRef<HTMLDivElement>(null);
   const { scale, offset, zoomIn, zoomOut } = useCanvasZoom(canvasRef);
 
@@ -31,7 +55,7 @@ export default function ZoomControlsDemo() {
           </div>
         ))}
       </div>
-      <ZoomControls fixed={false} scale={scale} onZoomIn={zoomIn} onZoomOut={zoomOut} />
+      <ZoomControls fixed={false} locale={locale} scale={scale} onZoomIn={zoomIn} onZoomOut={zoomOut} />
     </div>
   );
 }

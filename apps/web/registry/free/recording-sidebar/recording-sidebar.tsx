@@ -143,38 +143,149 @@ export interface PreflightSidebarLabels {
   qualities: Record<RecordingQuality, string>;
 }
 
-export const defaultSidebarLabels: PreflightSidebarLabels = {
-  sidebarLabel: "Audio, camera and quality",
-  audioSection: "Audio",
-  microphone: "Microphone",
-  systemAudio: "System Audio",
-  systemAudioHint: "Record the sound your computer plays",
-  micLevel: "Microphone level",
-  mic: {
-    ok: "Picking up sound",
-    silent: "No sound detected",
-    clipping: "Too loud, may distort",
-    probing: "Listening…",
-    denied: "Microphone permission not granted",
-    unavailable: "No usable microphone found",
-    notProbed: "Press test to turn the microphone on",
-    test: "Test microphone",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PreflightSidebarLabels> = {
+  en: {
+    sidebarLabel: "Audio, camera and quality",
+    audioSection: "Audio",
+    microphone: "Microphone",
+    systemAudio: "System Audio",
+    systemAudioHint: "Record the sound your computer plays",
+    micLevel: "Microphone level",
+    mic: {
+      ok: "Picking up sound",
+      silent: "No sound detected",
+      clipping: "Too loud, may distort",
+      probing: "Listening…",
+      denied: "Microphone permission not granted",
+      unavailable: "No usable microphone found",
+      notProbed: "Press test to turn the microphone on",
+      test: "Test microphone",
+    },
+    camera: "Camera",
+    cameraHint: "Permission is requested when recording starts",
+    cameraDenied: "Camera permission not granted",
+    countdown: "Countdown",
+    countdownOff: "No countdown",
+    countdownSeconds: (n) => `${n}s`,
+    advancedSection: "Advanced",
+    keepSystemCursor: "Keep system cursor",
+    cursorKeep: "No software cursor overlay (video keeps the real cursor)",
+    cursorHide: "Software cursor overlay enabled (system cursor hidden)",
+    performanceModeTitle: "Performance Mode",
+    performanceModes: { compatibility: "Compatibility", balanced: "Balanced", quality: "High Quality" },
+    qualityTitle: "Recording Quality",
+    qualities: { high: "High Quality", medium: "Medium Quality", low: "Low Quality" },
   },
-  camera: "Camera",
-  cameraHint: "Permission is requested when recording starts",
-  cameraDenied: "Camera permission not granted",
-  countdown: "Countdown",
-  countdownOff: "No countdown",
-  countdownSeconds: (n) => `${n}s`,
-  advancedSection: "Advanced",
-  keepSystemCursor: "Keep system cursor",
-  cursorKeep: "No software cursor overlay (video keeps the real cursor)",
-  cursorHide: "Software cursor overlay enabled (system cursor hidden)",
-  performanceModeTitle: "Performance Mode",
-  performanceModes: { compatibility: "Compatibility", balanced: "Balanced", quality: "High Quality" },
-  qualityTitle: "Recording Quality",
-  qualities: { high: "High Quality", medium: "Medium Quality", low: "Low Quality" },
+  "zh-TW": {
+    sidebarLabel: "音訊、鏡頭與畫質",
+    audioSection: "音訊",
+    microphone: "麥克風",
+    systemAudio: "系統音訊",
+    systemAudioHint: "錄下電腦播放的聲音",
+    micLevel: "麥克風音量",
+    mic: {
+      ok: "正在收音",
+      silent: "沒有偵測到聲音",
+      clipping: "音量太大，可能破音",
+      probing: "聆聽中…",
+      denied: "尚未取得麥克風權限",
+      unavailable: "找不到可用的麥克風",
+      notProbed: "按下測試以開啟麥克風",
+      test: "測試麥克風",
+    },
+    camera: "鏡頭",
+    cameraHint: "開始錄影時才會要求權限",
+    cameraDenied: "尚未取得鏡頭權限",
+    countdown: "倒數",
+    countdownOff: "不倒數",
+    countdownSeconds: (n) => `${n} 秒`,
+    advancedSection: "進階",
+    keepSystemCursor: "保留系統游標",
+    cursorKeep: "不疊加軟體游標（影片保留真實游標）",
+    cursorHide: "已啟用軟體游標疊加（隱藏系統游標）",
+    performanceModeTitle: "效能模式",
+    performanceModes: { compatibility: "相容", balanced: "平衡", quality: "高畫質" },
+    qualityTitle: "錄影畫質",
+    qualities: { high: "高畫質", medium: "中畫質", low: "低畫質" },
+  },
+  "zh-CN": {
+    sidebarLabel: "音频、摄像头与画质",
+    audioSection: "音频",
+    microphone: "麦克风",
+    systemAudio: "系统音频",
+    systemAudioHint: "录制电脑播放的声音",
+    micLevel: "麦克风音量",
+    mic: {
+      ok: "正在收音",
+      silent: "未检测到声音",
+      clipping: "音量过大，可能失真",
+      probing: "正在监听…",
+      denied: "未获得麦克风权限",
+      unavailable: "未找到可用的麦克风",
+      notProbed: "点击测试以开启麦克风",
+      test: "测试麦克风",
+    },
+    camera: "摄像头",
+    cameraHint: "开始录制时才会请求权限",
+    cameraDenied: "未获得摄像头权限",
+    countdown: "倒计时",
+    countdownOff: "不倒计时",
+    countdownSeconds: (n) => `${n} 秒`,
+    advancedSection: "高级",
+    keepSystemCursor: "保留系统光标",
+    cursorKeep: "不叠加软件光标（视频保留真实光标）",
+    cursorHide: "已启用软件光标叠加（隐藏系统光标）",
+    performanceModeTitle: "性能模式",
+    performanceModes: { compatibility: "兼容", balanced: "均衡", quality: "高画质" },
+    qualityTitle: "录制画质",
+    qualities: { high: "高画质", medium: "中画质", low: "低画质" },
+  },
+  ja: {
+    sidebarLabel: "オーディオ、カメラ、画質",
+    audioSection: "オーディオ",
+    microphone: "マイク",
+    systemAudio: "システム音声",
+    systemAudioHint: "パソコンで再生中の音を録音",
+    micLevel: "マイクの音量",
+    mic: {
+      ok: "音を拾っています",
+      silent: "音が検出されません",
+      clipping: "音量が大きすぎます",
+      probing: "聞き取り中…",
+      denied: "マイクの使用が許可されていません",
+      unavailable: "使用できるマイクが見つかりません",
+      notProbed: "テストを押すとマイクがオンになります",
+      test: "マイクをテスト",
+    },
+    camera: "カメラ",
+    cameraHint: "録画開始時に許可を求めます",
+    cameraDenied: "カメラへのアクセスが許可されていません",
+    countdown: "カウントダウン",
+    countdownOff: "なし",
+    countdownSeconds: (n) => `${n}秒`,
+    advancedSection: "詳細設定",
+    keepSystemCursor: "システムカーソルを使う",
+    cursorKeep: "ソフトウェアカーソルを重ねない（実際のカーソルを録画）",
+    cursorHide: "ソフトウェアカーソルを重ねる（システムカーソルは非表示）",
+    performanceModeTitle: "パフォーマンスモード",
+    performanceModes: { compatibility: "互換性", balanced: "バランス", quality: "高画質" },
+    qualityTitle: "録画画質",
+    qualities: { high: "高画質", medium: "標準画質", low: "低画質" },
+  },
 };
+
+/** 英文預設字串，保留舊的匯出名稱 */
+export const defaultSidebarLabels: PreflightSidebarLabels = MESSAGES.en;
 
 function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
@@ -283,6 +394,9 @@ export interface PreflightSidebarProps {
   micPermission: PermissionState;
   cameraPermission: PermissionState;
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<PreflightSidebarLabels>;
   className?: string;
 }
@@ -301,10 +415,11 @@ export function PreflightSidebar({
   micPermission,
   cameraPermission,
   accent,
+  locale = "en",
   labels,
   className,
 }: PreflightSidebarProps) {
-  const l = { ...defaultSidebarLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const set = <K extends keyof RecordingSettings>(k: K, v: RecordingSettings[K]) => onSettingsChange({ ...settings, [k]: v });
   const pref = <K extends keyof PreflightPreferences>(k: K, v: PreflightPreferences[K]) => onPreferencesChange({ ...preferences, [k]: v });
 

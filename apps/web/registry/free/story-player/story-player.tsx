@@ -47,16 +47,60 @@ export interface StoryPlayerProps {
   cardWidth?: number;
   /** true 時鋪滿整個視窗（原本的全螢幕模式） */
   fixed?: boolean;
-  labels?: Partial<typeof defaultLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<StoryPlayerLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  region: "Story",
-  paused: "Paused",
-  prev: "Previous story",
-  next: "Next story",
-  slideOf: (n: number, total: number) => `Story ${n} of ${total}`,
+export interface StoryPlayerLabels {
+  region: string;
+  paused: string;
+  prev: string;
+  next: string;
+  slideOf: (n: number, total: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, StoryPlayerLabels> = {
+  en: {
+    region: "Story",
+    paused: "Paused",
+    prev: "Previous story",
+    next: "Next story",
+    slideOf: (n, total) => `Story ${n} of ${total}`,
+  },
+  "zh-TW": {
+    region: "限時動態",
+    paused: "已暫停",
+    prev: "上一則",
+    next: "下一則",
+    slideOf: (n, total) => `第 ${n} 則，共 ${total} 則`,
+  },
+  "zh-CN": {
+    region: "快拍",
+    paused: "已暂停",
+    prev: "上一条",
+    next: "下一条",
+    slideOf: (n, total) => `第 ${n} 条，共 ${total} 条`,
+  },
+  ja: {
+    region: "ストーリー",
+    paused: "一時停止中",
+    prev: "前のストーリー",
+    next: "次のストーリー",
+    slideOf: (n, total) => `ストーリー ${n}/${total}`,
+  },
 };
 
 /** 原本動態島用的圖示（heroicons outline） */
@@ -110,10 +154,11 @@ export function StoryPlayer({
   actions = [],
   cardWidth = 480,
   fixed = false,
+  locale = "en",
   labels,
   className,
 }: StoryPlayerProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const total = slides.length;
   const [innerIndex, setInnerIndex] = useState(defaultIndex);

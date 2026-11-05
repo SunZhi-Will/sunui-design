@@ -17,17 +17,65 @@ export interface YouTubeCardProps {
   onPlay?: (videoId: string) => void;
   /** 套用 CardFlow 畫布卡片外框（白底、圓角、陰影） */
   framed?: boolean;
-  labels?: Partial<typeof defaultLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<YouTubeCardLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  emptyTitle: "YouTube video",
-  emptyHint: "Add a YouTube link or video ID in the editor",
-  formatsTitle: "Supported formats:",
-  formats: ["youtube.com/watch?v=ID", "youtu.be/ID", "Video ID on its own"],
-  fallbackTitle: "YouTube video",
-  play: (title: string) => `Play ${title}`,
+export interface YouTubeCardLabels {
+  emptyTitle: string;
+  emptyHint: string;
+  formatsTitle: string;
+  formats: string[];
+  fallbackTitle: string;
+  play: (title: string) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, YouTubeCardLabels> = {
+  en: {
+    emptyTitle: "YouTube video",
+    emptyHint: "Add a YouTube link or video ID in the editor",
+    formatsTitle: "Supported formats:",
+    formats: ["youtube.com/watch?v=ID", "youtu.be/ID", "Video ID on its own"],
+    fallbackTitle: "YouTube video",
+    play: (title) => `Play ${title}`,
+  },
+  "zh-TW": {
+    emptyTitle: "YouTube 影片",
+    emptyHint: "在編輯器中加入 YouTube 連結或影片 ID",
+    formatsTitle: "支援的格式：",
+    formats: ["youtube.com/watch?v=ID", "youtu.be/ID", "單獨的影片 ID"],
+    fallbackTitle: "YouTube 影片",
+    play: (title) => `播放 ${title}`,
+  },
+  "zh-CN": {
+    emptyTitle: "YouTube 视频",
+    emptyHint: "在编辑器中添加 YouTube 链接或视频 ID",
+    formatsTitle: "支持的格式：",
+    formats: ["youtube.com/watch?v=ID", "youtu.be/ID", "单独的视频 ID"],
+    fallbackTitle: "YouTube 视频",
+    play: (title) => `播放 ${title}`,
+  },
+  ja: {
+    emptyTitle: "YouTube 動画",
+    emptyHint: "エディタで YouTube のリンクまたは動画 ID を追加してください",
+    formatsTitle: "対応する形式：",
+    formats: ["youtube.com/watch?v=ID", "youtu.be/ID", "動画 ID のみ"],
+    fallbackTitle: "YouTube 動画",
+    play: (title) => `${title} を再生`,
+  },
 };
 
 // 支援多種 YouTube 網址格式
@@ -59,10 +107,11 @@ export function YouTubeCard({
   onDragHandleMouseDown,
   onPlay,
   framed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: YouTubeCardProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const id = videoId ? extractVideoId(videoId) : "";
   const [playing, setPlaying] = useState(!clickToPlay);
   const [isDragging, setIsDragging] = useState(false);

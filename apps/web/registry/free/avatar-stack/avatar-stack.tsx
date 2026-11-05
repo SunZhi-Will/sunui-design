@@ -22,13 +22,63 @@ export interface AvatarStackProps {
   /** 最多顯示幾個頭像，其餘收進 +N */
   max?: number;
   size?: "sm" | "md" | "lg";
-  /** 整組頭像的無障礙名稱 */
+  /** 整組頭像的無障礙名稱，等同 labels.label */
   label?: string;
   /** 點擊 +N 時觸發；未提供時 +N 僅為文字 */
   onOverflowClick?: () => void;
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<AvatarStackLabels>;
   className?: string;
 }
+
+export interface AvatarStackLabels {
+  label: string;
+  /** +N 的名稱；names 是收起來的人名，可能是空字串 */
+  more: (count: string, names: string) => string;
+  /** 可點擊的 +N 按鈕名稱 */
+  showMore: (count: string, names: string) => string;
+  /** 串接人名用的分隔符 */
+  separator: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AvatarStackLabels> = {
+  en: {
+    label: "Recent buyers",
+    more: (n, names) => (names ? `${n} more, including ${names}` : `${n} more`),
+    showMore: (n, names) => (names ? `Show ${n} more, including ${names}` : `Show ${n} more`),
+    separator: ", ",
+  },
+  "zh-TW": {
+    label: "最近購買",
+    more: (n, names) => (names ? `還有 ${n} 人，包括 ${names}` : `還有 ${n} 人`),
+    showMore: (n, names) => (names ? `查看其餘 ${n} 人，包括 ${names}` : `查看其餘 ${n} 人`),
+    separator: "、",
+  },
+  "zh-CN": {
+    label: "最近购买",
+    more: (n, names) => (names ? `还有 ${n} 人，包括 ${names}` : `还有 ${n} 人`),
+    showMore: (n, names) => (names ? `查看其余 ${n} 人，包括 ${names}` : `查看其余 ${n} 人`),
+    separator: "、",
+  },
+  ja: {
+    label: "最近の購入者",
+    more: (n, names) => (names ? `ほか ${n} 人（${names} など）` : `ほか ${n} 人`),
+    showMore: (n, names) => (names ? `ほか ${n} 人を表示（${names} など）` : `ほか ${n} 人を表示`),
+    separator: "、",
+  },
+};
 
 // 設計語言（DESIGN.md）：紙、墨
 const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
@@ -55,7 +105,8 @@ function compact(n: number, locale: string) {
   return new Intl.NumberFormat(locale, n >= 1_000 ? { notation: "compact", maximumFractionDigits: 1 } : {}).format(n);
 }
 
-export function AvatarStack({ people, total, max = 4, size = "md", label = "Recent buyers", onOverflowClick, locale = "en-US", className }: AvatarStackProps) {
+export function AvatarStack({ people, total, max = 4, size = "md", label, onOverflowClick, locale = "en-US", labels, className }: AvatarStackProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...(label !== undefined ? { label } : null), ...labels };
   const reduce = useReducedMotion() ?? false;
   const s = sizes[size];
   const visible = people.slice(0, Math.max(0, max));
@@ -63,12 +114,12 @@ export function AvatarStack({ people, total, max = 4, size = "md", label = "Rece
   const count = Math.max(total ?? people.length, people.length);
   const extra = count - visible.length;
   const extraText = `+${compact(extra, locale)}`;
-  const hiddenNames = hidden.map((h) => h.name).join(", ");
-  const extraLabel = hiddenNames ? `${extra} more, including ${hiddenNames}` : `${extra} more`;
+  const hiddenNames = hidden.map((h) => h.name).join(t.separator);
+  const extraLabel = t.more(String(extra), hiddenNames);
   const disc = cn("flex items-center justify-center rounded-full border font-medium tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", paper, ink, inkOutline, s.text);
 
   return (
-    <ul aria-label={`${label} (${count})`} className={cn("flex items-center", className)}>
+    <ul aria-label={`${t.label} (${count})`} className={cn("flex items-center", className)}>
       <AnimatePresence initial={false}>
         {visible.map((p, i) => (
           <motion.li
@@ -89,9 +140,9 @@ export function AvatarStack({ people, total, max = 4, size = "md", label = "Rece
         ))}
         {extra > 0 && (
           <motion.li key="overflow" className="relative" style={{ marginLeft: s.overlap, zIndex: 1 }}>
-            <Lift title={hiddenNames || `${compact(extra, locale)} more`} reduce={reduce}>
+            <Lift title={hiddenNames || t.more(compact(extra, locale), "")} reduce={reduce}>
               {onOverflowClick ? (
-                <button type="button" onClick={onOverflowClick} aria-label={`Show ${extraLabel}`} className={cn(disc, "px-1.5 hover:bg-[#f1ebdd] dark:hover:bg-[#29251f]")} style={{ minWidth: s.box, height: s.box }}>
+                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-[#f1ebdd] dark:hover:bg-[#29251f]")} style={{ minWidth: s.box, height: s.box }}>
                   {extraText}
                 </button>
               ) : (

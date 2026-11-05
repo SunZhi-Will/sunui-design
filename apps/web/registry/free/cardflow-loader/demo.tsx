@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { CardFlowLoader } from "./cardflow-loader";
 
 export default function CardFlowLoaderDemo() {
+  const locale = useDemoLocale();
   const [run, setRun] = useState(0);
   const [done, setDone] = useState(false);
 
@@ -20,7 +23,7 @@ export default function CardFlowLoaderDemo() {
 
   return (
     <div className="relative h-[420px] w-full min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
-      <CardFlowLoader key={run} hideOnComplete={false} messageInterval={2500} onComplete={() => setDone(true)} />
+      <CardFlowLoader key={run} locale={locale} hideOnComplete={false} messageInterval={2500} onComplete={() => setDone(true)} />
     </div>
   );
 }

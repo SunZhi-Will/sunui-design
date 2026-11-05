@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords } from "@/lib/icon-groups";
+import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
   AnimatedIcon,
@@ -17,17 +19,13 @@ const sizes = [16, 20, 24, 32] as const;
 const strokes = [1.25, 1.5, 1.75] as const;
 type Mode = "static" | "animated";
 
-const kindLabel: Record<MotionKind, string> = { hover: "hover", toggle: "toggle", loop: "loading" };
-const kindHint: Record<MotionKind, string> = {
-  hover: "Plays when its button is hovered or focused.",
-  toggle: "Switches between two states with the active prop.",
-  loop: "Loops only while active, for loading and live status.",
-};
 
 const animatedSet = new Set<string>(animatedIconNames);
 const extraKeywords: Record<string, string> = { theme: "dark light mode toggle sun moon 深色 主題" };
 
-export function IconGallery() {
+export function IconGallery({ messages: t }: { messages: Messages["iconGallery"] }) {
+  const kindLabel: Record<MotionKind, string> = t.kindLabel;
+  const kindHint: Record<MotionKind, string> = t.kindHint;
   const [mode, setMode] = useState<Mode>("static");
   const [query, setQuery] = useState("");
   const [size, setSize] = useState<number>(24);
@@ -40,14 +38,16 @@ export function IconGallery() {
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // 分組標題與說明換成目前語言，缺的沿用英文
     const base = iconGroups.map((group) => ({
       ...group,
+      ...t.groups[group.id],
       icons: group.icons.filter((name) => mode === "static" || animatedSet.has(name)) as string[],
     }));
     if (mode === "animated") {
       const grouped = new Set(iconGroups.flatMap((group) => group.icons as string[]));
       const rest = animatedIconNames.filter((name) => !grouped.has(name));
-      if (rest.length) base.push({ id: "toggles", title: "State toggles", note: "Icons that exist only as a pair of states.", icons: rest });
+      if (rest.length) base.push({ id: "toggles", ...t.groups.toggles, icons: rest });
     }
     return base
       .map((group) => ({
@@ -59,7 +59,7 @@ export function IconGallery() {
           : group.icons,
       }))
       .filter((group) => group.icons.length > 0);
-  }, [query, mode]);
+  }, [query, mode, t]);
 
   const total = groups.reduce((sum, group) => sum + group.icons.length, 0);
   const visible = groups.flatMap((group) => group.icons);
@@ -97,7 +97,7 @@ export function IconGallery() {
   return (
     <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]")}>
       <div className="min-w-0">
-        <div role="tablist" aria-label="Icon style" className="mb-4 inline-flex rounded-md border border-line bg-card p-0.5">
+        <div role="tablist" aria-label={t.styleLabel} className="mb-4 inline-flex rounded-md border border-line bg-card p-0.5">
           {(["static", "animated"] as const).map((m) => (
             <button
               key={m}
@@ -111,7 +111,7 @@ export function IconGallery() {
               )}
             >
               {m === "static" ? <Icon name="grid" size={16} /> : <AnimatedIcon name="activity" size={16} />}
-              {m === "static" ? "Static" : "Animated"}
+              {m === "static" ? t.static : t.animated}
               <span className="font-mono text-[11px] tabular-nums text-subtle">
                 {m === "static" ? iconGroups.reduce((s, g) => s + g.icons.length, 0) : animatedIconNames.length}
               </span>
@@ -121,18 +121,18 @@ export function IconGallery() {
 
         <div className="flex flex-wrap items-center gap-3">
           <label className="relative min-w-0 flex-1 basis-56">
-            <span className="sr-only">Search icons</span>
+            <span className="sr-only">{t.searchLabel}</span>
             <Icon name="search" size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-subtle" />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={`Search ${total} icons, e.g. coupon, 印章`}
+              placeholder={format(t.searchPlaceholder, { n: total })}
               className="h-9 w-full rounded-md border border-line bg-card pr-3 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <Segmented label="Size" options={sizes} value={size} onChange={setSize} />
-          <Segmented label="Stroke" options={strokes} value={stroke} onChange={setStroke} />
+          <Segmented label={t.size} options={sizes} value={size} onChange={setSize} />
+          <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />
           <button
             type="button"
             aria-pressed={accent}
@@ -143,19 +143,19 @@ export function IconGallery() {
             )}
           >
             <span className={cn("size-2 rounded-full", accent ? "bg-accent" : "bg-line")} />
-            Vermilion accent
+            {t.accent}
           </button>
         </div>
 
         {mode === "animated" && (
           <p className="mt-4 text-xs text-subtle">
-            Hover a tile to play it. Toggle and loading icons switch state when you click.
+            {t.animatedHint}
           </p>
         )}
 
         {groups.length === 0 && (
           <p className="mt-10 rounded-md border border-dashed border-line p-8 text-center text-sm text-subtle">
-            No icon matches “{query}”.
+            {format(t.noMatch, { q: query })}
           </p>
         )}
 
@@ -212,7 +212,7 @@ export function IconGallery() {
 
       <aside className="rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-5 text-[#1c1917] lg:sticky lg:top-20 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
         <p className="text-[11px] font-medium tracking-[0.14em] text-[#1c1917]/60 uppercase dark:text-[#ece7dc]/60">
-          {isAnimated ? `Animated · ${kindLabel[kind!]}` : "Selected"}
+          {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : t.selected}
         </p>
         <div ref={previewRef} className="mt-4 grid place-items-center rounded-sm border border-dashed border-[#e7e0d0] py-8 dark:border-[#38332b]">
           {isAnimated ? (
@@ -241,7 +241,7 @@ export function IconGallery() {
             )}
           </div>
         ) : (
-          <div className="mt-4 flex items-end justify-center gap-5" aria-label="Size scale">
+          <div className="mt-4 flex items-end justify-center gap-5" aria-label={t.sizeScale}>
             {sizes.map((s) => (
               <div key={s} className="flex flex-col items-center gap-1.5">
                 <Icon name={selected as IconName} size={s} strokeWidth={stroke} />
@@ -261,7 +261,7 @@ export function IconGallery() {
             className="flex h-9 items-center justify-center gap-1.5 rounded-md bg-primary text-xs font-medium text-primary-foreground"
           >
             <Icon name={copied === "jsx" ? "check" : "copy"} size={14} />
-            {copied === "jsx" ? "Copied" : "Copy JSX"}
+            {copied === "jsx" ? t.copied : t.copyJsx}
           </button>
           {!isAnimated && (
             <button
@@ -270,7 +270,7 @@ export function IconGallery() {
               className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#e7e0d0] text-xs font-medium dark:border-[#38332b]"
             >
               <Icon name={copied === "svg" ? "check" : "copy"} size={14} />
-              {copied === "svg" ? "Copied" : "Copy SVG"}
+              {copied === "svg" ? t.copied : t.copySvg}
             </button>
           )}
         </div>

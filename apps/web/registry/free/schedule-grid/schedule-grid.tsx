@@ -45,21 +45,81 @@ export interface ScheduleGridLabels {
   headcount: (assigned: number, required: number) => string;
   dayTitle: (month: number, day: number, weekday: string) => string;
   dayTabLabel: (month: number, day: number, weekday: string, isToday: boolean) => string;
+  /** 缺額按鈕 aria-label 裡的日期 */
+  dateLabel: (month: number, day: number, weekday: string) => string;
 }
 
-const defaultLabels: ScheduleGridLabels = {
-  weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  shiftColumn: "Shift",
-  week: (n) => `Week ${n}`,
-  shortage: (n) => `${n} short`,
-  shortageAction: (d, s, n) => `${d} ${s} is ${n} short, fill`,
-  locked: "Locked",
-  pickDate: "Pick a date",
-  today: "Today",
-  noOne: "No one scheduled",
-  headcount: (a, r) => `${a}/${r}`,
-  dayTitle: (m, d, w) => `${m}/${d} ${w}`,
-  dayTabLabel: (m, d, w, t) => `${w} ${m}/${d}${t ? " (today)" : ""}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ScheduleGridLabels> = {
+  en: {
+    weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    shiftColumn: "Shift",
+    week: (n) => `Week ${n}`,
+    shortage: (n) => `${n} short`,
+    shortageAction: (d, s, n) => `${d} ${s} is ${n} short, fill`,
+    locked: "Locked",
+    pickDate: "Pick a date",
+    today: "Today",
+    noOne: "No one scheduled",
+    headcount: (a, r) => `${a}/${r}`,
+    dayTitle: (m, d, w) => `${m}/${d} ${w}`,
+    dayTabLabel: (m, d, w, t) => `${w} ${m}/${d}${t ? " (today)" : ""}`,
+    dateLabel: (m, d, w) => `${m}/${d} (${w})`,
+  },
+  "zh-TW": {
+    weekdays: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"],
+    shiftColumn: "班別",
+    week: (n) => `第 ${n} 週`,
+    shortage: (n) => `缺 ${n} 人`,
+    shortageAction: (d, s, n) => `${d} ${s}缺 ${n} 人，補人`,
+    locked: "已鎖定",
+    pickDate: "選擇日期",
+    today: "今天",
+    noOne: "沒有排班",
+    headcount: (a, r) => `${a}/${r}`,
+    dayTitle: (m, d, w) => `${m}/${d} ${w}`,
+    dayTabLabel: (m, d, w, t) => `${m}月${d}日 ${w}${t ? "（今天）" : ""}`,
+    dateLabel: (m, d, w) => `${m}/${d}（${w}）`,
+  },
+  "zh-CN": {
+    weekdays: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+    shiftColumn: "班次",
+    week: (n) => `第 ${n} 周`,
+    shortage: (n) => `缺 ${n} 人`,
+    shortageAction: (d, s, n) => `${d} ${s}缺 ${n} 人，补人`,
+    locked: "已锁定",
+    pickDate: "选择日期",
+    today: "今天",
+    noOne: "暂无排班",
+    headcount: (a, r) => `${a}/${r}`,
+    dayTitle: (m, d, w) => `${m}/${d} ${w}`,
+    dayTabLabel: (m, d, w, t) => `${m}月${d}日 ${w}${t ? "（今天）" : ""}`,
+    dateLabel: (m, d, w) => `${m}/${d}（${w}）`,
+  },
+  ja: {
+    weekdays: ["日", "月", "火", "水", "木", "金", "土"],
+    shiftColumn: "シフト",
+    week: (n) => `第${n}週`,
+    shortage: (n) => `${n}人不足`,
+    shortageAction: (d, s, n) => `${d} ${s}が${n}人不足、補充する`,
+    locked: "ロック中",
+    pickDate: "日付を選択",
+    today: "今日",
+    noOne: "シフトなし",
+    headcount: (a, r) => `${a}/${r}`,
+    dayTitle: (m, d, w) => `${m}/${d}（${w}）`,
+    dayTabLabel: (m, d, w, t) => `${m}月${d}日（${w}）${t ? " 今日" : ""}`,
+    dateLabel: (m, d, w) => `${m}/${d}（${w}）`,
+  },
 };
 
 export interface ScheduleGridProps {
@@ -84,6 +144,9 @@ export interface ScheduleGridProps {
   today?: string;
   /** 品牌色，用於今天的標示 */
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<ScheduleGridLabels>;
   className?: string;
 }
@@ -215,10 +278,11 @@ export function ScheduleGrid({
   layout = "auto",
   today: todayProp,
   accent,
+  locale = "en",
   labels: labelsProp,
   className,
 }: ScheduleGridProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const requiredByCell = required ? new Map(required.map((r) => [`${r.date}__${r.shiftId}`, r.required])) : null;
   const requiredFor = (date: string, shift: ScheduleShift) =>
     requiredByCell ? (requiredByCell.get(`${date}__${shift.id}`) ?? 0) : (shift.requiredEmployees ?? 0);
@@ -240,7 +304,7 @@ export function ScheduleGrid({
   const weekday = (date: string) => labels.weekdays[parseDate(date).getDay()] ?? "";
   const dateLabel = (date: string) => {
     const d = parseDate(date);
-    return `${d.getMonth() + 1}/${d.getDate()} (${weekday(date)})`;
+    return labels.dateLabel(d.getMonth() + 1, d.getDate(), weekday(date));
   };
   const style = accent ? ({ "--sg-brand": accent } as CSSProperties) : undefined;
 

@@ -38,25 +38,39 @@ export interface ArchiveCabinetProps {
   highlightId?: string;
   /** 聚焦外框與空隔板高亮色，預設原本的月光藍 */
   accent?: string;
-  labels?: {
-    cabinet?: string;
-    /** 檔案夾本體上的固定標題 */
-    folderTitle?: string;
-    /** complete 狀態的印章 */
-    stamp?: string;
-    slot?: (slot: number) => string;
-    empty?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ArchiveCabinetLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels = {
-  cabinet: "Memoir archive cabinet",
-  folderTitle: "Case file",
-  stamp: "FAILED",
-  slot: (slot: number) => `Slot ${slot}`,
-  empty: "empty",
+export interface ArchiveCabinetLabels {
+  cabinet: string;
+  /** 檔案夾本體上的固定標題 */
+  folderTitle: string;
+  /** complete 狀態的印章 */
+  stamp: string;
+  slot: (slot: number) => string;
+  empty: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ArchiveCabinetLabels> = {
+  en: { cabinet: "Memoir archive cabinet", folderTitle: "Case file", stamp: "FAILED", slot: (n) => `Slot ${n}`, empty: "empty" },
+  "zh-TW": { cabinet: "回憶錄歸檔櫃", folderTitle: "任務資料單", stamp: "失敗", slot: (n) => `第 ${n} 格`, empty: "空位" },
+  "zh-CN": { cabinet: "回忆录归档柜", folderTitle: "任务资料单", stamp: "失败", slot: (n) => `第 ${n} 格`, empty: "空位" },
+  ja: { cabinet: "回想録のアーカイブキャビネット", folderTitle: "任務資料", stamp: "失敗", slot: (n) => `${n}番の棚`, empty: "空き" },
 };
 
 const MONO = '"SF Mono", "Menlo", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif';
@@ -109,11 +123,12 @@ export function ArchiveCabinet({
   onPreview,
   highlightId,
   accent = "#d5e1f5",
+  locale = "en",
   labels: labelsProp,
   className,
   style,
 }: ArchiveCabinetProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   // 一層抽屜放幾格；前後排列，越靠前的越大。
   const depth = Math.max(1, Math.ceil(slotCount / 2));
   const bySlot = new Map(items.map((item) => [item.slot, item]));

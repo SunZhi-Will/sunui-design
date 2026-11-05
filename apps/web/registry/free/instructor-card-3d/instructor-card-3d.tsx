@@ -40,14 +40,53 @@ export interface InstructorCard3DLabels {
   signatureAlt?: (name: string) => string;
 }
 
-const defaultLabels: Required<InstructorCard3DLabels> = {
-  eyebrow: "INSTRUCTOR",
-  flipToBack: "Flip to the back",
-  flipToFront: "Flip to the front",
-  fullProfile: "Read the full instructor bio",
-  close: "Close instructor card",
-  dialog: (name) => `${name}'s instructor card`,
-  signatureAlt: (name) => `${name}'s signature`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<InstructorCard3DLabels>> = {
+  en: {
+    eyebrow: "INSTRUCTOR",
+    flipToBack: "Flip to the back",
+    flipToFront: "Flip to the front",
+    fullProfile: "Read the full instructor bio",
+    close: "Close instructor card",
+    dialog: (name) => `${name}'s instructor card`,
+    signatureAlt: (name) => `${name}'s signature`,
+  },
+  "zh-TW": {
+    eyebrow: "講師",
+    flipToBack: "翻到背面",
+    flipToFront: "翻回正面",
+    fullProfile: "看完整講師介紹",
+    close: "關閉講師名片",
+    dialog: (name) => `${name}的講師名片`,
+    signatureAlt: (name) => `${name}的簽名`,
+  },
+  "zh-CN": {
+    eyebrow: "讲师",
+    flipToBack: "翻到背面",
+    flipToFront: "翻回正面",
+    fullProfile: "查看完整讲师介绍",
+    close: "关闭讲师名片",
+    dialog: (name) => `${name}的讲师名片`,
+    signatureAlt: (name) => `${name}的签名`,
+  },
+  ja: {
+    eyebrow: "講師",
+    flipToBack: "裏面を見る",
+    flipToFront: "表面に戻る",
+    fullProfile: "講師プロフィールを詳しく見る",
+    close: "講師カードを閉じる",
+    dialog: (name) => `${name}の講師カード`,
+    signatureAlt: (name) => `${name}のサイン`,
+  },
 };
 
 export interface InstructorCard3DProps {
@@ -62,6 +101,9 @@ export interface InstructorCard3DProps {
   accent?: string;
   /** 「看完整介紹」按鈕的漸層起點（終點是 accent） */
   accentFrom?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: InstructorCard3DLabels;
 }
 
@@ -138,9 +180,10 @@ export function InstructorCard3D({
   closeOnBackdrop = true,
   accent = "#e0a100",
   accentFrom = "#da7756",
+  locale = "en",
   labels,
 }: InstructorCard3DProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [mounted, setMounted] = useState(false);
   const [tilt, setTilt] = useState<{ x: number; y: number } | null>(null);

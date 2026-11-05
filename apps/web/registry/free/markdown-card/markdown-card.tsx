@@ -17,16 +17,60 @@ export interface MarkdownCardProps {
   fontFamily?: string;
   /** 套用 CardFlow 畫布卡片外框（白底、圓角、陰影） */
   framed?: boolean;
-  labels?: Partial<typeof defaultLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<MarkdownCardLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  placeholder: "Type Markdown...\n\nFor example:\n# Heading\n**Bold** *Italic*\n- List item\n\nPress ESC to stop editing",
-  emptySelected: "Click to start typing Markdown...",
-  emptyIdle: "Select this card to start editing",
-  editor: "Markdown editor",
-  editHint: "Press Enter to edit",
+export interface MarkdownCardLabels {
+  placeholder: string;
+  emptySelected: string;
+  emptyIdle: string;
+  editor: string;
+  editHint: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, MarkdownCardLabels> = {
+  en: {
+    placeholder: "Type Markdown...\n\nFor example:\n# Heading\n**Bold** *Italic*\n- List item\n\nPress ESC to stop editing",
+    emptySelected: "Click to start typing Markdown...",
+    emptyIdle: "Select this card to start editing",
+    editor: "Markdown editor",
+    editHint: "Press Enter to edit",
+  },
+  "zh-TW": {
+    placeholder: "輸入 Markdown...\n\n例如：\n# 標題\n**粗體** *斜體*\n- 清單項目\n\n按 ESC 結束編輯",
+    emptySelected: "點一下開始輸入 Markdown...",
+    emptyIdle: "選取這張卡片即可開始編輯",
+    editor: "Markdown 編輯器",
+    editHint: "按 Enter 開始編輯",
+  },
+  "zh-CN": {
+    placeholder: "输入 Markdown...\n\n例如：\n# 标题\n**粗体** *斜体*\n- 列表项\n\n按 ESC 结束编辑",
+    emptySelected: "点击开始输入 Markdown...",
+    emptyIdle: "选中这张卡片即可开始编辑",
+    editor: "Markdown 编辑器",
+    editHint: "按 Enter 开始编辑",
+  },
+  ja: {
+    placeholder: "Markdown を入力...\n\n例：\n# 見出し\n**太字** *斜体*\n- リスト項目\n\nESC で編集を終了",
+    emptySelected: "クリックして Markdown を入力...",
+    emptyIdle: "カードを選択すると編集できます",
+    editor: "Markdown エディター",
+    editHint: "Enter で編集",
+  },
 };
 
 type Strip<T extends keyof JSX.IntrinsicElements> = ComponentPropsWithoutRef<T> & { node?: unknown };
@@ -121,10 +165,11 @@ export function MarkdownCard({
   color = "#000000",
   fontFamily = "Arial",
   framed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: MarkdownCardProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const [innerValue, setInnerValue] = useState(defaultValue);
   const [innerSelected, setInnerSelected] = useState(false);
   const content = valueProp ?? innerValue;

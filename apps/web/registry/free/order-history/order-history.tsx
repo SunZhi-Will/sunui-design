@@ -41,6 +41,7 @@ export interface OrderHistoryLabels {
 export interface OrderHistoryProps {
   orders: HistoryOrder[];
   title?: ReactNode;
+  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   currency?: string;
   /** 展開後明細下方的動作，例如「再買一次」或「追蹤包裹」 */
@@ -48,26 +49,73 @@ export interface OrderHistoryProps {
   /** 沒有訂單時放在提示文字下方，例如回到商店的連結 */
   emptyAction?: ReactNode;
   defaultExpandedId?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: OrderHistoryLabels;
   className?: string;
 }
 
-const statusText: Record<OrderStatus, string> = {
-  pending: "Unpaid",
-  paid: "Paid",
-  shipped: "Shipped",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-const defaultLabels = {
-  items: (count: number) => `${count} item${count === 1 ? "" : "s"}`,
-  shipping: "Shipping",
-  discount: "Discount",
-  total: "Total",
-  free: "Free",
-  empty: "No orders yet. Anything you buy will show up here with its receipt.",
-  toggle: (number: string) => `Order ${number} details`,
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+interface OrderHistoryMessages {
+  status: Record<OrderStatus, string>;
+  items: (count: number) => string;
+  shipping: ReactNode;
+  discount: ReactNode;
+  total: ReactNode;
+  free: ReactNode;
+  empty: ReactNode;
+  toggle: (number: string) => string;
+}
+
+const MESSAGES: Record<SunLocale, OrderHistoryMessages> = {
+  en: {
+    status: { pending: "Unpaid", paid: "Paid", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled" },
+    items: (count) => `${count} item${count === 1 ? "" : "s"}`,
+    shipping: "Shipping",
+    discount: "Discount",
+    total: "Total",
+    free: "Free",
+    empty: "No orders yet. Anything you buy will show up here with its receipt.",
+    toggle: (number) => `Order ${number} details`,
+  },
+  "zh-TW": {
+    status: { pending: "待付款", paid: "已付款", shipped: "已出貨", delivered: "已送達", cancelled: "已取消" },
+    items: (count) => `${count} 件商品`,
+    shipping: "運費",
+    discount: "折扣",
+    total: "總計",
+    free: "免運",
+    empty: "還沒有訂單。之後買的東西都會連同收據出現在這裡。",
+    toggle: (number) => `訂單 ${number} 明細`,
+  },
+  "zh-CN": {
+    status: { pending: "待付款", paid: "已付款", shipped: "已发货", delivered: "已送达", cancelled: "已取消" },
+    items: (count) => `${count} 件商品`,
+    shipping: "运费",
+    discount: "优惠",
+    total: "合计",
+    free: "包邮",
+    empty: "还没有订单。之后购买的商品都会连同小票显示在这里。",
+    toggle: (number) => `订单 ${number} 明细`,
+  },
+  ja: {
+    status: { pending: "未払い", paid: "支払済", shipped: "発送済", delivered: "配達済", cancelled: "キャンセル" },
+    items: (count) => `${count} 点`,
+    shipping: "送料",
+    discount: "割引",
+    total: "合計",
+    free: "無料",
+    empty: "まだ注文はありません。購入したものはレシートと一緒にここに表示されます。",
+    toggle: (number) => `注文 ${number} の詳細`,
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -102,7 +150,8 @@ export function OrderHistory({
   labels,
   className,
 }: OrderHistoryProps) {
-  const t = { ...defaultLabels, ...labels, status: { ...statusText, ...labels?.status } };
+  const base = MESSAGES[resolveLocale(locale)];
+  const t = { ...base, ...labels, status: { ...base.status, ...labels?.status } };
   const reduce = useReducedMotion() ?? false;
   const baseId = useId();
   const [open, setOpen] = useState<string | null>(defaultExpandedId ?? null);

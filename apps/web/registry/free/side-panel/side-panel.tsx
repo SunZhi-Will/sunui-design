@@ -24,11 +24,33 @@ export interface SidePanelProps {
   initialFocusRef?: RefObject<HTMLElement | null>;
   /** 渲染到 document.body；false 時渲染在原位置（容器需有 relative 與 overflow-hidden） */
   portal?: boolean;
-  labels?: {
-    close?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SidePanelLabels>;
   className?: string;
 }
+
+export interface SidePanelLabels {
+  close: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SidePanelLabels> = {
+  en: { close: "Close panel" },
+  "zh-TW": { close: "關閉面板" },
+  "zh-CN": { close: "关闭面板" },
+  ja: { close: "パネルを閉じる" },
+};
 
 const sizeClass: Record<SidePanelSide, Record<"sm" | "md" | "lg", string>> = {
   left: { sm: "w-72", md: "w-96", lg: "w-[32rem]" },
@@ -87,6 +109,7 @@ export function SidePanel({
   dismissOnOverlay = true,
   initialFocusRef,
   portal = true,
+  locale = "en",
   labels,
   className,
 }: SidePanelProps) {
@@ -96,7 +119,7 @@ export function SidePanel({
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
-  const closeLabel = labels?.close ?? "Close panel";
+  const closeLabel = { ...MESSAGES[resolveLocale(locale)], ...labels }.close;
 
   useEffect(() => setMounted(true), []);
 

@@ -202,8 +202,32 @@ export interface CardProps {
   onClick?: () => void;
   /** 可存取名稱（clickable 時建議提供） */
   "aria-label"?: string;
-  labels?: { loading?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CardLabels>;
 }
+
+export interface CardLabels {
+  loading: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CardLabels> = {
+  en: { loading: "Loading..." },
+  "zh-TW": { loading: "載入中..." },
+  "zh-CN": { loading: "加载中..." },
+  ja: { loading: "読み込み中..." },
+};
 
 const SHIMMER_CSS = `@keyframes classic-card-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`;
 
@@ -242,9 +266,11 @@ export function Card({
   glow = false,
   style,
   onClick,
+  locale = "en",
   labels,
   "aria-label": ariaLabel,
 }: CardProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const reduce = useReducedMotion() ?? false;
@@ -407,13 +433,13 @@ export function Card({
                     />
                   </div>
                   <span className={cn("text-sm font-medium", mode === "dark" ? "text-gray-400" : "text-gray-500")}>
-                    {labels?.loading ?? "Loading..."}
+                    {t.loading}
                   </span>
                 </motion.div>
               ) : (
                 <>
                   <span className="sr-only" role="status">
-                    {labels?.loading ?? "Loading..."}
+                    {t.loading}
                   </span>
                   {loadingMode === "shimmer" && (
                     <div

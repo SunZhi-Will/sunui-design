@@ -68,15 +68,57 @@ export interface TestimonialMarqueeLabels {
   stars?: (rating: string) => string;
 }
 
-const defaultLabels: Required<TestimonialMarqueeLabels> = {
-  anonymous: "Anonymous",
-  expandHint: "Tap to expand →",
-  ratingOnly: (r) => `Gave a ${r} star rating`,
-  viewFull: "Tap to read the full review →",
-  openCard: (name) => `Read ${name}'s full feedback`,
-  dialog: (name) => `${name}'s full feedback`,
-  close: "Close feedback details",
-  stars: (r) => `Rated ${r} out of 5`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<TestimonialMarqueeLabels>> = {
+  en: {
+    anonymous: "Anonymous",
+    expandHint: "Tap to expand →",
+    ratingOnly: (r) => `Gave a ${r} star rating`,
+    viewFull: "Tap to read the full review →",
+    openCard: (name) => `Read ${name}'s full feedback`,
+    dialog: (name) => `${name}'s full feedback`,
+    close: "Close feedback details",
+    stars: (r) => `Rated ${r} out of 5`,
+  },
+  "zh-TW": {
+    anonymous: "匿名學員",
+    expandHint: "點擊展開 →",
+    ratingOnly: (r) => `給了 ${r} 星評價`,
+    viewFull: "點擊查看完整評價 →",
+    openCard: (name) => `查看 ${name} 的完整回饋`,
+    dialog: (name) => `${name} 的完整回饋`,
+    close: "關閉回饋詳情",
+    stars: (r) => `評分 ${r} / 5`,
+  },
+  "zh-CN": {
+    anonymous: "匿名学员",
+    expandHint: "点击展开 →",
+    ratingOnly: (r) => `给出了 ${r} 星评价`,
+    viewFull: "点击查看完整评价 →",
+    openCard: (name) => `查看 ${name} 的完整反馈`,
+    dialog: (name) => `${name} 的完整反馈`,
+    close: "关闭反馈详情",
+    stars: (r) => `评分 ${r} / 5`,
+  },
+  ja: {
+    anonymous: "匿名の受講者",
+    expandHint: "タップで開く →",
+    ratingOnly: (r) => `星 ${r} の評価`,
+    viewFull: "タップしてレビュー全文を読む →",
+    openCard: (name) => `${name}のレビュー全文を読む`,
+    dialog: (name) => `${name}のレビュー全文`,
+    close: "レビューの詳細を閉じる",
+    stars: (r) => `5 点中 ${r} 点`,
+  },
 };
 
 export interface TestimonialMarqueeProps {
@@ -95,6 +137,9 @@ export interface TestimonialMarqueeProps {
   /** 對話框是否以 fixed 蓋滿視窗；false 時以 absolute 蓋滿最近的 relative 父層 */
   fixed?: boolean;
   emptyFallback?: ReactNode;
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: TestimonialMarqueeLabels;
   className?: string;
 }
@@ -284,6 +329,7 @@ function TestimonialCard({
   expandable,
   width,
   labels,
+  formatRating,
   onClick,
 }: {
   t: Testimonial;
@@ -291,6 +337,7 @@ function TestimonialCard({
   expandable: boolean;
   width: number;
   labels: Required<TestimonialMarqueeLabels>;
+  formatRating: (n: number) => string;
   onClick?: () => void;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -341,9 +388,9 @@ function TestimonialCard({
     <>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <StarRating value={t.rating} size={13} label={labels.stars(t.rating.toFixed(1))} />
+          <StarRating value={t.rating} size={13} label={labels.stars(formatRating(t.rating))} />
           <span className="text-[12px] font-semibold" style={{ color: "var(--tm-text-muted)" }}>
-            {t.rating.toFixed(1)}
+            {formatRating(t.rating)}
           </span>
         </div>
         {t.tag ? <TagBadge tag={t.tag} /> : null}
@@ -368,7 +415,7 @@ function TestimonialCard({
         <div className="mb-4 flex min-h-[70px] flex-1 flex-col items-center justify-center gap-1.5 text-center">
           <QuoteIcon size={20} style={{ color: accentColor, opacity: 0.5 }} />
           <p className="text-[12px] leading-relaxed" style={{ color: "var(--tm-text-dim)" }}>
-            {labels.ratingOnly(t.rating.toFixed(1))}
+            {labels.ratingOnly(formatRating(t.rating))}
           </p>
           {expandable ? (
             <span className="text-[12px] font-medium" style={{ color: accentColor, opacity: 0.85 }}>
@@ -437,12 +484,14 @@ function ExpandedDialog({
   accentColor,
   fixed,
   labels,
+  formatRating,
   onClose,
 }: {
   t: Testimonial;
   accentColor: string;
   fixed: boolean;
   labels: Required<TestimonialMarqueeLabels>;
+  formatRating: (n: number) => string;
   onClose: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -553,9 +602,9 @@ function ExpandedDialog({
                 {name}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
-                <StarRating value={t.rating} size={12} label={labels.stars(t.rating.toFixed(1))} />
+                <StarRating value={t.rating} size={12} label={labels.stars(formatRating(t.rating))} />
                 <span className="text-[12px] font-bold" style={{ color: "var(--tm-text-secondary)" }}>
-                  {t.rating.toFixed(1)}
+                  {formatRating(t.rating)}
                 </span>
                 {t.tag ? (
                   <>
@@ -627,10 +676,12 @@ export function TestimonialMarquee({
   fadeWidth = 48,
   fixed = true,
   emptyFallback = null,
+  locale = "en",
   labels: labelsProp,
   className,
 }: TestimonialMarqueeProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
+  const formatRating = (n: number) => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
   const [expanded, setExpanded] = useState<Testimonial | null>(null);
   const [paused, setPaused] = useState(false);
   const [allowAnimation, setAllowAnimation] = useState(true);
@@ -660,6 +711,7 @@ export function TestimonialMarquee({
         expandable={expandable}
         width={cardWidth}
         labels={labels}
+        formatRating={formatRating}
         onClick={expandable ? () => setExpanded(t) : undefined}
       />
     ));
@@ -715,7 +767,7 @@ export function TestimonialMarquee({
         </div>
       )}
       {expandable && expanded ? (
-        <ExpandedDialog t={expanded} accentColor={accentColor} fixed={fixed} labels={labels} onClose={() => setExpanded(null)} />
+        <ExpandedDialog t={expanded} accentColor={accentColor} fixed={fixed} labels={labels} formatRating={formatRating} onClose={() => setExpanded(null)} />
       ) : null}
     </>
   );

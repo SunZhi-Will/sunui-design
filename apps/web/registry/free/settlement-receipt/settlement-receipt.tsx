@@ -66,6 +66,14 @@ export interface SettlementReceiptLabels {
   print?: ReactNode;
   copied?: ReactNode;
   closeToast?: string;
+  /** 餐點明細之間的分隔 */
+  separator?: string;
+  /** 複製到 LINE 的純文字 */
+  textTitle?: string;
+  textSummary?: (meals: string, fee: string | null, discount: string | null, total: string) => string;
+  textSends?: (from: string, amount: string, to: string) => string;
+  textNoTransfers?: string;
+  textTransfers?: (payer: string | null) => string;
 }
 
 export interface SettlementReceiptProps {
@@ -99,41 +107,168 @@ export interface SettlementReceiptProps {
   colorOf?: (index: number) => { bg: string; fg: string };
   /** 「已複製」提示是否 fixed 在視窗上方；false 交給父層定位 */
   fixed?: boolean;
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: SettlementReceiptLabels;
   className?: string;
 }
 
-const defaultFormat = (n: number) => `NT$${n.toLocaleString("en-US")}`;
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-const defaultLabels: Required<SettlementReceiptLabels> = {
-  title: "Settle up",
-  description: "What everyone owes and who pays whom. Copy it to LINE and you are done.",
-  grand: "Whole bill",
-  balanced: "Totals match",
-  unbalanced: "Totals do not match",
-  meals: "Meals",
-  counted: (n) => `${n} counted`,
-  fee: "Service fee",
-  discount: "Discount",
-  pending: (n) => `${n} ${n === 1 ? "dish is" : "dishes are"} not counted yet. Fix them on the dishes step.`,
-  perPerson: "What everyone owes",
-  perPersonList: "Amount owed by each person",
-  peopleCount: (n) => `${n} ${n === 1 ? "person" : "people"}`,
-  payer: "Paid",
-  payerMeta: (name) => `${name} paid`,
-  nothing: "Nothing eaten this time",
-  feeShare: (a) => `, service fee ${a}`,
-  discountShare: (a) => `, discount −${a}`,
-  sumMatches: (sum) => `Everyone adds up to ${sum}, exactly the whole bill`,
-  sumMismatch: (sum, grand) => `The total ${sum} differs from the bill ${grand}. Please report this.`,
-  oddment: (item, people) => `${item} does not split evenly, so ${people.join(", ")} ${people.length > 1 ? "each pay" : "pays"} 1 more`,
-  transfers: "Transfers",
-  sendsTo: "sends to",
-  noTransfers: "No one needs to transfer.",
-  copy: "Copy to LINE",
-  print: "Print",
-  copied: "Copied. Paste it into the LINE group.",
-  closeToast: "Close toast",
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<SettlementReceiptLabels>> = {
+  en: {
+    title: "Settle up",
+    description: "What everyone owes and who pays whom. Copy it to LINE and you are done.",
+    grand: "Whole bill",
+    balanced: "Totals match",
+    unbalanced: "Totals do not match",
+    meals: "Meals",
+    counted: (n) => `${n} counted`,
+    fee: "Service fee",
+    discount: "Discount",
+    pending: (n) => `${n} ${n === 1 ? "dish is" : "dishes are"} not counted yet. Fix them on the dishes step.`,
+    perPerson: "What everyone owes",
+    perPersonList: "Amount owed by each person",
+    peopleCount: (n) => `${n} ${n === 1 ? "person" : "people"}`,
+    payer: "Paid",
+    payerMeta: (name) => `${name} paid`,
+    nothing: "Nothing eaten this time",
+    feeShare: (a) => `, service fee ${a}`,
+    discountShare: (a) => `, discount −${a}`,
+    sumMatches: (sum) => `Everyone adds up to ${sum}, exactly the whole bill`,
+    sumMismatch: (sum, grand) => `The total ${sum} differs from the bill ${grand}. Please report this.`,
+    oddment: (item, people) => `${item} does not split evenly, so ${people.join(", ")} ${people.length > 1 ? "each pay" : "pays"} 1 more`,
+    transfers: "Transfers",
+    sendsTo: "sends to",
+    noTransfers: "No one needs to transfer.",
+    copy: "Copy to LINE",
+    print: "Print",
+    copied: "Copied. Paste it into the LINE group.",
+    closeToast: "Close toast",
+    separator: ", ",
+    textTitle: "Dinner split",
+    textSummary: (m, f, d, t) => `Meals ${m}${f ? ` + service fee ${f}` : ""}${d ? ` − discount ${d}` : ""} = total ${t}`,
+    textSends: (from, a, to) => `${from} sends ${a} to ${to}`,
+    textNoTransfers: "No one needs to transfer",
+    textTransfers: (payer) => `Transfers (${payer} paid):`,
+  },
+  "zh-TW": {
+    title: "結算",
+    description: "每個人該付多少、誰轉給誰，複製到 LINE 就完成了。",
+    grand: "整筆帳單",
+    balanced: "金額相符",
+    unbalanced: "金額不符",
+    meals: "餐點",
+    counted: (n) => `已算 ${n} 道`,
+    fee: "服務費",
+    discount: "折扣",
+    pending: (n) => `還有 ${n} 道餐點沒算進去，請回到餐點步驟處理。`,
+    perPerson: "每個人該付",
+    perPersonList: "每個人的應付金額",
+    peopleCount: (n) => `${n} 人`,
+    payer: "先付",
+    payerMeta: (name) => `${name} 先付`,
+    nothing: "這次沒有點餐",
+    feeShare: (a) => `，服務費 ${a}`,
+    discountShare: (a) => `，折扣 −${a}`,
+    sumMatches: (sum) => `大家加起來 ${sum}，剛好等於整筆帳單`,
+    sumMismatch: (sum, grand) => `加總 ${sum} 與帳單 ${grand} 不符，請回報這個問題。`,
+    oddment: (item, people) => `${item} 無法整除，由 ${people.join("、")} ${people.length > 1 ? "各" : ""}多付 1 元`,
+    transfers: "轉帳",
+    sendsTo: "轉給",
+    noTransfers: "不需要任何人轉帳。",
+    copy: "複製到 LINE",
+    print: "列印",
+    copied: "已複製，貼到 LINE 群組就好。",
+    closeToast: "關閉提示",
+    separator: "、",
+    textTitle: "聚餐分帳",
+    textSummary: (m, f, d, t) => `餐點 ${m}${f ? ` + 服務費 ${f}` : ""}${d ? ` − 折扣 ${d}` : ""} = 總計 ${t}`,
+    textSends: (from, a, to) => `${from} 轉 ${a} 給 ${to}`,
+    textNoTransfers: "不需要任何人轉帳",
+    textTransfers: (payer) => `轉帳（${payer} 先付）：`,
+  },
+  "zh-CN": {
+    title: "结算",
+    description: "每个人该付多少、谁转给谁，复制到 LINE 就搞定了。",
+    grand: "整笔账单",
+    balanced: "金额一致",
+    unbalanced: "金额不一致",
+    meals: "餐品",
+    counted: (n) => `已算 ${n} 道`,
+    fee: "服务费",
+    discount: "折扣",
+    pending: (n) => `还有 ${n} 道菜没算进去，请回到点菜步骤处理。`,
+    perPerson: "每个人该付",
+    perPersonList: "每个人的应付金额",
+    peopleCount: (n) => `${n} 人`,
+    payer: "垫付",
+    payerMeta: (name) => `${name} 垫付`,
+    nothing: "这次没有点餐",
+    feeShare: (a) => `，服务费 ${a}`,
+    discountShare: (a) => `，折扣 −${a}`,
+    sumMatches: (sum) => `大家加起来 ${sum}，正好等于整笔账单`,
+    sumMismatch: (sum, grand) => `合计 ${sum} 与账单 ${grand} 不一致，请反馈这个问题。`,
+    oddment: (item, people) => `${item} 无法均分，由 ${people.join("、")} ${people.length > 1 ? "各" : ""}多付 1 元`,
+    transfers: "转账",
+    sendsTo: "转给",
+    noTransfers: "不需要任何人转账。",
+    copy: "复制到 LINE",
+    print: "打印",
+    copied: "已复制，粘贴到 LINE 群里就好。",
+    closeToast: "关闭提示",
+    separator: "、",
+    textTitle: "聚餐分账",
+    textSummary: (m, f, d, t) => `餐品 ${m}${f ? ` + 服务费 ${f}` : ""}${d ? ` − 折扣 ${d}` : ""} = 合计 ${t}`,
+    textSends: (from, a, to) => `${from} 转 ${a} 给 ${to}`,
+    textNoTransfers: "不需要任何人转账",
+    textTransfers: (payer) => `转账（${payer} 垫付）：`,
+  },
+  ja: {
+    title: "精算",
+    description: "それぞれの支払額と送金先をまとめました。LINE にコピーすれば完了です。",
+    grand: "お会計",
+    balanced: "合計一致",
+    unbalanced: "合計が一致しません",
+    meals: "料理",
+    counted: (n) => `${n} 品を計上`,
+    fee: "サービス料",
+    discount: "割引",
+    pending: (n) => `まだ計上していない料理が ${n} 品あります。料理のステップで直してください。`,
+    perPerson: "それぞれの支払額",
+    perPersonList: "一人ひとりの支払額",
+    peopleCount: (n) => `${n} 人`,
+    payer: "立替",
+    payerMeta: (name) => `${name} が立替`,
+    nothing: "今回は注文なし",
+    feeShare: (a) => `、サービス料 ${a}`,
+    discountShare: (a) => `、割引 −${a}`,
+    sumMatches: (sum) => `全員の合計は ${sum} で、お会計とぴったり一致`,
+    sumMismatch: (sum, grand) => `合計 ${sum} がお会計 ${grand} と一致しません。この問題を報告してください。`,
+    oddment: (item, people) => `${item}は割り切れないため、${people.join("、")}が${people.length > 1 ? "それぞれ " : " "}1 多く払います`,
+    transfers: "送金",
+    sendsTo: "から",
+    noTransfers: "送金の必要はありません。",
+    copy: "LINE にコピー",
+    print: "印刷",
+    copied: "コピーしました。LINE グループに貼り付けてください。",
+    closeToast: "通知を閉じる",
+    separator: "、",
+    textTitle: "割り勘",
+    textSummary: (m, f, d, t) => `料理 ${m}${f ? ` + サービス料 ${f}` : ""}${d ? ` − 割引 ${d}` : ""} = 合計 ${t}`,
+    textSends: (from, a, to) => `${from} → ${to}：${a}`,
+    textNoTransfers: "送金の必要はありません",
+    textTransfers: (payer) => `送金（${payer} が立替）：`,
+  },
 };
 
 // spliteat-web 的成員色盤（employee-chip.tsx），照名單順序從第 2 色開始
@@ -254,16 +389,17 @@ export function SettlementReceipt({
   onCopied,
   onPrint,
   showHeader = true,
-  formatAmount = defaultFormat,
+  formatAmount,
   accent = "#4F46E5",
   accentDark = "#818CF8",
   colorOf = paletteColor,
   fixed = true,
+  locale = "en",
   labels,
   className,
 }: SettlementReceiptProps) {
-  const l = { ...defaultLabels, ...labels };
-  const fmt = formatAmount;
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const fmt = formatAmount ?? ((n: number) => `NT$${n.toLocaleString(locale)}`);
   const sum = people.reduce((s, p) => s + p.owe, 0);
   const balanced = sum === grand;
   const [toast, setToast] = useState(0);
@@ -271,12 +407,12 @@ export function SettlementReceipt({
   const buildText = () => {
     if (typeof copyText === "function") return copyText();
     if (typeof copyText === "string") return copyText;
-    const head = `Dinner split\nMeals ${fmt(subtotal)}${fee ? ` + service fee ${fmt(fee)}` : ""}${discount ? ` − discount ${fmt(discount)}` : ""} = total ${fmt(grand)}`;
+    const head = `${l.textTitle}\n${l.textSummary(fmt(subtotal), fee ? fmt(fee) : null, discount ? fmt(discount) : null, fmt(grand))}`;
     const rows = people
-      .map((p) => `${p.name}: ${fmt(p.owe)}${p.lines.length ? ` (${p.lines.map((x) => `${x.name} ${x.amount}`).join(", ")})` : ""}`)
+      .map((p) => `${p.name}: ${fmt(p.owe)}${p.lines.length ? ` (${p.lines.map((x) => `${x.name} ${x.amount}`).join(l.separator)})` : ""}`)
       .join("\n");
-    const moves = transfers.length ? transfers.map((t) => `${t.from} sends ${fmt(t.amount)} to ${t.to}`).join("\n") : "No one needs to transfer";
-    return `${head}\n\n${rows}\n\nTransfers (${payer} paid):\n${moves}`;
+    const moves = transfers.length ? transfers.map((t) => l.textSends(t.from, fmt(t.amount), t.to)).join("\n") : l.textNoTransfers;
+    return `${head}\n\n${rows}\n\n${l.textTransfers(payer)}\n${moves}`;
   };
 
   const copy = async () => {
@@ -354,7 +490,7 @@ export function SettlementReceipt({
             <ul className="divide-y divide-border" aria-label={l.perPersonList}>
               {people.map((p, i) => {
                 const c = colorOf(i);
-                const detail = p.lines.length ? p.lines.map((x) => `${x.name} ${x.amount}`).join(", ") : l.nothing;
+                const detail = p.lines.length ? p.lines.map((x) => `${x.name} ${x.amount}`).join(l.separator) : l.nothing;
                 const adjust = `${p.fee ? l.feeShare(String(p.fee)) : ""}${p.discount ? l.discountShare(String(p.discount)) : ""}`;
                 return (
                   <li key={p.id} className="flex items-center gap-3 px-4 py-3">

@@ -51,17 +51,45 @@ function ThemeStyle({ theme }: { theme: NumberedStepsTheme }) {
   );
 }
 
+export interface NumberedStepsLabels {
+  /** 每一步前面給螢幕閱讀器的前綴，例如「Step 1: 」 */
+  stepPrefix: (n: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, NumberedStepsLabels> = {
+  en: { stepPrefix: (n) => `Step ${n}: ` },
+  "zh-TW": { stepPrefix: (n) => `第 ${n} 步：` },
+  "zh-CN": { stepPrefix: (n) => `第 ${n} 步：` },
+  ja: { stepPrefix: (n) => `ステップ ${n}：` },
+};
+
 export interface NumberedStepsProps {
   items: ReactNode[];
-  /** 每一步前面給螢幕閱讀器的前綴，預設「Step 1: 」 */
+  /** 每一步前面給螢幕閱讀器的前綴；優先於 locale 與 labels */
   stepPrefix?: (n: number) => string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<NumberedStepsLabels>;
   theme?: NumberedStepsTheme;
   className?: string;
   style?: CSSProperties;
 }
 
 /** 編號步驟清單。保留有序清單語意，編號圓點僅作視覺。 */
-export function NumberedSteps({ items, stepPrefix = (n) => `Step ${n}: `, theme = "system", className, style }: NumberedStepsProps) {
+export function NumberedSteps({ items, stepPrefix, locale = "en", labels, theme = "system", className, style }: NumberedStepsProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const prefix = stepPrefix ?? t.stepPrefix;
   return (
     <>
       <ThemeStyle theme={theme} />
@@ -76,7 +104,7 @@ export function NumberedSteps({ items, stepPrefix = (n) => `Step ${n}: `, theme 
               {i + 1}
             </span>
             <div className="min-w-0 flex-1 text-[15px] leading-[1.8]" style={{ color: "var(--vw-text-secondary)" }}>
-              <span className="sr-only">{stepPrefix(i + 1)}</span>
+              <span className="sr-only">{prefix(i + 1)}</span>
               <div className="space-y-2 [&_a]:text-[color:var(--vw-accent-text)] [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-bold [&_strong]:text-[color:var(--vw-text-primary)]">
                 {it}
               </div>

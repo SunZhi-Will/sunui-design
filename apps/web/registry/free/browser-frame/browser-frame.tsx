@@ -73,6 +73,28 @@ function LockIcon({ size }: { size: number }) {
 
 /* ───────── 電腦瀏覽器 ───────── */
 
+export interface BrowserFrameLabels {
+  /** 外框的無障礙名稱 */
+  window: (url: string) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, BrowserFrameLabels> = {
+  en: { window: (url) => `Browser window, ${url}` },
+  "zh-TW": { window: (url) => `瀏覽器視窗，${url}` },
+  "zh-CN": { window: (url) => `浏览器窗口，${url}` },
+  ja: { window: (url) => `ブラウザウィンドウ、${url}` },
+};
+
 export interface BrowserFrameProps {
   /** 網址列（只顯示網域與路徑） */
   url: string;
@@ -82,6 +104,10 @@ export interface BrowserFrameProps {
   scheme?: BrowserFrameScheme;
   badge?: ReactNode;
   maxHeight?: number;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<BrowserFrameLabels>;
   children: ReactNode;
   className?: string;
 }
@@ -93,12 +119,15 @@ export function BrowserFrame({
   scheme = "auto",
   badge,
   maxHeight,
+  locale = "en",
+  labels,
   children,
   className,
 }: BrowserFrameProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <figure
-      aria-label={`Browser window, ${url}`}
+      aria-label={t.window(url)}
       className={cn(
         "m-0 min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] text-[var(--wf-fg)] shadow-[0_12px_30px_rgba(0,0,0,0.22)] transition-colors",
         schemeVars[scheme],

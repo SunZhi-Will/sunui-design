@@ -126,35 +126,137 @@ export interface AssignmentSheetLabels {
   removeFailed: string;
   assigned: (name: string) => string;
   assignFailed: string;
+  /** 候選人多個原因之間的分隔 */
+  separator: string;
 }
 
-const sheetLabels: AssignmentSheetLabels = {
-  fallbackTitle: "Shift details",
-  fallbackDescription: "See why this shift was scheduled",
-  close: "Close",
-  loading: "Loading shift explanation",
-  requestLeave: "Request leave for this day",
-  lock: "Lock this shift",
-  findReplacement: "Find a replacement",
-  remove: "Remove this shift",
-  replacementTitle: "Replacement options",
-  lockedHint: "This shift is locked. Unlock it before making changes.",
-  draftHint: "Changes are saved as a draft. Staff only see them after you publish.",
-  reasons: "Why",
-  otherCandidates: "Other candidates",
-  findingReplacement: "Finding replacements",
-  noReplacement: "No one can take this shift. Adjust someone's availability, or borrow staff from another store.",
-  excluded: (n) => `${n} cannot take this shift`,
-  assign: "Assign",
-  assigning: "Assigning",
-  assignAria: (name) => `Have ${name} work this shift`,
-  lockOn: "Shift locked",
-  lockOff: "Shift unlocked",
-  lockFailed: "Could not update the lock. Try again later.",
-  removed: "Shift removed. The change is saved in your draft",
-  removeFailed: "Could not remove. Try again later.",
-  assigned: (name) => `${name} now works this shift. The change is saved in your draft`,
-  assignFailed: "Could not assign. Try again later.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AssignmentSheetLabels> = {
+  en: {
+    fallbackTitle: "Shift details",
+    fallbackDescription: "See why this shift was scheduled",
+    close: "Close",
+    loading: "Loading shift explanation",
+    requestLeave: "Request leave for this day",
+    lock: "Lock this shift",
+    findReplacement: "Find a replacement",
+    remove: "Remove this shift",
+    replacementTitle: "Replacement options",
+    lockedHint: "This shift is locked. Unlock it before making changes.",
+    draftHint: "Changes are saved as a draft. Staff only see them after you publish.",
+    reasons: "Why",
+    otherCandidates: "Other candidates",
+    findingReplacement: "Finding replacements",
+    noReplacement: "No one can take this shift. Adjust someone's availability, or borrow staff from another store.",
+    excluded: (n) => `${n} cannot take this shift`,
+    assign: "Assign",
+    assigning: "Assigning",
+    assignAria: (name) => `Have ${name} work this shift`,
+    lockOn: "Shift locked",
+    lockOff: "Shift unlocked",
+    lockFailed: "Could not update the lock. Try again later.",
+    removed: "Shift removed. The change is saved in your draft",
+    removeFailed: "Could not remove. Try again later.",
+    assigned: (name) => `${name} now works this shift. The change is saved in your draft`,
+    assignFailed: "Could not assign. Try again later.",
+    separator: ", ",
+  },
+  "zh-TW": {
+    fallbackTitle: "班次詳情",
+    fallbackDescription: "看看這個班為什麼這樣排",
+    close: "關閉",
+    loading: "正在載入排班說明",
+    requestLeave: "這天請假",
+    lock: "鎖定這個班",
+    findReplacement: "找代班",
+    remove: "移除這個班",
+    replacementTitle: "可代班人選",
+    lockedHint: "這個班已鎖定，要先解鎖才能修改。",
+    draftHint: "變更會存成草稿，發布後員工才看得到。",
+    reasons: "排班理由",
+    otherCandidates: "其他候選人",
+    findingReplacement: "正在尋找代班人選",
+    noReplacement: "目前沒有人能接這個班。可以調整某人的可上班時間，或向其他門市借人。",
+    excluded: (n) => `${n} 人無法接這個班`,
+    assign: "指派",
+    assigning: "指派中",
+    assignAria: (name) => `讓 ${name} 上這個班`,
+    lockOn: "已鎖定班次",
+    lockOff: "已解除鎖定",
+    lockFailed: "無法更新鎖定狀態，請稍後再試。",
+    removed: "已移除班次，變更已存入草稿",
+    removeFailed: "無法移除，請稍後再試。",
+    assigned: (name) => `已改由 ${name} 上這個班，變更已存入草稿`,
+    assignFailed: "無法指派，請稍後再試。",
+    separator: "、",
+  },
+  "zh-CN": {
+    fallbackTitle: "班次详情",
+    fallbackDescription: "看看这个班为什么这样排",
+    close: "关闭",
+    loading: "正在加载排班说明",
+    requestLeave: "这天请假",
+    lock: "锁定这个班",
+    findReplacement: "找人替班",
+    remove: "移除这个班",
+    replacementTitle: "可替班人选",
+    lockedHint: "这个班已锁定，需要先解锁才能修改。",
+    draftHint: "改动会保存为草稿，发布后员工才能看到。",
+    reasons: "排班理由",
+    otherCandidates: "其他候选人",
+    findingReplacement: "正在查找替班人选",
+    noReplacement: "目前没有人能接这个班。可以调整某人的可上班时间，或从其他门店借调人手。",
+    excluded: (n) => `${n} 人无法接这个班`,
+    assign: "指派",
+    assigning: "指派中",
+    assignAria: (name) => `让 ${name} 上这个班`,
+    lockOn: "班次已锁定",
+    lockOff: "已解除锁定",
+    lockFailed: "无法更新锁定状态，请稍后再试。",
+    removed: "班次已移除，改动已保存到草稿",
+    removeFailed: "无法移除，请稍后再试。",
+    assigned: (name) => `已改由 ${name} 上这个班，改动已保存到草稿`,
+    assignFailed: "无法指派，请稍后再试。",
+    separator: "、",
+  },
+  ja: {
+    fallbackTitle: "シフトの詳細",
+    fallbackDescription: "このシフトが組まれた理由を確認",
+    close: "閉じる",
+    loading: "シフトの説明を読み込み中",
+    requestLeave: "この日の休みを申請",
+    lock: "このシフトをロック",
+    findReplacement: "代わりを探す",
+    remove: "このシフトを削除",
+    replacementTitle: "代わりの候補",
+    lockedHint: "このシフトはロック中です。変更するには先にロックを解除してください。",
+    draftHint: "変更は下書きとして保存され、公開するまでスタッフには表示されません。",
+    reasons: "理由",
+    otherCandidates: "ほかの候補",
+    findingReplacement: "代わりの候補を検索中",
+    noReplacement: "このシフトに入れる人がいません。誰かの勤務可能時間を調整するか、他店舗から応援を頼んでください。",
+    excluded: (n) => `${n}人はこのシフトに入れません`,
+    assign: "割り当て",
+    assigning: "割り当て中",
+    assignAria: (name) => `${name}さんをこのシフトに割り当てる`,
+    lockOn: "シフトをロックしました",
+    lockOff: "ロックを解除しました",
+    lockFailed: "ロックを更新できませんでした。しばらくしてからお試しください。",
+    removed: "シフトを削除しました。変更は下書きに保存されています",
+    removeFailed: "削除できませんでした。しばらくしてからお試しください。",
+    assigned: (name) => `${name}さんがこのシフトに入ります。変更は下書きに保存されています`,
+    assignFailed: "割り当てできませんでした。しばらくしてからお試しください。",
+    separator: "、",
+  },
 };
 
 export interface AssignmentExplainSheetProps {
@@ -181,6 +283,9 @@ export interface AssignmentExplainSheetProps {
   onRemove?: () => void | Promise<void>;
   /** true：貼右側的全螢幕 Sheet（含遮罩）；false：在容器內就地顯示 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<AssignmentSheetLabels>;
   className?: string;
 }
@@ -243,10 +348,11 @@ export function AssignmentExplainSheet({
   onAssign,
   onRemove,
   fixed = false,
+  locale = "en",
   labels: labelsProp,
   className,
 }: AssignmentExplainSheetProps) {
-  const l = { ...sheetLabels, ...labelsProp };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const reduce = useReducedMotion() ?? false;
   const [findingReplacement, setFindingReplacement] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -523,7 +629,7 @@ export function AssignmentExplainSheet({
                     <CandidateIcon status={c.status} />
                     <div>
                       <span className="font-medium text-foreground">{c.name}</span>
-                      {c.reasons.length > 0 ? <span className="ml-1 text-muted-foreground">{c.reasons.join(", ")}</span> : null}
+                      {c.reasons.length > 0 ? <span className="ml-1 text-muted-foreground">{c.reasons.join(l.separator)}</span> : null}
                     </div>
                   </li>
                 ))}

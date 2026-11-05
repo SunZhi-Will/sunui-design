@@ -22,13 +22,49 @@ export type ZoomControlsLabels = {
   zoomLevel: string;
 };
 
-const defaultLabels: ZoomControlsLabels = {
-  undo: "Undo (Ctrl+Z)",
-  redo: "Redo (Ctrl+Y)",
-  zoomIn: "Zoom in",
-  zoomOut: "Zoom out",
-  animation: "Animation",
-  zoomLevel: "Zoom level",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ZoomControlsLabels> = {
+  en: {
+    undo: "Undo (Ctrl+Z)",
+    redo: "Redo (Ctrl+Y)",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    animation: "Animation",
+    zoomLevel: "Zoom level",
+  },
+  "zh-TW": {
+    undo: "復原 (Ctrl+Z)",
+    redo: "重做 (Ctrl+Y)",
+    zoomIn: "放大",
+    zoomOut: "縮小",
+    animation: "動畫",
+    zoomLevel: "縮放比例",
+  },
+  "zh-CN": {
+    undo: "撤销 (Ctrl+Z)",
+    redo: "重做 (Ctrl+Y)",
+    zoomIn: "放大",
+    zoomOut: "缩小",
+    animation: "动画",
+    zoomLevel: "缩放比例",
+  },
+  ja: {
+    undo: "元に戻す (Ctrl+Z)",
+    redo: "やり直す (Ctrl+Y)",
+    zoomIn: "拡大",
+    zoomOut: "縮小",
+    animation: "アニメーション",
+    zoomLevel: "ズーム倍率",
+  },
 };
 
 export type ZoomControlsProps = {
@@ -44,6 +80,9 @@ export type ZoomControlsProps = {
   animationActive?: boolean;
   /** 原版固定在視窗右下角；放在 relative 容器內時設為 false */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<ZoomControlsLabels>;
   className?: string;
 };
@@ -72,10 +111,11 @@ export function ZoomControls({
   onToggleAnimation,
   animationActive = false,
   fixed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: ZoomControlsProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   return (
     <div className={cn(fixed ? "fixed" : "absolute", "right-4 bottom-4 z-50 flex flex-col items-end gap-3", className)}>
       {/* 動畫編輯按鈕 */}

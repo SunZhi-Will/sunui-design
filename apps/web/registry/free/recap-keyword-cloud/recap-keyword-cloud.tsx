@@ -10,14 +10,37 @@ export interface RecapKeyword {
   count: number;
 }
 
-export const recapKeywordLabels = {
-  title: "Top Keywords",
+export interface RecapKeywordCloudLabels {
+  title: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, RecapKeywordCloudLabels> = {
+  en: { title: "Top Keywords" },
+  "zh-TW": { title: "年度關鍵字" },
+  "zh-CN": { title: "年度关键词" },
+  ja: { title: "よく使ったキーワード" },
 };
+
+/** 英文預設字串，保留舊的匯出名稱 */
+export const recapKeywordLabels: RecapKeywordCloudLabels = MESSAGES.en;
 
 export interface RecapKeywordCloudProps {
   /** 關鍵字與出現次數，建議依次數由多到少排序 */
   keywords: RecapKeyword[];
-  labels?: Partial<typeof recapKeywordLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<RecapKeywordCloudLabels>;
   className?: string;
 }
 
@@ -40,9 +63,9 @@ function getColor(count: number, maxCount: number) {
   return "from-blue-400 to-indigo-400";
 }
 
-export function RecapKeywordCloud({ keywords, labels, className }: RecapKeywordCloudProps) {
+export function RecapKeywordCloud({ keywords, locale = "en", labels, className }: RecapKeywordCloudProps) {
   const reduce = useReducedMotion() ?? false;
-  const l = { ...recapKeywordLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const maxCount = Math.max(1, ...keywords.map((k) => k.count));
 
   // 每個字卡左右交錯傾斜 5 到 15 度，固定下來避免重新渲染時跳動

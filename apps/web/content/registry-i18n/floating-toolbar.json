@@ -1,0 +1,38 @@
+{
+  "zh-TW": {
+    "title": "浮動工具列",
+    "description": "CardFlow 的直式玻璃工具列，附深色提示、選取狀態與 300ms 滑入滑出，預設為 AI 動作工具列：「生成」會呼叫非同步的 onAction，執行期間顯示轉圈。工具使用 aria-pressed 與 aria-keyshortcuts，設定 onClose 時按 Escape 可返回，減少動態時移除滑動與縮放過場。",
+    "whenToUse": [
+      "畫布或編輯器的側邊工具列",
+      "從工具列按鈕執行非同步 AI 動作，並內建等待中的回饋"
+    ],
+    "watchOut": [
+      "錯誤請在 onAction 內處理，工具列只會清除等待狀態與選取",
+      "要切換兩組工具列時分別傳入 open，並讓畫布設定 overflow hidden，隱藏的那組才會滑出畫面"
+    ]
+  },
+  "zh-CN": {
+    "title": "浮动工具栏",
+    "description": "CardFlow 的竖向玻璃工具栏，带深色提示、选中状态和 300ms 滑入滑出，默认作为 AI 操作工具栏：「生成」会调用异步的 onAction，执行期间显示加载圈。工具使用 aria-pressed 和 aria-keyshortcuts，设置 onClose 时按 Escape 可返回，减少动态效果时移除滑动和缩放过渡。",
+    "whenToUse": [
+      "画布或编辑器的侧边工具栏",
+      "从工具栏按钮执行异步 AI 操作，并内置等待中的反馈"
+    ],
+    "watchOut": [
+      "错误请在 onAction 内处理，工具栏只会清除等待状态和选中",
+      "要切换两组工具栏时分别传入 open，并给画布设置 overflow hidden，隐藏的那组才会滑出画面"
+    ]
+  },
+  "ja": {
+    "title": "フローティングツールバー",
+    "description": "CardFlow の縦型ガラスツールレール。ダークなツールチップ、選択状態、300ms のスライドイン・アウトを備え、AI アクション用ツールバーとして構成済みです。「生成」は非同期の onAction を呼び、実行中はスピナーを表示します。各ツールは aria-pressed と aria-keyshortcuts を持ち、onClose を渡すと Escape で戻れます。視差効果を減らす設定ではスライドと拡大の遷移を外します。",
+    "whenToUse": [
+      "キャンバスやエディタのサイドツールレール",
+      "ツールバーのボタンから非同期の AI アクションを実行し、待機中の表示も任せたいとき"
+    ],
+    "watchOut": [
+      "エラー処理は onAction の中で行う。ツールバーは待機状態と選択を解除するだけです",
+      "2 つのツールバーを切り替えるときはそれぞれに open を渡し、キャンバスを overflow hidden にして隠れる側を画面外へ逃がす"
+    ]
+  }
+}

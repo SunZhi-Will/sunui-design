@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { IssueCard, type IssueStatus, type ScanIssue } from "./issue-card";
 
 const initial: ScanIssue = {
   id: "sql",
   severity: "critical",
   category: "security",
-  title: "SQL query built from user input",
-  message: "The search term is concatenated into raw SQL.",
+  title: "",
+  message: "",
   filePath: "src/products.repository.ts",
   lineStart: 42,
   lineEnd: 43,
@@ -22,8 +24,17 @@ const initial: ScanIssue = {
   ].join("\n"),
 };
 
+const copy = {
+  en: { title: "SQL query built from user input", message: "The search term is concatenated into raw SQL." },
+  "zh-TW": { title: "以使用者輸入組成的 SQL 查詢", message: "搜尋字詞被直接串接進原始 SQL。" },
+  "zh-CN": { title: "用用户输入拼接的 SQL 查询", message: "搜索词被直接拼接进原始 SQL。" },
+  ja: { title: "ユーザー入力から組み立てた SQL クエリ", message: "検索語が生の SQL に直接連結されています。" },
+};
+
 /** 型錄卡片：一張掃描問題卡，可展開程式碼、標記已解決或忽略（卡內可捲動）。 */
 export default function IssueCardCard() {
+  const locale = useDemoLocale();
+  const text = useDemoText(copy);
   const [issue, setIssue] = useState(initial);
 
   const updateStatus = async (_id: string, status: IssueStatus) => {
@@ -33,7 +44,7 @@ export default function IssueCardCard() {
 
   return (
     <div className="mx-auto h-56 w-72 overflow-y-auto rounded-lg bg-card text-card-foreground">
-      <IssueCard issue={issue} onStatusChange={updateStatus} confirmIgnore={() => true} fixed={false} />
+      <IssueCard locale={locale} issue={{ ...issue, ...text }} onStatusChange={updateStatus} confirmIgnore={() => true} fixed={false} />
     </div>
   );
 }

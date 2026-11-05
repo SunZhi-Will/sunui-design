@@ -42,16 +42,44 @@ function StateButton({ variant = "default", size = "default", href, className, c
 
 /* ---------- Error ---------- */
 
+export interface ErrorStateLabels {
+  title: ReactNode;
+  message: ReactNode;
+  retry: ReactNode;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ErrorStateLabels> = {
+  en: { title: "Couldn't load data", message: "Something went wrong. Please try again.", retry: "Retry" },
+  "zh-TW": { title: "無法載入資料", message: "發生了一點問題，請再試一次。", retry: "重試" },
+  "zh-CN": { title: "无法加载数据", message: "出了点问题，请重试。", retry: "重试" },
+  ja: { title: "データを読み込めませんでした", message: "問題が発生しました。もう一度お試しください。", retry: "再試行" },
+};
+
 export interface ErrorStateProps {
+  /** 不給時用 locale 的預設標題 */
   title?: ReactNode;
   /** 給使用者看的友善訊息；不要傳原始例外或技術訊息 */
   message?: ReactNode;
   onRetry?: () => void;
-  labels?: { retry?: ReactNode };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ErrorStateLabels>;
   className?: string;
 }
 
-export function ErrorState({ title = "Couldn't load data", message = "Something went wrong. Please try again.", onRetry, labels, className }: ErrorStateProps) {
+export function ErrorState({ title, message, onRetry, locale = "en", labels, className }: ErrorStateProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <div role="alert" className={cn("flex flex-col overflow-hidden rounded-xl border border-border bg-card text-sm text-card-foreground", className)}>
       <div className="flex flex-col items-center gap-4 px-5 py-12 text-center">
@@ -59,12 +87,12 @@ export function ErrorState({ title = "Couldn't load data", message = "Something 
           <AlertTriangleIcon />
         </span>
         <div>
-          <p className="text-sm font-medium text-foreground">{title}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{message}</p>
+          <p className="text-sm font-medium text-foreground">{title ?? t.title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{message ?? t.message}</p>
         </div>
         {onRetry ? (
           <StateButton variant="outline" size="sm" onClick={onRetry}>
-            {labels?.retry ?? "Retry"}
+            {t.retry}
           </StateButton>
         ) : null}
       </div>

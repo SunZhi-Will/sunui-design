@@ -7,25 +7,98 @@ import { cn } from "@/lib/utils";
 
 export type RecapRankLevel = "top01" | "top1" | "top5" | "top10" | "top25" | "top50" | "unknown";
 
-export const recapPercentileLabels = {
-  title: "Percentile Rank",
-  subtitle: "Top",
-  noData: "Ranking data requires comparison with other users to calculate",
-  levels: {
-    top01: "Top 0.1% Creator",
-    top1: "Top 1% Creator",
-    top5: "Top 5% Creator",
-    top10: "Top 10% Creator",
-    top25: "Top 25% Creator",
-    top50: "Top 50% Creator",
-    unknown: "Calculating Rank",
-  } as Record<RecapRankLevel, string>,
+export interface RecapPercentileLabels {
+  title: string;
+  subtitle: string;
+  noData: string;
+  /** 沒有排名資料時大字顯示的內容 */
+  notAvailable: string;
+  levels: Record<RecapRankLevel, string>;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, RecapPercentileLabels> = {
+  en: {
+    title: "Percentile Rank",
+    subtitle: "Top",
+    noData: "Ranking data requires comparison with other users to calculate",
+    notAvailable: "N/A",
+    levels: {
+      top01: "Top 0.1% Creator",
+      top1: "Top 1% Creator",
+      top5: "Top 5% Creator",
+      top10: "Top 10% Creator",
+      top25: "Top 25% Creator",
+      top50: "Top 50% Creator",
+      unknown: "Calculating Rank",
+    },
+  },
+  "zh-TW": {
+    title: "百分位排名",
+    subtitle: "頂尖",
+    noData: "排名需要與其他使用者比較後才能計算",
+    notAvailable: "無",
+    levels: {
+      top01: "前 0.1% 創作者",
+      top1: "前 1% 創作者",
+      top5: "前 5% 創作者",
+      top10: "前 10% 創作者",
+      top25: "前 25% 創作者",
+      top50: "前 50% 創作者",
+      unknown: "排名計算中",
+    },
+  },
+  "zh-CN": {
+    title: "百分位排名",
+    subtitle: "顶尖",
+    noData: "排名需要与其他用户比较后才能计算",
+    notAvailable: "无",
+    levels: {
+      top01: "前 0.1% 创作者",
+      top1: "前 1% 创作者",
+      top5: "前 5% 创作者",
+      top10: "前 10% 创作者",
+      top25: "前 25% 创作者",
+      top50: "前 50% 创作者",
+      unknown: "排名计算中",
+    },
+  },
+  ja: {
+    title: "パーセンタイル順位",
+    subtitle: "上位",
+    noData: "ランキングの算出には、ほかのユーザーとの比較データが必要です",
+    notAvailable: "なし",
+    levels: {
+      top01: "上位 0.1% のクリエイター",
+      top1: "上位 1% のクリエイター",
+      top5: "上位 5% のクリエイター",
+      top10: "上位 10% のクリエイター",
+      top25: "上位 25% のクリエイター",
+      top50: "上位 50% のクリエイター",
+      unknown: "順位を計算中",
+    },
+  },
 };
+
+/** 英文預設字串，保留舊的匯出名稱 */
+export const recapPercentileLabels = MESSAGES.en;
 
 export interface RecapPercentileRingProps {
   /** 排名百分比（越小越好），null 代表沒有可比較的資料 */
   percentileRank: number | null;
-  labels?: Partial<Omit<typeof recapPercentileLabels, "levels">> & { levels?: Partial<Record<RecapRankLevel, string>> };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<Omit<RecapPercentileLabels, "levels">> & { levels?: Partial<Record<RecapRankLevel, string>> };
   className?: string;
 }
 
@@ -51,10 +124,11 @@ export function getRankLevel(rank: number | null): { level: RecapRankLevel; colo
   return { level: "top50", color: "from-gray-500 via-slate-500 to-zinc-500", glow: "rgba(107, 114, 128, 0.6)" };
 }
 
-export function RecapPercentileRing({ percentileRank, labels, className }: RecapPercentileRingProps) {
+export function RecapPercentileRing({ percentileRank, locale = "en", labels, className }: RecapPercentileRingProps) {
   const reduce = useReducedMotion() ?? false;
   const tr = (t: Transition): Transition => (reduce ? { duration: 0 } : t);
-  const l = { ...recapPercentileLabels, ...labels, levels: { ...recapPercentileLabels.levels, ...labels?.levels } };
+  const base = MESSAGES[resolveLocale(locale)];
+  const l = { ...base, ...labels, levels: { ...base.levels, ...labels?.levels } };
 
   const rank = percentileRank ?? null;
   const displayValue = formatPercentile(rank);
@@ -186,7 +260,7 @@ export function RecapPercentileRing({ percentileRank, labels, className }: Recap
               animate={reduce ? { scale: 1 } : { scale: [1, 1.05, 1] }}
               transition={tr({ duration: 3, repeat: Infinity, ease: "easeInOut" })}
             >
-              {rank !== null ? `${displayValue}%` : displayValue}
+              {rank !== null ? `${displayValue}%` : l.notAvailable}
             </motion.div>
           </div>
 

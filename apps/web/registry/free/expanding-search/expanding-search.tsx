@@ -34,23 +34,67 @@ export interface ExpandingSearchProps {
   expandedWidth?: number;
   /** 啟用 "/" 快捷鍵開啟搜尋；在其他輸入框打字時不會觸發 */
   slashShortcut?: boolean;
+  /** 不給時用 labels.placeholder */
   placeholder?: string;
-  labels?: {
-    open?: string;
-    search?: string;
-    clear?: string;
-    suggestions?: string;
-    results?: (count: number) => string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ExpandingSearchLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  open: "Open search",
-  search: "Search",
-  clear: "Clear search",
-  suggestions: "Suggestions",
-  results: (n: number) => (n === 1 ? "1 suggestion" : `${n} suggestions`),
+export interface ExpandingSearchLabels {
+  open: string;
+  search: string;
+  clear: string;
+  suggestions: string;
+  results: (count: number) => string;
+  placeholder: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ExpandingSearchLabels> = {
+  en: {
+    open: "Open search",
+    search: "Search",
+    clear: "Clear search",
+    suggestions: "Suggestions",
+    results: (n) => (n === 1 ? "1 suggestion" : `${n} suggestions`),
+    placeholder: "Search…",
+  },
+  "zh-TW": {
+    open: "開啟搜尋",
+    search: "搜尋",
+    clear: "清除搜尋",
+    suggestions: "建議",
+    results: (n) => `${n} 項建議`,
+    placeholder: "搜尋…",
+  },
+  "zh-CN": {
+    open: "打开搜索",
+    search: "搜索",
+    clear: "清除搜索",
+    suggestions: "建议",
+    results: (n) => `${n} 条建议`,
+    placeholder: "搜索…",
+  },
+  ja: {
+    open: "検索を開く",
+    search: "検索",
+    clear: "検索をクリア",
+    suggestions: "候補",
+    results: (n) => `候補 ${n} 件`,
+    placeholder: "検索…",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
@@ -104,12 +148,13 @@ export function ExpandingSearch({
   onSuggestionSelect,
   expandedWidth = 280,
   slashShortcut = false,
-  placeholder = "Search…",
+  placeholder,
+  locale = "en",
   labels,
   className,
 }: ExpandingSearchProps) {
   const reduce = useReducedMotion() ?? false;
-  const text = { ...defaultLabels, ...labels };
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const baseId = useId();
   const listId = `${baseId}-list`;
   const [innerValue, setInnerValue] = useState(defaultValue);
@@ -253,7 +298,7 @@ export function ExpandingSearch({
               aria-activedescendant={showList && active >= 0 ? `${baseId}-opt-${active}` : undefined}
               autoComplete="off"
               enterKeyHint="search"
-              placeholder={placeholder}
+              placeholder={placeholder ?? text.placeholder}
               value={value}
               onChange={(e) => {
                 setValue(e.target.value);

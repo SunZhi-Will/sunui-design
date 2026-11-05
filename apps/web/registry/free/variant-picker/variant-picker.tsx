@@ -30,6 +30,8 @@ export interface VariantPickerLabels {
   inStock?: ReactNode;
   lowStock?: (n: number) => ReactNode;
   pickSize?: ReactNode;
+  /** 售完選項的無障礙名稱 */
+  soldOutItem?: (name: string) => string;
 }
 
 export interface VariantPickerProps {
@@ -42,17 +44,60 @@ export interface VariantPickerProps {
   onChange?: (value: VariantValue) => void;
   /** 庫存小於等於此數字時顯示「剩 N 件」 */
   lowStockAt?: number;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: VariantPickerLabels;
   className?: string;
 }
 
-const defaultLabels: Required<VariantPickerLabels> = {
-  color: "Colour",
-  size: "Size",
-  soldOut: "Sold out",
-  inStock: "In stock",
-  lowStock: (n) => <>Only {n} left</>,
-  pickSize: "Select a size",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<VariantPickerLabels>> = {
+  en: {
+    color: "Colour",
+    size: "Size",
+    soldOut: "Sold out",
+    inStock: "In stock",
+    lowStock: (n) => <>Only {n} left</>,
+    pickSize: "Select a size",
+    soldOutItem: (name) => `${name}, sold out`,
+  },
+  "zh-TW": {
+    color: "顏色",
+    size: "尺寸",
+    soldOut: "售完",
+    inStock: "有現貨",
+    lowStock: (n) => <>只剩 {n} 件</>,
+    pickSize: "請選擇尺寸",
+    soldOutItem: (name) => `${name}，售完`,
+  },
+  "zh-CN": {
+    color: "颜色",
+    size: "尺码",
+    soldOut: "售罄",
+    inStock: "有现货",
+    lowStock: (n) => <>仅剩 {n} 件</>,
+    pickSize: "请选择尺码",
+    soldOutItem: (name) => `${name}，售罄`,
+  },
+  ja: {
+    color: "カラー",
+    size: "サイズ",
+    soldOut: "売り切れ",
+    inStock: "在庫あり",
+    lowStock: (n) => <>残り {n} 点</>,
+    pickSize: "サイズを選択してください",
+    soldOutItem: (name) => `${name}、売り切れ`,
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -74,10 +119,13 @@ export function VariantPicker({
   defaultValue,
   onChange,
   lowStockAt = 3,
+  locale = "en",
   labels,
   className,
 }: VariantPickerProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  // 只覆寫 soldOut 時，無障礙名稱沿用舊格式「名稱, soldOut」
+  const soldOutItem = labels?.soldOutItem ?? (labels?.soldOut ? (n: string) => `${n}, ${labels.soldOut}` : t.soldOutItem);
   const reduceMotion = useReducedMotion();
   const [inner, setInner] = useState<VariantValue>(defaultValue ?? { color: colors[0]?.id });
   const current = value ?? inner;
@@ -112,7 +160,7 @@ export function VariantPicker({
           render={(id, on, disabled) => {
             const c = colors.find((x) => x.id === id)!;
             return {
-              label: disabled ? `${c.name}, ${t.soldOut}` : c.name,
+              label: disabled ? soldOutItem(c.name) : c.name,
               className: cn("relative grid size-9 place-items-center rounded-full border", on ? "border-current" : "border-transparent"),
               children: (
                 <>
@@ -137,7 +185,7 @@ export function VariantPicker({
           render={(id, on, disabled) => {
             const s = sizes.find((x) => x.id === id)!;
             return {
-              label: disabled ? `${s.label}, ${t.soldOut}` : s.label,
+              label: disabled ? soldOutItem(s.label) : s.label,
               className: cn("relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums", paper, on ? "border-current" : edge),
               children: (
                 <>

@@ -71,37 +71,164 @@ const difficultyClass = {
 
 /* 文案 */
 
-const defaultLabels = {
-  severity: { critical: "Critical", high: "High", medium: "Medium", low: "Low", info: "Info" } as Record<Severity, string>,
-  category: { security: "Security", performance: "Performance", quality: "Quality", maintainability: "Maintainability" } as Record<IssueCategory, string>,
-  status: { open: "Open", resolved: "Resolved", false_positive: "False Positive", wont_fix: "Won't Fix" } as Record<IssueStatus, string>,
-  aiGenerated: "AI Generated",
-  viewCode: "View Code",
-  hideCode: "Hide Code",
-  markResolved: "Mark as Resolved",
-  ignore: "Ignore",
-  confirmIgnore: "Are you sure you want to ignore this issue?",
-  fixSuggestion: "Fix Suggestion",
-  autoFixable: "Auto Fixable",
-  difficulty: { easy: "Easy", medium: "Medium", hard: "Hard" },
-  minutes: (n: number) => `~${n} min`,
-  fixReasoning: "Fix Reasoning",
-  before: "Before",
-  after: "After",
-  copy: "Copy",
-  copied: "Copied",
-  fixSteps: "Fix Steps",
-  autoFix: "Auto Fix",
-  expand: "Show details",
-  collapse: "Hide details",
-  close: "Close",
-  lines: (a: number, b: number) => `Lines ${a}-${b}`,
-  noCodeSnippet: "No code snippet available for this issue.",
-  highlighted: (a: number, b: number) => `Highlighted lines (${a}-${b}) indicate the problematic code`,
+export interface IssueCardText {
+  severity: Record<Severity, string>;
+  category: Record<IssueCategory, string>;
+  status: Record<IssueStatus, string>;
+  aiGenerated: string;
+  viewCode: string;
+  hideCode: string;
+  markResolved: string;
+  ignore: string;
+  confirmIgnore: string;
+  fixSuggestion: string;
+  autoFixable: string;
+  difficulty: Record<FixSuggestion["difficulty"], string>;
+  minutes: (n: number) => string;
+  fixReasoning: string;
+  before: string;
+  after: string;
+  copy: string;
+  copied: string;
+  fixSteps: string;
+  autoFix: string;
+  expand: string;
+  collapse: string;
+  close: string;
+  lines: (a: number, b: number) => string;
+  noCodeSnippet: string;
+  highlighted: (a: number, b: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, IssueCardText> = {
+  en: {
+    severity: { critical: "Critical", high: "High", medium: "Medium", low: "Low", info: "Info" },
+    category: { security: "Security", performance: "Performance", quality: "Quality", maintainability: "Maintainability" },
+    status: { open: "Open", resolved: "Resolved", false_positive: "False Positive", wont_fix: "Won't Fix" },
+    aiGenerated: "AI Generated",
+    viewCode: "View Code",
+    hideCode: "Hide Code",
+    markResolved: "Mark as Resolved",
+    ignore: "Ignore",
+    confirmIgnore: "Are you sure you want to ignore this issue?",
+    fixSuggestion: "Fix Suggestion",
+    autoFixable: "Auto Fixable",
+    difficulty: { easy: "Easy", medium: "Medium", hard: "Hard" },
+    minutes: (n) => `~${n} min`,
+    fixReasoning: "Fix Reasoning",
+    before: "Before",
+    after: "After",
+    copy: "Copy",
+    copied: "Copied",
+    fixSteps: "Fix Steps",
+    autoFix: "Auto Fix",
+    expand: "Show details",
+    collapse: "Hide details",
+    close: "Close",
+    lines: (a, b) => `Lines ${a}-${b}`,
+    noCodeSnippet: "No code snippet available for this issue.",
+    highlighted: (a, b) => `Highlighted lines (${a}-${b}) indicate the problematic code`,
+  },
+  "zh-TW": {
+    severity: { critical: "嚴重", high: "高", medium: "中", low: "低", info: "資訊" },
+    category: { security: "安全性", performance: "效能", quality: "品質", maintainability: "可維護性" },
+    status: { open: "待處理", resolved: "已解決", false_positive: "誤判", wont_fix: "不修正" },
+    aiGenerated: "AI 產生",
+    viewCode: "查看程式碼",
+    hideCode: "隱藏程式碼",
+    markResolved: "標記為已解決",
+    ignore: "忽略",
+    confirmIgnore: "確定要忽略這個問題嗎？",
+    fixSuggestion: "修正建議",
+    autoFixable: "可自動修正",
+    difficulty: { easy: "簡單", medium: "中等", hard: "困難" },
+    minutes: (n) => `約 ${n} 分鐘`,
+    fixReasoning: "修正理由",
+    before: "修改前",
+    after: "修改後",
+    copy: "複製",
+    copied: "已複製",
+    fixSteps: "修正步驟",
+    autoFix: "自動修正",
+    expand: "顯示詳情",
+    collapse: "隱藏詳情",
+    close: "關閉",
+    lines: (a, b) => `第 ${a}-${b} 行`,
+    noCodeSnippet: "這個問題沒有可顯示的程式碼片段。",
+    highlighted: (a, b) => `標示的行（${a}-${b}）為有問題的程式碼`,
+  },
+  "zh-CN": {
+    severity: { critical: "严重", high: "高", medium: "中", low: "低", info: "信息" },
+    category: { security: "安全", performance: "性能", quality: "质量", maintainability: "可维护性" },
+    status: { open: "待处理", resolved: "已解决", false_positive: "误报", wont_fix: "不修复" },
+    aiGenerated: "AI 生成",
+    viewCode: "查看代码",
+    hideCode: "隐藏代码",
+    markResolved: "标记为已解决",
+    ignore: "忽略",
+    confirmIgnore: "确定要忽略这个问题吗？",
+    fixSuggestion: "修复建议",
+    autoFixable: "可自动修复",
+    difficulty: { easy: "简单", medium: "中等", hard: "困难" },
+    minutes: (n) => `约 ${n} 分钟`,
+    fixReasoning: "修复理由",
+    before: "修改前",
+    after: "修改后",
+    copy: "复制",
+    copied: "已复制",
+    fixSteps: "修复步骤",
+    autoFix: "自动修复",
+    expand: "显示详情",
+    collapse: "隐藏详情",
+    close: "关闭",
+    lines: (a, b) => `第 ${a}-${b} 行`,
+    noCodeSnippet: "这个问题没有可显示的代码片段。",
+    highlighted: (a, b) => `高亮的行（${a}-${b}）为有问题的代码`,
+  },
+  ja: {
+    severity: { critical: "致命的", high: "高", medium: "中", low: "低", info: "情報" },
+    category: { security: "セキュリティ", performance: "パフォーマンス", quality: "品質", maintainability: "保守性" },
+    status: { open: "未対応", resolved: "解決済み", false_positive: "誤検知", wont_fix: "対応しない" },
+    aiGenerated: "AI 生成",
+    viewCode: "コードを表示",
+    hideCode: "コードを隠す",
+    markResolved: "解決済みにする",
+    ignore: "無視",
+    confirmIgnore: "この問題を無視してもよろしいですか？",
+    fixSuggestion: "修正案",
+    autoFixable: "自動修正可",
+    difficulty: { easy: "易しい", medium: "普通", hard: "難しい" },
+    minutes: (n) => `約 ${n} 分`,
+    fixReasoning: "修正の理由",
+    before: "修正前",
+    after: "修正後",
+    copy: "コピー",
+    copied: "コピーしました",
+    fixSteps: "修正手順",
+    autoFix: "自動修正",
+    expand: "詳細を表示",
+    collapse: "詳細を隠す",
+    close: "閉じる",
+    lines: (a, b) => `${a}-${b} 行目`,
+    noCodeSnippet: "この問題に表示できるコード断片はありません。",
+    highlighted: (a, b) => `ハイライト行（${a}-${b}）が問題のあるコードです`,
+  },
 };
 
-export type IssueCardLabels = Partial<typeof defaultLabels>;
-type Labels = typeof defaultLabels;
+export type IssueCardLabels = Partial<IssueCardText>;
+type Labels = IssueCardText;
+
+const text = (locale?: string, labels?: IssueCardLabels): Labels => ({ ...MESSAGES[resolveLocale(locale)], ...labels });
 
 /* 圖示（lucide 形狀） */
 
@@ -186,8 +313,8 @@ const btnGhostSm = cn(btnBase, "h-8 rounded-md px-3 text-xs hover:bg-accent hove
 
 /* 修正建議（FixSuggestionCard） */
 
-export function FixSuggestionCard({ fix, onAutoFix, labels }: { fix: FixSuggestion; onAutoFix?: () => void; labels?: IssueCardLabels }) {
-  const t = { ...defaultLabels, ...labels };
+export function FixSuggestionCard({ fix, onAutoFix, locale = "en", labels }: { fix: FixSuggestion; onAutoFix?: () => void; locale?: string; labels?: IssueCardLabels }) {
+  const t = text(locale, labels);
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -331,8 +458,8 @@ function resolveCode(issue: ScanIssue): { lines: string[]; start: number } | nul
   return { lines, start: Math.max(1, issue.lineStart - Math.floor(lines.length / 2)) };
 }
 
-export function CodeViewer({ issue, labels }: { issue: ScanIssue; labels?: IssueCardLabels }) {
-  const t = { ...defaultLabels, ...labels };
+export function CodeViewer({ issue, locale = "en", labels }: { issue: ScanIssue; locale?: string; labels?: IssueCardLabels }) {
+  const t = text(locale, labels);
   const code = resolveCode(issue);
   if (!code) return <p className="text-sm text-muted-foreground">{t.noCodeSnippet}</p>;
   return (
@@ -391,11 +518,14 @@ export interface IssueCardProps {
   colors?: Record<Severity, string>;
   /** true 時程式碼以全螢幕對話框開啟；false 時在卡片內展開 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: IssueCardLabels;
 }
 
-export function IssueCard({ issue, onStatusChange, onAutoFix, confirmIgnore, colors = severityColors, fixed = false, labels }: IssueCardProps) {
-  const t: Labels = { ...defaultLabels, ...labels };
+export function IssueCard({ issue, onStatusChange, onAutoFix, confirmIgnore, colors = severityColors, fixed = false, locale = "en", labels }: IssueCardProps) {
+  const t = text(locale, labels);
   const [showCode, setShowCode] = useState(false);
   const [updating, setUpdating] = useState(false);
   const codeId = `scan-code-${issue.id}`;
@@ -455,18 +585,18 @@ export function IssueCard({ issue, onStatusChange, onAutoFix, confirmIgnore, col
           <p className="mb-2 text-xs text-muted-foreground">
             {issue.filePath} ({t.lines(issue.lineStart, issue.lineEnd)})
           </p>
-          <CodeViewer issue={issue} labels={labels} />
+          <CodeViewer issue={issue} locale={locale} labels={labels} />
         </div>
       )}
 
-      {issue.fixSuggestion && <FixSuggestionCard fix={issue.fixSuggestion} labels={labels} onAutoFix={issue.autoFixable && onAutoFix ? () => onAutoFix(issue.id) : undefined} />}
+      {issue.fixSuggestion && <FixSuggestionCard fix={issue.fixSuggestion} locale={locale} labels={labels} onAutoFix={issue.autoFixable && onAutoFix ? () => onAutoFix(issue.id) : undefined} />}
 
-      {fixed && showCode && <CodeDialog issue={issue} t={t} labels={labels} onClose={() => setShowCode(false)} />}
+      {fixed && showCode && <CodeDialog issue={issue} t={t} locale={locale} labels={labels} onClose={() => setShowCode(false)} />}
     </div>
   );
 }
 
-function CodeDialog({ issue, t, labels, onClose }: { issue: ScanIssue; t: Labels; labels?: IssueCardLabels; onClose: () => void }) {
+function CodeDialog({ issue, t, locale, labels, onClose }: { issue: ScanIssue; t: Labels; locale?: string; labels?: IssueCardLabels; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     closeRef.current?.focus();
@@ -494,7 +624,7 @@ function CodeDialog({ issue, t, labels, onClose }: { issue: ScanIssue; t: Labels
         </div>
         <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
           <div className="p-6">
-            <CodeViewer issue={issue} labels={labels} />
+            <CodeViewer issue={issue} locale={locale} labels={labels} />
           </div>
         </div>
       </div>

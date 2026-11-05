@@ -30,6 +30,9 @@ export interface AddToCartButtonProps {
   /** added 狀態維持多久後回到 idle（ms） */
   resetAfter?: number;
   disabled?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: {
     idle?: ReactNode;
     adding?: ReactNode;
@@ -40,11 +43,59 @@ export interface AddToCartButtonProps {
   className?: string;
 }
 
-const defaultLabels = {
-  idle: "Add to cart",
-  adding: "Adding",
-  added: "Added",
-  announce: "Item added to cart",
+export interface AddToCartLabels {
+  idle: ReactNode;
+  adding: ReactNode;
+  added: ReactNode;
+  announce: string;
+  /** CartIcon 的名稱與數量描述 */
+  cart: string;
+  items: (count: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AddToCartLabels> = {
+  en: {
+    idle: "Add to cart",
+    adding: "Adding",
+    added: "Added",
+    announce: "Item added to cart",
+    cart: "Cart",
+    items: (n) => `${n} ${n === 1 ? "item" : "items"}`,
+  },
+  "zh-TW": {
+    idle: "加入購物車",
+    adding: "加入中",
+    added: "已加入",
+    announce: "商品已加入購物車",
+    cart: "購物車",
+    items: (n) => `${n} 件商品`,
+  },
+  "zh-CN": {
+    idle: "加入购物车",
+    adding: "加入中",
+    added: "已加入",
+    announce: "商品已加入购物车",
+    cart: "购物车",
+    items: (n) => `${n} 件商品`,
+  },
+  ja: {
+    idle: "カートに追加",
+    adding: "追加中",
+    added: "追加済み",
+    announce: "カートに商品を追加しました",
+    cart: "カート",
+    items: (n) => `${n} 点`,
+  },
 };
 
 // 設計語言（DESIGN.md）：飛出去的是一張紙吊牌
@@ -70,11 +121,12 @@ export function AddToCartButton({
   arcHeight = 120,
   resetAfter = 1600,
   disabled,
+  locale = "en",
   labels,
   className,
 }: AddToCartButtonProps) {
   const reduceMotion = useReducedMotion();
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [state, setState] = useState<AddToCartState>("idle");
   const [flights, setFlights] = useState<Flight[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -258,22 +310,28 @@ export interface CartIconProps {
   count: number;
   /** 超過時顯示 99+ */
   max?: number;
+  /** 購物車名稱，覆寫 labels.cart */
   label?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<Pick<AddToCartLabels, "cart" | "items">>;
   ref?: Ref<HTMLButtonElement>;
   onClick?: () => void;
   className?: string;
 }
 
 /** 搭配 AddToCartButton 的購物車目標 */
-export function CartIcon({ count, max = 99, label = "Cart", ref, onClick, className }: CartIconProps) {
+export function CartIcon({ count, max = 99, label, locale = "en", labels, ref, onClick, className }: CartIconProps) {
   const reduceMotion = useReducedMotion();
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
 
   return (
     <button
       ref={ref}
       type="button"
       onClick={onClick}
-      aria-label={`${label}, ${count} ${count === 1 ? "item" : "items"}`}
+      aria-label={`${label ?? t.cart}, ${t.items(count)}`}
       className={cn(
         "relative grid size-10 place-items-center rounded-md border border-border text-foreground transition-colors hover:border-foreground",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",

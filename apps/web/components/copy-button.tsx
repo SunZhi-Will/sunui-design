@@ -4,7 +4,15 @@ import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-export function CopyButton({ value, className }: { value: string; className?: string }) {
+export function CopyButton({
+  value,
+  className,
+  labels = { copy: "Copy", copied: "Copied" },
+}: {
+  value: string;
+  className?: string;
+  labels?: { copy: string; copied: string };
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -22,7 +30,7 @@ export function CopyButton({ value, className }: { value: string; className?: st
         className,
       )}
     >
-      {copied ? "Copied" : "Copy"}
+      {copied ? labels.copied : labels.copy}
     </button>
   );
 }

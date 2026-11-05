@@ -2,12 +2,23 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { RecordingHud } from "./recording-hud";
+
+const copy = {
+  en: { saved: (time: string) => `Saved recording, ${time}` },
+  "zh-TW": { saved: (time: string) => `已儲存錄影，${time}` },
+  "zh-CN": { saved: (time: string) => `已保存录制，${time}` },
+  ja: { saved: (time: string) => `録画を保存しました（${time}）` },
+};
 
 export default function RecordingHudDemo() {
   const [seconds, setSeconds] = useState(83);
   const [paused, setPaused] = useState(false);
   const [stopped, setStopped] = useState(false);
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
 
   // 主視窗每秒推一次計時給 HUD
   useEffect(() => {
@@ -26,11 +37,12 @@ export default function RecordingHudDemo() {
 
       {stopped ? (
         <p role="status" className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-xl bg-[rgba(15,15,15,0.88)] px-4 py-2.5 text-sm whitespace-nowrap backdrop-blur-[8px]">
-          Saved recording, {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
+          {t.saved(`${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`)}
         </p>
       ) : (
         <RecordingHud
           fixed={false}
+          locale={locale}
           seconds={seconds}
           paused={paused}
           onPauseToggle={() => setPaused((p) => !p)}

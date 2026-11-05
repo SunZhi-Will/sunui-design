@@ -47,6 +47,8 @@ export interface HeroBillboardCarouselLabels {
   slide?: (index: number, total: number, title: string) => string;
   goTo?: (title: string) => string;
   dot?: (index: number, title: string) => string;
+  /** 目前這張整卡連結的無障礙名稱 */
+  hit?: (title: string, cta: string) => string;
 }
 
 export interface HeroBillboardCarouselProps {
@@ -59,18 +61,64 @@ export interface HeroBillboardCarouselProps {
   theme?: "dark" | "light";
   /** 沒有 href 的卡片被點擊時 */
   onSelect?: (slide: HeroBillboardSlide, index: number) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: HeroBillboardCarouselLabels;
   className?: string;
 }
 
-const defaultLabels: Required<HeroBillboardCarouselLabels> = {
-  region: "Upcoming events and featured courses",
-  prev: "Previous slide",
-  next: "Next slide",
-  defaultCta: "View details",
-  slide: (i, n, title) => `Slide ${i + 1} of ${n}: ${title}`,
-  goTo: (title) => `Go to: ${title}`,
-  dot: (i, title) => `Slide ${i + 1}: ${title}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<HeroBillboardCarouselLabels>> = {
+  en: {
+    region: "Upcoming events and featured courses",
+    prev: "Previous slide",
+    next: "Next slide",
+    defaultCta: "View details",
+    slide: (i, n, title) => `Slide ${i + 1} of ${n}: ${title}`,
+    goTo: (title) => `Go to: ${title}`,
+    dot: (i, title) => `Slide ${i + 1}: ${title}`,
+    hit: (title, cta) => `${title}: ${cta}`,
+  },
+  "zh-TW": {
+    region: "近期活動與精選課程",
+    prev: "上一張",
+    next: "下一張",
+    defaultCta: "查看詳情",
+    slide: (i, n, title) => `第 ${i + 1} 張，共 ${n} 張：${title}`,
+    goTo: (title) => `前往：${title}`,
+    dot: (i, title) => `第 ${i + 1} 張：${title}`,
+    hit: (title, cta) => `${title}：${cta}`,
+  },
+  "zh-CN": {
+    region: "近期活动与精选课程",
+    prev: "上一张",
+    next: "下一张",
+    defaultCta: "查看详情",
+    slide: (i, n, title) => `第 ${i + 1} 张，共 ${n} 张：${title}`,
+    goTo: (title) => `前往：${title}`,
+    dot: (i, title) => `第 ${i + 1} 张：${title}`,
+    hit: (title, cta) => `${title}：${cta}`,
+  },
+  ja: {
+    region: "今後のイベントとおすすめコース",
+    prev: "前のスライド",
+    next: "次のスライド",
+    defaultCta: "詳細を見る",
+    slide: (i, n, title) => `スライド ${i + 1}/${n}：${title}`,
+    goTo: (title) => `${title}へ移動`,
+    dot: (i, title) => `スライド ${i + 1}：${title}`,
+    hit: (title, cta) => `${title}：${cta}`,
+  },
 };
 
 /** 第 i 張相對於目前這張的位置：0 是中間，±1 是兩側露出的那張，其餘藏起來 */
@@ -134,8 +182,8 @@ function ArrowIcon({ dir }: { dir: "left" | "right" }) {
  * 自動播放依 W3C APG 輪播模式：滑鼠移入、鍵盤焦點進入、分頁隱藏時暫停；
  * 系統開了「減少動態」時不自動播放。換張由進度條的 animationend 觸發，暫停後接著走。
  */
-export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme = "dark", onSelect, labels, className }: HeroBillboardCarouselProps) {
-  const l = { ...defaultLabels, ...labels };
+export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme = "dark", onSelect, locale = "en", labels, className }: HeroBillboardCarouselProps) {
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const n = items.length;
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
@@ -322,9 +370,9 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                 <span className="hbc-ring" aria-hidden />
                 {pos === "front" ? (
                   slide.href ? (
-                    <a href={slide.href} className="hbc-hit" aria-label={`${slide.title}: ${cta}`} draggable={false} />
+                    <a href={slide.href} className="hbc-hit" aria-label={l.hit(slide.title, cta)} draggable={false} />
                   ) : (
-                    <button type="button" className="hbc-hit" aria-label={`${slide.title}: ${cta}`} onClick={() => onSelect?.(slide, i)} />
+                    <button type="button" className="hbc-hit" aria-label={l.hit(slide.title, cta)} onClick={() => onSelect?.(slide, i)} />
                   )
                 ) : (
                   <button type="button" className="hbc-hit" tabIndex={-1} aria-label={l.goTo(slide.title)} onClick={() => go(i, o > 0 ? 1 : -1)} />

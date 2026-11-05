@@ -37,14 +37,28 @@ export interface ConfirmButtonProps {
   armedVariant?: ConfirmButtonVariant;
   size?: ConfirmButtonSize;
   disabled?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ConfirmButtonLabels;
   className?: string;
 }
 
-const defaultLabels: Required<ConfirmButtonLabels> = {
-  armedNotice: "Press again to {label}",
-  done: "Done",
-  failed: "That didn't work. Please try again.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<ConfirmButtonLabels>> = {
+  en: { armedNotice: "Press again to {label}", done: "Done", failed: "That didn't work. Please try again." },
+  "zh-TW": { armedNotice: "再按一次以{label}", done: "完成", failed: "沒有成功，請再試一次。" },
+  "zh-CN": { armedNotice: "再按一次以{label}", done: "完成", failed: "没有成功，请再试一次。" },
+  ja: { armedNotice: "もう一度押すと{label}", done: "完了しました", failed: "うまくいきませんでした。もう一度お試しください。" },
 };
 
 // usermeld components/ui/button.tsx 的 buttonVariants
@@ -82,10 +96,11 @@ export function ConfirmButton({
   armedVariant = "destructive",
   size = "default",
   disabled = false,
+  locale = "en",
   labels,
   className,
 }: ConfirmButtonProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [armed, setArmed] = useState(false);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<Notice>();

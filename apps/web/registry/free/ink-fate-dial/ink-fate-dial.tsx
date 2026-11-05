@@ -68,10 +68,63 @@ export interface InkFateDialProps {
   /** 月光色，預設原本的 #a3b8d9 系列 */
   moon?: string;
   moonBright?: string;
-  labels?: { noRoll?: string; skip?: string; dial?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<InkFateDialLabels>;
   className?: string;
   style?: CSSProperties;
 }
+
+export interface InkFateDialLabels {
+  /** 還沒擲骰時盤面中央的字 */
+  noRoll: string;
+  /** 跳過動畫按鈕的無障礙名稱 */
+  skip: string;
+  /** 有給才把盤面當成圖片並用這段文字描述 */
+  dial?: string;
+  /** 修正總和超過上限時補上那一步的名稱 */
+  cap: (cap: number) => string;
+  /** 預設分區的字，依分區 id */
+  segments: Record<string, string>;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, InkFateDialLabels> = {
+  en: {
+    noRoll: "Fate",
+    skip: "Skip the roll animation",
+    cap: (cap) => `Modifier cap ±${cap}`,
+    segments: { adverse: "Woe", mixed: "Twist", success: "Pass", wonder: "Boon" },
+  },
+  "zh-TW": {
+    noRoll: "定",
+    skip: "跳過擲骰動畫",
+    cap: (cap) => `修正上限 ±${cap}`,
+    segments: { adverse: "逆", mixed: "變", success: "成", wonder: "奇" },
+  },
+  "zh-CN": {
+    noRoll: "定",
+    skip: "跳过掷骰动画",
+    cap: (cap) => `修正上限 ±${cap}`,
+    segments: { adverse: "逆", mixed: "变", success: "成", wonder: "奇" },
+  },
+  ja: {
+    noRoll: "定",
+    skip: "ダイスのアニメーションを飛ばす",
+    cap: (cap) => `補正上限 ±${cap}`,
+    segments: { adverse: "逆", mixed: "変", success: "成", wonder: "奇" },
+  },
+};
 
 const SIZE = 260;
 const CENTER = SIZE / 2;
@@ -82,11 +135,12 @@ const DISC_INNER = 38;
 const LABEL_RADIUS = 58;
 const DROP_RADIUS = 82;
 
+/** 預設分區（英文字）；沒給 segments 時元件會依 locale 換成對應語言的字 */
 export const INK_FATE_SEGMENTS: InkFateSegment[] = [
-  { id: "adverse", label: "逆", from: 0, to: 29.5, fill: "rgba(96, 58, 58, 0.34)", activeFill: "rgba(143, 89, 105, 0.62)", text: "#b99696" },
-  { id: "mixed", label: "變", from: 29.5, to: 59.5, fill: "rgba(62, 75, 98, 0.32)", activeFill: "rgba(95, 116, 153, 0.58)", text: "#92a1bb" },
-  { id: "success", label: "成", from: 59.5, to: 99.5, fill: "rgba(67, 85, 117, 0.36)", activeFill: "rgba(99, 127, 175, 0.62)", text: "#8ca1c6" },
-  { id: "wonder", label: "奇", from: 99.5, to: 120, fill: "rgba(99, 125, 169, 0.44)", activeFill: "rgba(137, 162, 205, 0.72)", text: "#b9c8e2" },
+  { id: "adverse", label: "Woe", from: 0, to: 29.5, fill: "rgba(96, 58, 58, 0.34)", activeFill: "rgba(143, 89, 105, 0.62)", text: "#b99696" },
+  { id: "mixed", label: "Twist", from: 29.5, to: 59.5, fill: "rgba(62, 75, 98, 0.32)", activeFill: "rgba(95, 116, 153, 0.58)", text: "#92a1bb" },
+  { id: "success", label: "Pass", from: 59.5, to: 99.5, fill: "rgba(67, 85, 117, 0.36)", activeFill: "rgba(99, 127, 175, 0.62)", text: "#8ca1c6" },
+  { id: "wonder", label: "Boon", from: 99.5, to: 120, fill: "rgba(99, 125, 169, 0.44)", activeFill: "rgba(137, 162, 205, 0.72)", text: "#b9c8e2" },
 ];
 
 // 時間軸常數照原本 fate-odds.ts
@@ -115,11 +169,11 @@ function resolveSegment(segments: readonly InkFateSegment[], score: number): str
   return segments[segments.length - 1].id;
 }
 
-function buildSteps(modifiers: readonly InkFateModifier[], cap: number) {
+function buildSteps(modifiers: readonly InkFateModifier[], cap: number, capLabel: (cap: number) => string) {
   const steps = modifiers.map((modifier) => ({ ...modifier }));
   const sum = steps.reduce((total, step) => total + step.value, 0);
   const total = Math.max(-cap, Math.min(cap, sum));
-  if (sum !== total) steps.push({ label: `修正上限 ±${cap}`, value: total - sum, isCap: true });
+  if (sum !== total) steps.push({ label: capLabel(cap), value: total - sum, isCap: true });
   return { steps, total };
 }
 
@@ -168,7 +222,7 @@ export function InkFateDial({
   modifierCap = 20,
   outcome: outcomeProp,
   ghostScore,
-  segments = INK_FATE_SEGMENTS,
+  segments: segmentsProp,
   scaleMax = 120,
   rolling = false,
   rollKey,
@@ -178,10 +232,19 @@ export function InkFateDial({
   size = SIZE,
   moon,
   moonBright,
-  labels,
+  locale = "en",
+  labels: labelsProp,
   className,
   style,
 }: InkFateDialProps) {
+  const lang = resolveLocale(locale);
+  const labels = { ...MESSAGES[lang], ...labelsProp };
+  const segmentLabels = labels.segments;
+  const segments = useMemo(
+    () => segmentsProp ?? INK_FATE_SEGMENTS.map((segment) => ({ ...segment, label: segmentLabels[segment.id] ?? segment.label })),
+    [segmentsProp, segmentLabels],
+  );
+  const capLabel = labels.cap;
   const uid = useId().replace(/:/g, "");
   const reduced = usePrefersReducedMotion();
   // 時鐘與完成狀態都綁著 rollKey，換一次 key 立刻視為新的一擲，不會閃出上一擲的畫面
@@ -190,7 +253,7 @@ export function InkFateDial({
   const elapsed = clock.key === rollKey ? clock.ms : 0;
   const finished = finishedKey === rollKey;
 
-  const { steps, total } = useMemo(() => buildSteps(modifiers, modifierCap), [modifiers, modifierCap]);
+  const { steps, total } = useMemo(() => buildSteps(modifiers, modifierCap, capLabel), [modifiers, modifierCap, capLabel]);
   const hasRoll = rawRoll !== undefined;
   const finalScore = (rawRoll ?? 0) + total;
   const outcome = outcomeProp ?? resolveSegment(segments, finalScore);
@@ -315,7 +378,7 @@ export function InkFateDial({
   const drop = pointOn(liveScore, DROP_RADIUS);
   const ghost = ghostScore === undefined ? undefined : pointOn(ghostScore, DROP_RADIUS);
   const showArc = hasRoll && !spinning && liveScore !== rawRoll;
-  const centre = !hasRoll ? (labels?.noRoll ?? "定") : spinning ? String(frame?.displayRaw ?? rawRoll) : String(liveScore);
+  const centre = !hasRoll ? labels.noRoll : spinning ? String(frame?.displayRaw ?? rawRoll) : String(liveScore);
   // 原本只有擲骰的那一次才播落定點綴，靜止盤面不播
   const playing = animating;
 
@@ -332,9 +395,9 @@ export function InkFateDial({
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         width={size}
         height={size}
-        role={labels?.dial ? "img" : undefined}
-        aria-label={labels?.dial}
-        aria-hidden={labels?.dial ? undefined : true}
+        role={labels.dial ? "img" : undefined}
+        aria-label={labels.dial}
+        aria-hidden={labels.dial ? undefined : true}
         focusable="false"
         style={{ display: "block", overflow: "visible", maxWidth: "100%", height: "auto" }}
       >
@@ -495,7 +558,7 @@ export function InkFateDial({
         </text>
       </svg>
       {animating && skippable && (
-        <button type="button" className="ifd-skip" onClick={skip} aria-label={labels?.skip ?? "跳過擲骰動畫"} />
+        <button type="button" className="ifd-skip" onClick={skip} aria-label={labels.skip} />
       )}
     </div>
   );

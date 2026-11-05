@@ -39,15 +39,57 @@ export type WaterfallShowcaseLabels = {
   close: string;
 };
 
-const DEFAULT_LABELS: WaterfallShowcaseLabels = {
-  view: (w) => `View artwork: ${w.text ?? w.styleName}`,
-  youSaid: "You said",
-  style: "Style",
-  rewrittenAs: "AI rewrote it as",
-  model: "Model",
-  styleNote: "The same window-side portrait composition, drawn in this style.",
-  footnote: "Generated on this site, passed the output check and labelled as AI-generated.",
-  close: "Close",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, WaterfallShowcaseLabels> = {
+  en: {
+    view: (w) => `View artwork: ${w.text ?? w.styleName}`,
+    youSaid: "You said",
+    style: "Style",
+    rewrittenAs: "AI rewrote it as",
+    model: "Model",
+    styleNote: "The same window-side portrait composition, drawn in this style.",
+    footnote: "Generated on this site, passed the output check and labelled as AI-generated.",
+    close: "Close",
+  },
+  "zh-TW": {
+    view: (w) => `查看作品：${w.text ?? w.styleName}`,
+    youSaid: "你說的",
+    style: "風格",
+    rewrittenAs: "AI 改寫成",
+    model: "模型",
+    styleNote: "同一張窗邊人像構圖，以這個風格繪製。",
+    footnote: "於本站生成，已通過輸出檢查，並標示為 AI 生成。",
+    close: "關閉",
+  },
+  "zh-CN": {
+    view: (w) => `查看作品：${w.text ?? w.styleName}`,
+    youSaid: "你说的",
+    style: "风格",
+    rewrittenAs: "AI 改写为",
+    model: "模型",
+    styleNote: "同一张窗边人像构图，用这种风格绘制。",
+    footnote: "在本站生成，已通过输出审核，并标注为 AI 生成。",
+    close: "关闭",
+  },
+  ja: {
+    view: (w) => `作品を見る：${w.text ?? w.styleName}`,
+    youSaid: "あなたの言葉",
+    style: "スタイル",
+    rewrittenAs: "AI による書き直し",
+    model: "モデル",
+    styleNote: "同じ窓辺のポートレート構図を、このスタイルで描いたものです。",
+    footnote: "このサイトで生成され、出力チェックを通過し、AI 生成と表示されています。",
+    close: "閉じる",
+  },
 };
 
 export type WaterfallShowcaseProps = {
@@ -56,6 +98,9 @@ export type WaterfallShowcaseProps = {
   columns?: number;
   /** true：燈箱蓋滿視窗並鎖捲動；false：只蓋住元件本身 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<WaterfallShowcaseLabels>;
   className?: string;
 };
@@ -93,8 +138,8 @@ function WorkMedia({ work, alt, className, eager }: { work: WaterfallWork; alt: 
   );
 }
 
-export function WaterfallShowcase({ works, columns: cols = 5, fixed = true, labels, className }: WaterfallShowcaseProps) {
-  const l = { ...DEFAULT_LABELS, ...labels };
+export function WaterfallShowcase({ works, columns: cols = 5, fixed = true, locale = "en", labels, className }: WaterfallShowcaseProps) {
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [open, setOpen] = useState<WaterfallWork | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);

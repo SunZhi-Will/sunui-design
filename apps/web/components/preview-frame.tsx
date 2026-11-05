@@ -2,17 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { format, type Locale } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 
 const viewports = [
-  { key: "desktop", label: "Desktop", width: "100%" },
-  { key: "tablet", label: "Tablet", width: "768px" },
-  { key: "mobile", label: "Mobile", width: "375px" },
+  { key: "desktop", width: "100%" },
+  { key: "tablet", width: "768px" },
+  { key: "mobile", width: "375px" },
 ] as const;
 
 const MIN_HEIGHT = 448;
 
-export function PreviewFrame({ name }: { name: string }) {
+export function PreviewFrame({ name, locale, labels }: { name: string; locale: Locale; labels: Messages["preview"] }) {
   const [viewport, setViewport] = useState<(typeof viewports)[number]["key"]>("desktop");
   const [run, setRun] = useState(0);
   const [height, setHeight] = useState(MIN_HEIGHT);
@@ -40,7 +42,7 @@ export function PreviewFrame({ name }: { name: string }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-card">
       <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
-        <div role="radiogroup" aria-label="Viewport" className="flex gap-1">
+        <div role="radiogroup" aria-label={labels.viewport} className="flex gap-1">
           {viewports.map((v) => (
             <button
               key={v.key}
@@ -53,7 +55,7 @@ export function PreviewFrame({ name }: { name: string }) {
                 viewport === v.key ? "bg-stage text-fg" : "text-subtle hover:text-fg",
               )}
             >
-              {v.label}
+              {labels[v.key]}
             </button>
           ))}
         </div>
@@ -64,17 +66,18 @@ export function PreviewFrame({ name }: { name: string }) {
           onClick={() => setRun((n) => n + 1)}
           className="rounded-md px-2.5 py-1 text-xs font-medium text-subtle transition-colors hover:text-fg"
         >
-          Replay
+            {labels.replay}
           </button>
         </div>
       </div>
       {/* 外層不加任何留白：三種尺寸的展示區高度一致，只有寬度改變 */}
       <div className={cn("flex justify-center", viewport === "desktop" ? "stage-dots" : "stage-surround")}>
         <iframe
-          key={run}
+          // 換語言時 router.refresh() 會帶來新的 locale，iframe 跟著重新載入
+          key={`${locale}-${run}`}
           ref={iframeRef}
           src={`/preview/${name}`}
-          title={`${name} preview`}
+          title={format(labels.frameTitle, { name })}
           onLoad={handleLoad}
           className={cn(
             "block border-0 transition-[width] duration-300",

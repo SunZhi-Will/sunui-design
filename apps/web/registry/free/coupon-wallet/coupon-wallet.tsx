@@ -32,17 +32,56 @@ export interface CouponWalletProps {
   value?: string | null;
   defaultValue?: string | null;
   onChange?: (id: string | null) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: CouponWalletLabels;
   className?: string;
 }
 
-const defaultLabels: Required<CouponWalletLabels> = {
-  group: "Your coupons",
-  applied: "Applied",
-  off: "OFF",
-  hint: "Hover or tab through your coupons to compare them.",
-  appliedAnnouncement: (title) => `${title} applied to this order.`,
-  removedAnnouncement: "Coupon removed from this order.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<CouponWalletLabels>> = {
+  en: {
+    group: "Your coupons",
+    applied: "Applied",
+    off: "OFF",
+    hint: "Hover or tab through your coupons to compare them.",
+    appliedAnnouncement: (title) => `${title} applied to this order.`,
+    removedAnnouncement: "Coupon removed from this order.",
+  },
+  "zh-TW": {
+    group: "你的優惠券",
+    applied: "已套用",
+    off: "折抵",
+    hint: "滑過或用 Tab 逐張比較你的優惠券。",
+    appliedAnnouncement: (title) => `已將「${title}」套用到這筆訂單。`,
+    removedAnnouncement: "已從這筆訂單移除優惠券。",
+  },
+  "zh-CN": {
+    group: "你的优惠券",
+    applied: "已使用",
+    off: "立减",
+    hint: "悬停或用 Tab 逐张比较你的优惠券。",
+    appliedAnnouncement: (title) => `已将“${title}”用于本订单。`,
+    removedAnnouncement: "已从本订单移除优惠券。",
+  },
+  ja: {
+    group: "お持ちのクーポン",
+    applied: "適用中",
+    off: "OFF",
+    hint: "ホバーまたは Tab キーでクーポンを見比べられます。",
+    appliedAnnouncement: (title) => `「${title}」をこの注文に適用しました。`,
+    removedAnnouncement: "この注文からクーポンを外しました。",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -65,8 +104,8 @@ const notches: CSSProperties = (() => {
   return { maskImage: mask, WebkitMaskImage: mask, maskComposite: "intersect", WebkitMaskComposite: "source-in" };
 })();
 
-export function CouponWallet({ coupons, value, defaultValue = null, onChange, labels, className }: CouponWalletProps) {
-  const t = { ...defaultLabels, ...labels };
+export function CouponWallet({ coupons, value, defaultValue = null, onChange, locale = "en", labels, className }: CouponWalletProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const selected = value !== undefined ? value : inner;

@@ -2,11 +2,20 @@
 
 import { useState } from "react";
 
+import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 
 type Status = "idle" | "sending" | "done" | "error";
 
-export function WaitlistForm({ source, className }: { source: string; className?: string }) {
+export function WaitlistForm({
+  source,
+  className,
+  messages: t,
+}: {
+  source: string;
+  className?: string;
+  messages: Messages["waitlist"];
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
 
@@ -20,13 +29,25 @@ export function WaitlistForm({ source, className }: { source: string; className?
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.get("email"), company: form.get("company"), source }),
       });
-      const data = (await response.json()) as { message?: string };
-      if (!response.ok) throw new Error(data.message ?? "Something went wrong.");
+      // 伺服器回傳英文訊息，這裡依狀態碼改用目前語言的文字
+      if (!response.ok) {
+        setStatus("error");
+        setMessage(
+          response.status === 400
+            ? t.invalidEmail
+            : response.status === 429
+              ? t.tooMany
+              : response.status >= 500
+                ? t.unavailable
+                : t.generic,
+        );
+        return;
+      }
       setStatus("done");
-      setMessage(data.message ?? "You are on the list.");
-    } catch (error) {
+      setMessage(t.success);
+    } catch {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Something went wrong.");
+      setMessage(t.generic);
     }
   }
 
@@ -42,7 +63,7 @@ export function WaitlistForm({ source, className }: { source: string; className?
     <form onSubmit={submit} className={cn("grid gap-2", className)}>
       <div className="flex gap-2">
         <label htmlFor={`email-${source}`} className="sr-only">
-          Email
+          {t.email}
         </label>
         <input
           id={`email-${source}`}
@@ -50,7 +71,7 @@ export function WaitlistForm({ source, className }: { source: string; className?
           type="email"
           required
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={t.placeholder}
           className="min-w-0 flex-1 rounded-xl border border-line bg-card px-4 py-2.5 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
         />
         {/* 防機器人：真人看不到這個欄位 */}
@@ -60,7 +81,7 @@ export function WaitlistForm({ source, className }: { source: string; className?
           disabled={status === "sending"}
           className="shrink-0 rounded-xl bg-fg px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {status === "sending" ? "Joining…" : "Join waitlist"}
+          {status === "sending" ? t.joining : t.join}
         </button>
       </div>
       {status === "error" && (

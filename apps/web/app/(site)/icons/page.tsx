@@ -3,43 +3,40 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { IconGallery } from "@/components/icon-gallery";
+import { RichText } from "@/components/rich-text";
+import { getI18n } from "@/lib/i18n-server";
 import { siteUrl } from "@/lib/site";
 import { Icon } from "@/registry/icons/sunui-icons";
 
-export const metadata: Metadata = {
-  title: "Icons",
-  description:
-    "SunUI stroke icons on a 24px grid: notched coupons, zigzag receipts, tilted stamps and the everyday controls, with one optional vermilion accent.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { m } = await getI18n();
+  return { title: m.icons.metaTitle, description: m.icons.metaDescription };
+}
 
-const rules = [
-  { icon: "grid", title: "24px grid, 2px margin", body: "Shapes live between 3 and 21. Circles reach 8.5, squares 7 from center." },
-  { icon: "edit", title: "1.5 stroke, round caps", body: "Matches the 1px paper edge at 24px. Drop to 1.25 above 32px." },
-  { icon: "stamp", title: "One vermilion spot", body: "Each icon marks at most one accent part. It stays ink until you set the variable." },
-  { icon: "coupon", title: "Real paper details", body: "Notches, perforations, zigzag tears and a stamp tilted about 10°." },
-  { icon: "activity", title: "Motion that means something", body: "Coupons tear along the perforation, stamps press down, bells swing. Only on hover, focus or a state change." },
-] as const;
+// 規則卡片的圖示，順序對應字典裡的 icons.rules
+const ruleIcons = ["grid", "edit", "stamp", "coupon", "activity"] as const;
 
-export default function IconsPage() {
+export default async function IconsPage() {
+  const { m } = await getI18n();
+  const t = m.icons;
+  const rules = t.rules.map((rule, i) => ({ ...rule, icon: ruleIcons[i] ?? "grid" }));
   return (
     <>
       <section className="pt-14 pb-10 sm:pt-20">
-        <p className="mb-4 text-sm font-medium text-accent">SunUI Icons</p>
+        <p className="mb-4 text-sm font-medium text-accent">{t.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-          Icons cut from the same paper.
+          {t.title}
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
-          One stroke set for every SunUI series. Coupons with real notches, receipts that tear, stamps that land a little
-          crooked, and the plain controls around them. Every icon comes static, and the ones with something to say
-          also come animated.
+          {t.lead}
         </p>
         <div className="mt-8 grid max-w-2xl gap-3">
           <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">Static, no dependencies</p>
+            <p className="mb-1.5 text-xs font-medium text-subtle">{t.staticInstall}</p>
             <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
           </div>
           <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">Animated, adds framer-motion</p>
+            <p className="mb-1.5 text-xs font-medium text-subtle">{t.animatedInstall}</p>
             <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
           </div>
         </div>
@@ -55,13 +52,12 @@ export default function IconsPage() {
         ))}
       </ul>
 
-      <IconGallery />
+      <IconGallery messages={m.iconGallery} />
 
       <section aria-labelledby="usage-title" className="docs mt-20 max-w-3xl">
-        <h2 id="usage-title">Usage</h2>
+        <h2 id="usage-title">{t.usageTitle}</h2>
         <p>
-          Icons inherit <code>currentColor</code> and are hidden from screen readers unless you pass a{" "}
-          <code>title</code>.
+          <RichText text={t.usageBody} />
         </p>
         <div className="block-gap">
           <CodeBlock
@@ -81,11 +77,9 @@ export default function IconsPage() {
 </div>`}
           />
         </div>
-        <h2>Animated icons</h2>
+        <h2>{t.animatedTitle}</h2>
         <p>
-          <code>AnimatedIcon</code> uses the same shapes. Hover icons play when their parent button is hovered or
-          focused, so the whole control is the trigger. Toggle icons follow <code>active</code>, and loading icons loop
-          only while it is true. Under reduced motion every icon jumps straight to its end state.
+          <RichText text={t.animatedBody} />
         </p>
         <div className="block-gap">
           <CodeBlock

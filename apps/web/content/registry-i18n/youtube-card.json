@@ -1,0 +1,20 @@
+{
+  "zh-TW": {
+    "title": "YouTube 卡片",
+    "description": "CardFlow 的 YouTube 卡片：可讀取 watch、youtu.be、embed 網址或單獨的 11 碼 ID，顯示縮圖與 YouTube 風格的播放鍵，點擊後才載入播放器。空狀態會列出支援的格式。播放鍵是真正的按鈕，具備 aria-label 與焦點框，減少動態時關閉滑過轉場。",
+    "whenToUse": ["在看板或動態中嵌入影片，直到有人要播放才載入 YouTube", "需要在互動播放器四周提供邊與角拖曳控點的畫布元件"],
+    "watchOut": ["預設縮圖從 i.ytimg.com 載入；若不想有第三方請求請傳入 thumbnail", "即使點擊後，有些瀏覽器仍可能封鎖有聲自動播放"]
+  },
+  "zh-CN": {
+    "title": "YouTube 卡片",
+    "description": "CardFlow 的 YouTube 卡片：可识别 watch、youtu.be、embed 链接或单独的 11 位 ID，显示缩略图与 YouTube 风格的播放键，点击后才加载播放器。空状态会列出支持的格式。播放键是真正的按钮，具备 aria-label 与焦点框，减少动态时关闭悬停过渡。",
+    "whenToUse": ["在看板或信息流中嵌入视频，直到有人要播放才加载 YouTube", "需要在交互播放器四周提供边角拖拽手柄的画布组件"],
+    "watchOut": ["默认缩略图从 i.ytimg.com 加载；如果不想有第三方请求请传入 thumbnail", "即使点击后，有些浏览器仍可能拦截有声自动播放"]
+  },
+  "ja": {
+    "title": "YouTube カード",
+    "description": "CardFlow の YouTube カード。watch、youtu.be、embed の URL や 11 文字の ID だけでも読み取り、サムネイルと YouTube 風の再生ボタンを表示し、クリックして初めてプレーヤーを読み込みます。空の状態では対応形式を一覧表示。再生ボタンは aria-label とフォーカスリングを備えた本物のボタンで、視差効果を減らす設定ではホバーのトランジションを止めます。",
+    "whenToUse": ["再生を求められるまで YouTube を読み込まずに、ボードやフィードへ動画を埋め込む", "インタラクティブなプレーヤーの周囲に辺と角のドラッグハンドルが必要なキャンバスウィジェット"],
+    "watchOut": ["デフォルトのサムネイルは i.ytimg.com から読み込む。サードパーティへのリクエストを避けるなら thumbnail を渡す", "クリック後でも、音声付きの自動再生をブロックするブラウザがある"]
+  }
+}

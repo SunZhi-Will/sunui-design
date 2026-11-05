@@ -31,8 +31,34 @@ export interface SegmentedControlProps<T extends string = string> {
   /** 整組的無障礙名稱 */
   "aria-label"?: string;
   disabled?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SegmentedControlLabels>;
   className?: string;
 }
+
+export interface SegmentedControlLabels {
+  /** 沒有傳 aria-label 時整組的名稱 */
+  group: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SegmentedControlLabels> = {
+  en: { group: "Options" },
+  "zh-TW": { group: "選項" },
+  "zh-CN": { group: "选项" },
+  ja: { group: "オプション" },
+};
 
 // 設計語言（DESIGN.md）：墨色外框標示選取，snappy 彈簧滑動
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
@@ -52,10 +78,14 @@ export function SegmentedControl<T extends string = string>({
   size = "md",
   fullWidth = false,
   iconOnly = false,
-  "aria-label": ariaLabel = "Options",
+  "aria-label": ariaLabelProp,
   disabled = false,
+  locale = "en",
+  labels,
   className,
 }: SegmentedControlProps<T>) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const ariaLabel = ariaLabelProp ?? t.group;
   const reduceMotion = useReducedMotion();
   const groupId = useId();
   const refs = useRef<Array<HTMLButtonElement | null>>([]);

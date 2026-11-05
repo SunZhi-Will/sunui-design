@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { JobPanel, type Job } from "./job-panel";
 
 type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;
@@ -19,10 +21,17 @@ const timeline: Frame[] = [
   { status: "done" },
 ];
 
-const prompt = "Girl in a yellow raincoat on a rooftop at dusk, soft film grain, warm city lights";
+const copy = {
+  en: { prompt: "Girl in a yellow raincoat on a rooftop at dusk, soft film grain, warm city lights", meta: ["Just now", "Soft anime"], heading: "Your prompt" },
+  "zh-TW": { prompt: "黃昏的屋頂上穿黃色雨衣的女孩，柔和的底片顆粒，溫暖的城市燈火", meta: ["剛剛", "柔和動漫"], heading: "你的描述" },
+  "zh-CN": { prompt: "黄昏的屋顶上穿黄色雨衣的女孩，柔和的胶片颗粒，温暖的城市灯火", meta: ["刚刚", "柔和动漫"], heading: "你的描述" },
+  ja: { prompt: "夕暮れの屋上に立つ黄色いレインコートの少女、やわらかなフィルムグレイン、あたたかな街の灯り", meta: ["たった今", "やわらかアニメ"], heading: "プロンプト" },
+};
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function JobPanelDemo() {
+  const locale = useDemoLocale();
+  const { prompt, meta, heading } = useDemoText(copy);
   const [i, setI] = useState(0);
   const [canceled, setCanceled] = useState(false);
 
@@ -35,13 +44,14 @@ export default function JobPanelDemo() {
   const frame = timeline[i];
   const done = frame.status === "done";
   const job: Job = canceled
-    ? { id: "job_8f2a", prompt, status: "canceled", durationSeconds: 6, meta: ["Just now", "Soft anime"] }
-    : { id: "job_8f2a", prompt, ...frame, durationSeconds: done ? 52 : null, images: done ? 2 : 0, meta: ["Just now", "Soft anime"] };
+    ? { id: "job_8f2a", prompt, status: "canceled", durationSeconds: 6, meta }
+    : { id: "job_8f2a", prompt, ...frame, durationSeconds: done ? 52 : null, images: done ? 2 : 0, meta };
 
   return (
     <div className="w-full max-w-sm min-w-0 rounded-xl border border-border bg-card p-5">
       <JobPanel
         job={job}
+        locale={locale}
         onCancel={async () => {
           await wait(500);
           setCanceled(true);
@@ -54,7 +64,7 @@ export default function JobPanelDemo() {
         }}
       >
         <section className="flex flex-col gap-2">
-          <h3 className="text-xs font-medium text-muted-foreground">Your prompt</h3>
+          <h3 className="text-xs font-medium text-muted-foreground">{heading}</h3>
           <p className="text-sm text-pretty">{prompt}</p>
         </section>
       </JobPanel>

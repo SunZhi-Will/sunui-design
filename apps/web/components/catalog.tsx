@@ -1,24 +1,36 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { LivePreview } from "@/components/live-preview";
-import { interactionLabels } from "@/lib/interactions";
+import { format, type Locale } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
-import { seriesDescriptions, seriesLabels, seriesOf } from "@/lib/series";
+import { seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
 
-const seriesKeys = Object.keys(seriesLabels) as Series[];
+const seriesKeys: Series[] = ["paper", "product", "story", "showcase", "classic", "cardflow"];
+const interactionKeys: Interaction[] = ["press", "hover", "drag", "type", "loading", "scroll", "section"];
 
-export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | "meta" | "categories">;
+/** title、description 已換成目前語言；search 保留英文標題與描述，讓英文關鍵字也搜得到。 */
+export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | "meta" | "categories"> & {
+  search: string;
+};
 
-export function Catalog({ items }: { items: CatalogItem[] }) {
+export type CatalogMessages = Pick<Messages, "catalog" | "interactions" | "series" | "tier">;
+
+export function Catalog({ items, locale, messages }: { items: CatalogItem[]; locale: Locale; messages: CatalogMessages }) {
+  const { catalog: t, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
   const [tier, setTier] = useState<Tier | "all">("all");
   const [series, setSeries] = useState<Series | "all">("all");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入
   useEffect(() => {
@@ -85,6 +97,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
       const haystack = [
         item.title,
         item.description,
+        item.search,
         item.name,
         ...(item.categories ?? []),
         ...(item.meta.usage?.aliases ?? []),
@@ -96,11 +109,11 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
   }, [items, interaction, tier, series, query]);
 
   return (
-    <section id="blocks" aria-label="Blocks" className="scroll-mt-24">
+    <section id="blocks" aria-label={t.sectionLabel} className="scroll-mt-24">
       <div className="mb-6 grid gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <label className="relative min-w-0 flex-1 sm:max-w-xs">
-            <span className="sr-only">Search blocks</span>
+            <span className="sr-only">{t.searchLabel}</span>
             <svg
               viewBox="0 0 24 24"
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-subtle"
@@ -117,7 +130,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search blocks, e.g. coupon, cart, countdown"
+              placeholder={t.searchPlaceholder}
               aria-keyshortcuts="/"
               className="peer w-full rounded-full border border-line bg-card py-2 pr-10 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:border-accent"
             />
@@ -128,7 +141,7 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
               /
             </kbd>
           </label>
-          <div role="group" aria-label="Filter by plan" className="flex rounded-full border border-line p-0.5 text-sm">
+          <div role="group" aria-label={t.filterPlan} className="flex rounded-full border border-line p-0.5 text-sm">
             {(["all", "free", "pro"] as const).map((value) => (
               <button
                 key={value}
@@ -136,34 +149,34 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
                 aria-pressed={tier === value}
                 onClick={() => setTier(value)}
                 className={cn(
-                  "rounded-full px-3 py-1 capitalize transition-colors",
+                  "rounded-full px-3 py-1 transition-colors",
                   tier === value ? "bg-fg text-bg" : "text-subtle hover:text-fg",
                 )}
               >
-                {value}
+                {value === "all" ? t.tierAll : tierLabels[value]}
               </button>
             ))}
           </div>
         </div>
 
-        <div role="group" aria-label="Filter by series" className="flex flex-wrap items-center gap-2">
-          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label="All series" count={items.length} />
+        <div role="group" aria-label={t.filterSeries} className="flex flex-wrap items-center gap-2">
+          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label={t.allSeries} count={items.length} />
           {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
           {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
             <FilterChip
               key={key}
               active={series === key}
               onClick={() => setSeries(key)}
-              label={seriesLabels[key]}
+              label={seriesText.labels[key]}
               count={seriesCounts.get(key) ?? 0}
             />
           ))}
-          {series !== "all" && <p className="text-sm text-subtle">{seriesDescriptions[series]}</p>}
+          {series !== "all" && <p className="text-sm text-subtle">{seriesText.descriptions[series]}</p>}
         </div>
 
-        <div role="group" aria-label="Filter by interaction" className="flex flex-wrap gap-2">
-          <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label="All" count={scoped.length} />
-          {(Object.keys(interactionLabels) as Interaction[]).map((key) => (
+        <div role="group" aria-label={t.filterInteraction} className="flex flex-wrap gap-2">
+          <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label={t.allInteractions} count={scoped.length} />
+          {interactionKeys.map((key) => (
             <FilterChip
               key={key}
               active={interaction === key}
@@ -177,58 +190,76 @@ export function Catalog({ items }: { items: CatalogItem[] }) {
 
       <div className="mb-4 flex items-center gap-3 text-sm text-subtle">
         <p aria-live="polite">
-          {visible.length} {visible.length === 1 ? "block" : "blocks"}
+          {visible.length === 1 ? t.countOne : format(t.count, { n: visible.length })}
         </p>
         {filtered && (
           <button type="button" onClick={reset} className="underline-offset-4 hover:text-fg hover:underline">
-            Clear filters
+            {t.clearFilters}
           </button>
         )}
       </div>
 
       <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((item) => (
-          <li key={item.name} className="group">
-            {/* 卡片裡只有元件本身，原尺寸、可以直接操作；名稱放在卡片外，描述留給詳細頁 */}
-            <div className="relative aspect-[5/4] overflow-hidden rounded-[20px] bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line">
-              <LivePreview name={item.name} title={item.title} />
-              {item.meta.tier === "pro" && (
-                <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
-                  Pro
-                </span>
-              )}
-              <Link
-                href={`/blocks/${item.name}`}
-                aria-hidden="true"
-                tabIndex={-1}
-                className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-fg text-bg opacity-0 transition-opacity group-hover:opacity-100"
+        {visible.map((item) => {
+          const href = `/blocks/${item.name}`;
+          // 展開中的卡片先藏起來，面板會從它的位置長出來、關閉時再縮回去
+          const expanded = pathname === href;
+          return (
+            <li key={item.name} className="group">
+              {/* 卡片裡只有元件本身，原尺寸、可以直接操作；點空白處或右上角展開 */}
+              <motion.div
+                layoutId={`block-card-${item.name}`}
+                transition={{ type: "spring", stiffness: 240, damping: 30 }}
+                style={{ borderRadius: 20, opacity: expanded ? 0 : 1 }}
+                className="relative aspect-[5/4] overflow-hidden bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line"
               >
-                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75">
-                  <path d="M7 17 17 7M9 7h8v8" />
-                </svg>
-              </Link>
-            </div>
-            <h3 className="mt-3 px-1 text-sm font-medium tracking-tight">
-              <Link
-                href={`/blocks/${item.name}`}
-                className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                {item.title}
-              </Link>
-            </h3>
-          </li>
-        ))}
+                <LivePreview
+                  name={item.name}
+                  title={format(t.livePreview, { title: item.title })}
+                  locale={locale}
+                  onExpand={() => router.push(href, { scroll: false })}
+                />
+                {item.meta.tier === "pro" && (
+                  <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">
+                    {tierLabels.pro}
+                  </span>
+                )}
+                <Link
+                  href={href}
+                  scroll={false}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  title={t.expand}
+                  className="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-fg/90 text-bg opacity-0 shadow-sm transition-opacity group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+                >
+                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                    <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
+                  </svg>
+                </Link>
+              </motion.div>
+              <h3 className="mt-3 px-1 text-sm font-medium tracking-tight">
+                <Link
+                  href={href}
+                  scroll={false}
+                  className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
+                >
+                  {item.title}
+                </Link>
+              </h3>
+            </li>
+          );
+        })}
       </ul>
 
       {visible.length === 0 && (
         <div className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-subtle">
-          <p>No blocks match. Try another word or clear the filters.</p>
+          <p>{t.empty}</p>
           <button
             type="button"
             onClick={reset}
             className="mt-4 rounded-full border border-line px-4 py-1.5 text-fg transition-colors hover:border-accent/60"
           >
-            Clear filters
+            {t.clearFilters}
           </button>
         </div>
       )}

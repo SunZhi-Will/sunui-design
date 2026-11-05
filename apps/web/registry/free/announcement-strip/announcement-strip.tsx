@@ -29,18 +29,60 @@ export interface AnnouncementStripProps {
   storageKey?: string;
   dismissible?: boolean;
   onDismiss?: () => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: AnnouncementStripLabels;
   className?: string;
 }
 
-const defaultLabels: Required<AnnouncementStripLabels> = {
-  region: "Store announcements",
-  eyebrow: "Notice",
-  previous: "Previous announcement",
-  next: "Next announcement",
-  dismiss: "Dismiss announcements",
-  more: "Learn more",
-  position: (current, total) => `${current} of ${total}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<AnnouncementStripLabels>> = {
+  en: {
+    region: "Store announcements",
+    eyebrow: "Notice",
+    previous: "Previous announcement",
+    next: "Next announcement",
+    dismiss: "Dismiss announcements",
+    more: "Learn more",
+    position: (current, total) => `${current} of ${total}`,
+  },
+  "zh-TW": {
+    region: "商店公告",
+    eyebrow: "公告",
+    previous: "上一則公告",
+    next: "下一則公告",
+    dismiss: "關閉公告",
+    more: "了解更多",
+    position: (current, total) => `第 ${current} 則，共 ${total} 則`,
+  },
+  "zh-CN": {
+    region: "商店公告",
+    eyebrow: "公告",
+    previous: "上一条公告",
+    next: "下一条公告",
+    dismiss: "关闭公告",
+    more: "了解更多",
+    position: (current, total) => `第 ${current} 条，共 ${total} 条`,
+  },
+  ja: {
+    region: "ストアからのお知らせ",
+    eyebrow: "お知らせ",
+    previous: "前のお知らせ",
+    next: "次のお知らせ",
+    dismiss: "お知らせを閉じる",
+    more: "詳しく見る",
+    position: (current, total) => `${total}件中${current}件目`,
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -70,8 +112,8 @@ function readDismissed(key: string) {
   }
 }
 
-export function AnnouncementStrip({ messages, storageKey, dismissible = true, onDismiss, labels, className }: AnnouncementStripProps) {
-  const t = { ...defaultLabels, ...labels };
+export function AnnouncementStrip({ messages, storageKey, dismissible = true, onDismiss, locale = "en", labels, className }: AnnouncementStripProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   // 有 storageKey 時，掛載後才知道是否已關閉；先不渲染，避免已關閉的人看到一閃
   const [visible, setVisible] = useState(!storageKey);

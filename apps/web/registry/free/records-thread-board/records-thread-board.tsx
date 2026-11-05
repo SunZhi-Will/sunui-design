@@ -36,35 +36,107 @@ export interface RecordsThreadBoardProps {
   onSelect?: (selection: RecordsSelection) => void;
   /** 靈魂之絲的顏色，預設原本的玫瑰色 */
   thread?: string;
-  labels?: {
-    endings?: string;
-    achievements?: string;
-    fileTab?: (index: number) => string;
-    unfiled?: string;
-    stamp?: string;
-    unreached?: string;
-    unreachedTitle?: string;
-    unreachedBody?: string;
-    knotLocked?: string;
-    knotLockedTitle?: string;
-    knotLockedPrefix?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<RecordsThreadBoardLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels = {
-  endings: "結局",
-  achievements: "成就",
-  fileTab: (index: number) => `檔案 ${String(index + 1).padStart(2, "0")}`,
-  unfiled: "未歸檔",
-  stamp: "已歸檔",
-  unreached: "未抵達的結局",
-  unreachedTitle: "尚未抵達",
-  unreachedBody: "這份檔案還沒有寫下結尾。",
-  knotLocked: "未解開",
-  knotLockedTitle: "未解開的絲結",
-  knotLockedPrefix: "未達成：",
+export interface RecordsThreadBoardLabels {
+  endings: string;
+  achievements: string;
+  fileTab: (index: number) => string;
+  unfiled: string;
+  stamp: string;
+  unreached: string;
+  unreachedTitle: string;
+  unreachedBody: string;
+  knotLocked: string;
+  knotLockedTitle: string;
+  knotLockedPrefix: string;
+  /** 已完成項目的無障礙名稱：標題加說明 */
+  entry: (title: string, description: string) => string;
+  /** 標題旁的進度，例如 3／6 */
+  count: (done: number, total: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const pad = (index: number) => String(index + 1).padStart(2, "0");
+const cjkEntry = (title: string, description: string) => `${title}：${description}`;
+const cjkCount = (done: number, total: number) => `${done}／${total}`;
+
+const MESSAGES: Record<SunLocale, RecordsThreadBoardLabels> = {
+  en: {
+    endings: "Endings",
+    achievements: "Achievements",
+    fileTab: (index) => `File ${pad(index)}`,
+    unfiled: "Unfiled",
+    stamp: "Filed",
+    unreached: "Ending not reached",
+    unreachedTitle: "Not reached yet",
+    unreachedBody: "This file has no ending written yet.",
+    knotLocked: "Untied",
+    knotLockedTitle: "An untied knot",
+    knotLockedPrefix: "Not achieved: ",
+    entry: (title, description) => `${title}: ${description}`,
+    count: (done, total) => `${done}/${total}`,
+  },
+  "zh-TW": {
+    endings: "結局",
+    achievements: "成就",
+    fileTab: (index) => `檔案 ${pad(index)}`,
+    unfiled: "未歸檔",
+    stamp: "已歸檔",
+    unreached: "未抵達的結局",
+    unreachedTitle: "尚未抵達",
+    unreachedBody: "這份檔案還沒有寫下結尾。",
+    knotLocked: "未解開",
+    knotLockedTitle: "未解開的絲結",
+    knotLockedPrefix: "未達成：",
+    entry: cjkEntry,
+    count: cjkCount,
+  },
+  "zh-CN": {
+    endings: "结局",
+    achievements: "成就",
+    fileTab: (index) => `档案 ${pad(index)}`,
+    unfiled: "未归档",
+    stamp: "已归档",
+    unreached: "未抵达的结局",
+    unreachedTitle: "尚未抵达",
+    unreachedBody: "这份档案还没有写下结尾。",
+    knotLocked: "未解开",
+    knotLockedTitle: "未解开的丝结",
+    knotLockedPrefix: "未达成：",
+    entry: cjkEntry,
+    count: cjkCount,
+  },
+  ja: {
+    endings: "結末",
+    achievements: "実績",
+    fileTab: (index) => `ファイル ${pad(index)}`,
+    unfiled: "未保管",
+    stamp: "保管済",
+    unreached: "未到達の結末",
+    unreachedTitle: "未到達",
+    unreachedBody: "このファイルにはまだ結末が書かれていません。",
+    knotLocked: "未解放",
+    knotLockedTitle: "ほどけていない結び目",
+    knotLockedPrefix: "未達成：",
+    entry: cjkEntry,
+    count: cjkCount,
+  },
 };
 
 const FALLBACK_ICON = "M20 4c-7 0-13 5-14 12l-2 4M6 16l9-9M9 13h6M12 10h5";
@@ -134,11 +206,12 @@ export function RecordsThreadBoard({
   achievements,
   onSelect,
   thread = "#e6a4b8",
+  locale = "en",
   labels: labelsProp,
   className,
   style,
 }: RecordsThreadBoardProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const [selection, setSelection] = useState<RecordsSelection>({ kind: "ending", index: 0 });
   const endingRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const knotRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -205,9 +278,7 @@ export function RecordsThreadBoard({
         <section className="records-endings" aria-label={labels.endings}>
           <h3 className="records-heading">
             {labels.endings}
-            <span>
-              {seenEndings}／{endings.length}
-            </span>
+            <span>{labels.count(seenEndings, endings.length)}</span>
           </h3>
           <div className="records-ending-list">
             {endings.map((ending, index) => {
@@ -221,7 +292,7 @@ export function RecordsThreadBoard({
                   type="button"
                   className={cn("records-file", ending.seen && "is-done", selected && "is-selected")}
                   tabIndex={selected || selection.kind === "achievement" ? 0 : -1}
-                  aria-label={ending.seen ? `${ending.title}：${ending.description}` : labels.unreached}
+                  aria-label={ending.seen ? labels.entry(ending.title, ending.description) : labels.unreached}
                   onMouseEnter={() => select({ kind: "ending", index })}
                   onFocus={() => select({ kind: "ending", index })}
                   onClick={() => select({ kind: "ending", index })}
@@ -239,9 +310,7 @@ export function RecordsThreadBoard({
         <section className="records-knots" aria-label={labels.achievements}>
           <h3 className="records-heading">
             {labels.achievements}
-            <span>
-              {unlocked}／{achievements.length}
-            </span>
+            <span>{labels.count(unlocked, achievements.length)}</span>
           </h3>
           <div className="records-knot-field" style={{ gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
             <svg className="records-thread" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -273,7 +342,7 @@ export function RecordsThreadBoard({
                   tabIndex={selected ? 0 : -1}
                   aria-label={
                     achievement.done
-                      ? `${achievement.title}：${achievement.description}`
+                      ? labels.entry(achievement.title, achievement.description)
                       : `${labels.knotLockedPrefix}${achievement.hint}`
                   }
                   onMouseEnter={() => select({ kind: "achievement", index })}

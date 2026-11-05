@@ -42,6 +42,9 @@ export interface ChapterSeekbarProps {
   formatTime?: (t: number) => string;
   /** 主色，預設萬寶箱金 */
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ChapterSeekbarLabels;
   className?: string;
 }
@@ -59,9 +62,33 @@ export function formatTime(sec: number) {
   return neg ? `-${out}` : out;
 }
 
-const defaultLabels: Required<ChapterSeekbarLabels> = {
-  seek: "Seek",
-  valueText: (time, total, chapter) => `${time} of ${total}${chapter ? `, ${chapter}` : ""}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<ChapterSeekbarLabels>> = {
+  en: {
+    seek: "Seek",
+    valueText: (time, total, chapter) => `${time} of ${total}${chapter ? `, ${chapter}` : ""}`,
+  },
+  "zh-TW": {
+    seek: "播放進度",
+    valueText: (time, total, chapter) => `${time}，共 ${total}${chapter ? `，${chapter}` : ""}`,
+  },
+  "zh-CN": {
+    seek: "播放进度",
+    valueText: (time, total, chapter) => `${time}，共 ${total}${chapter ? `，${chapter}` : ""}`,
+  },
+  ja: {
+    seek: "再生位置",
+    valueText: (time, total, chapter) => `${time} / ${total}${chapter ? `、${chapter}` : ""}`,
+  },
 };
 
 const markColor: Record<SeekMarkerKind, string> = {
@@ -84,10 +111,11 @@ export function ChapterSeekbar({
   renderThumb,
   formatTime: fmt = formatTime,
   accent = "#f5b324",
+  locale = "en",
   labels,
   className,
 }: ChapterSeekbarProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const seekRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const [hover, setHover] = useState<{ v: number; x: number } | null>(null);

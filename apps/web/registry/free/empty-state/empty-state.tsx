@@ -61,11 +61,36 @@ export interface EmptyStateProps {
   secondary?: StateLink;
   /** start：靠左的版本（標題、說明、按鈕列靠左） */
   align?: "center" | "start";
-  labels?: { loadExample?: ReactNode };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<EmptyStateLabels>;
   className?: string;
 }
 
-export function EmptyState({ title, description, icon, action, onLoadExample, secondary, align = "center", labels, className }: EmptyStateProps) {
+export interface EmptyStateLabels {
+  loadExample: ReactNode;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, EmptyStateLabels> = {
+  en: { loadExample: "Load example" },
+  "zh-TW": { loadExample: "載入範例" },
+  "zh-CN": { loadExample: "加载示例" },
+  ja: { loadExample: "サンプルを読み込む" },
+};
+
+export function EmptyState({ title, description, icon, action, onLoadExample, secondary, align = "center", locale = "en", labels, className }: EmptyStateProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const start = align === "start";
   const builtIn =
     onLoadExample || secondary ? (
@@ -73,7 +98,7 @@ export function EmptyState({ title, description, icon, action, onLoadExample, se
         {onLoadExample && (
           <StateButton onClick={onLoadExample}>
             <SparklesIcon />
-            {labels?.loadExample ?? "Load example"}
+            {t.loadExample}
           </StateButton>
         )}
         {secondary && (

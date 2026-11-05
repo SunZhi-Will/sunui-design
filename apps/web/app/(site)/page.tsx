@@ -1,15 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { getI18n } from "@/lib/i18n-server";
 import { getItems, installCommand } from "@/lib/registry";
+import { localizeItem } from "@/lib/registry-i18n";
 
-export default function HomePage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const { m } = await getI18n();
+  return { title: { absolute: m.home.metaTitle }, description: m.meta.siteDescription };
+}
+
+export default async function HomePage() {
+  const { locale, m } = await getI18n();
   const all = getItems();
-  const items = all
-    .map(({ name, title, description, meta, categories }) => ({ name, title, description, meta, categories }))
-    .sort((a, b) => b.meta.addedAt.localeCompare(a.meta.addedAt) || a.title.localeCompare(b.title));
+  const items = [...all]
+    .sort((a, b) => b.meta.addedAt.localeCompare(a.meta.addedAt) || a.title.localeCompare(b.title))
+    .map((item) => {
+      const { name, title, description, meta, categories } = localizeItem(item, locale);
+      // 保留英文標題與描述給搜尋用
+      return { name, title, description, meta, categories, search: `${item.title} ${item.description}` };
+    });
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
   const firstFree = all.find((item) => item.meta.tier === "free");
@@ -17,13 +30,12 @@ export default function HomePage() {
   return (
     <>
       <section className="py-16 sm:py-24">
-        <p className="mb-4 text-sm font-medium text-accent">Paper-feel commerce blocks for React</p>
+        <p className="mb-4 text-sm font-medium text-accent">{m.home.eyebrow}</p>
         <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-          Coupons, receipts and stamps your shoppers can feel.
+          {m.home.title}
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
-          Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign. Motion only where
-          a shopper acts, accessible by default, installed with one command and owned by you.
+          {m.home.lead}
         </p>
         {firstFree && (
           <div className="mt-8 max-w-2xl">
@@ -31,20 +43,24 @@ export default function HomePage() {
           </div>
         )}
         <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4 text-sm">
-          <Stat label="blocks" value={all.length} />
-          <Stat label="free, MIT" value={freeCount} />
-          <Stat label="Pro sections" value={proCount} />
+          <Stat label={m.home.statBlocks} value={all.length} />
+          <Stat label={m.home.statFree} value={freeCount} />
+          <Stat label={m.home.statPro} value={proCount} />
         </dl>
       </section>
 
-      <Catalog items={items} />
+      <Catalog
+        items={items}
+        locale={locale}
+        messages={{ catalog: m.catalog, interactions: m.interactions, series: m.series, tier: m.tier }}
+      />
 
       <section aria-labelledby="why-title" className="mt-24">
         <h2 id="why-title" className="text-2xl font-semibold tracking-tight">
-          Why SunUI
+          {m.home.whyTitle}
         </h2>
         <div className="mt-6 grid gap-5 md:grid-cols-3">
-          {reasons.map((reason) => (
+          {m.home.reasons.map((reason) => (
             <div key={reason.title} className="rounded-2xl border border-line bg-card p-6">
               <h3 className="font-medium">{reason.title}</h3>
               <p className="mt-2 text-sm text-pretty text-subtle">{reason.body}</p>
@@ -58,23 +74,23 @@ export default function HomePage() {
         className="mt-24 grid gap-8 rounded-3xl border border-accent/40 bg-accent-soft/40 p-8 md:grid-cols-[1.2fr_1fr] md:items-center sm:p-10"
       >
         <div>
-          <p className="text-sm font-medium text-accent">SunUI Pro</p>
+          <p className="text-sm font-medium text-accent">{m.home.proEyebrow}</p>
           <h2 id="pro-title" className="mt-2 text-3xl font-semibold tracking-tight text-balance">
-            Every campaign section, one payment, yours forever.
+            {m.home.proTitle}
           </h2>
           <p className="mt-3 text-pretty text-subtle">
-            {proCount} Pro sections today, new ones every week. Founding members get lifetime access for $79.
+            {m.home.proBody(proCount)}
           </p>
           <Link
             href="/pricing"
             className="mt-6 inline-flex rounded-xl bg-fg px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90"
           >
-            See pricing
+            {m.common.seePricing}
           </Link>
         </div>
         <div>
-          <p className="mb-3 text-sm font-medium">Get launch updates</p>
-          <WaitlistForm source="home" />
+          <p className="mb-3 text-sm font-medium">{m.common.launchUpdates}</p>
+          <WaitlistForm source="home" messages={m.waitlist} />
         </div>
       </section>
     </>
@@ -92,18 +108,3 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
-
-const reasons = [
-  {
-    title: "A material, not a theme",
-    body: "Paper, ink and one vermilion seal. Coupons tear along the perforation, receipts print, results get stamped. A look AI generators do not hand out by default.",
-  },
-  {
-    title: "Built for sales moments",
-    body: "Flash sales, coupons, free shipping goals, carts, checkout and loyalty. Sections you can ship for Double 11, Black Friday or 週年慶, not demos.",
-  },
-  {
-    title: "Calm by default",
-    body: "No glows, no confetti, no looping motion. Animation answers a click, respects reduced motion and never hides content. Chinese typesetting is first-class.",
-  },
-];

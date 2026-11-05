@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { PermissionCenter, preflightTheme, type PermissionKey, type PermissionSnapshot } from "./permission-center";
 
 export default function PermissionCenterDemo() {
+  const locale = useDemoLocale();
   const [permissions, setPermissions] = useState<PermissionSnapshot[]>([
     { key: "screenRecording", state: "granted", required: true },
     { key: "microphone", state: "not-determined", required: false },
@@ -17,6 +20,7 @@ export default function PermissionCenterDemo() {
   return (
     <div style={preflightTheme()} className="w-full max-w-md mx-auto rounded-[14px] border border-[var(--pf-border)] bg-[var(--pf-surface)] p-4">
       <PermissionCenter
+        locale={locale}
         permissions={permissions}
         onRequest={(k) => update(k, "granted")}
         onOpenSettings={(k) => update(k, "restart-required")}

@@ -22,9 +22,25 @@ export interface CjkHeadingProps {
   /** 以朱紅印章樣式標出的關鍵字；一個標題建議只標一處 */
   highlight?: string[];
   highlightClassName?: string;
+  /** 介面語言：zh-TW、zh-CN、ja 時預設 lang 為 zh-Hant、zh-Hans、ja；en 或未給時沿用 zh-Hant */
+  locale?: string;
+  /** 明確指定 lang，優先於 locale */
   lang?: string;
   className?: string;
 }
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+// 本元件沒有內建字串，locale 只決定 lang（字形與標點規則）；英文介面裡的標題內容仍是中日文
+const LANG: Record<SunLocale, string> = { en: "zh-Hant", "zh-TW": "zh-Hant", "zh-CN": "zh-Hans", ja: "ja" };
 
 const CJK_CLASS = "\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Hangul}";
 // 中日文後接英數、或英數後接中日文之處插入細空格
@@ -53,9 +69,11 @@ export function CjkHeading({
   tateChuYoko = true,
   highlight = NO_WORDS,
   highlightClassName,
-  lang = "zh-Hant",
+  locale,
+  lang: langProp,
   className,
 }: CjkHeadingProps) {
+  const lang = langProp ?? LANG[resolveLocale(locale)];
   const highlightKey = highlight.join("\u0000");
 
   const parts = useMemo(() => {

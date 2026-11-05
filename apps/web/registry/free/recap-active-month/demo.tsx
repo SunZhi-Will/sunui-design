@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { RecapActiveMonth } from "./recap-active-month";
 
 // 限時動態上方的進度條：已看過的填滿，目前這張填一半
@@ -17,11 +19,12 @@ function ProgressStrip({ current, total }: { current: number; total: number }) {
 
 // 年度回顧裡的「最活躍月份」那一張，放在 9:16 的限時動態卡片裡
 export default function RecapActiveMonthDemo() {
+  const locale = useDemoLocale();
   return (
     <div className="mx-auto w-full max-w-[340px] min-w-0 rounded-3xl bg-[#0f0f0f] p-2">
       <ProgressStrip current={6} total={12} />
       <div className="aspect-[9/16] w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
-        <RecapActiveMonth data={{ monthIndex: 9, count: 38 }} />
+        <RecapActiveMonth data={{ monthIndex: 9, count: 38 }} locale={locale} />
       </div>
     </div>
   );

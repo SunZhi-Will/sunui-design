@@ -1,16 +1,26 @@
 "use client";
 
+import { useDemoText } from "@/lib/demo-locale";
+
 import { StatusDot, type StatusTone } from "./status-dot";
 
-const orders: { id: string; customer: string; tone: StatusTone; label: string }[] = [
-  { id: "#1042", customer: "Hana Ito", tone: "success", label: "Delivered" },
-  { id: "#1043", customer: "Marco Silva", tone: "info", label: "Shipped" },
-  { id: "#1044", customer: "王大同", tone: "warning", label: "Awaiting payment" },
-  { id: "#1045", customer: "Ava Chen", tone: "destructive", label: "Payment failed" },
-  { id: "#1046", customer: "Noah Park", tone: "muted", label: "Cancelled" },
+const orders: { id: string; customer: string; tone: StatusTone }[] = [
+  { id: "#1042", customer: "Hana Ito", tone: "success" },
+  { id: "#1043", customer: "Marco Silva", tone: "info" },
+  { id: "#1044", customer: "王大同", tone: "warning" },
+  { id: "#1045", customer: "Ava Chen", tone: "destructive" },
+  { id: "#1046", customer: "Noah Park", tone: "muted" },
 ];
 
+const statusText = {
+  en: { success: "Delivered", info: "Shipped", warning: "Awaiting payment", destructive: "Payment failed", muted: "Cancelled" },
+  "zh-TW": { success: "已送達", info: "已出貨", warning: "等待付款", destructive: "付款失敗", muted: "已取消" },
+  "zh-CN": { success: "已送达", info: "已发货", warning: "待付款", destructive: "支付失败", muted: "已取消" },
+  ja: { success: "配達済み", info: "発送済み", warning: "入金待ち", destructive: "決済失敗", muted: "キャンセル" },
+} satisfies Record<string, Record<StatusTone, string>>;
+
 export default function StatusDotDemo() {
+  const label = useDemoText(statusText);
   return (
     <div className="w-full max-w-md rounded-xl border border-border bg-card p-4">
       <ul className="flex flex-col divide-y divide-border">
@@ -21,7 +31,7 @@ export default function StatusDotDemo() {
               <span className="truncate text-sm text-foreground">{o.customer}</span>
             </span>
             <StatusDot tone={o.tone} className="text-xs text-foreground">
-              {o.label}
+              {label[o.tone]}
             </StatusDot>
           </li>
         ))}

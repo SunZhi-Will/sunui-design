@@ -27,16 +27,71 @@ const tools: ToolDef[] = [
   { id: "arrow", shortcut: "4", icon: icon("M14 5l7 7m0 0l-7 7m7-7H3") },
 ];
 
-type Labels = Record<DrawingTool, string> & { toolbar: string; back: string };
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-const defaultLabels: Labels = {
-  toolbar: "Drawing tools",
-  back: "Back to main toolbar (ESC)",
-  pen: "Pen",
-  line: "Line",
-  rectangle: "Rectangle",
-  circle: "Circle",
-  arrow: "Arrow",
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+export type DrawingToolbarLabels = Record<DrawingTool, string> & { toolbar: string; back: string };
+type Labels = DrawingToolbarLabels;
+
+const MESSAGES: Record<SunLocale, Labels> = {
+  en: {
+    toolbar: "Drawing tools",
+    back: "Back to main toolbar (ESC)",
+    pen: "Pen",
+    line: "Line",
+    rectangle: "Rectangle",
+    circle: "Circle",
+    arrow: "Arrow",
+  },
+  "zh-TW": {
+    toolbar: "繪圖工具",
+    back: "返回主工具列（ESC）",
+    pen: "畫筆",
+    line: "直線",
+    rectangle: "矩形",
+    circle: "圓形",
+    arrow: "箭頭",
+  },
+  "zh-CN": {
+    toolbar: "绘图工具",
+    back: "返回主工具栏（ESC）",
+    pen: "画笔",
+    line: "直线",
+    rectangle: "矩形",
+    circle: "圆形",
+    arrow: "箭头",
+  },
+  ja: {
+    toolbar: "描画ツール",
+    back: "メインツールバーに戻る（ESC）",
+    pen: "ペン",
+    line: "直線",
+    rectangle: "四角形",
+    circle: "円",
+    arrow: "矢印",
+  },
+};
+
+export interface DrawingPanelLabels {
+  title: string;
+  color: string;
+  /** 接在顏色名稱後，色碼輸入框用 */
+  hex: string;
+  width: (px: number) => string;
+}
+
+const PANEL_MESSAGES: Record<SunLocale, DrawingPanelLabels> = {
+  en: { title: "Drawing tools", color: "Pen colour", hex: "hex", width: (px) => `Pen width: ${px}px` },
+  "zh-TW": { title: "繪圖工具", color: "畫筆顏色", hex: "色碼", width: (px) => `畫筆粗細：${px}px` },
+  "zh-CN": { title: "绘图工具", color: "画笔颜色", hex: "色值", width: (px) => `画笔粗细：${px}px` },
+  ja: { title: "描画ツール", color: "ペンの色", hex: "カラーコード", width: (px) => `ペンの太さ：${px}px` },
 };
 
 export type DrawingToolbarProps = {
@@ -52,6 +107,9 @@ export type DrawingToolbarProps = {
   accent?: { soft: string; strong: string; hover: string };
   /** 原版為 fixed 貼齊視窗左側；放在相對容器裡時設 false */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<Labels>;
   className?: string;
 };
@@ -64,10 +122,11 @@ export function DrawingToolbar({
   shortcuts = true,
   accent = { soft: "rgba(59, 130, 246, 0.3)", strong: "#2563eb", hover: "rgba(59, 130, 246, 0.4)" },
   fixed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: DrawingToolbarProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const current = selectedTool || "pen";
   const handlers = useRef({ onSelectTool, onClose });
   useEffect(() => {
@@ -219,24 +278,36 @@ export type DrawingPanelProps = {
   lineWidth: number;
   onLineWidthChange: (width: number) => void;
   fixed?: boolean;
-  labels?: { title?: string; color?: string; width?: (px: number) => string };
+  /** 介面語言：en、zh-TW、zh-CN、ja */
+  locale?: string;
+  labels?: Partial<DrawingPanelLabels>;
   className?: string;
 };
 
-export function DrawingPanel({ color, onColorChange, lineWidth, onLineWidthChange, fixed = true, labels, className }: DrawingPanelProps) {
+export function DrawingPanel({
+  color,
+  onColorChange,
+  lineWidth,
+  onLineWidthChange,
+  fixed = true,
+  locale = "en",
+  labels,
+  className,
+}: DrawingPanelProps) {
   const id = useId();
+  const t = { ...PANEL_MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <section
       aria-labelledby={`${id}-t`}
       className={cn("cf-dt-panel right-4 top-4 z-50 w-64 rounded-2xl p-4", fixed ? "fixed" : "absolute", className)}
     >
       <h3 id={`${id}-t`} className="mb-3 text-base font-semibold text-gray-800">
-        {labels?.title ?? "Drawing tools"}
+        {t.title}
       </h3>
       <div className="space-y-3">
         <div>
           <label htmlFor={`${id}-c`} className="mb-1.5 block text-xs font-medium text-gray-700">
-            {labels?.color ?? "Pen colour"}
+            {t.color}
           </label>
           <div className="flex items-center gap-2">
             <input
@@ -248,7 +319,7 @@ export function DrawingPanel({ color, onColorChange, lineWidth, onLineWidthChang
             />
             <input
               type="text"
-              aria-label={`${labels?.color ?? "Pen colour"}, hex`}
+              aria-label={`${t.color}, ${t.hex}`}
               value={color}
               onChange={(e) => onColorChange(e.target.value)}
               className="min-w-0 flex-1 rounded-lg border border-gray-200/50 bg-white/50 px-3 py-2 text-xs text-gray-800 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-400/50"
@@ -257,7 +328,7 @@ export function DrawingPanel({ color, onColorChange, lineWidth, onLineWidthChang
         </div>
         <div>
           <label htmlFor={`${id}-w`} className="mb-1.5 block text-xs font-medium text-gray-700">
-            {labels?.width ? labels.width(lineWidth) : `Pen width: ${lineWidth}px`}
+            {t.width(lineWidth)}
           </label>
           <input
             id={`${id}-w`}

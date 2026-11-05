@@ -31,15 +31,57 @@ export interface RecordingHudLabels {
   color?: (color: string) => string;
 }
 
-const defaultLabels: Required<RecordingHudLabels> = {
-  region: "Recording controls",
-  pause: "Pause",
-  resume: "Resume",
-  pauseUnavailable: "Pause is not supported in this capture mode yet. Please stop recording instead.",
-  stop: "Stop Recording",
-  pen: "Pen",
-  clear: "Clear",
-  color: (c) => c,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<RecordingHudLabels>> = {
+  en: {
+    region: "Recording controls",
+    pause: "Pause",
+    resume: "Resume",
+    pauseUnavailable: "Pause is not supported in this capture mode yet. Please stop recording instead.",
+    stop: "Stop Recording",
+    pen: "Pen",
+    clear: "Clear",
+    color: (c) => c,
+  },
+  "zh-TW": {
+    region: "錄影控制",
+    pause: "暫停",
+    resume: "繼續",
+    pauseUnavailable: "這個擷取模式暫不支援暫停，請改為停止錄影。",
+    stop: "停止錄影",
+    pen: "畫筆",
+    clear: "清除",
+    color: (c) => c,
+  },
+  "zh-CN": {
+    region: "录制控制",
+    pause: "暂停",
+    resume: "继续",
+    pauseUnavailable: "此录制模式暂不支持暂停，请改为停止录制。",
+    stop: "停止录制",
+    pen: "画笔",
+    clear: "清除",
+    color: (c) => c,
+  },
+  ja: {
+    region: "録画コントロール",
+    pause: "一時停止",
+    resume: "再開",
+    pauseUnavailable: "このキャプチャモードではまだ一時停止できません。録画を停止してください。",
+    stop: "録画を停止",
+    pen: "ペン",
+    clear: "消去",
+    color: (c) => c,
+  },
 };
 
 export interface RecordingHudProps {
@@ -63,6 +105,9 @@ export interface RecordingHudProps {
   onMove?: (dx: number, dy: number) => void;
   /** 預設 fixed 於視窗下緣置中；false 時改為 absolute，只在父層範圍內拖曳 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: RecordingHudLabels;
   className?: string;
 }
@@ -89,10 +134,11 @@ export function RecordingHud({
   onClear,
   onMove,
   fixed = true,
+  locale = "en",
   labels,
   className,
 }: RecordingHudProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [seconds, setSeconds] = useState(secondsProp ?? 0);
   const pausedRef = useRef(paused);
   const [penInner, setPenInner] = useState(defaultPenActive);

@@ -18,18 +18,24 @@ export type CountdownLabels = {
   seconds: string;
   originalPrice: string;
   discountedPrice: string;
+  /** 未傳 title / subtitle / ctaText 時的預設文案 */
+  title: string;
+  subtitle: string;
+  cta: string;
 };
 
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
 // 語言包
-const translations: Record<CountdownLanguage, CountdownLabels> = {
-  zh: {
-    days: "天",
-    hours: "時",
-    minutes: "分",
-    seconds: "秒",
-    originalPrice: "原價",
-    discountedPrice: "優惠價",
-  },
+const MESSAGES: Record<SunLocale, CountdownLabels> = {
   en: {
     days: "Days",
     hours: "Hrs",
@@ -37,6 +43,42 @@ const translations: Record<CountdownLanguage, CountdownLabels> = {
     seconds: "Sec",
     originalPrice: "Original Price",
     discountedPrice: "Sale Price",
+    title: "Limited-Time Offer",
+    subtitle: "Once the countdown ends, it's gone",
+    cta: "View the Offer",
+  },
+  "zh-TW": {
+    days: "天",
+    hours: "時",
+    minutes: "分",
+    seconds: "秒",
+    originalPrice: "原價",
+    discountedPrice: "優惠價",
+    title: "限時優惠活動",
+    subtitle: "倒數結束，錯過不再",
+    cta: "立即查看優惠",
+  },
+  "zh-CN": {
+    days: "天",
+    hours: "时",
+    minutes: "分",
+    seconds: "秒",
+    originalPrice: "原价",
+    discountedPrice: "优惠价",
+    title: "限时优惠活动",
+    subtitle: "倒计时结束，错过不再",
+    cta: "立即查看优惠",
+  },
+  ja: {
+    days: "日",
+    hours: "時間",
+    minutes: "分",
+    seconds: "秒",
+    originalPrice: "通常価格",
+    discountedPrice: "セール価格",
+    title: "期間限定セール",
+    subtitle: "カウントダウン終了でセールも終了",
+    cta: "セール内容を見る",
   },
 };
 
@@ -56,9 +98,12 @@ export interface ClassicCountdownBannerProps {
   showParticles?: boolean;
   layout?: CountdownLayout;
   variant?: CountdownVariant;
+  /** 舊版語言參數："zh" 對應 zh-TW；有 locale 時以 locale 為準 */
   language?: CountdownLanguage;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
   mode?: CountdownMode;
-  /** 覆寫單位與價格標籤 */
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<CountdownLabels>;
   /** floating 變體：true 固定在視窗底部，false 在容器內 sticky（預設） */
   fixed?: boolean;
@@ -285,13 +330,13 @@ const padWithZero = (num: number) => num.toString().padStart(2, "0");
 const ZERO: TimeUnit = { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
 export function ClassicCountdownBanner({
-  title = "限時優惠活動",
-  subtitle = "倒數結束，錯過不再",
+  title,
+  subtitle,
   discount = "40% OFF",
   originalPrice = "42,000 NTD",
   discountedPrice = "25,200 NTD",
   endDate,
-  ctaText = "立即查看優惠",
+  ctaText,
   onCtaClick,
   theme = "gradient",
   className,
@@ -299,7 +344,8 @@ export function ClassicCountdownBanner({
   showParticles = true,
   layout = "modern",
   variant = "card",
-  language = "zh",
+  language,
+  locale,
   mode = "dark",
   labels,
   fixed = false,
@@ -313,7 +359,8 @@ export function ClassicCountdownBanner({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: false, amount: 0.3 });
 
-  const t = { ...translations[language], ...labels };
+  const lang = resolveLocale(locale ?? (language === "zh" ? "zh-TW" : language));
+  const t = { ...MESSAGES[lang], ...labels };
   const endMs = new Date(endDate).getTime();
 
   // 每秒更新倒數計時
@@ -448,7 +495,7 @@ export function ClassicCountdownBanner({
   // 單位標籤，英文較長時縮小
   const unitLabelClass = cn(
     mode === "dark" ? "text-gray-400 text-sm mt-2" : "text-gray-500 text-sm mt-2",
-    language === "en" && "text-[11px] sm:text-xs whitespace-nowrap",
+    lang === "en" && "text-[11px] sm:text-xs whitespace-nowrap",
   );
 
   const containerAnimation: Variants = {
@@ -544,7 +591,7 @@ export function ClassicCountdownBanner({
             </svg>
           </motion.div>
           <h2 className={cn("text-xl md:text-2xl font-bold", selectedTheme.title)}>
-            {isModern ? <span className="tracking-wide">{title}</span> : title}
+            {isModern ? <span className="tracking-wide">{title ?? t.title}</span> : (title ?? t.title)}
           </h2>
         </motion.div>
 
@@ -557,7 +604,7 @@ export function ClassicCountdownBanner({
           >
             <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5v-5z" />
           </svg>
-          <p className={cn("text-sm md:text-base", selectedTheme.subtitleText)}>{subtitle}</p>
+          <p className={cn("text-sm md:text-base", selectedTheme.subtitleText)}>{subtitle ?? t.subtitle}</p>
         </motion.div>
 
         <motion.div
@@ -640,7 +687,7 @@ export function ClassicCountdownBanner({
               animate={reduce ? undefined : { scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {ctaText}
+              {ctaText ?? t.cta}
             </motion.span>
           </motion.button>
         </motion.div>

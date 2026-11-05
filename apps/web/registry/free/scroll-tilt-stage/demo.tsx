@@ -2,17 +2,27 @@
 
 import { useRef } from "react";
 
+import { useDemoText } from "@/lib/demo-locale";
+
 import { ScrollTiltStage } from "./scroll-tilt-stage";
 
+const copy = {
+  en: { eyebrow: "Watch it work", heading: "Two streams, one timeline, perfectly in sync.", hint: "Scroll down to bring the demo upright." },
+  "zh-TW": { eyebrow: "實際看看", heading: "兩路直播，一條時間軸，完美同步。", hint: "往下捲，讓示範畫面立起來。" },
+  "zh-CN": { eyebrow: "实际看看", heading: "两路直播，一条时间轴，完美同步。", hint: "向下滚动，让演示画面立起来。" },
+  ja: { eyebrow: "動きを見る", heading: "2 つの配信を 1 本のタイムラインで、ぴったり同期。", hint: "下にスクロールするとデモが起き上がります。" },
+};
+
 export default function ScrollTiltStageDemo() {
+  const t = useDemoText(copy);
   const scroller = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={scroller} className="h-[520px] w-full max-w-4xl overflow-y-auto rounded-xl bg-[#0d0f13] text-[#eceef2]">
       <header className="flex min-h-[420px] flex-col justify-center px-6 md:px-10">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#f5b324]">Watch it work</p>
-        <h2 className="mt-3 max-w-[16em] text-3xl font-black tracking-tight text-balance">Two streams, one timeline, perfectly in sync.</h2>
-        <p className="mt-3 text-sm text-[#8f97a6]">Scroll down to bring the demo upright.</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#f5b324]">{t.eyebrow}</p>
+        <h2 className="mt-3 max-w-[16em] text-3xl font-black tracking-tight text-balance">{t.heading}</h2>
+        <p className="mt-3 text-sm text-[#8f97a6]">{t.hint}</p>
       </header>
 
       <section className="px-4 pb-24 md:px-10">

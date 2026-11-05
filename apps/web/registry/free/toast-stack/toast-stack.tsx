@@ -56,11 +56,34 @@ export interface ToastStackProps {
   /** 收合狀態下每層露出的距離 */
   peek?: number;
   gap?: number;
-  labels?: { region?: string; dismiss?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ToastStackLabels>;
   className?: string;
 }
 
-const defaultLabels = { region: "Notifications", dismiss: "Dismiss notification" };
+export interface ToastStackLabels {
+  region: string;
+  dismiss: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ToastStackLabels> = {
+  en: { region: "Notifications", dismiss: "Dismiss notification" },
+  "zh-TW": { region: "通知", dismiss: "關閉通知" },
+  "zh-CN": { region: "通知", dismiss: "关闭通知" },
+  ja: { region: "通知", dismiss: "通知を閉じる" },
+};
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
 const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
@@ -101,11 +124,12 @@ export function ToastStack({
   fixed = true,
   peek = 10,
   gap = 8,
+  locale = "en",
   labels,
   className,
 }: ToastStackProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const expanded = hovered || focused;

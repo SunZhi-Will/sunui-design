@@ -111,7 +111,27 @@ function Icon({ d, className }: { d: string; className?: string }) {
 
 /* 文案 */
 
-const defaultLabels = {
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+type SpeedOption = { value: number; label: string; isDefault?: boolean };
+
+/** 速度選單的數值固定，只換說明文字 */
+const speedOptions = (names: string[], unit: string): SpeedOption[] =>
+  [60, 120, 180, 240, 300, 400, 500, 700, 1000].map((value, i) => ({
+    value,
+    label: `${names[i]} (${value}${unit})`,
+    ...(value === 240 ? { isDefault: true } : {}),
+  }));
+
+const EN = {
   region: "Flash reader",
   empty: "Type or paste text to start flash reading",
   play: "Play",
@@ -137,17 +157,7 @@ const defaultLabels = {
   close: "Close",
   startReading: "Start reading",
   pauseReading: "Pause reading",
-  speeds: [
-    { value: 60, label: "Very slow (60/min)" },
-    { value: 120, label: "Slower (120/min)" },
-    { value: 180, label: "Slow (180/min)" },
-    { value: 240, label: "Normal (240/min)", isDefault: true },
-    { value: 300, label: "Brisk (300/min)" },
-    { value: 400, label: "Fast (400/min)" },
-    { value: 500, label: "Faster (500/min)" },
-    { value: 700, label: "Very fast (700/min)" },
-    { value: 1000, label: "Lightning (1000/min)" },
-  ] as { value: number; label: string; isDefault?: boolean }[],
+  speeds: speedOptions(["Very slow", "Slower", "Slow", "Normal", "Brisk", "Fast", "Faster", "Very fast", "Lightning"], "/min"),
   shortcutsTitle: "Keyboard shortcuts",
   shortcuts: [
     ["Space", "Play or pause"],
@@ -177,7 +187,168 @@ const defaultLabels = {
   ],
 };
 
-export type SpeedReaderLabels = Partial<typeof defaultLabels>;
+type SpeedReaderMessages = typeof EN;
+
+const MESSAGES: Record<SunLocale, SpeedReaderMessages> = {
+  en: EN,
+  "zh-TW": {
+    region: "閃字閱讀器",
+    empty: "輸入或貼上文字，開始閃字閱讀",
+    play: "播放",
+    pause: "暫停",
+    reset: "重新開始",
+    needText: "請先輸入文字",
+    progress: "閱讀位置",
+    perMinute: "字/分",
+    speedTitle: "速度（每分鐘字數）",
+    faster: "快",
+    slower: "慢",
+    filterSymbols: "過濾符號",
+    toLight: "切換為亮色主題",
+    toDark: "切換為暗色主題",
+    enterFullscreen: "進入全螢幕",
+    exitFullscreen: "離開全螢幕",
+    help: "顯示說明",
+    expand: "（點擊展開全文）",
+    expandTitle: "點擊查看全文",
+    pickStart: "選擇開始位置",
+    pickHint: "點任一個字，從那裡開始閱讀",
+    cancel: "取消",
+    close: "關閉",
+    startReading: "開始閱讀",
+    pauseReading: "暫停閱讀",
+    speeds: speedOptions(["極慢", "較慢", "慢速", "標準", "稍快", "快速", "較快", "極快", "閃電"], "字/分"),
+    shortcutsTitle: "鍵盤快捷鍵",
+    shortcuts: [
+      ["Space", "播放或暫停"],
+      ["←", "上一個字"],
+      ["→", "下一個字"],
+      ["F", "切換符號過濾"],
+      ["H", "顯示或隱藏說明"],
+      ["ESC", "離開全螢幕"],
+      ["T", "切換主題"],
+    ],
+    readingTipsTitle: "閱讀技巧",
+    readingTips: ["點擊閱讀區域即可播放或暫停", "點擊下方的文字可展開全文", "在全文中點任一個字，從那裡開始", "調整速度，找到舒服的節奏"],
+    tipsTitle: "使用提示",
+    tips: [
+      "點擊文字區域開始或暫停閱讀",
+      "點擊下方的文字可開啟全文，並選擇任意起點",
+      "使用右側的全螢幕按鈕，專心閱讀不受干擾",
+      "全螢幕時：空白鍵（播放或暫停）、方向鍵（逐字移動）、H（說明）",
+      "拖曳進度條可跳到任意位置",
+      "過濾符號會移除多餘的標點，但保留日期與時間符號",
+      "熟悉之後再逐步提高速度",
+    ],
+  },
+  "zh-CN": {
+    region: "闪字阅读器",
+    empty: "输入或粘贴文字，开始闪字阅读",
+    play: "播放",
+    pause: "暂停",
+    reset: "重新开始",
+    needText: "请先输入文字",
+    progress: "阅读位置",
+    perMinute: "字/分",
+    speedTitle: "速度（每分钟字数）",
+    faster: "快",
+    slower: "慢",
+    filterSymbols: "过滤符号",
+    toLight: "切换为浅色主题",
+    toDark: "切换为深色主题",
+    enterFullscreen: "进入全屏",
+    exitFullscreen: "退出全屏",
+    help: "显示帮助",
+    expand: "（点击展开全文）",
+    expandTitle: "点击查看全文",
+    pickStart: "选择开始位置",
+    pickHint: "点击任意一个字，从那里开始阅读",
+    cancel: "取消",
+    close: "关闭",
+    startReading: "开始阅读",
+    pauseReading: "暂停阅读",
+    speeds: speedOptions(["极慢", "较慢", "慢速", "标准", "稍快", "快速", "较快", "极快", "闪电"], "字/分"),
+    shortcutsTitle: "键盘快捷键",
+    shortcuts: [
+      ["Space", "播放或暂停"],
+      ["←", "上一个字"],
+      ["→", "下一个字"],
+      ["F", "切换符号过滤"],
+      ["H", "显示或隐藏帮助"],
+      ["ESC", "退出全屏"],
+      ["T", "切换主题"],
+    ],
+    readingTipsTitle: "阅读技巧",
+    readingTips: ["点击阅读区域即可播放或暂停", "点击下方的文字可展开全文", "在全文中点击任意一个字，从那里开始", "调整速度，找到舒适的节奏"],
+    tipsTitle: "使用提示",
+    tips: [
+      "点击文字区域开始或暂停阅读",
+      "点击下方的文字可打开全文，并选择任意起点",
+      "使用右侧的全屏按钮，专心阅读不受打扰",
+      "全屏时：空格键（播放或暂停）、方向键（逐字移动）、H（帮助）",
+      "拖动进度条可跳到任意位置",
+      "过滤符号会去掉多余的标点，但保留日期与时间符号",
+      "熟练之后再逐步提高速度",
+    ],
+  },
+  ja: {
+    region: "フラッシュリーダー",
+    empty: "テキストを入力または貼り付けるとフラッシュ読書を始められます",
+    play: "再生",
+    pause: "一時停止",
+    reset: "最初から",
+    needText: "先にテキストを入力してください",
+    progress: "読書位置",
+    perMinute: "語/分",
+    speedTitle: "速度（1 分あたりの語数）",
+    faster: "速い",
+    slower: "遅い",
+    filterSymbols: "記号を除外",
+    toLight: "ライトテーマに切り替え",
+    toDark: "ダークテーマに切り替え",
+    enterFullscreen: "全画面表示",
+    exitFullscreen: "全画面を終了",
+    help: "ヘルプを表示",
+    expand: "（クリックで全文を表示）",
+    expandTitle: "クリックして全文を見る",
+    pickStart: "開始位置を選ぶ",
+    pickHint: "好きな語をクリックすると、そこから読み始めます",
+    cancel: "キャンセル",
+    close: "閉じる",
+    startReading: "読み始める",
+    pauseReading: "一時停止する",
+    speeds: speedOptions(["とても遅い", "やや遅い", "遅め", "標準", "やや速い", "速い", "もっと速い", "とても速い", "超高速"], "語/分"),
+    shortcutsTitle: "キーボードショートカット",
+    shortcuts: [
+      ["Space", "再生または一時停止"],
+      ["←", "前の語"],
+      ["→", "次の語"],
+      ["F", "記号の除外を切り替え"],
+      ["H", "ヘルプの表示を切り替え"],
+      ["ESC", "全画面を終了"],
+      ["T", "テーマを切り替え"],
+    ],
+    readingTipsTitle: "読むコツ",
+    readingTips: [
+      "表示エリアをクリックで再生と一時停止",
+      "下の文をクリックすると全文が開きます",
+      "全文で好きな語をクリックすると、そこから始まります",
+      "速度を調整して心地よいペースを見つけましょう",
+    ],
+    tipsTitle: "ヒント",
+    tips: [
+      "語の表示エリアをクリックすると読書を開始または一時停止します",
+      "その下の文をクリックすると全文が開き、好きな位置から始められます",
+      "右側の全画面ボタンで、集中して読めます",
+      "全画面では Space（再生と一時停止）、矢印キー（1 語ずつ移動）、H（ヘルプ）",
+      "進捗バーをドラッグすると好きな位置へ移動できます",
+      "記号を除外すると余分な句読点を取り除き、日付と時刻の記号は残します",
+      "慣れてきたら少しずつ速度を上げましょう",
+    ],
+  },
+};
+
+export type SpeedReaderLabels = Partial<SpeedReaderMessages>;
 
 export interface SpeedReaderProps {
   text: string;
@@ -194,6 +365,9 @@ export interface SpeedReaderProps {
   fixed?: boolean;
   /** 處理後的單位數改變時通知（原本頁面顯示「分割為 N 個閱讀單位」） */
   onWordsChange?: (count: number) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: SpeedReaderLabels;
   className?: string;
 }
@@ -207,10 +381,11 @@ export function SpeedReader({
   showTips = true,
   fixed = false,
   onWordsChange,
+  locale = "en",
   labels,
   className,
 }: SpeedReaderProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [filterSymbols, setFilterSymbols] = useState(defaultFilterSymbols);
   const words = useMemo(() => processText(text, filterSymbols), [text, filterSymbols]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -584,7 +759,7 @@ function WordDisplay({ word, theme }: { word?: string; theme: Theme }) {
   );
 }
 
-type Labels = typeof defaultLabels;
+type Labels = SpeedReaderMessages;
 
 function Controls(p: {
   t: Labels;

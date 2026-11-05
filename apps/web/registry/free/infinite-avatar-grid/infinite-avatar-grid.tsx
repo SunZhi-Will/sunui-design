@@ -41,14 +41,44 @@ export interface InfiniteAvatarGridProps {
   minScale?: number;
   maxScale?: number;
   onScaleChange?: (scale: number) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤；未給 getUser 時也決定範例資料語言 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<InfiniteAvatarGridLabels>;
   className?: string;
 }
 
-const defaultLabels: InfiniteAvatarGridLabels = {
-  canvas: "People grid. Drag or use arrow keys to pan, scroll or press plus and minus to zoom.",
-  skills: "Skills",
-  zoom: "Zoom",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, InfiniteAvatarGridLabels> = {
+  en: {
+    canvas: "People grid. Drag or use arrow keys to pan, scroll or press plus and minus to zoom.",
+    skills: "Skills",
+    zoom: "Zoom",
+  },
+  "zh-TW": {
+    canvas: "人物網格。拖曳或用方向鍵平移，滾動滑鼠滾輪或按加減鍵縮放。",
+    skills: "技能",
+    zoom: "縮放",
+  },
+  "zh-CN": {
+    canvas: "人物网格。拖动或用方向键平移，滚动鼠标滚轮或按加减键缩放。",
+    skills: "技能",
+    zoom: "缩放",
+  },
+  ja: {
+    canvas: "人物グリッド。ドラッグまたは矢印キーで移動、スクロールまたはプラス・マイナスキーで拡大縮小します。",
+    skills: "スキル",
+    zoom: "ズーム",
+  },
 };
 
 const RENDER_BUFFER = 1;
@@ -56,31 +86,95 @@ const ZOOM_STEP = 0.1;
 // 泡泡出現的彈簧曲線（原專案 UserCard.tsx）
 const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-// 原專案 UserGenerator.ts 的資料與種子公式
-const names = ["張小明", "李美華", "王大偉", "陳小芳", "林志強", "黃淑芬", "吳建國", "劉雅婷", "鄭文傑", "許慧君", "周俊傑", "徐雅琪", "朱建華", "高文斌", "孫麗娟", "馬志明", "趙淑惠", "錢俊宏", "蔡雅芳", "謝建國"];
-const titles = ["前端工程師", "UI設計師", "後端工程師", "產品經理", "數據分析師", "專案經理", "DevOps工程師", "UX設計師", "全端工程師", "行銷專員", "系統架構師", "QA工程師", "技術總監", "設計總監", "業務經理"];
-const locations = ["台北市", "新北市", "桃園市", "台中市", "台南市", "高雄市", "新竹市", "基隆市", "嘉義市", "彰化縣"];
-const skillsList = [
-  ["React", "TypeScript", "Node.js"],
-  ["Figma", "Sketch", "Photoshop"],
-  ["Python", "Django", "PostgreSQL"],
-  ["產品規劃", "用戶研究", "數據分析"],
-  ["SQL", "R", "Python"],
-  ["專案管理", "團隊協作", "敏捷開發"],
-  ["Docker", "Kubernetes", "AWS"],
-  ["用戶體驗", "介面設計", "原型製作"],
-  ["Vue.js", "Express", "MongoDB"],
-  ["數位行銷", "社群經營", "內容創作"],
-];
+// 原專案 UserGenerator.ts 的資料與種子公式，各語言各一份
+interface SampleData {
+  names: string[];
+  titles: string[];
+  locations: string[];
+  skills: string[][];
+}
 
-export function defaultGetUser(gridX: number, gridY: number): AvatarGridUser {
+const SAMPLES: Record<SunLocale, SampleData> = {
+  "zh-TW": {
+    names: ["張小明", "李美華", "王大偉", "陳小芳", "林志強", "黃淑芬", "吳建國", "劉雅婷", "鄭文傑", "許慧君", "周俊傑", "徐雅琪", "朱建華", "高文斌", "孫麗娟", "馬志明", "趙淑惠", "錢俊宏", "蔡雅芳", "謝建國"],
+    titles: ["前端工程師", "UI設計師", "後端工程師", "產品經理", "數據分析師", "專案經理", "DevOps工程師", "UX設計師", "全端工程師", "行銷專員", "系統架構師", "QA工程師", "技術總監", "設計總監", "業務經理"],
+    locations: ["台北市", "新北市", "桃園市", "台中市", "台南市", "高雄市", "新竹市", "基隆市", "嘉義市", "彰化縣"],
+    skills: [
+      ["React", "TypeScript", "Node.js"],
+      ["Figma", "Sketch", "Photoshop"],
+      ["Python", "Django", "PostgreSQL"],
+      ["產品規劃", "用戶研究", "數據分析"],
+      ["SQL", "R", "Python"],
+      ["專案管理", "團隊協作", "敏捷開發"],
+      ["Docker", "Kubernetes", "AWS"],
+      ["用戶體驗", "介面設計", "原型製作"],
+      ["Vue.js", "Express", "MongoDB"],
+      ["數位行銷", "社群經營", "內容創作"],
+    ],
+  },
+  "zh-CN": {
+    names: ["张小明", "李美华", "王大伟", "陈小芳", "林志强", "黄淑芬", "吴建国", "刘雅婷", "郑文杰", "许慧君", "周俊杰", "徐雅琪", "朱建华", "高文斌", "孙丽娟", "马志明", "赵淑惠", "钱俊宏", "蔡雅芳", "谢建国"],
+    titles: ["前端工程师", "UI设计师", "后端工程师", "产品经理", "数据分析师", "项目经理", "DevOps工程师", "UX设计师", "全栈工程师", "市场专员", "系统架构师", "QA工程师", "技术总监", "设计总监", "销售经理"],
+    locations: ["台北市", "新北市", "桃园市", "台中市", "台南市", "高雄市", "新竹市", "基隆市", "嘉义市", "彰化县"],
+    skills: [
+      ["React", "TypeScript", "Node.js"],
+      ["Figma", "Sketch", "Photoshop"],
+      ["Python", "Django", "PostgreSQL"],
+      ["产品规划", "用户研究", "数据分析"],
+      ["SQL", "R", "Python"],
+      ["项目管理", "团队协作", "敏捷开发"],
+      ["Docker", "Kubernetes", "AWS"],
+      ["用户体验", "界面设计", "原型制作"],
+      ["Vue.js", "Express", "MongoDB"],
+      ["数字营销", "社群运营", "内容创作"],
+    ],
+  },
+  en: {
+    names: ["Alex Chen", "Maya Lin", "David Wang", "Grace Liu", "Ethan Lin", "Iris Huang", "Kevin Wu", "Tina Liu", "Jason Cheng", "Wendy Hsu", "Leo Chou", "Chloe Hsu", "Brian Chu", "Victor Kao", "Lily Sun", "Martin Ma", "Sophie Chao", "Ryan Chien", "Amy Tsai", "Daniel Hsieh"],
+    titles: ["Frontend Engineer", "UI Designer", "Backend Engineer", "Product Manager", "Data Analyst", "Project Manager", "DevOps Engineer", "UX Designer", "Full-stack Engineer", "Marketing Specialist", "Systems Architect", "QA Engineer", "Engineering Director", "Design Director", "Sales Manager"],
+    locations: ["Taipei", "New Taipei", "Taoyuan", "Taichung", "Tainan", "Kaohsiung", "Hsinchu", "Keelung", "Chiayi", "Changhua"],
+    skills: [
+      ["React", "TypeScript", "Node.js"],
+      ["Figma", "Sketch", "Photoshop"],
+      ["Python", "Django", "PostgreSQL"],
+      ["Product planning", "User research", "Data analysis"],
+      ["SQL", "R", "Python"],
+      ["Project management", "Teamwork", "Agile"],
+      ["Docker", "Kubernetes", "AWS"],
+      ["User experience", "Interface design", "Prototyping"],
+      ["Vue.js", "Express", "MongoDB"],
+      ["Digital marketing", "Community", "Content creation"],
+    ],
+  },
+  ja: {
+    names: ["佐藤 陽翔", "鈴木 美咲", "高橋 大輔", "田中 結衣", "伊藤 健太", "渡辺 さくら", "山本 翔太", "中村 彩花", "小林 拓海", "加藤 愛", "吉田 蓮", "山田 美穂", "佐々木 誠", "山口 浩二", "松本 千尋", "井上 直樹", "木村 恵", "林 優斗", "清水 菜々子", "斎藤 健一"],
+    titles: ["フロントエンドエンジニア", "UIデザイナー", "バックエンドエンジニア", "プロダクトマネージャー", "データアナリスト", "プロジェクトマネージャー", "DevOpsエンジニア", "UXデザイナー", "フルスタックエンジニア", "マーケティング担当", "システムアーキテクト", "QAエンジニア", "技術責任者", "デザイン責任者", "営業マネージャー"],
+    locations: ["台北市", "新北市", "桃園市", "台中市", "台南市", "高雄市", "新竹市", "基隆市", "嘉義市", "彰化県"],
+    skills: [
+      ["React", "TypeScript", "Node.js"],
+      ["Figma", "Sketch", "Photoshop"],
+      ["Python", "Django", "PostgreSQL"],
+      ["プロダクト企画", "ユーザー調査", "データ分析"],
+      ["SQL", "R", "Python"],
+      ["プロジェクト管理", "チームワーク", "アジャイル開発"],
+      ["Docker", "Kubernetes", "AWS"],
+      ["ユーザー体験", "UIデザイン", "プロトタイピング"],
+      ["Vue.js", "Express", "MongoDB"],
+      ["デジタルマーケティング", "コミュニティ運営", "コンテンツ制作"],
+    ],
+  },
+};
+
+/** 預設的確定性產生器；locale 決定範例資料的語言（預設繁中，與原專案相同） */
+export function defaultGetUser(gridX: number, gridY: number, locale: string = "zh-TW"): AvatarGridUser {
+  const d = SAMPLES[resolveLocale(locale)];
   const seed = Math.abs(gridX * 997 + gridY * 991);
   return {
     id: `user_${gridX}_${gridY}`,
-    name: names[seed % names.length],
-    title: titles[(seed * 7) % titles.length],
-    location: locations[(seed * 13) % locations.length],
-    skills: skillsList[(seed * 17) % skillsList.length],
+    name: d.names[seed % d.names.length],
+    title: d.titles[(seed * 7) % d.titles.length],
+    location: d.locations[(seed * 13) % d.locations.length],
+    skills: d.skills[(seed * 17) % d.skills.length],
   };
 }
 
@@ -324,7 +418,7 @@ function ZoomIndicator({ scale, label }: { scale: number; label: string }) {
 }
 
 export function InfiniteAvatarGrid({
-  getUser = defaultGetUser,
+  getUser: getUserProp,
   onSelect,
   showModal = true,
   visible = true,
@@ -335,10 +429,14 @@ export function InfiniteAvatarGrid({
   minScale = 0.3,
   maxScale = 2,
   onScaleChange,
+  locale = "en",
   labels: labelsProp,
   className,
 }: InfiniteAvatarGridProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const lang = resolveLocale(locale);
+  const labels = { ...MESSAGES[lang], ...labelsProp };
+  const fallbackGetUser = useCallback((x: number, y: number) => defaultGetUser(x, y, lang), [lang]);
+  const getUser = getUserProp ?? fallbackGetUser;
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);

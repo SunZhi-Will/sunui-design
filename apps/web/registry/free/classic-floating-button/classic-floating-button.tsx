@@ -187,7 +187,28 @@ function SocialButton({
   );
 }
 
-const defaultLabels = { open: "Open menu", close: "Close menu", menu: "Social links" };
+export interface FloatingButtonLabels {
+  open: string;
+  close: string;
+  menu: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, FloatingButtonLabels> = {
+  en: { open: "Open menu", close: "Close menu", menu: "Social links" },
+  "zh-TW": { open: "開啟選單", close: "關閉選單", menu: "社群連結" },
+  "zh-CN": { open: "打开菜单", close: "关闭菜单", menu: "社交链接" },
+  ja: { open: "メニューを開く", close: "メニューを閉じる", menu: "ソーシャルリンク" },
+};
 
 export interface FloatingButtonProps {
   /** 顯示或隱藏整組按鈕（下滑淡出） */
@@ -209,7 +230,10 @@ export interface FloatingButtonProps {
   dragConstraints?: RefObject<Element | null> | { top?: number; left?: number; right?: number; bottom?: number };
   /** true 時相對視窗定位（原版行為）；false 時相對最近的 relative 容器 */
   fixed?: boolean;
-  labels?: Partial<typeof defaultLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<FloatingButtonLabels>;
 }
 
 const positionClasses: Record<FloatingPosition, string> = {
@@ -278,9 +302,10 @@ export function FloatingButton({
   defaultPosition,
   dragConstraints,
   fixed = true,
+  locale = "en",
   labels,
 }: FloatingButtonProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(defaultOpen);
   const isMenuOpen = controlledIsOpen !== undefined ? controlledIsOpen : uncontrolledIsOpen;

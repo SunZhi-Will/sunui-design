@@ -129,15 +129,57 @@ export interface JobsTrayLabels {
   cancel?: string;
 }
 
-const defaultLabels: Required<JobsTrayLabels> = {
-  region: "Background jobs",
-  running: "In progress",
-  completed: "Done",
-  failed: "Failed",
-  cancelled: "Cancelled",
-  queued: "Queued",
-  dismiss: "Dismiss",
-  cancel: "Cancel this job",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<JobsTrayLabels>> = {
+  en: {
+    region: "Background jobs",
+    running: "In progress",
+    completed: "Done",
+    failed: "Failed",
+    cancelled: "Cancelled",
+    queued: "Queued",
+    dismiss: "Dismiss",
+    cancel: "Cancel this job",
+  },
+  "zh-TW": {
+    region: "背景工作",
+    running: "進行中",
+    completed: "完成",
+    failed: "失敗",
+    cancelled: "已取消",
+    queued: "排隊中",
+    dismiss: "關閉",
+    cancel: "取消這項工作",
+  },
+  "zh-CN": {
+    region: "后台任务",
+    running: "进行中",
+    completed: "完成",
+    failed: "失败",
+    cancelled: "已取消",
+    queued: "排队中",
+    dismiss: "关闭",
+    cancel: "取消此任务",
+  },
+  ja: {
+    region: "バックグラウンド処理",
+    running: "処理中",
+    completed: "完了",
+    failed: "失敗",
+    cancelled: "キャンセル済み",
+    queued: "待機中",
+    dismiss: "閉じる",
+    cancel: "この処理をキャンセル",
+  },
 };
 
 export interface JobsTrayProps {
@@ -148,12 +190,15 @@ export interface JobsTrayProps {
   fixed?: boolean;
   /** 進行中圓點的顏色，預設 AutoLens 金 */
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: JobsTrayLabels;
   className?: string;
 }
 
-export function JobsTray({ jobs: allJobs, onDismiss, fixed = true, accent = "#eab308", labels, className }: JobsTrayProps) {
-  const t = { ...defaultLabels, ...labels };
+export function JobsTray({ jobs: allJobs, onDismiss, fixed = true, accent = "#eab308", locale = "en", labels, className }: JobsTrayProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const jobs = allJobs.filter(isJobWorthShowing);
 
   const stateLabel = (job: BackgroundJob) => {

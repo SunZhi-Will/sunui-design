@@ -55,6 +55,30 @@ function previewPath(tool: Exclude<DrawingTool, "pen">, a: Point, b: Point) {
   return `M ${a.x} ${a.y} L ${b.x} ${b.y} M ${p[2].x} ${p[2].y} L ${b.x} ${b.y} L ${p[4].x} ${p[4].y}`;
 }
 
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+export interface DrawingSurfaceLabels {
+  /** 繪圖區的無障礙名稱 */
+  area: string;
+  /** 筆畫數量，接在名稱後面 */
+  strokes: (n: number) => string;
+}
+
+const MESSAGES: Record<SunLocale, DrawingSurfaceLabels> = {
+  en: { area: "Drawing area", strokes: (n) => `${n} ${n === 1 ? "stroke" : "strokes"}` },
+  "zh-TW": { area: "繪圖區", strokes: (n) => `${n} 筆` },
+  "zh-CN": { area: "绘图区", strokes: (n) => `${n} 笔` },
+  ja: { area: "描画エリア", strokes: (n) => `${n} 本のストローク` },
+};
+
 const line = { fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
 export type DrawingSurfaceProps = {
@@ -67,7 +91,12 @@ export type DrawingSurfaceProps = {
   tool?: DrawingTool;
   color?: string;
   lineWidth?: number;
+  /** 繪圖區名稱，等同 labels.area */
   label?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<DrawingSurfaceLabels>;
   className?: string;
 };
 
@@ -78,9 +107,13 @@ export function DrawingSurface({
   tool = "pen",
   color = "#000000",
   lineWidth = 2,
-  label = "Drawing area",
+  label,
+  locale = "en",
+  labels,
   className,
 }: DrawingSurfaceProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const area = label ?? t.area;
   const ref = useRef<HTMLDivElement>(null);
   const [penPoints, setPenPoints] = useState<Point[]>([]);
   const [shape, setShape] = useState<{ a: Point; b: Point } | null>(null);
@@ -134,7 +167,7 @@ export function DrawingSurface({
       className={cn("absolute inset-0 select-none", active ? "pointer-events-auto" : "pointer-events-none", className)}
       style={{ cursor: active ? "crosshair" : "default", touchAction: active ? "none" : "auto" }}
     >
-      <svg className="absolute inset-0 h-full w-full overflow-visible" role="img" aria-label={`${label}, ${strokes.length} ${strokes.length === 1 ? "stroke" : "strokes"}`}>
+      <svg className="absolute inset-0 h-full w-full overflow-visible" role="img" aria-label={`${area}, ${t.strokes(strokes.length)}`}>
         {strokes.map((s, i) => (
           <polyline key={i} points={s.points.map((p) => `${p.x},${p.y}`).join(" ")} stroke={s.color} strokeWidth={s.lineWidth} {...line} />
         ))}

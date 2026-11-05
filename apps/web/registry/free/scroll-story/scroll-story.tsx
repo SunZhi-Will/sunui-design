@@ -146,9 +146,34 @@ export interface ScrollStoryStep {
 
 export interface ScrollStoryProps {
   steps: ScrollStoryStep[];
-  labels?: { nav?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ScrollStoryLabels>;
   className?: string;
 }
+
+export interface ScrollStoryLabels {
+  /** 右側分頁導覽的無障礙名稱 */
+  nav: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ScrollStoryLabels> = {
+  en: { nav: "Story sections" },
+  "zh-TW": { nav: "故事段落" },
+  "zh-CN": { nav: "故事段落" },
+  ja: { nav: "ストーリーのセクション" },
+};
 
 function StepBlock({
   id,
@@ -195,7 +220,8 @@ function StepBlock({
   );
 }
 
-export function ScrollStory({ steps, labels, className }: ScrollStoryProps) {
+export function ScrollStory({ steps, locale = "en", labels, className }: ScrollStoryProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const uid = useId().replace(/:/g, "");
   const [active, setActive] = useState(0);
   const { ref: panelRef, inView: panelInView } = useInView<HTMLDivElement>({ once: false, threshold: 0.2 });
@@ -233,7 +259,7 @@ export function ScrollStory({ steps, labels, className }: ScrollStoryProps) {
               );
             })}
           </div>
-          <nav aria-label={labels?.nav ?? "Story sections"} className="mt-4 flex justify-center gap-1">
+          <nav aria-label={t.nav} className="mt-4 flex justify-center gap-1">
             {steps.map((step, i) => (
               <a
                 key={step.key}

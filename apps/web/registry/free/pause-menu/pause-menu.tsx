@@ -138,28 +138,109 @@ export interface PauseMenuLabels {
   saveErrorDismissLabel?: string;
 }
 
-const defaultLabels: Required<PauseMenuLabels> = {
-  title: "選單",
-  dialog: "暫停選單",
-  nav: "暫停選項",
-  objective: "目標・",
-  resume: "繼續遊戲",
-  journal: "山河錄",
-  save: "存檔",
-  load: "讀檔",
-  settings: "設定",
-  exit: "返回主選單",
-  confirmDialog: "返回主選單確認",
-  confirmTitle: "返回主選單",
-  confirmBody: "遊戲只在劇情節點自動存檔。上次自動存檔之後的進度將不會保留。",
-  autosaveAt: "回到主選單後可讀取的自動存檔停在：",
-  noAutosave: "目前沒有任何自動存檔，這段遊玩進度將全部消失。",
-  saveFirst: "先去存檔",
-  discardAndExit: "捨棄進度並返回主選單",
-  cancel: "取消",
-  saveErrorTitle: "存檔失敗",
-  saveErrorDismiss: "知道了",
-  saveErrorDismissLabel: "關閉存檔失敗提示",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<PauseMenuLabels>> = {
+  en: {
+    title: "Menu",
+    dialog: "Pause menu",
+    nav: "Pause options",
+    objective: "Objective: ",
+    resume: "Resume",
+    journal: "Chronicle",
+    save: "Save",
+    load: "Load",
+    settings: "Settings",
+    exit: "Exit to Menu",
+    confirmDialog: "Confirm exit to main menu",
+    confirmTitle: "Exit to Main Menu",
+    confirmBody: "The game only autosaves at story checkpoints. Progress since the last autosave will be lost.",
+    autosaveAt: "The autosave you can load from the main menu is at: ",
+    noAutosave: "There is no autosave yet, so all progress from this session will be lost.",
+    saveFirst: "Save first",
+    discardAndExit: "Discard progress and exit",
+    cancel: "Cancel",
+    saveErrorTitle: "Save failed",
+    saveErrorDismiss: "Got it",
+    saveErrorDismissLabel: "Dismiss save failure notice",
+  },
+  "zh-TW": {
+    title: "選單",
+    dialog: "暫停選單",
+    nav: "暫停選項",
+    objective: "目標・",
+    resume: "繼續遊戲",
+    journal: "山河錄",
+    save: "存檔",
+    load: "讀檔",
+    settings: "設定",
+    exit: "返回主選單",
+    confirmDialog: "返回主選單確認",
+    confirmTitle: "返回主選單",
+    confirmBody: "遊戲只在劇情節點自動存檔。上次自動存檔之後的進度將不會保留。",
+    autosaveAt: "回到主選單後可讀取的自動存檔停在：",
+    noAutosave: "目前沒有任何自動存檔，這段遊玩進度將全部消失。",
+    saveFirst: "先去存檔",
+    discardAndExit: "捨棄進度並返回主選單",
+    cancel: "取消",
+    saveErrorTitle: "存檔失敗",
+    saveErrorDismiss: "知道了",
+    saveErrorDismissLabel: "關閉存檔失敗提示",
+  },
+  "zh-CN": {
+    title: "菜单",
+    dialog: "暂停菜单",
+    nav: "暂停选项",
+    objective: "目标・",
+    resume: "继续游戏",
+    journal: "山河录",
+    save: "存档",
+    load: "读档",
+    settings: "设置",
+    exit: "返回主菜单",
+    confirmDialog: "返回主菜单确认",
+    confirmTitle: "返回主菜单",
+    confirmBody: "游戏只在剧情节点自动存档。上次自动存档之后的进度将不会保留。",
+    autosaveAt: "回到主菜单后可读取的自动存档停在：",
+    noAutosave: "目前没有任何自动存档，这段游玩进度将全部丢失。",
+    saveFirst: "先去存档",
+    discardAndExit: "放弃进度并返回主菜单",
+    cancel: "取消",
+    saveErrorTitle: "存档失败",
+    saveErrorDismiss: "知道了",
+    saveErrorDismissLabel: "关闭存档失败提示",
+  },
+  ja: {
+    title: "メニュー",
+    dialog: "ポーズメニュー",
+    nav: "ポーズメニューの項目",
+    objective: "目標・",
+    resume: "ゲームに戻る",
+    journal: "山河録",
+    save: "セーブ",
+    load: "ロード",
+    settings: "設定",
+    exit: "メインメニューへ",
+    confirmDialog: "メインメニューへ戻る確認",
+    confirmTitle: "メインメニューへ戻る",
+    confirmBody: "このゲームはストーリーの節目でのみオートセーブします。前回のオートセーブ以降の進行は保存されません。",
+    autosaveAt: "メインメニューから読み込めるオートセーブ：",
+    noAutosave: "オートセーブがまだないため、今回のプレイ内容はすべて失われます。",
+    saveFirst: "先にセーブする",
+    discardAndExit: "進行を破棄してメインメニューへ",
+    cancel: "キャンセル",
+    saveErrorTitle: "セーブに失敗しました",
+    saveErrorDismiss: "閉じる",
+    saveErrorDismissLabel: "セーブ失敗の通知を閉じる",
+  },
 };
 
 export interface PauseMenuProps {
@@ -182,13 +263,16 @@ export interface PauseMenuProps {
   theme?: StoryTheme;
   /** true 時貼著視窗；預設 absolute 蓋滿最近的 relative 容器 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: PauseMenuLabels;
   className?: string;
 }
 
 /** 自動存檔失敗時唯一的提醒；關掉的只是「這一次」的失敗 */
-export function SaveErrorBanner({ message, labels }: { message?: string; labels?: PauseMenuLabels }) {
-  const l = { ...defaultLabels, ...labels };
+export function SaveErrorBanner({ message, locale = "en", labels }: { message?: string; locale?: string; labels?: PauseMenuLabels }) {
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [dismissed, setDismissed] = useState(false);
   const [seen, setSeen] = useState(message);
   if (seen !== message) {
@@ -249,10 +333,11 @@ export function PauseMenu({
   saveError,
   theme = "ink",
   fixed = false,
+  locale = "en",
   labels: labelsProp,
   className,
 }: PauseMenuProps) {
-  const l = { ...defaultLabels, ...labelsProp };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const [confirmingExit, setConfirmingExit] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -292,7 +377,7 @@ export function PauseMenu({
       style={{ ...vars, zIndex: 60, fontFamily: "var(--story-font)", color: "var(--story-text)" }}
     >
       <style>{storyMenuCss}</style>
-      <SaveErrorBanner message={saveError} labels={labelsProp} />
+      <SaveErrorBanner message={saveError} locale={locale} labels={labelsProp} />
       {open && (
         <div className="spm-overlay absolute inset-0">
           <div ref={cardRef} className="spm-card" role="dialog" aria-modal="true" aria-label={confirmingExit ? l.confirmDialog : l.dialog}>

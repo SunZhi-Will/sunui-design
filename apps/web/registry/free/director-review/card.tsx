@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { DirectorReviewPanel, type DirectorSuggestion } from "./director-review";
 
 const suggestions: DirectorSuggestion[] = [
@@ -11,10 +13,11 @@ const applied: DirectorSuggestion["kind"][] = ["zoom", "cut"];
 
 /** 型錄卡片：剪輯建議清單，逐條接受或略過，上方計畫摘要即時更新。 */
 export default function DirectorReviewCard() {
+  const locale = useDemoLocale();
   return (
     // 面板比卡片高，給一個內部捲動區
     <div className="mx-auto h-56 w-72 overflow-y-auto overscroll-contain">
-      <DirectorReviewPanel suggestions={suggestions} appliedKinds={applied} />
+      <DirectorReviewPanel locale={locale} suggestions={suggestions} appliedKinds={applied} />
     </div>
   );
 }

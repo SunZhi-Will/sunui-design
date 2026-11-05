@@ -54,18 +54,60 @@ export interface HoldToRedeemProps {
   result?: ReactNode;
   /** 進度色，預設是原作的金色 */
   color?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: HoldToRedeemLabels;
   className?: string;
 }
 
-const defaultLabels: Required<HoldToRedeemLabels> = {
-  hint: "Hold {key} to redeem",
-  warn: "Release {key} to back out",
-  confirming: "Redeeming...",
-  failed: "It didn't take. Nothing was spent.",
-  redeemed: "Redeemed",
-  doneAnnouncement: "Redeemed.",
-  failedAnnouncement: "Redeem failed. Nothing was spent.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<HoldToRedeemLabels>> = {
+  en: {
+    hint: "Hold {key} to redeem",
+    warn: "Release {key} to back out",
+    confirming: "Redeeming...",
+    failed: "It didn't take. Nothing was spent.",
+    redeemed: "Redeemed",
+    doneAnnouncement: "Redeemed.",
+    failedAnnouncement: "Redeem failed. Nothing was spent.",
+  },
+  "zh-TW": {
+    hint: "按住 {key} 兌換",
+    warn: "放開 {key} 可以反悔",
+    confirming: "兌換中...",
+    failed: "沒有成功，什麼都沒扣。",
+    redeemed: "已兌換",
+    doneAnnouncement: "已兌換。",
+    failedAnnouncement: "兌換失敗，什麼都沒扣。",
+  },
+  "zh-CN": {
+    hint: "按住 {key} 兑换",
+    warn: "松开 {key} 可以反悔",
+    confirming: "兑换中...",
+    failed: "没有成功，什么都没扣。",
+    redeemed: "已兑换",
+    doneAnnouncement: "已兑换。",
+    failedAnnouncement: "兑换失败，什么都没扣。",
+  },
+  ja: {
+    hint: "{key} を長押しで交換",
+    warn: "{key} を離すと取り消し",
+    confirming: "交換中...",
+    failed: "うまくいきませんでした。消費はありません。",
+    redeemed: "交換済み",
+    doneAnnouncement: "交換しました。",
+    failedAnnouncement: "交換に失敗しました。消費はありません。",
+  },
 };
 
 // 原作 HoldRing.tsx 的尺寸與顏色
@@ -112,10 +154,11 @@ export function HoldToRedeem({
   defaultDone = false,
   result,
   color = "#ffd96b",
+  locale = "en",
   labels,
   className,
 }: HoldToRedeemProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const id = useId();
 

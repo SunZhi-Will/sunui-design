@@ -86,9 +86,45 @@ export interface PreviewPaywallProps {
   /** 按鈕漸層，預設原站的品牌金 */
   ctaFrom?: string;
   ctaTo?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: PreviewPaywallLabels;
   className?: string;
 }
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<PreviewPaywallLabels>> = {
+  en: {
+    title: "Buy the course to keep watching",
+    body: (n) => `You've previewed ${n} slide${n === 1 ? "" : "s"}. Buy the course to unlock everything.`,
+    cta: "View course & buy",
+  },
+  "zh-TW": {
+    title: "購買課程即可繼續觀看",
+    body: (n) => `你已試看 ${n} 張投影片，購買課程即可解鎖全部內容。`,
+    cta: "查看課程並購買",
+  },
+  "zh-CN": {
+    title: "购买课程即可继续观看",
+    body: (n) => `你已试看 ${n} 张幻灯片，购买课程即可解锁全部内容。`,
+    cta: "查看课程并购买",
+  },
+  ja: {
+    title: "続きを見るにはコースを購入",
+    body: (n) => `${n} 枚のスライドを試し見しました。コースを購入するとすべてのコンテンツが見られます。`,
+    cta: "コースを見て購入",
+  },
+};
 
 /** 蓋在播放器上（父層要 relative），試看到最後一張時顯示 */
 export function PreviewPaywall({
@@ -97,16 +133,11 @@ export function PreviewPaywall({
   onClick,
   ctaFrom = "#F5C045",
   ctaTo = "#A67C1E",
+  locale = "en",
   labels,
   className,
 }: PreviewPaywallProps) {
-  const l = {
-    title: "Buy the course to keep watching",
-    body: (n: number) =>
-      `You've previewed ${n} slides. Buy the course to unlock everything.`,
-    cta: "View course & buy",
-    ...labels,
-  };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <div
       role="region"

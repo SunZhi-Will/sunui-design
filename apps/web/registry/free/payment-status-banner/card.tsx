@@ -2,10 +2,21 @@
 
 import { useRef, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { PaymentStatusBanner } from "./payment-status-banner";
+
+const copy = {
+  en: { pending: "Confirming your payment…", success: "Payment received!", successLink: "Start →", course: "Build small tools with AI", replay: "Replay" },
+  "zh-TW": { pending: "正在確認付款…", success: "付款成功！", successLink: "開始 →", course: "用 AI 打造小工具", replay: "重播" },
+  "zh-CN": { pending: "正在确认支付…", success: "支付成功！", successLink: "开始 →", course: "用 AI 打造小工具", replay: "重播" },
+  ja: { pending: "お支払いを確認中…", success: "お支払い完了！", successLink: "始める →", course: "AI で小さなツールを作る", replay: "もう一度" },
+};
 
 /** 型錄卡片：付款確認中的橫幅自己輪詢，第二次查詢開通後切成成功。 */
 export default function PaymentStatusBannerCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [run, setRun] = useState(0);
   const [unlocked, setUnlocked] = useState(false);
   const refreshes = useRef(0);
@@ -30,7 +41,8 @@ export default function PaymentStatusBannerCard() {
         unlocked={unlocked}
         interval={1500}
         className="px-4"
-        labels={{ pending: "Confirming your payment…", success: "Payment received!", successLink: "Start →" }}
+        locale={locale}
+        labels={{ pending: t.pending, success: t.success, successLink: t.successLink }}
         onRefresh={() => {
           refreshes.current += 1;
           if (refreshes.current >= 2) setUnlocked(true);
@@ -39,9 +51,9 @@ export default function PaymentStatusBannerCard() {
         successHref="#lesson-1"
       />
       <div className="flex items-center justify-between gap-3 p-4">
-        <p className="text-[15px] leading-snug font-black">Build small tools with AI</p>
+        <p className="text-[15px] leading-snug font-black">{t.course}</p>
         <button type="button" onClick={replay} className="shrink-0 text-xs text-white/60 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
-          Replay
+          {t.replay}
         </button>
       </div>
     </div>

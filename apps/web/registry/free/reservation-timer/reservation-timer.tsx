@@ -61,6 +61,8 @@ export interface ReservationTimerLabels {
   zero?: ReactNode;
   /** 第三行：逾時會發生什麼事，照實說 */
   note?: ReactNode;
+  /** 剩餘時間格式；formatCountdown prop 優先 */
+  countdown?: (ms: number) => string;
 }
 
 export interface ReservationTimerProps {
@@ -69,23 +71,77 @@ export interface ReservationTimerProps {
   /** 剩餘歸零時呼叫一次（原本用來重新抓訂單，讓頁面切到「已逾期」） */
   onExpire?: () => void;
   formatCountdown?: (ms: number) => string;
+  /** 介面語言與日期格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   timeZone?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ReservationTimerLabels;
   theme?: ReservationTheme;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels: Required<ReservationTimerLabels> = {
-  title: "This item is held for you",
-  deadline: (date, left) => (
-    <>
-      Held until {date}, <strong className="tabular-nums">{left}</strong> left
-    </>
-  ),
-  zero: "0 sec",
-  note: "When the hold runs out the order is cancelled automatically and the item goes back on sale. If you pay after that, the order is handled by hand (usually a refund), so please finish paying before the deadline.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+/** 依單位字組出「0 小時 09 分 40 秒」這類格式 */
+const countdownWith = (h: string, m: string, sec: string) => (ms: number) => {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${Math.floor(s / 3600)} ${h} ${pad(Math.floor((s % 3600) / 60))} ${m} ${pad(s % 60)} ${sec}`;
+};
+
+const MESSAGES: Record<SunLocale, Required<ReservationTimerLabels>> = {
+  en: {
+    title: "This item is held for you",
+    deadline: (date, left) => (
+      <>
+        Held until {date}, <strong className="tabular-nums">{left}</strong> left
+      </>
+    ),
+    zero: "0 sec",
+    note: "When the hold runs out the order is cancelled automatically and the item goes back on sale. If you pay after that, the order is handled by hand (usually a refund), so please finish paying before the deadline.",
+    countdown: formatHoldCountdown,
+  },
+  "zh-TW": {
+    title: "為你保留中",
+    deadline: (date, left) => (
+      <>
+        保留至 {date}，剩餘 <strong className="tabular-nums">{left}</strong>
+      </>
+    ),
+    zero: "0 秒",
+    note: "保留時間結束後，訂單會自動取消，商品重新開放購買。若在那之後才付款，訂單將改由人工處理（通常為退款），請在期限內完成付款。",
+    countdown: countdownWith("小時", "分", "秒"),
+  },
+  "zh-CN": {
+    title: "为你保留中",
+    deadline: (date, left) => (
+      <>
+        保留至 {date}，剩余 <strong className="tabular-nums">{left}</strong>
+      </>
+    ),
+    zero: "0 秒",
+    note: "保留时间结束后，订单会自动取消，商品重新开放购买。若在此之后才付款，订单将转为人工处理（通常为退款），请在期限内完成付款。",
+    countdown: countdownWith("小时", "分", "秒"),
+  },
+  ja: {
+    title: "お取り置き中です",
+    deadline: (date, left) => (
+      <>
+        {date} までお取り置き、残り <strong className="tabular-nums">{left}</strong>
+      </>
+    ),
+    zero: "0 秒",
+    note: "お取り置き期間を過ぎると注文は自動でキャンセルされ、商品は再び販売されます。期限後のお支払いは個別対応（通常は返金）となるため、期限内にお支払いを済ませてください。",
+    countdown: countdownWith("時間", "分", "秒"),
+  },
 };
 
 // lucide Timer
@@ -103,7 +159,7 @@ function TimerIcon() {
 export function ReservationTimer({
   expiresAt,
   onExpire,
-  formatCountdown = formatHoldCountdown,
+  formatCountdown,
   locale = "en-US",
   timeZone,
   labels,
@@ -111,7 +167,8 @@ export function ReservationTimer({
   className,
   style,
 }: ReservationTimerProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const format = formatCountdown ?? t.countdown;
   const end = toTime(expiresAt);
   const [now, setNow] = useState(() => Date.now());
   const onExpireRef = useRef(onExpire);
@@ -157,7 +214,7 @@ export function ReservationTimer({
           {t.title}
         </p>
         <p suppressHydrationWarning>
-          {t.deadline(date, <span role="timer" suppressHydrationWarning>{left > 0 ? formatCountdown(left) : t.zero}</span>)}
+          {t.deadline(date, <span role="timer" suppressHydrationWarning>{left > 0 ? format(left) : t.zero}</span>)}
         </p>
         <p style={{ color: "var(--vw-text-secondary)" }}>{t.note}</p>
       </div>
@@ -180,20 +237,51 @@ export interface ReservationExpiredPanelProps {
   children?: ReactNode;
   /** 例如「回到商品頁」按鈕 */
   action?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale；title / children prop 又優先於這裡 */
+  labels?: Partial<ReservationExpiredLabels>;
   theme?: ReservationTheme;
   className?: string;
   style?: CSSProperties;
 }
 
+export interface ReservationExpiredLabels {
+  title: ReactNode;
+  body: ReactNode;
+}
+
+const EXPIRED_MESSAGES: Record<SunLocale, ReservationExpiredLabels> = {
+  en: {
+    title: "Order expired",
+    body: "The hold has ended, the order was cancelled automatically and the item is back on sale. If you already paid, contact us and we will sort it out or refund you.",
+  },
+  "zh-TW": {
+    title: "訂單已逾期",
+    body: "保留時間已結束，訂單已自動取消，商品重新開放購買。若你已經付款，請與我們聯繫，我們會協助處理或退款。",
+  },
+  "zh-CN": {
+    title: "订单已过期",
+    body: "保留时间已结束，订单已自动取消，商品重新开放购买。如果你已经付款，请联系我们，我们会协助处理或退款。",
+  },
+  ja: {
+    title: "注文の期限が切れました",
+    body: "お取り置き期間が終了したため、注文は自動でキャンセルされ、商品は再び販売中です。すでにお支払い済みの場合はご連絡ください。対応または返金いたします。",
+  },
+};
+
 /** 保留逾時後取代結帳內容的狀態面板。 */
 export function ReservationExpiredPanel({
-  title = "Order expired",
-  children = "The hold has ended, the order was cancelled automatically and the item is back on sale. If you already paid, contact us and we will sort it out or refund you.",
+  title,
+  children,
   action,
+  locale = "en",
+  labels,
   theme = "system",
   className,
   style,
 }: ReservationExpiredPanelProps) {
+  const t = { ...EXPIRED_MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <>
       <ThemeStyle theme={theme} />
@@ -202,10 +290,10 @@ export function ReservationExpiredPanel({
           <ClockIcon />
         </span>
         <h2 className="text-[22px] tracking-[0.02em]" style={{ color: "var(--vw-text-primary)" }}>
-          {title}
+          {title ?? t.title}
         </h2>
         <div className="flex w-full flex-col gap-3 text-[14px] leading-relaxed" style={{ color: "var(--vw-text-secondary)" }}>
-          <p>{children}</p>
+          <p>{children ?? t.body}</p>
           {action && <div>{action}</div>}
         </div>
       </div>

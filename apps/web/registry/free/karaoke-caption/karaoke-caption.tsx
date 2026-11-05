@@ -40,9 +40,33 @@ export interface KaraokeCaptionProps {
   theme?: StoryTheme;
   /** 落在兩句之間的空檔時，顯示開始時間最接近的一句（原作行為） */
   holdNearest?: boolean;
-  labels?: { region?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<KaraokeCaptionLabels>;
   className?: string;
 }
+
+export interface KaraokeCaptionLabels {
+  region: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, KaraokeCaptionLabels> = {
+  en: { region: "Captions" },
+  "zh-TW": { region: "字幕" },
+  "zh-CN": { region: "字幕" },
+  ja: { region: "字幕" },
+};
 
 /** 中文逐字、英數逐詞、標點各自一個 token（與原作同一條規則） */
 export function tokenize(text: string): string[] {
@@ -103,9 +127,11 @@ export function KaraokeCaption({
   accent,
   theme = "ink",
   holdNearest = true,
+  locale = "en",
   labels,
   className,
 }: KaraokeCaptionProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const active = findSubtitle(subtitles, time, holdNearest);
 
@@ -123,7 +149,7 @@ export function KaraokeCaption({
   return (
     <div
       role="region"
-      aria-label={labels?.region ?? "Captions"}
+      aria-label={t.region}
       className={cn("pointer-events-none flex w-full justify-center font-sans [container-type:inline-size]", className)}
       style={themeVars as CSSProperties}
     >

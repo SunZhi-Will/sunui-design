@@ -109,6 +109,24 @@ export interface NoticeQueueLabels {
   dismiss?: (notice: StoryNotice) => string;
 }
 
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+// dismiss 沒有內建字串：卡片按鈕預設直接念出通知內容
+const MESSAGES: Record<SunLocale, Required<Pick<NoticeQueueLabels, "region" | "more">>> = {
+  en: { region: "New discoveries", more: (n) => `${n} more waiting` },
+  "zh-TW": { region: "新發現", more: (n) => `還有 ${n} 則待查看` },
+  "zh-CN": { region: "新发现", more: (n) => `还有 ${n} 条待查看` },
+  ja: { region: "新しい発見", more: (n) => `ほかに ${n} 件あります` },
+};
+
 export interface NoticeQueueProps {
   notices: StoryNotice[];
   onDismiss: (id: string) => void;
@@ -123,6 +141,9 @@ export interface NoticeQueueProps {
   theme?: StoryTheme;
   /** true 時貼著視窗；預設 absolute 疊在最近的 relative 容器右上 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: NoticeQueueLabels;
   className?: string;
 }
@@ -172,6 +193,7 @@ export function NoticeQueue({
   leaveDuration = 280,
   theme = "ink",
   fixed = false,
+  locale = "en",
   labels,
   className,
 }: NoticeQueueProps) {
@@ -210,7 +232,7 @@ export function NoticeQueue({
 
   if (!current) return null;
 
-  const more = labels?.more ?? ((n: number) => `還有 ${n} 則待查看`);
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const leaving = leavingId === current.id;
   const vars = storyThemes[theme] as unknown as CSSProperties;
   const canOpen = Boolean(onOpen && current.openable);
@@ -220,7 +242,7 @@ export function NoticeQueue({
     <div
       role="region"
       aria-live="polite"
-      aria-label={labels?.region ?? "新發現"}
+      aria-label={t.region}
       className={cn(
         fixed ? "fixed" : "absolute",
         "z-[57] top-[clamp(1rem,15%,10.5rem)] right-[clamp(1rem,5%,4rem)] max-w-[calc(100%-2rem)]",
@@ -259,7 +281,7 @@ export function NoticeQueue({
             key={current.id}
             type="button"
             className={cn("snq-card", leaving && "snq-leaving")}
-            aria-label={current.label ?? (labels?.dismiss ? labels.dismiss(current) : undefined)}
+            aria-label={current.label ?? (t.dismiss ? t.dismiss(current) : undefined)}
             onClick={() => (canOpen ? onOpen!(current) : onDismiss(current.id))}
           >
             <span className="snq-art" aria-hidden="true">
@@ -275,7 +297,7 @@ export function NoticeQueue({
               </span>
             )}
             {queueCount > 1 && (
-              <span className="snq-small" aria-label={more(queueCount - 1)}>
+              <span className="snq-small" aria-label={t.more(queueCount - 1)}>
                 +{queueCount - 1}
               </span>
             )}

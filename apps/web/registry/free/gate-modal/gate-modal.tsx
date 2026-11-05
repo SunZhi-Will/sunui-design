@@ -30,23 +30,85 @@ export interface ContentGateModalLabels {
   dialog?: string;
 }
 
-const defaultLabels: Required<ContentGateModalLabels> = {
-  kicker: "Access check",
-  body: (state) =>
-    state === "no-access"
-      ? "You're signed in, but this account doesn't have access to this course yet. If you bought a ticket, check that you're using the Google account you bought it with."
-      : "This is a paid course. Sign in with the Google account you bought your ticket with to unlock it.",
-  note: "Once you sign in with the account you bought with, your course access syncs automatically. No code to enter.",
-  signIn: (state) =>
-    state === "no-access"
-      ? "Sign in with another Google account"
-      : "Sign in with Google to unlock",
-  contactPrompt: (state) =>
-    state === "no-access" ? "Account looks right?" : "Haven't bought it yet?",
-  contact: "Contact the instructor",
-  later: "Maybe later",
-  close: "Close",
-  dialog: "Course access",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<ContentGateModalLabels>> = {
+  en: {
+    kicker: "Access check",
+    body: (state) =>
+      state === "no-access"
+        ? "You're signed in, but this account doesn't have access to this course yet. If you bought a ticket, check that you're using the Google account you bought it with."
+        : "This is a paid course. Sign in with the Google account you bought your ticket with to unlock it.",
+    note: "Once you sign in with the account you bought with, your course access syncs automatically. No code to enter.",
+    signIn: (state) =>
+      state === "no-access"
+        ? "Sign in with another Google account"
+        : "Sign in with Google to unlock",
+    contactPrompt: (state) =>
+      state === "no-access" ? "Account looks right?" : "Haven't bought it yet?",
+    contact: "Contact the instructor",
+    later: "Maybe later",
+    close: "Close",
+    dialog: "Course access",
+  },
+  "zh-TW": {
+    kicker: "權限檢查",
+    body: (state) =>
+      state === "no-access"
+        ? "你已經登入，但這個帳號目前還沒有這門課的權限。如果你已購票，請確認登入的是購票時使用的 Google 帳號。"
+        : "這是付費課程。請用購票時的 Google 帳號登入來解鎖。",
+    note: "用購票帳號登入後，課程權限會自動同步，不需要輸入任何序號。",
+    signIn: (state) =>
+      state === "no-access" ? "改用其他 Google 帳號登入" : "使用 Google 登入解鎖",
+    contactPrompt: (state) =>
+      state === "no-access" ? "帳號確定沒錯？" : "還沒購買嗎？",
+    contact: "聯絡講師",
+    later: "稍後再說",
+    close: "關閉",
+    dialog: "課程權限",
+  },
+  "zh-CN": {
+    kicker: "权限检查",
+    body: (state) =>
+      state === "no-access"
+        ? "你已经登录，但这个账号目前还没有这门课的权限。如果你已购票，请确认登录的是购票时使用的 Google 账号。"
+        : "这是付费课程。请用购票时的 Google 账号登录来解锁。",
+    note: "用购票账号登录后，课程权限会自动同步，无需输入任何兑换码。",
+    signIn: (state) =>
+      state === "no-access" ? "改用其他 Google 账号登录" : "使用 Google 登录解锁",
+    contactPrompt: (state) =>
+      state === "no-access" ? "确定账号没错？" : "还没购买？",
+    contact: "联系讲师",
+    later: "稍后再说",
+    close: "关闭",
+    dialog: "课程权限",
+  },
+  ja: {
+    kicker: "アクセス確認",
+    body: (state) =>
+      state === "no-access"
+        ? "ログイン済みですが、このアカウントにはまだこの講座へのアクセス権がありません。チケットを購入済みの場合は、購入時の Google アカウントでログインしているか確認してください。"
+        : "こちらは有料講座です。チケットを購入した Google アカウントでログインするとロックが解除されます。",
+    note: "購入時のアカウントでログインすると、受講権限は自動で同期されます。コードの入力は不要です。",
+    signIn: (state) =>
+      state === "no-access"
+        ? "別の Google アカウントでログイン"
+        : "Google でログインして解除",
+    contactPrompt: (state) =>
+      state === "no-access" ? "アカウントに間違いがない場合" : "まだ購入していませんか？",
+    contact: "講師に問い合わせる",
+    later: "あとで",
+    close: "閉じる",
+    dialog: "講座へのアクセス",
+  },
 };
 
 interface SharedProps {
@@ -65,6 +127,9 @@ interface SharedProps {
   onContact?: () => void;
   /** 登入鈕左側的服務商圖示，預設 Google */
   providerIcon?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ContentGateModalLabels;
 }
 
@@ -203,9 +268,10 @@ export function ContentGateModal({
   contactHref,
   onContact,
   providerIcon = <GoogleIcon />,
+  locale = "en",
   labels,
 }: ContentGateModalProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);

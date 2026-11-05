@@ -343,30 +343,135 @@ const ICON = {
 /* 編輯器                                                             */
 /* ------------------------------------------------------------------ */
 
-const defaultLabels = {
-  title: "Animation timeline",
-  addKeyframe: "Add keyframe",
-  saveKeyframe: "Save the current canvas state to this keyframe",
-  preview: "Preview",
-  previewTitle: "Preview animation",
-  name: "Name",
-  time: "Time",
-  elements: "Elements",
-  zoom: "Zoom",
-  deleteKeyframe: "Delete keyframe",
-  empty: "No keyframes yet. Click “Add keyframe” to start",
-  copy: "Copy",
-  delete: "Delete",
-  copyShortcut: "Ctrl+C",
-  deleteShortcut: "Delete",
-  expand: "Expand",
-  collapse: "Collapse",
-  timestamp: "Keyframe time in seconds",
-  newKeyframeName: (n: number) => `Keyframe ${n}`,
-  copySuffix: " (copy)",
-};
+export interface AnimationEditorLabels {
+  title: string;
+  addKeyframe: string;
+  saveKeyframe: string;
+  preview: string;
+  previewTitle: string;
+  name: string;
+  time: string;
+  elements: string;
+  zoom: string;
+  deleteKeyframe: string;
+  empty: string;
+  copy: string;
+  delete: string;
+  copyShortcut: string;
+  deleteShortcut: string;
+  expand: string;
+  collapse: string;
+  timestamp: string;
+  newKeyframeName: (n: number) => string;
+  copySuffix: string;
+  /** 欄位名稱與值之間的冒號 */
+  colon: string;
+}
 
-export type AnimationEditorLabels = typeof defaultLabels;
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AnimationEditorLabels> = {
+  en: {
+    title: "Animation timeline",
+    addKeyframe: "Add keyframe",
+    saveKeyframe: "Save the current canvas state to this keyframe",
+    preview: "Preview",
+    previewTitle: "Preview animation",
+    name: "Name",
+    time: "Time",
+    elements: "Elements",
+    zoom: "Zoom",
+    deleteKeyframe: "Delete keyframe",
+    empty: "No keyframes yet. Click “Add keyframe” to start",
+    copy: "Copy",
+    delete: "Delete",
+    copyShortcut: "Ctrl+C",
+    deleteShortcut: "Delete",
+    expand: "Expand",
+    collapse: "Collapse",
+    timestamp: "Keyframe time in seconds",
+    newKeyframeName: (n) => `Keyframe ${n}`,
+    copySuffix: " (copy)",
+    colon: ": ",
+  },
+  "zh-TW": {
+    title: "動畫時間軸",
+    addKeyframe: "新增關鍵影格",
+    saveKeyframe: "把目前的畫布狀態存到這個關鍵影格",
+    preview: "預覽",
+    previewTitle: "預覽動畫",
+    name: "名稱",
+    time: "時間",
+    elements: "元素",
+    zoom: "縮放",
+    deleteKeyframe: "刪除關鍵影格",
+    empty: "還沒有關鍵影格，按「新增關鍵影格」開始",
+    copy: "複製",
+    delete: "刪除",
+    copyShortcut: "Ctrl+C",
+    deleteShortcut: "Delete",
+    expand: "展開",
+    collapse: "收合",
+    timestamp: "關鍵影格時間（秒）",
+    newKeyframeName: (n) => `關鍵影格 ${n}`,
+    copySuffix: "（副本）",
+    colon: "：",
+  },
+  "zh-CN": {
+    title: "动画时间轴",
+    addKeyframe: "添加关键帧",
+    saveKeyframe: "把当前的画布状态保存到这个关键帧",
+    preview: "预览",
+    previewTitle: "预览动画",
+    name: "名称",
+    time: "时间",
+    elements: "元素",
+    zoom: "缩放",
+    deleteKeyframe: "删除关键帧",
+    empty: "还没有关键帧，点击“添加关键帧”开始",
+    copy: "复制",
+    delete: "删除",
+    copyShortcut: "Ctrl+C",
+    deleteShortcut: "Delete",
+    expand: "展开",
+    collapse: "收起",
+    timestamp: "关键帧时间（秒）",
+    newKeyframeName: (n) => `关键帧 ${n}`,
+    copySuffix: "（副本）",
+    colon: "：",
+  },
+  ja: {
+    title: "アニメーションタイムライン",
+    addKeyframe: "キーフレームを追加",
+    saveKeyframe: "現在のキャンバスの状態をこのキーフレームに保存",
+    preview: "プレビュー",
+    previewTitle: "アニメーションをプレビュー",
+    name: "名前",
+    time: "時間",
+    elements: "要素",
+    zoom: "ズーム",
+    deleteKeyframe: "キーフレームを削除",
+    empty: "キーフレームはまだありません。「キーフレームを追加」から始めましょう",
+    copy: "コピー",
+    delete: "削除",
+    copyShortcut: "Ctrl+C",
+    deleteShortcut: "Delete",
+    expand: "展開",
+    collapse: "折りたたむ",
+    timestamp: "キーフレームの時間（秒）",
+    newKeyframeName: (n) => `キーフレーム ${n}`,
+    copySuffix: "（コピー）",
+    colon: "：",
+  },
+};
 
 export interface AnimationEditorProps<T = unknown> {
   /** 關鍵影格清單（受控） */
@@ -388,6 +493,9 @@ export interface AnimationEditorProps<T = unknown> {
   /** true：固定在視窗底部（原本行為）；false：跟著版面排列 */
   fixed?: boolean;
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<AnimationEditorLabels>;
   className?: string;
 }
@@ -405,10 +513,11 @@ export function AnimationEditor<T = unknown>({
   shortcutScope = "window",
   fixed = true,
   accent,
+  locale = "en",
   labels: labelsProp,
   className,
 }: AnimationEditorProps<T>) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const reduce = useReducedMotion() ?? false;
 
   const [selectedInner, setSelectedInner] = useState<string | null>(defaultSelectedKeyframeId);
@@ -724,16 +833,16 @@ export function AnimationEditor<T = unknown>({
                 {selectedKeyframe && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
                     <span>
-                      {labels.name}: <strong>{selectedKeyframe.name}</strong>
+                      {labels.name}{labels.colon}<strong>{selectedKeyframe.name}</strong>
                     </span>
                     <span>
-                      {labels.time}: <strong>{selectedKeyframe.timestamp.toFixed(1)}s</strong>
+                      {labels.time}{labels.colon}<strong>{selectedKeyframe.timestamp.toFixed(1)}s</strong>
                     </span>
                     <span>
-                      {labels.elements}: <strong>{selectedKeyframe.elements.length}</strong>
+                      {labels.elements}{labels.colon}<strong>{selectedKeyframe.elements.length}</strong>
                     </span>
                     <span>
-                      {labels.zoom}: <strong>{Math.round(selectedKeyframe.scale * 100)}%</strong>
+                      {labels.zoom}{labels.colon}<strong>{Math.round(selectedKeyframe.scale * 100)}%</strong>
                     </span>
                     <button
                       type="button"
@@ -845,7 +954,7 @@ export function AnimationEditor<T = unknown>({
                                 value={keyframe.timestamp}
                                 onChange={(e) => handleUpdateKeyframeTimestamp(keyframe.id, parseFloat(e.target.value) || 0)}
                                 onClick={(e) => e.stopPropagation()}
-                                aria-label={`${keyframe.name}: ${labels.timestamp}`}
+                                aria-label={`${keyframe.name}${labels.colon}${labels.timestamp}`}
                                 className="w-12 rounded border-none bg-transparent px-1 py-0 text-center text-[9px] text-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--ae-accent-light)]"
                                 min="0"
                                 step="0.1"

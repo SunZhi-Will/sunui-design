@@ -16,6 +16,8 @@ export interface AddonItem {
 }
 
 export interface AddonChecklistLabels {
+  /** 未傳 title 時的預設標題 */
+  title?: ReactNode;
   base?: ReactNode;
   subtotal?: ReactNode;
   required?: ReactNode;
@@ -34,18 +36,57 @@ export interface AddonChecklistProps {
   defaultValue?: string[];
   /** 回傳勾選的 id 與畫面上的總額；伺服器結帳時仍要自行重算 */
   onChange?: (ids: string[], total: number) => void;
+  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   currency?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: AddonChecklistLabels;
   className?: string;
 }
 
-const defaultLabels: Required<AddonChecklistLabels> = {
-  base: "Base item",
-  subtotal: "Subtotal",
-  required: "Included",
-  free: "Free",
-  announce: (total, count) => `${count} add-ons selected. Subtotal ${total}.`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<AddonChecklistLabels>> = {
+  en: {
+    title: "Add to your order",
+    base: "Base item",
+    subtotal: "Subtotal",
+    required: "Included",
+    free: "Free",
+    announce: (total, count) => `${count} ${count === 1 ? "add-on" : "add-ons"} selected. Subtotal ${total}.`,
+  },
+  "zh-TW": {
+    title: "加購項目",
+    base: "主商品",
+    subtotal: "小計",
+    required: "必選",
+    free: "免費",
+    announce: (total, count) => `已選 ${count} 項加購，小計 ${total}。`,
+  },
+  "zh-CN": {
+    title: "加购项目",
+    base: "主商品",
+    subtotal: "小计",
+    required: "必选",
+    free: "免费",
+    announce: (total, count) => `已选 ${count} 项加购，小计 ${total}。`,
+  },
+  ja: {
+    title: "ご注文に追加",
+    base: "本体",
+    subtotal: "小計",
+    required: "必須",
+    free: "無料",
+    announce: (total, count) => `オプションを ${count} 件選択中。小計 ${total}。`,
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
@@ -60,7 +101,7 @@ const springs = {
 } as const;
 
 export function AddonChecklist({
-  title = "Add to your order",
+  title: titleProp,
   basePrice,
   items,
   value,
@@ -71,7 +112,8 @@ export function AddonChecklist({
   labels,
   className,
 }: AddonChecklistProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const title = titleProp ?? t.title;
   const reduceMotion = useReducedMotion();
   const [inner, setInner] = useState<string[]>(defaultValue);
   const [announcement, setAnnouncement] = useState("");

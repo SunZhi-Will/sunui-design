@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
@@ -12,20 +13,101 @@ const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const inkMuted = "text-[#1c1917]/60 dark:text-[#ece7dc]/60";
 
-const products = [
-  { name: "Linen overshirt", price: 128, color: "Oat" },
-  { name: "Wide-leg trousers", price: 96, color: "Charcoal" },
-  { name: "Washed linen shirt", price: 84, color: "Undyed" },
-  { name: "Linen apron", price: 42, color: "Olive" },
-];
-
-const bag = [
-  { name: "Linen overshirt", detail: "Oat, M", price: 128 },
-  { name: "Washed linen shirt", detail: "Undyed, L", price: 84 },
-];
-
+const prices = [128, 96, 84, 42];
+const bagPrices = [128, 84];
 const sizes = ["XS", "S", "M", "L", "XL"];
-const colors = ["Undyed", "Oat", "Charcoal", "Olive"];
+const colorIds = ["undyed", "oat", "charcoal", "olive"] as const;
+
+const copy = {
+  en: {
+    products: ["Linen overshirt", "Wide-leg trousers", "Washed linen shirt", "Linen apron"],
+    productColors: ["Oat", "Charcoal", "Undyed", "Olive"],
+    bag: [
+      { name: "Linen overshirt", detail: "Oat, M" },
+      { name: "Washed linen shirt", detail: "Undyed, L" },
+    ],
+    colors: ["Undyed", "Oat", "Charcoal", "Olive"],
+    filters: "Filters",
+    collection: "Linen, autumn",
+    bagLabel: "Bag",
+    filtersDesc: "24 pieces in linen.",
+    clear: "Clear all",
+    show: "Show results",
+    size: "Size",
+    color: "Color",
+    bagTitle: "Your bag",
+    bagDesc: "Free shipping over $80.",
+    subtotal: "Subtotal",
+    checkout: "Checkout",
+    sep: ", ",
+  },
+  "zh-TW": {
+    products: ["亞麻罩衫", "寬褲", "水洗亞麻襯衫", "亞麻圍裙"],
+    productColors: ["燕麥", "炭灰", "原色", "橄欖"],
+    bag: [
+      { name: "亞麻罩衫", detail: "燕麥，M" },
+      { name: "水洗亞麻襯衫", detail: "原色，L" },
+    ],
+    colors: ["原色", "燕麥", "炭灰", "橄欖"],
+    filters: "篩選",
+    collection: "亞麻．秋季",
+    bagLabel: "購物袋",
+    filtersDesc: "共 24 件亞麻單品。",
+    clear: "全部清除",
+    show: "查看結果",
+    size: "尺寸",
+    color: "顏色",
+    bagTitle: "你的購物袋",
+    bagDesc: "滿 $80 免運費。",
+    subtotal: "小計",
+    checkout: "結帳",
+    sep: "，",
+  },
+  "zh-CN": {
+    products: ["亚麻罩衫", "阔腿裤", "水洗亚麻衬衫", "亚麻围裙"],
+    productColors: ["燕麦", "炭灰", "本色", "橄榄"],
+    bag: [
+      { name: "亚麻罩衫", detail: "燕麦，M" },
+      { name: "水洗亚麻衬衫", detail: "本色，L" },
+    ],
+    colors: ["本色", "燕麦", "炭灰", "橄榄"],
+    filters: "筛选",
+    collection: "亚麻·秋季",
+    bagLabel: "购物袋",
+    filtersDesc: "共 24 件亚麻单品。",
+    clear: "全部清除",
+    show: "查看结果",
+    size: "尺码",
+    color: "颜色",
+    bagTitle: "你的购物袋",
+    bagDesc: "满 $80 包邮。",
+    subtotal: "小计",
+    checkout: "去结算",
+    sep: "，",
+  },
+  ja: {
+    products: ["リネンのシャツジャケット", "ワイドパンツ", "洗いざらしリネンシャツ", "リネンエプロン"],
+    productColors: ["オート", "チャコール", "生成り", "オリーブ"],
+    bag: [
+      { name: "リネンのシャツジャケット", detail: "オート、M" },
+      { name: "洗いざらしリネンシャツ", detail: "生成り、L" },
+    ],
+    colors: ["生成り", "オート", "チャコール", "オリーブ"],
+    filters: "絞り込み",
+    collection: "リネン、秋",
+    bagLabel: "バッグ",
+    filtersDesc: "リネンのアイテム 24 点。",
+    clear: "すべてクリア",
+    show: "結果を表示",
+    size: "サイズ",
+    color: "カラー",
+    bagTitle: "ショッピングバッグ",
+    bagDesc: "$80 以上で送料無料。",
+    subtotal: "小計",
+    checkout: "レジに進む",
+    sep: "、",
+  },
+};
 
 const money = (n: number) => `$${n}`;
 const trigger =
@@ -34,6 +116,8 @@ const primary =
   "rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
 export default function SidePanelDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [panel, setPanel] = useState<"filters" | "bag" | null>(null);
   const [picked, setPicked] = useState<string[]>(["M"]);
   const close = (open: boolean) => !open && setPanel(null);
@@ -46,21 +130,24 @@ export default function SidePanelDemo() {
           <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
             <path d="M2.5 4.5h11M4.5 8h7M6.5 11.5h3" />
           </svg>
-          Filters{picked.length > 0 && <span className={cn("tabular-nums", inkMuted)}>({picked.length})</span>}
+          {t.filters}
+          {picked.length > 0 && <span className={cn("tabular-nums", inkMuted)}>({picked.length})</span>}
         </button>
-        <span className="text-sm font-semibold tracking-tight">Linen, autumn</span>
+        <span className="text-sm font-semibold tracking-tight">{t.collection}</span>
         <button type="button" onClick={() => setPanel("bag")} className={trigger}>
-          Bag <span className={cn("tabular-nums", inkMuted)}>({bag.length})</span>
+          {t.bagLabel} <span className={cn("tabular-nums", inkMuted)}>({bagPrices.length})</span>
         </button>
       </header>
 
       <ul className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4 sm:p-5">
-        {products.map((p) => (
-          <li key={p.name} className="text-sm">
+        {t.products.map((name, i) => (
+          <li key={i} className="text-sm">
             <div aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", paperUnder)} />
-            <p className="mt-2 font-medium">{p.name}</p>
+            <p className="mt-2 font-medium">{name}</p>
             <p className={cn("tabular-nums", inkMuted)}>
-              {p.color}, {money(p.price)}
+              {t.productColors[i]}
+              {t.sep}
+              {money(prices[i])}
             </p>
           </li>
         ))}
@@ -72,21 +159,22 @@ export default function SidePanelDemo() {
         side="left"
         size="sm"
         portal={false}
-        title="Filters"
-        description="24 pieces in linen."
+        locale={locale}
+        title={t.filters}
+        description={t.filtersDesc}
         footer={
           <div className="flex items-center justify-between gap-2">
             <button type="button" onClick={() => setPicked([])} className={cn(trigger, "px-0")}>
-              Clear all
+              {t.clear}
             </button>
             <button type="button" onClick={() => setPanel(null)} className={primary}>
-              Show results
+              {t.show}
             </button>
           </div>
         }
       >
         <fieldset className="space-y-2.5">
-          <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>Size</legend>
+          <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.size}</legend>
           <div className="flex flex-wrap gap-1.5">
             {sizes.map((s) => (
               <label key={s} className={cn("relative cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#1c1917] has-[:checked]:bg-[#1c1917] has-[:checked]:text-[#faf7f0] dark:has-[:checked]:border-[#ece7dc] dark:has-[:checked]:bg-[#ece7dc] dark:has-[:checked]:text-[#1f1c18] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring", edge)}>
@@ -97,12 +185,12 @@ export default function SidePanelDemo() {
           </div>
         </fieldset>
         <fieldset className="mt-6">
-          <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>Color</legend>
+          <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.color}</legend>
           <div className="space-y-2 text-sm">
-            {colors.map((c) => (
-              <label key={c} className="flex cursor-pointer items-center gap-2.5">
-                <input type="checkbox" checked={picked.includes(c)} onChange={() => toggle(c)} className="size-4 accent-[#1c1917] dark:accent-[#ece7dc]" />
-                {c}
+            {colorIds.map((id, i) => (
+              <label key={id} className="flex cursor-pointer items-center gap-2.5">
+                <input type="checkbox" checked={picked.includes(id)} onChange={() => toggle(id)} className="size-4 accent-[#1c1917] dark:accent-[#ece7dc]" />
+                {t.colors[i]}
               </label>
             ))}
           </div>
@@ -115,29 +203,30 @@ export default function SidePanelDemo() {
         side="right"
         size="sm"
         portal={false}
-        title="Your bag"
-        description="Free shipping over $80."
+        locale={locale}
+        title={t.bagTitle}
+        description={t.bagDesc}
         footer={
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className={inkMuted}>Subtotal</span>
-              <span className="font-semibold tabular-nums">{money(bag.reduce((n, b) => n + b.price, 0))}</span>
+              <span className={inkMuted}>{t.subtotal}</span>
+              <span className="font-semibold tabular-nums">{money(bagPrices.reduce((n, p) => n + p, 0))}</span>
             </div>
             <button type="button" className={cn(primary, "w-full")}>
-              Checkout
+              {t.checkout}
             </button>
           </div>
         }
       >
         <ul className={cn("divide-y", "divide-[#e7e0d0] dark:divide-[#38332b]")}>
-          {bag.map((b) => (
-            <li key={b.name} className="flex gap-3 py-3 first:pt-0">
+          {t.bag.map((b, i) => (
+            <li key={i} className="flex gap-3 py-3 first:pt-0">
               <div aria-hidden="true" className={cn("h-16 w-13 shrink-0 rounded-[3px]", paperUnder)} />
               <div className="min-w-0 flex-1 text-sm">
                 <p className="font-medium">{b.name}</p>
                 <p className={inkMuted}>{b.detail}</p>
               </div>
-              <span className="text-sm tabular-nums">{money(b.price)}</span>
+              <span className="text-sm tabular-nums">{money(bagPrices[i])}</span>
             </li>
           ))}
         </ul>

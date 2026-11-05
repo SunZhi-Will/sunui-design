@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { PreflightSidebar, type MicHealth, type PreflightPreferences, type RecordingSettings } from "./recording-sidebar";
 
 export default function RecordingSidebarDemo() {
+  const locale = useDemoLocale();
   const [settings, setSettings] = useState<RecordingSettings>({ countdownSec: 3, showCursor: false, performanceMode: "balanced", quality: "high" });
   const [prefs, setPrefs] = useState<PreflightPreferences>({ micEnabled: true, systemAudioEnabled: true, cameraEnabled: false });
   const [armed, setArmed] = useState(false);
@@ -33,6 +36,7 @@ export default function RecordingSidebarDemo() {
     <div className="w-full max-w-xs mx-auto overflow-hidden rounded-[14px] border border-white/10">
       <PreflightSidebar
         className="w-full border-l-0"
+        locale={locale}
         settings={settings}
         onSettingsChange={setSettings}
         preferences={prefs}

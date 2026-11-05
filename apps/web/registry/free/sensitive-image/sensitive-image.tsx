@@ -19,6 +19,8 @@ export interface SensitiveImageLabels {
   fullHint?: string;
   curtainOn?: string;
   curtainOff?: string;
+  /** 分級說明與 fullHint 之間的分隔 */
+  descSeparator?: string;
 }
 
 export interface SensitiveImageProps {
@@ -40,6 +42,9 @@ export interface SensitiveImageProps {
   openLabel?: string;
   /** tile：縮圖（小遮罩）；full：大圖檢視 */
   size?: "tile" | "full";
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: SensitiveImageLabels;
   className?: string;
   imgClassName?: string;
@@ -47,20 +52,86 @@ export interface SensitiveImageProps {
   children?: ReactNode;
 }
 
-const defaultLabels = {
-  rating: { general: "All ages", sensitive: "Sensitive", explicit: "18+" } as Record<ImageRating, string>,
-  ratingDesc: {
-    general: "No nudity or suggestive content",
-    sensitive: "Underwear, suggestive poses, nudity without explicit detail",
-    explicit: "Explicit nudity or sexual content",
-  } as Record<ImageRating, string>,
-  blurredAlt: (r: string) => `Blurred ${r} image`,
-  coveredAlt: "Covered image",
-  show: "Show",
-  showAria: (r: string) => `Show this ${r} image`,
-  fullHint: "Blurred by your settings. Use the button below to show it.",
-  curtainOn: "Privacy curtain is on",
-  curtainOff: "Lift curtain",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+type ResolvedLabels = Required<Omit<SensitiveImageLabels, "rating" | "ratingDesc">> & {
+  rating: Record<ImageRating, string>;
+  ratingDesc: Record<ImageRating, string>;
+};
+
+const MESSAGES: Record<SunLocale, ResolvedLabels> = {
+  en: {
+    rating: { general: "All ages", sensitive: "Sensitive", explicit: "18+" },
+    ratingDesc: {
+      general: "No nudity or suggestive content",
+      sensitive: "Underwear, suggestive poses, nudity without explicit detail",
+      explicit: "Explicit nudity or sexual content",
+    },
+    blurredAlt: (r) => `Blurred ${r} image`,
+    coveredAlt: "Covered image",
+    show: "Show",
+    showAria: (r) => `Show this ${r} image`,
+    fullHint: "Blurred by your settings. Use the button below to show it.",
+    curtainOn: "Privacy curtain is on",
+    curtainOff: "Lift curtain",
+    descSeparator: ". ",
+  },
+  "zh-TW": {
+    rating: { general: "全年齡", sensitive: "敏感", explicit: "18+" },
+    ratingDesc: {
+      general: "沒有裸露或性暗示內容",
+      sensitive: "內衣、性感姿勢，或不含露骨細節的裸露",
+      explicit: "露骨裸露或性內容",
+    },
+    blurredAlt: (r) => `已模糊的${r}圖片`,
+    coveredAlt: "已遮住的圖片",
+    show: "顯示",
+    showAria: (r) => `顯示這張${r}圖片`,
+    fullHint: "依你的設定已模糊處理，可用下方按鈕顯示。",
+    curtainOn: "隱私遮罩已開啟",
+    curtainOff: "拉開遮罩",
+    descSeparator: "。",
+  },
+  "zh-CN": {
+    rating: { general: "全年龄", sensitive: "敏感", explicit: "18+" },
+    ratingDesc: {
+      general: "没有裸露或性暗示内容",
+      sensitive: "内衣、性感姿势，或不含露骨细节的裸露",
+      explicit: "露骨裸露或色情内容",
+    },
+    blurredAlt: (r) => `已模糊的${r}图片`,
+    coveredAlt: "已遮挡的图片",
+    show: "显示",
+    showAria: (r) => `显示这张${r}图片`,
+    fullHint: "已按你的设置模糊处理，可用下方按钮显示。",
+    curtainOn: "隐私遮罩已开启",
+    curtainOff: "拉开遮罩",
+    descSeparator: "。",
+  },
+  ja: {
+    rating: { general: "全年齢", sensitive: "センシティブ", explicit: "18+" },
+    ratingDesc: {
+      general: "裸や性的なほのめかしはありません",
+      sensitive: "下着、性的なポーズ、露骨な描写のない裸",
+      explicit: "露骨な裸や性的な内容",
+    },
+    blurredAlt: (r) => `ぼかし済みの${r}画像`,
+    coveredAlt: "隠された画像",
+    show: "表示",
+    showAria: (r) => `この${r}画像を表示`,
+    fullHint: "設定によりぼかしています。下のボタンで表示できます。",
+    curtainOn: "プライバシーカーテンがオンです",
+    curtainOff: "カーテンを外す",
+    descSeparator: "。",
+  },
 };
 
 // 單張點開只存在記憶體，重新整理後恢復模糊
@@ -84,10 +155,21 @@ export function revealImage(key: string, on = true) {
 }
 
 /** 分級標籤：性感用琥珀色、18+ 用紅色，全年齡不顯示 */
-export function RatingBadge({ rating, labels, className }: { rating?: ImageRating; labels?: SensitiveImageLabels; className?: string }) {
+export function RatingBadge({
+  rating,
+  locale = "en",
+  labels,
+  className,
+}: {
+  rating?: ImageRating;
+  locale?: string;
+  labels?: SensitiveImageLabels;
+  className?: string;
+}) {
   if (!rating || rating === "general") return null;
-  const label = labels?.rating?.[rating] ?? defaultLabels.rating[rating];
-  const desc = labels?.ratingDesc?.[rating] ?? defaultLabels.ratingDesc[rating];
+  const m = MESSAGES[resolveLocale(locale)];
+  const label = labels?.rating?.[rating] ?? m.rating[rating];
+  const desc = labels?.ratingDesc?.[rating] ?? m.ratingDesc[rating];
   return (
     <span
       title={desc}
@@ -146,17 +228,19 @@ export function SensitiveImage({
   onOpen,
   openLabel,
   size = "tile",
+  locale = "en",
   labels,
   className,
   imgClassName,
   style,
   children,
 }: SensitiveImageProps) {
+  const m = MESSAGES[resolveLocale(locale)];
   const t = {
-    ...defaultLabels,
+    ...m,
     ...labels,
-    rating: { ...defaultLabels.rating, ...labels?.rating },
-    ratingDesc: { ...defaultLabels.ratingDesc, ...labels?.ratingDesc },
+    rating: { ...m.rating, ...labels?.rating },
+    ratingDesc: { ...m.ratingDesc, ...labels?.ratingDesc },
   };
   const shared = useSyncExternalStore(store.subscribe, store.get, store.get);
   const [localShown, setLocalShown] = useState(false);
@@ -213,10 +297,12 @@ export function SensitiveImage({
             </>
           ) : (
             <>
-              <RatingBadge rating={rating} labels={t} />
+              <RatingBadge rating={rating} locale={locale} labels={t} />
               {size === "full" && rating ? (
                 <p className="max-w-xs text-sm text-white/90">
-                  {t.ratingDesc[rating]}. {t.fullHint}
+                  {t.ratingDesc[rating]}
+                  {t.descSeparator}
+                  {t.fullHint}
                 </p>
               ) : null}
               <button type="button" onClick={reveal} aria-label={t.showAria(ratingLabel)} className={cn(pill, "inline-flex items-center gap-1")}>
@@ -226,7 +312,7 @@ export function SensitiveImage({
           )}
         </div>
       ) : mature ? (
-        <RatingBadge rating={rating} labels={t} className="pointer-events-none absolute top-2 left-2 z-[2] shadow-sm" />
+        <RatingBadge rating={rating} locale={locale} labels={t} className="pointer-events-none absolute top-2 left-2 z-[2] shadow-sm" />
       ) : null}
 
       {children}

@@ -23,21 +23,36 @@ export interface QuantityStepperProps {
   repeatDelay?: number;
   /** 連續增減的起始間隔（ms），之後會逐漸加速 */
   repeatInterval?: number;
-  labels?: {
-    /** spinbutton 的無障礙名稱 */
-    quantity?: string;
-    decrement?: string;
-    increment?: string;
-    remove?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<QuantityStepperLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  quantity: "Quantity",
-  decrement: "Decrease quantity",
-  increment: "Increase quantity",
-  remove: "Remove item",
+export interface QuantityStepperLabels {
+  /** spinbutton 的無障礙名稱，也用在數量變動的朗讀 */
+  quantity: string;
+  decrement: string;
+  increment: string;
+  remove: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, QuantityStepperLabels> = {
+  en: { quantity: "Quantity", decrement: "Decrease quantity", increment: "Increase quantity", remove: "Remove item" },
+  "zh-TW": { quantity: "數量", decrement: "減少數量", increment: "增加數量", remove: "移除商品" },
+  "zh-CN": { quantity: "数量", decrement: "减少数量", increment: "增加数量", remove: "移除商品" },
+  ja: { quantity: "数量", decrement: "数量を減らす", increment: "数量を増やす", remove: "商品を削除" },
 };
 
 // 設計語言（DESIGN.md）：收據紙、紙邊虛線、墨色數字
@@ -75,11 +90,12 @@ export function QuantityStepper({
   size = "md",
   repeatDelay = 400,
   repeatInterval = 120,
+  locale = "en",
   labels,
   className,
 }: QuantityStepperProps) {
   const reduce = useReducedMotion() ?? false;
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [inner, setInner] = useState(() => clampSnap(defaultValue ?? min, min, max, step));
   const value = valueProp ?? inner;
   const [draft, setDraft] = useState<string | null>(null);

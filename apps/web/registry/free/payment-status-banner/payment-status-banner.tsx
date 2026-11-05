@@ -39,17 +39,56 @@ export interface PaymentStatusBannerProps {
   fixed?: boolean;
   /** fixed 時距離視窗頂端的距離，預設 56（頁首高度） */
   top?: number;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: PaymentStatusBannerLabels;
   className?: string;
 }
 
-const defaultLabels: Required<PaymentStatusBannerLabels> = {
-  success: "Payment received! You're all set, enjoy the course.",
-  pending: "Confirming your payment. Hang on a few seconds; this page updates by itself once you're in.",
-  failed: "Payment wasn't completed. Please try again.",
-  error: "Something went wrong during payment. Contact support if you have questions.",
-  successLink: "Go to course →",
-  close: "Close",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<PaymentStatusBannerLabels>> = {
+  en: {
+    success: "Payment received! You're all set, enjoy the course.",
+    pending: "Confirming your payment. Hang on a few seconds; this page updates by itself once you're in.",
+    failed: "Payment wasn't completed. Please try again.",
+    error: "Something went wrong during payment. Contact support if you have questions.",
+    successLink: "Go to course →",
+    close: "Close",
+  },
+  "zh-TW": {
+    success: "付款成功！課程已開通，祝你學習愉快。",
+    pending: "正在確認付款，請稍候幾秒，開通後頁面會自動更新。",
+    failed: "付款未完成，請再試一次。",
+    error: "付款過程發生錯誤，如有疑問請聯絡客服。",
+    successLink: "前往課程 →",
+    close: "關閉",
+  },
+  "zh-CN": {
+    success: "支付成功！课程已开通，祝你学习愉快。",
+    pending: "正在确认支付，请稍等几秒，开通后页面会自动刷新。",
+    failed: "支付未完成，请重试。",
+    error: "支付过程中出现错误，如有疑问请联系客服。",
+    successLink: "前往课程 →",
+    close: "关闭",
+  },
+  ja: {
+    success: "お支払いが完了しました！準備完了です。講座をお楽しみください。",
+    pending: "お支払いを確認しています。数秒お待ちください。利用可能になるとページが自動で更新されます。",
+    failed: "お支払いが完了しませんでした。もう一度お試しください。",
+    error: "お支払い中にエラーが発生しました。ご不明な点はサポートまでお問い合わせください。",
+    successLink: "講座へ進む →",
+    close: "閉じる",
+  },
 };
 
 const TONE = {
@@ -143,10 +182,11 @@ export function PaymentStatusBanner({
   onDismiss,
   fixed = true,
   top = 56,
+  locale = "en",
   labels,
   className,
 }: PaymentStatusBannerProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [banner, setBanner] = useState<string>(status ?? "");
   const refreshRef = useRef(onRefresh);
   refreshRef.current = onRefresh;

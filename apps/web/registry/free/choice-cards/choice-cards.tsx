@@ -53,12 +53,31 @@ export interface ChoiceCardsProps {
   nameplate?: string;
   /** 手把操作（十字鍵移動、A 選、B 關），只在焦點在元件內時生效 */
   gamepad?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ChoiceCardsLabels;
   className?: string;
 }
 
 const LEAVE_ID = "__leave__";
-const defaultLabels: Required<ChoiceCardsLabels> = { close: "Close", group: "Choices" };
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<ChoiceCardsLabels>> = {
+  en: { close: "Close", group: "Choices" },
+  "zh-TW": { close: "關閉", group: "選項" },
+  "zh-CN": { close: "关闭", group: "选项" },
+  ja: { close: "閉じる", group: "選択肢" },
+};
 
 export function ChoiceCards({
   name,
@@ -70,10 +89,11 @@ export function ChoiceCards({
   onClose,
   nameplate = "linear-gradient(180deg, #f87171 0%, #dc2626 50%, #7f1d1d 100%)",
   gamepad = true,
+  locale = "en",
   labels,
   className,
 }: ChoiceCardsProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const id = useId();
   const rows: (ChoiceRow & { accent: string })[] = [
     ...choiceRows.map((r) => ({ ...r, accent: r.color ?? (r.path ? CHOICE_PATH_COLOR[r.path] : "#e8edf5") })),

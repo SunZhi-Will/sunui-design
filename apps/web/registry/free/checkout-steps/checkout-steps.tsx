@@ -65,17 +65,56 @@ export interface CheckoutStepsProps {
   steps: string[];
   /** 目前步驟的 index（從 0 起算），之前的步驟顯示為已完成 */
   current: number;
-  /** ol 的無障礙名稱 */
+  /** ol 的無障礙名稱，優先於 labels.label */
   label?: string;
-  /** 已完成步驟附加給螢幕閱讀器的字 */
+  /** 已完成步驟附加給螢幕閱讀器的字，優先於 labels.done */
   doneLabel?: string;
   theme?: CheckoutStepsTheme;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CheckoutStepsLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
+export interface CheckoutStepsLabels {
+  label: string;
+  done: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CheckoutStepsLabels> = {
+  en: { label: "Checkout steps", done: "completed" },
+  "zh-TW": { label: "結帳步驟", done: "已完成" },
+  "zh-CN": { label: "结账步骤", done: "已完成" },
+  ja: { label: "購入手続きのステップ", done: "完了" },
+};
+
 /** 結帳步驟：一行可換行的小圓點加名稱，完成的步驟用主色加勾。 */
-export function CheckoutSteps({ steps, current, label = "Checkout steps", doneLabel = "completed", theme = "system", className, style }: CheckoutStepsProps) {
+export function CheckoutSteps({
+  steps,
+  current,
+  label: labelProp,
+  doneLabel: doneLabelProp,
+  theme = "system",
+  locale = "en",
+  labels,
+  className,
+  style,
+}: CheckoutStepsProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const label = labelProp ?? t.label;
+  const doneLabel = doneLabelProp ?? t.done;
   return (
     <>
       <ThemeStyle theme={theme} />
@@ -105,7 +144,7 @@ export function CheckoutSteps({ steps, current, label = "Checkout steps", doneLa
               {i < current ? <CheckIcon /> : i + 1}
             </span>
             {s}
-            {i < current && <span className="sr-only">, {doneLabel}</span>}
+            {i < current && <span className="sr-only">{resolveLocale(locale) === "en" ? ", " : "，"}{doneLabel}</span>}
           </li>
         ))}
       </ol>

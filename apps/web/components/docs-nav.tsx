@@ -5,18 +5,20 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
-export const docsPages = [
-  { href: "/docs", title: "Introduction" },
-  { href: "/docs/installation", title: "Installation" },
-  { href: "/docs/pro", title: "Using Pro blocks" },
-  { href: "/docs/ai-agents", title: "AI agents and MCP" },
-  { href: "/docs/changelog", title: "Changelog" },
-];
+import type { Messages } from "@/lib/messages";
 
-export function DocsNav() {
+const docsPages = [
+  { href: "/docs", key: "intro" },
+  { href: "/docs/installation", key: "installation" },
+  { href: "/docs/pro", key: "pro" },
+  { href: "/docs/ai-agents", key: "aiAgents" },
+  { href: "/docs/changelog", key: "changelog" },
+] as const;
+
+export function DocsNav({ labels }: { labels: Messages["docsNav"] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Docs" className="text-sm">
+    <nav aria-label={labels.label} className="text-sm">
       <ul className="flex gap-1 overflow-x-auto md:grid md:gap-0.5">
         {docsPages.map((page) => (
           <li key={page.href} className="shrink-0">
@@ -28,7 +30,7 @@ export function DocsNav() {
                 pathname === page.href ? "bg-stage font-medium text-fg" : "text-subtle hover:text-fg",
               )}
             >
-              {page.title}
+              {labels[page.key]}
             </Link>
           </li>
         ))}

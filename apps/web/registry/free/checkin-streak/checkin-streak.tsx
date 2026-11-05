@@ -56,33 +56,116 @@ export interface CheckinStreakProps {
   fixed?: boolean;
   /** 提示自動關閉毫秒數 */
   toastDuration?: number;
+  /** 介面語言與星期格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: CheckinStreakLabels;
   className?: string;
 }
 
-const defaultLabels: Required<CheckinStreakLabels> = {
-  title: "Daily check-in",
-  description: (reward, streak) => (
-    <>
-      Once a day, {reward} more images.
-      {streak ? (
-        <>
-          {" "}
-          <span className="font-medium text-[var(--yc-fg)] tabular-nums">{streak}</span>-day streak.
-        </>
-      ) : null}
-    </>
-  ),
-  weekAria: "Check-ins over the last 7 days",
-  today: "Today",
-  weekday: (date, locale) => date.toLocaleDateString(locale ?? "en-US", { weekday: "short" }),
-  dayAria: (label, done) => `${label}, ${done ? "checked in" : "not checked in"}`,
-  checkIn: (reward) => <>Check in for {reward} images</>,
-  done: "Checked in today, come back tomorrow",
-  success: (reward) => `Checked in, ${reward} more images`,
-  error: "Check-in failed. Please try again.",
-  close: "Close",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const Num = ({ children }: { children: ReactNode }) => <span className="font-medium text-[var(--yc-fg)] tabular-nums">{children}</span>;
+const weekday = (fallback: string) => (date: Date, locale?: string) => date.toLocaleDateString(locale ?? fallback, { weekday: "short" });
+
+const MESSAGES: Record<SunLocale, Required<CheckinStreakLabels>> = {
+  en: {
+    title: "Daily check-in",
+    description: (reward, streak) => (
+      <>
+        Once a day, {reward} more images.
+        {streak ? (
+          <>
+            {" "}
+            <Num>{streak}</Num>-day streak.
+          </>
+        ) : null}
+      </>
+    ),
+    weekAria: "Check-ins over the last 7 days",
+    today: "Today",
+    weekday: weekday("en-US"),
+    dayAria: (label, done) => `${label}, ${done ? "checked in" : "not checked in"}`,
+    checkIn: (reward) => <>Check in for {reward} images</>,
+    done: "Checked in today, come back tomorrow",
+    success: (reward) => `Checked in, ${reward} more images`,
+    error: "Check-in failed. Please try again.",
+    close: "Close",
+  },
+  "zh-TW": {
+    title: "每日簽到",
+    description: (reward, streak) => (
+      <>
+        每天一次，多 {reward} 張。
+        {streak ? (
+          <>
+            已連續簽到 <Num>{streak}</Num> 天。
+          </>
+        ) : null}
+      </>
+    ),
+    weekAria: "最近 7 天的簽到紀錄",
+    today: "今天",
+    weekday: weekday("zh-TW"),
+    dayAria: (label, done) => `${label}，${done ? "已簽到" : "未簽到"}`,
+    checkIn: (reward) => <>簽到領 {reward} 張</>,
+    done: "今天已簽到，明天再來",
+    success: (reward) => `簽到成功，多 ${reward} 張`,
+    error: "簽到失敗，請再試一次。",
+    close: "關閉",
+  },
+  "zh-CN": {
+    title: "每日签到",
+    description: (reward, streak) => (
+      <>
+        每天一次，多 {reward} 张。
+        {streak ? (
+          <>
+            已连续签到 <Num>{streak}</Num> 天。
+          </>
+        ) : null}
+      </>
+    ),
+    weekAria: "最近 7 天的签到记录",
+    today: "今天",
+    weekday: weekday("zh-CN"),
+    dayAria: (label, done) => `${label}，${done ? "已签到" : "未签到"}`,
+    checkIn: (reward) => <>签到领 {reward} 张</>,
+    done: "今天已签到，明天再来",
+    success: (reward) => `签到成功，多 ${reward} 张`,
+    error: "签到失败，请重试。",
+    close: "关闭",
+  },
+  ja: {
+    title: "毎日チェックイン",
+    description: (reward, streak) => (
+      <>
+        1 日 1 回、{reward} 枚追加。
+        {streak ? (
+          <>
+            <Num>{streak}</Num> 日連続。
+          </>
+        ) : null}
+      </>
+    ),
+    weekAria: "直近 7 日間のチェックイン",
+    today: "今日",
+    weekday: weekday("ja-JP"),
+    dayAria: (label, done) => `${label}、${done ? "チェックイン済み" : "未チェックイン"}`,
+    checkIn: (reward) => <>チェックインで {reward} 枚もらう</>,
+    done: "今日はチェックイン済み。また明日",
+    success: (reward) => `チェックイン完了、${reward} 枚追加`,
+    error: "チェックインに失敗しました。もう一度お試しください。",
+    close: "閉じる",
+  },
 };
 
 // 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
@@ -166,7 +249,7 @@ export function CheckinStreak({
   labels,
   className,
 }: CheckinStreakProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [busy, setBusy] = useState(false);
   const [state, setState] = useState({ week: weekProp, streak: streakProp, done: doneProp });

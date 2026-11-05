@@ -195,8 +195,34 @@ export interface SocialButtonGroupProps {
   /** 主按鈕漸層色 class */
   toggleClassName?: string;
   className?: string;
-  labels?: { open?: string; close?: string; group?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SocialButtonGroupLabels>;
 }
+
+export interface SocialButtonGroupLabels {
+  open: string;
+  close: string;
+  group: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SocialButtonGroupLabels> = {
+  en: { open: "Open social links", close: "Close social links", group: "Social links" },
+  "zh-TW": { open: "展開社群連結", close: "收合社群連結", group: "社群連結" },
+  "zh-CN": { open: "展开社交链接", close: "收起社交链接", group: "社交链接" },
+  ja: { open: "SNS リンクを開く", close: "SNS リンクを閉じる", group: "SNS リンク" },
+};
 
 const cornerClass: Record<SocialCorner, string> = {
   "bottom-right": "right-4 sm:right-8 bottom-8",
@@ -218,8 +244,10 @@ export function SocialButtonGroup({
   fixed = false,
   toggleClassName = "from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50",
   className,
+  locale = "en",
   labels,
 }: SocialButtonGroupProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [uncontrolled, setUncontrolled] = React.useState(defaultOpen);
   const isOpen = open ?? uncontrolled;
@@ -250,7 +278,7 @@ export function SocialButtonGroup({
     >
       <AnimatePresence>
         {isOpen && (
-          <ul id={menuId} aria-label={labels?.group ?? "Social links"} className="absolute inset-0">
+          <ul id={menuId} aria-label={t.group} className="absolute inset-0">
             {buttons.map((b, i) => {
               const pos = positionOf(i);
               return (
@@ -285,7 +313,7 @@ export function SocialButtonGroup({
           <SocialButton
             isMainButton
             isOpen={isOpen}
-            aria-label={isOpen ? (labels?.close ?? "Close social links") : (labels?.open ?? "Open social links")}
+            aria-label={isOpen ? t.close : t.open}
             icon={
               <motion.svg
                 className="h-6 w-6"

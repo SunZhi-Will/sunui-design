@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { revealImage, SensitiveImage } from "./sensitive-image";
 
 // 示意的生成結果：色塊與簡單形狀，代替真實圖片
@@ -11,24 +13,34 @@ const src = `data:image/svg+xml,${encodeURIComponent(
 
 const KEY = "card-g-102";
 
+const copy = {
+  en: { alt: "Portrait in swimwear, beach, golden hour", caption: "Beach, golden hour", blurAgain: "Blur again" },
+  "zh-TW": { alt: "泳裝人像，海灘，黃金時刻", caption: "海灘，黃金時刻", blurAgain: "重新模糊" },
+  "zh-CN": { alt: "泳装人像，海滩，黄金时刻", caption: "海滩，黄金时刻", blurAgain: "重新模糊" },
+  ja: { alt: "水着のポートレート、ビーチ、ゴールデンアワー", caption: "ビーチ、ゴールデンアワー", blurAgain: "再びぼかす" },
+};
+
 /** 型錄卡片：一張分級為 Sensitive 的圖先模糊，按「顯示」才看得到，可再遮回去。 */
 export default function SensitiveImageCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [shown, setShown] = useState(false);
 
   return (
     <figure className="mx-auto w-60 rounded-xl border border-border bg-card p-2.5 text-card-foreground">
       <SensitiveImage
         src={src}
-        alt="Portrait in swimwear, beach, golden hour"
+        alt={t.alt}
         width={512}
         height={640}
         rating="sensitive"
+        locale={locale}
         revealKey={KEY}
         onReveal={() => setShown(true)}
         className="aspect-[4/3] rounded-lg"
       />
       <figcaption className="mt-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-        <span className="truncate">Beach, golden hour</span>
+        <span className="truncate">{t.caption}</span>
         {shown && (
           <button
             type="button"
@@ -38,7 +50,7 @@ export default function SensitiveImageCard() {
             }}
             className="shrink-0 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
-            Blur again
+            {t.blurAgain}
           </button>
         )}
       </figcaption>

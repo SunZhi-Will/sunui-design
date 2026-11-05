@@ -46,6 +46,30 @@ const GAP = 14;
 /** 往上滑超過這個距離就關掉（sonner SWIPE_THRESHOLD） */
 const SWIPE = 45;
 
+export interface UndoToastLabels {
+  undo: string;
+  /** 通知區的無障礙名稱 */
+  region: string;
+  close: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, UndoToastLabels> = {
+  en: { undo: "Undo", region: "Notifications alt+T", close: "Close toast" },
+  "zh-TW": { undo: "復原", region: "通知 alt+T", close: "關閉通知" },
+  "zh-CN": { undo: "撤销", region: "通知 alt+T", close: "关闭通知" },
+  ja: { undo: "元に戻す", region: "通知 alt+T", close: "通知を閉じる" },
+};
+
 let seq = 0;
 
 /** 元件內的 toast 佇列，用法對應 sonner 的 toast() 與 toast.success() */
@@ -75,7 +99,10 @@ export type Toaster = ReturnType<typeof useToaster>;
 export interface UndoableOptions<T> {
   /** 原狀態是空的就不給復原，只跳一般的成功提示 */
   isEmpty?: (value: T) => boolean;
+  /** 不給時依 locale 用內建文字 */
   undoLabel?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
 }
 
 /**
@@ -86,13 +113,13 @@ export function useUndoable<T>(
   value: T,
   setValue: Dispatch<SetStateAction<T>>,
   toaster: Pick<Toaster, "toast" | "success">,
-  { isEmpty, undoLabel = "Undo" }: UndoableOptions<T> = {},
+  { isEmpty, undoLabel, locale = "en" }: UndoableOptions<T> = {},
 ) {
   return (change: (prev: T) => T, message: ReactNode) => {
     const before = value;
     setValue(change);
     if (!isEmpty?.(before)) {
-      toaster.toast(message, { duration: Infinity, action: { label: undoLabel, onClick: () => setValue(before) } });
+      toaster.toast(message, { duration: Infinity, action: { label: undoLabel ?? MESSAGES[resolveLocale(locale)].undo, onClick: () => setValue(before) } });
     } else {
       toaster.success(message);
     }
@@ -104,13 +131,17 @@ export interface UndoToasterProps {
   /** 預設 fixed 在視窗上方置中；false 改為 absolute，交給父層定位 */
   fixed?: boolean;
   closeButton?: boolean;
-  labels?: { region?: string; close?: string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<UndoToastLabels>;
   className?: string;
 }
 
 const ease = [0.25, 0.1, 0.25, 1] as const; // CSS 的 ease，sonner 的 transition 沒指定緩動
 
-export function UndoToaster({ toaster, fixed = true, closeButton = true, labels, className }: UndoToasterProps) {
+export function UndoToaster({ toaster, fixed = true, closeButton = true, locale = "en", labels, className }: UndoToasterProps) {
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const { toasts, dismiss } = toaster;
   const [expanded, setExpanded] = useState(false);
@@ -140,7 +171,7 @@ export function UndoToaster({ toaster, fixed = true, closeButton = true, labels,
   }, []);
 
   const frontHeight = toasts[0] ? heights[toasts[0].id] : undefined;
-  const label = labels?.region ?? "Notifications alt+T";
+  const label = text.region;
 
   return (
     <section
@@ -178,7 +209,7 @@ export function UndoToaster({ toaster, fixed = true, closeButton = true, labels,
                   frontHeight={frontHeight}
                   reduce={reduce}
                   closeButton={closeButton}
-                  closeLabel={labels?.close ?? "Close toast"}
+                  closeLabel={text.close}
                   paused={expanded}
                   onHeight={setHeight}
                   onDismiss={() => dismiss(t.id)}

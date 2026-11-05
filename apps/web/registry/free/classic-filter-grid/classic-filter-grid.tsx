@@ -101,14 +101,53 @@ export interface FilterGridLabels {
   loading?: string;
 }
 
-const DEFAULT_LABELS: Required<Omit<FilterGridLabels, "title">> = {
-  all: "All",
-  categories: "Filter by category",
-  pagination: "Pagination",
-  previous: "Previous page",
-  next: "Next page",
-  page: (page) => `Page ${page}`,
-  loading: "Loading more items",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<Omit<FilterGridLabels, "title">>> = {
+  en: {
+    all: "All",
+    categories: "Filter by category",
+    pagination: "Pagination",
+    previous: "Previous page",
+    next: "Next page",
+    page: (page) => `Page ${page}`,
+    loading: "Loading more items",
+  },
+  "zh-TW": {
+    all: "全部",
+    categories: "依分類篩選",
+    pagination: "分頁",
+    previous: "上一頁",
+    next: "下一頁",
+    page: (page) => `第 ${page} 頁`,
+    loading: "正在載入更多項目",
+  },
+  "zh-CN": {
+    all: "全部",
+    categories: "按分类筛选",
+    pagination: "分页",
+    previous: "上一页",
+    next: "下一页",
+    page: (page) => `第 ${page} 页`,
+    loading: "正在加载更多项目",
+  },
+  ja: {
+    all: "すべて",
+    categories: "カテゴリで絞り込む",
+    pagination: "ページ送り",
+    previous: "前のページ",
+    next: "次のページ",
+    page: (page) => `${page} ページ`,
+    loading: "さらに読み込み中",
+  },
 };
 
 export interface GridItemProps {
@@ -211,6 +250,9 @@ export const GridItem = memo(function GridItem({
 
 export interface ClassicFilterGridProps {
   children: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: FilterGridLabels;
   className?: string;
   showTitle?: boolean;
@@ -236,6 +278,7 @@ export interface ClassicFilterGridProps {
 
 export function ClassicFilterGrid({
   children,
+  locale = "en",
   labels,
   className,
   showTitle = true,
@@ -256,7 +299,7 @@ export function ClassicFilterGrid({
   onPageChange,
 }: ClassicFilterGridProps) {
   const reduce = useReducedMotion() ?? false;
-  const t = { ...DEFAULT_LABELS, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const themeClasses = THEMES[theme];
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [innerPage, setInnerPage] = useState(1);

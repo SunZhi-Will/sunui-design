@@ -28,25 +28,78 @@ export interface TierProgressProps {
   /** 由低到高排列；第一級的 min 通常是 0 */
   tiers: MembershipTier[];
   points: number;
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 例如 "Points reset on Dec 31" */
   footnote?: ReactNode;
+  /** 覆寫內建字串，優先於 locale */
   labels?: TierProgressLabels;
   className?: string;
 }
 
-const defaultLabels: Required<TierProgressLabels> = {
-  eyebrow: "Membership",
-  points: "pts",
-  toNext: (pts, tier) => (
-    <>
-      <span className="font-semibold tabular-nums">{pts}</span> pts to {tier}
-    </>
-  ),
-  unlocks: (tier) => <>Unlocks at {tier}</>,
-  topTier: "You have reached the top tier.",
-  topStamp: "Top tier",
-  valueText: (pts, target, tier) => `${pts} of ${target} points toward ${tier}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<TierProgressLabels>> = {
+  en: {
+    eyebrow: "Membership",
+    points: "pts",
+    toNext: (pts, tier) => (
+      <>
+        <span className="font-semibold tabular-nums">{pts}</span> pts to {tier}
+      </>
+    ),
+    unlocks: (tier) => <>Unlocks at {tier}</>,
+    topTier: "You have reached the top tier.",
+    topStamp: "Top tier",
+    valueText: (pts, target, tier) => `${pts} of ${target} points toward ${tier}`,
+  },
+  "zh-TW": {
+    eyebrow: "會員等級",
+    points: "點",
+    toNext: (pts, tier) => (
+      <>
+        再 <span className="font-semibold tabular-nums">{pts}</span> 點升級 {tier}
+      </>
+    ),
+    unlocks: (tier) => <>升級 {tier} 可解鎖</>,
+    topTier: "你已達到最高等級。",
+    topStamp: "最高等級",
+    valueText: (pts, target, tier) => `升級 ${tier} 進度：${pts} / ${target} 點`,
+  },
+  "zh-CN": {
+    eyebrow: "会员等级",
+    points: "积分",
+    toNext: (pts, tier) => (
+      <>
+        再攒 <span className="font-semibold tabular-nums">{pts}</span> 积分升级 {tier}
+      </>
+    ),
+    unlocks: (tier) => <>升级 {tier} 可解锁</>,
+    topTier: "你已达到最高等级。",
+    topStamp: "最高等级",
+    valueText: (pts, target, tier) => `升级 ${tier} 进度：${pts} / ${target} 积分`,
+  },
+  ja: {
+    eyebrow: "会員ランク",
+    points: "pt",
+    toNext: (pts, tier) => (
+      <>
+        {tier}まであと <span className="font-semibold tabular-nums">{pts}</span> pt
+      </>
+    ),
+    unlocks: (tier) => <>{tier}で解放される特典</>,
+    topTier: "最上位ランクに到達しました。",
+    topStamp: "最上位",
+    valueText: (pts, target, tier) => `${tier}まで ${pts} / ${target} pt`,
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -65,7 +118,7 @@ const springs = {
 const ARC = "M 16 100 A 84 84 0 0 1 184 100";
 
 export function TierProgress({ tiers, points, locale = "en-US", footnote, labels, className }: TierProgressProps) {
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const id = useId();
   const titleId = `${id}-tier`;

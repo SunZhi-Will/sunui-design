@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { ClassicFilterGrid, GridItem } from "./classic-filter-grid";
 
 const skills = [
@@ -31,12 +33,23 @@ function Badge({ abbr, color }: { abbr: string; color: string }) {
   );
 }
 
+type Category = "Frontend" | "Backend" | "Tools" | "Design";
+
+const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { title: string; cat: Record<Category, string> }> = {
+  en: { title: "Skills", cat: { Frontend: "Frontend", Backend: "Backend", Tools: "Tools", Design: "Design" } },
+  "zh-TW": { title: "技能", cat: { Frontend: "前端", Backend: "後端", Tools: "工具", Design: "設計" } },
+  "zh-CN": { title: "技能", cat: { Frontend: "前端", Backend: "后端", Tools: "工具", Design: "设计" } },
+  ja: { title: "スキル", cat: { Frontend: "フロントエンド", Backend: "バックエンド", Tools: "ツール", Design: "デザイン" } },
+};
+
 export default function ClassicFilterGridDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   return (
     <section className="w-full max-w-5xl min-w-0 rounded-2xl bg-slate-950 px-4 py-10 sm:px-8">
-      <ClassicFilterGrid theme="blue" usePagination itemsPerPage={8} labels={{ title: "Skills" }}>
+      <ClassicFilterGrid key={locale} locale={locale} theme="blue" usePagination itemsPerPage={8} labels={{ title: t.title }}>
         {skills.map((s) => (
-          <GridItem key={s.name} name={s.name} category={s.category} icon={<Badge abbr={s.abbr} color={s.color} />} />
+          <GridItem key={s.name} name={s.name} category={t.cat[s.category as Category]} icon={<Badge abbr={s.abbr} color={s.color} />} />
         ))}
       </ClassicFilterGrid>
     </section>

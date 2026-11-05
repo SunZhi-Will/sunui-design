@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export interface MotionClip {
   id: string;
-  /** 分頁上的編號，例如 壹 */
+  /** 分頁上的編號，例如 1 或 壹 */
   no: string;
   title: string;
   /** 標題下方的英文小字 */
@@ -44,22 +44,37 @@ export interface MotionClipTabsProps {
   accent?: string;
   /** 亮一階的燈火色，預設原本的 #edc186 */
   accentBright?: string;
-  labels?: {
-    tablist?: string;
-    live?: string;
-    play?: string;
-    pause?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<MotionClipTabsLabels>;
   onChange?: (index: number, clip: MotionClip) => void;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels = {
-  tablist: "實機短片",
-  live: "實機錄影",
-  play: "播放實機短片",
-  pause: "暫停實機短片",
+export interface MotionClipTabsLabels {
+  tablist: string;
+  live: string;
+  play: string;
+  pause: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, MotionClipTabsLabels> = {
+  en: { tablist: "Gameplay clips", live: "Gameplay", play: "Play gameplay clip", pause: "Pause gameplay clip" },
+  "zh-TW": { tablist: "實機短片", live: "實機錄影", play: "播放實機短片", pause: "暫停實機短片" },
+  "zh-CN": { tablist: "实机短片", live: "实机录像", play: "播放实机短片", pause: "暂停实机短片" },
+  ja: { tablist: "実機映像", live: "実機映像", play: "実機映像を再生", pause: "実機映像を一時停止" },
 };
 
 export function MotionClipTabs({
@@ -68,12 +83,13 @@ export function MotionClipTabs({
   threshold = 0.35,
   accent = "#d9a05b",
   accentBright = "#edc186",
+  locale = "en",
   labels,
   onChange,
   className,
   style,
 }: MotionClipTabsProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const uid = useId();
   const count = clips.length;
   const [active, setActive] = useState(0);

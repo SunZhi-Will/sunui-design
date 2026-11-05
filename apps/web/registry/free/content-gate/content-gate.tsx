@@ -15,19 +15,69 @@ export interface ContentGateLabels {
   contact?: ReactNode;
 }
 
-const defaultLabels: Required<ContentGateLabels> = {
-  body: (state) =>
-    state === "no-access"
-      ? "You're signed in, but this account doesn't have access to this course yet. If you bought a ticket, check that you're using the Google account you bought it with."
-      : "This is a paid course. Sign in with the Google account you bought your ticket with to unlock it.",
-  signIn: (state) =>
-    state === "no-access"
-      ? "Sign in with another Google account"
-      : "Sign in with Google to unlock",
-  signingIn: "Signing in…",
-  contactPrompt: (state) =>
-    state === "no-access" ? "Account looks right?" : "Haven't bought it yet?",
-  contact: "Contact the instructor",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
+  en: {
+    body: (state) =>
+      state === "no-access"
+        ? "You're signed in, but this account doesn't have access to this course yet. If you bought a ticket, check that you're using the Google account you bought it with."
+        : "This is a paid course. Sign in with the Google account you bought your ticket with to unlock it.",
+    signIn: (state) =>
+      state === "no-access"
+        ? "Sign in with another Google account"
+        : "Sign in with Google to unlock",
+    signingIn: "Signing in…",
+    contactPrompt: (state) =>
+      state === "no-access" ? "Account looks right?" : "Haven't bought it yet?",
+    contact: "Contact the instructor",
+  },
+  "zh-TW": {
+    body: (state) =>
+      state === "no-access"
+        ? "你已經登入，但這個帳號還沒有這門課的存取權。如果你已購票，請確認使用的是購票時的 Google 帳號。"
+        : "這是付費課程。請用購票時的 Google 帳號登入來解鎖。",
+    signIn: (state) =>
+      state === "no-access" ? "改用其他 Google 帳號登入" : "使用 Google 登入解鎖",
+    signingIn: "登入中…",
+    contactPrompt: (state) =>
+      state === "no-access" ? "帳號沒錯？" : "還沒購買？",
+    contact: "聯絡講師",
+  },
+  "zh-CN": {
+    body: (state) =>
+      state === "no-access"
+        ? "你已登录，但这个账号还没有这门课的访问权限。如果你已购票，请确认使用的是购票时的 Google 账号。"
+        : "这是付费课程。请用购票时的 Google 账号登录以解锁。",
+    signIn: (state) =>
+      state === "no-access" ? "使用其他 Google 账号登录" : "使用 Google 登录解锁",
+    signingIn: "登录中…",
+    contactPrompt: (state) =>
+      state === "no-access" ? "账号没问题？" : "还没购买？",
+    contact: "联系讲师",
+  },
+  ja: {
+    body: (state) =>
+      state === "no-access"
+        ? "ログイン済みですが、このアカウントにはまだこの講座へのアクセス権がありません。チケットを購入済みの場合は、購入時の Google アカウントを使っているか確認してください。"
+        : "これは有料の講座です。チケットを購入した Google アカウントでログインするとロックが解除されます。",
+    signIn: (state) =>
+      state === "no-access"
+        ? "別の Google アカウントでログイン"
+        : "Google でログインして解除",
+    signingIn: "ログイン中…",
+    contactPrompt: (state) =>
+      state === "no-access" ? "アカウントは合っていますか？" : "まだ購入していませんか？",
+    contact: "講師に問い合わせる",
+  },
 };
 
 interface SharedProps {
@@ -46,6 +96,9 @@ interface SharedProps {
   onContact?: () => void;
   /** 登入鈕左側的服務商圖示，預設 Google */
   providerIcon?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: ContentGateLabels;
 }
 
@@ -193,11 +246,12 @@ export function ContentGate({
   contactHref,
   onContact,
   providerIcon = <GoogleIcon />,
+  locale = "en",
   labels,
   children,
   className,
 }: ContentGateProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [signingIn, setSigningIn] = useState(false);
 
   return (

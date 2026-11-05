@@ -24,25 +24,88 @@ export interface CardFlowLoaderProps {
   fullScreen?: boolean;
   /** 詞語切換間隔（毫秒），原專案為 10 秒 */
   messageInterval?: number;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<CardFlowLoaderLabels>;
   className?: string;
 }
 
-const defaultLabels: CardFlowLoaderLabels = {
-  title: "Personal Cards",
-  messages: [
-    "Preparing the infinite grid...",
-    "Generating profile cards...",
-    "Calculating the best positions...",
-    "Loading user avatars...",
-    "Preparing bubble animations...",
-    "Tuning the zoom experience...",
-    "Building the coordinate system...",
-    "Loading background dots...",
-    "Preparing drag controls...",
-    "Final checks...",
-  ],
-  progress: "Loading",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CardFlowLoaderLabels> = {
+  en: {
+    title: "Personal Cards",
+    messages: [
+      "Preparing the infinite grid...",
+      "Generating profile cards...",
+      "Calculating the best positions...",
+      "Loading user avatars...",
+      "Preparing bubble animations...",
+      "Tuning the zoom experience...",
+      "Building the coordinate system...",
+      "Loading background dots...",
+      "Preparing drag controls...",
+      "Final checks...",
+    ],
+    progress: "Loading",
+  },
+  "zh-TW": {
+    title: "個人名片",
+    messages: [
+      "正在準備無限網格...",
+      "正在產生個人名片...",
+      "正在計算最佳位置...",
+      "正在載入使用者頭像...",
+      "正在準備泡泡動畫...",
+      "正在調整縮放體驗...",
+      "正在建立座標系統...",
+      "正在載入背景圓點...",
+      "正在準備拖曳控制...",
+      "最後檢查中...",
+    ],
+    progress: "載入中",
+  },
+  "zh-CN": {
+    title: "个人名片",
+    messages: [
+      "正在准备无限网格...",
+      "正在生成个人名片...",
+      "正在计算最佳位置...",
+      "正在加载用户头像...",
+      "正在准备气泡动画...",
+      "正在优化缩放体验...",
+      "正在构建坐标系统...",
+      "正在加载背景圆点...",
+      "正在准备拖拽控制...",
+      "最后检查中...",
+    ],
+    progress: "加载中",
+  },
+  ja: {
+    title: "パーソナルカード",
+    messages: [
+      "無限グリッドを準備中...",
+      "プロフィールカードを生成中...",
+      "最適な配置を計算中...",
+      "アバターを読み込み中...",
+      "バブルアニメーションを準備中...",
+      "ズームの操作感を調整中...",
+      "座標系を構築中...",
+      "背景のドットを読み込み中...",
+      "ドラッグ操作を準備中...",
+      "最終確認中...",
+    ],
+    progress: "読み込み中",
+  },
 };
 
 // 原專案 LoadingScreen.tsx 的分段：先設進度，再等待
@@ -63,11 +126,13 @@ export function CardFlowLoader({
   hideOnComplete = true,
   fullScreen = false,
   messageInterval = 10000,
+  locale = "en",
   labels: labelsProp,
   className,
 }: CardFlowLoaderProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
-  const messages = labels.messages.length ? labels.messages : defaultLabels.messages;
+  const base = MESSAGES[resolveLocale(locale)];
+  const labels = { ...base, ...labelsProp };
+  const messages = labels.messages.length ? labels.messages : base.messages;
 
   const [scripted, setScripted] = useState(0);
   const [done, setDone] = useState(false);

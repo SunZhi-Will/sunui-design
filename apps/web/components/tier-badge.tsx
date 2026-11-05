@@ -1,7 +1,9 @@
+import { getI18n } from "@/lib/i18n-server";
 import type { Tier } from "@/lib/registry";
 import { cn } from "@/lib/utils";
 
-export function TierBadge({ tier }: { tier: Tier }) {
+export async function TierBadge({ tier }: { tier: Tier }) {
+  const { m } = await getI18n();
   return (
     <span
       className={cn(
@@ -9,7 +11,7 @@ export function TierBadge({ tier }: { tier: Tier }) {
         tier === "pro" ? "bg-accent text-accent-fg" : "bg-stage text-subtle",
       )}
     >
-      {tier}
+      {m.tier[tier]}
     </span>
   );
 }

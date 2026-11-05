@@ -30,22 +30,90 @@ export interface LinkPreviewCardProps {
   onDragExtract?: (url: string, text: string) => void;
   /** 套用 CardFlow 畫布卡片外框（白底、圓角、陰影） */
   framed?: boolean;
-  labels?: Partial<typeof defaultLabels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<LinkPreviewCardLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  emptyTitle: "Link",
-  emptyHint: "Add a link URL and description in the editor",
-  invalidTitle: "Invalid link",
-  invalidHint: "Enter a valid URL (for example: https://example.com)",
-  untitled: "Untitled link",
-  loading: "Loading preview...",
-  open: (title: string) => `Open link: ${title} (double-click or right-click to open)`,
-  switchToWeb: "Switch to web view",
-  switchToCard: "Switch to preview card",
-  openInNewTab: "Open in new tab",
-  webFallbackTitle: "Link preview",
+export interface LinkPreviewCardLabels {
+  emptyTitle: string;
+  emptyHint: string;
+  invalidTitle: string;
+  invalidHint: string;
+  untitled: string;
+  loading: string;
+  open: (title: string) => string;
+  switchToWeb: string;
+  switchToCard: string;
+  openInNewTab: string;
+  webFallbackTitle: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, LinkPreviewCardLabels> = {
+  en: {
+    emptyTitle: "Link",
+    emptyHint: "Add a link URL and description in the editor",
+    invalidTitle: "Invalid link",
+    invalidHint: "Enter a valid URL (for example: https://example.com)",
+    untitled: "Untitled link",
+    loading: "Loading preview...",
+    open: (title) => `Open link: ${title} (double-click or right-click to open)`,
+    switchToWeb: "Switch to web view",
+    switchToCard: "Switch to preview card",
+    openInNewTab: "Open in new tab",
+    webFallbackTitle: "Link preview",
+  },
+  "zh-TW": {
+    emptyTitle: "連結",
+    emptyHint: "在編輯器中加入連結網址與說明",
+    invalidTitle: "無效的連結",
+    invalidHint: "請輸入有效的網址（例如：https://example.com）",
+    untitled: "未命名連結",
+    loading: "正在載入預覽...",
+    open: (title) => `開啟連結：${title}（雙擊或按右鍵開啟）`,
+    switchToWeb: "切換到網頁檢視",
+    switchToCard: "切換到預覽卡片",
+    openInNewTab: "在新分頁開啟",
+    webFallbackTitle: "連結預覽",
+  },
+  "zh-CN": {
+    emptyTitle: "链接",
+    emptyHint: "在编辑器中添加链接网址和说明",
+    invalidTitle: "无效的链接",
+    invalidHint: "请输入有效的网址（例如：https://example.com）",
+    untitled: "未命名链接",
+    loading: "正在加载预览...",
+    open: (title) => `打开链接：${title}（双击或右键打开）`,
+    switchToWeb: "切换到网页视图",
+    switchToCard: "切换到预览卡片",
+    openInNewTab: "在新标签页打开",
+    webFallbackTitle: "链接预览",
+  },
+  ja: {
+    emptyTitle: "リンク",
+    emptyHint: "エディタでリンクの URL と説明を追加してください",
+    invalidTitle: "無効なリンク",
+    invalidHint: "有効な URL を入力してください（例：https://example.com）",
+    untitled: "無題のリンク",
+    loading: "プレビューを読み込み中...",
+    open: (title) => `リンクを開く：${title}（ダブルクリックまたは右クリックで開きます）`,
+    switchToWeb: "ウェブ表示に切り替え",
+    switchToCard: "プレビューカードに切り替え",
+    openInNewTab: "新しいタブで開く",
+    webFallbackTitle: "リンクプレビュー",
+  },
 };
 
 // 已知會設定 X-Frame-Options: deny 的網站
@@ -85,10 +153,11 @@ export function LinkPreviewCard({
   allowEmbed = true,
   onDragExtract,
   framed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: LinkPreviewCardProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const [showIframe, setShowIframe] = useState(true);
   // 預設使用預覽卡片
   const [viewMode, setViewMode] = useState<"iframe" | "preview">("preview");

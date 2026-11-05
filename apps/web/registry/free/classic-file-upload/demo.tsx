@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { ClassicFileUpload } from "./classic-file-upload";
+
+const copy = {
+  en: { heading: "Project attachments", body: "{t.body}", attached: (n: number) => `${n} attached` },
+  "zh-TW": { heading: "專案附件", body: "加入設計稿、簽署好的需求單與任何參考文件。", attached: (n: number) => `已附加 ${n} 個` },
+  "zh-CN": { heading: "项目附件", body: "添加设计稿、已签署的需求文档和其他参考资料。", attached: (n: number) => `已添加 ${n} 个` },
+  ja: { heading: "プロジェクトの添付ファイル", body: "モックアップ、署名済みの依頼書、参考資料を追加してください。", attached: (n: number) => `${n} 件添付済み` },
+};
 
 // 模擬上傳：依檔案大小推進進度，約 1.2 到 2.4 秒完成
 function fakeUpload(files: File[], onProgress: (p: number) => void) {
@@ -21,6 +30,8 @@ function fakeUpload(files: File[], onProgress: (p: number) => void) {
 }
 
 export default function ClassicFileUploadDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [attached, setAttached] = useState(0);
 
   return (
@@ -28,14 +39,15 @@ export default function ClassicFileUploadDemo() {
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="min-w-0">
           <h2 id="attach-heading" className="text-lg font-semibold">
-            Project attachments
+            {t.heading}
           </h2>
-          <p className="text-sm text-gray-500">Add mockups, the signed brief and any reference docs.</p>
+          <p className="text-sm text-gray-500">{t.body}</p>
         </div>
-        <span className="text-sm text-gray-500 tabular-nums">{attached} attached</span>
+        <span className="text-sm text-gray-500 tabular-nums">{t.attached(attached)}</span>
       </header>
       <ClassicFileUpload
         theme="orange"
+        locale={locale}
         multiple
         accept="image/*,application/pdf,.doc,.docx"
         maxSize={10 * 1024 * 1024}

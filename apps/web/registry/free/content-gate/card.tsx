@@ -2,10 +2,21 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { ContentGate } from "./content-gate";
+
+const copy = {
+  en: { title: "Claude, Not Just Chat", subtitle: "Hands-on workshop", signIn: "Sign in to unlock" },
+  "zh-TW": { title: "Claude 不只是聊天", subtitle: "實作工作坊", signIn: "登入以解鎖" },
+  "zh-CN": { title: "Claude 不只是聊天", subtitle: "实操工作坊", signIn: "登录以解锁" },
+  ja: { title: "Claude はチャットだけじゃない", subtitle: "ハンズオンワークショップ", signIn: "ログインして解除" },
+};
 
 /** 型錄卡片：一張上鎖的課程卡，按登入鈕看轉圈的登入狀態。 */
 export default function ContentGateCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   // 登入狀態在元件內部，換 key 讓卡片在示範後回到初始狀態
   const [round, setRound] = useState(0);
 
@@ -13,12 +24,13 @@ export default function ContentGateCard() {
     <div className="mx-auto w-72 overflow-hidden rounded-2xl">
       <ContentGate
         key={round}
-        title="Claude, Not Just Chat"
-        subtitle="Hands-on workshop"
+        title={t.title}
+        subtitle={t.subtitle}
         state="anon"
+        locale={locale}
         onSignIn={() => setTimeout(() => setRound((r) => r + 1), 1800)}
         contactHref="#"
-        labels={{ body: () => null, signIn: () => "Sign in to unlock" }}
+        labels={{ body: () => null, signIn: () => t.signIn }}
         className="p-0 [&>div:nth-child(2)]:p-4 [&_.h-14]:size-10 [&_.mb-5]:mb-3 [&_.mb-7]:mb-3 [&_p.mt-5]:mt-3"
       />
     </div>

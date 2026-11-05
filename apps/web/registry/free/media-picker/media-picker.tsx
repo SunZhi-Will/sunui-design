@@ -37,19 +37,73 @@ export interface MediaPickerLabels {
   cancel: string;
 }
 
-export const defaultMediaPickerLabels: MediaPickerLabels = {
-  title: (n) => `What to download? (${n} total)`,
-  subtitle: "Tap to select. One is fine",
-  imageLabel: (i) => `Image ${i}`,
-  videoLabel: (i) => `Video ${i}`,
-  selectAll: "Select all",
-  clearAll: "Clear",
-  includeText: "Include the post text",
-  downloadTextOnly: "Download text only",
-  download: (n) => `Download ${n}`,
-  downloadNone: "Select something first",
-  cancel: "Cancel",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, MediaPickerLabels> = {
+  en: {
+    title: (n) => `What to download? (${n} total)`,
+    subtitle: "Tap to select. One is fine",
+    imageLabel: (i) => `Image ${i}`,
+    videoLabel: (i) => `Video ${i}`,
+    selectAll: "Select all",
+    clearAll: "Clear",
+    includeText: "Include the post text",
+    downloadTextOnly: "Download text only",
+    download: (n) => `Download ${n}`,
+    downloadNone: "Select something first",
+    cancel: "Cancel",
+  },
+  "zh-TW": {
+    title: (n) => `要下載哪些？（共 ${n} 個）`,
+    subtitle: "點縮圖勾選，只選一個也可以",
+    imageLabel: (i) => `圖片 ${i}`,
+    videoLabel: (i) => `影片 ${i}`,
+    selectAll: "全選",
+    clearAll: "全不選",
+    includeText: "連同貼文文字一起下載",
+    downloadTextOnly: "只下載文字",
+    download: (n) => `下載 ${n} 個`,
+    downloadNone: "請先選擇項目",
+    cancel: "取消",
+  },
+  "zh-CN": {
+    title: (n) => `要下载哪些？（共 ${n} 个）`,
+    subtitle: "点击缩略图选择，只选一个也可以",
+    imageLabel: (i) => `图片 ${i}`,
+    videoLabel: (i) => `视频 ${i}`,
+    selectAll: "全选",
+    clearAll: "全不选",
+    includeText: "同时下载帖子文字",
+    downloadTextOnly: "仅下载文字",
+    download: (n) => `下载 ${n} 个`,
+    downloadNone: "请先选择内容",
+    cancel: "取消",
+  },
+  ja: {
+    title: (n) => `どれをダウンロードしますか？（全 ${n} 件）`,
+    subtitle: "タップして選択。1 つだけでも OK",
+    imageLabel: (i) => `画像 ${i}`,
+    videoLabel: (i) => `動画 ${i}`,
+    selectAll: "すべて選択",
+    clearAll: "選択解除",
+    includeText: "投稿のテキストも含める",
+    downloadTextOnly: "テキストのみダウンロード",
+    download: (n) => `${n} 件をダウンロード`,
+    downloadNone: "先に選択してください",
+    cancel: "キャンセル",
+  },
 };
+
+/** 英文預設字串，保留舊的匯出名稱 */
+export const defaultMediaPickerLabels: MediaPickerLabels = MESSAGES.en;
 
 /** 只有一個媒體就不用選了，直接下載；沒有媒體回傳 none */
 export function resolveMediaPick(items: PickMediaItem[]): "none" | "direct" | "picker" {
@@ -90,6 +144,9 @@ export interface MediaPickerProps {
   onClose: () => void;
   /** true 時蓋住整個視窗；false 時蓋住最近的 relative 容器 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<MediaPickerLabels>;
   className?: string;
 }
@@ -102,10 +159,11 @@ export function MediaPicker({
   onDownload,
   onClose,
   fixed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: MediaPickerProps) {
-  const l = { ...defaultMediaPickerLabels, ...labelsProp };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   // 預設全選：大多數人是要整則存下來，不要的再取消

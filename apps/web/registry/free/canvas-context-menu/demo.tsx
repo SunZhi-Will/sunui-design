@@ -2,17 +2,31 @@
 
 import { useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { CanvasContextMenu } from "./canvas-context-menu";
 
-type Card = { id: string; title: string; x: number; y: number; group?: string };
+type Card = { id: string; x: number; y: number; group?: string };
 
 const initial: Card[] = [
-  { id: "c1", title: "Hello, I'm Sun", x: 20, y: 24 },
-  { id: "c2", title: "github.com/sun", x: 160, y: 60 },
-  { id: "c3", title: "Now: canvas tools", x: 48, y: 140 },
+  { id: "c1", x: 20, y: 24 },
+  { id: "c2", x: 160, y: 60 },
+  { id: "c3", x: 48, y: 140 },
 ];
 
+const copy = {
+  en: { titles: { c1: "Hello, I'm Sun", c2: "github.com/sun", c3: "Now: canvas tools" }, hint: "Right-click the canvas for actions." },
+  "zh-TW": { titles: { c1: "嗨，我是 Sun", c2: "github.com/sun", c3: "最近在做：畫布工具" }, hint: "在畫布上按右鍵開啟操作選單。" },
+  "zh-CN": { titles: { c1: "嗨，我是 Sun", c2: "github.com/sun", c3: "最近在做：画布工具" }, hint: "在画布上右键打开操作菜单。" },
+  ja: { titles: { c1: "こんにちは、Sun です", c2: "github.com/sun", c3: "いま：キャンバスツール" }, hint: "キャンバスを右クリックすると操作メニューが開きます。" },
+};
+
+// 複製出來的卡片沿用原卡片的標題
+const baseId = (id: string) => id.split("-")[0] as keyof (typeof copy)["en"]["titles"];
+
 export default function CanvasContextMenuDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const areaRef = useRef<HTMLDivElement>(null);
   const [cards, setCards] = useState(initial);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -39,13 +53,14 @@ export default function CanvasContextMenuDemo() {
           className={`absolute w-32 rounded-xl border bg-white p-2.5 text-sm font-semibold text-gray-800 shadow-sm ${c.id !== "c3" ? "ring-2 ring-blue-500" : ""} ${c.group ? "border-dashed border-blue-300" : "border-gray-200"}`}
           style={{ left: c.x, top: c.y }}
         >
-          {c.title}
+          {t.titles[baseId(c.id)]}
         </div>
       ))}
-      <p className="pointer-events-none absolute right-3 bottom-2 left-3 text-[11px] text-gray-400">Right-click the canvas for actions.</p>
+      <p className="pointer-events-none absolute right-3 bottom-2 left-3 text-[11px] text-gray-400">{t.hint}</p>
       {menu && (
         <CanvasContextMenu
           fixed={false}
+          locale={locale}
           x={menu.x}
           y={menu.y}
           onClose={() => setMenu(null)}

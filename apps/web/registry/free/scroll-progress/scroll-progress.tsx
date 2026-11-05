@@ -26,16 +26,33 @@ export interface ScrollProgressProps {
   showPercent?: boolean;
   /** 平滑跟隨；減少動態時自動關閉 */
   smooth?: boolean;
-  labels?: {
-    progress?: string;
-    jumpTo?: (label: string) => string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<ScrollProgressLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  progress: "Reading progress",
-  jumpTo: (label: string) => `Jump to ${label}`,
+export interface ScrollProgressLabels {
+  progress: string;
+  jumpTo: (label: string) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ScrollProgressLabels> = {
+  en: { progress: "Reading progress", jumpTo: (label) => `Jump to ${label}` },
+  "zh-TW": { progress: "閱讀進度", jumpTo: (label) => `跳到「${label}」` },
+  "zh-CN": { progress: "阅读进度", jumpTo: (label) => `跳到“${label}”` },
+  ja: { progress: "読書の進捗", jumpTo: (label) => `「${label}」へ移動` },
 };
 
 // 設計語言（DESIGN.md）：紙邊作底線，墨色作進度
@@ -54,11 +71,12 @@ export function ScrollProgress({
   barClassName,
   showPercent = false,
   smooth = true,
+  locale = "en",
   labels,
   className,
 }: ScrollProgressProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   // layoutEffect: false，等父層的 container ref 掛上後才綁定，否則會退回追蹤 window
   const { scrollYProgress } = useScroll(container ? { container, layoutEffect: false } : undefined);
   const spring = useSpring(scrollYProgress, { stiffness: 240, damping: 30, restDelta: 0.001 });

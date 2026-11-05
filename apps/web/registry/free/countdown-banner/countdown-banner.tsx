@@ -20,14 +20,96 @@ export interface CountdownBannerProps {
   /** 提供時 CTA 為連結 */
   ctaHref?: string;
   onCtaClick?: () => void;
+  /** 舊版寫法：zh 等同 locale="zh-TW"，en 等同 locale="en"；有給 locale 時以 locale 為準 */
   language?: LanguageType;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CountdownBannerLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
-const translations = {
-  zh: { days: "天", hours: "時", minutes: "分", seconds: "秒", endsIn: "倒數", ended: "已結束", original: "原價", timer: "距離結束還有" },
-  en: { days: "Days", hours: "Hrs", minutes: "Min", seconds: "Sec", endsIn: "Ends in", ended: "Ended", original: "Was", timer: "Time left:" },
+export interface CountdownBannerLabels {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+  endsIn: string;
+  ended: string;
+  /** 原價前的螢幕閱讀器文字 */
+  original: string;
+  /** 倒數計時器的無障礙名稱 */
+  timer: (p: { days: number; hours: number; minutes: number }) => string;
+  /** 沒有給 title、subtitle、ctaText 時的預設文案 */
+  defaultTitle: string;
+  defaultSubtitle: string;
+  defaultCta: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
+  en: {
+    days: "Days",
+    hours: "Hrs",
+    minutes: "Min",
+    seconds: "Sec",
+    endsIn: "Ends in",
+    ended: "Ended",
+    original: "Was",
+    timer: (p) => `Time left: ${p.days} Days ${p.hours} Hrs ${p.minutes} Min`,
+    defaultTitle: "Limited-time offer",
+    defaultSubtitle: "When the countdown ends, so does the deal.",
+    defaultCta: "View the offer",
+  },
+  "zh-TW": {
+    days: "天",
+    hours: "時",
+    minutes: "分",
+    seconds: "秒",
+    endsIn: "倒數",
+    ended: "已結束",
+    original: "原價",
+    timer: (p) => `距離結束還有 ${p.days} 天 ${p.hours} 時 ${p.minutes} 分`,
+    defaultTitle: "限時優惠活動",
+    defaultSubtitle: "倒數結束，錯過不再",
+    defaultCta: "立即查看優惠",
+  },
+  "zh-CN": {
+    days: "天",
+    hours: "时",
+    minutes: "分",
+    seconds: "秒",
+    endsIn: "倒计时",
+    ended: "已结束",
+    original: "原价",
+    timer: (p) => `距离结束还有 ${p.days} 天 ${p.hours} 小时 ${p.minutes} 分`,
+    defaultTitle: "限时优惠活动",
+    defaultSubtitle: "倒计时结束，错过不再",
+    defaultCta: "立即查看优惠",
+  },
+  ja: {
+    days: "日",
+    hours: "時間",
+    minutes: "分",
+    seconds: "秒",
+    endsIn: "終了まで",
+    ended: "終了",
+    original: "通常価格",
+    timer: (p) => `終了まで残り ${p.days} 日 ${p.hours} 時間 ${p.minutes} 分`,
+    defaultTitle: "期間限定セール",
+    defaultSubtitle: "カウントダウンが終わると締め切りです",
+    defaultCta: "セール内容を見る",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -44,20 +126,25 @@ const springs = {
 } as const;
 
 export function CountdownBanner({
-  title = "限時優惠活動",
-  subtitle = "倒數結束，錯過不再",
+  title,
+  subtitle,
   discount = "40% OFF",
   originalPrice = "42,000 NTD",
   discountedPrice = "25,200 NTD",
   endDate,
-  ctaText = "立即查看優惠",
+  ctaText,
   ctaHref,
   onCtaClick,
-  language = "zh",
+  language,
+  locale,
+  labels,
   className,
   style,
 }: CountdownBannerProps) {
-  const t = translations[language];
+  const t = { ...MESSAGES[resolveLocale(locale ?? (language === "zh" ? "zh-TW" : language))], ...labels };
+  title ??= t.defaultTitle;
+  subtitle ??= t.defaultSubtitle;
+  ctaText ??= t.defaultCta;
   const reduceMotion = !!useReducedMotion();
   const endTime = new Date(endDate).getTime();
   const endKey = Number.isNaN(endTime) ? null : endTime;
@@ -83,7 +170,7 @@ export function CountdownBanner({
   const s = Math.floor((remaining ?? 0) / 1000);
   const parts = { days: Math.floor(s / 86400), hours: Math.floor((s % 86400) / 3600), minutes: Math.floor((s % 3600) / 60), seconds: s % 60 };
   const units = (["days", "hours", "minutes", "seconds"] as const).filter((k) => k !== "days" || parts.days > 0 || remaining === null);
-  const timerLabel = `${t.timer} ${parts.days} ${t.days} ${parts.hours} ${t.hours} ${parts.minutes} ${t.minutes}`;
+  const timerLabel = t.timer(parts);
 
   return (
     <section

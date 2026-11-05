@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-import { PermissionCenter, preflightTheme, defaultPermissionLabels, type PermissionKey, type PermissionSnapshot } from "./permission-center";
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
+import { PermissionCenter, preflightTheme, type PermissionKey, type PermissionSnapshot } from "./permission-center";
 
 const initial: PermissionSnapshot[] = [
   { key: "microphone", state: "not-determined", required: false },
@@ -10,13 +12,18 @@ const initial: PermissionSnapshot[] = [
 ];
 
 // 卡片空間有限：拿掉說明，只留狀態與降級提示
-const labels = {
-  desc: { ...defaultPermissionLabels.desc, microphone: "", camera: "" },
-  degradedOptional: "Screen-only still works.",
+const noDesc = { screenRecording: "", microphone: "", camera: "" };
+const copy = {
+  en: { degradedOptional: "Screen-only still works.", reset: "Reset" },
+  "zh-TW": { degradedOptional: "仍可只錄螢幕。", reset: "重設" },
+  "zh-CN": { degradedOptional: "仍可只录屏幕。", reset: "重置" },
+  ja: { degradedOptional: "画面だけの収録は可能です。", reset: "リセット" },
 };
 
 /** 型錄卡片：兩項權限，按 Request 或 Open System Settings 看狀態燈與提示切換。 */
 export default function PermissionCenterCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [permissions, setPermissions] = useState(initial);
   const update = (key: PermissionKey, state: PermissionSnapshot["state"]) =>
     setPermissions((ps) => ps.map((p) => (p.key === key ? { ...p, state } : p)));
@@ -27,13 +34,14 @@ export default function PermissionCenterCard() {
       <PermissionCenter
         hideHeading
         permissions={permissions}
-        labels={labels}
+        locale={locale}
+        labels={{ desc: noDesc, degradedOptional: t.degradedOptional }}
         onRequest={(k) => update(k, "granted")}
         onOpenSettings={(k) => update(k, "restart-required")}
       />
       {settled && (
         <button type="button" onClick={() => setPermissions(initial)} className="mt-2 text-[11px] text-[var(--pf-muted)] underline-offset-4 hover:underline">
-          Reset
+          {t.reset}
         </button>
       )}
     </div>

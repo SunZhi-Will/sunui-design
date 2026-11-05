@@ -52,17 +52,65 @@ export interface UpdateBannerLabels {
   dismissError?: string;
 }
 
-const bannerLabels: Required<UpdateBannerLabels> = {
-  updateAvailable: (v) => `A new version${v ? ` v${v}` : ""} is available. Ready to update?`,
-  downloadNow: "Download Now",
-  dismissUpdate: "Dismiss update notice",
-  downloadingUpdate: (p) => `Downloading update… ${p}%`,
-  downloadRetrying: (a, m) => `Download interrupted, retrying… (${a}/${m})`,
-  updateDownloaded: "Update downloaded. After you restart, the app will close for a few seconds then reopen automatically.",
-  restartNow: "Restart Now",
-  installingUpdate: "Installing update… the app will restart shortly.",
-  updateFailed: (m) => `Update failed: ${m}`,
-  dismissError: "Dismiss error notice",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<UpdateBannerLabels>> = {
+  en: {
+    updateAvailable: (v) => `A new version${v ? ` v${v}` : ""} is available. Ready to update?`,
+    downloadNow: "Download Now",
+    dismissUpdate: "Dismiss update notice",
+    downloadingUpdate: (p) => `Downloading update… ${p}%`,
+    downloadRetrying: (a, m) => `Download interrupted, retrying… (${a}/${m})`,
+    updateDownloaded: "Update downloaded. After you restart, the app will close for a few seconds then reopen automatically.",
+    restartNow: "Restart Now",
+    installingUpdate: "Installing update… the app will restart shortly.",
+    updateFailed: (m) => `Update failed: ${m}`,
+    dismissError: "Dismiss error notice",
+  },
+  "zh-TW": {
+    updateAvailable: (v) => `有新版本${v ? ` v${v}` : ""}可以更新，要現在更新嗎？`,
+    downloadNow: "立即下載",
+    dismissUpdate: "關閉更新通知",
+    downloadingUpdate: (p) => `正在下載更新… ${p}%`,
+    downloadRetrying: (a, m) => `下載中斷，正在重試… (${a}/${m})`,
+    updateDownloaded: "更新已下載。重新啟動後，應用程式會關閉幾秒再自動開啟。",
+    restartNow: "立即重新啟動",
+    installingUpdate: "正在安裝更新… 應用程式即將重新啟動。",
+    updateFailed: (m) => `更新失敗：${m}`,
+    dismissError: "關閉錯誤通知",
+  },
+  "zh-CN": {
+    updateAvailable: (v) => `有新版本${v ? ` v${v}` : ""}可用，要现在更新吗？`,
+    downloadNow: "立即下载",
+    dismissUpdate: "关闭更新通知",
+    downloadingUpdate: (p) => `正在下载更新… ${p}%`,
+    downloadRetrying: (a, m) => `下载中断，正在重试… (${a}/${m})`,
+    updateDownloaded: "更新已下载。重启后，应用会关闭几秒钟再自动打开。",
+    restartNow: "立即重启",
+    installingUpdate: "正在安装更新… 应用即将重启。",
+    updateFailed: (m) => `更新失败：${m}`,
+    dismissError: "关闭错误通知",
+  },
+  ja: {
+    updateAvailable: (v) => `新しいバージョン${v ? ` v${v}` : ""}があります。アップデートしますか？`,
+    downloadNow: "今すぐダウンロード",
+    dismissUpdate: "アップデート通知を閉じる",
+    downloadingUpdate: (p) => `アップデートをダウンロード中… ${p}%`,
+    downloadRetrying: (a, m) => `ダウンロードが中断されました。再試行中… (${a}/${m})`,
+    updateDownloaded: "アップデートをダウンロードしました。再起動するとアプリが数秒間閉じ、自動で再び開きます。",
+    restartNow: "今すぐ再起動",
+    installingUpdate: "アップデートをインストール中… まもなくアプリが再起動します。",
+    updateFailed: (m) => `アップデートに失敗しました：${m}`,
+    dismissError: "エラー通知を閉じる",
+  },
 };
 
 export interface UpdateBannerProps {
@@ -73,6 +121,9 @@ export interface UpdateBannerProps {
   onInstall?: () => Promise<Result>;
   /** 預設 fixed 於視窗頂部並把實際高度寫進 :root 的 --banner-height；false 時改為 absolute */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: UpdateBannerLabels;
   className?: string;
 }
@@ -94,8 +145,8 @@ const CloseIcon = () => (
   </Icon>
 );
 
-export function UpdateBanner({ event, onDownload, onInstall, fixed = true, labels, className }: UpdateBannerProps) {
-  const t = { ...bannerLabels, ...labels };
+export function UpdateBanner({ event, onDownload, onInstall, fixed = true, locale = "en", labels, className }: UpdateBannerProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [banner, setBanner] = useState<BannerState>({ type: "idle" });
   const [dismissed, setDismissed] = useState(false);

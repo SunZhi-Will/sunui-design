@@ -26,22 +26,60 @@ export interface OtpInputProps {
   mask?: boolean;
   disabled?: boolean;
   autoFocus?: boolean;
-  labels?: {
-    group?: string;
-    digit?: (index: number, total: number) => string;
-    success?: string;
-    error?: string;
-    stamp?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<OtpInputLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  group: "One-time code",
-  digit: (i: number, n: number) => `Digit ${i} of ${n}`,
-  success: "Code verified",
-  error: "That code doesn't match. Check the email and try again.",
-  stamp: "Verified",
+export interface OtpInputLabels {
+  group: string;
+  digit: (index: number, total: number) => string;
+  success: string;
+  error: string;
+  stamp: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, OtpInputLabels> = {
+  en: {
+    group: "One-time code",
+    digit: (i, n) => `Digit ${i} of ${n}`,
+    success: "Code verified",
+    error: "That code doesn't match. Check the email and try again.",
+    stamp: "Verified",
+  },
+  "zh-TW": {
+    group: "一次性驗證碼",
+    digit: (i, n) => `第 ${i} 碼，共 ${n} 碼`,
+    success: "驗證碼正確",
+    error: "驗證碼不符，請檢查信件後再試一次。",
+    stamp: "已驗證",
+  },
+  "zh-CN": {
+    group: "一次性验证码",
+    digit: (i, n) => `第 ${i} 位，共 ${n} 位`,
+    success: "验证码正确",
+    error: "验证码不正确，请检查邮件后重试。",
+    stamp: "已验证",
+  },
+  ja: {
+    group: "ワンタイムコード",
+    digit: (i, n) => `${n} 桁中 ${i} 桁目`,
+    success: "コードを確認しました",
+    error: "コードが一致しません。メールを確認して、もう一度お試しください。",
+    stamp: "認証済み",
+  },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
@@ -75,11 +113,12 @@ export function OtpInput({
   mask = false,
   disabled = false,
   autoFocus = false,
+  locale = "en",
   labels,
   className,
 }: OtpInputProps) {
   const reduceMotion = useReducedMotion();
-  const text = { ...defaultLabels, ...labels };
+  const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const groupId = useId();
   const controls = useAnimationControls();
   const refs = useRef<Array<HTMLInputElement | null>>([]);

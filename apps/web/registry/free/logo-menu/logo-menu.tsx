@@ -60,8 +60,34 @@ export type LogoMenuProps = {
   /** 受控開關；不傳則滑入展開、離開 150ms 後收合 */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** LOGO 按鈕與 nav 的名稱，優先於 labels.menu */
   label?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<LogoMenuLabels>;
   className?: string;
+};
+
+export type LogoMenuLabels = {
+  menu: string;
+};
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, LogoMenuLabels> = {
+  en: { menu: "Menu" },
+  "zh-TW": { menu: "選單" },
+  "zh-CN": { menu: "菜单" },
+  ja: { menu: "メニュー" },
 };
 
 export function LogoMenu({
@@ -70,9 +96,13 @@ export function LogoMenu({
   logo = "✨",
   open: openProp,
   onOpenChange,
-  label = "Menu",
+  label: labelProp,
+  locale = "en",
+  labels,
   className,
 }: LogoMenuProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const label = labelProp ?? t.menu;
   const isRight = direction === "right";
   const [openState, setOpenState] = useState(false);
   const isOpen = openProp ?? openState;

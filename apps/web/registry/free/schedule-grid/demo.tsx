@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { ScheduleGrid, type ScheduleAssignment, type ScheduleShift } from "./schedule-grid";
 
 const shifts: ScheduleShift[] = [
@@ -10,6 +12,13 @@ const shifts: ScheduleShift[] = [
 ];
 
 const staff = ["Mia", "Leo", "Ava", "Noah", "Iris"].map((name, i) => ({ id: i + 1, name }));
+
+const copy = {
+  en: { shifts: ["Morning", "Evening"], staff: ["Mia", "Leo", "Ava", "Noah", "Iris"] },
+  "zh-TW": { shifts: ["早班", "晚班"], staff: ["美琪", "立安", "雅文", "諾恩", "怡君"] },
+  "zh-CN": { shifts: ["早班", "晚班"], staff: ["美琪", "立安", "雅文", "诺恩", "怡君"] },
+  ja: { shifts: ["早番", "遅番"], staff: ["美月", "蓮", "葵", "湊", "彩"] },
+};
 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -32,6 +41,8 @@ function buildWeek() {
 }
 
 export default function ScheduleGridDemo() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const week = useMemo(buildWeek, []);
   const [assignments, setAssignments] = useState(week.list);
   const [selected, setSelected] = useState<ScheduleAssignment | null>(null);
@@ -39,9 +50,10 @@ export default function ScheduleGridDemo() {
   return (
     <div className="w-full max-w-5xl min-w-0">
       <ScheduleGrid
+        locale={locale}
         dates={week.dates}
-        shifts={shifts}
-        assignments={assignments}
+        shifts={shifts.map((shift, i) => ({ ...shift, name: t.shifts[i] }))}
+        assignments={assignments.map((a) => ({ ...a, employeeName: t.staff[a.employeeId - 1] }))}
         selectedAssignmentId={selected?.id ?? null}
         onSelectAssignment={(a) => setSelected((cur) => (cur?.id === a.id ? null : a))}
         onFillShortage={(date, shift) => {

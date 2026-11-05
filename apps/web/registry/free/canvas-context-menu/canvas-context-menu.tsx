@@ -4,7 +4,7 @@ import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from "rea
 
 import { cn } from "@/lib/utils";
 
-type Labels = {
+export type CanvasContextMenuLabels = {
   menu: string;
   selected: (count: number) => string;
   empty: string;
@@ -15,15 +15,57 @@ type Labels = {
   delete: string;
 };
 
-const defaultLabels: Labels = {
-  menu: "Canvas actions",
-  selected: (n) => `${n} ${n === 1 ? "object" : "objects"} selected`,
-  empty: "No actions available",
-  group: "Group",
-  ungroup: "Ungroup",
-  layout: "Layout",
-  duplicate: "Duplicate",
-  delete: "Delete",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CanvasContextMenuLabels> = {
+  en: {
+    menu: "Canvas actions",
+    selected: (n) => `${n} ${n === 1 ? "object" : "objects"} selected`,
+    empty: "No actions available",
+    group: "Group",
+    ungroup: "Ungroup",
+    layout: "Layout",
+    duplicate: "Duplicate",
+    delete: "Delete",
+  },
+  "zh-TW": {
+    menu: "畫布操作",
+    selected: (n) => `已選取 ${n} 個物件`,
+    empty: "沒有可用的操作",
+    group: "組成群組",
+    ungroup: "解散群組",
+    layout: "佈局",
+    duplicate: "複製",
+    delete: "刪除",
+  },
+  "zh-CN": {
+    menu: "画布操作",
+    selected: (n) => `已选中 ${n} 个对象`,
+    empty: "没有可用的操作",
+    group: "编组",
+    ungroup: "取消编组",
+    layout: "布局",
+    duplicate: "复制",
+    delete: "删除",
+  },
+  ja: {
+    menu: "キャンバス操作",
+    selected: (n) => `${n} 個のオブジェクトを選択中`,
+    empty: "使用できる操作はありません",
+    group: "グループ化",
+    ungroup: "グループ解除",
+    layout: "レイアウト",
+    duplicate: "複製",
+    delete: "削除",
+  },
 };
 
 export type CanvasContextMenuProps = {
@@ -41,7 +83,10 @@ export type CanvasContextMenuProps = {
   onSnapToGrid?: () => void;
   /** 原版為 fixed；放在相對容器裡時設 false */
   fixed?: boolean;
-  labels?: Partial<Labels>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CanvasContextMenuLabels>;
   className?: string;
 };
 
@@ -67,10 +112,11 @@ export function CanvasContextMenu({
   onDuplicate,
   onSnapToGrid,
   fixed = true,
+  locale = "en",
   labels: labelsProp,
   className,
 }: CanvasContextMenuProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const menuRef = useRef<HTMLDivElement>(null);
 
   // 點外面或按 Escape 關閉

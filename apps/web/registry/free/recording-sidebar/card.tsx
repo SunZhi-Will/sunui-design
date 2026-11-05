@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { PreflightSidebar, type MicHealth, type PreflightPreferences, type RecordingSettings } from "./recording-sidebar";
 
 /** 型錄卡片：錄影前的右欄，切換麥克風與系統音、按測試看音量條跳動，可在框內捲動。 */
 export default function RecordingSidebarCard() {
+  const locale = useDemoLocale();
   const [settings, setSettings] = useState<RecordingSettings>({ countdownSec: 3, showCursor: false, performanceMode: "balanced", quality: "high" });
   const [prefs, setPrefs] = useState<PreflightPreferences>({ micEnabled: true, systemAudioEnabled: true, cameraEnabled: false });
   const [armed, setArmed] = useState(false);
@@ -34,6 +37,7 @@ export default function RecordingSidebarCard() {
     <div className="mx-auto w-72 overflow-hidden rounded-[14px] border border-white/10">
       <PreflightSidebar
         className="h-[230px] w-full border-l-0"
+        locale={locale}
         settings={settings}
         onSettingsChange={setSettings}
         preferences={prefs}

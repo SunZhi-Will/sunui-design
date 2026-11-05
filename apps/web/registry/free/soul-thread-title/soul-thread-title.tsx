@@ -118,8 +118,26 @@ function DefaultScythe({ id }: { id: string }) {
   );
 }
 
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+/** 預設字標的襯線字體，依語言挑對應字形；英文沿用原本的繁中襯線。 */
+const SERIF_STACKS: Record<SunLocale, string> = {
+  en: '"Noto Serif TC", "Songti TC", "Source Han Serif", serif',
+  "zh-TW": '"Noto Serif TC", "Songti TC", "Source Han Serif", serif',
+  "zh-CN": '"Noto Serif SC", "Songti SC", "Source Han Serif SC", "Source Han Serif", serif',
+  ja: '"Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "Source Han Serif", serif',
+};
+
 /** 預設字標：把片名畫進字標座標空間，絲線才對得上字。 */
-function DefaultWordmark({ title, gradientId }: { title: string; gradientId: string }) {
+function DefaultWordmark({ title, gradientId, fontFamily }: { title: string; gradientId: string; fontFamily: string }) {
   return (
     <svg viewBox={`0 0 ${WORDMARK_WIDTH} ${WORDMARK_HEIGHT}`} className="block size-full" role="img" aria-label={title}>
       <defs>
@@ -137,7 +155,7 @@ function DefaultWordmark({ title, gradientId }: { title: string; gradientId: str
         fill={`url(#${gradientId})`}
         fontSize={400}
         fontWeight={700}
-        style={{ fontFamily: '"Noto Serif TC", "Songti TC", "Source Han Serif", serif' }}
+        style={{ fontFamily }}
       >
         {title}
       </text>
@@ -158,6 +176,8 @@ export interface SoulThreadTitleProps {
   skipped?: boolean;
   /** 絲線顏色。 */
   threadColor?: string;
+  /** 預設字標的字形語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤。片名本身不翻譯。 */
+  locale?: string;
   className?: string;
 }
 
@@ -172,6 +192,7 @@ export function SoulThreadTitle({
   intro = true,
   skipped = false,
   threadColor = "#e6a4b8",
+  locale = "en",
   className,
 }: SoulThreadTitleProps) {
   const reduce = useReducedMotion() ?? false;
@@ -267,7 +288,7 @@ export function SoulThreadTitle({
         <path ref={backRef} fill={threadColor} />
       </svg>
       <div className="relative z-[1] size-full [&>img]:block [&>img]:size-full" style={wordmarkStyle}>
-        {wordmark ?? <DefaultWordmark title={title} gradientId={`${uid}-wm`} />}
+        {wordmark ?? <DefaultWordmark title={title} gradientId={`${uid}-wm`} fontFamily={SERIF_STACKS[resolveLocale(locale)]} />}
       </div>
       <svg className={cn(layer, "z-[2]")} viewBox={viewBox} aria-hidden="true">
         <defs>

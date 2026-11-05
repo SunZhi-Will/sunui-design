@@ -41,19 +41,35 @@ export interface Bookshelf3DProps {
   spineTitle?: string;
   /** 聚焦外框與空位高亮色，預設原本的燈金 */
   accent?: string;
-  labels?: {
-    shelf?: string;
-    slot?: (slot: number) => string;
-    empty?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<Bookshelf3DLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels = {
-  shelf: "Memoir bookshelf",
-  slot: (slot: number) => `Slot ${slot}`,
-  empty: "empty",
+export interface Bookshelf3DLabels {
+  shelf: string;
+  slot: (slot: number) => string;
+  empty: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Bookshelf3DLabels> = {
+  en: { shelf: "Memoir bookshelf", slot: (slot) => `Slot ${slot}`, empty: "empty" },
+  "zh-TW": { shelf: "回憶錄書架", slot: (slot) => `第 ${slot} 格`, empty: "空位" },
+  "zh-CN": { shelf: "回忆录书架", slot: (slot) => `第 ${slot} 格`, empty: "空位" },
+  ja: { shelf: "回想録の本棚", slot: (slot) => `${slot} 番目の枠`, empty: "空き" },
 };
 
 const css = `
@@ -160,11 +176,12 @@ export function Bookshelf3D({
   spineSrc,
   spineTitle,
   accent = "#e7c489",
+  locale = "en",
   labels: labelsProp,
   className,
   style,
 }: Bookshelf3DProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const bySlot = new Map(items.map((item) => [item.slot, item]));
 
   return (

@@ -13,36 +13,85 @@ export interface RecapMonthData {
   month?: string;
 }
 
-export const recapMonthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+export interface RecapMonthLabels {
+  title: string;
+  posts: string;
+  comments: { low: string; medium: string; high: string };
+}
 
-export const recapMonthLabels = {
-  title: "Most Active Month",
-  posts: "posts",
-  comments: {
-    low: "You were quieter this month",
-    medium: "You were very active this month",
-    high: "You were super active this month!",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const zhMonths = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+
+const MESSAGES: Record<SunLocale, RecapMonthLabels & { months: string[] }> = {
+  en: {
+    title: "Most Active Month",
+    posts: "posts",
+    comments: {
+      low: "You were quieter this month",
+      medium: "You were very active this month",
+      high: "You were super active this month!",
+    },
+    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
   },
+  "zh-TW": {
+    title: "最活躍的月份",
+    posts: "則貼文",
+    comments: {
+      low: "這個月你比較安靜",
+      medium: "這個月你非常活躍",
+      high: "這個月你超級活躍！",
+    },
+    months: zhMonths,
+  },
+  "zh-CN": {
+    title: "最活跃的月份",
+    posts: "条动态",
+    comments: {
+      low: "这个月你比较安静",
+      medium: "这个月你非常活跃",
+      high: "这个月你超级活跃！",
+    },
+    months: zhMonths,
+  },
+  ja: {
+    title: "いちばん活発だった月",
+    posts: "件の投稿",
+    comments: {
+      low: "今月はちょっと静かでした",
+      medium: "今月はとても活発でした",
+      high: "今月は大活躍でした！",
+    },
+    months: Array.from({ length: 12 }, (_, i) => `${i + 1}月`),
+  },
+};
+
+/** 英文月份名稱（向下相容的匯出） */
+export const recapMonthNames = MESSAGES.en.months;
+
+/** 英文預設字串（向下相容的匯出） */
+export const recapMonthLabels: RecapMonthLabels = {
+  title: MESSAGES.en.title,
+  posts: MESSAGES.en.posts,
+  comments: MESSAGES.en.comments,
 };
 
 export interface RecapActiveMonthProps {
   data: RecapMonthData;
-  /** 12 個月份名稱，預設英文 */
+  /** 12 個月份名稱，預設依 locale */
   monthNames?: string[];
-  labels?: Partial<Omit<typeof recapMonthLabels, "comments">> & { comments?: Partial<typeof recapMonthLabels.comments> };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<Omit<RecapMonthLabels, "comments">> & { comments?: Partial<RecapMonthLabels["comments"]> };
   className?: string;
 }
 
@@ -64,13 +113,15 @@ const backgrounds = [
 
 const allMonths = Array.from({ length: 12 }, (_, i) => i);
 
-export function RecapActiveMonth({ data, monthNames = recapMonthNames, labels, className }: RecapActiveMonthProps) {
+export function RecapActiveMonth({ data, monthNames: monthNamesProp, locale = "en", labels, className }: RecapActiveMonthProps) {
   const reduce = useReducedMotion() ?? false;
   const tr = (t: Transition): Transition => (reduce ? { duration: 0 } : t);
-  const l = { ...recapMonthLabels, ...labels, comments: { ...recapMonthLabels.comments, ...labels?.comments } };
+  const base = MESSAGES[resolveLocale(locale)];
+  const l = { ...base, ...labels, comments: { ...base.comments, ...labels?.comments } };
+  const monthNames = monthNamesProp ?? base.months;
 
   const monthData = data ?? { month: "", monthIndex: 0, count: 0 };
-  const monthName = monthNames[monthData.monthIndex] || monthData.month || monthNames[0] || "January";
+  const monthName = monthNames[monthData.monthIndex] || monthData.month || monthNames[0] || base.months[0];
   const isActiveMonth = (index: number) => index === monthData.monthIndex;
 
   // 根據發佈數量產生評論

@@ -21,14 +21,47 @@ type Mode = "move" | "rotate" | Direction;
 
 export type SelectionBoundsLabels = {
   selection: (count: number) => string;
+  /** 接在 selection 後面的位置、大小與角度說明 */
+  geometry: (g: { x: number; y: number; width: number; height: number; rotation: number }) => string;
   rotate: string;
   hint: string;
 };
 
-const defaultLabels: SelectionBoundsLabels = {
-  selection: (n) => (n === 1 ? "Selected element" : `${n} selected elements`),
-  rotate: "Rotate",
-  hint: "Arrow keys move, Alt plus arrow keys resize, [ and ] rotate.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, SelectionBoundsLabels> = {
+  en: {
+    selection: (n) => (n === 1 ? "Selected element" : `${n} selected elements`),
+    geometry: (g) => `x ${g.x}, y ${g.y}, ${g.width} by ${g.height}${g.rotation ? `, rotated ${g.rotation} degrees` : ""}`,
+    rotate: "Rotate",
+    hint: "Arrow keys move, Alt plus arrow keys resize, [ and ] rotate.",
+  },
+  "zh-TW": {
+    selection: (n) => (n === 1 ? "已選取的物件" : `已選取 ${n} 個物件`),
+    geometry: (g) => `x ${g.x}，y ${g.y}，寬 ${g.width} 高 ${g.height}${g.rotation ? `，旋轉 ${g.rotation} 度` : ""}`,
+    rotate: "旋轉",
+    hint: "方向鍵移動，Alt 加方向鍵調整大小，[ 與 ] 旋轉。",
+  },
+  "zh-CN": {
+    selection: (n) => (n === 1 ? "已选中的对象" : `已选中 ${n} 个对象`),
+    geometry: (g) => `x ${g.x}，y ${g.y}，宽 ${g.width} 高 ${g.height}${g.rotation ? `，旋转 ${g.rotation} 度` : ""}`,
+    rotate: "旋转",
+    hint: "方向键移动，Alt 加方向键调整大小，[ 和 ] 旋转。",
+  },
+  ja: {
+    selection: (n) => (n === 1 ? "選択中の要素" : `${n} 個の要素を選択中`),
+    geometry: (g) => `x ${g.x}、y ${g.y}、幅 ${g.width} 高さ ${g.height}${g.rotation ? `、${g.rotation} 度回転` : ""}`,
+    rotate: "回転",
+    hint: "矢印キーで移動、Alt と矢印キーでサイズ変更、[ と ] で回転します。",
+  },
 };
 
 export type SelectionBoundsProps = {
@@ -51,6 +84,9 @@ export type SelectionBoundsProps = {
   onGuidesChange?: (guides: Guide[]) => void;
   /** 選取框顏色，預設為 CardFlow 的 blue-500 */
   color?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<SelectionBoundsLabels>;
   className?: string;
 };
@@ -120,10 +156,11 @@ export function SelectionBounds({
   snapResize,
   onGuidesChange,
   color = "#3b82f6",
+  locale = "en",
   labels: labelsProp,
   className,
 }: SelectionBoundsProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const frameRef = useRef<HTMLDivElement>(null);
   const hintId = useId();
   const [active, setActive] = useState<Mode | null>(null);
@@ -313,7 +350,7 @@ export function SelectionBounds({
       data-selection-bounds="true"
       role="group"
       tabIndex={0}
-      aria-label={`${labels.selection(items.length)}, x ${Math.round(bounds.x)}, y ${Math.round(bounds.y)}, ${Math.round(bounds.width)} by ${Math.round(bounds.height)}${rotation ? `, rotated ${Math.round(rotation)} degrees` : ""}`}
+      aria-label={`${labels.selection(items.length)}, ${labels.geometry({ x: Math.round(bounds.x), y: Math.round(bounds.y), width: Math.round(bounds.width), height: Math.round(bounds.height), rotation: Math.round(rotation) })}`}
       aria-describedby={hintId}
       onKeyDown={onKeyDown}
       className={cn("absolute outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dashed", className)}

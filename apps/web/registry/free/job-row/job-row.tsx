@@ -68,9 +68,21 @@ export interface JobRowLabels {
   progress?: string;
 }
 
-const defaultLabels: Required<JobRowLabels> = {
-  failedRow: "Generation failed, open to view and retry",
-  progress: "Generation progress",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<JobRowLabels>> = {
+  en: { failedRow: "Generation failed, open to view and retry", progress: "Generation progress" },
+  "zh-TW": { failedRow: "生成失敗，點開查看並重試", progress: "生成進度" },
+  "zh-CN": { failedRow: "生成失败，点开查看并重试", progress: "生成进度" },
+  ja: { failedRow: "生成に失敗しました。開いて確認し、再試行してください", progress: "生成の進行状況" },
 };
 
 export interface JobRowProps {
@@ -84,13 +96,16 @@ export interface JobRowProps {
   failed?: boolean;
   href?: string;
   onClick?: () => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: JobRowLabels;
   className?: string;
 }
 
 /** 控制台裡的單行進度列：刻意不是卡片，讀起來是「進行中、需要留意的工作」 */
-export function JobRow({ title, source, progress, label, failed = false, href, onClick, labels, className }: JobRowProps) {
-  const t = { ...defaultLabels, ...labels };
+export function JobRow({ title, source, progress, label, failed = false, href, onClick, locale = "en", labels, className }: JobRowProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const width = Math.max(0, Math.min(100, progress));
   return (
     <a

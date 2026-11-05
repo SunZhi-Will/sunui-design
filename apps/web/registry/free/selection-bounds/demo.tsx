@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 
+import { useDemoLocale } from "@/lib/demo-locale";
+
 import { SelectionBounds, type BoundsItem } from "./selection-bounds";
 
 export default function SelectionBoundsDemo() {
+  const locale = useDemoLocale();
   const [photo, setPhoto] = useState<BoundsItem>({ id: "photo", x: 96, y: 60, width: 160, height: 140, rotation: -4 });
   const [selected, setSelected] = useState(true);
 
@@ -26,7 +29,7 @@ export default function SelectionBoundsDemo() {
           </svg>
         </div>
       </div>
-      <SelectionBounds items={selected ? [photo] : []} onChange={([next]) => next && setPhoto(next)} rotatable />
+      <SelectionBounds items={selected ? [photo] : []} onChange={([next]) => next && setPhoto(next)} rotatable locale={locale} />
     </div>
   );
 }

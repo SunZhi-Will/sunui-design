@@ -38,6 +38,28 @@ export function appColor(appId: string) {
 const STATUS_TOKENS =
   "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#4F46E5] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#818CF8]";
 
+export interface AppChipLabels {
+  /** 付費標記「$」的無障礙名稱 */
+  paid: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AppChipLabels> = {
+  en: { paid: "Paid" },
+  "zh-TW": { paid: "付費" },
+  "zh-CN": { paid: "付费" },
+  ja: { paid: "有料" },
+};
+
 /* ──────────────────────────────────────────────────────────────
  * AppDot、AppChip（usermeld app-chip）
  * ────────────────────────────────────────────────────────────── */
@@ -54,16 +76,25 @@ export function AppChip({
   appId,
   name,
   paid,
-  paidLabel = "Paid",
+  paidLabel,
+  locale = "en",
+  labels,
   className,
 }: {
   appId: string;
   /** 顯示名稱，預設用 appId */
   name?: ReactNode;
   paid?: boolean;
+  /** 舊版寫法，等同 labels.paid */
   paidLabel?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<AppChipLabels>;
   className?: string;
 }) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const paidName = paidLabel ?? t.paid;
   return (
     <span
       className={cn(
@@ -75,7 +106,7 @@ export function AppChip({
       <AppDot appId={appId} />
       <span className="truncate">{name ?? appId}</span>
       {paid ? (
-        <span role="img" aria-label={paidLabel} className="text-(--db-success)">
+        <span role="img" aria-label={paidName} className="text-(--db-success)">
           $
         </span>
       ) : null}

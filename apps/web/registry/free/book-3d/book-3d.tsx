@@ -141,6 +141,8 @@ export interface Book3DLabels {
   next?: string;
   close?: string;
   prev?: string;
+  /** 控制列的頁碼，例如 3–4 / 9 */
+  pageOf?: (pages: number[], total: number) => string;
 }
 
 export interface Book3DCover {
@@ -176,57 +178,178 @@ export interface Book3DProps {
   backSrc?: string;
   /** 方向鍵與 PageUp／PageDown 聽整個視窗，或只在元件內有焦點時 */
   keyboard?: "window" | "self";
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤；也決定書系名、書封文案等預設內容 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Book3DLabels;
   /** 自訂書下方的控制列；預設是上一頁、頁碼、下一頁 */
   renderControls?: (controls: Book3DControls) => ReactNode;
   className?: string;
 }
 
-const defaultLabels: Required<Book3DLabels> = {
-  nav: "回憶錄翻頁",
-  openHint: "點書封翻開",
-  backSide: "書背",
-  titlePage: "扉頁",
-  openCover: "翻開書封",
-  toBack: "看書背",
-  next: "下一頁",
-  close: "闔上",
-  prev: "上一頁",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+/** 控制列字串之外，也包含沒傳入時的預設書系名、體裁、版權頁與書封文案 */
+interface Book3DMessages extends Required<Book3DLabels> {
+  seriesTitle: string;
+  genre: string;
+  colophon: string[];
+  cover: Required<Book3DCover>;
+  /** 書系名與書名之間的分隔 */
+  titleSeparator: string;
+}
+
+const MESSAGES: Record<SunLocale, Book3DMessages> = {
+  en: {
+    nav: "Memoir page controls",
+    openHint: "Tap the cover to open",
+    backSide: "Back cover",
+    titlePage: "Title page",
+    openCover: "Open",
+    toBack: "Back cover",
+    next: "Next",
+    close: "Close",
+    prev: "Previous",
+    pageOf: (pages, total) => `${pages.join("–")} / ${total}`,
+    seriesTitle: "Where the Mountains Await",
+    genre: "Memoir",
+    colophon: ["This book", "was written by every choice you made on this journey."],
+    cover: {
+      subtitle: "SHANHE WEIGUI",
+      blurb: ["Eleven years gone, a letter in his late master's hand", "calls him back to the empty, mist-bound gate."],
+      tagline: "Wuxia Story RPG",
+      backBlurb: [
+        "The gate is shut, yet the charcoal seller still climbs each month;",
+        "a lost remedy, an erased name,",
+        "and a letter that should not exist",
+        "lead a long-departed swordsman back down the old road.",
+      ],
+      backTagline: "A narrative wuxia tale of memory, duty and choice.",
+    },
+    titleSeparator: " · ",
+  },
+  "zh-TW": {
+    nav: "回憶錄翻頁",
+    openHint: "點書封翻開",
+    backSide: "書背",
+    titlePage: "扉頁",
+    openCover: "翻開書封",
+    toBack: "看書背",
+    next: "下一頁",
+    close: "闔上",
+    prev: "上一頁",
+    pageOf: (pages, total) => `${pages.join("–")}／${total}`,
+    seriesTitle: "山河未歸",
+    genre: "回憶錄",
+    colophon: ["這本書，", "由你在這一輪旅途中的每一個選擇寫成。"],
+    cover: {
+      subtitle: "WHERE THE MOUNTAINS AWAIT",
+      blurb: ["離山十一年，一封亡師的親筆信，", "喚他重返霧鎖的空山門。"],
+      tagline: "敘事武俠 RPG",
+      backBlurb: [
+        "山門關了，送炭的人仍每月上山；",
+        "失去的藥、被抹去的名字，",
+        "與一封不該存在的信，",
+        "將一名離山多年的劍客帶回舊路。",
+      ],
+      backTagline: "一部關於記憶、責任與選擇的敘事武俠作品。",
+    },
+    titleSeparator: "・",
+  },
+  "zh-CN": {
+    nav: "回忆录翻页",
+    openHint: "点书封翻开",
+    backSide: "书背",
+    titlePage: "扉页",
+    openCover: "翻开书封",
+    toBack: "看书背",
+    next: "下一页",
+    close: "合上",
+    prev: "上一页",
+    pageOf: (pages, total) => `${pages.join("–")}／${total}`,
+    seriesTitle: "山河未归",
+    genre: "回忆录",
+    colophon: ["这本书，", "由你在这一轮旅途中的每一个选择写成。"],
+    cover: {
+      subtitle: "WHERE THE MOUNTAINS AWAIT",
+      blurb: ["离山十一年，一封亡师的亲笔信，", "唤他重返雾锁的空山门。"],
+      tagline: "叙事武侠 RPG",
+      backBlurb: [
+        "山门关了，送炭的人仍每月上山；",
+        "失去的药、被抹去的名字，",
+        "与一封不该存在的信，",
+        "将一名离山多年的剑客带回旧路。",
+      ],
+      backTagline: "一部关于记忆、责任与选择的叙事武侠作品。",
+    },
+    titleSeparator: "・",
+  },
+  ja: {
+    nav: "回想録のページ送り",
+    openHint: "表紙を押して開く",
+    backSide: "裏表紙",
+    titlePage: "扉",
+    openCover: "表紙を開く",
+    toBack: "裏表紙へ",
+    next: "次へ",
+    close: "閉じる",
+    prev: "前へ",
+    pageOf: (pages, total) => `${pages.join("–")}／${total}`,
+    seriesTitle: "山河未帰",
+    genre: "回想録",
+    colophon: ["この本は、", "今回の旅であなたが重ねた選択で綴られています。"],
+    cover: {
+      subtitle: "WHERE THE MOUNTAINS AWAIT",
+      blurb: ["山を離れて十一年。亡き師の直筆の手紙が、", "霧に閉ざされた無人の山門へ彼を呼び戻す。"],
+      tagline: "物語武侠 RPG",
+      backBlurb: [
+        "山門は閉ざされても、炭売りは毎月山を登る。",
+        "失われた薬、消された名、",
+        "そしてあるはずのない一通の手紙が、",
+        "山を離れて久しい剣客を古い道へ連れ戻す。",
+      ],
+      backTagline: "記憶と責任、そして選択をめぐる物語武侠作品。",
+    },
+    titleSeparator: "・",
+  },
 };
 
-const defaultCover: Required<Book3DCover> = {
-  subtitle: "WHERE THE MOUNTAINS AWAIT",
-  blurb: ["離山十一年，一封亡師的親筆信，", "喚他重返霧鎖的空山門。"],
-  tagline: "敘事武俠 RPG",
-  backBlurb: [
-    "山門關了，送炭的人仍每月上山；",
-    "失去的藥、被抹去的名字，",
-    "與一封不該存在的信，",
-    "將一名離山多年的劍客帶回舊路。",
-  ],
-  backTagline: "一部關於記憶、責任與選擇的敘事武俠作品。",
-};
+/** 書系名沒有中日文字時，書封大字改成可換行的較小字級 */
+const CJK_RE = /[\u3000-\u30ff\u3400-\u9fff\uf900-\ufaff\uff00-\uffef]/;
 
 export function Book3D({
   title,
-  seriesTitle = "山河未歸",
-  genre = "回憶錄",
+  seriesTitle: seriesTitleProp,
+  genre: genreProp,
   children,
   summary,
   date,
-  colophon = ["這本書，", "由你在這一輪旅途中的每一個選擇寫成。"],
+  colophon: colophonProp,
   cover,
   frontSrc,
   spineSrc,
   backSrc,
   keyboard = "window",
+  locale = "en",
   labels,
   renderControls,
   className,
 }: Book3DProps) {
-  const l = { ...defaultLabels, ...labels };
-  const c = { ...defaultCover, ...cover };
-  const fullTitle = `${seriesTitle}・${title}`;
+  const m = MESSAGES[resolveLocale(locale)];
+  const l = { ...m, ...labels };
+  const c = { ...m.cover, ...cover };
+  const seriesTitle = seriesTitleProp ?? m.seriesTitle;
+  const genre = genreProp ?? m.genre;
+  const colophon = colophonProp ?? m.colophon;
+  const fullTitle = `${seriesTitle}${m.titleSeparator}${title}`;
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -433,7 +556,7 @@ export function Book3D({
       role="region"
       aria-label={fullTitle}
       tabIndex={keyboard === "self" ? 0 : undefined}
-      className={cn("m3d-root relative flex h-[560px] w-full min-w-0 flex-col outline-none", className)}
+      className={cn("m3d-root", !CJK_RE.test(seriesTitle) && "m3d-latin", "relative flex h-[560px] w-full min-w-0 flex-col outline-none", className)}
     >
       <style>{BOOK_CSS}</style>
       <div className="m3d-stage" ref={stageRef}>
@@ -540,7 +663,7 @@ function DefaultControls({ position, goNext, goPrev, labels: l }: Book3DControls
         ? l.backSide
         : position.pageNumbers.length === 0
           ? l.titlePage
-          : `${position.pageNumbers.join("–")}／${position.pageCount}`;
+          : l.pageOf(position.pageNumbers, position.pageCount);
   const nextLabel = position.side === "front" ? l.openCover : isLastSpread ? l.toBack : l.next;
   const prevLabel = position.open && position.spread === 0 ? l.close : l.prev;
   return (
@@ -1119,6 +1242,7 @@ const BOOK_CSS = `
 .m3d-art-back-copy .m3d-art-blurb { align-items: center; text-align: center; }
 .m3d-art-back-copy .m3d-art-title { font-size: calc(var(--m3d-w) * 0.12); }
 .m3d-art-back-copy .m3d-art-rule { width: 64%; }
+.m3d-latin .m3d-art-title, .m3d-latin .m3d-art-back-copy .m3d-art-title { font-size: calc(var(--m3d-w) * 0.075); line-height: 1.15; white-space: normal; text-align: center; }
 .m3d-art-tag {
   position: absolute;
   bottom: 9.5%;

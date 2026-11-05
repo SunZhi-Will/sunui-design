@@ -24,6 +24,8 @@ export interface ScrollRevealTextProps {
   offset?: ScrollOffset;
   /** 語言標記，例如 zh-Hant、ja；影響字型與斷行 */
   lang?: string;
+  /** 介面語言（en、zh-TW、zh-CN、ja 等）；沒給 lang 時當作語言標記。元件本身沒有內建字串 */
+  locale?: string;
   className?: string;
 }
 
@@ -51,6 +53,7 @@ export function ScrollRevealText({
   accentClassName = "text-[#c8361d] dark:text-[#ec6a4f]",
   offset = ["start 0.85", "end 0.45"],
   lang,
+  locale,
   className,
 }: ScrollRevealTextProps) {
   const reduceMotion = useReducedMotion();
@@ -84,7 +87,7 @@ export function ScrollRevealText({
   return (
     <Tag
       ref={ref}
-      lang={lang}
+      lang={lang ?? locale}
       className={cn("text-2xl leading-relaxed font-semibold text-[#1c1917] sm:text-3xl dark:text-[#ece7dc]", className)}
     >
       <span className="sr-only">{text}</span>

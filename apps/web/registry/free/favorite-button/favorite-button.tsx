@@ -13,17 +13,33 @@ export interface FavoriteButtonProps {
   /** 顯示收藏數；不給則只顯示愛心 */
   count?: number;
   size?: "sm" | "md" | "lg";
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
-  labels?: {
-    add?: string;
-    remove?: string;
-  };
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<FavoriteButtonLabels>;
   className?: string;
 }
 
-const defaultLabels = {
-  add: "Add to favorites",
-  remove: "Remove from favorites",
+export interface FavoriteButtonLabels {
+  add: string;
+  remove: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, FavoriteButtonLabels> = {
+  en: { add: "Add to favorites", remove: "Remove from favorites" },
+  "zh-TW": { add: "加入收藏", remove: "取消收藏" },
+  "zh-CN": { add: "加入收藏", remove: "取消收藏" },
+  ja: { add: "お気に入りに追加", remove: "お気に入りから削除" },
 };
 
 // 設計語言（DESIGN.md）：墨色外框，收藏時朱紅實心
@@ -55,7 +71,7 @@ export function FavoriteButton({
   className,
 }: FavoriteButtonProps) {
   const reduceMotion = useReducedMotion();
-  const t = { ...defaultLabels, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [internal, setInternal] = useState(defaultPressed);
   const pressed = pressedProp ?? internal;
   const s = sizes[size];

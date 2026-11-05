@@ -1,0 +1,20 @@
+{
+  "zh-TW": {
+    "title": "餘燼粒子",
+    "description": "以 canvas 繪製緩緩上升、忽明忽暗的餘燼，用 lighter 疊加出溫暖的燈火光暈，適合放在主視覺或 CTA 區塊後方。canvas 設為 aria-hidden 且不攔截指標，離開畫面或分頁隱藏時停止繪製，偏好減少動態時完全不啟動。",
+    "whenToUse": ["深色主視覺或結尾 CTA 區塊的氛圍背景", "夜晚、火光或燈籠場景，想在文字後方加入細微動態"],
+    "watchOut": ["父層需要 position relative，上方內容的 z-index 要更高（canvas 使用 z-1）", "每次尺寸改變都會重新產生餘燼，density 設得很大會更耗效能"]
+  },
+  "zh-CN": {
+    "title": "余烬粒子",
+    "description": "用 canvas 绘制缓缓上升、忽明忽暗的余烬，以 lighter 叠加出温暖的灯火光晕，适合放在主视觉或 CTA 区块后方。canvas 设为 aria-hidden 且不拦截指针，离开屏幕或标签页隐藏时停止绘制，偏好减少动态时完全不启动。",
+    "whenToUse": ["深色主视觉或结尾 CTA 区块的氛围背景", "夜晚、火光或灯笼场景，想在文字后方加入细微动态"],
+    "watchOut": ["父元素需要 position relative，上方内容的 z-index 要更高（canvas 使用 z-1）", "每次尺寸变化都会重新生成余烬，density 设得很大会更耗性能"]
+  },
+  "ja": {
+    "title": "残り火パーティクル",
+    "description": "ゆっくり昇りながら明滅する残り火を canvas で描き、lighter 合成で灯火のような暖かい光をヒーローや CTA の背景に添えます。canvas は aria-hidden でポインターを受けず、画面外やタブが非表示のときは描画を止め、視差効果を減らす設定ではまったく起動しません。",
+    "whenToUse": ["暗いヒーローや締めの CTA セクションの雰囲気づくり", "夜、炎、灯籠の場面で、文字の後ろにさりげない動きがほしいとき"],
+    "watchOut": ["親要素には position relative が必要で、上に載せる内容はより高い z-index にすること（canvas は z-1）", "リサイズのたびに残り火を作り直すため、density を大きくすると負荷が増えます"]
+  }
+}

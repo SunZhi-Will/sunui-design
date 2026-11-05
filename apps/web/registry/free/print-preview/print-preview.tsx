@@ -86,6 +86,28 @@ export function computeA4PageSlices(totalHeightPx: number, pageHeightPx: number,
 
 /* 元件 */
 
+export interface PrintPreviewLabels {
+  region: string;
+  page: (n: number, total: number) => string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PrintPreviewLabels> = {
+  en: { region: "Print preview", page: (n, total) => `Page ${n} of ${total}` },
+  "zh-TW": { region: "列印預覽", page: (n, total) => `第 ${n} 頁，共 ${total} 頁` },
+  "zh-CN": { region: "打印预览", page: (n, total) => `第 ${n} 页，共 ${total} 页` },
+  ja: { region: "印刷プレビュー", page: (n, total) => `${total} ページ中 ${n} ページ目` },
+};
+
 const SHEET_SHADOW = "shadow-[0_2px_12px_rgba(0,0,0,0.06),0_0_1px_rgba(0,0,0,0.08)]";
 const defaultPageH = () => (297 * 96) / 25.4;
 
@@ -103,7 +125,10 @@ export interface PrintPreviewProps {
   /** 內容變動但子節點參照不變時，可傳入此值強制重新分頁 */
   layoutKey?: unknown;
   onPagesChange?: (pages: number) => void;
-  labels?: { region?: string; page?: (n: number, total: number) => string };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<PrintPreviewLabels>;
   className?: string;
   contentClassName?: string;
 }
@@ -117,15 +142,12 @@ export function PrintPreview({
   splitChildSelector,
   layoutKey,
   onPagesChange,
+  locale = "en",
   labels,
   className,
   contentClassName,
 }: PrintPreviewProps) {
-  const t = {
-    region: "Print preview",
-    page: (n: number, total: number) => `Page ${n} of ${total}`,
-    ...labels,
-  };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const probeRef = useRef<HTMLDivElement>(null);
   const measureSliceRef = useRef<HTMLDivElement>(null);
   const [pageHeightPx, setPageHeightPx] = useState(defaultPageH);

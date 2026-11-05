@@ -109,6 +109,177 @@ export const lightEffects: Record<LightEffect, { name: string; description: stri
   gradient: { name: "Gradient light", description: "Multi-colour gradient lighting", icon: "🌈" },
 };
 
+/* ---------- 多語系 ---------- */
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+export interface FlipProfileCardLabels {
+  namePlaceholder: string;
+  titlePlaceholder: string;
+  details: string;
+  about: string;
+  skills: string;
+  social: string;
+  showBack: string;
+  showFront: string;
+  avatarAlt: string;
+  /** 社群連結裡「網站」的讀屏名稱；GitHub 等品牌名不翻 */
+  website: string;
+}
+
+const MESSAGES: Record<SunLocale, FlipProfileCardLabels> = {
+  en: {
+    namePlaceholder: "Your Name",
+    titlePlaceholder: "Your Title",
+    details: "Details",
+    about: "About me",
+    skills: "Skills",
+    social: "Social links",
+    showBack: "Show details",
+    showFront: "Show front",
+    avatarAlt: "Avatar",
+    website: "Website",
+  },
+  "zh-TW": {
+    namePlaceholder: "你的名字",
+    titlePlaceholder: "你的職稱",
+    details: "詳細資料",
+    about: "關於我",
+    skills: "技能",
+    social: "社群連結",
+    showBack: "顯示詳細資料",
+    showFront: "顯示正面",
+    avatarAlt: "頭像",
+    website: "個人網站",
+  },
+  "zh-CN": {
+    namePlaceholder: "你的名字",
+    titlePlaceholder: "你的职位",
+    details: "详细信息",
+    about: "关于我",
+    skills: "技能",
+    social: "社交链接",
+    showBack: "显示详细信息",
+    showFront: "显示正面",
+    avatarAlt: "头像",
+    website: "个人网站",
+  },
+  ja: {
+    namePlaceholder: "お名前",
+    titlePlaceholder: "肩書き",
+    details: "詳細",
+    about: "自己紹介",
+    skills: "スキル",
+    social: "SNS リンク",
+    showBack: "詳細を表示",
+    showFront: "表面を表示",
+    avatarAlt: "アバター",
+    website: "ウェブサイト",
+  },
+};
+
+type OptionText = { name: string; description: string };
+
+// 選擇器的標題、提示與各選項文字；英文沿用 lightEffects / cardThemes
+const PICKER_MESSAGES: Record<
+  SunLocale,
+  {
+    effectHeading: string;
+    effectHint: string;
+    themeHeading: string;
+    themeHint: string;
+    effects?: Record<LightEffect, OptionText>;
+    themes?: Record<CardThemeKey, OptionText>;
+  }
+> = {
+  en: {
+    effectHeading: "Light effect",
+    effectHint: "Tip: with “Dynamic tracking” the light follows your mouse for an interactive feel.",
+    themeHeading: "Colour theme",
+    themeHint: "Tip: picking a theme applies matching gradients to both sides of the card.",
+  },
+  "zh-TW": {
+    effectHeading: "光影效果",
+    effectHint: "提示：選擇「動態追蹤」時，光線會跟著滑鼠移動，互動感更強。",
+    themeHeading: "配色主題",
+    themeHint: "提示：選好主題後，卡片正反兩面都會套用對應的漸層。",
+    effects: {
+      none: { name: "無效果", description: "隱藏光影效果" },
+      dynamic: { name: "動態追蹤", description: "光線跟著游標移動（預設）" },
+      diagonal: { name: "斜角光", description: "從左上角投下的一道光帶" },
+      center: { name: "中心光", description: "從中央向外擴散的光源" },
+      top: { name: "頂光", description: "從上方灑下的光線" },
+      dual: { name: "雙光源", description: "對角兩側各一個光源" },
+      gradient: { name: "漸層光", description: "多彩的漸層光影" },
+    },
+    themes: {
+      classic: { name: "經典紫羅蘭", description: "經典的紫到藍漸層" },
+      peachFuzz: { name: "柔和桃", description: "2025 流行色，溫暖舒適" },
+      cobaltBlue: { name: "鈷藍", description: "清爽明亮的鈷藍色調" },
+      monochrome: { name: "黑白", description: "經典不敗的黑與白" },
+      softPastels: { name: "柔和粉彩", description: "平靜放鬆的柔和色調" },
+      sunset: { name: "夕陽", description: "溫暖的夕陽色調" },
+      glassmorphism: { name: "毛玻璃", description: "2025 流行，半透明霧面玻璃" },
+    },
+  },
+  "zh-CN": {
+    effectHeading: "光影效果",
+    effectHint: "提示：选择“动态追踪”时，光线会跟随鼠标移动，互动感更强。",
+    themeHeading: "配色主题",
+    themeHint: "提示：选好主题后，卡片正反两面都会应用对应的渐变。",
+    effects: {
+      none: { name: "无效果", description: "隐藏光影效果" },
+      dynamic: { name: "动态追踪", description: "光线跟随光标移动（默认）" },
+      diagonal: { name: "斜角光", description: "从左上角投下的一道光带" },
+      center: { name: "中心光", description: "从中央向外扩散的光源" },
+      top: { name: "顶光", description: "从上方洒下的光线" },
+      dual: { name: "双光源", description: "对角两侧各一个光源" },
+      gradient: { name: "渐变光", description: "多彩的渐变光影" },
+    },
+    themes: {
+      classic: { name: "经典紫罗兰", description: "经典的紫到蓝渐变" },
+      peachFuzz: { name: "柔和桃", description: "2025 流行色，温暖舒适" },
+      cobaltBlue: { name: "钴蓝", description: "清爽明亮的钴蓝色调" },
+      monochrome: { name: "黑白", description: "经典永不过时的黑与白" },
+      softPastels: { name: "柔和马卡龙", description: "平静放松的柔和色调" },
+      sunset: { name: "日落", description: "温暖的日落色调" },
+      glassmorphism: { name: "毛玻璃", description: "2025 流行，半透明磨砂玻璃" },
+    },
+  },
+  ja: {
+    effectHeading: "ライト効果",
+    effectHint: "ヒント：「ダイナミック追従」を選ぶと、光がマウスに合わせて動きます。",
+    themeHeading: "カラーテーマ",
+    themeHint: "ヒント：テーマを選ぶと、カードの表と裏に対応するグラデーションが適用されます。",
+    effects: {
+      none: { name: "なし", description: "ライト効果を表示しない" },
+      dynamic: { name: "ダイナミック追従", description: "光がカーソルを追う（デフォルト）" },
+      diagonal: { name: "斜光", description: "左上から差し込む光の帯" },
+      center: { name: "センターライト", description: "中央から広がる光源" },
+      top: { name: "トップライト", description: "上から降り注ぐ光" },
+      dual: { name: "デュアルライト", description: "対角に置いた二つの光源" },
+      gradient: { name: "グラデーションライト", description: "多色のグラデーション照明" },
+    },
+    themes: {
+      classic: { name: "クラシックバイオレット", description: "定番の紫から青へのグラデーション" },
+      peachFuzz: { name: "ピーチファズ", description: "2025 年のトレンド色、温かく心地よい" },
+      cobaltBlue: { name: "コバルトブルー", description: "涼しげで明るいコバルトの色調" },
+      monochrome: { name: "モノクローム", description: "色あせない白と黒" },
+      softPastels: { name: "ソフトパステル", description: "穏やかでくつろげる淡い色調" },
+      sunset: { name: "サンセット", description: "温かな夕焼けの色調" },
+      glassmorphism: { name: "グラスモーフィズム", description: "2025 年のトレンド、半透明のすりガラス" },
+    },
+  },
+};
+
 function Styles() {
   // React 19 依 href 去重並提升到 head
   return (
@@ -150,30 +321,11 @@ export interface FlipProfileCardProps {
   /** 陰影光暈色，"r, g, b"，預設 102, 126, 234（#667eea） */
   glowColor?: string;
   className?: string;
-  labels?: {
-    namePlaceholder?: string;
-    titlePlaceholder?: string;
-    details?: string;
-    about?: string;
-    skills?: string;
-    social?: string;
-    showBack?: string;
-    showFront?: string;
-    avatarAlt?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<FlipProfileCardLabels>;
 }
-
-const defaultLabels = {
-  namePlaceholder: "Your Name",
-  titlePlaceholder: "Your Title",
-  details: "Details",
-  about: "About me",
-  skills: "Skills",
-  social: "Social links",
-  showBack: "Show details",
-  showFront: "Show front",
-  avatarAlt: "Avatar",
-};
 
 // 原版卡片固定 w-80 h-96，中心光以此換算像素
 const BASE_SIZE = { w: 320, h: 384 };
@@ -186,9 +338,10 @@ export function FlipProfileCard({
   onFlippedChange,
   glowColor = "102, 126, 234",
   className,
+  locale = "en",
   labels,
 }: FlipProfileCardProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const [finePointer, setFinePointer] = useState(false);
 
@@ -356,7 +509,7 @@ export function FlipProfileCard({
       ["github", "🐙", "GitHub"],
       ["linkedin", "💼", "LinkedIn"],
       ["twitter", "🐦", "Twitter"],
-      ["website", "🌐", "Website"],
+      ["website", "🌐", l.website],
     ] as const
   ).filter(([key]) => social[key]);
   const skills = data.skills ?? [];
@@ -568,12 +721,23 @@ export interface LightEffectPickerProps {
   className?: string;
   /** 覆寫各效果的名稱與說明 */
   options?: Partial<Record<LightEffect, { name?: string; description?: string; icon?: string }>>;
+  /** 介面語言：en、zh-TW、zh-CN、ja */
+  locale?: string;
   labels?: { heading?: string; hint?: string };
 }
 
 const effectKeys = Object.keys(lightEffects) as LightEffect[];
 
-export function LightEffectPicker({ value, defaultValue = "dynamic", onValueChange, className, options, labels }: LightEffectPickerProps) {
+export function LightEffectPicker({
+  value,
+  defaultValue = "dynamic",
+  onValueChange,
+  className,
+  options,
+  locale = "en",
+  labels,
+}: LightEffectPickerProps) {
+  const pm = PICKER_MESSAGES[resolveLocale(locale)];
   const [inner, setInner] = useState<LightEffect>(defaultValue);
   const selected = value ?? inner;
   const headingId = useId();
@@ -582,8 +746,8 @@ export function LightEffectPicker({ value, defaultValue = "dynamic", onValueChan
     onValueChange?.(k);
   };
   const { onKeyDown, setRef } = useRadioKeys(effectKeys, selected, select);
-  const heading = labels?.heading ?? "Light effect";
-  const hint = labels?.hint ?? "Tip: with “Dynamic tracking” the light follows your mouse for an interactive feel.";
+  const heading = labels?.heading ?? pm.effectHeading;
+  const hint = labels?.hint ?? pm.effectHint;
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -593,7 +757,7 @@ export function LightEffectPicker({ value, defaultValue = "dynamic", onValueChan
       </h3>
       <div role="radiogroup" aria-labelledby={headingId} className="grid grid-cols-1 gap-2">
         {effectKeys.map((key) => {
-          const meta = { ...lightEffects[key], ...options?.[key] };
+          const meta = { ...lightEffects[key], ...pm.effects?.[key], ...options?.[key] };
           const on = selected === key;
           return (
             <button
@@ -646,12 +810,23 @@ export interface ThemePickerProps {
   className?: string;
   /** 覆寫各主題的名稱與說明 */
   options?: Partial<Record<CardThemeKey, { name?: string; description?: string }>>;
+  /** 介面語言：en、zh-TW、zh-CN、ja */
+  locale?: string;
   labels?: { heading?: string; hint?: string };
 }
 
 const themeKeys = Object.keys(cardThemes) as CardThemeKey[];
 
-export function ThemePicker({ value, defaultValue = "classic", onValueChange, className, options, labels }: ThemePickerProps) {
+export function ThemePicker({
+  value,
+  defaultValue = "classic",
+  onValueChange,
+  className,
+  options,
+  locale = "en",
+  labels,
+}: ThemePickerProps) {
+  const pm = PICKER_MESSAGES[resolveLocale(locale)];
   const [inner, setInner] = useState<CardThemeKey>(defaultValue);
   const selected = value ?? inner;
   const headingId = useId();
@@ -661,8 +836,8 @@ export function ThemePicker({ value, defaultValue = "classic", onValueChange, cl
     onValueChange?.(k, { front: t.front, back: t.back });
   };
   const { onKeyDown, setRef } = useRadioKeys(themeKeys, selected, select, 2);
-  const heading = labels?.heading ?? "Colour theme";
-  const hint = labels?.hint ?? "Tip: picking a theme applies matching gradients to both sides of the card.";
+  const heading = labels?.heading ?? pm.themeHeading;
+  const hint = labels?.hint ?? pm.themeHint;
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -673,7 +848,7 @@ export function ThemePicker({ value, defaultValue = "classic", onValueChange, cl
       <div role="radiogroup" aria-labelledby={headingId} className="grid grid-cols-2 gap-3">
         {themeKeys.map((key) => {
           const t = cardThemes[key];
-          const meta = { name: t.name, description: t.description, ...options?.[key] };
+          const meta = { name: t.name, description: t.description, ...pm.themes?.[key], ...options?.[key] };
           const on = selected === key;
           const glass = key === "glassmorphism";
           return (

@@ -16,14 +16,49 @@ import {
   type InterpolatedElement,
 } from "./animation-editor";
 
-const defaultLabels = {
-  close: "Close preview",
-  keyframeCounter: (current: number, total: number) => `Keyframe ${current} / ${total}`,
-  keyframeDot: (n: number) => `Keyframe ${n}`,
-  scrollRegion: "Scroll to play the animation",
-};
+export interface AnimationPreviewLabels {
+  close: string;
+  keyframeCounter: (current: number, total: number) => string;
+  keyframeDot: (n: number) => string;
+  scrollRegion: string;
+}
 
-export type AnimationPreviewLabels = typeof defaultLabels;
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, AnimationPreviewLabels> = {
+  en: {
+    close: "Close preview",
+    keyframeCounter: (current, total) => `Keyframe ${current} / ${total}`,
+    keyframeDot: (n) => `Keyframe ${n}`,
+    scrollRegion: "Scroll to play the animation",
+  },
+  "zh-TW": {
+    close: "關閉預覽",
+    keyframeCounter: (current, total) => `關鍵影格 ${current} / ${total}`,
+    keyframeDot: (n) => `關鍵影格 ${n}`,
+    scrollRegion: "捲動以播放動畫",
+  },
+  "zh-CN": {
+    close: "关闭预览",
+    keyframeCounter: (current, total) => `关键帧 ${current} / ${total}`,
+    keyframeDot: (n) => `关键帧 ${n}`,
+    scrollRegion: "滚动以播放动画",
+  },
+  ja: {
+    close: "プレビューを閉じる",
+    keyframeCounter: (current, total) => `キーフレーム ${current} / ${total}`,
+    keyframeDot: (n) => `キーフレーム ${n}`,
+    scrollRegion: "スクロールしてアニメーションを再生",
+  },
+};
 
 export interface AnimationPreviewProps<T = unknown> {
   keyframes: AnimationKeyframe<T>[];
@@ -38,6 +73,9 @@ export interface AnimationPreviewProps<T = unknown> {
   /** true：全螢幕覆蓋（原本行為）；false：填滿父層容器 */
   fixed?: boolean;
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<AnimationPreviewLabels>;
   className?: string;
 }
@@ -50,10 +88,11 @@ export function AnimationPreview<T = unknown>({
   onProgressChange,
   fixed = true,
   accent,
+  locale = "en",
   labels: labelsProp,
   className,
 }: AnimationPreviewProps<T>) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const reduce = useReducedMotion() ?? false;
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);

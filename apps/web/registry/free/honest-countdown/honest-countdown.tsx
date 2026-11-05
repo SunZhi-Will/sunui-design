@@ -30,20 +30,66 @@ export interface HonestCountdownProps {
   onEnd?: () => void;
   /** 強調色，預設品牌金 */
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: HonestCountdownLabels;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels: Required<HonestCountdownLabels> = {
-  until: "Starts in",
-  days: "d",
-  hours: "h",
-  minutes: "m",
-  seconds: "s",
-  live: "Live now",
-  ended: (d) => <>The live stream has ended, {d}</>,
-  srRemaining: (d, h, label) => `${d} days ${h} hours to go, ${label}`,
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<HonestCountdownLabels>> = {
+  en: {
+    until: "Starts in",
+    days: "d",
+    hours: "h",
+    minutes: "m",
+    seconds: "s",
+    live: "Live now",
+    ended: (d) => <>The live stream has ended, {d}</>,
+    srRemaining: (d, h, label) =>
+      `${d} ${d === 1 ? "day" : "days"} ${h} ${h === 1 ? "hour" : "hours"} to go, ${label}`,
+  },
+  "zh-TW": {
+    until: "距離開始",
+    days: "天",
+    hours: "時",
+    minutes: "分",
+    seconds: "秒",
+    live: "直播中",
+    ended: (d) => <>直播已結束，{d}</>,
+    srRemaining: (d, h, label) => `還有 ${d} 天 ${h} 小時，${label}`,
+  },
+  "zh-CN": {
+    until: "距离开始",
+    days: "天",
+    hours: "时",
+    minutes: "分",
+    seconds: "秒",
+    live: "直播中",
+    ended: (d) => <>直播已结束，{d}</>,
+    srRemaining: (d, h, label) => `还有 ${d} 天 ${h} 小时，${label}`,
+  },
+  ja: {
+    until: "開始まで",
+    days: "日",
+    hours: "時間",
+    minutes: "分",
+    seconds: "秒",
+    live: "配信中",
+    ended: (d) => <>配信は終了しました（{d}）</>,
+    srRemaining: (d, h, label) => `あと ${d} 日 ${h} 時間、${label}`,
+  },
 };
 
 const parse = (v?: Date | string | number) => (v === undefined ? NaN : typeof v === "number" ? v : new Date(v).getTime());
@@ -67,8 +113,8 @@ const CSS = `@keyframes sunui-hc-pulse{0%,100%{opacity:1}50%{opacity:.35}}
  * 距離開始的倒數。只倒數到「真正開始的那一刻」，不製造假的截止壓力。
  * 伺服器端與 hydration 前只顯示日期文字，掛載後才開始算，避免時間不同造成 hydration 不一致。
  */
-export function HonestCountdown({ startAt, endAt, dateLabel, onStart, onEnd, accent, labels, className, style }: HonestCountdownProps) {
-  const t = { ...defaultLabels, ...labels };
+export function HonestCountdown({ startAt, endAt, dateLabel, onStart, onEnd, accent, locale = "en", labels, className, style }: HonestCountdownProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [now, setNow] = useState<number | null>(null);
   const start = parse(startAt);
   const end = endAt === undefined ? start + 2 * 60 * 60 * 1000 : parse(endAt);

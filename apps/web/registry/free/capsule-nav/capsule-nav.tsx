@@ -59,15 +59,28 @@ export interface CapsuleNavProps {
   /** 捲動容器；不給時監聽 window */
   scrollContainer?: RefObject<HTMLElement | null>;
   onNavigate?: (item: CapsuleNavItem) => void;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: CapsuleNavLabels;
   className?: string;
 }
 
-const defaultLabels: Required<CapsuleNavLabels> = {
-  navigation: "Main",
-  openMenu: "Open menu",
-  closeMenu: "Close menu",
-  home: "Home",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<CapsuleNavLabels>> = {
+  en: { navigation: "Main", openMenu: "Open menu", closeMenu: "Close menu", home: "Home" },
+  "zh-TW": { navigation: "主要導覽", openMenu: "開啟選單", closeMenu: "關閉選單", home: "首頁" },
+  "zh-CN": { navigation: "主导航", openMenu: "打开菜单", closeMenu: "关闭菜单", home: "首页" },
+  ja: { navigation: "メイン", openMenu: "メニューを開く", closeMenu: "メニューを閉じる", home: "ホーム" },
 };
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -125,10 +138,11 @@ export function CapsuleNav({
   fixed = true,
   scrollContainer,
   onNavigate,
+  locale = "en",
   labels,
   className,
 }: CapsuleNavProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const panelId = useId();
 

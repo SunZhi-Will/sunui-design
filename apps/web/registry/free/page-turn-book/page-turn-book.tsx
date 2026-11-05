@@ -47,6 +47,8 @@ export interface PageTurnBookLabels {
   theEnd: string;
   note: string;
   map: string;
+  /** 小地圖羅盤上的「北」 */
+  north: string;
   closedHint: string;
   openHint: string;
   /** 有 onClose 時接在提示後面，{key} 代入 closeKey */
@@ -61,21 +63,85 @@ export interface PageTurnBookLabels {
   closed: string;
 }
 
-const defaultLabels: PageTurnBookLabels = {
-  openIt: "Open it and see",
-  pages: "{n} pages",
-  theEnd: "The End",
-  note: "A traveller's note",
-  map: "A hand-drawn map",
-  closedHint: "→ or click the book to open it",
-  openHint: "← → turn pages",
-  closeHint: "{key} close",
-  closeKey: "Esc",
-  prev: "Previous page",
-  next: "Next page",
-  goToSpread: "Go to spread {n}",
-  spreadStatus: "Spread {n} of {total}",
-  closed: "Book closed",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PageTurnBookLabels> = {
+  en: {
+    openIt: "Open it and see",
+    pages: "{n} pages",
+    theEnd: "The End",
+    note: "A traveller's note",
+    map: "A hand-drawn map",
+    north: "N",
+    closedHint: "→ or click the book to open it",
+    openHint: "← → turn pages",
+    closeHint: "{key} close",
+    closeKey: "Esc",
+    prev: "Previous page",
+    next: "Next page",
+    goToSpread: "Go to spread {n}",
+    spreadStatus: "Spread {n} of {total}",
+    closed: "Book closed",
+  },
+  "zh-TW": {
+    openIt: "翻開看看",
+    pages: "共 {n} 頁",
+    theEnd: "完",
+    note: "旅人手記",
+    map: "手繪地圖",
+    north: "北",
+    closedHint: "→ 或點書本翻開",
+    openHint: "← → 翻頁",
+    closeHint: "{key} 闔上",
+    closeKey: "Esc",
+    prev: "上一頁",
+    next: "下一頁",
+    goToSpread: "跳到第 {n} 個跨頁",
+    spreadStatus: "第 {n} 個跨頁，共 {total} 個",
+    closed: "書已闔上",
+  },
+  "zh-CN": {
+    openIt: "翻开看看",
+    pages: "共 {n} 页",
+    theEnd: "完",
+    note: "旅人手记",
+    map: "手绘地图",
+    north: "北",
+    closedHint: "→ 或点击书本翻开",
+    openHint: "← → 翻页",
+    closeHint: "{key} 合上",
+    closeKey: "Esc",
+    prev: "上一页",
+    next: "下一页",
+    goToSpread: "跳到第 {n} 个跨页",
+    spreadStatus: "第 {n} 个跨页，共 {total} 个",
+    closed: "书已合上",
+  },
+  ja: {
+    openIt: "開いてみる",
+    pages: "全 {n} ページ",
+    theEnd: "おわり",
+    note: "旅人の手記",
+    map: "手描きの地図",
+    north: "北",
+    closedHint: "→ か本をクリックして開く",
+    openHint: "← → でページをめくる",
+    closeHint: "{key} で閉じる",
+    closeKey: "Esc",
+    prev: "前のページ",
+    next: "次のページ",
+    goToSpread: "見開き {n} へ移動",
+    spreadStatus: "見開き {n} / {total}",
+    closed: "本は閉じています",
+  },
 };
 
 export interface PageTurnBookProps {
@@ -95,6 +161,9 @@ export interface PageTurnBookProps {
   onClose?: () => void;
   /** true：蓋滿視窗的閱讀層，鍵盤聽 window；false：嵌在容器裡，鍵盤聽元件本身 */
   fixed?: boolean;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<PageTurnBookLabels>;
   className?: string;
 }
@@ -147,10 +216,11 @@ export function PageTurnBook({
   onSpread,
   onClose,
   fixed = false,
+  locale = "en",
   labels: labelsProp,
   className,
 }: PageTurnBookProps) {
-  const labels = { ...defaultLabels, ...labelsProp };
+  const labels = { ...MESSAGES[resolveLocale(locale)], ...labelsProp };
   const reduce = usePrefersReducedMotion();
   const flipMs = reduce ? 0 : FLIP_MS;
   const staggerMs = reduce ? 0 : STAGGER_MS;
@@ -672,7 +742,7 @@ const PageView: FC<{ page: BookPage | undefined; side: "left" | "right"; no: num
           }}
         >
           <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 8, letterSpacing: 1 }}>{obj.kind === "note" ? labels.note : labels.map}</div>
-          {obj.kind === "chart" && <MapSketch bearing={obj.bearing} />}
+          {obj.kind === "chart" && <MapSketch bearing={obj.bearing} north={labels.north} />}
           <div style={{ fontSize: fluid(13, 1.5, 16), lineHeight: 1.85 }}>{obj.text}</div>
           {obj.stamp != null && (
             <div
@@ -706,7 +776,7 @@ const PageView: FC<{ page: BookPage | undefined; side: "left" | "right"; no: num
 };
 
 /** 手繪小地圖：中間是書架（這座房子），虛線通向 X，右上角一個指北的羅盤。bearing 沒有就不畫 X */
-const MapSketch: FC<{ bearing: number | undefined }> = ({ bearing }) => {
+const MapSketch: FC<{ bearing: number | undefined; north: string }> = ({ bearing, north }) => {
   const cx = 100,
     cy = 62,
     R = 44;
@@ -745,7 +815,7 @@ const MapSketch: FC<{ bearing: number | undefined }> = ({ bearing }) => {
         <circle r={13} />
         <path d="M0 -11 L4 2 L0 -1 L-4 2 Z" fill="#5a3a14" />
         <text y={-16} textAnchor="middle" fontSize={9} fill="#5a3a14" stroke="none" fontFamily={SERIF}>
-          N
+          {north}
         </text>
       </g>
     </svg>

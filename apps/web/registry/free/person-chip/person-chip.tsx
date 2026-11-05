@@ -64,6 +64,27 @@ function LockIcon({ label }: { label: string }) {
   );
 }
 
+export interface PersonChipLabels {
+  locked: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PersonChipLabels> = {
+  en: { locked: "Locked" },
+  "zh-TW": { locked: "已鎖定" },
+  "zh-CN": { locked: "已锁定" },
+  ja: { locked: "ロック中" },
+};
+
 export interface PersonChipProps {
   name: string;
   personId: number;
@@ -79,7 +100,12 @@ export interface PersonChipProps {
   onClick?: () => void;
   /** lg：手機版較大的觸控範圍 */
   size?: "default" | "lg";
+  /** 舊的寫法，等同 labels.locked */
   lockedLabel?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<PersonChipLabels>;
   className?: string;
 }
 
@@ -93,9 +119,12 @@ export function PersonChip({
   muted,
   onClick,
   size = "default",
-  lockedLabel = "Locked",
+  lockedLabel,
+  locale = "en",
+  labels,
   className,
 }: PersonChipProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...(lockedLabel ? { locked: lockedLabel } : null), ...labels };
   const color = personColor(personId);
   const Comp = onClick ? "button" : "span";
 
@@ -118,7 +147,7 @@ export function PersonChip({
       )}
     >
       <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: emphasized ? "currentColor" : color.fg }} />
-      {locked ? <LockIcon label={lockedLabel} /> : null}
+      {locked ? <LockIcon label={t.locked} /> : null}
       {name}
     </Comp>
   );

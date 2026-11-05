@@ -58,29 +58,113 @@ export interface PermissionCenterLabels {
   state: Record<PermissionSnapshot["state"], string>;
 }
 
-export const defaultPermissionLabels: PermissionCenterLabels = {
-  title: "macOS permissions",
-  checking: "Checking current permission status…",
-  current: "Current permission status.",
-  required: "required",
-  blockedRequired: "Screen recording is blocked until this is granted.",
-  degradedOptional: "Screen-only recording still works without this.",
-  request: "Request",
-  openSettings: "Open System Settings",
-  label: { screenRecording: "Screen & system audio recording", microphone: "Microphone", camera: "Camera" },
-  desc: {
-    screenRecording: "Required to capture your screen. On macOS this single grant also covers system audio, there is no separate \"system audio\" permission.",
-    microphone: "Optional. Lets you record your voice alongside the screen.",
-    camera: "Optional. Lets you overlay a webcam bubble while recording.",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, PermissionCenterLabels> = {
+  en: {
+    title: "macOS permissions",
+    checking: "Checking current permission status…",
+    current: "Current permission status.",
+    required: "required",
+    blockedRequired: "Screen recording is blocked until this is granted.",
+    degradedOptional: "Screen-only recording still works without this.",
+    request: "Request",
+    openSettings: "Open System Settings",
+    label: { screenRecording: "Screen & system audio recording", microphone: "Microphone", camera: "Camera" },
+    desc: {
+      screenRecording: "Required to capture your screen. On macOS this single grant also covers system audio, there is no separate \"system audio\" permission.",
+      microphone: "Optional. Lets you record your voice alongside the screen.",
+      camera: "Optional. Lets you overlay a webcam bubble while recording.",
+    },
+    state: {
+      "not-determined": "Not requested yet",
+      granted: "Granted",
+      denied: "Denied",
+      restricted: "Restricted by system policy",
+      "restart-required": "Granted, restart the app to use it",
+    },
   },
-  state: {
-    "not-determined": "Not requested yet",
-    granted: "Granted",
-    denied: "Denied",
-    restricted: "Restricted by system policy",
-    "restart-required": "Granted, restart the app to use it",
+  "zh-TW": {
+    title: "macOS 權限",
+    checking: "正在檢查目前的權限狀態…",
+    current: "目前的權限狀態。",
+    required: "必要",
+    blockedRequired: "授權之前無法錄製螢幕。",
+    degradedOptional: "沒有這項權限仍可只錄螢幕。",
+    request: "請求權限",
+    openSettings: "打開系統設定",
+    label: { screenRecording: "螢幕與系統錄音", microphone: "麥克風", camera: "相機" },
+    desc: {
+      screenRecording: "擷取螢幕畫面時必要。在 macOS 上這一項授權也涵蓋系統聲音，沒有另外的「系統聲音」權限。",
+      microphone: "選用。可以在錄螢幕時同時錄下你的聲音。",
+      camera: "選用。錄製時可以疊上視訊鏡頭的小圓框。",
+    },
+    state: {
+      "not-determined": "尚未請求",
+      granted: "已授權",
+      denied: "已拒絕",
+      restricted: "受系統原則限制",
+      "restart-required": "已授權，重新啟動 app 後生效",
+    },
+  },
+  "zh-CN": {
+    title: "macOS 权限",
+    checking: "正在检查当前权限状态…",
+    current: "当前的权限状态。",
+    required: "必需",
+    blockedRequired: "授权之前无法录屏。",
+    degradedOptional: "没有这项权限仍可只录屏幕。",
+    request: "请求权限",
+    openSettings: "打开系统设置",
+    label: { screenRecording: "录屏与系统录音", microphone: "麦克风", camera: "摄像头" },
+    desc: {
+      screenRecording: "录制屏幕时必需。在 macOS 上这一项授权也包含系统声音，没有单独的“系统声音”权限。",
+      microphone: "可选。录屏时可以同时录下你的声音。",
+      camera: "可选。录制时可以叠加摄像头小圆窗。",
+    },
+    state: {
+      "not-determined": "尚未请求",
+      granted: "已授权",
+      denied: "已拒绝",
+      restricted: "受系统策略限制",
+      "restart-required": "已授权，重启应用后生效",
+    },
+  },
+  ja: {
+    title: "macOS のアクセス権",
+    checking: "現在のアクセス権を確認しています…",
+    current: "現在のアクセス権の状態です。",
+    required: "必須",
+    blockedRequired: "許可されるまで画面収録はできません。",
+    degradedOptional: "許可がなくても画面だけの収録はできます。",
+    request: "許可を求める",
+    openSettings: "システム設定を開く",
+    label: { screenRecording: "画面収録とシステムオーディオ録音", microphone: "マイク", camera: "カメラ" },
+    desc: {
+      screenRecording: "画面の収録に必要です。macOS ではこの許可でシステムオーディオも含まれ、別の「システムオーディオ」権限はありません。",
+      microphone: "任意。画面と一緒に自分の声を録音できます。",
+      camera: "任意。収録中に Web カメラの小窓を重ねられます。",
+    },
+    state: {
+      "not-determined": "未リクエスト",
+      granted: "許可済み",
+      denied: "拒否",
+      restricted: "システムのポリシーで制限",
+      "restart-required": "許可済み、アプリの再起動後に有効",
+    },
   },
 };
+
+/** 英文預設字串（保留舊的匯出名稱） */
+export const defaultPermissionLabels: PermissionCenterLabels = MESSAGES.en;
 
 const STATE_DOT: Record<PermissionSnapshot["state"], string> = {
   "not-determined": "bg-[var(--pf-muted)]",
@@ -98,12 +182,15 @@ export interface PermissionCenterProps {
   onOpenSettings: (key: PermissionKey) => void;
   hideHeading?: boolean;
   accent?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: Partial<PermissionCenterLabels>;
   className?: string;
 }
 
-export function PermissionCenter({ permissions, loading = false, onRequest, onOpenSettings, hideHeading, accent, labels, className }: PermissionCenterProps) {
-  const l = { ...defaultPermissionLabels, ...labels };
+export function PermissionCenter({ permissions, loading = false, onRequest, onOpenSettings, hideHeading, accent, locale = "en", labels, className }: PermissionCenterProps) {
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <div style={preflightTheme(accent)} className={cn("flex flex-col gap-2 text-left", className)}>
       {!hideHeading && (

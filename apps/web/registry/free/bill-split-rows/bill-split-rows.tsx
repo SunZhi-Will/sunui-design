@@ -58,32 +58,116 @@ export interface BillSplitRowsProps {
   formatAmount?: (n: number) => string;
   /** 成員識別色，只上在小圓點 */
   colorOf?: (index: number) => string;
+  /** 介面語言與預設金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: BillSplitRowsLabels;
   className?: string;
 }
 
-const defaultLabels: Required<BillSplitRowsLabels> = {
-  title: "What we ate",
-  meta: (n, c) => `${n} ${n === 1 ? "dish" : "dishes"} · ${c} counted`,
-  name: "Dish",
-  namePlaceholder: (n) => `Dish ${n}, e.g. beef noodles`,
-  price: "Price",
-  qty: "Qty",
-  remove: (name) => `Delete ${name}`,
-  fallbackName: (n) => `dish ${n}`,
-  whoAte: "Who ate it",
-  selectAll: "Everyone",
-  clearAll: "Clear all",
-  addAnother: "Add another dish",
-  emptyTitle: "No dishes yet",
-  emptyBody: "Add them one by one and tick who ate each.",
-  notCounted: (p) => `Not counted yet: ${p.join(", ")}`,
-  solo: (total) => `${total}, one person, pays it all`,
-  shared: (total, n, each, rem) => `${total}, split ${n} ways, about ${each} each${rem ? ", leftover goes in list order" : ""}`,
-  problemName: "needs a name",
-  problemPrice: "price must be a whole number above 0",
-  problemQty: "quantity must be a whole number above 0",
-  problemEaters: "no one picked",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<BillSplitRowsLabels>> = {
+  en: {
+    title: "What we ate",
+    meta: (n, c) => `${n} ${n === 1 ? "dish" : "dishes"} · ${c} counted`,
+    name: "Dish",
+    namePlaceholder: (n) => `Dish ${n}, e.g. beef noodles`,
+    price: "Price",
+    qty: "Qty",
+    remove: (name) => `Delete ${name}`,
+    fallbackName: (n) => `dish ${n}`,
+    whoAte: "Who ate it",
+    selectAll: "Everyone",
+    clearAll: "Clear all",
+    addAnother: "Add another dish",
+    emptyTitle: "No dishes yet",
+    emptyBody: "Add them one by one and tick who ate each.",
+    notCounted: (p) => `Not counted yet: ${p.join(", ")}`,
+    solo: (total) => `${total}, one person, pays it all`,
+    shared: (total, n, each, rem) => `${total}, split ${n} ways, about ${each} each${rem ? ", leftover goes in list order" : ""}`,
+    problemName: "needs a name",
+    problemPrice: "price must be a whole number above 0",
+    problemQty: "quantity must be a whole number above 0",
+    problemEaters: "no one picked",
+  },
+  "zh-TW": {
+    title: "我們吃了什麼",
+    meta: (n, c) => `${n} 道 · 已計入 ${c} 道`,
+    name: "品名",
+    namePlaceholder: (n) => `第 ${n} 道，例如牛肉麵`,
+    price: "價格",
+    qty: "數量",
+    remove: (name) => `刪除${name}`,
+    fallbackName: (n) => `第 ${n} 道`,
+    whoAte: "誰吃了",
+    selectAll: "全選",
+    clearAll: "全部取消",
+    addAnother: "再加一道",
+    emptyTitle: "還沒有餐點",
+    emptyBody: "一道一道加進來，再勾選每道是誰吃的。",
+    notCounted: (p) => `尚未計入：${p.join("、")}`,
+    solo: (total) => `${total}，一個人全付`,
+    shared: (total, n, each, rem) => `${total}，${n} 人分，每人約 ${each}${rem ? "，零頭依名單順序分配" : ""}`,
+    problemName: "需要品名",
+    problemPrice: "價格須為大於 0 的整數",
+    problemQty: "數量須為大於 0 的整數",
+    problemEaters: "還沒選人",
+  },
+  "zh-CN": {
+    title: "我们吃了什么",
+    meta: (n, c) => `${n} 道 · 已计入 ${c} 道`,
+    name: "菜名",
+    namePlaceholder: (n) => `第 ${n} 道，例如牛肉面`,
+    price: "价格",
+    qty: "数量",
+    remove: (name) => `删除${name}`,
+    fallbackName: (n) => `第 ${n} 道`,
+    whoAte: "谁吃了",
+    selectAll: "全选",
+    clearAll: "全部取消",
+    addAnother: "再加一道",
+    emptyTitle: "还没有菜品",
+    emptyBody: "一道一道加进来，再勾选每道是谁吃的。",
+    notCounted: (p) => `尚未计入：${p.join("、")}`,
+    solo: (total) => `${total}，一个人全付`,
+    shared: (total, n, each, rem) => `${total}，${n} 人分，每人约 ${each}${rem ? "，零头按名单顺序分配" : ""}`,
+    problemName: "需要菜名",
+    problemPrice: "价格须为大于 0 的整数",
+    problemQty: "数量须为大于 0 的整数",
+    problemEaters: "还没选人",
+  },
+  ja: {
+    title: "食べたもの",
+    meta: (n, c) => `${n} 品 · ${c} 品を計上`,
+    name: "料理名",
+    namePlaceholder: (n) => `${n} 品目（例：牛肉麺）`,
+    price: "価格",
+    qty: "数量",
+    remove: (name) => `${name}を削除`,
+    fallbackName: (n) => `${n} 品目`,
+    whoAte: "食べた人",
+    selectAll: "全員",
+    clearAll: "すべて解除",
+    addAnother: "料理を追加",
+    emptyTitle: "まだ料理がありません",
+    emptyBody: "1 品ずつ追加して、誰が食べたかをチェックしてください。",
+    notCounted: (p) => `未計上：${p.join("、")}`,
+    solo: (total) => `${total}、1 人で全額支払い`,
+    shared: (total, n, each, rem) => `${total}を ${n} 人で割り勘、1 人あたり約 ${each}${rem ? "、端数は名簿順に配分" : ""}`,
+    problemName: "料理名が必要です",
+    problemPrice: "価格は 1 以上の整数にしてください",
+    problemQty: "数量は 1 以上の整数にしてください",
+    problemEaters: "食べた人が未選択です",
+  },
 };
 
 // spliteat-web 的成員色盤（employee-chip.tsx 的 fg），照名單順序從第 2 色開始
@@ -98,7 +182,6 @@ export function parsePositiveInt(raw: string): number | null {
   return n > 0 && n <= 10_000_000 ? n : null;
 }
 
-const defaultFormat = (n: number) => `NT$${n.toLocaleString("en-US")}`;
 let seq = 0;
 const defaultNewId = () => `i-${Date.now().toString(36)}-${++seq}`;
 
@@ -158,12 +241,14 @@ export function BillSplitRows({
   onItemsChange,
   onRemove,
   newId = defaultNewId,
-  formatAmount = defaultFormat,
+  formatAmount: formatAmountProp,
   colorOf = paletteColor,
+  locale = "en",
   labels,
   className,
 }: BillSplitRowsProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const formatAmount = formatAmountProp ?? ((n: number) => `NT$${n.toLocaleString(locale)}`);
   const reduce = useReducedMotion() ?? false;
   const titleId = useId();
   const [inner, setInner] = useState(defaultItems);

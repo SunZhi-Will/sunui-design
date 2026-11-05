@@ -2,22 +2,33 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { Card, CardContent, CardFooter, CardHeader } from "./classic-card";
+
+const copy = {
+  en: { title: "Studio Headphones", subtitle: "Wireless, 40h battery", badge: "NEW", buy: "Buy now", add: "Add to wishlist", remove: "Remove from wishlist", cover: "Wireless headphones cover" },
+  "zh-TW": { title: "錄音室耳機", subtitle: "無線，續航 40 小時", badge: "新品", buy: "立即購買", add: "加入願望清單", remove: "移出願望清單", cover: "無線耳機封面" },
+  "zh-CN": { title: "录音室耳机", subtitle: "无线，续航 40 小时", badge: "新品", buy: "立即购买", add: "加入心愿单", remove: "移出心愿单", cover: "无线耳机封面" },
+  ja: { title: "スタジオヘッドホン", subtitle: "ワイヤレス、40 時間再生", badge: "NEW", buy: "今すぐ購入", add: "ウィッシュリストに追加", remove: "ウィッシュリストから削除", cover: "ワイヤレスヘッドホンのカバー" },
+};
 
 /** 型錄卡片：一張經典商品卡，滑過會微微放大並亮起光暈，愛心可切換收藏。 */
 export default function ClassicCardCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [saved, setSaved] = useState(false);
 
   return (
     <div className="mx-auto w-64">
-      <Card variant="elevated" theme="violet" size="sm" glow className="group min-w-0">
+      <Card variant="elevated" theme="violet" size="sm" glow locale={locale} className="group min-w-0">
         <CardHeader showDivider>
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
-              <h4 className="text-lg font-bold">Studio Headphones</h4>
-              <p className="mt-1 text-sm opacity-70">Wireless, 40h battery</p>
+              <h4 className="text-lg font-bold">{t.title}</h4>
+              <p className="mt-1 text-sm opacity-70">{t.subtitle}</p>
             </div>
-            <span className="shrink-0 rounded-full bg-violet-500 px-2.5 py-1 text-xs font-semibold text-white">NEW</span>
+            <span className="shrink-0 rounded-full bg-violet-500 px-2.5 py-1 text-xs font-semibold text-white">{t.badge}</span>
           </div>
         </CardHeader>
         <CardContent>
@@ -31,11 +42,11 @@ export default function ClassicCardCard() {
             type="button"
             className="rounded-lg bg-linear-to-r from-violet-500 to-purple-600 px-5 py-2.5 font-semibold text-white shadow-lg transition-all hover:from-violet-600 hover:to-purple-700 hover:shadow-xl"
           >
-            Buy now
+            {t.buy}
           </button>
           <button
             type="button"
-            aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={saved ? t.remove : t.add}
             aria-pressed={saved}
             onClick={() => setSaved((s) => !s)}
             className="rounded-lg border border-violet-300 px-3.5 py-2.5 text-violet-600 transition-all hover:bg-violet-50"

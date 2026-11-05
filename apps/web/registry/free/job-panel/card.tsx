@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { JobPanel, type Job } from "./job-panel";
 
 type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;
@@ -18,11 +20,18 @@ const timeline: Frame[] = [
   { status: "done" },
 ];
 
-const prompt = "Girl in a yellow raincoat on a rooftop at dusk";
+const prompts = {
+  en: "Girl in a yellow raincoat on a rooftop at dusk",
+  "zh-TW": "黃昏的屋頂上穿黃色雨衣的女孩",
+  "zh-CN": "黄昏的屋顶上穿黄色雨衣的女孩",
+  ja: "夕暮れの屋上に立つ黄色いレインコートの少女",
+};
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** 型錄卡片：一個生圖任務面板自己往前跑，可取消再重跑。 */
 export default function JobPanelCard() {
+  const locale = useDemoLocale();
+  const prompt = useDemoText(prompts);
   const [i, setI] = useState(0);
   const [canceled, setCanceled] = useState(false);
 
@@ -42,6 +51,7 @@ export default function JobPanelCard() {
     <div className="mx-auto w-72">
       <JobPanel
         job={job}
+        locale={locale}
         onCancel={async () => {
           await wait(500);
           setCanceled(true);

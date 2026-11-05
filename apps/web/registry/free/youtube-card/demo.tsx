@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { YouTubeCard } from "./youtube-card";
 
 // 內嵌 SVG 縮圖，展示時不向 YouTube 載入任何東西；點擊播放後才嵌入
@@ -32,13 +34,23 @@ function TalkThumbnail() {
   );
 }
 
+const titles = {
+  en: "Visual thinking on an infinite canvas (conference talk)",
+  "zh-TW": "在無限畫布上視覺化思考（研討會演講）",
+  "zh-CN": "在无限画布上进行可视化思考（大会演讲）",
+  ja: "無限キャンバスでのビジュアル思考（カンファレンス講演）",
+};
+
 export default function YouTubeCardDemo() {
+  const locale = useDemoLocale();
+  const title = useDemoText(titles);
   return (
     <div className="w-full max-w-xl min-w-0 rounded-xl bg-[#f3f4f6] p-4 sm:p-6">
       <div className="aspect-[16/10] w-full">
         <YouTubeCard
           videoId="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-          title="Visual thinking on an infinite canvas (conference talk)"
+          locale={locale}
+          title={title}
           thumbnail={<TalkThumbnail />}
         />
       </div>

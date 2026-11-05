@@ -1,0 +1,38 @@
+{
+  "zh-TW": {
+    "title": "經典檔案上傳",
+    "description": "SunUI 最初的動態拖放區：紫、青、橘或自訂主題，上下浮動的上傳圖示、拖曳提示、圖片縮圖或精簡列表、帶光澤的進度覆蓋層，以及大小與類型檢查和錯誤提示。可當作鍵盤可操作的按鈕，以 progressbar 搭配 polite live region 回報進度，開啟減少動態效果時所有循環動畫都會停止。",
+    "whenToUse": [
+      "在表單或專案中附加圖片、PDF 或文件並顯示預覽",
+      "需要同時支援拖放與點擊選檔的單一上傳區"
+    ],
+    "watchOut": [
+      "預設會先跑一段模擬進度（約 330 毫秒從 0 到 100）再等 onFileUpload 完成；要顯示真實進度請傳 simulateProgress={false} 並呼叫 onProgress",
+      "PDF 縮圖需要 renderPdfPreview 函式（例如以 pdfjs-dist 實作）；沒有時 PDF 會顯示檔案圖示"
+    ]
+  },
+  "zh-CN": {
+    "title": "经典文件上传",
+    "description": "SunUI 最初的动态拖放区：紫、青、橙或自定义主题，上下浮动的上传图标、拖拽提示、图片缩略图或紧凑列表、带光泽的进度遮罩，以及大小与类型校验和错误提示。可作为支持键盘操作的按钮，通过 progressbar 配合 polite live region 播报进度，开启减少动态效果时所有循环动画都会停止。",
+    "whenToUse": [
+      "在表单或项目中添加图片、PDF 或文档并显示预览",
+      "需要同时支持拖放和点击选择文件的单一上传区"
+    ],
+    "watchOut": [
+      "默认会先跑一段模拟进度（约 330 毫秒从 0 到 100）再等待 onFileUpload 完成；要显示真实进度请传 simulateProgress={false} 并调用 onProgress",
+      "PDF 缩略图需要 renderPdfPreview 函数（例如基于 pdfjs-dist 实现）；没有时 PDF 会显示文件图标"
+    ]
+  },
+  "ja": {
+    "title": "クラシックファイルアップロード",
+    "description": "SunUI オリジナルのアニメーション付きドロップゾーン。バイオレット、シアン、オレンジ、カスタムのテーマ、ふわふわ動くアップロードアイコン、ドラッグ中の案内、画像サムネイルまたはコンパクトな行表示、きらめく進捗オーバーレイ、サイズと形式のチェックとエラートーストを備えています。キーボードで操作できるボタンとして動き、progressbar と polite な live region で進捗を伝え、視差効果を減らす設定ではループするアニメーションをすべて止めます。",
+    "whenToUse": [
+      "フォームやプロジェクトに画像、PDF、文書をプレビュー付きで添付したいとき",
+      "ドラッグ＆ドロップとクリックでの選択の両方に対応した、ひとつのアップロード領域"
+    ],
+    "watchOut": [
+      "既定では onFileUpload の完了前に疑似進捗（約 330 ミリ秒で 0 から 100）が流れる。実際の進捗を出すには simulateProgress={false} を渡して onProgress を呼ぶ",
+      "PDF のサムネイルには renderPdfPreview 関数（pdfjs-dist などで実装）が必要。ない場合はファイルアイコンを表示する"
+    ]
+  }
+}

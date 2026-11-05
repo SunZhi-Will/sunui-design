@@ -25,12 +25,38 @@ export interface ShippingOptionsProps {
   onChange?: (id: string) => void;
   /** radiogroup 的無障礙名稱 */
   label?: string;
+  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   currency?: string;
   freeLabel?: ReactNode;
   etaLabel?: ReactNode;
+  /** 覆寫內建字串，優先於 locale；label、freeLabel、etaLabel 又優先於這裡 */
+  labels?: Partial<ShippingOptionsLabels>;
   className?: string;
 }
+
+export interface ShippingOptionsLabels {
+  label: string;
+  free: ReactNode;
+  eta: ReactNode;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, ShippingOptionsLabels> = {
+  en: { label: "Delivery method", free: "Free", eta: "Arrives" },
+  "zh-TW": { label: "配送方式", free: "免運", eta: "預計到貨" },
+  "zh-CN": { label: "配送方式", free: "包邮", eta: "预计送达" },
+  ja: { label: "配送方法", free: "送料無料", eta: "お届け予定" },
+};
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
 const paper = "bg-[#faf7f0] dark:bg-[#1f1c18]";
@@ -55,13 +81,18 @@ export function ShippingOptions({
   value,
   defaultValue,
   onChange,
-  label = "Delivery method",
+  label: labelProp,
   locale = "en-US",
   currency = "USD",
-  freeLabel = "Free",
-  etaLabel = "Arrives",
+  freeLabel: freeProp,
+  etaLabel: etaProp,
+  labels,
   className,
 }: ShippingOptionsProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const label = labelProp ?? t.label;
+  const freeLabel = freeProp ?? t.free;
+  const etaLabel = etaProp ?? t.eta;
   const reduceMotion = useReducedMotion();
   const [inner, setInner] = useState(defaultValue ?? options.find((o) => !o.disabled)?.id);
   const selected = value ?? inner;

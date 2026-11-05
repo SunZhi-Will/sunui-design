@@ -5,22 +5,81 @@ import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 
-export const recapStreakLabels = {
-  title: "Posting Streak",
-  subtitle: "Your longest streak was",
-  days: "days",
-  comments: {
-    low: "You like to post casually",
-    medium: "You have a habit of posting regularly",
-    high: "You are a persistent creator!",
-    veryHigh: "You are a super persistent creator!",
+export interface RecapStreakLabels {
+  title: string;
+  subtitle: string;
+  /** 天數單位；給函式可依天數處理單複數 */
+  days: string | ((n: number) => string);
+  comments: { low: string; medium: string; high: string; veryHigh: string };
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, RecapStreakLabels> = {
+  en: {
+    title: "Posting Streak",
+    subtitle: "Your longest streak was",
+    days: (n) => (n === 1 ? "day" : "days"),
+    comments: {
+      low: "You like to post casually",
+      medium: "You have a habit of posting regularly",
+      high: "You are a persistent creator!",
+      veryHigh: "You are a super persistent creator!",
+    },
+  },
+  "zh-TW": {
+    title: "連續發文",
+    subtitle: "你最長的連續紀錄是",
+    days: "天",
+    comments: {
+      low: "你喜歡隨興發文",
+      medium: "你有固定發文的習慣",
+      high: "你是一位堅持不懈的創作者！",
+      veryHigh: "你是超級堅持的創作者！",
+    },
+  },
+  "zh-CN": {
+    title: "连续发帖",
+    subtitle: "你最长的连续纪录是",
+    days: "天",
+    comments: {
+      low: "你喜欢随性发帖",
+      medium: "你有定期发帖的习惯",
+      high: "你是一位坚持不懈的创作者！",
+      veryHigh: "你是超级坚持的创作者！",
+    },
+  },
+  ja: {
+    title: "連続投稿",
+    subtitle: "最長の連続記録は",
+    days: "日",
+    comments: {
+      low: "気ままに投稿するタイプです",
+      medium: "定期的に投稿する習慣があります",
+      high: "粘り強いクリエイターです！",
+      veryHigh: "超粘り強いクリエイターです！",
+    },
   },
 };
+
+/** 英文預設字串（保留舊的匯出名稱） */
+export const recapStreakLabels = MESSAGES.en;
 
 export interface RecapStreakFlameProps {
   /** 最長連續發文天數 */
   streak: number;
-  labels?: Partial<Omit<typeof recapStreakLabels, "comments">> & { comments?: Partial<typeof recapStreakLabels.comments> };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<Omit<RecapStreakLabels, "comments">> & { comments?: Partial<RecapStreakLabels["comments"]> };
   className?: string;
 }
 
@@ -32,11 +91,13 @@ function getBackground(streak: number) {
   return "from-orange-950/40 via-red-950/30 to-pink-950/40";
 }
 
-export function RecapStreakFlame({ streak: streakProp, labels, className }: RecapStreakFlameProps) {
+export function RecapStreakFlame({ streak: streakProp, locale = "en", labels, className }: RecapStreakFlameProps) {
   const reduce = useReducedMotion() ?? false;
   const tr = (t: Transition): Transition => (reduce ? { duration: 0 } : t);
-  const l = { ...recapStreakLabels, ...labels, comments: { ...recapStreakLabels.comments, ...labels?.comments } };
+  const base = MESSAGES[resolveLocale(locale)];
+  const l = { ...base, ...labels, comments: { ...base.comments, ...labels?.comments } };
   const streak = streakProp ?? 0;
+  const days = typeof l.days === "function" ? l.days(streak) : l.days;
 
   // 根據連續天數產生評論
   const comment =
@@ -143,7 +204,7 @@ export function RecapStreakFlame({ streak: streakProp, labels, className }: Reca
           transition={tr({ delay: 0.6 })}
           className="mb-6"
         >
-          <div className="text-2xl font-semibold text-white/90 @md:text-3xl">{l.days}</div>
+          <div className="text-2xl font-semibold text-white/90 @md:text-3xl">{days}</div>
         </motion.div>
 
         <motion.p

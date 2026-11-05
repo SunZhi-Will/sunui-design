@@ -56,17 +56,65 @@ export interface FileUploadLabels {
   dismiss?: string;
 }
 
-const DEFAULT_LABELS: Required<FileUploadLabels> = {
-  placeholder: "Drop files here or click to upload",
-  release: "Release to upload files",
-  uploading: "Uploading...",
-  supportedTypes: (types) => `Supported file types: ${types}`,
-  maxSize: (mb) => `Maximum file size: ${mb} MB`,
-  tooLarge: (name, mb) => `File ${name} exceeds size limit of ${mb}MB`,
-  unsupported: (name) => `File type ${name} is not supported`,
-  failed: "Upload failed. Please try again.",
-  remove: (name) => `Remove ${name}`,
-  dismiss: "Dismiss error",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<FileUploadLabels>> = {
+  en: {
+    placeholder: "Drop files here or click to upload",
+    release: "Release to upload files",
+    uploading: "Uploading...",
+    supportedTypes: (types) => `Supported file types: ${types}`,
+    maxSize: (mb) => `Maximum file size: ${mb} MB`,
+    tooLarge: (name, mb) => `File ${name} exceeds size limit of ${mb}MB`,
+    unsupported: (name) => `File type ${name} is not supported`,
+    failed: "Upload failed. Please try again.",
+    remove: (name) => `Remove ${name}`,
+    dismiss: "Dismiss error",
+  },
+  "zh-TW": {
+    placeholder: "將檔案拖曳到這裡，或點擊上傳",
+    release: "放開即可上傳檔案",
+    uploading: "上傳中...",
+    supportedTypes: (types) => `支援的檔案類型：${types}`,
+    maxSize: (mb) => `檔案大小上限：${mb} MB`,
+    tooLarge: (name, mb) => `檔案 ${name} 超過 ${mb}MB 的大小上限`,
+    unsupported: (name) => `不支援 ${name} 的檔案類型`,
+    failed: "上傳失敗，請再試一次。",
+    remove: (name) => `移除 ${name}`,
+    dismiss: "關閉錯誤訊息",
+  },
+  "zh-CN": {
+    placeholder: "将文件拖放到这里，或点击上传",
+    release: "松开即可上传文件",
+    uploading: "上传中...",
+    supportedTypes: (types) => `支持的文件类型：${types}`,
+    maxSize: (mb) => `文件大小上限：${mb} MB`,
+    tooLarge: (name, mb) => `文件 ${name} 超过 ${mb}MB 的大小限制`,
+    unsupported: (name) => `不支持 ${name} 的文件类型`,
+    failed: "上传失败，请重试。",
+    remove: (name) => `移除 ${name}`,
+    dismiss: "关闭错误提示",
+  },
+  ja: {
+    placeholder: "ファイルをドロップ、またはクリックしてアップロード",
+    release: "離すとアップロードします",
+    uploading: "アップロード中...",
+    supportedTypes: (types) => `対応ファイル形式：${types}`,
+    maxSize: (mb) => `最大ファイルサイズ：${mb} MB`,
+    tooLarge: (name, mb) => `${name} はサイズ上限の ${mb}MB を超えています`,
+    unsupported: (name) => `${name} のファイル形式には対応していません`,
+    failed: "アップロードに失敗しました。もう一度お試しください。",
+    remove: (name) => `${name} を削除`,
+    dismiss: "エラーを閉じる",
+  },
 };
 
 export interface ClassicFileUploadProps {
@@ -93,6 +141,9 @@ export interface ClassicFileUploadProps {
   simulateProgress?: boolean;
   /** PDF 第一頁縮圖產生器（例如以 pdfjs-dist 繪製），回傳圖片網址；未提供時顯示檔案圖示 */
   renderPdfPreview?: (file: File) => Promise<string>;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: FileUploadLabels;
 }
 
@@ -208,10 +259,11 @@ export function ClassicFileUpload({
   description,
   simulateProgress = true,
   renderPdfPreview,
+  locale = "en",
   labels,
 }: ClassicFileUploadProps) {
   const reduce = useReducedMotion() ?? false;
-  const t = { ...DEFAULT_LABELS, ...labels };
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const placeholderText = placeholder ?? t.placeholder;
   const descId = useId();
 
@@ -261,7 +313,7 @@ export function ClassicFileUpload({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [maxSize, accept, labels],
+    [maxSize, accept, labels, locale],
   );
 
   const handleDrag = useCallback((e: DragEvent) => {
@@ -332,7 +384,7 @@ export function ClassicFileUpload({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onFileSelect, onFileUpload, handlePreview, runSimulatedProgress, simulateProgress, labels],
+    [onFileSelect, onFileUpload, handlePreview, runSimulatedProgress, simulateProgress, labels, locale],
   );
 
   const handleDrop = useCallback(

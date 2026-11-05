@@ -116,45 +116,150 @@ export interface JobPanelLabels {
   actionFailed?: string;
 }
 
-const defaultLabels: Required<JobPanelLabels> = {
-  steps: ["Read prompt", "Load model", "Generate", "Safety check", "Done"],
-  queued: (ahead) => `In queue, ${ahead} ahead of you`,
-  startingSoon: "Starting soon",
-  planning: "AI is reading your prompt",
-  loading: "Loading model",
-  sampling: (s, t) => `Generating ${s}/${t}`,
-  decoding: "Writing image",
-  refining: (s, t) => (t ? `Refining faces ${s}/${t}` : "Refining faces"),
-  checking: "Checking the result",
-  done: "Done",
-  held: "Waiting for manual review",
-  deleted: "Images deleted",
-  blocked: "Not run",
-  error: "Generation didn't finish",
-  canceled: "Canceled",
-  eta: (time) => `About ${time} left`,
-  took: (time) => `Took ${time}`,
-  seconds: (s) => {
-    const v = Math.max(0, Math.round(s));
-    if (v < 60) return `${v}s`;
-    const m = Math.floor(v / 60);
-    const r = v % 60;
-    return r ? `${m}m ${r}s` : `${m}m`;
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+/** 秒數轉成「1m 5s」「1分5秒」這類短格式 */
+function formatSeconds(s: number, unit: { s: string; m: string; gap: string }) {
+  const v = Math.max(0, Math.round(s));
+  if (v < 60) return `${v}${unit.s}`;
+  const m = Math.floor(v / 60);
+  const r = v % 60;
+  return r ? `${m}${unit.m}${unit.gap}${r}${unit.s}` : `${m}${unit.m}`;
+}
+
+const MESSAGES: Record<SunLocale, Required<JobPanelLabels>> = {
+  en: {
+    steps: ["Read prompt", "Load model", "Generate", "Safety check", "Done"],
+    queued: (ahead) => `In queue, ${ahead} ahead of you`,
+    startingSoon: "Starting soon",
+    planning: "AI is reading your prompt",
+    loading: "Loading model",
+    sampling: (s, t) => `Generating ${s}/${t}`,
+    decoding: "Writing image",
+    refining: (s, t) => (t ? `Refining faces ${s}/${t}` : "Refining faces"),
+    checking: "Checking the result",
+    done: "Done",
+    held: "Waiting for manual review",
+    deleted: "Images deleted",
+    blocked: "Not run",
+    error: "Generation didn't finish",
+    canceled: "Canceled",
+    eta: (time) => `About ${time} left`,
+    took: (time) => `Took ${time}`,
+    seconds: (s) => formatSeconds(s, { s: "s", m: "m", gap: " " }),
+    progress: "Generation progress",
+    leaveNote: "Leaving this page won't stop generation. Finished images appear first on the create page.",
+    heldNote: "These images are waiting for manual review. They haven't been deleted and will come back once cleared. Your quota has been refunded.",
+    deletedNote: "The images from this run have been deleted.",
+    cancel: "Cancel",
+    cancelAndEdit: "Cancel and edit prompt",
+    retry: "Retry",
+    edit: "Edit prompt",
+    remove: "Remove record",
+    actionFailed: "That didn't work. Please try again.",
   },
-  progress: "Generation progress",
-  leaveNote: "Leaving this page won't stop generation. Finished images appear first on the create page.",
-  heldNote: "These images are waiting for manual review. They haven't been deleted and will come back once cleared. Your quota has been refunded.",
-  deletedNote: "The images from this run have been deleted.",
-  cancel: "Cancel",
-  cancelAndEdit: "Cancel and edit prompt",
-  retry: "Retry",
-  edit: "Edit prompt",
-  remove: "Remove record",
-  actionFailed: "That didn't work. Please try again.",
+  "zh-TW": {
+    steps: ["理解描述", "載入模型", "生成", "安全檢查", "完成"],
+    queued: (ahead) => `排隊中，前面還有 ${ahead} 位`,
+    startingSoon: "即將開始",
+    planning: "AI 正在理解你的描述",
+    loading: "正在載入模型",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "正在輸出圖片",
+    refining: (s, t) => (t ? `修飾臉部 ${s}/${t}` : "修飾臉部"),
+    checking: "正在檢查結果",
+    done: "完成",
+    held: "等待人工複查",
+    deleted: "圖片已刪除",
+    blocked: "未執行",
+    error: "生成沒有完成",
+    canceled: "已取消",
+    eta: (time) => `約剩 ${time}`,
+    took: (time) => `耗時 ${time}`,
+    seconds: (s) => formatSeconds(s, { s: " 秒", m: " 分", gap: " " }),
+    progress: "生成進度",
+    leaveNote: "離開這個頁面不會中斷生成，完成的圖片會優先出現在創作頁。",
+    heldNote: "這些圖片正在等待人工複查，並沒有被刪除，通過後就會回來。額度已退還。",
+    deletedNote: "這次生成的圖片已被刪除。",
+    cancel: "取消",
+    cancelAndEdit: "取消並修改描述",
+    retry: "重試",
+    edit: "修改描述",
+    remove: "刪除紀錄",
+    actionFailed: "操作沒有成功，請再試一次。",
+  },
+  "zh-CN": {
+    steps: ["理解描述", "加载模型", "生成", "安全检查", "完成"],
+    queued: (ahead) => `排队中，前面还有 ${ahead} 位`,
+    startingSoon: "即将开始",
+    planning: "AI 正在理解你的描述",
+    loading: "正在加载模型",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "正在输出图片",
+    refining: (s, t) => (t ? `修饰面部 ${s}/${t}` : "修饰面部"),
+    checking: "正在检查结果",
+    done: "完成",
+    held: "等待人工复审",
+    deleted: "图片已删除",
+    blocked: "未执行",
+    error: "生成未完成",
+    canceled: "已取消",
+    eta: (time) => `约剩 ${time}`,
+    took: (time) => `耗时 ${time}`,
+    seconds: (s) => formatSeconds(s, { s: " 秒", m: " 分", gap: " " }),
+    progress: "生成进度",
+    leaveNote: "离开此页面不会中断生成，完成的图片会优先显示在创作页。",
+    heldNote: "这些图片正在等待人工复审，并没有被删除，通过后就会恢复。额度已退还。",
+    deletedNote: "本次生成的图片已被删除。",
+    cancel: "取消",
+    cancelAndEdit: "取消并修改描述",
+    retry: "重试",
+    edit: "修改描述",
+    remove: "删除记录",
+    actionFailed: "操作未成功，请重试。",
+  },
+  ja: {
+    steps: ["プロンプト解析", "モデル読込", "生成", "安全チェック", "完了"],
+    queued: (ahead) => `順番待ち、あと ${ahead} 件`,
+    startingSoon: "まもなく開始",
+    planning: "AI がプロンプトを読んでいます",
+    loading: "モデルを読み込み中",
+    sampling: (s, t) => `生成中 ${s}/${t}`,
+    decoding: "画像を書き出し中",
+    refining: (s, t) => (t ? `顔を補正中 ${s}/${t}` : "顔を補正中"),
+    checking: "結果をチェック中",
+    done: "完了",
+    held: "手動審査待ち",
+    deleted: "画像は削除されました",
+    blocked: "実行されませんでした",
+    error: "生成が完了しませんでした",
+    canceled: "キャンセル済み",
+    eta: (time) => `残り約 ${time}`,
+    took: (time) => `所要時間 ${time}`,
+    seconds: (s) => formatSeconds(s, { s: "秒", m: "分", gap: "" }),
+    progress: "生成の進捗",
+    leaveNote: "このページを離れても生成は止まりません。完成した画像は作成ページに先に表示されます。",
+    heldNote: "これらの画像は手動審査待ちです。削除されてはおらず、審査を通過すると戻ってきます。利用枠は返却済みです。",
+    deletedNote: "今回生成した画像は削除されました。",
+    cancel: "キャンセル",
+    cancelAndEdit: "キャンセルして編集",
+    retry: "再試行",
+    edit: "プロンプトを編集",
+    remove: "履歴を削除",
+    actionFailed: "うまくいきませんでした。もう一度お試しください。",
+  },
 };
 
-export function jobStatusLabel(job: Job, labels?: JobPanelLabels) {
-  const t = { ...defaultLabels, ...labels };
+export function jobStatusLabel(job: Job, labels?: JobPanelLabels, locale = "en") {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const step = job.step ?? 0;
   const total = job.total ?? 0;
   switch (job.status) {
@@ -326,13 +431,16 @@ export interface JobPanelProps {
   onRemove?: () => void | Promise<unknown>;
   /** 放在步驟與操作之間的內容，例如描述、AI 改寫結果 */
   children?: ReactNode;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: JobPanelLabels;
   className?: string;
 }
 
 /** 進度頁的側欄：狀態標題、進度條與具名步驟、錯誤說明、取消或重試 */
-export function JobPanel({ job, onCancel, onEdit, onRerun, onRemove, children, labels, className }: JobPanelProps) {
-  const t = { ...defaultLabels, ...labels };
+export function JobPanel({ job, onCancel, onEdit, onRerun, onRemove, children, locale = "en", labels, className }: JobPanelProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const actions = useActions(t.actionFailed);
   const active = isActive(job);
   const current = stepIndex(job.status);
@@ -350,7 +458,7 @@ export function JobPanel({ job, onCancel, onEdit, onRerun, onRemove, children, l
     <div className={cn(tokens, "flex min-w-0 flex-col gap-5 text-[var(--yc-fg)]", className)}>
       <div>
         <h2 className="text-lg font-semibold" aria-live="polite">
-          {jobStatusLabel(job, labels)}
+          {jobStatusLabel(job, labels, locale)}
         </h2>
         {meta.length ? <p className="mt-1 text-xs text-[var(--yc-muted-fg)] tabular-nums">{meta.join("・")}</p> : null}
       </div>

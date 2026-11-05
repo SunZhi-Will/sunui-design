@@ -36,7 +36,29 @@ export const COVER_PATTERNS: readonly CoverPattern[] = ["lines", "dots", "arcs",
 /** 傳統書封色系：磚紅、赭石、琥珀、麥稈、苔綠、青瓷、碧、霧藍、天青、夜藍、藤紫、絳 */
 const HUES: readonly number[] = [8, 24, 38, 52, 96, 152, 176, 196, 214, 246, 268, 328];
 
-const FALLBACK_GLYPHS = "無題";
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+export interface SeededCoverLabels {
+  /** 標題取不到字時直排的字 */
+  untitled: string;
+}
+
+const MESSAGES: Record<SunLocale, SeededCoverLabels> = {
+  en: { untitled: "NT" },
+  "zh-TW": { untitled: "無題" },
+  "zh-CN": { untitled: "无题" },
+  ja: { untitled: "無題" },
+};
+
+const FALLBACK_GLYPHS = MESSAGES.en.untitled;
 const MAX_GLYPHS = 4;
 
 /** FNV-1a 32 bit，同一字串永遠得到同一個無號整數 */
@@ -53,13 +75,13 @@ const isWordChar = (char: string) => /[\p{L}\p{N}]/u.test(char);
 const isLatinTitle = (text: string) => /^[A-Za-z0-9]+$/.test(text);
 
 /** 標題轉成直排的 1 到 4 個字：中文取主標前四字，英文取首字母 */
-export function pickGlyphs(title: string): string {
+export function pickGlyphs(title: string, fallback = FALLBACK_GLYPHS): string {
   const segments = title
     .split(/[：:｜|／/\\\u2014–\-·・,，。、;；!！?？"'「」『』()（）[\]【】\s]+/u)
     .map((segment) => Array.from(segment).filter(isWordChar).join(""))
     .filter((segment) => segment.length > 0);
 
-  if (segments.length === 0) return FALLBACK_GLYPHS;
+  if (segments.length === 0) return fallback;
 
   const latinWords = segments.filter(isLatinTitle);
   if (latinWords.length === segments.length) {
@@ -77,12 +99,12 @@ export function pickGlyphs(title: string): string {
 }
 
 /** 低位決定色相、高位決定紋理，兩者不會綁在一起 */
-export function coverStyle(seed: string, title: string) {
+export function coverStyle(seed: string, title: string, fallback = FALLBACK_GLYPHS) {
   const n = coverSeed(seed || title);
   return {
     hue: HUES[n % HUES.length],
     pattern: COVER_PATTERNS[(n >>> 11) % COVER_PATTERNS.length],
-    glyphs: pickGlyphs(title) || FALLBACK_GLYPHS,
+    glyphs: pickGlyphs(title, fallback) || fallback,
   };
 }
 
@@ -176,10 +198,15 @@ export interface SeededCoverProps {
   label?: string;
   /** 不給就繼承外層的 --story-* 變數，外層也沒有時用 ink */
   theme?: StoryTheme;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<SeededCoverLabels>;
   className?: string;
 }
 
-export function SeededCover({ seed, title, glyphs, size = "md", src, alt, label, theme, className }: SeededCoverProps) {
+export function SeededCover({ seed, title, glyphs, size = "md", src, alt, label, theme, locale = "en", labels, className }: SeededCoverProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const base = cn(
     "relative flex-none overflow-hidden rounded-[8px] border border-[var(--story-line,rgba(230,225,213,.12))] aspect-[3/4]",
     coverWidth[size],
@@ -195,7 +222,7 @@ export function SeededCover({ seed, title, glyphs, size = "md", src, alt, label,
     );
   }
 
-  const style = coverStyle(seed, title);
+  const style = coverStyle(seed, title, t.untitled);
   const patternId = `sc-cover-${style.pattern}-${coverSeed(seed || title).toString(36)}`;
   const tile = patternTile(style.pattern, patternId);
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoText } from "@/lib/demo-locale";
+
 import { SocialButton, type SocialGroupItem } from "./classic-social-button";
 
 const svg = { className: "h-5 w-5", viewBox: "0 0 24 24", "aria-hidden": true } as const;
@@ -38,20 +40,28 @@ const links: SocialGroupItem[] = [
   },
 ];
 
+const copy = {
+  en: { role: "Frontend engineer, SunUI Design", findMe: "Find me on", email: "Email" },
+  "zh-TW": { role: "前端工程師，SunUI Design", findMe: "在這些地方找到我", email: "電子郵件" },
+  "zh-CN": { role: "前端工程师，SunUI Design", findMe: "在这些地方找到我", email: "电子邮件" },
+  ja: { role: "フロントエンドエンジニア、SunUI Design", findMe: "各種リンク", email: "メール" },
+};
+
 export default function SocialButtonDemo() {
+  const t = useDemoText(copy);
   return (
     <section className="w-full max-w-sm min-w-0 rounded-2xl bg-gray-900 p-6 text-white">
       <div className="flex items-center gap-4">
         <div className="h-14 w-14 shrink-0 rounded-full bg-linear-to-br from-blue-500 to-purple-600" aria-hidden />
         <div className="min-w-0">
           <h3 className="truncate text-lg font-semibold">Sun</h3>
-          <p className="truncate text-sm text-gray-400">Frontend engineer, SunUI Design</p>
+          <p className="truncate text-sm text-gray-400">{t.role}</p>
         </div>
       </div>
-      <ul className="mt-6 flex flex-wrap gap-4 pb-8" aria-label="Find me on">
+      <ul className="mt-6 flex flex-wrap gap-4 pb-8" aria-label={t.findMe}>
         {links.map((l) => (
           <li key={l.title} className="relative h-10 w-10">
-            <SocialButton {...l} titleDisplay="hover" titlePosition="bottom" />
+            <SocialButton {...l} title={l.title === "Email" ? t.email : l.title} titleDisplay="hover" titlePosition="bottom" />
           </li>
         ))}
       </ul>

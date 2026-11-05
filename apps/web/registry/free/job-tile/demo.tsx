@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+
 import { JobTile, type Job } from "./job-tile";
 
 // 參考圖用內嵌 SVG 畫一張簡單的人像剪影，不用外部圖片
@@ -26,9 +28,16 @@ const timeline: Frame[] = [
 ];
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const prompt = "Girl in a yellow raincoat on a rooftop at dusk, soft film grain, warm city lights";
+const prompts = {
+  en: "Girl in a yellow raincoat on a rooftop at dusk, soft film grain, warm city lights",
+  "zh-TW": "黃昏的屋頂上穿黃色雨衣的女孩，柔和底片顆粒，溫暖的城市燈光",
+  "zh-CN": "黄昏的屋顶上穿黄色雨衣的女孩，柔和胶片颗粒，温暖的城市灯光",
+  ja: "夕暮れの屋上に立つ黄色いレインコートの少女、やわらかなフィルムグレイン、温かな街の灯り",
+};
 
 export default function JobTileDemo() {
+  const locale = useDemoLocale();
+  const prompt = useDemoText(prompts);
   const [i, setI] = useState(0);
   const [canceled, setCanceled] = useState(false);
 
@@ -48,6 +57,7 @@ export default function JobTileDemo() {
         <img src={reference} alt={prompt} className="aspect-[2/3] w-full rounded-lg object-cover" />
       ) : (
         <JobTile
+          locale={locale}
           job={job}
           onCancel={async () => {
             await wait(500);

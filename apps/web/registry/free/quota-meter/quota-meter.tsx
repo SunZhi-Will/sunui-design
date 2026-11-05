@@ -52,6 +52,8 @@ export function useQuotaUsage(
 }
 
 export interface QuotaMeterLabels {
+  /** card 版的預設標題 */
+  title?: string;
   unlimitedHead?: string;
   unlimitedSub?: string;
   /** card 版不限量時的說明 */
@@ -64,15 +66,61 @@ export interface QuotaMeterLabels {
   separator?: string;
 }
 
-const defaultLabels: Required<QuotaMeterLabels> = {
-  unlimitedHead: "Unlimited for now",
-  unlimitedSub: "Remaining percent shows once quotas start",
-  unlimitedBody: "Generation has no image limit right now.",
-  head: (pct) => `${pct}% of quota left`,
-  sub: (left) => `About ${left} images left`,
-  checkin: (n) => `Check in today for ${n} images`,
-  nudge: (n) => <>You haven&apos;t checked in today. Check in for {n} more images</>,
-  separator: " · ",
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, Required<QuotaMeterLabels>> = {
+  en: {
+    title: "Today's free quota",
+    unlimitedHead: "Unlimited for now",
+    unlimitedSub: "Remaining percent shows once quotas start",
+    unlimitedBody: "Generation has no image limit right now.",
+    head: (pct) => `${pct}% of quota left`,
+    sub: (left) => `About ${left} images left`,
+    checkin: (n) => `Check in today for ${n} images`,
+    nudge: (n) => <>You haven&apos;t checked in today. Check in for {n} more images</>,
+    separator: " · ",
+  },
+  "zh-TW": {
+    title: "今日免費額度",
+    unlimitedHead: "目前不限量",
+    unlimitedSub: "開始計算額度後會顯示剩餘百分比",
+    unlimitedBody: "目前生成圖片沒有張數限制。",
+    head: (pct) => `額度剩餘 ${pct}%`,
+    sub: (left) => `約可再生成 ${left} 張`,
+    checkin: (n) => `今天簽到可領 ${n} 張`,
+    nudge: (n) => <>今天還沒簽到，簽到可再領 {n} 張</>,
+    separator: "・",
+  },
+  "zh-CN": {
+    title: "今日免费额度",
+    unlimitedHead: "目前不限量",
+    unlimitedSub: "开始计算额度后会显示剩余百分比",
+    unlimitedBody: "目前生成图片没有张数限制。",
+    head: (pct) => `额度剩余 ${pct}%`,
+    sub: (left) => `约可再生成 ${left} 张`,
+    checkin: (n) => `今天签到可领 ${n} 张`,
+    nudge: (n) => <>今天还没签到，签到可再领 {n} 张</>,
+    separator: "・",
+  },
+  ja: {
+    title: "本日の無料枠",
+    unlimitedHead: "いまは無制限",
+    unlimitedSub: "上限が始まると残りの割合を表示します",
+    unlimitedBody: "現在、画像の生成枚数に上限はありません。",
+    head: (pct) => `残り ${pct}%`,
+    sub: (left) => `あと約 ${left} 枚生成できます`,
+    checkin: (n) => `チェックインで +${n} 枚`,
+    nudge: (n) => <>今日はまだチェックインしていません。チェックインであと {n} 枚もらえます</>,
+    separator: "・",
+  },
 };
 
 export interface QuotaMeterProps {
@@ -86,7 +134,7 @@ export interface QuotaMeterProps {
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   /** 目前就在方案頁 */
   current?: boolean;
-  /** card 版的標題與附註 */
+  /** card 版的標題與附註；不給時用 labels.title */
   title?: ReactNode;
   hint?: ReactNode;
   /** card 版簽到提醒條的連結 */
@@ -95,7 +143,9 @@ export interface QuotaMeterProps {
   lowAt?: number;
   /** 品牌色（簽到提醒），預設為原本的靛藍 */
   accent?: string;
+  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
+  /** 覆寫內建字串，優先於 locale */
   labels?: QuotaMeterLabels;
   className?: string;
 }
@@ -162,7 +212,7 @@ export function QuotaMeter({
   href = "/plans/",
   onClick,
   current = false,
-  title = "Today's free quota",
+  title: titleProp,
   hint,
   nudgeHref = "#rewards",
   lowAt = 10,
@@ -173,7 +223,8 @@ export function QuotaMeter({
 }: QuotaMeterProps) {
   const [tip, setTip] = useState(false);
   if (!usage) return null;
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const title = titleProp ?? l.title;
   const t = texts(usage, lowAt, l, locale);
   const style = accent ? ({ "--yc-brand": accent } as CSSProperties) : undefined;
   const root = cn(tokens, brand, "text-[var(--yc-fg)]");

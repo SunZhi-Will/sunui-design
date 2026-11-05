@@ -29,27 +29,71 @@ export interface CgGalleryProps {
   onOpenChange?: (entry: CgGalleryEntry | undefined) => void;
   /** 指到格子與已解鎖數字的顏色，預設原本的靈魂之絲粉 */
   accent?: string;
-  labels?: {
-    region?: string;
-    heading?: string;
-    unlocked?: (count: number, total: number) => string;
-    locked?: string;
-    view?: (title: string) => string;
-    lockedAria?: (index: number) => string;
-    hint?: string;
-  };
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<CgGalleryLabels>;
   className?: string;
   style?: CSSProperties;
 }
 
-const defaultLabels = {
-  region: "CG 圖鑑",
-  heading: "現場畫面",
-  unlocked: (count: number, total: number) => `已解鎖 ${count}／${total}`,
-  locked: "尚未解鎖",
-  view: (title: string) => `檢視 CG：${title}`,
-  lockedAria: (index: number) => `第 ${index} 張 CG，尚未解鎖`,
-  hint: "點擊或按空白鍵返回",
+export interface CgGalleryLabels {
+  region: string;
+  heading: string;
+  unlocked: (count: number, total: number) => string;
+  locked: string;
+  view: (title: string) => string;
+  lockedAria: (index: number) => string;
+  hint: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const MESSAGES: Record<SunLocale, CgGalleryLabels> = {
+  en: {
+    region: "CG gallery",
+    heading: "Scenes",
+    unlocked: (count, total) => `Unlocked ${count}/${total}`,
+    locked: "Locked",
+    view: (title) => `View CG: ${title}`,
+    lockedAria: (index) => `CG ${index}, locked`,
+    hint: "Click or press Space to return",
+  },
+  "zh-TW": {
+    region: "CG 圖鑑",
+    heading: "現場畫面",
+    unlocked: (count, total) => `已解鎖 ${count}／${total}`,
+    locked: "尚未解鎖",
+    view: (title) => `檢視 CG：${title}`,
+    lockedAria: (index) => `第 ${index} 張 CG，尚未解鎖`,
+    hint: "點擊或按空白鍵返回",
+  },
+  "zh-CN": {
+    region: "CG 图鉴",
+    heading: "现场画面",
+    unlocked: (count, total) => `已解锁 ${count}／${total}`,
+    locked: "尚未解锁",
+    view: (title) => `查看 CG：${title}`,
+    lockedAria: (index) => `第 ${index} 张 CG，尚未解锁`,
+    hint: "点击或按空格键返回",
+  },
+  ja: {
+    region: "CG ギャラリー",
+    heading: "シーン",
+    unlocked: (count, total) => `解放 ${count}／${total}`,
+    locked: "未解放",
+    view: (title) => `CG を見る：${title}`,
+    lockedAria: (index) => `CG ${index}、未解放`,
+    hint: "クリックかスペースキーで戻る",
+  },
 };
 
 const LOCK_ICON = "M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6zM12 15v2";
@@ -68,11 +112,12 @@ export function CgGallery({
   fixed = true,
   onOpenChange,
   accent = "#e6a4b8",
+  locale = "en",
   labels,
   className,
   style,
 }: CgGalleryProps) {
-  const l = { ...defaultLabels, ...labels };
+  const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const [open, setOpen] = useState<CgGalleryEntry | undefined>();
   const viewerRef = useRef<HTMLDivElement>(null);
   const returnRef = useRef<HTMLButtonElement | null>(null);

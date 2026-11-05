@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
@@ -12,8 +13,17 @@ const edge = "border-[#e7e0d0] dark:border-[#38332b]";
 const ink = "text-[#1c1917] dark:text-[#ece7dc]";
 const sizes = ["S", "M", "L", "XL"];
 
+const copy = {
+  en: { filters: "Filters", linen: "Linen" },
+  "zh-TW": { filters: "篩選", linen: "亞麻" },
+  "zh-CN": { filters: "筛选", linen: "亚麻" },
+  ja: { filters: "絞り込み", linen: "リネン" },
+};
+
 /** 型錄卡片：點 Filters，一張紙從左側滑進來，可勾尺寸、按 Esc 或遮罩關閉。 */
 export default function SidePanelCard() {
+  const locale = useDemoLocale();
+  const t = useDemoText(copy);
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<string[]>(["M"]);
   const toggle = (v: string) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
@@ -26,9 +36,9 @@ export default function SidePanelCard() {
           onClick={() => setOpen(true)}
           className="rounded-md px-2 py-1 text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
         >
-          Filters <span className="tabular-nums opacity-60">({picked.length})</span>
+          {t.filters} <span className="tabular-nums opacity-60">({picked.length})</span>
         </button>
-        <span className="text-sm font-semibold tracking-tight">Linen</span>
+        <span className="text-sm font-semibold tracking-tight">{t.linen}</span>
       </header>
       <div className="grid grid-cols-2 gap-3 p-3">
         {[0, 1].map((i) => (
@@ -36,7 +46,7 @@ export default function SidePanelCard() {
         ))}
       </div>
 
-      <SidePanel open={open} onOpenChange={setOpen} side="left" size="sm" portal={false} title="Filters">
+      <SidePanel open={open} onOpenChange={setOpen} side="left" size="sm" portal={false} locale={locale} title={t.filters}>
         <div className="flex flex-wrap gap-1.5">
           {sizes.map((s) => (
             <label
