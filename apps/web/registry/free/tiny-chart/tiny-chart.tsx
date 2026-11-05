@@ -18,7 +18,7 @@ export interface TinyState {
   label: string;
   /** 節點旁的小字 */
   note?: string;
-  /** 進入這一步時的旁白；省略時用連線文字或名稱 */
+  /** 進入這一步時的旁白；省略時用步驟名稱 */
   say?: string;
   /** 終點：畫成靶心，按下一步會說已經結束 */
   final?: boolean;
@@ -173,7 +173,7 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
     const hit = exits.find(({ t }) => (t.on ?? NEXT) === a.event);
     if (hit) {
       const to = byId.get(hit.t.to);
-      const text = to?.say ?? hit.t.label ?? name(hit.t.to);
+      const text = to?.say ?? name(hit.t.to);
       return { at: hit.t.to, path: [...s.path, hit.i], message: { text, refused: false }, beat: s.beat + 1 };
     }
     let text = copy.stuck;
@@ -210,7 +210,7 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
 
 type Pt = [number, number];
 interface Box { x: number; y: number; w: number; h: number }
-interface Edge { d: string; lx: number; ly: number; anchor: "start" | "middle" | "end"; text: string }
+interface Edge { d: string; lx: number; ly: number; anchor: "start" | "middle" | "end"; text: string; tape?: boolean }
 interface Layout { nodes: Map<string, Box>; edges: Edge[]; start: [Pt, Pt]; tick: boolean }
 
 const NODE_FONT = 12;
@@ -219,12 +219,9 @@ const NODE_H = 28;
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const textW = (s: string, size: number) =>
   [...s].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? size * 1.08 : size * 0.68), 0);
-const nodeBox = (s: TinyState, x: number, y: number): Box => ({
-  x,
-  y,
-  w: Math.max(60, textW(s.label.toUpperCase(), NODE_FONT) + 24),
-  h: NODE_H,
-});
+// 終點畫成靶心，方框只是用來算箭頭停在哪
+const nodeBox = (s: TinyState, x: number, y: number): Box =>
+  s.final ? { x, y, w: 22, h: 22 } : { x, y, w: Math.max(60, textW(s.label.toUpperCase(), NODE_FONT) + 24), h: NODE_H };
 const edgeText = (t: TinyTransition) => [t.guard && `[${t.guard}]`, t.label].filter(Boolean).join(" ");
 
 /** 直角折線，轉角帶小圓角 */
@@ -294,9 +291,13 @@ function layoutFlow(m: TinyMachine): Layout {
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     const top = a.y + a.h / 2, bottom = b.y - b.h / 2;
     if (b.y > a.y + 1) {
-      if (Math.abs(a.x - b.x) < 1) return orthoLabel([[a.x, top], [b.x, bottom]], edgeText(t));
       // 一分多：在出發處就轉彎；多合一：在抵達前才轉彎
       const splits = m.transitions.filter((x) => x.from === t.from && nodes.get(x.to)!.y > a.y + 1).length > 1;
+      if (Math.abs(a.x - b.x) < 1) {
+        const e = orthoLabel([[a.x, top], [b.x, bottom]], edgeText(t));
+        // 分岔時直走那條的文字放左邊，讓出右邊給轉彎那條
+        return splits ? { ...e, lx: a.x - 8, anchor: "end" as const } : e;
+      }
       const ym = splits ? top + (rowH - NODE_H) / 2 : bottom - (rowH - NODE_H) / 2;
       return orthoLabel([[a.x, top], [a.x, ym], [b.x, ym], [b.x, bottom]], edgeText(t));
     }
@@ -319,49 +320,68 @@ function layoutTimeline(m: TinyMachine): Layout {
   let y = 40;
   for (const s of m.states) {
     nodes.set(s.id, { x, y, w: 14, h: 14 });
-    if (!s.final) y += Math.max(54, ((s.duration ?? 1) / total) * 460);
+    if (!s.final) y += Math.max(54, ((s.duration ?? 1) / total) * 400);
   }
   const index = new Map(m.states.map((s, i) => [s.id, i]));
   const edges = m.transitions.map((t): Edge => {
     const a = nodes.get(t.from)!, b = nodes.get(t.to)!;
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     if (index.get(t.to) === index.get(t.from)! + 1)
-      return { d: `M${x} ${a.y + 8} L${x} ${b.y - 8}`, lx: x - 14, ly: (a.y + b.y) / 2 + 4, anchor: "end", text: edgeText(t) };
+      return { d: `M${x} ${a.y + 8} L${x} ${b.y - 8}`, lx: x - 14, ly: (a.y + b.y) / 2 + 4, anchor: "end", text: edgeText(t), tape: true };
     // 跳過或折返的線，從時間軸左側繞過去
     const bend = x - 46 - Math.min(40, Math.abs(b.y - a.y) / 10);
-    const mid = (a.y + b.y) / 2;
-    return { d: `M${x - 7} ${a.y} C${bend} ${a.y}, ${bend} ${b.y}, ${x - 8} ${b.y}`, lx: bend + 12, ly: mid + 4, anchor: "end", text: edgeText(t) };
+    // 文字靠近出發端，避開時間段中間的長度標示
+    return { d: `M${x - 7} ${a.y} C${bend} ${a.y}, ${bend} ${b.y}, ${x - 8} ${b.y}`, lx: 0.75 * bend - 8, ly: a.y + (b.y - a.y) * 0.3 + 4, anchor: "end", text: edgeText(t) };
   });
   const first = nodes.get(m.initial)!;
   return { nodes, edges, start: [[x, first.y - 30], [x, first.y - 9]], tick: true };
 }
 
 function layoutCycle(m: TinyMachine): Layout {
-  const ring = m.states.filter((s) => !s.final);
-  const R = Math.max(96, ring.length * 30);
-  const angle = (i: number) => -Math.PI / 2 + (i / ring.length) * Math.PI * 2;
-  const nodes = new Map<string, Box>();
-  ring.forEach((s, i) => nodes.set(s.id, nodeBox(s, Math.cos(angle(i)) * R, Math.sin(angle(i)) * R)));
-  for (const s of m.states.filter((x) => x.final)) {
-    const from = m.transitions.find((t) => t.to === s.id && nodes.has(t.from));
-    const a = from ? nodes.get(from.from)! : { x: 0, y: R };
-    const l = Math.hypot(a.x, a.y) || 1;
-    nodes.set(s.id, nodeBox(s, a.x + (a.x / l) * 86, a.y + (a.y / l) * 72));
+  // 圈上只放主循環：從起點沿下一步走回起點的那幾步；其他步驟（暫停、終點）放在圈外
+  const loop: string[] = [m.initial];
+  for (let at = m.initial; ; ) {
+    const t = m.transitions.find((x) => x.from === at && (x.on ?? NEXT) === NEXT);
+    if (!t || t.to === m.initial || loop.includes(t.to)) {
+      if (t?.to !== m.initial) loop.splice(0, loop.length, ...m.states.filter((x) => !x.final).map((x) => x.id));
+      break;
+    }
+    loop.push((at = t.to));
   }
-  const pos = new Map(ring.map((s, i) => [s.id, i]));
+  const R = Math.max(96, loop.length * 32);
+  const angle = (i: number) => -Math.PI / 2 + (i / loop.length) * Math.PI * 2;
+  const byId = new Map(m.states.map((s) => [s.id, s]));
+  const nodes = new Map<string, Box>();
+  loop.forEach((id, i) => nodes.set(id, nodeBox(byId.get(id)!, Math.cos(angle(i)) * R, Math.sin(angle(i)) * R)));
+  for (const s of m.states.filter((x) => !nodes.has(x.id))) {
+    // 圈外的步驟放在它連到的圈上步驟的方向，往外推
+    const near = m.transitions.flatMap((t) => (t.to === s.id ? [t.from] : t.from === s.id ? [t.to] : [])).filter((id) => nodes.has(id));
+    const vx = near.reduce((n, id) => n + nodes.get(id)!.x, 0), vy = near.reduce((n, id) => n + nodes.get(id)!.y, 0);
+    const l = Math.hypot(vx, vy) || 1;
+    const out = R + 44 + Math.max(0, ...near.map((id) => nodes.get(id)!.w / 2)) + (s.final ? 0 : 20);
+    nodes.set(s.id, nodeBox(s, near.length ? (vx / l) * out : 0, near.length ? (vy / l) * out : R + 80));
+  }
+  const pos = new Map(loop.map((id, i) => [id, i]));
   const edges = m.transitions.map((t) => {
     const a = nodes.get(t.from)!, b = nodes.get(t.to)!;
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     const i = pos.get(t.from), j = pos.get(t.to);
-    if (i === undefined || j === undefined) return curve(a, b, [(a.x + b.x) / 2, (a.y + b.y) / 2], edgeText(t));
-    const forward = (i + 1) % ring.length === j;
-    const mid = angle(i) + (((j - i + ring.length) % ring.length) / ring.length) * Math.PI;
+    if (i === undefined || j === undefined) {
+      // 進出圈外的線向外微彎
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, l = Math.hypot(mx, my) || 1;
+      return curve(a, b, [mx + (mx / l) * 18, my + (my / l) * 18], edgeText(t));
+    }
+    const forward = (i + 1) % loop.length === j;
+    const mid = angle(i) + (((j - i + loop.length) % loop.length) / loop.length) * Math.PI;
     // 順著走的沿外圈，跨步或倒退的從圈內穿過
     const k = forward ? R * 1.18 : R * 0.3;
     return curve(a, b, [Math.cos(mid) * k, Math.sin(mid) * k], edgeText(t));
   });
+  // 起點箭頭從圈外指進來
   const first = nodes.get(m.initial)!;
-  return { nodes, edges, start: [[first.x - first.w / 2 - 34, first.y], [first.x - first.w / 2 - 3, first.y]], tick: false };
+  const fl = Math.hypot(first.x, first.y) || 1;
+  const from: Pt = [first.x + (first.x / fl) * 44, first.y + (first.y / fl) * 44];
+  return { nodes, edges, start: [from, rim(first, from)], tick: false };
 }
 
 /** 手畫感方框：四條線各自略超出轉角，端點有一點點偏移，由 id 決定，重繪不會跳 */
@@ -406,7 +426,6 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const shape = useMemo(() => (layout === "timeline" ? layoutTimeline : layout === "cycle" ? layoutCycle : layoutFlow)(machine), [machine, layout]);
   const checks = useMemo(() => checkMachine(machine), [machine]);
   const [open, setOpen] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   const edgeEls = useRef<(SVGPathElement | null)[]>([]);
   const tx = useMotionValue(0), ty = useMotionValue(0);
@@ -419,8 +438,9 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     const xs: number[] = [], ys: number[] = [];
     for (const [id, b] of shape.nodes) {
       const s = machine.states.find((x) => x.id === id)!;
-      const labelW = shape.tick ? 22 + Math.max(textW(s.label.toUpperCase(), NODE_FONT), textW(s.note ?? "", EDGE_FONT)) : b.w / 2;
-      xs.push(b.x - b.w / 2, b.x + labelW);
+      const half = Math.max(b.w, textW(s.label.toUpperCase(), NODE_FONT)) / 2;
+      const labelW = shape.tick ? 22 + Math.max(textW(s.label.toUpperCase(), NODE_FONT), textW(s.note ?? "", EDGE_FONT)) : half;
+      xs.push(b.x - (shape.tick ? b.w / 2 : half), b.x + labelW);
       ys.push(b.y - b.h / 2, b.y + b.h / 2 + (s.note ? 18 : 0) + (s.final && !shape.tick ? 22 : 0));
     }
     for (const e of shape.edges) {
@@ -437,19 +457,16 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     return { minX, minY, w: maxX - minX, h: maxY - minY };
   }, [shape, machine]);
 
-  const stop = useCallback(() => {
-    window.clearTimeout(timer.current);
-    setPlaying(false);
-  }, []);
+  // 全部播放：從頭開始，一步一步送出劇本裡的事件；手動按任何按鈕就停
+  const stop = () => window.clearTimeout(timer.current);
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const playAll = () => {
     stop();
     reset();
-    setPlaying(true);
     let i = 0;
     const tick = () => {
-      if (i >= script.length) return setPlaying(false);
+      if (i >= script.length) return;
       send(script[i++]);
       timer.current = window.setTimeout(tick, reduce ? 700 : 950);
     };
@@ -489,7 +506,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const arrow = (tone: "ink" | "red") => `url(#${uid}-${tone})`;
 
   return (
-    <figure className={cn("rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-4 text-[#1c1917] sm:p-5 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]", className)}>
+    <figure className={cn("min-w-0 rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-4 text-[#1c1917] sm:p-5 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <figcaption className="text-lg font-semibold leading-tight tracking-tight">{title}</figcaption>
@@ -505,7 +522,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
         <svg
           viewBox={`${r1(box.minX)} ${r1(box.minY)} ${r1(box.w)} ${r1(box.h)}`}
           className="mx-auto block h-auto w-full"
-          style={{ minWidth: Math.min(box.w * 0.8, 560), maxWidth: box.w * 1.25 }}
+          style={{ minWidth: Math.min(box.w * 0.68, 480), maxWidth: box.w * 1.25 }}
           role="img"
           aria-label={`${title}. ${copy.step(chart.step, chart.total)}: ${chart.state?.label ?? ""}`}
         >
@@ -536,8 +553,8 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 fill="none"
                 strokeWidth="1.3"
                 strokeLinecap="round"
-                className={cn(INK, "opacity-70", shape.tick && "opacity-0")}
-                markerEnd={shape.tick ? undefined : arrow("ink")}
+                className={cn(INK, e.tape ? "opacity-0" : "opacity-70")}
+                markerEnd={e.tape ? undefined : arrow("ink")}
               />
               {e.text && (
                 <text x={e.lx} y={e.ly} textAnchor={e.anchor} fontSize={EDGE_FONT} className="fill-[#1c1917]/60 font-mono dark:fill-[#ece7dc]/60">
@@ -553,10 +570,10 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
               key={k}
               d={shape.edges[ti].d}
               fill="none"
-              strokeWidth={shape.tick ? 5 : 2}
+              strokeWidth={shape.edges[ti].tape ? 5 : 2}
               strokeLinecap="round"
               className={RED}
-              markerEnd={shape.tick ? undefined : arrow("red")}
+              markerEnd={shape.edges[ti].tape ? undefined : arrow("red")}
               initial={k === path.length - 1 && !reduce ? { pathLength: 0 } : false}
               animate={{ pathLength: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
