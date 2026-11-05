@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
-import { TinyChart, type TinyChartCopy, type TinyMachine } from "./tiny-chart";
+import { TinyChart, type TinyChartCopy, type TinyMachine, type TinyScene } from "./tiny-chart";
 
 type Text = {
   ui: Partial<TinyChartCopy>;
@@ -167,6 +167,17 @@ function orderMachine(t: Text["order"]): TinyMachine {
       say: t.say[i] || undefined,
       final: id === "delivered",
       at: ([[0, 0], [0, 1], [1, 1], [0, 2], [0, 3], [0, 4], [1, 5], [0, 5]] as [number, number][])[i],
+      // 等角版面每一步旁邊的小場景：下單在家、付款在櫃台、層架揀貨、倉庫出貨、貨車配送、沒人在家留在郵筒、送達住家
+      scene: ([
+        { prop: "home", person: true },
+        { prop: "counter" },
+        undefined,
+        { prop: "shelf", person: true },
+        "warehouse",
+        "truck",
+        "post",
+        { prop: "house", person: true },
+      ] as (TinyScene | undefined)[])[i],
     })),
     transitions: [
       { from: "placed", to: "paid", guard: t.g[0] },

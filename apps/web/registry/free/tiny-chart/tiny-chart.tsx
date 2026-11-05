@@ -5,6 +5,10 @@ import { useCallback, useEffect, useId, useMemo, useReducer, useRef, useState } 
 
 import { cn } from "@/lib/utils";
 
+import { Figure, ISO_C, ISO_S, iso, placeScene, r1, SceneParts, type Pt, type SceneDraw, type TinyScene } from "./tiny-scenes";
+
+export { tinyProps, type TinyProp, type TinyScene } from "./tiny-scenes";
+
 /* 一張會動的流程小圖：畫面背後是一台真的狀態機，每個按鈕都照規則走。
    不合規則的按鈕不會被藏起來，按下去會用一句話說明為什麼不行，這是讀者理解規則的方式。
    三種版面共用同一台機器：flow（流程與分岔）、timeline（照比例的時間軸）、cycle（循環與出口）。 */
@@ -24,6 +28,8 @@ export interface TinyState {
   final?: boolean;
   /** flow 與 isometric 版面的格位 [欄, 列]；省略時依距離起點的步數自動排 */
   at?: [number, number];
+  /** isometric 版面：放在這一步旁邊的小場景，例如 "truck" 或 { prop: "counter", person: true } */
+  scene?: TinyScene;
   /** timeline 版面的相對長度，預設 1 */
   duration?: number;
 }
@@ -230,7 +236,6 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
 
 /* ---------- 版面：把機器排成三種圖 ---------- */
 
-type Pt = [number, number];
 interface Box { x: number; y: number; w: number; h: number }
 interface Edge { d: string; lx: number; ly: number; anchor: "start" | "middle" | "end"; text: string; tape?: boolean }
 interface IsoBlock { top: Pt[]; front: Pt[]; side: Pt[]; label: Pt; note: Pt; depth: number }
@@ -240,13 +245,20 @@ interface Layout {
   start: [Pt, Pt];
   tick: boolean;
   /** isometric 版面才有：每一步的三個面與地板格線 */
-  iso?: { blocks: Map<string, IsoBlock>; floor: string };
+  iso?: {
+    blocks: Map<string, IsoBlock>;
+    floor: string;
+    scenes: Map<string, SceneDraw>;
+    /** 小人站在每一步的哪裡（方塊頂面中心或終點圓盤） */
+    stands: Map<string, Pt>;
+  };
+  /** 視框也要包進來的額外點（場景道具） */
+  extra?: Pt[];
 }
 
 const NODE_FONT = 12;
 const EDGE_FONT = 11;
 const NODE_H = 28;
-const r1 = (n: number) => Math.round(n * 10) / 10;
 const textW = (s: string, size: number) =>
   [...s].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? size * 1.08 : size * 0.68), 0);
 // 終點畫成靶心，方框只是用來算箭頭停在哪
@@ -423,9 +435,6 @@ function layoutCycle(m: TinyMachine): Layout {
 
 /* ---------- 等角版面：步驟是立在等角地板上的方塊，連線走在地板上 ---------- */
 
-const ISO_C = Math.cos(Math.PI / 6), ISO_S = 0.5;
-/** 世界座標 (x, y, z) 投影到畫面：y（流程前進方向）往右下、x（分岔）往左下、z 往上，讀起來由左上到右下 */
-const iso = (x: number, y: number, z = 0): Pt => [r1((y - x) * ISO_C), r1((x + y) * ISO_S - z)];
 const ISO_FONT = 11;
 const BLOCK_D = 30, BLOCK_H = 24, DISC = 13;
 
@@ -489,11 +498,27 @@ function layoutIso(m: TinyMachine): Layout {
     return floorEdge([[a.x + a.w / 2, a.y], [lane, a.y], [lane, b.y], [b.x + b.w / 2 + 4, b.y]], edgeText(t));
   });
 
-  // 地板：每 26 單位一條格線，範圍比方塊多出一圈
-  const all = [...world.values()];
-  const pad = 52, step = 26;
-  const [fx0, fx1] = [Math.min(...all.map((b) => b.x - b.w / 2)) - pad, Math.max(right + 60, ...all.map((b) => b.x + b.w / 2)) + pad / 2];
-  const [fy0, fy1] = [Math.min(...all.map((b) => b.y - b.d / 2)) - pad, Math.max(...all.map((b) => b.y + b.d / 2)) + pad];
+  // 場景：主線上的步驟放在遠側（畫面右上），分岔出去的步驟放在近側（左下），不擋住主線
+  const scenes = new Map<string, SceneDraw>();
+  const stands = new Map<string, Pt>();
+  const extra: Pt[] = [];
+  for (const [id, b] of world) {
+    const s = byId.get(id)!;
+    stands.set(id, iso(b.x, b.y, s.final ? 0 : BLOCK_H));
+    if (!s.scene) continue;
+    const draw = placeScene(s.scene, b.x, b.y, b.w, cells.get(id)![0] >= 1 ? 1 : -1);
+    scenes.set(id, draw);
+    for (const part of draw.parts) part.kind === "person" ? extra.push(part.at, [part.at[0], part.at[1] - 38]) : extra.push(...part.pts);
+  }
+
+  // 地板：每 26 單位一條格線，範圍比方塊與場景多出一圈
+  const all = [
+    ...[...world.values()].map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d / 2, y1: b.y + b.d / 2 })),
+    ...[...scenes.values()].map((d) => d.footprint),
+  ];
+  const pad = 40, step = 26;
+  const [fx0, fx1] = [Math.min(...all.map((b) => b.x0)) - pad, Math.max(right + 60, ...all.map((b) => b.x1)) + pad / 2];
+  const [fy0, fy1] = [Math.min(...all.map((b) => b.y0)) - pad, Math.max(...all.map((b) => b.y1)) + pad];
   let floor = "";
   for (let x = Math.ceil(fx0 / step) * step; x <= fx1; x += step) floor += `M${iso(x, fy0).join(" ")} L${iso(x, fy1).join(" ")} `;
   for (let y = Math.ceil(fy0 / step) * step; y <= fy1; y += step) floor += `M${iso(fx0, y).join(" ")} L${iso(fx1, y).join(" ")} `;
@@ -504,7 +529,8 @@ function layoutIso(m: TinyMachine): Layout {
     edges,
     start: [iso(first.x, first.y - first.d / 2 - 46), iso(first.x, first.y - first.d / 2 - 4)],
     tick: false,
-    iso: { blocks, floor },
+    iso: { blocks, floor, scenes, stands },
+    extra,
   };
 }
 
@@ -535,6 +561,8 @@ export interface TinyChartProps {
   showLogic?: boolean;
   copy?: Partial<TinyChartCopy>;
   onStateChange?: (id: string) => void;
+  /** isometric 版面：一個小人站在目前這一步，換步時跳過去；預設開啟 */
+  walker?: boolean;
   className?: string;
 }
 
@@ -546,7 +574,7 @@ const FACE_FRONT = "fill-[#efe8da] dark:fill-[#2a2620]";
 const FACE_SIDE = "fill-[#e3dbc9] dark:fill-[#15130f]";
 const poly = (p: Pt[]) => p.map((q) => q.join(",")).join(" ");
 
-export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = true, showLogic = true, copy: copyProp, onStateChange, className }: TinyChartProps) {
+export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = true, showLogic = true, copy: copyProp, onStateChange, walker = true, className }: TinyChartProps) {
   const copy = useMemo(() => ({ ...defaultTinyChartCopy, ...copyProp, checks: { ...defaultTinyChartCopy.checks, ...copyProp?.checks } }), [copyProp]);
   const chart = useStatechart(machine, copy);
   const reduce = useReducedMotion();
@@ -557,17 +585,20 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const timer = useRef<number | undefined>(undefined);
   const svgRef = useRef<SVGSVGElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
-  const tx = useMotionValue(0), ty = useMotionValue(0), tokenOpacity = useMotionValue(1);
+  const tx = useMotionValue(0), ty = useMotionValue(0);
   const [lineRef, animateLine] = useAnimate<HTMLParagraphElement>();
   const { at, path, beat, message, send, reset, script, can } = chart;
   const moved = path.length;
   const isIso = !!shape.iso;
   const byId = useMemo(() => new Map(machine.states.map((s) => [s.id, s])), [machine]);
-  // 等角方塊由遠到近畫，近的才會蓋住遠的
-  const isoOrder = useMemo(
-    () => (shape.iso ? [...machine.states].sort((a, b) => shape.iso!.blocks.get(a.id)!.depth - shape.iso!.blocks.get(b.id)!.depth) : []),
-    [shape, machine],
-  );
+  // 等角方塊與場景一起由遠到近畫，近的才會蓋住遠的
+  const isoOrder = useMemo(() => {
+    if (!shape.iso) return [];
+    const { blocks, scenes } = shape.iso;
+    const items: { depth: number; state: TinyState; scene?: SceneDraw }[] = machine.states.map((state) => ({ depth: blocks.get(state.id)!.depth, state }));
+    for (const [id, scene] of scenes) items.push({ depth: scene.depth, state: byId.get(id)!, scene });
+    return items.sort((a, b) => a.depth - b.depth);
+  }, [shape, machine, byId]);
 
   // 視框依內容算，連線文字也算進去，避免被切掉
   const box = useMemo(() => {
@@ -586,6 +617,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
       // 路徑上的數字依序是 x, y 成對
       (e.d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number).forEach((n, i) => (i % 2 ? ys : xs).push(n));
     }
+    for (const [x, y] of shape.extra ?? []) xs.push(x), ys.push(y);
     ys.push(shape.start[0][1] - 6);
     xs.push(shape.start[0][0] - 6);
     const pad = 14;
@@ -631,8 +663,32 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     void animateLine(lineRef.current, { x: [0, -6, 5, -3, 2, 0] }, { duration: 0.32, ease: "easeOut" });
   }, [beat, message.refused, reduce, animateLine, lineRef]);
 
-  // 朱紅小點沿著剛走過的線移動，停在箭頭處
+  // 等角版面：小人站在目前這一步的頂面，換步時沿弧線跳過去（落點算上方塊浮起的高度）
+  const stands = shape.iso?.stands;
   useEffect(() => {
+    if (!stands || !walker) return;
+    const lift = (id: string) => (byId.get(id)?.final ? 0 : 7);
+    const to = stands.get(at)!;
+    const end: Pt = [to[0], to[1] - lift(at)];
+    const last = path.length ? machine.transitions[path[path.length - 1]] : null;
+    if (!last || reduce) return void (tx.set(end[0]), ty.set(end[1]));
+    const from = stands.get(last.from)!;
+    const c: Pt = [(from[0] + end[0]) / 2, Math.min(from[1], end[1]) - 36];
+    const run = animate(0, 1, {
+      duration: 0.4,
+      ease: "easeInOut",
+      onUpdate: (t) => {
+        const u = 1 - t;
+        tx.set(u * u * from[0] + 2 * u * t * c[0] + t * t * end[0]);
+        ty.set(u * u * from[1] + 2 * u * t * c[1] + t * t * end[1]);
+      },
+    });
+    return () => run.stop();
+  }, [path, at, stands, walker, reduce, byId, machine, tx, ty]);
+
+  // 朱紅小點沿著剛走過的線移動，停在箭頭處（等角版面改由小人表示）
+  useEffect(() => {
+    if (isIso) return;
     const el = path.length ? svgRef.current?.querySelector<SVGPathElement>(`[data-edge="${path[path.length - 1]}"]`) : null;
     if (!el) return;
     const len = el.getTotalLength();
@@ -641,14 +697,11 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
       tx.set(p.x);
       ty.set(p.y);
     };
-    // 等角版面的小點走到方塊後面就收起來，目前位置交給浮起的方塊表示
-    const settle = () => tokenOpacity.set(isIso ? 0 : 1);
-    tokenOpacity.set(1);
-    if (reduce) return put(1), settle();
-    const run = animate(0, 1, { duration: 0.4, ease: "easeOut", onUpdate: put, onComplete: settle });
+    if (reduce) return put(1);
+    const run = animate(0, 1, { duration: 0.4, ease: "easeOut", onUpdate: put });
     return () => run.stop();
     // path 只在真的移動或重來時換新陣列，被拒絕時沿用舊的，所以不會重播
-  }, [path, reduce, isIso, tx, ty, tokenOpacity]);
+  }, [path, reduce, isIso, tx, ty]);
 
   const visited = new Set([machine.initial, ...path.map((i) => machine.transitions[i].to)]);
   const arrow = (tone: "ink" | "red") => `url(#${uid}-${tone})`;
@@ -730,7 +783,8 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           ))}
 
           {shape.iso &&
-            isoOrder.map((s) => {
+            isoOrder.map(({ state: s, scene }) => {
+                if (scene) return <g key={`scene-${s.id}`}><SceneParts parts={scene.parts} /></g>;
                 const k = shape.iso!.blocks.get(s.id)!;
                 const here = s.id === at;
                 const labelCls = cn("font-mono uppercase", here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]");
@@ -772,6 +826,13 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                   </text>
                 ),
             )}
+
+          {/* 走流程的小人：穿朱紅上衣，和描線、目前方塊是同一種「現在在這」的顏色 */}
+          {isIso && walker && (
+            <motion.g style={{ x: tx, y: ty }} aria-hidden>
+              <Figure tone="red" />
+            </motion.g>
+          )}
 
           {!shape.iso && machine.states.map((s) => {
             const b = shape.nodes.get(s.id)!;
@@ -847,7 +908,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             );
           })}
 
-          {moved > 0 && <motion.circle r="4.5" cx={tx} cy={ty} opacity={tokenOpacity} strokeWidth="2" className="fill-[#c8361d] stroke-[#faf7f0] dark:fill-[#ec6a4f] dark:stroke-[#1f1c18]" />}
+          {moved > 0 && !isIso && <motion.circle r="4.5" cx={tx} cy={ty} strokeWidth="2" className="fill-[#c8361d] stroke-[#faf7f0] dark:fill-[#ec6a4f] dark:stroke-[#1f1c18]" />}
         </svg>
       </div>
 

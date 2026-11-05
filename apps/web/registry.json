@@ -4381,7 +4381,7 @@
       "name": "tiny-chart",
       "type": "registry:block",
       "title": "Tiny Chart",
-      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks standing on an isometric floor, the current one lifted), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
+      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks on an isometric floor, each with an optional code-drawn scene such as a desk, counter, shelf, warehouse, truck, house or post box, and a character who hops onto the current step), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4409,7 +4409,8 @@
             "Keep it to about 4 to 10 steps; a bigger process reads better as several charts",
             "Give flow charts explicit at: [column, row] positions once there are branches that rejoin, so arrows do not cross",
             "Labels are measured, not wrapped: keep step names to a few words, and long sentences in say instead",
-            "It explains a process, it is not live order status: pass the real current step from your data by building a machine that starts there"
+            "It explains a process, it is not live order status: pass the real current step from your data by building a machine that starts there",
+            "Scenes only draw in the isometric layout; they are neutral props, so keep brand imagery in the surrounding page"
           ],
           "aliases": [
             "statechart",
@@ -4426,13 +4427,20 @@
             "explainer chart",
             "isometric diagram",
             "2.5D flowchart",
-            "isometric process"
+            "isometric process",
+            "isometric scene",
+            "isometric illustration",
+            "diorama diagram"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/tiny-chart/tiny-chart.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/tiny-chart/tiny-scenes.tsx",
           "type": "registry:component"
         }
       ]
