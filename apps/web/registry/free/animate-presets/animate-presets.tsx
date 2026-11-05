@@ -338,7 +338,9 @@ export function Animate({
   const controls = useAnimationControls();
   const ref = useRef<HTMLDivElement>(null);
   const isLoop = play === undefined && trigger === "loop";
-  const inView = useInView(ref, { once: !isLoop, amount });
+  // loop 只用來在離開畫面時暫停，露出一點就算在畫面上：
+  // 進場的起點常是位移到框外或 clip-path 全遮（backInRight、clipReveal），用 amount 比例判斷會永遠不開始
+  const inView = useInView(ref, { once: !isLoop, amount: isLoop ? "some" : amount });
   const played = useRef(false);
 
   const variants: Variants = useMemo(() => ({ rest: restOf(def), play: def.to }), [def]);

@@ -14,7 +14,9 @@ export default function AnimatePresetsVariant({ variant }: { variant: string }) 
   const family = presetFamily(preset);
   const repeatDelay = family === "emphasis" ? (preset === "spin" || preset === "float" ? 0.2 : 1.2) : 0.8;
   return (
-    <div className="grid h-36 w-64 place-items-center overflow-hidden">
+    // 框要接近卡片大小：backIn 系列從 120 到 160px 外起跳，框太小時起點整個被裁掉，
+    // IntersectionObserver 判定不在畫面上，loop 就永遠不會開始
+    <div className="grid h-72 w-80 place-items-center overflow-hidden">
       <Animate preset={preset} trigger="loop" repeatDelay={repeatDelay}>
         <Subject label={t.sample} />
       </Animate>
