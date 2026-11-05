@@ -13,14 +13,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.11.0",
+    "mcp-handler": "^2.3.0",
     "next": "^15.5.12",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
     "shiki": "^4.6.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.6",
