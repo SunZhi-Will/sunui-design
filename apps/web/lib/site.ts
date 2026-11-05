@@ -19,6 +19,17 @@ export function foundingState(now = new Date()): FoundingState {
   return "open";
 }
 
+/** 定價（美元，一次買斷）。pricing 頁、401 訊息與 agent 說明都從這裡取。 */
+export const prices = { pro: 129, team: 349, founding: 79, teamSeats: 5 };
+
+/** 給終端機與 agent 看的一句話方案說明（英文）。 */
+export function licenseSummary(now = new Date()) {
+  const base = `Pro is a one-time $${prices.pro} (Team: $${prices.team} for ${prices.teamSeats} people), no subscription, and covers unlimited personal and client projects.`;
+  return foundingState(now) === "open"
+    ? `${base} Founding members pay $${prices.founding} for lifetime Pro until the seats run out.`
+    : base;
+}
+
 /** Polar 結帳連結；未設定時頁面改導向 waitlist。 */
 export const checkoutUrls = {
   founding: process.env.NEXT_PUBLIC_CHECKOUT_FOUNDING_URL,

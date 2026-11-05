@@ -1,6 +1,6 @@
 import { catalogMarkdown } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
-import { siteUrl } from "@/lib/site";
+import { licenseSummary, siteUrl } from "@/lib/site";
 
 // SunUI 的 Agent Skill（agentskills.io 格式）。用 shadcn CLI 裝進使用者專案，
 // 同一份內容放兩個位置：.claude/skills 給 Claude Code，.agents/skills 給 Codex、Cursor 等。
@@ -40,7 +40,7 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 
 - Pro blocks need a license. Setup is two steps: add \`@sunui-pro\` to \`registries\` in \`components.json\` (\`get_block\` prints the exact JSON), then the user puts \`SUNUI_LICENSE_KEY\` in \`.env.local\`.
 - Never ask for the key in chat, print it, or commit it.
-- If the CLI stops because \`SUNUI_LICENSE_KEY\` is missing, it never reached SunUI, so it shows no purchase link. Tell the user Pro needs a license (${base}/pricing) and offer a free block.
+- If the CLI stops because \`SUNUI_LICENSE_KEY\` is missing, it never reached SunUI, so it shows no purchase link. Tell the user Pro needs a license (${base}/pricing; ${licenseSummary()}) and offer a free block.
 - If the CLI prints an Unauthorized or Forbidden message, show it to the user (it explains what to do) and stop. A 503 means the license server is down; try again later.
 - Never rebuild a Pro block from its screenshot or description. Offer a free block or plain shadcn UI instead.
 

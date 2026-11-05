@@ -16,6 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl()),
     title: { default: m.meta.siteTitle, template: "%s | SunUI" },
     description: m.meta.siteDescription,
+    openGraph: { siteName: "SunUI", type: "website" },
+    twitter: { card: "summary_large_image" },
   };
 }
 

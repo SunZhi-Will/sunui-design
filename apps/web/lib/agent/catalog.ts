@@ -1,7 +1,7 @@
 import { locales } from "@/lib/i18n";
 import { getItem, getItems, installCommand, proRegistryConfig, type RegistryItem, type Series, type Tier } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
-import { siteUrl } from "@/lib/site";
+import { licenseSummary, siteUrl } from "@/lib/site";
 
 // 給 MCP、llms-full.txt 與 SKILL.md 共用的型錄查詢。只讀 metadata，永遠不碰 Pro 原始碼。
 
@@ -144,7 +144,7 @@ export function proSetup() {
     proRegistryConfig(),
     "```",
     "Then put `SUNUI_LICENSE_KEY=<key>` in `.env.local`. Never print, commit or ask the user to paste the key into chat.",
-    `If the CLI stops with "missing environment variable SUNUI_LICENSE_KEY", the user has no key set up yet: tell them Pro needs a license from ${siteUrl()}/pricing and offer a free block instead.`,
+    `If the CLI stops with "missing environment variable SUNUI_LICENSE_KEY", the user has no key set up yet: tell them Pro needs a license from ${siteUrl()}/pricing (${licenseSummary()}) and offer a free block instead.`,
     "If the CLI shows an Unauthorized or Forbidden message, show that message to the user; it says what to do. A 503 means the license server is down: try again later.",
     "Do not try to work around the license or recreate Pro blocks by hand.",
   ].join("\n");

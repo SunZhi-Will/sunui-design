@@ -13,6 +13,7 @@ import type { Messages } from "@/lib/messages";
 import { getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { seriesOf } from "@/lib/series";
+import { prices } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,6 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: m.block.metaTitle(item.title),
     description: item.description,
+    // 分享預覽用 block 自己的標題與描述；圖片來自同層的 opengraph-image
+    openGraph: { siteName: "SunUI", type: "website", title: item.title, description: item.description },
+    twitter: { card: "summary_large_image", title: item.title, description: item.description },
   };
 }
 
@@ -252,6 +256,12 @@ function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"];
         <div>
           <h2 className="text-lg font-semibold tracking-tight">{t.proTitle}</h2>
           <p className="mt-1 text-sm text-subtle">{t.proBody}</p>
+          <p className="mt-2 flex items-center gap-2 text-sm font-medium text-fg">
+            <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m5 12 4.5 4.5L19 7" />
+            </svg>
+            {t.proTerms(prices.pro)}
+          </p>
         </div>
         <Link
           href="/pricing"

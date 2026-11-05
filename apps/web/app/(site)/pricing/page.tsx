@@ -5,7 +5,7 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
-import { checkoutUrls, foundingState, foundingWindow } from "@/lib/site";
+import { checkoutUrls, foundingState, foundingWindow, prices } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,7 +34,7 @@ export default async function PricingPage() {
     },
     {
       name: t.pro.name,
-      price: "$129",
+      price: `$${prices.pro}`,
       note: t.pro.note,
       highlight: true,
       features: t.pro.features,
@@ -42,7 +42,7 @@ export default async function PricingPage() {
     },
     {
       name: t.team.name,
-      price: "$349",
+      price: `$${prices.team}`,
       note: t.team.note,
       features: t.team.features,
       cta: checkoutUrls.team ? { label: t.team.cta, href: checkoutUrls.team } : { label: t.joinWaitlist, href: "#waitlist" },

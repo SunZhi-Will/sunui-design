@@ -1,6 +1,6 @@
 import { checkLicense, clientIp, readBearer } from "@/lib/license";
 import { buildRegistryItem, getItem } from "@/lib/registry";
-import { siteUrl } from "@/lib/site";
+import { licenseSummary, siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +25,7 @@ export async function GET(
       401,
       [
         `"${item.title}" is a SunUI Pro block.`,
+        licenseSummary(),
         `Get a license at ${siteUrl()}/pricing, then add SUNUI_LICENSE_KEY=<your key> to .env.local.`,
         `Setup guide: ${siteUrl()}/blocks/${item.name}`,
       ].join("\n"),
