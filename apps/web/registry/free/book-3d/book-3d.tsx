@@ -371,7 +371,9 @@ export function Book3D({
     const stage = stageRef.current;
     if (!stage) return;
     const update = () => {
-      const rect = stage.getBoundingClientRect();
+      // 用版面尺寸而不是 getBoundingClientRect：外層若有 transform: scale（例如縮圖、卡片預覽），
+      // 量到的是縮放後的大小，書會被算成一小本、比例也被最小值卡歪
+      const rect = { width: stage.clientWidth, height: stage.clientHeight };
       if (rect.width > 0 && rect.height > 0) {
         setStageSize((previous) =>
           Math.abs(previous.width - rect.width) < 1 && Math.abs(previous.height - rect.height) < 1

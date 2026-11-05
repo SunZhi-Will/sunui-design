@@ -80,7 +80,7 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
 
   return (
     <div
-      className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-hidden bg-card transition-colors duration-300"
+      className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-clip bg-card transition-colors duration-300"
       style={surface ? { backgroundColor: surface } : undefined}
       // 點到元件以外的空白處（舞台或滿版的外框本身），請外層型錄展開成面板
       onClick={(event) => {
@@ -96,7 +96,9 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
       <style>{BLEED_CSS}</style>
       <div
         ref={contentRef}
-        className="shrink-0 origin-center"
+        // block 根元素是 flex 子項，預設會被壓窄（overflow-hidden 的固定寬元素甚至能壓到 0）；
+        // 卡片要的是原寸排版再整體縮小，所以不讓它收縮
+        className="shrink-0 origin-center [&>div>*]:shrink-0"
         style={{
           transform: `scale(${scale})`,
           opacity: scale ? 1 : 0,
