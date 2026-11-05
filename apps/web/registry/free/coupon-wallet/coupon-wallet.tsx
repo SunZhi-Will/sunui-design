@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface WalletCoupon {
@@ -236,20 +237,9 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                 </span>
                 <AnimatePresence initial={false}>
                   {isOn && (
-                    <motion.span
-                      key="stamp"
-                      aria-hidden="true"
-                      className={cn(
-                        "pointer-events-none absolute right-2 bottom-2 rounded-[3px] border-2 border-current px-1.5 py-0.5 text-[11px] font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-                        vermilion,
-                      )}
-                      initial={reduce ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-                      animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-                      exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.15 } }}
-                      transition={springs.stamp}
-                    >
+                    <Stamp key="stamp" size="sm" seed={c.id} className="absolute right-2 bottom-2">
                       {t.applied}
-                    </motion.span>
+                    </Stamp>
                   )}
                 </AnimatePresence>
               </span>

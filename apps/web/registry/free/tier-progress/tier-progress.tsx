@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface MembershipTier {
@@ -216,20 +217,9 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
 
       <AnimatePresence initial={false}>
         {isTop && (
-          <motion.span
-            key="stamp"
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute top-4 right-4 rounded-[3px] border-2 border-current px-2 py-0.5 text-xs font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-              vermilion,
-            )}
-            initial={reduce ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-            animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, transition: { duration: 0.15 } }}
-            transition={springs.stamp}
-          >
+          <Stamp key="stamp" shape="seal" size="sm" seed="tier-top" className="absolute top-4 right-4">
             {t.topStamp}
-          </motion.span>
+          </Stamp>
         )}
       </AnimatePresence>
     </div>

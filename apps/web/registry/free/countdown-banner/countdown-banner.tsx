@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type LanguageType = "zh" | "en";
@@ -296,15 +297,11 @@ export function CountdownBanner({
           )}
           <AnimatePresence initial={false}>
             {ended && (
-              <motion.span
-                aria-hidden="true"
-                className={cn("pointer-events-none absolute top-1/2 left-1/2 rounded-[3px] border-2 border-current px-2 py-0.5 text-sm font-bold tracking-[0.22em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen", ink)}
-                initial={reduceMotion || !wasRunning ? false : { scale: 1.6, opacity: 0, rotate: -4, x: "-50%", y: "-40%" }}
-                animate={{ scale: 1, opacity: 0.55, rotate: -10, x: "-50%", y: "-40%" }}
-                transition={springs.stamp}
-              >
-                {t.ended}
-              </motion.span>
+              <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%]">
+                <Stamp tone="ink" seed="sale-ended" appear={wasRunning}>
+                  {t.ended}
+                </Stamp>
+              </span>
             )}
           </AnimatePresence>
         </div>

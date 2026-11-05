@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface CopyCodeButtonProps {
@@ -180,22 +181,11 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         </span>
         <AnimatePresence>
           {copied && (
-            <motion.span
-              key={stampKey}
-              aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute top-1/2 left-1/2 rounded-[3px] border-2 border-current px-1.5 py-px font-sans font-bold tracking-[0.2em] whitespace-nowrap uppercase",
-                vermilion,
-                s.stamp,
-              )}
-              style={{ x: "-50%", y: "-50%" }}
-              initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-              animate={{ scale: 1, opacity: 0.9, rotate: -8 }}
-              exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.2 } }}
-              transition={springs.stamp}
-            >
-              {t.stamp}
-            </motion.span>
+            <span key={stampKey} className="pointer-events-none absolute inset-0 grid place-items-center font-sans">
+              <Stamp shape="tick" seed={code} size={size === "lg" ? "lg" : size === "sm" ? "sm" : "md"}>
+                {t.stamp}
+              </Stamp>
+            </span>
           )}
         </AnimatePresence>
       </span>

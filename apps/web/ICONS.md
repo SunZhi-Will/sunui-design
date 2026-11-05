@@ -94,8 +94,38 @@
 
 1. 在 `sunui-icons.tsx` 的 `icons` 加一筆，名稱用 kebab-case 名詞。
 2. 在 `lib/icon-groups.ts` 放進對應分組，必要時補中英關鍵字。
-3. 到 `/icons` 用 16 與 24 兩個尺寸、Light 與 Dark 各看一次，確認在 16px 下還認得出來。
-4. 若要動態版，在 `sunui-animated-icons.tsx` 的 `recipes` 加一筆，選 hover、toggle 或 loop，並在 Animated 模式下用 72px 預覽確認軸心方向。
+3. 若要動態版，在 `sunui-animated-icons.tsx` 的 `recipes` 加一筆，選 hover、toggle 或 loop。
+4. 跑自檢（見下節），新圖示旁邊放幾個既有圖示，確認 16px 下還認得出來、線寬與大小和旁邊一致、動態版的軸心方向正確。
+
+## 自檢
+
+`scripts/check-icons.mjs` 用無頭 Chrome 截下自檢頁 `/preview/icons`，人或 agent 都能跑。需要 `npm run web:dev` 正在跑，不需要任何 npm 套件。
+
+```bash
+node apps/web/scripts/check-icons.mjs --only coupon,receipt --with cart,stamp,check
+```
+
+| 選項 | 作用 |
+|---|---|
+| `--set line\|pixel\|all` | 只檢查一套，預設兩套都跑 |
+| `--only a,b` | 只看這些圖示；不加就是整套 |
+| `--with c,d` | 把既有圖示放在前面一起比較，標成 ref |
+| `--theme light\|dark\|both` | 預設兩種都截 |
+| `--no-accent` | 關掉朱紅，確認 accent 部位在單色下還分得出來 |
+| `--scale 3` | 放大找細縫，預設 2 |
+| `--base`、`--out` | 網站網址（預設 `http://localhost:3100`）與輸出目錄（預設 `apps/web/check-out/icons/`） |
+
+輸出：
+
+- `<set>-sizes-<theme>.png`：線條版 16、24、48px，像素版 16、32、48px。
+- `<set>-frames-<theme>.png`：動態版。線條版是 rest 加上 active 的 0%、25%、50%、75%、100%；像素版是靜止格加每一格影格。
+- 圖示多時自動分頁（sizes 每頁 48 個、frames 每頁 24 個），檔名加 `-1`、`-2`。
+- 參考框：線條版虛線是 3 到 21 的內容區，像素版實線是 16 格邊界。動作途中超出框可以接受，靜止與結束狀態都要在框內。
+- 頁面的腳本錯誤和不存在的圖示名稱會印在終端，有任何一項就以非零結束。
+
+自檢頁不播動畫，每個時間點都直接算成靜態的一格：線條版的關鍵影格陣列平均分配時間、單一值從 rest 線性插到 active（彈簧的過衝不會出現），像素版直接解出每一格。所以截圖不會停在半路，但看不出彈簧手感，手感仍要到 `/icons` 的 Animated 模式看。
+
+瀏覽器優先找 Playwright 的 `chrome-headless-shell`，其次是 Chrome、Chromium。日常用的瀏覽器（例如 Brave）在無頭模式下可能卡住，所以排在最後，單次呼叫超過 90 秒就中止。要指定時用環境變數 `CHROME`。
 
 ## 與 block 的關係
 

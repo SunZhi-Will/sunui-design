@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type StockLevel = "in-stock" | "low" | "critical" | "sold-out";
@@ -186,14 +187,12 @@ export function LowStockIndicator({
         <div className="flex min-h-7 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
           <p id={labelId} role="status" aria-live="polite" className="flex items-center">
             {level === "sold-out" ? (
-              <motion.span
-                className={cn("inline-block rounded-[3px] border-2 border-current px-2 py-0.5 text-xs font-bold tracking-[0.2em] uppercase", inkMuted)}
-                initial={reduceMotion || !stampLive ? false : { scale: 1.6, opacity: 0, rotate: -2 }}
-                animate={{ scale: 1, opacity: 1, rotate: -6 }}
-                transition={springs.stamp}
-              >
-                {t.soldOut}
-              </motion.span>
+              <>
+                <Stamp tone="ink" seed="sold-out" appear={stampLive}>
+                  {t.soldOut}
+                </Stamp>
+                <span className="sr-only">{t.soldOut}</span>
+              </>
             ) : (
               <span>{message}</span>
             )}

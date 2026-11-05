@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { Fragment, useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type OtpStatus = "idle" | "success" | "error";
@@ -256,20 +257,9 @@ export function OtpInput({
 
         <AnimatePresence initial={false}>
           {status === "success" && (
-            <motion.span
-              key="stamp"
-              aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute top-full right-1 mt-2 rounded-[3px] border-2 border-current bg-transparent px-2.5 py-1 text-sm leading-none font-bold tracking-[0.2em] whitespace-nowrap uppercase mix-blend-multiply dark:mix-blend-screen",
-                vermilion,
-              )}
-              initial={reduceMotion ? false : { scale: 1.6, opacity: 0, rotate: -4 }}
-              animate={{ scale: 1, opacity: 0.9, rotate: -10 }}
-              exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.15 } }}
-              transition={springs.stamp}
-            >
+            <Stamp key="stamp" shape="tick" seed={groupId} className="absolute top-full right-1 mt-2">
               {text.stamp}
-            </motion.span>
+            </Stamp>
           )}
         </AnimatePresence>
       </div>

@@ -57,7 +57,8 @@ ${seriesSummary.paper}
 
 - Vermilion has at most one main use per block (discount value, stamp, promo emphasis). Do not pick a new accent color per block; tell coupons apart with copy and layout.
 - Paper is flat: 1px paper edge, no shadow or at most \`shadow-[0_1px_0_rgb(0_0_0/0.04)]\`, radius \`rounded-md\` or less.
-- Results (claimed, redeemed, expired, sold out) are shown as a vermilion outlined stamp rotated -8 to -12 degrees. The stamp is the only celebration in the whole library.
+- Results are shown with the shared \`Stamp\` component (install \`stamp\` from the SunUI registry, import from \`@/components/ui/stamp\`). Never hand-write a stamp. The stamp is the only celebration in the whole library, and its shape follows what the result means: \`tick\` for small confirmations (copied, saved, verified, added), \`box\` for transaction status (claimed, applied, sold out, ended), \`seal\` for wins and achievements, \`date\` for dated records such as paid or a postmark (pass \`date\`), \`chop\` for personal marks such as an invitation.
+- Use \`tone="vermilion"\` for positive results and \`tone="ink"\` for expired, sold out, ended or no prize. Always pass a \`seed\` (order, coupon or step id) so each stamp gets its own stable angle and ink texture. Labels that are not results (Recommended, Popular) must not be stamps.
 - Springs: snappy \`{ stiffness: 520, damping: 34 }\`, gentle \`{ stiffness: 240, damping: 30 }\`, stamp \`{ stiffness: 620, damping: 20, mass: 0.8 }\`. Single animations stay under 400ms.`;
 
 const product = `## Series: product
