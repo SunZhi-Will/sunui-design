@@ -1,10 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 const GUTTER = { card: 20, sheet: 32 } as const;
 // 卡片排版的最小寬度：375 手機扣掉頁面左右留白，demo 本來就要在這個寬度下好看
 const MIN_LAYOUT_WIDTH = 360;
+// 小元件（按鈕、徽章）在卡片裡只佔一角會留下大片空白：放得下時放大到約佔舞台的這個比例，但不超過上限
+const CARD_FILL = 0.78;
+const MAX_UPSCALE = 1.6;
 
 /**
  * 型錄卡片 iframe 內的舞台：block 以原尺寸置中顯示。
@@ -20,6 +23,13 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
   const contentRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
   const [surface, setSurface] = useState<string | null>(null);
+  // 第一次量好之前不加過渡（否則會從 0 放大進場）；之後內容長高、縮放改變時平滑帶過，不會跳一下
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    if (!scale || shown) return;
+    const id = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(id);
+  }, [scale, shown]);
 
   useLayoutEffect(() => {
     const content = contentRef.current;
@@ -42,7 +52,10 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
       const height = Math.max(content.offsetHeight, 1);
       const byWidth = available / width;
       const byHeight = (window.innerHeight - gutter * 2) / height;
-      setScale(mode === "sheet" ? 1 : Math.min(byWidth, byHeight, 1));
+      const fit = Math.min(byWidth, byHeight);
+      // 放不下就等比縮小；放得下就放大到約 CARD_FILL，避免小元件四周大片空白
+      const cardScale = fit < 1 ? fit : Math.max(1, Math.min(fit * CARD_FILL, MAX_UPSCALE));
+      setScale(mode === "sheet" ? 1 : cardScale);
       setSurface(findSurface(content));
     };
 
@@ -95,7 +108,7 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
         if (blank && window.parent !== window) window.parent.postMessage({ type: "sunui:expand" }, window.location.origin);
       }}
     >
-      <style>{BLEED_CSS}</style>
+      <style>{BLEED_CSS + HIDE_SCROLLBARS_CSS}</style>
       <div
         ref={contentRef}
         // block 根元素是 flex 子項，預設會被壓窄（overflow-hidden 的固定寬元素甚至能壓到 0）；
@@ -104,6 +117,7 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
         style={{
           transform: `scale(${scale})`,
           opacity: scale ? 1 : 0,
+          transition: shown ? "transform 450ms cubic-bezier(0.22, 1, 0.36, 1)" : "none",
         }}
       >
         {children}
@@ -114,6 +128,9 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
 
 // 滿版時拿掉 block 外框，讓它和舞台融成一片
 const BLEED_CSS = `[data-card-bleed]{border-color:transparent!important;border-radius:0!important;box-shadow:none!important;outline:none!important}`;
+
+// 卡片是縮圖，內部捲動區的捲軸在網格裡只是雜訊：一律隱藏，滾輪與觸控照樣能捲
+const HIDE_SCROLLBARS_CSS = `*{scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important}`;
 
 /**
  * 沿著 block 最外層往下找第一個「有實心底色、而且佔滿大部分寬度」的元素。
