@@ -296,11 +296,11 @@ export function CountdownBanner({
           )}
           <AnimatePresence initial={false}>
             {ended && (
-              <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%]">
+              <motion.span key="ended" exit={{ opacity: 0, transition: { duration: 0.15 } }} className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%]">
                 <Stamp tone="ink" seed="sale-ended" appear={wasRunning}>
                   {t.ended}
                 </Stamp>
-              </span>
+              </motion.span>
             )}
           </AnimatePresence>
         </div>

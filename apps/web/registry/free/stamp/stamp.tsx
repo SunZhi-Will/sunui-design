@@ -120,7 +120,7 @@ export function Stamp({
   // 圓章與方框從高處壓下；落款章是直直按下去，不轉
   const lifted = shape === "chop" ? { scale: 1.25, opacity: 0, rotate, x: dx, y: dy } : { scale: size === "lg" ? 1.4 : 1.6, opacity: 0, rotate: rotate + 6, x: dx, y: dy };
   const initial = reduce || !appear ? false : lifted;
-  const exit = { opacity: 0, transition: { duration: 0.15 } };
+  const exit = { opacity: 0, transition: { duration: reduce ? 0 : 0.15 } };
 
   if (shape === "tick") {
     return (

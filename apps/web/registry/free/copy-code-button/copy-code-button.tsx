@@ -179,11 +179,11 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         </span>
         <AnimatePresence>
           {copied && (
-            <span key={stampKey} className="pointer-events-none absolute inset-0 grid place-items-center font-sans">
+            <motion.span key={stampKey} exit={{ opacity: 0, transition: { duration: 0.15 } }} className="pointer-events-none absolute inset-0 grid place-items-center font-sans">
               <Stamp shape="tick" seed={code} size={size}>
                 {t.stamp}
               </Stamp>
-            </span>
+            </motion.span>
           )}
         </AnimatePresence>
       </span>
