@@ -26,18 +26,18 @@ export default function FloatingToolbarCard() {
 
   return (
     <div
-      className="relative mx-auto h-56 w-72 overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
+      className="relative mx-auto h-56 w-72 overflow-hidden rounded-xl border border-border bg-background"
       style={{
-        backgroundImage: "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px)",
         backgroundSize: "20px 20px",
       }}
     >
       <div className="absolute inset-y-4 right-4 left-20 flex min-w-0 flex-col gap-2 overflow-hidden">
         {/* 只留最新四張，避免溢出畫布 */}
         {titles.map((title, i) => ({ title, i })).slice(-4).map(({ title, i }) => (
-          <div key={i} className="w-full rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
-            {i > 0 && <p className="text-[10px] font-medium tracking-wide text-violet-500 uppercase">{t.generated}</p>}
-            <p className="truncate text-sm font-semibold text-gray-800">{title}</p>
+          <div key={i} className="w-full rounded-xl border border-border bg-card p-2.5 shadow-sm">
+            {i > 0 && <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">{t.generated}</p>}
+            <p className="truncate text-sm font-semibold text-foreground">{title}</p>
           </div>
         ))}
       </div>

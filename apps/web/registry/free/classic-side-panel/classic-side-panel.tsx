@@ -79,7 +79,6 @@ export type SidePanelTheme = "default" | "primary" | "success" | "warning" | "da
 
 type ThemeClasses = {
   panel: string;
-  header: string;
   title: string;
   border: string;
   content: string;
@@ -89,98 +88,60 @@ type ThemeClasses = {
   overlay: string;
   dateBtn: string;
   dateBtnActive: string;
+  /** 狀態主題只在標題前放一顆小點，不把整條標題列上色 */
+  dot?: string;
 };
 
-const grayDate = (d: boolean) => (d ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300");
+// 全部主題共用中性 shadcn token；主要動作（切換鈕）用 primary。
+// 舊版 primary、success、warning、danger 的彩色標題列與 gradient 的紫粉漸層已停用。
+const NEUTRAL: ThemeClasses = {
+  panel: "bg-card",
+  title: "text-foreground",
+  border: "border-border",
+  content: "text-foreground",
+  toggleBtn: "bg-primary text-primary-foreground hover:opacity-90",
+  closeBtn: "text-muted-foreground hover:bg-muted hover:text-foreground",
+  shadow: "shadow-sm",
+  overlay: "bg-black/40",
+  dateBtn: "text-muted-foreground hover:text-foreground",
+  dateBtnActive: "bg-card text-foreground shadow-sm",
+};
 
-function getThemeClasses(theme: SidePanelTheme, isDark: boolean): ThemeClasses {
-  const map: Record<SidePanelTheme, ThemeClasses> = {
-    default: {
-      panel: isDark ? "bg-gray-800" : "bg-white",
-      header: isDark ? "bg-gray-800" : "bg-white",
-      title: isDark ? "text-white" : "text-gray-900",
-      border: isDark ? "border-gray-700" : "border-gray-200",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn: isDark ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-blue-600 text-white hover:bg-blue-700",
-      closeBtn: isDark ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
-      shadow: "shadow-lg",
-      overlay: "bg-black/50",
-      dateBtn: grayDate(isDark),
-      dateBtnActive: isDark ? "bg-blue-600" : "bg-blue-500",
-    },
-    primary: {
-      panel: isDark ? "bg-gray-800" : "bg-white",
-      header: isDark ? "bg-blue-800 text-white" : "bg-blue-600 text-white",
-      title: "text-white",
-      border: isDark ? "border-blue-900" : "border-blue-500",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn: "bg-blue-600 text-white hover:bg-blue-700",
-      closeBtn: "text-white hover:text-white hover:bg-blue-500",
-      shadow: "shadow-lg shadow-blue-500/20",
-      overlay: "bg-blue-900/40",
-      dateBtn: grayDate(isDark),
-      dateBtnActive: isDark ? "bg-blue-600" : "bg-blue-500",
-    },
-    success: {
-      panel: isDark ? "bg-gray-800" : "bg-white",
-      header: isDark ? "bg-green-800 text-white" : "bg-green-600 text-white",
-      title: "text-white",
-      border: isDark ? "border-green-900" : "border-green-500",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn: "bg-green-600 text-white hover:bg-green-700",
-      closeBtn: "text-white hover:text-white hover:bg-green-500",
-      shadow: "shadow-lg shadow-green-500/20",
-      overlay: "bg-green-900/40",
-      dateBtn: grayDate(isDark),
-      dateBtnActive: isDark ? "bg-green-600" : "bg-green-500",
-    },
-    warning: {
-      panel: isDark ? "bg-gray-800" : "bg-white",
-      header: isDark ? "bg-amber-800 text-white" : "bg-amber-500 text-white",
-      title: "text-white",
-      border: isDark ? "border-amber-900" : "border-amber-500",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn: "bg-amber-500 text-white hover:bg-amber-600",
-      closeBtn: "text-white hover:text-white hover:bg-amber-400",
-      shadow: "shadow-lg shadow-amber-500/20",
-      overlay: "bg-amber-900/40",
-      dateBtn: grayDate(isDark),
-      dateBtnActive: "bg-amber-500",
-    },
-    danger: {
-      panel: isDark ? "bg-gray-800" : "bg-white",
-      header: isDark ? "bg-red-800 text-white" : "bg-red-600 text-white",
-      title: "text-white",
-      border: isDark ? "border-red-900" : "border-red-500",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn: "bg-red-600 text-white hover:bg-red-700",
-      closeBtn: "text-white hover:text-white hover:bg-red-500",
-      shadow: "shadow-lg shadow-red-500/20",
-      overlay: "bg-red-900/40",
-      dateBtn: grayDate(isDark),
-      dateBtnActive: isDark ? "bg-red-600" : "bg-red-500",
-    },
-    gradient: {
-      panel: isDark ? "bg-gradient-to-br from-gray-800 via-gray-900 to-gray-950" : "bg-white",
-      header: isDark
-        ? "bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 text-white"
-        : "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white",
-      title: "text-white",
-      border: isDark ? "border-gray-700" : "border-gray-200",
-      content: isDark ? "text-gray-300" : "text-gray-700",
-      toggleBtn:
-        "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:from-blue-600 hover:via-purple-600 hover:to-pink-600",
-      closeBtn: "text-white hover:text-white backdrop-blur-sm bg-white/20 hover:bg-white/30",
-      shadow: "shadow-xl shadow-purple-500/20",
-      overlay: "backdrop-blur-sm bg-black/30",
-      dateBtn: isDark ? "bg-gray-700/80 hover:bg-gray-600/80" : "bg-gray-200/80 hover:bg-gray-300/80",
-      dateBtnActive: isDark
-        ? "bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
-        : "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500",
-    },
-  };
-  return map[theme];
+const STATUS_DOT: Partial<Record<SidePanelTheme, string>> = {
+  success: "bg-emerald-500",
+  warning: "bg-amber-500",
+  danger: "bg-destructive",
+};
+
+function getThemeClasses(theme: SidePanelTheme): ThemeClasses {
+  return { ...NEUTRAL, dot: STATUS_DOT[theme] };
 }
+
+// mode 指定明暗時，在面板內覆寫 shadcn token；不指定就跟隨網站
+const forcedTokens: Record<ThemeMode, Record<string, string>> = {
+  light: {
+    "--background": "#fafaf9",
+    "--foreground": "#1c1917",
+    "--card": "#ffffff",
+    "--muted": "#f5f5f4",
+    "--muted-foreground": "#78716c",
+    "--border": "#e7e5e4",
+    "--primary": "#1c1917",
+    "--primary-foreground": "#fafaf9",
+    colorScheme: "light",
+  },
+  dark: {
+    "--background": "#0c0a09",
+    "--foreground": "#f5f5f4",
+    "--card": "#151311",
+    "--muted": "#292524",
+    "--muted-foreground": "#a8a29e",
+    "--border": "#292524",
+    "--primary": "#f5f5f4",
+    "--primary-foreground": "#1c1917",
+    colorScheme: "dark",
+  },
+};
 
 interface SidePanelMessages {
   /** 舊版寫法：給了就用「open + 標題」組成切換鈕名稱 */
@@ -271,7 +232,9 @@ export interface SidePanelProps {
   closeButtonIcon?: ComponentType<IconProps>;
   /** 動畫毫秒數，預設 300 */
   animationDuration?: number;
+  /** 舊版配色。現在一律中性；success、warning、danger 只在標題前顯示一顆狀態小點 */
   theme?: SidePanelTheme;
+  /** 不給時跟隨網站明暗（shadcn token）；給 light 或 dark 時面板自帶該配色 */
   mode?: ThemeMode;
   showBorder?: boolean;
   showShadow?: boolean;
@@ -322,7 +285,7 @@ export function SidePanel({
   closeButtonIcon: CloseIcon = CloseOutline,
   animationDuration = 300,
   theme = "default",
-  mode = "light",
+  mode,
   showBorder = true,
   showShadow = true,
   showHeaderBorder = true,
@@ -354,7 +317,6 @@ export function SidePanel({
   // isInDOM：是否掛載；isPositioned：是否滑入定位
   const [isInDOM, setIsInDOM] = useState(isOpen);
   const [isPositioned, setIsPositioned] = useState(isOpen);
-  const [isHovering, setIsHovering] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -432,7 +394,8 @@ export function SidePanel({
     return () => document.removeEventListener("mousedown", onDown);
   }, [closeOnOutsideClick, isOpen, handleToggle]);
 
-  const t = getThemeClasses(theme, mode === "dark");
+  const t = getThemeClasses(theme);
+  const tokens = mode ? forcedTokens[mode] : undefined;
   const isLeft = position === "left";
 
   const shouldShowToggleButton = showToggleButton && (!hideButtonsWhenAnyOpen || !isAnyPanelOpen() || isOpen);
@@ -449,8 +412,6 @@ export function SidePanel({
         <button
           type="button"
           onClick={handleToggle}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
           aria-label={labels?.open !== undefined && labels.openPanel === undefined ? `${l.open} ${titleText}` : l.openPanel(titleText)}
           aria-expanded={false}
           aria-controls={panelId}
@@ -458,13 +419,14 @@ export function SidePanel({
             "hidden items-center justify-center sm:flex",
             fixed && buttonSticky ? "fixed" : "absolute",
             "min-w-0 p-2.5 ease-in-out",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500",
-            theme === "gradient" ? "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white" : t.toggleBtn,
-            isLeft ? "left-0 rounded-r-lg hover:translate-x-0.5" : "right-0 rounded-l-lg hover:-translate-x-0.5",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+            t.toggleBtn,
+            isLeft ? "left-0 rounded-r-md hover:translate-x-0.5" : "right-0 rounded-l-md hover:-translate-x-0.5",
             showShadow && t.shadow,
             toggleButtonClassName,
           )}
           style={{
+            ...tokens,
             zIndex,
             top: buttonTopPosition,
             [position]: buttonHorizontalOffset,
@@ -472,16 +434,6 @@ export function SidePanel({
           }}
         >
           <ToggleIcon size={20} className={isLeft ? "rotate-180" : ""} />
-          {theme === "gradient" && (
-            <span
-              aria-hidden="true"
-              className={cn(
-                "absolute -inset-0.5 rounded-r-lg bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 blur-md transition-opacity",
-                isHovering ? "opacity-60" : "opacity-0",
-              )}
-              style={{ zIndex: -1 }}
-            />
-          )}
         </button>
       )}
 
@@ -510,17 +462,17 @@ export function SidePanel({
           tabIndex={-1}
           className={cn(
             pos,
-            "top-0 h-full max-w-full outline-none transition-transform ease-in-out",
+            "top-0 h-full max-w-full text-foreground outline-none transition-transform ease-in-out",
             isLeft ? "left-0" : "right-0",
             t.panel,
             isPositioned ? "translate-x-0" : isLeft ? "-translate-x-full" : "translate-x-full",
             showBorder && (isLeft ? "border-r" : "border-l"),
             showBorder && t.border,
             showShadow && t.shadow,
-            rounded && (isLeft ? "rounded-r-lg" : "rounded-l-lg"),
+            rounded && (isLeft ? "rounded-r-xl" : "rounded-l-xl"),
             className,
           )}
-          style={{ width, zIndex: panelZIndex, transitionDuration: `${duration}ms`, overflowX: "hidden" }}
+          style={{ ...tokens, width, zIndex: panelZIndex, transitionDuration: `${duration}ms`, overflowX: "hidden" }}
         >
           <div className="flex h-full flex-col">
             <div
@@ -528,14 +480,15 @@ export function SidePanel({
                 "flex h-14 items-center justify-between p-4",
                 showHeaderBorder && "border-b",
                 showHeaderBorder && t.border,
-                theme !== "default" ? t.header : t.panel,
-                rounded && isLeft && "rounded-tr-lg",
-                rounded && !isLeft && "rounded-tl-lg",
+                t.panel,
+                rounded && isLeft && "rounded-tr-xl",
+                rounded && !isLeft && "rounded-tl-xl",
                 headerClassName,
               )}
             >
-              <h2 id={titleId} className={cn("flex-1 truncate text-xl font-semibold", theme === "default" && t.title)}>
-                {title}
+              <h2 id={titleId} className={cn("flex min-w-0 flex-1 items-center gap-2 text-lg font-semibold tracking-tight", t.title)}>
+                {t.dot && <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", t.dot)} />}
+                <span className="truncate">{title}</span>
               </h2>
               {showCloseButton && (
                 <button
@@ -544,8 +497,8 @@ export function SidePanel({
                   onClick={handleToggle}
                   aria-label={l.close}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
-                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+                    "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
+                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                     t.closeBtn,
                     closeButtonClassName,
                   )}
@@ -559,7 +512,7 @@ export function SidePanel({
                 <div
                   role="group"
                   aria-label={l.dateRange}
-                  className={cn("mb-4 flex w-full justify-around rounded-lg p-1", mode === "dark" ? "bg-gray-800" : "bg-gray-100")}
+                  className="mb-4 flex w-full justify-around rounded-md border border-border bg-muted p-0.5"
                 >
                   {dateRangeOptions.map((range) => {
                     const active = selectedDateRange === range;
@@ -570,10 +523,8 @@ export function SidePanel({
                         aria-pressed={active}
                         onClick={() => onDateRangeChange(range)}
                         className={cn(
-                          "rounded-md px-3 py-1 text-sm transition-all duration-200",
-                          active
-                            ? cn(t.dateBtnActive, "text-white")
-                            : cn(t.dateBtn, mode === "dark" ? "text-gray-300" : "text-gray-700"),
+                          "flex-1 rounded-[5px] px-2 py-1 text-sm whitespace-nowrap transition-colors duration-200",
+                          active ? t.dateBtnActive : t.dateBtn,
                         )}
                       >
                         {l.ranges[range]}
@@ -586,18 +537,6 @@ export function SidePanel({
             </div>
           </div>
 
-          {theme === "gradient" && (
-            <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
-              <div
-                className="absolute top-0 right-0 -z-10 h-36 w-36 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-20 blur-3xl"
-                style={{ transform: "translate(30%, -30%)" }}
-              />
-              <div
-                className="absolute bottom-0 left-0 -z-10 h-36 w-36 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-20 blur-3xl"
-                style={{ transform: "translate(-30%, 30%)" }}
-              />
-            </div>
-          )}
         </div>
       )}
     </>

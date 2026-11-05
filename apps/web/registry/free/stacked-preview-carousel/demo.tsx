@@ -4,78 +4,103 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { StackedPreviewCarousel, type StackedPreviewItem } from "./stacked-preview-carousel";
 
-// 示意封面：投影片風格的漸層與色塊，代替課程截圖
-function SlideArt({ from, to, label }: { from: string; to: string; label: string }) {
+// 示意封面：中性色塊與線條排成書封版面，代替實際封面照片；每本一種構圖
+type CoverKind = "orchard" | "workshop" | "grid" | "trains";
+
+function BookCover({ kind }: { kind: CoverKind }) {
+  const ink = "#e7e5e4";
   return (
     <svg viewBox="0 0 160 90" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <defs>
-        <linearGradient id={`g-${label}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={from} />
-          <stop offset="1" stopColor={to} />
-        </linearGradient>
-      </defs>
-      <rect width="160" height="90" fill={`url(#g-${label})`} />
-      <circle cx="128" cy="22" r="34" fill="#fff" opacity="0.08" />
-      <rect x="12" y="14" width="22" height="3" rx="1.5" fill="#fff" opacity="0.7" />
-      <rect x="12" y="24" width="78" height="8" rx="2" fill="#fff" opacity="0.92" />
-      <rect x="12" y="36" width="56" height="8" rx="2" fill="#fff" opacity="0.92" />
-      <rect x="12" y="56" width="64" height="2.5" rx="1.25" fill="#fff" opacity="0.45" />
-      <rect x="12" y="62" width="48" height="2.5" rx="1.25" fill="#fff" opacity="0.45" />
-      <rect x="96" y="48" width="50" height="30" rx="4" fill="#000" opacity="0.25" />
-      <rect x="102" y="54" width="22" height="3" rx="1.5" fill="#fff" opacity="0.6" />
-      <rect x="102" y="61" width="36" height="2.5" rx="1.25" fill="#fff" opacity="0.35" />
+      <rect width="160" height="90" fill={kind === "grid" ? "#1c1a17" : kind === "trains" ? "#201d1a" : kind === "workshop" ? "#23201c" : "#262320"} />
+      {/* 書本身：直立的一本，放在右側 */}
+      <rect x="98" y="10" width="44" height="70" fill="#0c0a09" stroke={ink} strokeOpacity="0.18" strokeWidth="0.5" />
+      <rect x="104" y="18" width="24" height="2.4" fill={ink} opacity="0.75" />
+      <rect x="104" y="23" width="16" height="2.4" fill={ink} opacity="0.75" />
+      {kind === "orchard" && <circle cx="120" cy="52" r="11" fill="none" stroke={ink} strokeOpacity="0.45" strokeWidth="0.6" />}
+      {kind === "workshop" && (
+        <g stroke={ink} strokeOpacity="0.45" strokeWidth="0.6">
+          <path d="M106 66 L134 40" />
+          <path d="M106 58 L126 40" />
+        </g>
+      )}
+      {kind === "grid" && (
+        <g stroke={ink} strokeOpacity="0.3" strokeWidth="0.4">
+          {[0, 1, 2, 3].map((i) => (
+            <path key={`v${i}`} d={`M${106 + i * 9} 36 V70`} />
+          ))}
+          {[0, 1, 2, 3].map((i) => (
+            <path key={`h${i}`} d={`M104 ${38 + i * 10} H136`} />
+          ))}
+        </g>
+      )}
+      {kind === "trains" && (
+        <g stroke={ink} strokeOpacity="0.45" strokeWidth="0.6">
+          <path d="M100 60 H140" />
+          <path d="M100 64 H140" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <path key={i} d={`M${104 + i * 8} 58 V66`} />
+          ))}
+        </g>
+      )}
+      {/* 左側的書名列示意 */}
+      <rect x="14" y="58" width="56" height="2" fill={ink} opacity="0.25" />
+      <rect x="14" y="64" width="38" height="2" fill={ink} opacity="0.25" />
     </svg>
   );
 }
 
 const covers = {
-  prompt: <SlideArt from="#1e3a8a" to="#7c3aed" label="prompt" />,
-  vision: <SlideArt from="#0f766e" to="#0ea5e9" label="vision" />,
-  agents: <SlideArt from="#9a3412" to="#f59e0b" label="agents" />,
-  deploy: <SlideArt from="#831843" to="#db2777" label="deploy" />,
+  orchard: <BookCover kind="orchard" />,
+  workshop: <BookCover kind="workshop" />,
+  grid: <BookCover kind="grid" />,
+  trains: <BookCover kind="trains" />,
 };
 
 type Key = keyof typeof covers;
 
-const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { heading: string; lead: string; items: Record<Key, [string, string]> }> = {
+const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { store: string; heading: string; lead: string; items: Record<Key, [string, string]> }> = {
   en: {
-    heading: "Learn to build with AI, one short course at a time.",
-    lead: "Slides, handouts and live sessions, all free to start.",
+    store: "Paperlane Books",
+    heading: "This season's staff picks, one stack at a time.",
+    lead: "Chosen by the people who shelve them. Hover to pause the stack.",
     items: {
-      prompt: ["Free course", "Prompt design basics in AI Studio"],
-      vision: ["Workshop", "Build a vision app with Gemini in one afternoon"],
-      agents: ["Live session", "From chat to agents: tools, memory and evals"],
-      deploy: ["Free course", "Ship your prototype to the web"],
+      orchard: ["Fiction", "The Salt Orchard"],
+      workshop: ["Essays", "Notes from a Small Workshop"],
+      grid: ["Design", "Grids and the Printed Page"],
+      trains: ["Travel", "Night Trains of the North"],
     },
   },
   "zh-TW": {
-    heading: "一次一堂短課，學會用 AI 打造產品。",
-    lead: "投影片、講義與直播課程，全部免費開始。",
+    store: "紙巷書店",
+    heading: "這一季的店員推薦，一次翻一本。",
+    lead: "由每天上架的店員親手挑選。滑鼠移上去可以暫停。",
     items: {
-      prompt: ["免費課程", "AI Studio 提示詞設計入門"],
-      vision: ["工作坊", "一個下午用 Gemini 做出視覺應用"],
-      agents: ["直播課程", "從聊天到代理：工具、記憶與評測"],
-      deploy: ["免費課程", "把你的原型發布到網路上"],
+      orchard: ["小說", "鹽之果園"],
+      workshop: ["散文", "小工坊筆記"],
+      grid: ["設計", "網格與印刷頁面"],
+      trains: ["旅行", "北方的夜行列車"],
     },
   },
   "zh-CN": {
-    heading: "一次一节短课，学会用 AI 构建产品。",
-    lead: "幻灯片、讲义和直播课程，全部免费开始。",
+    store: "纸巷书店",
+    heading: "这一季的店员推荐，一次翻一本。",
+    lead: "由每天上架的店员亲手挑选。鼠标悬停可以暂停。",
     items: {
-      prompt: ["免费课程", "AI Studio 提示词设计入门"],
-      vision: ["工作坊", "一个下午用 Gemini 做出视觉应用"],
-      agents: ["直播课程", "从聊天到智能体：工具、记忆与评测"],
-      deploy: ["免费课程", "把你的原型发布到网上"],
+      orchard: ["小说", "盐之果园"],
+      workshop: ["散文", "小工坊笔记"],
+      grid: ["设计", "网格与印刷页面"],
+      trains: ["旅行", "北方的夜行列车"],
     },
   },
   ja: {
-    heading: "短いコースを一つずつ、AI でつくる力を。",
-    lead: "スライド、資料、ライブ講座。すべて無料で始められます。",
+    store: "ペーパーレーン書店",
+    heading: "今季のスタッフおすすめを、一冊ずつ。",
+    lead: "毎日棚に並べるスタッフが選びました。ホバーで一時停止します。",
     items: {
-      prompt: ["無料コース", "AI Studio で学ぶプロンプト設計の基本"],
-      vision: ["ワークショップ", "Gemini で午後のうちにビジョンアプリを作る"],
-      agents: ["ライブ講座", "チャットからエージェントへ：ツール、記憶、評価"],
-      deploy: ["無料コース", "プロトタイプを Web に公開する"],
+      orchard: ["小説", "塩の果樹園"],
+      workshop: ["エッセイ", "小さな工房のノート"],
+      grid: ["デザイン", "グリッドと印刷のページ"],
+      trains: ["旅", "北の夜行列車"],
     },
   },
 };
@@ -84,14 +109,11 @@ export default function StackedPreviewCarouselDemo() {
   const t = useDemoText(copy);
   const items: StackedPreviewItem[] = (Object.keys(covers) as Key[]).map((key) => ({ key, subtitle: t.items[key][0], title: t.items[key][1], cover: covers[key] }));
   return (
-    <section
-      className="grid w-full grid-cols-1 items-center gap-10 overflow-hidden rounded-2xl px-6 py-10 text-white md:grid-cols-2 md:px-10"
-      style={{ background: "radial-gradient(120% 85% at 76% 6%, rgba(245,192,69,0.16), transparent 56%), linear-gradient(180deg, #0d0d11 0%, #08080b 100%)" }}
-    >
+    <section className="grid w-full grid-cols-1 items-center gap-10 overflow-hidden rounded-2xl bg-[#0c0a09] px-6 py-10 text-[#f5f5f4] md:grid-cols-2 md:px-10">
       <div className="min-w-0">
-        <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#F5C045]">AI Studio Academy</p>
-        <h1 className="mt-3 text-3xl font-black leading-tight md:text-4xl">{t.heading}</h1>
-        <p className="mt-3 text-sm text-white/60">{t.lead}</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#d4a24c]">{t.store}</p>
+        <h1 className="mt-3 font-serif text-3xl font-normal leading-tight tracking-[-0.01em] md:text-4xl">{t.heading}</h1>
+        <p className="mt-3 text-sm text-[#a8a29e]">{t.lead}</p>
       </div>
       <div className="min-w-0 pb-6 pr-4">
         <StackedPreviewCarousel items={items} />

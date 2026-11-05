@@ -34,17 +34,17 @@ export default function AnimationEditorDemo() {
   const [canvas, setCanvas] = useState<CanvasSnapshot<string>>(keyframes[0]);
 
   return (
-    <div className="flex w-full max-w-xl min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+    <div className="flex w-full max-w-xl min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-background">
       {/* 畫布顯示目前套用的關鍵影格 */}
       <div
         className="relative h-56 overflow-hidden"
-        style={{ backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+        style={{ backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 1px, transparent 1px)", backgroundSize: "20px 20px" }}
       >
         <div className="absolute inset-0" style={getCanvasStyle(canvas)}>
           {canvas.elements.map((el) => (
             <div
               key={el.id}
-              className="absolute rounded-lg bg-white p-3 text-sm font-semibold text-gray-800 shadow-lg transition-all duration-300 motion-reduce:transition-none"
+              className="absolute rounded-lg border border-border bg-card p-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-300 motion-reduce:transition-none"
               style={{ left: el.position.x, top: el.position.y, width: el.size.width, height: el.size.height }}
             >
               {el.data}

@@ -150,10 +150,9 @@ export interface NoticeQueueProps {
 
 const css = `
 .snq-stack{display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
-.snq-card{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:.6rem;min-width:0;max-width:min(30rem,100%);min-height:2.7rem;box-sizing:border-box;padding:.38rem .68rem;color:var(--story-text);text-align:left;letter-spacing:.08em;cursor:pointer;background:linear-gradient(110deg,rgb(var(--story-glow) / .1),transparent 45%),var(--story-panel);border:1px solid var(--story-accent-dim);border-radius:4px;box-shadow:0 5px 18px var(--story-shadow);pointer-events:auto;animation:snq-ink-in 440ms cubic-bezier(.2,.8,.2,1) backwards;transition:border-color 160ms ease,background 160ms ease,transform 160ms ease;font:inherit}
-.snq-card:hover,.snq-card:focus-visible{background:linear-gradient(110deg,rgb(var(--story-glow) / .16),transparent 45%),var(--story-panel-hover);border-color:var(--story-accent);outline:none}
+.snq-card{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:.6rem;min-width:0;max-width:min(30rem,100%);min-height:2.7rem;box-sizing:border-box;padding:.38rem .68rem;color:var(--story-text);text-align:left;letter-spacing:.08em;cursor:pointer;background:var(--story-panel);border:1px solid var(--story-accent-dim);border-radius:4px;box-shadow:0 5px 18px var(--story-shadow);pointer-events:auto;animation:snq-ink-in 440ms cubic-bezier(.2,.8,.2,1) backwards;transition:border-color 160ms ease,background 160ms ease,transform 160ms ease;font:inherit}
+.snq-card:hover,.snq-card:focus-visible{background:var(--story-panel-hover);border-color:var(--story-accent);outline:none}
 .snq-card:active{transform:translateY(1px)}
-.snq-card::before,.snq-line::before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 0% 50%,rgb(var(--story-glow) / .28),transparent 70%);opacity:0;transform-origin:0% 50%;animation:snq-ink-bleed 900ms ease-out 80ms both}
 .snq-card.snq-leaving,.snq-line.snq-leaving{animation:snq-ink-out 280ms ease-in both;pointer-events:none}
 .snq-art{display:inline-flex;width:2rem;height:2rem;flex:0 0 2rem;align-items:center;justify-content:center;overflow:hidden;color:var(--story-accent-bright);background:var(--story-well);border:1px solid var(--story-accent-dim);border-radius:3px;font-size:1.2rem;line-height:1}
 .snq-art img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.72) sepia(.12) contrast(.96)}
@@ -168,9 +167,8 @@ const css = `
 .snq-seal{display:inline-block;margin-right:.6em;padding:.05rem .5rem;border:1px solid var(--story-accent);border-radius:2px;color:var(--story-accent);font-size:.72em;letter-spacing:.08em;transform:rotate(-4deg);vertical-align:middle}
 @keyframes snq-ink-in{0%{opacity:0;transform:translateX(1.4rem);filter:blur(3px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
 @keyframes snq-ink-out{from{opacity:1;transform:none;filter:none}to{opacity:0;transform:translateX(.9rem);filter:blur(3px)}}
-@keyframes snq-ink-bleed{0%{opacity:0;transform:scaleX(.2)}35%{opacity:1}100%{opacity:0;transform:scaleX(1.3)}}
 @keyframes snq-shimmer{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
-@media (prefers-reduced-motion:reduce){.snq-card,.snq-card.snq-leaving,.snq-line,.snq-line.snq-leaving{animation:none;transition-duration:1ms}.snq-card::before,.snq-line::before,.snq-shimmer::after{display:none}}
+@media (prefers-reduced-motion:reduce){.snq-card,.snq-card.snq-leaving,.snq-line,.snq-line.snq-leaving{animation:none;transition-duration:1ms}.snq-shimmer::after{display:none}}
 `;
 
 function prefersReducedMotion() {

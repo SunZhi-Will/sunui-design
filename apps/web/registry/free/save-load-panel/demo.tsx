@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { SaveLoadPanel, type SaveSlot } from "./save-load-panel";
+import { SaveLoadPanel, storyThemes, type SaveSlot } from "./save-load-panel";
 
 // 山河未歸 的章節與場景名稱
 const story = {
@@ -28,13 +28,13 @@ export default function SaveLoadPanelDemo() {
   return (
     <div
       className="relative h-[34rem] w-full max-w-3xl min-w-0 overflow-hidden rounded-[4px]"
-      style={{ color: "#eae4d6", background: "linear-gradient(180deg, #1a1d24, #08090c)" }}
+      style={{ ...(storyThemes.ink as unknown as CSSProperties), color: "var(--story-text)", background: "var(--story-bg)" }}
     >
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="absolute top-4 left-5 border-b px-1 py-2 text-sm tracking-[0.18em] outline-none hover:text-[#e7c489] focus-visible:text-[#e7c489]"
-        style={{ borderColor: "rgb(201 160 99 / 0.22)", fontFamily: '"Noto Serif TC", "Songti TC", serif' }}
+        className="absolute top-4 left-5 border-b px-1 py-2 text-sm tracking-[0.18em] outline-none hover:text-(--story-accent-bright) focus-visible:text-(--story-accent-bright)"
+        style={{ borderColor: "var(--story-line)", fontFamily: '"Noto Serif TC", "Songti TC", serif' }}
       >
         {t.open}
       </button>

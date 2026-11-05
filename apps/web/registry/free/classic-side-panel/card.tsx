@@ -45,16 +45,16 @@ export default function ClassicSidePanelCard() {
 
   return (
     <SidePanelProvider>
-      <div className="relative isolate mx-auto h-56 w-72 overflow-hidden rounded-xl bg-gray-100 text-gray-800">
+      <div className="relative isolate mx-auto h-56 w-72 overflow-hidden rounded-xl border border-border bg-muted/40 text-foreground">
         <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
           <div>
-            <p className="text-3xl font-semibold tabular-nums text-gray-900">{visits[range]}</p>
-            <p className="text-sm text-gray-500">{t.visits[range]}</p>
+            <p className="text-3xl font-semibold tabular-nums text-foreground">{visits[range]}</p>
+            <p className="text-sm text-muted-foreground">{t.visits[range]}</p>
           </div>
           <button
             type="button"
             onClick={() => setTimeout(() => setOpen(true), 0)}
-            className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
             {t.open}
           </button>
@@ -67,7 +67,6 @@ export default function ClassicSidePanelCard() {
           onToggle={() => setOpen((o) => !o)}
           title={t.title}
           position="left"
-          theme="primary"
           width="220px"
           buttonTopPosition="1rem"
           contentClassName="p-3"
@@ -82,7 +81,7 @@ export default function ClassicSidePanelCard() {
           <div className="space-y-1.5 text-sm">
             {t.channelList.map((c, i) => (
               <label key={c} className="flex items-center gap-2">
-                <input type="checkbox" defaultChecked={i < 2} className="size-4 accent-blue-600" />
+                <input type="checkbox" defaultChecked={i < 2} className="size-4 accent-foreground" />
                 {c}
               </label>
             ))}

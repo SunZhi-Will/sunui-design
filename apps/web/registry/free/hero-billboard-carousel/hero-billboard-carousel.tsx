@@ -34,8 +34,9 @@ export interface HeroBillboardSlide {
   cta?: string;
   /** 狀態標籤，例：Open */
   badge?: string;
-  /** 沒有圖片時環境光改用這兩個顏色 */
+  /** 沒有圖片時環境光改用這個顏色（單色，模糊後鋪在卡片背後） */
   accentFrom?: string;
+  /** 保留給舊版 API，已不使用（不再畫跨色相漸層） */
   accentTo?: string;
 }
 
@@ -59,6 +60,8 @@ export interface HeroBillboardCarouselProps {
   slideMs?: number;
   /** 原專案預設暗色，淺色主題一起保留 */
   theme?: "dark" | "light";
+  /** 唯一強調色（徽章、分類字、進度條、焦點框），預設暗色 #d4a24c、淺色 #a8741f */
+  accent?: string;
   /** 沒有 href 的卡片被點擊時 */
   onSelect?: (slide: HeroBillboardSlide, index: number) => void;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
@@ -152,12 +155,12 @@ function SlideMedia({ slide }: { slide: HeroBillboardSlide }) {
       )}
       {slide.overlayTitle && (
         <div className="absolute inset-0" style={{ containerType: "inline-size" }}>
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(6,6,20,0.65) 75%, rgba(6,6,20,0.92) 100%)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.85) 100%)" }} />
           <div className="absolute inset-x-0 bottom-0" style={{ padding: "4.5cqw", paddingRight: "20cqw" }}>
-            <div className="line-clamp-1 font-bold uppercase tracking-[0.2em]" style={{ fontSize: "clamp(9px,1.6cqw,14px)", marginBottom: "1cqw", color: slide.overlayColor }}>
+            <div className="line-clamp-1 font-semibold uppercase tracking-[0.2em]" style={{ fontSize: "clamp(9px,1.6cqw,14px)", marginBottom: "1cqw", color: slide.overlayColor ?? "var(--accent-gold)" }}>
               {slide.subtitle}
             </div>
-            <div className="line-clamp-2 font-black leading-tight" style={{ fontSize: "clamp(16px,3.6cqw,38px)", color: "#fff" }}>
+            <div className="line-clamp-2 font-serif font-normal leading-tight tracking-[-0.01em]" style={{ fontSize: "clamp(16px,3.6cqw,38px)", color: "#f5f5f4" }}>
               {slide.title}
             </div>
           </div>
@@ -177,12 +180,12 @@ function ArrowIcon({ dir }: { dir: "left" | "right" }) {
 
 /**
  * 滿版焦點輪播：中間一張大封面、左右各露出上一張與下一張（點了就切過去），
- * 背後是目前封面模糊放大的環境光。卡片正下方是圓點指示器，目前這張拉長成進度條。
+ * 有圖片時背後鋪一層低不透明度的模糊封面當環境光。卡片正下方是圓點指示器，目前這張拉長成進度條。
  *
  * 自動播放依 W3C APG 輪播模式：滑鼠移入、鍵盤焦點進入、分頁隱藏時暫停；
  * 系統開了「減少動態」時不自動播放。換張由進度條的 animationend 觸發，暫停後接著走。
  */
-export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme = "dark", onSelect, locale = "en", labels, className }: HeroBillboardCarouselProps) {
+export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme = "dark", accent, onSelect, locale = "en", labels, className }: HeroBillboardCarouselProps) {
   const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const n = items.length;
   const [active, setActive] = useState(0);
@@ -247,6 +250,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
     <section
       className={cn("hbc-root", className)}
       data-theme={theme}
+      style={accent ? ({ "--accent-gold": accent } as CSSProperties) : undefined}
       aria-roledescription="carousel"
       aria-label={l.region}
       onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
@@ -274,9 +278,9 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
           <div key={slide.key} className="hbc-ambient-layer" data-active={i === active}>
             {slide.image ? (
               <img src={slide.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            ) : (
-              <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${slide.accentFrom ?? "#1a1a24"}, ${slide.accentTo ?? "#f5c045"})` }} />
-            )}
+            ) : slide.accentFrom ? (
+              <div className="absolute inset-0" style={{ background: slide.accentFrom }} />
+            ) : null}
           </div>
         ))}
       </div>
@@ -346,12 +350,12 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                   <div className="hbc-panel-text">
                     <div className="hbc-meta-row">
                       {slide.badge && (
-                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-extrabold" style={{ background: "var(--accent-gold)", color: "#111" }}>
+                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style={{ background: "var(--accent-gold)", color: "#0c0a09" }}>
                           {slide.badge}
                         </span>
                       )}
                       {slide.eyebrow && (
-                        <span className="font-extrabold tracking-[0.06em]" style={{ color: "var(--accent-gold)" }}>
+                        <span className="font-semibold uppercase tracking-[0.12em] text-[12px]" style={{ color: "var(--accent-gold)" }}>
                           {slide.eyebrow}
                         </span>
                       )}
@@ -429,20 +433,20 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
 // 放在任何寬度的容器裡都以容器寬度計算；@media 768px 改成 @container。
 const BILLBOARD_CSS = `
 .hbc-root {
-  --bg: #000000;
-  --text-primary: rgba(255,255,255,0.93);
-  --text-secondary: rgba(255,255,255,0.58);
-  --card: rgba(255,255,255,0.05);
-  --card-raised: rgba(255,255,255,0.08);
-  --border: rgba(255,255,255,0.10);
-  --accent-gold: #F5C045;
-  --hero-bg: radial-gradient(120% 85% at 76% 6%, rgba(245,192,69,0.16), transparent 56%), linear-gradient(180deg, #0d0d11 0%, #08080b 100%);
+  --bg: #0c0a09;
+  --text-primary: #f5f5f4;
+  --text-secondary: #a8a29e;
+  --card: #161412;
+  --card-raised: #1c1a17;
+  --border: rgb(255 255 255 / 0.08);
+  --accent-gold: #d4a24c;
+  --hero-bg: #0c0a09;
   --gap: 28px;
   --side-scale: 0.86;
   --side-dim: brightness(0.5) saturate(0.75);
   --side-dim-hover: brightness(0.72) saturate(0.9);
-  --ambient-opacity: 0.6;
-  --scrim: rgba(8, 8, 11, 0.42);
+  --ambient-opacity: 0.22;
+  --scrim: rgba(12, 10, 9, 0.5);
   container-type: inline-size;
   position: relative;
   overflow: hidden;
@@ -451,18 +455,18 @@ const BILLBOARD_CSS = `
   color: var(--text-primary);
 }
 .hbc-root[data-theme="light"] {
-  --bg: #ffffff;
-  --text-primary: rgba(15, 23, 42, 0.95);
-  --text-secondary: rgba(15, 23, 42, 0.75);
+  --bg: #fafaf9;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
   --card: #ffffff;
-  --card-raised: #ffffff;
-  --border: rgba(15, 23, 42, 0.06);
-  --accent-gold: #d97706;
-  --hero-bg: radial-gradient(120% 85% at 76% 6%, rgba(217,119,6,0.09), transparent 56%), linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  --card-raised: #f5f5f4;
+  --border: rgba(28, 25, 23, 0.08);
+  --accent-gold: #a8741f;
+  --hero-bg: #fafaf9;
   --side-dim: saturate(0.7) opacity(0.55);
   --side-dim-hover: saturate(0.9) opacity(0.8);
-  --ambient-opacity: 0.4;
-  --scrim: rgba(255, 255, 255, 0.5);
+  --ambient-opacity: 0.16;
+  --scrim: rgba(250, 250, 249, 0.6);
 }
 .hbc-ambient {
   position: absolute;
@@ -476,7 +480,7 @@ const BILLBOARD_CSS = `
   position: absolute;
   inset: 0;
   opacity: 0;
-  filter: blur(56px) saturate(1.5);
+  filter: blur(56px);
   transform: scale(1.1);
   transition: opacity 1.2s ease;
 }
@@ -547,7 +551,7 @@ const BILLBOARD_CSS = `
   --s: 1;
   --op: 1;
   z-index: 3;
-  box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border);
 }
 .hbc-slide[data-pos="side"] {
   --s: var(--side-scale);
@@ -576,7 +580,7 @@ const BILLBOARD_CSS = `
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: #0a0c1e;
+  background: var(--card-raised);
 }
 .hbc-media { position: absolute; inset: 0; }
 .hbc-panel {
@@ -591,8 +595,6 @@ const BILLBOARD_CSS = `
   background: var(--card);
 }
 .hbc-panel-text { min-width: 0; }
-.hbc-slide[data-pos="front"] .hbc-panel-text { animation: hbc-rise 0.6s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.hbc-slide[data-pos="front"] .hbc-cta { animation: hbc-rise 0.6s 0.18s cubic-bezier(0.22, 1, 0.36, 1) both; }
 /* Ken Burns：當前這張緩慢推近 */
 .hbc-slide[data-pos="front"] .hbc-media { animation: hbc-kenburns 9s ease-out both; }
 @keyframes hbc-kenburns { from { transform: scale(1); } to { transform: scale(1.055); } }
@@ -611,10 +613,10 @@ const BILLBOARD_CSS = `
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  box-shadow: inset 0 0 0 1px rgba(245, 192, 69, 0.18);
+  box-shadow: inset 0 0 0 1px var(--border);
   transition: box-shadow 0.35s ease;
 }
-.hbc-slide[data-pos="front"]:hover .hbc-ring { box-shadow: inset 0 0 0 1.5px rgba(245, 192, 69, 0.6); }
+.hbc-slide[data-pos="front"]:hover .hbc-ring { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent-gold) 60%, transparent); }
 .hbc-hit {
   position: absolute;
   inset: 0;
@@ -640,20 +642,17 @@ const BILLBOARD_CSS = `
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(10, 10, 14, 0.55);
-  color: #fff;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgba(22, 20, 18, 0.92);
+  color: #f5f5f4;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-.hbc-arrow:hover { background: rgba(10, 10, 14, 0.8); transform: scale(1.08); }
+.hbc-arrow:hover { background: rgba(28, 26, 23, 0.96); transform: scale(1.08); }
 .hbc-arrow:active { transform: scale(0.96); }
 .hbc-arrow:focus-visible { outline: 3px solid var(--accent-gold); outline-offset: 3px; }
 .hbc-arrow-prev { left: calc(50% - var(--card-w) / 2 - 26px); }
 .hbc-arrow-next { right: calc(50% - var(--card-w) / 2 - 26px); }
-@keyframes hbc-rise { from { opacity: 0; transform: translateY(10px); } }
 .hbc-cta {
   flex: none;
   display: inline-flex;
@@ -663,17 +662,14 @@ const BILLBOARD_CSS = `
   height: 46px;
   padding: 0 24px;
   border-radius: 12px;
-  font-weight: 800;
+  font-weight: 600;
   font-size: 15px;
   background: var(--text-primary);
   color: var(--bg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
   white-space: nowrap;
 }
-.hbc-slide[data-pos="front"]:hover .hbc-cta {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--text-primary) 45%, transparent);
-}
+.hbc-slide[data-pos="front"]:hover .hbc-cta { transform: translateY(-2px); }
 .hbc-slide[data-pos="side"] .hbc-cta,
 .hbc-slide[data-pos="hidden"] .hbc-cta {
   background: color-mix(in srgb, var(--text-primary) 14%, transparent);
@@ -755,8 +751,6 @@ const BILLBOARD_CSS = `
   .hbc-slide,
   .hbc-ambient-layer { transition: opacity 0.3s ease; }
   .hbc-slide[data-pos="front"] .hbc-media,
-  .hbc-slide[data-pos="front"] .hbc-panel-text,
-  .hbc-slide[data-pos="front"] .hbc-cta,
   .hbc-slide[data-jump="true"] { animation: none; }
 }
 /* 資訊列高度固定：換張時整個 Hero 高度都不跳 */
@@ -768,7 +762,8 @@ const BILLBOARD_CSS = `
   height: 24px;
   margin-bottom: 6px;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
   overflow: hidden;
   color: var(--text-secondary);
@@ -776,8 +771,9 @@ const BILLBOARD_CSS = `
 .hbc-meta-row > span { flex: none; }
 .hbc-meta-row > span:last-child { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .hbc-title {
-  font-weight: 900;
+  font-weight: 600;
   font-size: clamp(17px, 1.75cqw, 24px);
+  letter-spacing: -0.01em;
   line-height: 1.3;
   /* 永遠保留兩行高度；一行的標題就靠上 */
   height: 2.6em;

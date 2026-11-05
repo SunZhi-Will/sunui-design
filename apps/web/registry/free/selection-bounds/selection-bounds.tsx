@@ -82,7 +82,7 @@ export type SelectionBoundsProps = {
   /** 縮放對齊，簽名與 snap-guides 的 snapResize 相容 */
   snapResize?: (rect: Rect, direction: string) => { rect: Rect; guides: Guide[] };
   onGuidesChange?: (guides: Guide[]) => void;
-  /** 選取框顏色，預設為 CardFlow 的 blue-500 */
+  /** 選取框顏色，預設為畫布工具慣用的藍 #2563eb */
   color?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -155,7 +155,7 @@ export function SelectionBounds({
   snapMove,
   snapResize,
   onGuidesChange,
-  color = "#3b82f6",
+  color = "#2563eb",
   locale = "en",
   labels: labelsProp,
   className,
@@ -424,7 +424,7 @@ export type SelectionMarqueeProps = {
 };
 
 /** 框選框：在畫布背景拖曳時顯示 */
-export function SelectionMarquee({ box, color = "#3b82f6", className }: SelectionMarqueeProps) {
+export function SelectionMarquee({ box, color = "#2563eb", className }: SelectionMarqueeProps) {
   if (!box) return null;
   return (
     <div

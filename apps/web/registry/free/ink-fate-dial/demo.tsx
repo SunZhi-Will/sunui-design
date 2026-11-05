@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { InkFateDial, type InkFateModifier } from "./ink-fate-dial";
+import { InkFateDial, storyThemes, type InkFateModifier } from "./ink-fate-dial";
 
 type Verdict = "adverse" | "mixed" | "success" | "wonder";
 
@@ -114,9 +114,12 @@ export default function InkFateDialDemo() {
   }
 
   return (
-    <section className="flex w-full max-w-sm min-w-0 flex-col items-center gap-3 rounded-[2px] border border-[rgba(143,157,182,0.42)] bg-[linear-gradient(180deg,#151b28,#0c1019)] px-5 py-5 text-[#d7deeb] shadow-[0_1.2rem_2.5rem_rgba(0,0,0,0.6)]">
+    <section
+      style={storyThemes.moon as unknown as CSSProperties}
+      className="flex w-full max-w-sm min-w-0 flex-col items-center gap-3 rounded-[2px] border border-[color-mix(in_srgb,var(--story-accent)_30%,transparent)] bg-(--story-bg) px-5 py-5 text-(--story-text) shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
+    >
       <header className="text-center">
-        <div className="text-xs tracking-[0.16em] text-[#8fa3c6]">{t.kicker}</div>
+        <div className="text-xs tracking-[0.16em] text-(--story-muted)">{t.kicker}</div>
         <h2 className="mt-1 font-serif text-lg tracking-[0.1em]">{t.title}</h2>
       </header>
 
@@ -134,14 +137,14 @@ export default function InkFateDialDemo() {
             setVerdict(segment as Verdict);
           }}
         />
-        <p className="min-h-6 text-center text-sm tracking-[0.06em] text-[#b9c8e2]">{rolling ? status : t.verdicts[verdict]}</p>
+        <p className="min-h-6 text-center text-sm tracking-[0.06em] text-(--story-text)">{rolling ? status : t.verdicts[verdict]}</p>
       </div>
 
       <button
         type="button"
         onClick={cast}
         disabled={rolling}
-        className="min-h-10 rounded-[2px] border border-[rgba(163,184,217,0.38)] px-6 tracking-[0.14em] text-[#d5e1f5] transition-colors hover:bg-[rgba(163,184,217,0.12)] disabled:opacity-40"
+        className="min-h-10 rounded-[2px] border border-[color-mix(in_srgb,var(--story-accent)_38%,transparent)] px-6 tracking-[0.14em] text-(--story-accent) transition-colors hover:bg-[color-mix(in_srgb,var(--story-accent)_12%,transparent)] disabled:opacity-40"
       >
         {rolling ? t.casting : t.cast}
       </button>

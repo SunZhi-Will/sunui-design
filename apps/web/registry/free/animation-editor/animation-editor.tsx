@@ -279,18 +279,16 @@ export function toElementCssAnimation<T>(
 /* 樣式常數                                                           */
 /* ------------------------------------------------------------------ */
 
-/** 原本 canvas/page.tsx 的 .glassmorphism-panel */
+/** 原本 canvas/page.tsx 的 .glassmorphism-panel，收斂成跟隨主題的實底面板（沿用名稱以免破壞 import） */
 export const glassPanelStyle: CSSProperties = {
-  background: "rgba(255, 255, 255, 0.75)",
-  backdropFilter: "blur(24px) saturate(180%)",
-  WebkitBackdropFilter: "blur(24px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.8)",
-  boxShadow:
-    "0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(255, 255, 255, 0.5)",
+  background: "var(--card)",
+  color: "var(--foreground)",
+  border: "1px solid var(--border)",
+  boxShadow: "0 1px 2px rgb(0 0 0 / 0.06)",
 };
 
-/** 強調色衍生的 CSS 變數（預設為原本的 blue-500） */
-export function accentVars(accent = "#3b82f6"): CSSProperties {
+/** 強調色衍生的 CSS 變數；預設為畫布工具藍 #2563eb，只用在時間軸的標記與指示線 */
+export function accentVars(accent = "#2563eb"): CSSProperties {
   return {
     "--ae-accent": accent,
     "--ae-accent-strong": `color-mix(in srgb, ${accent}, black 15%)`,
@@ -743,7 +741,7 @@ export function AnimationEditor<T = unknown>({
   const selectedIndex = selectedKeyframe ? sortedKeyframes.indexOf(selectedKeyframe) : -1;
 
   const tabClass =
-    "w-12 h-4 bg-gray-300/80 hover:bg-gray-400/80 rounded-t-lg flex items-center justify-center transition-colors shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ae-accent)]";
+    "w-12 h-4 border border-b-0 border-border bg-card text-muted-foreground hover:bg-muted rounded-t-lg flex items-center justify-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ae-accent)]";
 
   return (
     <div
@@ -762,7 +760,7 @@ export function AnimationEditor<T = unknown>({
             aria-label={labels.expand}
             aria-expanded={false}
           >
-            <Icon d={ICON.chevronUp} className="h-3 w-3 text-gray-600" />
+            <Icon d={ICON.chevronUp} className="h-3 w-3" />
           </button>
         )}
 
@@ -776,7 +774,9 @@ export function AnimationEditor<T = unknown>({
             )}
             style={{
               ...glassPanelStyle,
-              borderTopColor: "rgba(229, 231, 235, 0.5)",
+              borderLeft: "none",
+              borderRight: "none",
+              borderBottom: "none",
               transform: isVisible ? "translateY(0)" : "translateY(100%)",
             }}
           >
@@ -788,18 +788,18 @@ export function AnimationEditor<T = unknown>({
               aria-label={labels.collapse}
               aria-expanded
             >
-              <Icon d={ICON.chevronUp} className="h-3 w-3 text-gray-600" style={{ transform: "rotate(180deg)" }} />
+              <Icon d={ICON.chevronUp} className="h-3 w-3" style={{ transform: "rotate(180deg)" }} />
             </button>
 
             <div className="max-w-full px-4 py-3">
               {/* 標題與控制按鈕 */}
               <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-sm font-semibold text-gray-800">{labels.title}</h3>
+                  <h3 className="text-sm font-semibold text-foreground">{labels.title}</h3>
                   <button
                     type="button"
                     onClick={handleAddKeyframe}
-                    className="flex items-center gap-1.5 rounded-lg bg-[var(--ae-accent)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--ae-accent-strong)]"
+                    className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     title={labels.addKeyframe}
                   >
                     <Icon d={ICON.plus} className="h-3.5 w-3.5" />
@@ -809,7 +809,7 @@ export function AnimationEditor<T = unknown>({
                     <button
                       type="button"
                       onClick={handleUpdateCurrentKeyframe}
-                      className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-green-600"
+                      className="rounded-md border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                       title={labels.saveKeyframe}
                       aria-label={labels.saveKeyframe}
                     >
@@ -820,7 +820,7 @@ export function AnimationEditor<T = unknown>({
                     <button
                       type="button"
                       onClick={handlePreview}
-                      className="flex items-center gap-1.5 rounded-lg bg-purple-500 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-purple-600"
+                      className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                       title={labels.previewTitle}
                     >
                       <Icon d={ICON.play} className="h-3.5 w-3.5" />
@@ -831,7 +831,7 @@ export function AnimationEditor<T = unknown>({
 
                 {/* 選中關鍵影格的資訊 */}
                 {selectedKeyframe && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground tabular-nums">
                     <span>
                       {labels.name}{labels.colon}<strong>{selectedKeyframe.name}</strong>
                     </span>
@@ -847,7 +847,7 @@ export function AnimationEditor<T = unknown>({
                     <button
                       type="button"
                       onClick={() => handleDeleteKeyframe(selectedKeyframe.id)}
-                      className="rounded px-2 py-1 text-red-600 transition-colors hover:bg-red-50"
+                      className="rounded px-2 py-1 text-destructive transition-colors hover:bg-destructive/10"
                       title={labels.deleteKeyframe}
                       aria-label={labels.deleteKeyframe}
                     >
@@ -860,19 +860,19 @@ export function AnimationEditor<T = unknown>({
               {/* 時間軸 */}
               <div className="relative h-20">
                 {sortedKeyframes.length === 0 ? (
-                  <div className="flex h-full items-center justify-center rounded-lg bg-gray-50/50 px-2 text-center text-xs text-gray-400">
+                  <div className="flex h-full items-center justify-center rounded-lg bg-muted/50 px-2 text-center text-xs text-muted-foreground">
                     <span>{labels.empty}</span>
                   </div>
                 ) : (
-                  <div ref={timelineRef} className="relative h-full overflow-hidden rounded-lg bg-gray-50/50">
+                  <div ref={timelineRef} className="relative h-full overflow-hidden rounded-lg bg-muted/50">
                     {/* 秒數刻度 */}
                     <div className="absolute inset-0 z-10 flex items-end px-4" aria-hidden="true">
                       {Array.from({ length: Math.ceil(maxTimestamp) + 1 }).map((_, i) => {
                         const tick = maxTimestamp > 0 ? MIN_PADDING + (i / maxTimestamp) * AVAILABLE_WIDTH : MIN_PADDING;
                         return (
                           <div key={i} className="absolute" style={{ left: `${tick}%`, height: "100%", transform: "translateX(-50%)" }}>
-                            <div className="absolute bottom-0 left-1/2 top-0 w-px bg-gray-300" />
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-gray-500">{i}s</div>
+                            <div className="absolute bottom-0 left-1/2 top-0 w-px bg-border" />
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] tabular-nums text-muted-foreground">{i}s</div>
                           </div>
                         );
                       })}
@@ -937,8 +937,8 @@ export function AnimationEditor<T = unknown>({
                               className={cn(
                                 "absolute z-30 whitespace-nowrap rounded px-2 py-0.5 text-[10px] font-medium transition-all motion-reduce:transition-none",
                                 isSelected
-                                  ? "bg-[var(--ae-accent)] text-white shadow-lg"
-                                  : "bg-white/90 text-gray-700 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100",
+                                  ? "bg-[var(--ae-accent)] text-white"
+                                  : "border border-border bg-card text-foreground opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100",
                               )}
                               style={{ top: "calc(50% - 2.5rem)", left: "50%", transform: "translateX(-50%)" }}
                             >
@@ -955,22 +955,22 @@ export function AnimationEditor<T = unknown>({
                                 onChange={(e) => handleUpdateKeyframeTimestamp(keyframe.id, parseFloat(e.target.value) || 0)}
                                 onClick={(e) => e.stopPropagation()}
                                 aria-label={`${keyframe.name}${labels.colon}${labels.timestamp}`}
-                                className="w-12 rounded border-none bg-transparent px-1 py-0 text-center text-[9px] text-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--ae-accent-light)]"
+                                className="w-12 rounded border-none bg-transparent px-1 py-0 text-center text-[9px] tabular-nums text-muted-foreground focus:outline-none focus:ring-1 focus:ring-[var(--ae-accent-light)]"
                                 min="0"
                                 step="0.1"
                               />
-                              <span className="text-[9px] text-gray-500">s</span>
+                              <span className="text-[9px] text-muted-foreground">s</span>
                             </div>
                             {/* 圓點，垂直置中 */}
                             <div
                               className={cn(
                                 "absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 transition-all motion-reduce:transition-none",
-                                "group-focus-visible:ring-2 group-focus-visible:ring-[var(--ae-accent-light)] group-focus-visible:ring-offset-1",
+                                "group-focus-visible:ring-2 group-focus-visible:ring-[var(--ae-accent-light)] group-focus-visible:ring-offset-1 ring-offset-card",
                                 isDragging
                                   ? "scale-150 border-[var(--ae-accent-stronger)] bg-[var(--ae-accent-strong)]"
                                   : isSelected
                                     ? "scale-125 border-[var(--ae-accent-strong)] bg-[var(--ae-accent)]"
-                                    : "border-[var(--ae-accent-soft)] bg-white hover:scale-110",
+                                    : "border-[var(--ae-accent-soft)] bg-card hover:scale-110",
                               )}
                               title={keyframe.name}
                             />
@@ -1004,8 +1004,8 @@ export function AnimationEditor<T = unknown>({
         <div
           ref={menuRef}
           role="menu"
-          className={cn("z-50 min-w-[160px] rounded-lg py-1 shadow-xl", fixed ? "fixed" : "absolute")}
-          style={{ ...glassPanelStyle, borderColor: "rgba(229, 231, 235, 0.5)", left: contextMenu.x, top: contextMenu.y }}
+          className={cn("z-50 min-w-[160px] rounded-lg py-1 shadow-md", fixed ? "fixed" : "absolute")}
+          style={{ ...glassPanelStyle, left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -1015,11 +1015,11 @@ export function AnimationEditor<T = unknown>({
               handleDuplicateKeyframe(contextMenu.keyframeId);
               setContextMenu(null);
             }}
-            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100/50 focus-visible:bg-gray-100/50 focus-visible:outline-none"
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
           >
             <Icon d={ICON.copy} className="h-4 w-4" />
             <span>{labels.copy}</span>
-            <span className="ml-auto text-xs text-gray-400">{labels.copyShortcut}</span>
+            <span className="ml-auto font-mono text-[11px] text-muted-foreground">{labels.copyShortcut}</span>
           </button>
           <button
             type="button"
@@ -1028,11 +1028,11 @@ export function AnimationEditor<T = unknown>({
               handleDeleteKeyframe(contextMenu.keyframeId);
               setContextMenu(null);
             }}
-            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50/50 focus-visible:bg-red-50/50 focus-visible:outline-none"
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-destructive transition-colors hover:bg-destructive/10 focus-visible:bg-destructive/10 focus-visible:outline-none"
           >
             <Icon d={ICON.trash} className="h-4 w-4" />
             <span>{labels.delete}</span>
-            <span className="ml-auto text-xs text-gray-400">{labels.deleteShortcut}</span>
+            <span className="ml-auto font-mono text-[11px] text-muted-foreground">{labels.deleteShortcut}</span>
           </button>
         </div>
       )}

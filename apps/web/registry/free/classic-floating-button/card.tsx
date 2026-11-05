@@ -6,11 +6,11 @@ import { useDemoLocale } from "@/lib/demo-locale";
 
 import { FloatingButton, type SocialButtonConfig } from "./classic-floating-button";
 
-// 與 demo 相同的社群按鈕配色
+// 與 demo 相同的社群按鈕，沿用元件的中性預設樣式
 const socialButtons: SocialButtonConfig[] = [
-  { type: "github", href: "https://github.com", className: "bg-gradient-to-r from-gray-600 to-gray-800 hover:shadow-gray-500/50" },
-  { type: "twitter", href: "https://twitter.com", className: "bg-gradient-to-r from-blue-400 to-blue-600 hover:shadow-blue-500/50" },
-  { type: "linkedin", href: "https://linkedin.com", className: "bg-gradient-to-r from-blue-700 to-blue-900 hover:shadow-blue-600/50" },
+  { type: "github", href: "https://github.com" },
+  { type: "twitter", href: "https://twitter.com" },
+  { type: "linkedin", href: "https://linkedin.com" },
 ];
 
 /** 型錄卡片：一顆可拖曳的浮動按鈕，點開後社群按鈕以花瓣狀展開。 */
@@ -19,7 +19,7 @@ export default function ClassicFloatingButtonCard() {
   const dragArea = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={dragArea} className="relative isolate mx-auto h-56 w-72 overflow-hidden rounded-xl bg-gray-50">
+    <div ref={dragArea} className="relative isolate mx-auto h-56 w-72 overflow-hidden rounded-xl border border-border bg-muted/40">
       <FloatingButton
         fixed={false}
         locale={locale}

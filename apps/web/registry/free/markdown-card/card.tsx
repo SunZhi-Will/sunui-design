@@ -50,7 +50,7 @@ function Sheet() {
   const [content, setContent] = useState(initial);
 
   return (
-    <div className="mx-auto w-72 rounded-xl bg-[#f3f4f6] p-3">
+    <div className="mx-auto w-72 rounded-xl border border-border bg-muted/50 p-3">
       <div className="h-48 min-w-0">
         <MarkdownCard value={content} onValueChange={setContent} fontSize={13} locale={locale} />
       </div>

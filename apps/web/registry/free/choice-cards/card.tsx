@@ -7,11 +7,12 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { ChoiceCards, type ChoiceRow } from "./choice-cards";
 
 // 簡化的像素圖示：錨、握手
+// 圖示用 currentColor，顏色跟著卡片的 path 走（--story-*）
 const glyph = (d: string, fill: string) => <svg viewBox="0 0 12 12" shapeRendering="crispEdges" aria-hidden="true"><path d={d} fill={fill} /></svg>;
 
 const art = {
-  stop: glyph("M5 1h2v2H5zM5 3h2v7H5zM3 4h6v1H3zM1 7h1v2h1v1h6V9h1V7h1v3h-1v1H2v-1H1z", "#e5e7eb"),
-  talk: glyph("M1 3h2v2h1v1h4V5h1V3h2v4h-1v1H9v1H3V8H2V7H1z", "#34d399"),
+  stop: glyph("M5 1h2v2H5zM5 3h2v7H5zM3 4h6v1H3zM1 7h1v2h1v1h6V9h1V7h1v3h-1v1H2v-1H1z", "currentColor"),
+  talk: glyph("M1 3h2v2h1v1h4V5h1V3h2v4h-1v1H9v1H3V8H2V7H1z", "currentColor"),
 };
 
 const copy = {
@@ -55,7 +56,7 @@ export default function ChoiceCardsCard() {
 
   // 卡片在窄寬度會直向堆疊，放進內部捲動區
   return (
-    <div className="mx-auto h-[230px] w-72 overflow-y-auto overscroll-contain bg-[#070a12] px-3 pb-3">
+    <div className="mx-auto h-[230px] w-72 overflow-y-auto overscroll-contain bg-[#0b0e14] px-3 pb-3">
       <ChoiceCards
         compact
         locale={locale}

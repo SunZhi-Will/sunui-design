@@ -17,7 +17,7 @@ export default function InfiniteAvatarGridCard() {
   }, []);
 
   return (
-    <div className="relative mx-auto h-56 w-72 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+    <div className="relative mx-auto h-56 w-72 overflow-hidden rounded-xl border border-border bg-background">
       <InfiniteAvatarGrid locale={locale} visible={show} fixed={false} showModal={false} cellSize={110} avatarSize={64} />
     </div>
   );

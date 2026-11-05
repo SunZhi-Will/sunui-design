@@ -110,8 +110,8 @@ const WALL_CSS = `
 .wf-wall-col { animation: wf-wall-up var(--wall-duration, 80s) linear infinite; }
 .wf-wall-col-down { animation-direction: reverse; }
 @keyframes wf-swap-in {
-  from { opacity: 0; transform: translateY(6px); filter: blur(4px); }
-  to { opacity: 1; transform: none; filter: none; }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
 }
 .wf-swap-in { animation: wf-swap-in 500ms cubic-bezier(0.23, 1, 0.32, 1) both; }
 @media (prefers-reduced-motion: reduce) {
@@ -235,7 +235,7 @@ export function WaterfallShowcase({ works, columns: cols = 5, fixed = true, loca
                         {/* 說明：有滑鼠時移上去才出現，觸控裝置一直顯示風格 */}
                         <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3 pt-10 text-white opacity-100 transition-opacity duration-300 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-visible:opacity-100">
                           {w.text ? <span className="line-clamp-2 text-[13px] leading-snug">{w.text}</span> : null}
-                          <span className="mt-1.5 inline-flex rounded-full bg-white/20 px-2 py-0.5 text-[11px] backdrop-blur">
+                          <span className="mt-1.5 inline-flex rounded-full border border-white/20 bg-black/60 px-2 py-0.5 text-[11px]">
                             {w.styleName}
                           </span>
                         </span>
@@ -259,7 +259,7 @@ export function WaterfallShowcase({ works, columns: cols = 5, fixed = true, loca
             exit={{ opacity: 0 }}
             transition={fade}
           >
-            <div className="absolute inset-0 bg-black/10 supports-[backdrop-filter]:backdrop-blur-xs" onClick={close} aria-hidden />
+            <div className="absolute inset-0 bg-black/50" onClick={close} aria-hidden />
             <motion.div
               ref={dialogRef}
               role="dialog"

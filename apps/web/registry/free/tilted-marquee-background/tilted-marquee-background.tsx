@@ -9,7 +9,7 @@ export interface TiltedMarqueeCover {
   key: string;
   /** 封面圖片網址，以 object-cover 填滿 16:9 磚 */
   image?: string;
-  /** 沒有圖片時改畫自訂內容（漸層、標題等） */
+  /** 沒有圖片時改畫自訂內容（中性色塊、標題等） */
   content?: ReactNode;
 }
 
@@ -90,8 +90,8 @@ export function TiltedMarqueeBackground({
                 style={{
                   width: tileWidth,
                   aspectRatio: "16/9",
-                  background: "#0a0c1e",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "#161412",
+                  border: "1px solid rgb(255 255 255 / 0.08)",
                   boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
                 }}
               >

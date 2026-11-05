@@ -1,18 +1,30 @@
 "use client";
 
-import { useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
 import { snapMove, SnapGuides, type SnapGuide, type SnapRect } from "./snap-guides";
 
-type Card = SnapRect & { id: "a" | "b" | "c"; tone: string };
+type Card = SnapRect & { id: "a" | "b" | "c" };
 
 const initial: Card[] = [
-  { id: "a", tone: "from-amber-200 to-orange-300", x: 16, y: 24, width: 140, height: 110 },
-  { id: "b", tone: "from-sky-200 to-indigo-300", x: 190, y: 70, width: 130, height: 120 },
-  { id: "c", tone: "from-emerald-200 to-teal-300", x: 52, y: 196, width: 150, height: 100 },
+  { id: "a", x: 16, y: 24, width: 140, height: 110 },
+  { id: "b", x: 190, y: 70, width: 130, height: 120 },
+  { id: "c", x: 52, y: 196, width: 150, height: 100 },
 ];
+
+// 中性示意縮圖：文案、照片、影片，用線條表示內容類型
+const line = (children: ReactNode) => (
+  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+const thumbs: Record<Card["id"], ReactNode> = {
+  a: line(<path d="M4 6h16M4 10h12M4 14h16M4 18h9" />),
+  b: line(<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="1.5" /><path d="m21 16-5-5-9 8" /></>),
+  c: line(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m10 9 5 3-5 3z" /></>),
+};
 
 const titles = {
   en: { a: "Hero copy", b: "Product shot", c: "Demo video" },
@@ -47,18 +59,18 @@ export default function SnapGuidesDemo() {
 
   return (
     <div
-      className="relative h-[320px] w-full max-w-xl min-w-0 touch-none overflow-hidden rounded-xl border border-gray-200 bg-gray-50 select-none"
-      style={{ backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+      className="relative h-[320px] w-full max-w-xl min-w-0 touch-none overflow-hidden rounded-xl border border-border bg-background select-none"
+      style={{ backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 1px, transparent 1px)", backgroundSize: "20px 20px" }}
     >
       {cards.map((c) => (
         <div
           key={c.id}
           onPointerDown={(e) => onDown(e, c)}
-          className="absolute flex cursor-move flex-col overflow-hidden rounded-lg bg-white shadow-lg"
+          className="absolute flex cursor-move flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm"
           style={{ left: c.x, top: c.y, width: c.width, height: c.height }}
         >
-          <div className={`min-h-0 flex-1 bg-gradient-to-br ${c.tone}`} />
-          <p className="truncate px-2.5 py-2 text-xs font-semibold text-gray-800">{title[c.id]}</p>
+          <div className="flex min-h-0 flex-1 items-center justify-center bg-muted text-muted-foreground">{thumbs[c.id]}</div>
+          <p className="truncate px-2.5 py-2 text-xs font-semibold text-foreground">{title[c.id]}</p>
         </div>
       ))}
       <SnapGuides guides={guides} />

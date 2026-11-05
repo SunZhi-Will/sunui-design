@@ -16,7 +16,7 @@ const copy = {
 function Slide({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 text-center">
-      <span className="text-3xl font-bold text-white tabular-nums">{value}</span>
+      <span className="text-3xl font-semibold text-white tabular-nums">{value}</span>
       <span className="text-[11px] text-white/80">{label}</span>
     </div>
   );
@@ -41,7 +41,7 @@ export default function StoryPlayerCard() {
         onIndexChange={setIndex}
         duration={2500}
         cardWidth={112}
-        className="rounded-2xl"
+        className="rounded-xl"
         locale={locale}
         labels={{ region: t.region }}
         actions={[{ key: "replay", label: t.replay, icon: storyIcons.replay, onClick: () => setIndex(0) }]}

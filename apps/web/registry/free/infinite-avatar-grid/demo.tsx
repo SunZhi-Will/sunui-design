@@ -16,7 +16,7 @@ export default function InfiniteAvatarGridDemo() {
   }, []);
 
   return (
-    <div className="relative h-[520px] w-full min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+    <div className="relative h-[520px] w-full min-w-0 overflow-hidden rounded-xl border border-border bg-background">
       <InfiniteAvatarGrid locale={locale} visible={showCards} fixed={false} />
     </div>
   );

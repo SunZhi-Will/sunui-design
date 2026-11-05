@@ -120,7 +120,7 @@ export default function MotionClipTabsDemo() {
   const items = useDemoText(text);
   const clips: MotionClip[] = useMemo(() => posters.map((p, i) => ({ ...p, ...items[i] })), [items]);
   return (
-    <section className="w-full max-w-5xl min-w-0 bg-[radial-gradient(ellipse_60%_45%_at_50%_60%,rgba(217,160,91,0.06),transparent_70%),#070a10] px-3 py-6 sm:px-8">
+    <section className="w-full max-w-5xl min-w-0 bg-[#0b0e14] px-3 py-6 sm:px-8">
       <MotionClipTabs clips={clips} locale={locale} />
     </section>
   );

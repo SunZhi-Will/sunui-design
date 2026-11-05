@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -37,6 +36,8 @@ export const recapKeywordLabels: RecapKeywordCloudLabels = MESSAGES.en;
 export interface RecapKeywordCloudProps {
   /** 關鍵字與出現次數，建議依次數由多到少排序 */
   keywords: RecapKeyword[];
+  /** 唯一強調色（最常出現的那個字與 hover 底線），預設琥珀金 #d4a24c */
+  accent?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -44,92 +45,66 @@ export interface RecapKeywordCloudProps {
   className?: string;
 }
 
+const EASE = [0.23, 1, 0.32, 1] as const;
+
 // 根據頻率計算字體大小（@md 為容器寬度斷點）
 function getFontSize(count: number, maxCount: number) {
   const ratio = count / maxCount;
-  if (ratio > 0.8) return "text-4xl @md:text-5xl";
-  if (ratio > 0.6) return "text-3xl @md:text-4xl";
-  if (ratio > 0.4) return "text-2xl @md:text-3xl";
-  if (ratio > 0.2) return "text-xl @md:text-2xl";
-  return "text-lg @md:text-xl";
+  if (ratio > 0.8) return "text-5xl @md:text-6xl";
+  if (ratio > 0.6) return "text-4xl @md:text-5xl";
+  if (ratio > 0.4) return "text-3xl @md:text-4xl";
+  if (ratio > 0.2) return "text-2xl @md:text-3xl";
+  return "text-xl @md:text-2xl";
 }
 
-function getColor(count: number, maxCount: number) {
+// 次數越少字越淡：只用同一個暖灰的深淺，最常出現的字才用強調色
+function getTone(count: number, maxCount: number) {
   const ratio = count / maxCount;
-  if (ratio > 0.8) return "from-pink-400 to-fuchsia-400";
-  if (ratio > 0.6) return "from-purple-400 to-pink-400";
-  if (ratio > 0.4) return "from-violet-400 to-purple-400";
-  if (ratio > 0.2) return "from-indigo-400 to-violet-400";
-  return "from-blue-400 to-indigo-400";
+  if (ratio > 0.6) return "#f5f5f4";
+  if (ratio > 0.3) return "#d6d3d1";
+  return "#a8a29e";
 }
 
-export function RecapKeywordCloud({ keywords, locale = "en", labels, className }: RecapKeywordCloudProps) {
+/**
+ * 年度回顧的「關鍵字」：大小依出現次數的襯線字排成一段，像雜誌的拉頁引言。
+ * 只有一次整體淡入；滑鼠移到字上時出現強調色底線。
+ */
+export function RecapKeywordCloud({ keywords, accent = "#d4a24c", locale = "en", labels, className }: RecapKeywordCloudProps) {
   const reduce = useReducedMotion() ?? false;
   const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const maxCount = Math.max(1, ...keywords.map((k) => k.count));
 
-  // 每個字卡左右交錯傾斜 5 到 15 度，固定下來避免重新渲染時跳動
-  const rotations = useMemo(
-    () => keywords.map((_, index) => (index % 2 === 0 ? 1 : -1) * (Math.random() * 10 + 5)),
-    [keywords],
-  );
-
   return (
     <div
-      className={cn(
-        "@container relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-violet-950/30 via-purple-950/20 to-fuchsia-950/30 p-6",
-        className,
-      )}
-      // 卡片原本的深色底，漸層疊在上面
-      style={{ backgroundColor: "#0f0f0f" }}
+      className={cn("@container relative flex h-full w-full flex-col overflow-hidden p-6 @md:p-8", className)}
+      style={{ backgroundColor: "#0c0a09", color: "#f5f5f4", ["--rk-accent" as string]: accent }}
     >
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
+      <motion.div
+        className="flex h-full flex-col"
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={reduce ? { duration: 0 } : { duration: 0.6 }}
-        className="absolute top-6 right-0 left-0 z-10 mb-6 w-full text-center text-2xl font-bold text-white @md:text-3xl"
+        transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE }}
       >
-        {l.title}
-      </motion.h1>
+        <h1 className="border-b pb-3 text-[11px] font-medium uppercase tracking-[0.16em] text-[#a8a29e]" style={{ borderColor: "rgb(255 255 255 / 0.08)" }}>
+          {l.title}
+        </h1>
 
-      <ul className="relative z-10 mt-16 flex flex-wrap items-center justify-center gap-3 px-4 @md:gap-4">
-        {keywords.map((keyword, index) => {
-          const baseRotation = rotations[index] ?? 0;
-          return (
-            <motion.li
+        <ul className="m-0 flex flex-1 flex-wrap content-center items-baseline gap-x-4 gap-y-2 p-0 @md:gap-x-5">
+          {keywords.map((keyword) => (
+            <li
               key={keyword.word}
-              initial={{ opacity: 0, scale: 0, rotate: baseRotation - 20 }}
-              animate={{ opacity: 1, scale: 1, rotate: baseRotation, y: reduce ? 0 : [0, -10, 0] }}
-              transition={
-                reduce
-                  ? { duration: 0 }
-                  : {
-                      delay: index * 0.15,
-                      duration: 0.6,
-                      type: "spring",
-                      y: { duration: 2, repeat: Infinity, repeatType: "reverse", delay: index * 0.2 },
-                    }
-              }
-              whileHover={reduce ? undefined : { scale: 1.1, rotate: baseRotation + 5 }}
               className={cn(
-                "cursor-pointer list-none rounded-xl bg-gradient-to-br px-4 py-3 font-bold text-white shadow-lg backdrop-blur-sm",
+                "cursor-default list-none font-serif leading-[1.1] tracking-[-0.01em] underline-offset-[6px] decoration-1 transition-[text-decoration-color] duration-200 hover:underline hover:decoration-[var(--rk-accent)]",
                 getFontSize(keyword.count, maxCount),
-                getColor(keyword.count, maxCount),
               )}
+              style={{ color: keyword.count === maxCount ? accent : getTone(keyword.count, maxCount) }}
             >
               {keyword.word}
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                transition={reduce ? { duration: 0 } : { delay: index * 0.15 + 0.3 }}
-                className="ml-2 text-xs font-normal @md:text-sm"
-              >
-                {keyword.count}
-              </motion.span>
-            </motion.li>
-          );
-        })}
-      </ul>
+              <sup className="ml-1 align-super font-sans text-[11px] font-medium tabular-nums text-[#a8a29e] @md:text-xs">{keyword.count}</sup>
+            </li>
+          ))}
+        </ul>
+      </motion.div>
     </div>
   );
 }

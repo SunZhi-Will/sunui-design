@@ -57,7 +57,7 @@ void main() {
 }
 `;
 
-/** 賽璐璐三階加描線的顏色，各為 0 到 1 的 RGB。預設是原本的粉紅簾布。 */
+/** 賽璐璐三階加描線的顏色，各為 0 到 1 的 RGB。預設是深酒紅色的厚簾布，原本的粉紅可用 tones 傳回。 */
 export interface ClothTones {
   light: readonly [number, number, number];
   base: readonly [number, number, number];
@@ -66,10 +66,10 @@ export interface ClothTones {
 }
 
 export const DEFAULT_CLOTH_TONES: ClothTones = {
-  light: [0.93, 0.68, 0.77],
-  base: [0.8, 0.52, 0.67],
-  shadow: [0.53, 0.37, 0.6],
-  line: [0.36, 0.25, 0.47],
+  light: [0.6, 0.27, 0.22],
+  base: [0.45, 0.18, 0.15],
+  shadow: [0.27, 0.11, 0.1],
+  line: [0.14, 0.06, 0.06],
 };
 
 function vec3([r, g, b]: readonly [number, number, number]): string {

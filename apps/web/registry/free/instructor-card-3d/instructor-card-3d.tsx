@@ -97,9 +97,9 @@ export interface InstructorCard3DProps {
   fixed?: boolean;
   /** 點遮罩是否關閉，預設 true */
   closeOnBackdrop?: boolean;
-  /** 眉標與分隔點的金色 */
+  /** 唯一強調色：眉標、分隔點與「看完整介紹」按鈕，預設琥珀金 #d4a24c */
   accent?: string;
-  /** 「看完整介紹」按鈕的漸層起點（終點是 accent） */
+  /** 保留給舊版 API：給了才讓按鈕改成同色相的雙色漸層（起點），預設是純色 accent */
   accentFrom?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -112,8 +112,8 @@ const FOCUSABLE =
 
 const CARD_FACE = "absolute inset-0 overflow-hidden rounded-[20px]";
 const CARD_FACE_STYLE: CSSProperties = {
-  background: "linear-gradient(150deg, #1b1e29 0%, #0d0f16 62%, #14161f 100%)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "#161412",
+  border: "1px solid rgb(255 255 255 / 0.08)",
   // 陰影下在每一面，不能下在旋轉的容器上：filter 會把 3D 情境壓平，
   // backface-visibility 就會失效，翻面時看到的是鏡像的正面。
   boxShadow: "0 26px 44px rgba(0,0,0,0.55)",
@@ -124,10 +124,8 @@ const CARD_FACE_STYLE: CSSProperties = {
 const KEYFRAMES = `
 @keyframes sunui-icard-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sunui-icard-pop {
-  0%   { opacity: 0; transform: scale(0.86) translateY(28px); }
-  55%  { opacity: 1; transform: scale(1.035) translateY(-6px); }
-  78%  { transform: scale(0.988) translateY(2px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.97) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }`;
 
 /* 圖示（形狀照 lucide） */
@@ -178,8 +176,8 @@ export function InstructorCard3D({
   onClose,
   fixed = true,
   closeOnBackdrop = true,
-  accent = "#e0a100",
-  accentFrom = "#da7756",
+  accent = "#d4a24c",
+  accentFrom,
   locale = "en",
   labels,
 }: InstructorCard3DProps) {
@@ -279,9 +277,7 @@ export function InstructorCard3D({
       className={cn("inset-0 z-[100] flex items-center justify-center p-4", fixed ? "fixed" : "absolute")}
       data-lenis-prevent
       style={{
-        background: "rgba(3,5,12,0.80)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        background: "rgba(12,10,9,0.88)",
         animation: reduce ? undefined : "sunui-icard-backdrop-in 0.2s ease both",
       }}
       onMouseDown={(e) => {
@@ -302,7 +298,7 @@ export function InstructorCard3D({
           maxWidth: 430,
           // 3D 傾斜會超出面板邊界，overflow 必須維持 visible
           overflow: "visible",
-          animation: reduce ? undefined : "sunui-icard-pop 0.52s cubic-bezier(0.34,1.42,0.5,1) both",
+          animation: reduce ? undefined : "sunui-icard-pop 0.32s cubic-bezier(0.23,1,0.32,1) both",
         }}
       >
         <div className="mb-3 flex justify-end">
@@ -311,7 +307,7 @@ export function InstructorCard3D({
             onClick={onClose}
             aria-label={l.close}
             className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.14)" }}
+            style={{ background: "#161412", color: "#a8a29e", border: "1px solid rgb(255 255 255 / 0.08)" }}
           >
             <XIcon />
           </button>
@@ -334,15 +330,10 @@ export function InstructorCard3D({
             <div className="flex h-full">
               <div
                 className="relative h-full w-[38%] shrink-0 overflow-hidden"
-                style={{ background: "linear-gradient(168deg, #fff8ee 0%, #ffecd9 54%, #f7dabd 100%)" }}
+                style={{ background: "linear-gradient(180deg, #e7e5e4 0%, #d6d3d1 100%)" }}
               >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0"
-                  style={{ background: "radial-gradient(120% 66% at 50% 96%, rgba(218,119,86,0.30) 0%, rgba(218,119,86,0) 64%)" }}
-                />
                 {card.portrait ? (
-                  <div className="absolute inset-x-0 bottom-0 flex justify-center" style={{ filter: "drop-shadow(0 12px 18px rgba(122,64,28,0.22))" }}>
+                  <div className="absolute inset-x-0 bottom-0 flex justify-center">
                     {card.portrait}
                   </div>
                 ) : card.image ? (
@@ -351,18 +342,17 @@ export function InstructorCard3D({
                     src={card.image.src}
                     alt={card.image.alt}
                     className="absolute bottom-0 left-1/2 h-auto w-[115%] max-w-none -translate-x-1/2 object-contain"
-                    style={{ filter: "drop-shadow(0 12px 18px rgba(122,64,28,0.22))" }}
                   />
                 ) : null}
               </div>
 
               <div className="relative flex min-w-0 flex-1 flex-col justify-center px-5">
-                <div className="text-[9px] font-black tracking-[0.24em]" style={{ color: accent }}>
+                <div className="text-[9px] font-semibold tracking-[0.24em]" style={{ color: accent }}>
                   {l.eyebrow}
                 </div>
-                <h2 className="mt-2 text-[21px] font-black leading-none text-white">{card.name}</h2>
+                <h2 className="mt-2 font-serif text-[23px] font-normal leading-none text-[#f5f5f4]">{card.name}</h2>
                 {card.roles && card.roles.length > 0 && (
-                  <div className="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-bold text-white/50">
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-medium text-[#a8a29e]">
                     {/* 分隔點跟在前一個職稱後面，換行時不會變成下一行的行首 */}
                     {card.roles.map((role, index) => (
                       <span key={role} className="flex items-center gap-1.5">
@@ -390,19 +380,19 @@ export function InstructorCard3D({
               </div>
             </div>
 
-            {/* 光澤：跟著游標的高光 + 固定的斜向鍍膜 */}
+            {/* 光澤：跟著游標的高光 + 固定的斜向紙面反光 */}
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 transition-opacity duration-300"
               style={{
                 opacity: glare ? 1 : 0,
-                background: `radial-gradient(circle at ${glare?.x ?? 50}% ${glare?.y ?? 50}%, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 46%)`,
+                background: `radial-gradient(circle at ${glare?.x ?? 50}% ${glare?.y ?? 50}%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 46%)`,
               }}
             />
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
-              style={{ background: "linear-gradient(118deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 58%)" }}
+              style={{ background: "linear-gradient(118deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0) 58%)" }}
             />
           </div>
 
@@ -412,14 +402,14 @@ export function InstructorCard3D({
             style={{ ...CARD_FACE_STYLE, transform: "rotateY(180deg)" }}
             aria-hidden={!flipped}
           >
-            {card.bio && <p className="text-[11.5px] leading-[1.75] text-white/62 sm:text-[12px]">{card.bio}</p>}
+            {card.bio && <p className="text-[11.5px] leading-[1.75] text-[#a8a29e] sm:text-[12px]">{card.bio}</p>}
             {card.chips && card.chips.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {card.chips.map((chip) => (
                   <span
                     key={chip}
-                    className="rounded-full px-2.5 py-1 text-[9.5px] font-bold text-white/70"
-                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}
+                    className="rounded-full px-2.5 py-1 text-[9.5px] font-medium tabular-nums text-[#d6d3d1]"
+                    style={{ background: "#0c0a09", border: "1px solid rgb(255 255 255 / 0.08)" }}
                   >
                     {chip}
                   </span>
@@ -428,7 +418,7 @@ export function InstructorCard3D({
             )}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute right-5 top-5 text-[9px] font-black tracking-[0.24em] text-white/20"
+              className="pointer-events-none absolute right-5 top-5 text-[9px] font-semibold tracking-[0.24em] text-white/20"
             >
               {card.name}
             </span>
@@ -439,8 +429,8 @@ export function InstructorCard3D({
           <button
             type="button"
             onClick={() => setFlipped((v) => !v)}
-            className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-[12.5px] font-bold text-white/75 transition-colors hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)" }}
+            className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-[12.5px] font-medium text-[#d6d3d1] transition-colors hover:bg-white/10"
+            style={{ background: "#161412", border: "1px solid rgb(255 255 255 / 0.08)" }}
           >
             <RotateCwIcon />
             {flipped ? l.flipToFront : l.flipToBack}
@@ -448,8 +438,8 @@ export function InstructorCard3D({
           {card.href && (
             <a
               href={card.href}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-[13px] font-black transition-opacity hover:opacity-90"
-              style={{ background: `linear-gradient(135deg, ${accentFrom} 0%, ${accent} 100%)`, color: "#1d1206" }}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-[13px] font-semibold transition-opacity hover:opacity-90"
+              style={{ background: accentFrom ? `linear-gradient(135deg, ${accentFrom} 0%, ${accent} 100%)` : accent, color: "#0c0a09" }}
             >
               {l.fullProfile}
               <ArrowRightIcon />

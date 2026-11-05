@@ -35,7 +35,7 @@ export default function AnimationEditorCard() {
   const [canvas, setCanvas] = useState<CanvasSnapshot<string>>(keyframes[0]);
 
   return (
-    <div className="mx-auto flex w-[300px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+    <div className="mx-auto flex w-[300px] flex-col overflow-hidden rounded-xl border border-border bg-background">
       <AnimationEditor
         fixed={false}
         locale={locale}

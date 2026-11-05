@@ -21,7 +21,7 @@ export default function ContentGateCard() {
   const [round, setRound] = useState(0);
 
   return (
-    <div className="mx-auto w-72 overflow-hidden rounded-2xl">
+    <div className="mx-auto w-72 overflow-hidden rounded-xl">
       <ContentGate
         key={round}
         title={t.title}

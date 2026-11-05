@@ -39,7 +39,7 @@ export interface ClothCurtainProps {
   fallback?: ReactNode;
   /** 不跑模擬。不給時跟著 prefers-reduced-motion。 */
   still?: boolean;
-  /** 賽璐璐配色，預設是原本的粉紅簾布。 */
+  /** 賽璐璐配色，預設是深酒紅色的厚簾布。 */
   tones?: ClothTones;
   className?: string;
 }
@@ -63,12 +63,12 @@ function StaticCurtain({ layout, open, className }: { layout: "single" | "pair";
         className={cn("pointer-events-none absolute inset-0", className)}
         style={{
           transform: `translateX(${open * 100}%)`,
-          background: "repeating-linear-gradient(90deg, rgb(232 160 186 / 78%) 0 5rem, rgb(214 134 164 / 78%) 5rem 9rem)",
+          background: "repeating-linear-gradient(90deg, rgb(115 46 38 / 92%) 0 5rem, rgb(92 37 31 / 92%) 5rem 9rem)",
         }}
       />
     );
   }
-  const stripes = "repeating-linear-gradient(90deg, #eab0c4 0 34px, #f4c8d6 34px 70px, #dd97b0 70px 96px)";
+  const stripes = "repeating-linear-gradient(90deg, #7a3127 0 34px, #8a3a2e 34px 70px, #682a21 70px 96px)";
   return (
     <div aria-hidden="true" className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
       <div

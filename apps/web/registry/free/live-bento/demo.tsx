@@ -6,7 +6,8 @@ import { BentoTile, LiveBento, useTicker } from "./live-bento";
 
 // 排班系統首頁的「更多功能」格子。每格的小動畫用 useTicker 只在畫面內重播。
 
-const COLORS = ["#2563EB", "#D97706", "#DB2777", "#7C3AED", "#0891B2", "#E11D48"];
+// 身分色只上在 6px 的點，低彩度、不用紫與粉
+const COLORS = ["#2563EB", "#B45309", "#0F766E", "#78716C", "#0E7490", "#A16207"];
 
 const copy = {
   en: {
@@ -118,7 +119,7 @@ function PhoneList() {
   const t = useDemoText(copy);
   const current = tick % t.shifts.length;
   return (
-    <div ref={ref} className="w-44 rounded-[28px] border-[5px] border-foreground/85 bg-background p-2.5 shadow-lg">
+    <div ref={ref} className="w-44 rounded-xl border-[5px] border-foreground/85 bg-background p-2.5 shadow-sm">
       <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-foreground/15" />
       <p className="px-1 text-[11px] font-semibold">{t.myShifts}</p>
       <ul className="mt-2 space-y-1">

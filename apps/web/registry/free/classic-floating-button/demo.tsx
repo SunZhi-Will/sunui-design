@@ -6,11 +6,11 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { FloatingButton, type SocialButtonConfig } from "./classic-floating-button";
 
-// 原版 Storybook 的社群按鈕配色
+// 原版 Storybook 的社群按鈕，沿用元件的中性預設樣式
 const socialButtons: SocialButtonConfig[] = [
-  { type: "github", href: "https://github.com", className: "bg-gradient-to-r from-gray-600 to-gray-800 hover:shadow-gray-500/50" },
-  { type: "twitter", href: "https://twitter.com", className: "bg-gradient-to-r from-blue-400 to-blue-600 hover:shadow-blue-500/50" },
-  { type: "linkedin", href: "https://linkedin.com", className: "bg-gradient-to-r from-blue-700 to-blue-900 hover:shadow-blue-600/50" },
+  { type: "github", href: "https://github.com" },
+  { type: "twitter", href: "https://twitter.com" },
+  { type: "linkedin", href: "https://linkedin.com" },
 ];
 
 const copy = {
@@ -27,11 +27,11 @@ export default function ClassicFloatingButtonDemo() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
 
   return (
-    <div ref={dragArea} className="relative isolate h-[380px] w-full max-w-md min-w-0 overflow-hidden rounded-xl bg-gray-50 text-gray-800">
+    <div ref={dragArea} className="relative isolate h-[380px] w-full max-w-md min-w-0 overflow-hidden rounded-xl border border-border bg-muted/40 text-foreground">
       <div className="p-5">
-        <p className="text-xs font-medium tracking-wide text-gray-400 uppercase">{t.eyebrow}</p>
-        <h3 className="mt-1 text-lg font-semibold text-gray-900">{t.name}</h3>
-        <p className="mt-1 text-sm text-gray-500">{t.bio}</p>
+        <p className="text-[11px] font-medium tracking-[0.14em] text-muted-foreground uppercase">{t.eyebrow}</p>
+        <h3 className="mt-1 text-lg font-semibold text-foreground">{t.name}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{t.bio}</p>
       </div>
       <FloatingButton
         fixed={false}

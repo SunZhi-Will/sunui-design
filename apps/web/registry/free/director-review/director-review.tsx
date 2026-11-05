@@ -32,12 +32,12 @@ const icons = {
       <path d="m6 6 12 12" />
     </>
   ),
-  sparkles: (
+  zoomIn: (
     <>
-      <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
-      <path d="M20 2v4" />
-      <path d="M22 4h-4" />
-      <circle cx="4" cy="20" r="2" />
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+      <path d="M11 8v6" />
+      <path d="M8 11h6" />
     </>
   ),
   scissors: (
@@ -293,7 +293,7 @@ const MESSAGES: Record<SunLocale, DirectorPanelLabels> = {
 };
 
 const KIND_ICON: Record<SuggestionKind, ReactNode> = {
-  zoom: icons.sparkles,
+  zoom: icons.zoomIn,
   cut: icons.scissors,
   chapter: icons.skipForward,
   shortcut: icons.info,
@@ -532,7 +532,7 @@ export function DirectorReviewPanel({
             )}
           >
             <div className="flex items-center gap-2">
-              <Icon className="h-3.5 w-3.5 text-(--al-accent)">{KIND_ICON[s.kind] ?? icons.info}</Icon>
+              <Icon className="h-3.5 w-3.5 text-(--al-text-muted)">{KIND_ICON[s.kind] ?? icons.info}</Icon>
               <span className="flex-1 truncate text-[11px] font-medium text-(--al-text-primary)">{kindLabel}</span>
               <button
                 type="button"

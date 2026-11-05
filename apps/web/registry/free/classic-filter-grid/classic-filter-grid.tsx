@@ -4,7 +4,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Children,
   cloneElement,
-  Fragment,
   isValidElement,
   memo,
   useEffect,
@@ -25,50 +24,26 @@ interface ThemeConfig {
   text: string;
   image: string;
   button: { active: string; inactive: string };
-  title: string;
 }
 
-// 原本 themes.ts 的五組主題（purple 主題原本就是 pink 色系）
+// 所有主題共用同一套中性樣式：shadcn token 跟隨網站明暗，選取狀態用 primary 淡底加邊線。
+// theme 參數保留相容，舊版的 blue、green、purple 霓虹配色已停用。
+const NEUTRAL: ThemeConfig = {
+  container: "bg-card border-border group-hover:border-foreground/25 group-hover:bg-muted/50",
+  text: "text-foreground",
+  image: "",
+  button: {
+    active: "border-primary/40 bg-primary/10 text-foreground",
+    inactive: "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground",
+  },
+};
+
 const THEMES: Record<FilterGridTheme, ThemeConfig> = {
-  light: {
-    container: "bg-slate-200/80 border-slate-200 group-hover:border-slate-300 group-hover:shadow-[0_0_15px_rgba(241,245,249,0.4)]",
-    text: "text-slate-600",
-    image: "brightness-100 contrast-105",
-    button: { active: "bg-slate-600 text-white shadow-sm", inactive: "bg-slate-200/80 text-slate-600 hover:bg-slate-300/80" },
-    title: "from-slate-400 to-slate-600",
-  },
-  dark: {
-    container:
-      "bg-gradient-to-br from-slate-700/40 to-slate-900/60 border-slate-500/20 group-hover:border-slate-400/50 group-hover:shadow-[0_0_20px_rgba(148,163,184,0.3)]",
-    text: "text-slate-200",
-    image: "brightness-125 contrast-125",
-    button: { active: "bg-slate-200 text-slate-800 shadow-sm", inactive: "bg-slate-700/50 text-slate-300 hover:bg-slate-600/50" },
-    title: "from-slate-300 to-slate-100",
-  },
-  blue: {
-    container:
-      "bg-gradient-to-br from-blue-600/20 to-blue-900/40 border-blue-500/20 group-hover:border-blue-400/50 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]",
-    text: "text-white",
-    image: "brightness-125 contrast-125",
-    button: { active: "bg-blue-500 text-white shadow-sm", inactive: "bg-blue-400/30 text-white hover:bg-blue-400/40" },
-    title: "from-blue-200 to-blue-400",
-  },
-  green: {
-    container:
-      "bg-gradient-to-br from-emerald-600/20 to-emerald-900/40 border-emerald-500/20 group-hover:border-emerald-400/50 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]",
-    text: "text-white",
-    image: "brightness-125 contrast-125",
-    button: { active: "bg-emerald-500 text-white shadow-sm", inactive: "bg-emerald-400/30 text-white hover:bg-emerald-400/40" },
-    title: "from-emerald-200 to-emerald-400",
-  },
-  purple: {
-    container:
-      "bg-gradient-to-br from-pink-600/20 to-pink-900/40 border-pink-500/20 group-hover:border-pink-400/50 group-hover:shadow-[0_0_20px_rgba(244,114,182,0.3)]",
-    text: "text-white",
-    image: "brightness-125 contrast-125",
-    button: { active: "bg-pink-500 text-white shadow-sm", inactive: "bg-pink-400/30 text-white hover:bg-pink-400/40" },
-    title: "from-pink-200 to-pink-400",
-  },
+  light: NEUTRAL,
+  dark: NEUTRAL,
+  blue: NEUTRAL,
+  green: NEUTRAL,
+  purple: NEUTRAL,
 };
 
 const HEXAGON = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
@@ -197,7 +172,7 @@ export const GridItem = memo(function GridItem({
   const iconPx = showName ? 48 : 32;
   const iconClass = cn(
     showName ? "mb-2" : "mb-0",
-    "filter transition-transform group-hover:scale-110",
+    "text-foreground",
     themeClasses.image,
     styles.icon,
   );
@@ -212,11 +187,10 @@ export const GridItem = memo(function GridItem({
 
   return (
     <motion.div
-      initial={reduce ? false : { scale: 0, rotate: -30 }}
-      animate={{ scale: 1, rotate: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20, delay: delay * 0.1 }}
-      whileHover={reduce ? undefined : { scale: 1.1, rotate: 5, transition: { duration: 0.2 } }}
-      className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-current"
+      initial={reduce ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1], delay: delay * 0.03 }}
+      className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring"
       onClick={() => onClick?.(name, category)}
       onKeyDown={interactive ? handleKey : undefined}
       role={interactive ? "button" : undefined}
@@ -226,14 +200,13 @@ export const GridItem = memo(function GridItem({
     >
       <div
         className={cn(
-          "relative flex flex-col items-center justify-center overflow-hidden border backdrop-blur-sm transition-all duration-300",
+          "relative flex flex-col items-center justify-center overflow-hidden border transition-colors duration-200",
           themeClasses.container,
           (shape === "circle" || shape === "square") && "aspect-square",
           styles.item,
         )}
         style={{ width: `${size.width}px`, height: `${size.height}px`, ...shapeStyle(shape) }}
       >
-        <div className="absolute inset-0 bg-current opacity-0 transition-opacity group-hover:opacity-10" />
         {typeof icon === "string" ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={icon} alt={showName ? "" : name} width={iconPx} height={iconPx} className={iconClass} />
@@ -359,7 +332,7 @@ export function ClassicFilterGrid({
       else visible = [1, -1, currentPage - 1, currentPage, currentPage + 1, -2, actualTotalPages];
     }
     const edge = (disabled: boolean) =>
-      cn("rounded-lg px-3 py-2 transition-all duration-300", themeClasses.button.inactive, disabled && "cursor-not-allowed opacity-50");
+      cn("rounded-md border px-3 py-2 text-sm transition-colors duration-200", themeClasses.button.inactive, disabled && "cursor-not-allowed opacity-50");
 
     return (
       <nav aria-label={t.pagination} className="mt-8 flex flex-wrap items-center justify-center gap-2">
@@ -374,7 +347,7 @@ export function ClassicFilterGrid({
         </button>
         {visible.map((page, index) =>
           page < 0 ? (
-            <span key={`gap-${index}`} aria-hidden="true" className={themeClasses.text}>
+            <span key={`gap-${index}`} aria-hidden="true" className="text-muted-foreground">
               ...
             </span>
           ) : (
@@ -386,7 +359,7 @@ export function ClassicFilterGrid({
               onClick={() => goToPage(page)}
               disabled={loading}
               className={cn(
-                "size-10 rounded-lg transition-all duration-300",
+                "size-10 rounded-md border text-sm tabular-nums transition-colors duration-200",
                 currentPage === page ? themeClasses.button.active : themeClasses.button.inactive,
               )}
             >
@@ -408,18 +381,16 @@ export function ClassicFilterGrid({
   };
 
   return (
-    <div className={cn("w-full", className, styles.container)}>
+    <div className={cn("w-full text-foreground", className, styles.container)}>
       {showTitle && labels?.title && (
-        <div className="mb-16 flex flex-col items-center">
-          <h2 className={cn("bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent", themeClasses.title, styles.title)}>
-            {labels.title}
-          </h2>
-          <div className={cn("mt-2 h-1 w-24 rounded-full bg-gradient-to-r", themeClasses.title, styles.titleBar)} />
+        <div className="mb-10 flex flex-col items-center">
+          <h2 className={cn("text-2xl font-semibold tracking-tight text-foreground sm:text-3xl", styles.title)}>{labels.title}</h2>
+          <div className={cn("mt-3 h-px w-12 bg-border", styles.titleBar)} />
         </div>
       )}
 
       {showCategories && availableCategories.length > 0 && (
-        <div role="group" aria-label={t.categories} className="mb-12 flex flex-wrap justify-center gap-4">
+        <div role="group" aria-label={t.categories} className="mb-10 flex flex-wrap justify-center gap-2">
           {[null, ...availableCategories].map((category) => {
             const active = selectedCategory === category;
             return (
@@ -429,7 +400,7 @@ export function ClassicFilterGrid({
                 aria-pressed={active}
                 onClick={() => selectCategory(category)}
                 className={cn(
-                  "rounded-full px-4 py-2 transition-all duration-300",
+                  "rounded-md border px-3.5 py-1.5 text-sm transition-colors duration-200",
                   active ? cn(themeClasses.button.active, styles.buttonActive) : cn(themeClasses.button.inactive, styles.button),
                 )}
               >
@@ -442,20 +413,20 @@ export function ClassicFilterGrid({
 
       <motion.div aria-busy={loading} className="flex flex-wrap justify-center gap-6" layout={!reduce}>
         <AnimatePresence mode="popLayout">
-          <Fragment key="items">{paginatedItems}</Fragment>
+          {paginatedItems}
           {loading &&
             Array.from({ length: loadingItemCount }).map((_, index) => (
               <motion.div
                 key={`loading-${index}`}
                 aria-hidden="true"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={reduce ? { opacity: 0.45, scale: 0.85 } : { opacity: [0.3, 0.6, 0.3], scale: [0.8, 0.9, 0.8] }}
+                initial={{ opacity: 0 }}
+                animate={reduce ? { opacity: 0.6 } : { opacity: [0.5, 0.8, 0.5] }}
                 transition={reduce ? { duration: 0 } : { duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
-                className={cn("relative flex flex-col items-center justify-center overflow-hidden border backdrop-blur-sm", themeClasses.container)}
+                className="relative flex flex-col items-center justify-center overflow-hidden border border-border bg-muted"
                 style={{ width: `${width}px`, height: `${height}px`, ...shapeStyle(shape) }}
               >
-                <div className="mb-2 size-12 rounded-full bg-current opacity-20" />
-                <div className="h-2 w-16 rounded-full bg-current opacity-20" />
+                <div className="mb-2 size-12 rounded-md bg-foreground/10" />
+                <div className="h-2 w-16 rounded-full bg-foreground/10" />
               </motion.div>
             ))}
         </AnimatePresence>

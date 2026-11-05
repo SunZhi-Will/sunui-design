@@ -10,7 +10,7 @@ import { JobTile, type Job } from "./job-tile";
 const reference =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7d2fe"/><stop offset="1" stop-color="#f5d0fe"/></linearGradient></defs><rect width="200" height="300" fill="url(#g)"/><circle cx="150" cy="60" r="26" fill="#fef3c7"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a5b4fc"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7e5e4"/><stop offset="1" stop-color="#d6d3d1"/></linearGradient></defs><rect width="200" height="300" fill="url(#g)"/><circle cx="150" cy="60" r="26" fill="#fafaf9"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a8a29e"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
   );
 
 type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;

@@ -20,13 +20,13 @@ export default function GateModalCard() {
   const t = useDemoText(copy);
 
   return (
-    <div className="relative mx-auto flex h-56 w-72 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] p-4 text-white/90">
-      <p className="text-[11px] font-bold tracking-[0.2em] text-[#da7756] uppercase">{t.lesson}</p>
-      <div className="mt-3 flex min-w-0 flex-1 items-center justify-center rounded-xl bg-white/[0.04]">
+    <div className="relative mx-auto flex h-56 w-72 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e0e0e] p-4 text-white/90">
+      <p className="text-[11px] font-medium tracking-[0.14em] text-white/50 uppercase">{t.lesson}</p>
+      <div className="mt-3 flex min-w-0 flex-1 items-center justify-center rounded-lg bg-white/[0.04]">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-xl bg-[#da7756] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="rounded-md bg-[#da7756] px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           {t.watch}
         </button>

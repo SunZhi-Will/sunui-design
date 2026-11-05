@@ -43,25 +43,25 @@ export interface StackedPreviewCarouselProps {
   interval?: number;
   /** 原專案預設暗色，淺色主題的 token 也一起保留 */
   theme?: "dark" | "light";
-  /** 強調色（小標、邊框旋光），預設跟主題走 */
+  /** 唯一強調色（小標、hover 時指向游標的邊框細線），預設暗色 #d4a24c、淺色 #a8741f */
   accent?: string;
   className?: string;
 }
 
 const THEMES = {
   dark: {
-    "--card": "rgba(255,255,255,0.05)",
-    "--card-raised": "rgba(255,255,255,0.08)",
-    "--border": "rgba(255,255,255,0.10)",
-    "--text-primary": "rgba(255,255,255,0.93)",
-    "--accent-gold": "#F5C045",
+    "--card": "#161412",
+    "--card-raised": "#1c1a17",
+    "--border": "rgb(255 255 255 / 0.08)",
+    "--text-primary": "#f5f5f4",
+    "--accent-gold": "#d4a24c",
   },
   light: {
     "--card": "#ffffff",
-    "--card-raised": "#ffffff",
-    "--border": "rgba(15, 23, 42, 0.06)",
-    "--text-primary": "rgba(15, 23, 42, 0.95)",
-    "--accent-gold": "#d97706",
+    "--card-raised": "#f5f5f4",
+    "--border": "rgba(28, 25, 23, 0.08)",
+    "--text-primary": "#1c1917",
+    "--accent-gold": "#a8741f",
   },
 } as const;
 
@@ -83,10 +83,10 @@ function usePrefersReducedMotion() {
 function CardMeta({ item }: { item: StackedPreviewItem }) {
   return (
     <div className="flex-1 px-4 py-3.5" style={{ background: "var(--card)" }}>
-      <div className="line-clamp-1 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--accent-gold)" }}>
+      <div className="line-clamp-1 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--accent-gold)" }}>
         {item.subtitle}
       </div>
-      <div className="mt-1 line-clamp-2 text-[17px] font-black leading-snug" style={{ color: "var(--text-primary)", minHeight: "2.75em" }}>
+      <div className="mt-1 line-clamp-2 font-serif text-[18px] font-normal leading-snug tracking-[-0.01em]" style={{ color: "var(--text-primary)", minHeight: "2.75em" }}>
         {item.title}
       </div>
     </div>
@@ -95,7 +95,7 @@ function CardMeta({ item }: { item: StackedPreviewItem }) {
 
 /**
  * 3D 堆疊卡片輪播：換張時最上面那張退到最後一層、下一張補上來，像手上一疊卡片抽換。
- * perspective + translateZ 做真的縱深。最上層卡片跟著游標傾斜、浮起，邊框旋光指向游標；
+ * perspective + translateZ 做真的縱深。最上層卡片跟著游標傾斜、浮起，邊框一段細線指向游標；
  * 這些都寫進 CSS 變數用 ref 直接改，避免 pointermove 觸發 re-render。
  */
 export function StackedPreviewCarousel({ items, interval = 3800, theme = "dark", accent, className }: StackedPreviewCarouselProps) {
@@ -221,7 +221,7 @@ export function StackedPreviewCarousel({ items, interval = 3800, theme = "dark",
           const content = (
             <>
               {hasMedia ? (
-                <div className="relative w-full shrink-0 overflow-hidden" style={{ aspectRatio: "16/9", background: "#0a0c1e", containerType: "inline-size" }}>
+                <div className="relative w-full shrink-0 overflow-hidden" style={{ aspectRatio: "16/9", background: "var(--card-raised)", containerType: "inline-size" }}>
                   {/* 封面往游標反方向微移，像沉在卡片內部（先放大一點避免露邊） */}
                   <div
                     className="absolute inset-0"
@@ -241,16 +241,16 @@ export function StackedPreviewCarousel({ items, interval = 3800, theme = "dark",
                     <>
                       <div
                         className="pointer-events-none absolute inset-0"
-                        style={{ background: "linear-gradient(to bottom, transparent 38%, rgba(6,6,20,0.6) 72%, rgba(6,6,20,0.92) 100%)" }}
+                        style={{ background: "linear-gradient(to bottom, transparent 38%, rgba(0,0,0,0.55) 72%, rgba(0,0,0,0.85) 100%)" }}
                       />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0" style={{ padding: "5cqw", paddingRight: "16cqw" }}>
                         <div
-                          className="line-clamp-1 font-bold uppercase tracking-[0.2em]"
-                          style={{ fontSize: "clamp(7px,2.4cqw,11px)", marginBottom: "1.2cqw", color: item.overlayColor, opacity: 0.9 }}
+                          className="line-clamp-1 font-semibold uppercase tracking-[0.2em]"
+                          style={{ fontSize: "clamp(7px,2.4cqw,11px)", marginBottom: "1.2cqw", color: item.overlayColor ?? "var(--accent-gold)" }}
                         >
                           {item.subtitle}
                         </div>
-                        <div className="line-clamp-2 font-black leading-tight" style={{ fontSize: "clamp(11px,3.8cqw,18px)", color: "#fff" }}>
+                        <div className="line-clamp-2 font-serif leading-tight" style={{ fontSize: "clamp(11px,3.8cqw,18px)", color: "#f5f5f4" }}>
                           {item.title}
                         </div>
                       </div>
@@ -271,27 +271,26 @@ export function StackedPreviewCarousel({ items, interval = 3800, theme = "dark",
                     aria-hidden
                     className="pointer-events-none absolute inset-0"
                     style={{
-                      background: "radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,0.28), rgba(255,255,255,0.06) 34%, transparent 62%)",
+                      background: "radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,0.18), rgba(255,255,255,0.04) 34%, transparent 62%)",
                       mixBlendMode: "soft-light",
                       opacity: hovering ? 1 : 0,
                       transition: "opacity 0.3s ease",
                     }}
                   />
-                  {/* 邊框旋光：用 mask 挖空中間只留一圈，亮點角度指向游標 */}
+                  {/* 邊框細線：用 mask 挖空中間只留一圈，亮段角度指向游標；不發光 */}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute inset-0 rounded-2xl"
                     style={{
-                      padding: 2,
+                      padding: 1.5,
                       background:
-                        "conic-gradient(from var(--glow-angle), transparent 0deg, var(--accent-gold) 30deg, #fff 58deg, var(--accent-gold) 86deg, transparent 130deg, transparent 360deg)",
+                        "conic-gradient(from var(--glow-angle), transparent 0deg, var(--accent-gold) 40deg, var(--accent-gold) 76deg, transparent 116deg, transparent 360deg)",
                       WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
                       mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
                       WebkitMaskComposite: "xor",
                       maskComposite: "exclude",
-                      filter: hovering ? "drop-shadow(0 0 6px rgba(245,192,69,0.55))" : "none",
-                      opacity: hovering ? 1 : 0.4,
-                      transition: "opacity 0.3s ease, filter 0.3s ease",
+                      opacity: hovering ? 1 : 0,
+                      transition: "opacity 0.3s ease",
                     }}
                   />
                 </>

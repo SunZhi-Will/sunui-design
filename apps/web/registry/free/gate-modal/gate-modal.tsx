@@ -112,13 +112,14 @@ const MESSAGES: Record<SunLocale, Required<ContentGateModalLabels>> = {
 };
 
 interface SharedProps {
-  /** 課程名稱，以白色到 accentTo 的漸層字印出 */
+  /** 課程名稱 */
   title: ReactNode;
   /** 標題上方的大寫小字 */
   subtitle: ReactNode;
   state?: ContentGateState;
-  /** 課程品牌色，預設是原站 Claude 工作坊的橘與杏色 */
+  /** 唯一強調色，只用在主要按鈕；預設是原站工作坊的橘 */
   accentFrom?: string;
+  /** 保留給相容舊版的第二色，目前不再使用（不做漸層） */
   accentTo?: string;
   /** 登入連結；有給就是 <a>，否則是按鈕並呼叫 onSignIn */
   signInHref?: string;
@@ -231,9 +232,9 @@ function ActionLink({
   );
 }
 
-/* ───────── 彈窗版：設計品光暈卡 ───────── */
+/* ───────── 彈窗版 ───────── */
 
-// 彈窗原本只有暗色：卡面是固定的深色漸層，文字層次沿用原站暗色 token
+// 彈窗原本只有暗色：卡面是固定的深色實底，文字層次沿用原站暗色 token
 const dark = {
   border: "rgba(255,255,255,0.10)",
   borderSubtle: "rgba(255,255,255,0.06)",
@@ -262,7 +263,6 @@ export function ContentGateModal({
   subtitle,
   state = "anon",
   accentFrom = "#da7756",
-  accentTo = "#f5c99b",
   signInHref,
   onSignIn,
   contactHref,
@@ -338,48 +338,13 @@ export function ContentGateModal({
         fixed ? "fixed" : "absolute",
       )}
       data-lenis-prevent
-      style={{
-        background: "rgba(3,5,12,0.78)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-      }}
+      style={{ background: "rgba(3,5,12,0.78)" }}
       onMouseDown={(e) => {
         // 按下與放開都在遮罩上才關閉，從卡片內拖曳選字不會誤關
         if (closeOnBackdrop && e.target === e.currentTarget) onClose();
       }}
       onKeyDown={onKeyDown}
     >
-      <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        aria-hidden="true"
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "22%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 420,
-            height: 420,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${accentFrom}2e 0%, transparent 68%)`,
-            filter: "blur(66px)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-10%",
-            right: "8%",
-            width: 320,
-            height: 320,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${accentTo}1f 0%, transparent 70%)`,
-            filter: "blur(60px)",
-          }}
-        />
-      </div>
-
       <div
         ref={panelRef}
         role="dialog"
@@ -388,35 +353,21 @@ export function ContentGateModal({
         aria-describedby={titleId}
         tabIndex={-1}
         className={cn(
-          "relative w-full overflow-y-auto rounded-3xl p-6 outline-none sm:p-7",
+          "relative w-full overflow-y-auto rounded-xl p-6 outline-none sm:p-7",
           fixed ? "max-h-[88vh]" : "max-h-full",
         )}
         style={{
           maxWidth: 512,
-          background:
-            "linear-gradient(165deg, rgba(10,12,24,0.96) 0%, rgba(8,10,20,0.98) 100%)",
+          background: "#0e0f14",
           border: `1px solid ${dark.border}`,
-          boxShadow: "0 28px 70px rgba(0,0,0,0.58)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
         }}
       >
-        {/* 頂端細光條 */}
-        <div
-          aria-hidden="true"
-          className="absolute top-0 right-6 left-6 h-px"
-          style={{
-            background: `linear-gradient(90deg, transparent 0%, ${accentFrom}66 45%, ${accentTo}66 100%)`,
-          }}
-        />
-
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-white/10"
-          style={{
-            background: dark.cardRaised,
-            color: dark.textMuted,
-            border: `1px solid ${dark.borderSubtle}`,
-          }}
+          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-white/10"
+          style={{ color: dark.textMuted }}
           aria-label={l.close}
         >
           <Svg size={16}>
@@ -424,51 +375,23 @@ export function ContentGateModal({
           </Svg>
         </button>
 
-        <div className="mb-5 flex items-center gap-2">
+        <div className="mb-6 flex items-center gap-2.5">
           <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold tracking-[0.16em] uppercase"
-            style={{
-              background: `${accentFrom}1c`,
-              border: `1px solid ${accentFrom}40`,
-              color: accentFrom,
-            }}
+            className="flex h-8 w-8 items-center justify-center rounded-md"
+            style={{ background: dark.cardRaised, border: `1px solid ${dark.borderSubtle}`, color: dark.textSecondary }}
           >
-            <Svg size={12}>
-              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-              <path d="M20 3v4M22 5h-4M4 17v2M5 18H3" />
-            </Svg>
+            <LockIcon size={15} />
+          </span>
+          <span className="text-[11px] font-medium tracking-[0.14em] uppercase" style={{ color: dark.textMuted }}>
             {l.kicker}
           </span>
         </div>
 
-        <div className="mb-4 flex justify-center">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-2xl"
-            style={{
-              background: `linear-gradient(135deg, ${accentFrom}30, ${accentTo}24)`,
-              border: `1px solid ${accentFrom}4d`,
-            }}
-          >
-            <LockIcon size={26} style={{ color: accentFrom }} />
-          </div>
-        </div>
-
-        <div id={titleId} className="mb-6 text-center">
-          <div
-            className="mb-2 text-[12px] font-bold tracking-[0.2em] uppercase"
-            style={{ color: accentFrom }}
-          >
+        <div id={titleId} className="mb-5">
+          <div className="mb-1.5 text-[13px]" style={{ color: dark.textMuted }}>
             {subtitle}
           </div>
-          <h2
-            className="mb-2 text-xl font-black sm:text-2xl"
-            style={{
-              background: `linear-gradient(135deg, #ffffff 0%, ${accentTo} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
+          <h2 className="mb-2 text-xl font-semibold text-white/95 sm:text-[22px]">
             {title}
           </h2>
           <p
@@ -480,7 +403,7 @@ export function ContentGateModal({
         </div>
 
         <div
-          className="mb-5 rounded-2xl px-4 py-3"
+          className="mb-5 rounded-lg px-4 py-3"
           style={{
             background: dark.cardSubtle,
             border: `1px solid ${dark.borderSubtle}`,
@@ -497,12 +420,8 @@ export function ContentGateModal({
         <ActionLink
           href={signInHref}
           onClick={onSignIn}
-          className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.985]"
-          style={{
-            background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})`,
-            color: "#ffffff",
-            boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
-          }}
+          className="flex w-full items-center justify-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-opacity hover:opacity-90 active:translate-y-px"
+          style={{ background: accentFrom, color: "#ffffff" }}
         >
           {providerIcon}
           <Svg size={15}>
@@ -519,7 +438,7 @@ export function ContentGateModal({
           <ActionLink
             href={contactHref}
             onClick={onContact}
-            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 transition-colors hover:opacity-75"
+            className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 transition-colors hover:opacity-75"
             style={{
               background: dark.cardRaised,
               color: dark.textMuted,
@@ -536,7 +455,7 @@ export function ContentGateModal({
         <button
           type="button"
           onClick={onClose}
-          className="mt-3 w-full rounded-xl py-2.5 text-[13px] font-semibold transition-colors hover:opacity-80"
+          className="mt-3 w-full rounded-md py-2.5 text-[13px] font-medium transition-colors hover:opacity-80"
           style={{
             background: "transparent",
             color: dark.textDim,

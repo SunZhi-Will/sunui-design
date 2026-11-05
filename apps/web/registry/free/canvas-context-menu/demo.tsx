@@ -44,19 +44,19 @@ export default function CanvasContextMenuDemo() {
     <div
       ref={areaRef}
       onContextMenu={onContextMenu}
-      className="relative h-80 w-full max-w-xl min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
-      style={{ backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+      className="relative h-80 w-full max-w-xl min-w-0 overflow-hidden rounded-xl border border-border bg-background"
+      style={{ backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 1px, transparent 1px)", backgroundSize: "20px 20px" }}
     >
       {cards.map((c) => (
         <div
           key={c.id}
-          className={`absolute w-32 rounded-xl border bg-white p-2.5 text-sm font-semibold text-gray-800 shadow-sm ${c.id !== "c3" ? "ring-2 ring-blue-500" : ""} ${c.group ? "border-dashed border-blue-300" : "border-gray-200"}`}
+          className={`absolute w-32 rounded-xl border bg-card p-2.5 text-sm font-semibold text-foreground shadow-sm ${c.id !== "c3" ? "ring-2 ring-[#2563eb]" : ""} ${c.group ? "border-dashed border-[#2563eb]/50" : "border-border"}`}
           style={{ left: c.x, top: c.y }}
         >
           {t.titles[baseId(c.id)]}
         </div>
       ))}
-      <p className="pointer-events-none absolute right-3 bottom-2 left-3 text-[11px] text-gray-400">{t.hint}</p>
+      <p className="pointer-events-none absolute right-3 bottom-2 left-3 text-[11px] text-muted-foreground">{t.hint}</p>
       {menu && (
         <CanvasContextMenu
           fixed={false}

@@ -8,7 +8,7 @@ import { DrawingSurface, DrawingToolbar, shapePoints, type DrawingTool, type Str
 
 // 預先畫好的標註：圈住卡片
 const seeded: Stroke[] = [
-  { toolType: "circle", points: shapePoints("circle", { x: 92, y: 168 }, { x: 232, y: 252 }), color: "#ef4444", lineWidth: 3 },
+  { toolType: "circle", points: shapePoints("circle", { x: 92, y: 168 }, { x: 232, y: 252 }), color: "#c8361d", lineWidth: 3 },
 ];
 
 const copy = {
@@ -27,17 +27,17 @@ export default function DrawingToolbarDemo() {
 
   return (
     <div
-      className="relative h-[320px] w-full max-w-2xl min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
-      style={{ backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+      className="relative h-[320px] w-full max-w-2xl min-w-0 overflow-hidden rounded-xl border border-border bg-background"
+      style={{ backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 1px, transparent 1px)", backgroundSize: "20px 20px" }}
     >
-      <div className="absolute top-[184px] left-[104px] w-32 rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
-        <p className="text-[10px] font-medium tracking-wide text-gray-400 uppercase">{t.link}</p>
-        <p className="truncate text-xs font-medium text-blue-600">github.com/sun</p>
+      <div className="absolute top-[184px] left-[104px] w-32 rounded-xl border border-border bg-card p-2.5 shadow-sm">
+        <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">{t.link}</p>
+        <p className="truncate text-xs font-medium text-foreground underline decoration-border underline-offset-2">github.com/sun</p>
       </div>
       <DrawingSurface
         active={drawing}
         tool={tool}
-        color="#ef4444"
+        color="#c8361d"
         lineWidth={3}
         strokes={strokes}
         onStrokeComplete={(s) => setStrokes((prev) => [...prev, s])}
@@ -49,7 +49,7 @@ export default function DrawingToolbarDemo() {
         <button
           type="button"
           onClick={() => setDrawing(true)}
-          className="absolute top-1/2 left-4 -translate-y-1/2 rounded-xl border border-white/80 bg-white/70 px-3 py-2 text-xs font-medium text-gray-700 shadow-md backdrop-blur-xl hover:text-blue-600"
+          className="absolute top-1/2 left-4 -translate-y-1/2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-sm hover:bg-muted"
         >
           {t.draw}
         </button>

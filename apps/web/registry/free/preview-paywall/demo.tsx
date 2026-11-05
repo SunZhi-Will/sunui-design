@@ -15,12 +15,12 @@ export default function PreviewPaywallDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   return (
-    <div className="relative aspect-video w-full max-w-xl min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111113]">
+    <div className="relative aspect-video w-full max-w-xl min-w-0 overflow-hidden rounded-xl border border-border bg-muted">
       {/* 試看到第三張，付費牆蓋在投影片上 */}
-      <div className="flex h-full flex-col justify-between p-5 text-white">
-        <p className="text-xs text-white/50 tabular-nums">{t.slide}</p>
-        <p className="text-lg font-bold sm:text-2xl">{t.heading}</p>
-        <div className="h-1 w-full rounded-full bg-white/10" />
+      <div className="flex h-full flex-col justify-between p-5 text-foreground">
+        <p className="text-xs text-muted-foreground tabular-nums">{t.slide}</p>
+        <p className="text-lg font-semibold sm:text-2xl">{t.heading}</p>
+        <div className="h-1 w-full rounded-full bg-foreground/10" />
       </div>
       <PreviewPaywall locale={locale} previewCount={3} href="#" />
     </div>

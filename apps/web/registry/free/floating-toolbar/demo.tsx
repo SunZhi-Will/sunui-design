@@ -57,17 +57,17 @@ export default function FloatingToolbarDemo() {
 
   return (
     <div
-      className="relative h-[24rem] w-full min-w-0 max-w-2xl overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
+      className="relative h-[24rem] w-full min-w-0 max-w-2xl overflow-hidden rounded-xl border border-border bg-background"
       style={{
-        backgroundImage: "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px)",
         backgroundSize: "20px 20px",
       }}
     >
       <div className="absolute inset-y-6 left-20 right-4 flex min-w-0 flex-col gap-2 overflow-hidden">
         {titles.map((title, i) => (
-          <div key={i} className="w-full max-w-[12rem] rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
-            {i > 0 && <p className="text-[10px] font-medium uppercase tracking-wide text-violet-500">{t.generated}</p>}
-            <p className="truncate text-sm font-semibold text-gray-800">{title}</p>
+          <div key={i} className="w-full max-w-[12rem] rounded-xl border border-border bg-card p-2.5 shadow-sm">
+            {i > 0 && <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{t.generated}</p>}
+            <p className="truncate text-sm font-semibold text-foreground">{title}</p>
           </div>
         ))}
       </div>
@@ -85,7 +85,7 @@ export default function FloatingToolbarDemo() {
         }}
       />
 
-      <p aria-live="polite" className="absolute bottom-3 left-20 right-3 rounded-xl border border-white/80 bg-white/75 px-3 py-2 text-xs text-gray-600 backdrop-blur-xl">
+      <p aria-live="polite" className="absolute bottom-3 left-20 right-3 rounded-xl border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
         {tool ? t.hints[tool] : t.idle}
       </p>
     </div>

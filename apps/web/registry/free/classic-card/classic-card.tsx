@@ -11,184 +11,57 @@ export type CardTheme = "violet" | "cyan" | "orange" | "gradient" | "dark" | "li
 export type CardLoadingMode = "overlay" | "skeleton" | "shimmer";
 export type CardMode = "light" | "dark";
 
-type ThemeColors = {
-  bg: string;
-  border: string;
-  hoverBorder: string;
-  text: string;
-  accent: string;
-  glow: string;
-  glowHover: string;
-  glowLayer: string;
-  gradient: string;
-  glassBg: string;
-};
+// 唯一的強調色：預設朱紅，暗色時亮一階；theme 只決定要不要用它
+const VERMILION = "text-[#c8361d] dark:text-[#ec6a4f]";
 
-// 深色模式主題配置（照原本 Card.tsx）
-const darkThemeColors: Record<CardTheme, ThemeColors> = {
-  violet: {
-    bg: "from-gray-950 to-gray-900",
-    border: "border-violet-900/50",
-    hoverBorder: "hover:border-violet-700/70",
-    text: "text-gray-100",
-    accent: "text-violet-400",
-    glow: "shadow-violet-500/20",
-    glowHover: "hover:shadow-violet-500/40",
-    glowLayer: "from-violet-500/20",
-    gradient: "from-violet-950/50 via-gray-900/50 to-gray-950/50",
-    glassBg: "bg-gray-900/80",
-  },
-  cyan: {
-    bg: "from-gray-950 to-gray-900",
-    border: "border-cyan-900/50",
-    hoverBorder: "hover:border-cyan-700/70",
-    text: "text-gray-100",
-    accent: "text-cyan-400",
-    glow: "shadow-cyan-500/20",
-    glowHover: "hover:shadow-cyan-500/40",
-    glowLayer: "from-cyan-500/20",
-    gradient: "from-cyan-950/50 via-gray-900/50 to-gray-950/50",
-    glassBg: "bg-gray-900/80",
-  },
-  orange: {
-    bg: "from-gray-950 to-gray-900",
-    border: "border-orange-900/50",
-    hoverBorder: "hover:border-orange-700/70",
-    text: "text-gray-100",
-    accent: "text-orange-400",
-    glow: "shadow-orange-500/20",
-    glowHover: "hover:shadow-orange-500/40",
-    glowLayer: "from-orange-500/20",
-    gradient: "from-orange-950/50 via-gray-900/50 to-gray-950/50",
-    glassBg: "bg-gray-900/80",
-  },
-  gradient: {
-    bg: "from-gray-950 via-gray-900 to-gray-950",
-    border: "border-pink-900/50",
-    hoverBorder: "hover:border-pink-700/70",
-    text: "text-gray-100",
-    accent: "text-transparent bg-clip-text bg-linear-to-r from-orange-400 to-pink-500",
-    glow: "shadow-pink-500/20",
-    glowHover: "hover:shadow-pink-500/40",
-    glowLayer: "from-pink-500/20",
-    gradient: "from-pink-950/50 via-purple-950/50 to-orange-950/50",
-    glassBg: "bg-linear-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80",
-  },
-  dark: {
-    bg: "from-gray-950 via-slate-900 to-gray-900",
-    border: "border-blue-900/50",
-    hoverBorder: "hover:border-blue-700/70",
-    text: "text-gray-100",
-    accent: "text-blue-400",
-    glow: "shadow-blue-500/20",
-    glowHover: "hover:shadow-blue-500/40",
-    glowLayer: "from-blue-500/20",
-    gradient: "from-blue-950/50 via-slate-900/50 to-gray-950/50",
-    glassBg: "bg-gray-900/80",
-  },
-  light: {
-    bg: "from-white to-gray-50",
-    border: "border-gray-200",
-    hoverBorder: "hover:border-gray-300",
-    text: "text-gray-900",
-    accent: "text-gray-700",
-    glow: "shadow-gray-200/50",
-    glowHover: "hover:shadow-gray-300/60",
-    glowLayer: "from-gray-200/50",
-    gradient: "from-gray-50/50 via-white/50 to-gray-100/50",
-    glassBg: "bg-white/80",
-  },
-};
-
-// 淺色模式主題配置
-const lightThemeColors: Record<CardTheme, ThemeColors> = {
-  violet: {
-    bg: "from-white to-violet-50",
-    border: "border-violet-200",
-    hoverBorder: "hover:border-violet-300",
-    text: "text-gray-900",
-    accent: "text-violet-600",
-    glow: "shadow-violet-200/50",
-    glowHover: "hover:shadow-violet-300/60",
-    glowLayer: "from-violet-200/50",
-    gradient: "from-violet-50/50 via-white/50 to-purple-50/50",
-    glassBg: "bg-white/80",
-  },
-  cyan: {
-    bg: "from-white to-cyan-50",
-    border: "border-cyan-200",
-    hoverBorder: "hover:border-cyan-300",
-    text: "text-gray-900",
-    accent: "text-cyan-600",
-    glow: "shadow-cyan-200/50",
-    glowHover: "hover:shadow-cyan-300/60",
-    glowLayer: "from-cyan-200/50",
-    gradient: "from-cyan-50/50 via-white/50 to-blue-50/50",
-    glassBg: "bg-white/80",
-  },
-  orange: {
-    bg: "from-white to-orange-50",
-    border: "border-orange-200",
-    hoverBorder: "hover:border-orange-300",
-    text: "text-gray-900",
-    accent: "text-orange-600",
-    glow: "shadow-orange-200/50",
-    glowHover: "hover:shadow-orange-300/60",
-    glowLayer: "from-orange-200/50",
-    gradient: "from-orange-50/50 via-white/50 to-amber-50/50",
-    glassBg: "bg-white/80",
-  },
-  gradient: {
-    bg: "from-white via-purple-50 to-pink-50",
-    border: "border-pink-200",
-    hoverBorder: "hover:border-pink-300",
-    text: "text-gray-900",
-    accent: "text-transparent bg-clip-text bg-linear-to-r from-pink-500 to-purple-600",
-    glow: "shadow-pink-200/50",
-    glowHover: "hover:shadow-pink-300/60",
-    glowLayer: "from-pink-200/50",
-    gradient: "from-pink-50/50 via-purple-50/50 to-orange-50/50",
-    glassBg: "bg-linear-to-br from-white/80 via-purple-50/80 to-pink-50/80",
-  },
-  dark: {
-    bg: "from-gray-50 to-gray-100",
-    border: "border-gray-300",
-    hoverBorder: "hover:border-gray-400",
-    text: "text-gray-900",
-    accent: "text-gray-700",
-    glow: "shadow-gray-300/50",
-    glowHover: "hover:shadow-gray-400/60",
-    glowLayer: "from-gray-300/50",
-    gradient: "from-gray-100/50 via-gray-50/50 to-slate-100/50",
-    glassBg: "bg-white/80",
-  },
-  light: {
-    bg: "from-white to-gray-50",
-    border: "border-gray-200",
-    hoverBorder: "hover:border-gray-300",
-    text: "text-gray-900",
-    accent: "text-gray-700",
-    glow: "shadow-gray-200/50",
-    glowHover: "hover:shadow-gray-300/60",
-    glowLayer: "from-gray-200/50",
-    gradient: "from-gray-50/50 via-white/50 to-gray-100/50",
-    glassBg: "bg-white/80",
-  },
-};
-
-/** 取得主題的強調文字 class（原本的 accent 欄位），方便標題或價格套用 */
-export function cardAccentClass(theme: CardTheme = "violet", mode: CardMode = "light") {
-  return (mode === "dark" ? darkThemeColors : lightThemeColors)[theme].accent;
+/**
+ * 取得主題的強調文字 class，方便標題或價格套用（整張卡只建議用在一處）。
+ * 舊版的 violet、cyan、gradient 霓虹配色已停用，彩色主題一律回傳朱紅；light、dark 回傳前景色。
+ * mode 參數保留相容：指定 mode 時直接回傳該明暗的朱紅，不依賴網站主題。
+ */
+export function cardAccentClass(theme: CardTheme = "violet", mode?: CardMode) {
+  if (theme === "light" || theme === "dark") return "text-foreground";
+  if (mode === "light") return "text-[#c8361d]";
+  if (mode === "dark") return "text-[#ec6a4f]";
+  return VERMILION;
 }
 
+// mode 指定明暗時，在卡片內覆寫 shadcn token；不指定就跟隨網站
+const forcedTokens: Record<CardMode, Record<string, string>> = {
+  light: {
+    "--background": "#fafaf9",
+    "--foreground": "#1c1917",
+    "--card": "#ffffff",
+    "--muted": "#f5f5f4",
+    "--muted-foreground": "#78716c",
+    "--border": "#e7e5e4",
+    "--primary": "#1c1917",
+    "--primary-foreground": "#fafaf9",
+    colorScheme: "light",
+  },
+  dark: {
+    "--background": "#0c0a09",
+    "--foreground": "#f5f5f4",
+    "--card": "#151311",
+    "--muted": "#292524",
+    "--muted-foreground": "#a8a29e",
+    "--border": "#292524",
+    "--primary": "#f5f5f4",
+    "--primary-foreground": "#1c1917",
+    colorScheme: "dark",
+  },
+};
+
 // 子元件預設跟隨 Card 的 mode，仍可個別覆寫
-const CardModeContext = React.createContext<CardMode>("light");
+const CardModeContext = React.createContext<CardMode | undefined>(undefined);
 
 export interface CardProps {
   children?: React.ReactNode;
   variant?: CardVariant;
   size?: CardSize;
+  /** 舊版配色。現在卡片本身一律中性，theme 只影響 cardAccentClass 回傳的強調色 */
   theme?: CardTheme;
+  /** 不給時跟隨網站明暗（shadcn token）；給 light 或 dark 時卡片自帶該配色 */
   mode?: CardMode;
   loading?: boolean;
   loadingMode?: CardLoadingMode;
@@ -196,6 +69,7 @@ export interface CardProps {
   clickable?: boolean;
   bordered?: boolean;
   shadow?: boolean;
+  /** 已停用：舊版的彩色光暈。保留參數相容，現在只是讓滑過時的邊線再深一點 */
   glow?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -231,8 +105,8 @@ const MESSAGES: Record<SunLocale, CardLabels> = {
 
 const SHIMMER_CSS = `@keyframes classic-card-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`;
 
-function SkeletonBlock({ mode }: { mode: CardMode }) {
-  const base = cn("rounded-sm animate-pulse motion-reduce:animate-none", mode === "dark" ? "bg-gray-700/50" : "bg-gray-200");
+function SkeletonBlock() {
+  const base = "rounded-sm bg-muted";
   return (
     <div className="flex h-full w-full flex-col px-6 py-5">
       <div className="mb-6 flex flex-col gap-3">
@@ -255,8 +129,7 @@ export function Card({
   className,
   variant = "outlined",
   size = "md",
-  theme = "violet",
-  mode = "light",
+  mode,
   loading = false,
   loadingMode = "skeleton",
   hoverable = true,
@@ -274,76 +147,34 @@ export function Card({
   const ref = React.useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const reduce = useReducedMotion() ?? false;
-  const [isHovering, setIsHovering] = React.useState(false);
-
-  const colors = (mode === "dark" ? darkThemeColors : lightThemeColors)[theme];
 
   // 基礎樣式
   const baseStyles = cn(
-    "relative overflow-hidden transition-all duration-300",
-    "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2",
-    mode === "dark" ? "focus-visible:ring-white/60 focus-visible:ring-offset-gray-950" : "focus-visible:ring-gray-900/40",
-    colors.text,
+    "relative overflow-hidden text-card-foreground transition-[border-color,background-color] duration-200",
+    "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "text-foreground",
     clickable && "cursor-pointer",
   );
 
-  // 變體樣式
+  const hoverBorder = hoverable && bordered && (glow ? "hover:border-foreground/30" : "hover:border-foreground/20");
+
+  // 變體樣式：全部是中性底，差別只在底色深淺、邊線與陰影
   const variantStyles: Record<CardVariant, string> = {
-    outlined: cn(
-      "bg-linear-to-b backdrop-blur-xs",
-      mode === "dark" ? "from-gray-900/95 to-gray-950/95" : "from-white/95 to-gray-50/95",
-      bordered && colors.border,
-      bordered && colors.hoverBorder,
-      shadow && "shadow-md",
-      shadow && hoverable && "hover:shadow-xl",
-      glow && colors.glow,
-      glow && hoverable && colors.glowHover,
-    ),
-    filled: cn(
-      "bg-linear-to-br",
-      colors.bg,
-      "backdrop-blur-md",
-      bordered && "border border-white/10",
-      shadow && "shadow-lg",
-      shadow && hoverable && "hover:shadow-2xl",
-      glow && colors.glow,
-      glow && hoverable && colors.glowHover,
-    ),
-    elevated: cn(
-      "bg-linear-to-br backdrop-blur-md",
-      mode === "dark" ? "from-gray-900/95 via-gray-800/95 to-gray-900/95" : "from-white/95 via-gray-50/95 to-white/95",
-      "border-transparent",
-      "shadow-xl",
-      hoverable && "hover:shadow-2xl",
-      glow && colors.glow,
-      glow && hoverable && colors.glowHover,
-    ),
-    glass: cn(
-      "backdrop-blur-xl",
-      colors.glassBg,
-      "border border-white/20",
-      mode === "dark" && "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
-      mode === "light" && "shadow-[0_8px_32px_rgba(0,0,0,0.08)]",
-      hoverable && mode === "dark" && "hover:shadow-[0_12px_48px_rgba(0,0,0,0.5)]",
-      hoverable && mode === "light" && "hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)]",
-    ),
-    gradient: cn(
-      "bg-linear-to-br",
-      colors.gradient,
-      "backdrop-blur-lg border border-white/10",
-      shadow && "shadow-xl",
-      shadow && hoverable && "hover:shadow-2xl",
-      glow && colors.glow,
-      glow && hoverable && colors.glowHover,
-    ),
+    outlined: cn("bg-card", bordered && "border-border", shadow && "shadow-sm"),
+    filled: cn("bg-muted", bordered && "border-border"),
+    elevated: cn("bg-card", bordered && "border-border", "shadow-sm"),
+    // 只在真的疊在內容上時才有意義；底色維持 90% 不透明
+    glass: cn("bg-card/90 backdrop-blur-sm", bordered && "border-border", shadow && "shadow-sm"),
+    // 同色相的淡變化，像紙面受光，不跨色相
+    gradient: cn("bg-linear-to-b from-card to-muted", bordered && "border-border", shadow && "shadow-sm"),
   };
 
   // 尺寸樣式
   const sizeStyles: Record<CardSize, string> = {
-    sm: "p-4 rounded-lg",
+    sm: "p-4 rounded-xl",
     md: "p-6 rounded-xl",
-    lg: "p-8 rounded-2xl",
-    xl: "p-10 rounded-3xl",
+    lg: "p-8 rounded-xl",
+    xl: "p-10 rounded-xl",
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -354,6 +185,8 @@ export function Card({
     }
   };
 
+  const ease = [0.23, 1, 0.32, 1] as const;
+
   return (
     <CardModeContext.Provider value={mode}>
       <motion.div
@@ -362,39 +195,16 @@ export function Card({
         tabIndex={clickable ? 0 : undefined}
         aria-label={ariaLabel}
         aria-busy={loading || undefined}
-        className={cn(baseStyles, variantStyles[variant], sizeStyles[size], bordered && "border", className)}
-        initial={reduce ? false : { opacity: 0, y: 20 }}
-        animate={reduce ? { opacity: 1, y: 0 } : isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: reduce ? 0 : 0.5, ease: "easeOut" }}
-        whileHover={hoverable && !reduce ? { scale: clickable ? 1.02 : 1.01, transition: { duration: 0.2, ease: "easeOut" } } : undefined}
-        whileTap={clickable && !reduce ? { scale: 0.98, transition: { duration: 0.1, ease: "easeIn" } } : undefined}
-        style={style}
+        className={cn(baseStyles, variantStyles[variant], sizeStyles[size], bordered && "border", hoverBorder, className)}
+        initial={reduce ? false : { opacity: 0, y: 12 }}
+        animate={reduce ? { opacity: 1, y: 0 } : isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+        transition={{ duration: reduce ? 0 : 0.36, ease }}
+        whileTap={clickable && !reduce ? { scale: 0.99, transition: { duration: 0.12 } } : undefined}
+        style={{ ...(mode ? forcedTokens[mode] : null), ...style } as React.CSSProperties}
         onClick={clickable ? onClick : undefined}
         onKeyDown={handleKeyDown}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
       >
         {loading && loadingMode === "shimmer" && <style>{SHIMMER_CSS}</style>}
-
-        {/* 光暈效果 */}
-        {glow && isHovering && (
-          <motion.div
-            aria-hidden
-            className={cn("pointer-events-none absolute inset-0 -z-10 bg-radial to-transparent blur-xl", colors.glowLayer)}
-            initial={reduce ? { opacity: 0.5 } : { opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.5, scale: 1 }}
-            transition={{ duration: reduce ? 0 : 0.3 }}
-          />
-        )}
-
-        {/* 內部光澤效果 */}
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-0 z-0 bg-linear-to-b",
-            mode === "dark" ? "from-white/[0.05] via-transparent to-transparent" : "from-white/60 via-transparent to-transparent",
-          )}
-        />
 
         <AnimatePresence>
           {loading && (
@@ -402,40 +212,23 @@ export function Card({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.2 }}
-              className={cn(
-                "absolute inset-0 z-30 flex items-center justify-center backdrop-blur-xs",
-                mode === "dark" ? "bg-gray-900/80" : "bg-white/80",
-              )}
+              transition={{ duration: reduce ? 0 : 0.18 }}
+              className="absolute inset-0 z-30 flex items-center justify-center bg-card/95"
             >
               {loadingMode === "overlay" ? (
-                <motion.div
-                  className="relative flex flex-col items-center gap-3"
-                  initial={reduce ? false : { scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                  role="status"
-                >
-                  <div className="relative h-12 w-12" aria-hidden>
+                <div className="relative flex flex-col items-center gap-3" role="status">
+                  <div className="relative h-8 w-8" aria-hidden>
+                    <div className="absolute h-full w-full rounded-full border-2 border-border" />
                     <div
                       className={cn(
-                        "absolute h-full w-full rounded-full border-[3px]",
-                        mode === "dark" ? "border-gray-700" : "border-gray-200",
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        "absolute h-full w-full animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite] rounded-full border-[3px] motion-reduce:animate-[spin_2.4s_linear_infinite]",
-                        mode === "dark" ? "border-gray-300" : "border-gray-600",
+                        "absolute h-full w-full animate-[spin_0.8s_cubic-bezier(0.4,0,0.2,1)_infinite] rounded-full border-2 border-foreground/60 motion-reduce:animate-[spin_2.4s_linear_infinite]",
                         // 放在顏色之後，否則會被 tailwind-merge 蓋掉
                         "border-t-transparent",
                       )}
                     />
                   </div>
-                  <span className={cn("text-sm font-medium", mode === "dark" ? "text-gray-400" : "text-gray-500")}>
-                    {t.loading}
-                  </span>
-                </motion.div>
+                  <span className="text-sm text-muted-foreground">{t.loading}</span>
+                </div>
               ) : (
                 <>
                   <span className="sr-only" role="status">
@@ -444,14 +237,11 @@ export function Card({
                   {loadingMode === "shimmer" && (
                     <div
                       aria-hidden
-                      className={cn(
-                        "absolute inset-0 z-20 bg-linear-to-r animate-[classic-card-shimmer_2s_infinite] motion-reduce:animate-none",
-                        mode === "dark" ? "from-transparent via-white/5 to-transparent" : "from-transparent via-white/50 to-transparent",
-                      )}
+                      className="absolute inset-0 z-20 animate-[classic-card-shimmer_2s_infinite] bg-linear-to-r from-transparent via-foreground/[0.04] to-transparent motion-reduce:animate-none"
                     />
                   )}
                   <div aria-hidden className="h-full w-full">
-                    <SkeletonBlock mode={mode} />
+                    <SkeletonBlock />
                   </div>
                 </>
               )}
@@ -463,7 +253,7 @@ export function Card({
           className={cn(
             "relative z-10",
             loading && loadingMode !== "overlay" && "invisible",
-            loading && loadingMode === "overlay" && "pointer-events-none blur-[1px] opacity-30 select-none",
+            loading && loadingMode === "overlay" && "pointer-events-none opacity-30 select-none",
           )}
           aria-hidden={loading || undefined}
         >
@@ -474,14 +264,8 @@ export function Card({
   );
 }
 
-const dividerBorder = (mode: CardMode, side: "b" | "t") =>
-  side === "b"
-    ? mode === "dark"
-      ? "border-b border-white/10"
-      : "border-b border-gray-200/60"
-    : mode === "dark"
-      ? "border-t border-white/10"
-      : "border-t border-gray-200/60";
+// 分隔線一律用 border token；mode 參數保留相容
+const dividerBorder = (_mode: CardMode | undefined, side: "b" | "t") => (side === "b" ? "border-b border-border" : "border-t border-border");
 
 export interface CardHeaderProps {
   children?: React.ReactNode;
@@ -622,10 +406,10 @@ export function CardImage({
   };
 
   return (
-    <div className={cn("relative mb-4 w-full overflow-hidden rounded-xl", aspectRatioStyles[aspectRatio])}>
+    <div className={cn("relative mb-4 w-full overflow-hidden rounded-lg border border-border bg-muted", aspectRatioStyles[aspectRatio])}>
       {/* 載入骨架屏 */}
       {!imageLoaded && (
-        <div className="absolute inset-0 animate-pulse bg-linear-to-br from-gray-200 via-gray-100 to-gray-200 motion-reduce:animate-none" />
+        <div className="absolute inset-0 bg-muted" />
       )}
 
       <motion.img
@@ -636,14 +420,14 @@ export function CardImage({
         onError={() => fallback && setImgSrc(fallback)}
         onLoad={() => setImageLoaded(true)}
         className={cn(
-          "h-full w-full transition-all duration-700",
+          "h-full w-full transition-transform duration-500",
           objectFitStyles[objectFit],
-          "group-hover:scale-110 group-hover:brightness-110 motion-reduce:group-hover:scale-100",
+          "group-hover:scale-[1.03] motion-reduce:group-hover:scale-100",
           className,
         )}
-        initial={reduce ? false : { opacity: 0, scale: 1.1 }}
-        animate={{ opacity: imageLoaded ? 1 : 0, scale: 1 }}
-        transition={{ duration: reduce ? 0 : 0.6, ease: "easeOut" }}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: imageLoaded ? 1 : 0 }}
+        transition={{ duration: reduce ? 0 : 0.36, ease: [0.23, 1, 0.32, 1] }}
       />
 
       {/* 覆蓋層漸變 */}
@@ -656,12 +440,6 @@ export function CardImage({
           )}
         />
       )}
-
-      {/* 光暈效果 */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-linear-to-t from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-      />
     </div>
   );
 }

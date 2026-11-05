@@ -17,9 +17,9 @@ export interface BrowserShowcase3DProps {
   items: ShowcaseItem[];
   /** 輪播間隔（毫秒） */
   interval?: number;
-  /** 主色，預設金色 */
+  /** 唯一強調色（hover 時跟著游標的邊框亮線），預設琥珀金 */
   accent?: string;
-  /** hover 光暈的亮色 */
+  /** 邊框亮線中心的淺色，預設由 accent 混白算出 */
   accentBright?: string;
   /** 有值時改成 role="img" 並以此為名稱；預設為純裝飾（aria-hidden） */
   label?: string;
@@ -29,8 +29,13 @@ export interface BrowserShowcase3DProps {
 const REST_ROTATE_Y = -16;
 const REST_ROTATE_X = 6;
 const MAX_SWING = 9;
-/** 必須與光暈層的 background-size 一致 */
+/** 必須與邊框亮線層的 background-size 一致 */
 const GLOW_SIZE = 260;
+
+const BASE = "#0c0a09";
+const SURFACE = "#161412";
+const LINE = "rgb(255 255 255 / 0.08)";
+const LINE_STRONG = "rgb(255 255 255 / 0.14)";
 
 const E_OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const E_IN_OUT = "cubic-bezier(0.65, 0, 0.35, 1)";
@@ -49,13 +54,13 @@ function useReducedMotionPref() {
 
 /**
  * 傾斜的瀏覽器視窗，後面疊兩張裝飾卡片，像幻燈片一樣輪播項目。
- * 滑鼠移到上面時跟著游標傾斜、邊框出現光暈，並暫停輪播。
+ * 滑鼠移到上面時跟著游標傾斜、邊框出現一段跟著游標的亮線，並暫停輪播。
  */
 export function BrowserShowcase3D({
   items,
   interval = 4800,
-  accent = "#d4af37",
-  accentBright = "#e8c874",
+  accent = "#d4a24c",
+  accentBright,
   label,
   className,
 }: BrowserShowcase3DProps) {
@@ -87,7 +92,7 @@ export function BrowserShowcase3D({
       el.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
     }
 
-    // 光暈用像素定位：background-position 的百分比是比例公式，會跟游標對不上
+    // 亮線用像素定位：background-position 的百分比是比例公式，會跟游標對不上
     const win = windowRef.current;
     if (win) {
       const winRect = win.getBoundingClientRect();
@@ -112,9 +117,9 @@ export function BrowserShowcase3D({
 
   const vars = {
     "--sc-gold": accent,
-    "--sc-gold-bright": accentBright,
-    "--sc-line-1": `color-mix(in srgb, ${accent} 14%, transparent)`,
-    "--sc-line-2": `color-mix(in srgb, ${accent} 30%, transparent)`,
+    "--sc-gold-bright": accentBright ?? `color-mix(in srgb, ${accent} 70%, #ffffff)`,
+    "--sc-line-1": LINE,
+    "--sc-line-2": LINE_STRONG,
     perspective: "1600px",
   } as CSSProperties;
 
@@ -137,29 +142,29 @@ export function BrowserShowcase3D({
         {/* 後面的裝飾層：只露出邊角，營造很多層的深度 */}
         <div
           className="pointer-events-none absolute inset-0 rounded-[10px] border border-[var(--sc-line-1)] opacity-40"
-          style={{ background: "linear-gradient(180deg, #141418, #0e0e11)", transform: "translate3d(40px, 34px, -84px) scale(0.94)" }}
+          style={{ background: SURFACE, transform: "translate3d(40px, 34px, -84px) scale(0.94)" }}
         />
         <div
           className="pointer-events-none absolute inset-0 rounded-[10px] border border-[var(--sc-line-1)] opacity-70"
-          style={{ background: "linear-gradient(180deg, #141418, #0e0e11)", transform: "translate3d(20px, 17px, -42px) scale(0.97)" }}
+          style={{ background: SURFACE, transform: "translate3d(20px, 17px, -42px) scale(0.97)" }}
         />
 
         <div
           ref={windowRef}
-          className="relative cursor-pointer overflow-hidden rounded-[10px] border border-[var(--sc-line-2)] bg-[#0e0e11]"
+          className="relative cursor-pointer overflow-hidden rounded-[10px] border border-[var(--sc-line-2)]"
           style={{
-            boxShadow:
-              "0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 60px -20px color-mix(in srgb, var(--sc-gold) 25%, transparent)",
+            background: BASE,
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 64px rgba(0, 0, 0, 0.5)",
           }}
         >
-          {/* 炫光邊框：mask 只露出 2px 的邊框那一圈，z-index 要壓過畫面層 */}
+          {/* 邊框亮線：mask 只露出 1.5px 的邊框那一圈，z-index 要壓過畫面層 */}
           <div
             className="pointer-events-none absolute inset-0 z-[2] opacity-0 group-hover:opacity-100"
             style={{
               borderRadius: "inherit",
-              padding: 2,
+              padding: 1.5,
               transition: reduce ? "none" : `opacity 160ms ${E_OUT}`,
-              backgroundImage: "radial-gradient(circle, var(--sc-gold-bright) 0%, var(--sc-gold) 45%, transparent 68%)",
+              backgroundImage: "radial-gradient(circle, var(--sc-gold-bright) 0%, var(--sc-gold) 40%, transparent 62%)",
               backgroundSize: `${GLOW_SIZE}px ${GLOW_SIZE}px`,
               backgroundRepeat: "no-repeat",
               backgroundPosition: "var(--glow-x, 50%) var(--glow-y, 50%)",
@@ -170,14 +175,14 @@ export function BrowserShowcase3D({
           />
 
           {/* 瀏覽器外框：矮、置中網址列 */}
-          <div className="flex items-center gap-2 border-b border-[var(--sc-line-1)] bg-[#141418] px-3 py-[7px]">
+          <div className="flex items-center gap-2 border-b border-[var(--sc-line-1)] px-3 py-[7px]" style={{ background: SURFACE }}>
             <div className="flex flex-none gap-[5px]">
               {[0, 1, 2].map((i) => (
                 <span key={i} className="size-1.5 flex-none rounded-full bg-[var(--sc-line-2)]" />
               ))}
             </div>
             <div className="flex min-w-0 flex-1 justify-center">
-              <span className="max-w-[70%] truncate whitespace-nowrap rounded-full border border-[var(--sc-line-1)] bg-[#0e0e11] px-3 py-[2px] font-mono text-[10px] text-[#8a8578]">
+              <span className="max-w-[70%] truncate whitespace-nowrap rounded-full border border-[var(--sc-line-1)] px-3 py-[2px] font-mono text-[10px] text-[#a8a29e]" style={{ background: BASE }}>
                 {current.url}
               </span>
             </div>

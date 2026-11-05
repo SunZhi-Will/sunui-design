@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const icon = (d: string) => (
   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={d} />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={d} />
   </svg>
 );
 
@@ -56,7 +56,7 @@ export type ToolbarTool = {
   icon: ReactNode;
   /** true：點了執行 onAction（非同步，期間顯示轉圈），不會變成選取狀態 */
   action?: boolean;
-  /** 選取時的底色、字色與滑過底色，預設藍色；沒有 hover 時滑過沿用一般的藍色 hover（同原版） */
+  /** 選取時的底色、字色與滑過底色，預設跟隨主題的 primary；沒有 hover 時滑過沿用一般的 hover（同原版） */
   accent?: { soft: string; strong: string; hover?: string };
 };
 
@@ -132,7 +132,12 @@ const buildAiTools = (t: Pick<FloatingToolbarLabels, "generate" | "enhance" | "a
 /** 原版 AIToolbar 的四個工具（英文）；「生成內容」是動作 */
 export const aiTools: ToolbarEntry[] = buildAiTools(MESSAGES.en);
 
-const defaultAccent = { soft: "rgba(59, 130, 246, 0.3)", strong: "#2563eb", hover: "rgba(59, 130, 246, 0.4)" };
+// 原版為工具藍；改成跟隨主題的 primary，買家可用 tool.accent 開回藍色
+const defaultAccent = {
+  soft: "color-mix(in oklab, var(--primary) 12%, transparent)",
+  strong: "var(--primary)",
+  hover: "color-mix(in oklab, var(--primary) 18%, transparent)",
+};
 
 export type FloatingToolbarProps = {
   tools?: ToolbarEntry[];
@@ -223,12 +228,12 @@ export function FloatingToolbar({
                 {backLabel}
               </span>
             </button>
-            <div className="my-0.5 h-px bg-white/20" />
+            <div className="my-0.5 h-px bg-border" />
           </>
         )}
 
         {tools.map((tool, i) => {
-          if (tool === "divider") return <div key={`d${i}`} className="my-0.5 h-px bg-white/20" />;
+          if (tool === "divider") return <div key={`d${i}`} className="my-0.5 h-px bg-border" />;
           const isSelected = !tool.action && selectedTool === tool.id;
           const busy = pending === tool.id;
           const accent = tool.accent ?? defaultAccent;
@@ -261,15 +266,9 @@ export function FloatingToolbar({
       <style>{`
         .cf-ft-wrap { transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1); }
         .cf-ft-glass {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.08),
-            0 2px 8px rgba(0, 0, 0, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+          background: var(--card);
+          border: 1px solid var(--border);
+          box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
         }
         .cf-ft-btn {
           position: relative;
@@ -279,7 +278,7 @@ export function FloatingToolbar({
           width: 32px;
           height: 32px;
           border-radius: 8px;
-          color: #374151;
+          color: var(--muted-foreground);
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           pointer-events: auto;
           outline: none;
@@ -288,22 +287,21 @@ export function FloatingToolbar({
         }
         .cf-ft-btn[data-selected] { background: var(--cf-ft-soft); color: var(--cf-ft-strong); }
         .cf-ft-btn:hover:not(:disabled), .cf-ft-btn:focus-visible {
-          background: rgba(59, 130, 246, 0.15);
-          color: #2563eb;
-          transform: scale(1.05);
+          background: var(--muted);
+          color: var(--foreground);
         }
         .cf-ft-btn[data-accent-hover]:hover, .cf-ft-btn[data-accent-hover]:focus-visible {
           background: var(--cf-ft-hover);
           color: var(--cf-ft-strong);
         }
-        .cf-ft-btn:disabled { cursor: progress; color: #2563eb; }
+        .cf-ft-btn:disabled { cursor: progress; color: var(--foreground); }
+        .cf-ft-btn:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
         .cf-ft-btn:active { transform: scale(0.95); }
         .cf-ft-tip {
           position: absolute;
           left: calc(100% + 8px);
-          background: rgba(17, 24, 39, 0.95);
-          backdrop-filter: blur(8px);
-          color: white;
+          background: var(--foreground);
+          color: var(--background);
           font-size: 10px;
           font-weight: 500;
           padding: 4px 8px;
@@ -312,7 +310,7 @@ export function FloatingToolbar({
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
           z-index: 1;
         }
         .cf-ft-btn:hover .cf-ft-tip, .cf-ft-btn:focus-visible .cf-ft-tip { opacity: 1; }
@@ -323,13 +321,13 @@ export function FloatingToolbar({
           top: 50%;
           transform: translateY(-50%);
           border: 5px solid transparent;
-          border-right-color: rgba(17, 24, 39, 0.95);
+          border-right-color: var(--foreground);
         }
         .cf-ft-spin { animation: cf-ft-spin 1s linear infinite; }
         @keyframes cf-ft-spin { to { transform: rotate(360deg); } }
         @media (prefers-reduced-motion: reduce) {
           .cf-ft-wrap, .cf-ft-btn, .cf-ft-tip { transition: none; }
-          .cf-ft-btn:hover:not(:disabled), .cf-ft-btn:focus-visible, .cf-ft-btn:active { transform: none; }
+          .cf-ft-btn:active { transform: none; }
           .cf-ft-spin { animation-duration: 2.4s; }
         }
       `}</style>

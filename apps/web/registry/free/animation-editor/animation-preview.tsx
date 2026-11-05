@@ -147,7 +147,7 @@ export function AnimationPreview<T = unknown>({
     <div
       className={cn(
         fixed ? "fixed inset-0 z-[100]" : "relative h-full w-full overflow-hidden",
-        "bg-gradient-to-br from-gray-50 to-gray-100",
+        "bg-background",
         className,
       )}
       style={accentVars(accent)}
@@ -169,7 +169,7 @@ export function AnimationPreview<T = unknown>({
         aria-hidden="true"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px)",
+            "linear-gradient(color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px)",
           backgroundSize: `${20 * state.scale}px ${20 * state.scale}px`,
           backgroundPosition: `${state.offset.x}px ${state.offset.y}px`,
         }}
@@ -194,7 +194,7 @@ export function AnimationPreview<T = unknown>({
                     } as CSSProperties
                   }
                 >
-                  <div className="relative h-full w-full overflow-hidden rounded-lg bg-white shadow-lg">{renderElement?.(element)}</div>
+                  <div className="relative h-full w-full overflow-hidden rounded-lg border border-border bg-card shadow-sm">{renderElement?.(element)}</div>
                 </div>
               </div>
             ))}
@@ -208,12 +208,12 @@ export function AnimationPreview<T = unknown>({
           onClick={onClose}
           className={cn(
             overlay,
-            "right-4 top-4 z-[101] rounded-lg p-3 shadow-lg transition-colors hover:bg-gray-100/50 focus-visible:outline-2 focus-visible:outline-[var(--ae-accent)]",
+            "right-4 top-4 z-[101] rounded-lg p-3 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-[var(--ae-accent)]",
           )}
           style={glassPanelStyle}
           aria-label={labels.close}
         >
-          <svg className="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -221,11 +221,11 @@ export function AnimationPreview<T = unknown>({
 
       {/* 進度指示 */}
       <div
-        className={cn(overlay, "left-1/2 top-4 z-[101] -translate-x-1/2 rounded-lg px-4 py-2 shadow-lg", onClose && !fixed && "max-w-[calc(100%-6rem)]")}
+        className={cn(overlay, "left-1/2 top-4 z-[101] -translate-x-1/2 rounded-lg px-4 py-2", onClose && !fixed && "max-w-[calc(100%-6rem)]")}
         style={glassPanelStyle}
       >
         <div className="flex items-center gap-3">
-          <span className="whitespace-nowrap text-xs font-medium text-gray-700" aria-live="polite">
+          <span className="whitespace-nowrap text-xs font-medium tabular-nums text-foreground" aria-live="polite">
             {labels.keyframeCounter(currentKeyframeIndex + 1, keyframes.length)}
           </span>
           <div className="flex gap-1" aria-hidden="true">
@@ -238,7 +238,7 @@ export function AnimationPreview<T = unknown>({
                     ? "bg-[var(--ae-accent)]"
                     : index < currentKeyframeIndex
                       ? "bg-[var(--ae-accent-light)]"
-                      : "bg-gray-300",
+                      : "bg-border",
                 )}
                 title={labels.keyframeDot(index + 1)}
               />

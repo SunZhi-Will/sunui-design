@@ -90,7 +90,7 @@ export default function DialogueBoxDemo() {
   return (
     <div
       className="relative h-[26rem] w-full max-w-3xl min-w-0 overflow-hidden rounded-[4px]"
-      style={{ background: "radial-gradient(ellipse at 70% 25%, rgb(231 196 137 / 0.18), transparent 35%), linear-gradient(180deg, #1a1d24 0%, #101318 55%, #08090c 100%)" }}
+      style={{ background: "linear-gradient(180deg, #1a1d24 0%, #101318 55%, #08090c 100%)" }}
     >
       <DialogueBox
         locale={locale}

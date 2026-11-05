@@ -58,13 +58,11 @@ export default function FlipProfileCardDemo() {
   const locale = useDemoLocale();
   const profile = useDemoText(profiles);
   return (
-    // 同 CardFlow 首頁：白底加三顆模糊光斑
-    <div className="relative flex w-full max-w-xl min-w-0 justify-center overflow-hidden rounded-xl bg-white px-4 py-8 sm:py-12">
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-blue-300/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-300/10 blur-3xl" />
-      </div>
+    // CardFlow 首頁的背景光斑已拿掉，改成安靜的點格畫布
+    <div
+      className="relative flex w-full max-w-xl min-w-0 justify-center overflow-hidden rounded-xl border border-border bg-background px-4 py-8 sm:py-12"
+      style={{ backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--muted-foreground) 25%, transparent) 1px, transparent 1px)", backgroundSize: "20px 20px" }}
+    >
       <div className="relative min-w-0">
         <FlipProfileCard data={profile} locale={locale} lightEffect="dynamic" />
       </div>

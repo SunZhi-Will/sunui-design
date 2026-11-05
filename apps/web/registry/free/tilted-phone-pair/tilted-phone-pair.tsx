@@ -16,9 +16,9 @@ export interface TiltedPhonePairProps {
   frontScreen: ReactNode;
   /** 左上角的對話泡泡，例如使用者下的提示詞；不給就不顯示 */
   callout?: ReactNode;
-  /** 後方手機螢幕的細邊框色，預設原站的 emerald-500/20 */
+  /** 後方手機螢幕的細邊框色，預設中性細線 */
   backAccent?: string;
-  /** 前方手機螢幕的細邊框色，預設原站的 indigo-500/20 */
+  /** 前方手機螢幕的細邊框色，預設中性細線 */
   frontAccent?: string;
   /** 游標視差傾斜，預設開啟；偏好減少動態時一律關閉 */
   parallax?: boolean;
@@ -36,8 +36,8 @@ export function TiltedPhonePair({
   backScreen,
   frontScreen,
   callout,
-  backAccent = "rgba(16,185,129,0.2)",
-  frontAccent = "rgba(99,102,241,0.2)",
+  backAccent = "rgb(255 255 255 / 0.08)",
+  frontAccent = "rgb(255 255 255 / 0.08)",
   parallax = true,
   label,
   className,
@@ -99,8 +99,8 @@ export function TiltedPhonePair({
         />
 
         {callout != null && (
-          <div className="absolute left-0 top-8 z-30 w-[17rem] rounded-2xl border border-white/10 bg-zinc-950/90 px-4 py-3 shadow-[0_18px_42px_-18px_rgba(0,0,0,0.8)]">
-            <div className="text-sm leading-relaxed text-zinc-200">{callout}</div>
+          <div className="absolute left-0 top-8 z-30 w-[17rem] rounded-2xl border border-white/[0.08] bg-[#161412] px-4 py-3 shadow-[0_18px_42px_-18px_rgba(0,0,0,0.8)]">
+            <div className="text-sm leading-relaxed text-[#d6d3d1]">{callout}</div>
           </div>
         )}
 

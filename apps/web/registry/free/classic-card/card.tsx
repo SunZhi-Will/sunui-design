@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { Card, CardContent, CardFooter, CardHeader } from "./classic-card";
+import { Card, CardContent, CardFooter, CardHeader, cardAccentClass } from "./classic-card";
 
 const copy = {
   en: { title: "Studio Headphones", subtitle: "Wireless, 40h battery", badge: "NEW", buy: "Buy now", add: "Add to wishlist", remove: "Remove from wishlist", cover: "Wireless headphones cover" },
@@ -13,7 +13,7 @@ const copy = {
   ja: { title: "スタジオヘッドホン", subtitle: "ワイヤレス、40 時間再生", badge: "NEW", buy: "今すぐ購入", add: "ウィッシュリストに追加", remove: "ウィッシュリストから削除", cover: "ワイヤレスヘッドホンのカバー" },
 };
 
-/** 型錄卡片：一張經典商品卡，滑過會微微放大並亮起光暈，愛心可切換收藏。 */
+/** 型錄卡片：一張經典商品卡，滑過時邊線加深，愛心可切換收藏。 */
 export default function ClassicCardCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -21,26 +21,26 @@ export default function ClassicCardCard() {
 
   return (
     <div className="mx-auto w-64">
-      <Card variant="elevated" theme="violet" size="sm" glow locale={locale} className="group min-w-0">
+      <Card variant="elevated" theme="orange" size="sm" locale={locale} className="group min-w-0">
         <CardHeader showDivider>
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
-              <h4 className="text-lg font-bold">{t.title}</h4>
-              <p className="mt-1 text-sm opacity-70">{t.subtitle}</p>
+              <h4 className="text-lg font-semibold">{t.title}</h4>
+              <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
             </div>
-            <span className="shrink-0 rounded-full bg-violet-500 px-2.5 py-1 text-xs font-semibold text-white">{t.badge}</span>
+            <span className="shrink-0 rounded-md border border-border px-2 py-0.5 text-[11px] font-medium tracking-wide text-muted-foreground">{t.badge}</span>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-end gap-3">
-            <p className="text-2xl font-bold text-violet-600 tabular-nums">NT$ 1,299</p>
-            <p className="pb-1 text-sm line-through opacity-50 tabular-nums">NT$ 1,999</p>
+            <p className={`text-2xl font-semibold tabular-nums ${cardAccentClass("orange")}`}>NT$ 1,299</p>
+            <p className="pb-1 text-sm text-muted-foreground line-through tabular-nums">NT$ 1,999</p>
           </div>
         </CardContent>
         <CardFooter justify="between" className="gap-3">
           <button
             type="button"
-            className="rounded-lg bg-linear-to-r from-violet-500 to-purple-600 px-5 py-2.5 font-semibold text-white shadow-lg transition-all hover:from-violet-600 hover:to-purple-700 hover:shadow-xl"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             {t.buy}
           </button>
@@ -49,10 +49,10 @@ export default function ClassicCardCard() {
             aria-label={saved ? t.remove : t.add}
             aria-pressed={saved}
             onClick={() => setSaved((s) => !s)}
-            className="rounded-lg border border-violet-300 px-3.5 py-2.5 text-violet-600 transition-all hover:bg-violet-50"
+            className="rounded-md border border-border px-2.5 py-2 text-foreground transition-colors hover:bg-muted"
           >
             <svg className="h-5 w-5" fill={saved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
         </CardFooter>

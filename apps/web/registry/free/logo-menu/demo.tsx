@@ -16,9 +16,9 @@ export default function LogoMenuDemo() {
   const t = useDemoText(copy);
   return (
     <div
-      className="relative h-64 w-full min-w-0 max-w-2xl overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
+      className="relative h-64 w-full min-w-0 max-w-2xl overflow-hidden rounded-xl border border-border bg-background"
       style={{
-        backgroundImage: "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px)",
         backgroundSize: "20px 20px",
       }}
     >
@@ -30,8 +30,8 @@ export default function LogoMenuDemo() {
           { label: t.grid, icon: menuGlyphs.grid, href: "#grid" },
         ]}
       />
-      <div className="absolute left-24 top-8 right-4 min-w-0 max-w-[12rem] rounded-xl border border-gray-200 bg-white p-2.5 shadow-sm">
-        <p className="truncate text-sm font-semibold text-gray-800">{t.hello}</p>
+      <div className="absolute left-24 top-8 right-4 min-w-0 max-w-[12rem] rounded-xl border border-border bg-card p-2.5 shadow-sm">
+        <p className="truncate text-sm font-semibold text-foreground">{t.hello}</p>
       </div>
     </div>
   );

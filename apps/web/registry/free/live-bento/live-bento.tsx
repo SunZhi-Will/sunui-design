@@ -13,17 +13,17 @@ import { cn } from "@/lib/utils";
 const CSS = `
 .lb-root{--lb-success:var(--success,#15803D);--lb-warning:var(--warning,#B45309)}
 @media (prefers-color-scheme: dark){.lb-root{--lb-success:var(--success,#4ADE80);--lb-warning:var(--warning,#FBBF24)}}
-@keyframes lb-pop{0%{opacity:0;transform:translateY(6px) scale(.85)}70%{opacity:1;transform:translateY(-1px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes lb-swap-in{from{opacity:0;transform:translateY(6px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes lb-pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes lb-swap-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes lb-slide-in-right{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
 @keyframes lb-grow-x{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes lb-type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-@keyframes lb-pulse-red{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--destructive) 30%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in oklab,var(--destructive) 0%,transparent)}}
+@keyframes lb-pulse-red{0%,100%{opacity:1}50%{opacity:.45}}
 @keyframes lb-stamp{0%{opacity:0;transform:rotate(-12deg) scale(1.6)}60%{opacity:1;transform:rotate(-12deg) scale(.94)}100%{opacity:1;transform:rotate(-12deg) scale(1)}}
 @keyframes lb-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes lb-blink{0%,100%{opacity:1}50%{opacity:.25}}
 @keyframes lb-spin{to{transform:rotate(360deg)}}
-.lb-pop{animation:lb-pop 420ms cubic-bezier(.2,.8,.2,1) both}
+.lb-pop{animation:lb-pop 240ms cubic-bezier(.23,1,.32,1) both}
 .lb-swap-in{animation:lb-swap-in 500ms cubic-bezier(.23,1,.32,1) both}
 .lb-slide-in-right{animation:lb-slide-in-right 480ms cubic-bezier(.2,.8,.2,1) both}
 .lb-grow-x{transform:scaleX(0);animation:lb-grow-x 1.6s cubic-bezier(.23,1,.32,1) forwards}
@@ -34,12 +34,12 @@ const CSS = `
 .lb-progress{transform-origin:left center;animation:lb-progress var(--lb-duration,2s) cubic-bezier(.4,0,.2,1) both}
 .lb-blink{animation:lb-blink 1.2s ease-in-out infinite}
 .lb-spin-once{animation:lb-spin 1.2s linear 1}
-.lb-reveal{opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity 800ms cubic-bezier(.23,1,.32,1),transform 800ms cubic-bezier(.23,1,.32,1),filter 800ms cubic-bezier(.23,1,.32,1);transition-delay:var(--lb-delay,0ms)}
-.lb-reveal[data-shown="true"]{opacity:1;transform:none;filter:none}
+.lb-reveal{opacity:0;transform:translateY(18px);transition:opacity 800ms cubic-bezier(.23,1,.32,1),transform 800ms cubic-bezier(.23,1,.32,1);transition-delay:var(--lb-delay,0ms)}
+.lb-reveal[data-shown="true"]{opacity:1;transform:none}
 .lb-lift{transition:transform 400ms cubic-bezier(.23,1,.32,1),box-shadow 400ms cubic-bezier(.23,1,.32,1)}
-@media (hover: hover) and (pointer: fine){.lb-lift:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(0,0,0,.04),0 18px 40px -20px rgba(0,0,0,.22)}}
+@media (hover: hover) and (pointer: fine){.lb-lift:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(0,0,0,.06)}}
 @media (prefers-reduced-motion: reduce){
-.lb-reveal{opacity:1;transform:none;filter:none;transition:none}
+.lb-reveal{opacity:1;transform:none;transition:none}
 .lb-pop,.lb-swap-in,.lb-slide-in-right,.lb-type,.lb-pulse-red,.lb-blink,.lb-spin-once,.lb-progress{animation:none}
 .lb-grow-x,.lb-strike{transform:none;animation:none}
 .lb-stamp{animation:none}
@@ -135,7 +135,7 @@ export interface BentoTileProps {
 export function BentoTile({ title, body, wide, delay = 0, className, children }: BentoTileProps) {
   return (
     <Reveal delay={delay} className={cn("h-full min-w-0", wide && "md:col-span-2", className)}>
-      <article className="lb-lift flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground">
+      <article className="lb-lift flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card text-card-foreground">
         <div className="p-6 pb-0">
           <h3 className="font-semibold">{title}</h3>
           {body ? <p className="mt-1.5 text-sm text-pretty text-muted-foreground">{body}</p> : null}

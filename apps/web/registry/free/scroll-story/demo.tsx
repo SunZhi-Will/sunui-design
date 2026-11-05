@@ -10,7 +10,8 @@ import { ScrollStory, StoryPanel, useLoop, type ScrollStoryStep } from "./scroll
 // 排班系統首頁的功能故事：求解、最小擾動、公平，三個循環場景。
 
 const PEOPLE = ["Alex", "Mia", "Jordan", "Tina", "Ken"];
-const COLORS = ["#2563EB", "#16A34A", "#D97706", "#DB2777", "#7C3AED"];
+// 單一強調色的深淺，不用多色
+const COLORS = [100, 78, 58, 42, 28].map((n) => `color-mix(in oklab, var(--primary) ${n}%, var(--muted))`);
 
 const copy = {
   en: {

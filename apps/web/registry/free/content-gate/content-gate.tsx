@@ -81,12 +81,12 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
 };
 
 interface SharedProps {
-  /** 課程名稱，以白色到 accentTo 的漸層字印出 */
+  /** 課程名稱 */
   title: ReactNode;
   /** 標題上方的大寫小字 */
   subtitle: ReactNode;
   state?: ContentGateState;
-  /** 課程品牌色，預設是原站 Claude 工作坊的橘與杏色 */
+  /** 保留給相容舊版的品牌色，頁內版走中性 token，不再使用（不做光暈與漸層） */
   accentFrom?: string;
   accentTo?: string;
   /** 登入連結；有給就是 <a>，否則是按鈕並呼叫 onSignIn */
@@ -239,8 +239,6 @@ export function ContentGate({
   title,
   subtitle,
   state = "anon",
-  accentFrom = "#da7756",
-  accentTo = "#f5c99b",
   signInHref,
   onSignIn,
   contactHref,
@@ -263,28 +261,8 @@ export function ContentGate({
       )}
       style={{ background: "var(--cg-surface)" }}
     >
-      {/* 背景光暈 */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "20%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 480,
-            height: 480,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${accentFrom}22 0%, transparent 65%)`,
-            filter: "blur(80px)",
-          }}
-        />
-      </div>
-
-      <div
-        className="relative z-10 w-full max-w-md rounded-2xl p-8"
+        className="relative z-10 w-full max-w-md rounded-xl p-8"
         style={{
           background: "var(--cg-card)",
           border: "1px solid var(--cg-border)",
@@ -292,32 +270,21 @@ export function ContentGate({
       >
         <div className="mb-5 flex justify-center">
           <div
-            className="flex h-14 w-14 items-center justify-center rounded-2xl"
-            style={{
-              background: `linear-gradient(135deg, ${accentFrom}33, ${accentTo}22)`,
-              border: "1px solid var(--cg-border)",
-            }}
+            className="flex h-11 w-11 items-center justify-center rounded-lg"
+            style={{ border: "1px solid var(--cg-border)" }}
           >
-            <LockIcon size={24} style={{ color: "var(--cg-p1)" }} />
+            <LockIcon size={20} style={{ color: "var(--cg-muted)" }} />
           </div>
         </div>
 
         <div className="mb-7 text-center">
           <div
-            className="mb-2 text-[12px] font-bold tracking-[0.2em] uppercase"
-            style={{ color: "var(--cg-p1)" }}
+            className="mb-2 text-[11px] font-medium tracking-[0.14em] uppercase"
+            style={{ color: "var(--cg-muted)" }}
           >
             {subtitle}
           </div>
-          <h2
-            className="mb-2 text-xl font-black"
-            style={{
-              background: `linear-gradient(135deg, var(--cg-text) 0%, ${accentTo} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
+          <h2 className="mb-2 text-xl font-semibold" style={{ color: "var(--cg-text)" }}>
             {title}
           </h2>
           <p className="text-sm" style={{ color: "var(--cg-muted)" }}>
@@ -333,7 +300,7 @@ export function ContentGate({
             setSigningIn(true);
             onSignIn?.();
           }}
-          className="flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+          className="flex w-full items-center justify-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-all hover:opacity-90 active:translate-y-px"
           style={{
             background: "var(--cg-text)",
             color: "var(--cg-bg)",

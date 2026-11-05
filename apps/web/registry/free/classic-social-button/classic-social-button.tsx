@@ -13,7 +13,7 @@ export interface SocialButtonProps {
   href?: string;
   /** 圖示：網址字串會渲染成 <img>，或直接傳 React 節點 */
   icon: React.ReactNode;
-  /** 漸層色 class，例如 "from-purple-600/90 to-indigo-800/90" */
+  /** 覆寫底色與字色的 class；預設是中性的卡片圓鈕（border-border bg-card text-foreground） */
   className?: string;
   iconClassName?: string;
   position?: { x: number; y: number };
@@ -26,6 +26,10 @@ export interface SocialButtonProps {
   isOpen?: boolean;
   "aria-label"?: string;
 }
+
+// 預設樣式：一般按鈕是中性的卡片圓鈕，主按鈕用 primary 實色（唯一強調）
+const ITEM_CLASS = "border border-border bg-card text-foreground hover:bg-muted";
+const MAIN_CLASS = "bg-primary text-primary-foreground hover:opacity-90";
 
 const titlePositionClass: Record<TitlePosition, string> = {
   top: "bottom-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2",
@@ -70,14 +74,14 @@ export function SocialButton({
         <span
           aria-hidden
           className={cn(
-            "absolute z-[2000] rounded-sm bg-gray-800/90 px-2 py-1 text-sm whitespace-nowrap text-white transition-opacity duration-200",
+            "absolute z-[2000] rounded-md bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background transition-opacity duration-200",
             titlePositionClass[titlePosition],
             titleDisplay === "always"
               ? "pointer-events-auto opacity-100"
               : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:opacity-100",
           )}
         >
-          <span className={cn("absolute h-2 w-2 rotate-45 bg-gray-800/90", titleArrowClass[titlePosition])} />
+          <span className={cn("absolute h-2 w-2 rotate-45 bg-foreground", titleArrowClass[titlePosition])} />
           {title}
         </span>
       )}
@@ -86,19 +90,18 @@ export function SocialButton({
 
   const buttonClassName = cn(
     isMainButton ? "h-12 w-12" : "h-10 w-10",
-    "group relative flex items-center justify-center rounded-full bg-linear-to-r text-white shadow-lg transition-all duration-300 hover:z-[1500]",
-    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 focus-visible:outline-hidden",
-    className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50",
+    "group relative flex items-center justify-center rounded-full shadow-sm transition-colors duration-200 hover:z-[1500]",
+    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-hidden",
+    className || (isMainButton ? MAIN_CLASS : ITEM_CLASS),
   );
 
   const x = variant === "vertical" ? 0 : position?.x || 0;
   const y = position?.y || 0;
   const motionProps = {
-    initial: reduce ? false : { scale: 0, x, y },
-    animate: { scale: 1, x, y },
-    exit: reduce ? { opacity: 0, x, y } : { scale: 0, x, y },
-    whileHover: reduce ? undefined : { scale: 1.1 },
-    whileTap: reduce ? undefined : { scale: 0.9 },
+    initial: reduce ? false : { opacity: 0, x, y },
+    animate: { opacity: 1, x, y },
+    exit: { opacity: 0, x, y },
+    whileTap: reduce ? undefined : { scale: 0.96 },
     transition: { duration: reduce ? 0 : 0.1, ease: [1, 1, 1, 1] as [number, number, number, number] },
   };
 
@@ -192,7 +195,7 @@ export interface SocialButtonGroupProps {
   showToggleButton?: boolean;
   /** true 時固定在視窗角落；false 時以 absolute 貼齊最近的 relative 父層角落 */
   fixed?: boolean;
-  /** 主按鈕漸層色 class */
+  /** 主按鈕樣式 class，預設 primary 實色 */
   toggleClassName?: string;
   className?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
@@ -242,7 +245,7 @@ export function SocialButtonGroup({
   show = true,
   showToggleButton = true,
   fixed = false,
-  toggleClassName = "from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50",
+  toggleClassName = MAIN_CLASS,
   className,
   locale = "en",
   labels,
@@ -286,7 +289,7 @@ export function SocialButtonGroup({
                   key={b.href ?? i}
                   className="absolute top-1/2 left-1/2 -mt-5 -ml-5 h-10 w-10"
                   style={{ zIndex: layout === "vertical" ? 1000 - i : 10 }}
-                  initial={reduce ? { opacity: 0, x: pos.x, y: pos.y } : { opacity: 0, scale: 0, x: 0, y: 0 }}
+                  initial={reduce ? { opacity: 0, x: pos.x, y: pos.y } : { opacity: 0, scale: 0.6, x: 0, y: 0 }}
                   animate={{
                     opacity: 1,
                     scale: 1,
@@ -297,10 +300,10 @@ export function SocialButtonGroup({
                   exit={
                     reduce
                       ? { opacity: 0, transition: { duration: 0 } }
-                      : { opacity: 0, scale: 0, x: 0, y: 0, transition: { duration: 0.2, delay: (total - i - 1) * 0.05 } }
+                      : { opacity: 0, scale: 0.6, x: 0, y: 0, transition: { duration: 0.2, delay: (total - i - 1) * 0.05 } }
                   }
                 >
-                  <SocialButton {...b} variant={layout} className={cn(b.className || "from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50", "cursor-pointer")} />
+                  <SocialButton {...b} variant={layout} className={cn(b.className || ITEM_CLASS, "cursor-pointer")} />
                 </motion.li>
               );
             })}
@@ -324,7 +327,7 @@ export function SocialButtonGroup({
                 animate={{ rotate: isOpen ? 180 : 0 }}
                 transition={{ duration: reduce ? 0 : 0.3 }}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
               </motion.svg>
             }
             className={toggleClassName}

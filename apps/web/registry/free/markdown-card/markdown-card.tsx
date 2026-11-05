@@ -13,9 +13,10 @@ export interface MarkdownCardProps {
   selected?: boolean;
   onSelectedChange?: (selected: boolean) => void;
   fontSize?: number;
+  /** 文字色，預設跟隨主題文字色 */
   color?: string;
   fontFamily?: string;
-  /** 套用 CardFlow 畫布卡片外框（白底、圓角、陰影） */
+  /** 套用 CardFlow 畫布卡片外框（卡片底、圓角、細邊框） */
   framed?: boolean;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -105,7 +106,7 @@ function markdownComponents(fontSize: number): Components {
       return inline ? (
         <code
           style={{
-            backgroundColor: "rgba(0,0,0,0.08)",
+            backgroundColor: "color-mix(in oklab, currentColor 10%, transparent)",
             padding: "0.125em 0.375em",
             borderRadius: "0.25em",
             fontFamily: "monospace",
@@ -120,7 +121,7 @@ function markdownComponents(fontSize: number): Components {
           className={className}
           style={{
             display: "block",
-            backgroundColor: "rgba(0,0,0,0.06)",
+            backgroundColor: "color-mix(in oklab, currentColor 7%, transparent)",
             padding: "0.75em",
             borderRadius: "0.375em",
             fontFamily: "monospace",
@@ -136,17 +137,17 @@ function markdownComponents(fontSize: number): Components {
       );
     },
     a: ({ node: _n, ...p }: Strip<"a">) => (
-      <a style={{ color: "#2563eb", textDecoration: "underline", cursor: "pointer" }} {...p} />
+      <a style={{ color: "inherit", textDecoration: "underline", textDecorationColor: "color-mix(in oklab, currentColor 40%, transparent)", textUnderlineOffset: "0.2em", cursor: "pointer" }} {...p} />
     ),
     blockquote: ({ node: _n, ...p }: Strip<"blockquote">) => (
       <blockquote
         style={{
-          borderLeft: "3px solid #e0e0e0",
+          borderLeft: "3px solid color-mix(in oklab, currentColor 18%, transparent)",
           paddingLeft: "1em",
           marginLeft: "0",
           marginTop: "0.75em",
           marginBottom: "0.75em",
-          color: "#666",
+          opacity: 0.72,
           fontStyle: "italic",
         }}
         {...p}
@@ -162,7 +163,7 @@ export function MarkdownCard({
   selected: selectedProp,
   onSelectedChange,
   fontSize = 16,
-  color = "#000000",
+  color = "currentColor",
   fontFamily = "Arial",
   framed = true,
   locale = "en",
@@ -268,8 +269,8 @@ export function MarkdownCard({
     <div
       ref={containerRef}
       className={cn(
-        "h-full w-full overflow-auto bg-white p-4 transition-all duration-150 motion-reduce:transition-none",
-        framed && "rounded-lg shadow-lg",
+        "h-full w-full overflow-auto bg-card p-4 text-card-foreground transition-all duration-150 motion-reduce:transition-none",
+        framed && "rounded-lg border border-border shadow-sm",
         className,
       )}
       onMouseDown={(e) => {
@@ -300,7 +301,7 @@ export function MarkdownCard({
       ) : (
         <div
           className={cn(
-            "h-full w-full break-words outline-none transition-opacity duration-150 focus-visible:ring-2 focus-visible:ring-blue-500 motion-reduce:transition-none",
+            "h-full w-full break-words outline-none transition-opacity duration-150 focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
             isHovering && isSelected ? "opacity-90" : "opacity-100",
           )}
           style={{ ...textStyle, cursor: isSelected ? "text" : "default" }}
@@ -322,7 +323,7 @@ export function MarkdownCard({
           {content.trim() ? (
             <ReactMarkdown components={markdownComponents(fontSize)}>{content}</ReactMarkdown>
           ) : (
-            <div className={cn("italic text-gray-400 transition-opacity motion-reduce:transition-none", isSelected ? "opacity-70" : "opacity-50")}>
+            <div className={cn("italic text-muted-foreground transition-opacity motion-reduce:transition-none", isSelected ? "opacity-70" : "opacity-50")}>
               {isSelected ? labels.emptySelected : labels.emptyIdle}
             </div>
           )}

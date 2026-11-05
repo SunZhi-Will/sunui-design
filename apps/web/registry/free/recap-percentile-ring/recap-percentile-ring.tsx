@@ -95,6 +95,8 @@ export const recapPercentileLabels = MESSAGES.en;
 export interface RecapPercentileRingProps {
   /** 排名百分比（越小越好），null 代表沒有可比較的資料 */
   percentileRank: number | null;
+  /** 唯一強調色（已填滿的刻度點與等級標籤的點），預設琥珀金 #d4a24c */
+  accent?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -111,20 +113,29 @@ export function formatPercentile(rank: number | null): string {
   return Math.round(rank).toString(); // 大於 10% 顯示整數
 }
 
-// 根據排名百分比獲取等級和顏色
+/**
+ * 根據排名百分比取得等級。
+ * color 與 glow 為舊版 API 保留的欄位，元件本身已不使用（不再依等級換彩色漸層），
+ * 現在一律回傳中性值。
+ */
 export function getRankLevel(rank: number | null): { level: RecapRankLevel; color: string; glow: string } {
-  if (rank === null || rank === undefined) {
-    return { level: "unknown", color: "from-gray-500 via-slate-500 to-zinc-500", glow: "rgba(107, 114, 128, 0.6)" };
-  }
-  if (rank <= 0.1) return { level: "top01", color: "from-purple-500 via-pink-500 to-red-500", glow: "rgba(168, 85, 247, 0.6)" };
-  if (rank <= 1) return { level: "top1", color: "from-blue-500 via-cyan-500 to-teal-500", glow: "rgba(59, 130, 246, 0.6)" };
-  if (rank <= 5) return { level: "top5", color: "from-green-500 via-emerald-500 to-teal-500", glow: "rgba(34, 197, 94, 0.6)" };
-  if (rank <= 10) return { level: "top10", color: "from-yellow-500 via-amber-500 to-orange-500", glow: "rgba(234, 179, 8, 0.6)" };
-  if (rank <= 25) return { level: "top25", color: "from-orange-500 via-red-500 to-pink-500", glow: "rgba(249, 115, 22, 0.6)" };
-  return { level: "top50", color: "from-gray-500 via-slate-500 to-zinc-500", glow: "rgba(107, 114, 128, 0.6)" };
+  const neutral = { color: "from-stone-400 to-stone-300", glow: "transparent" };
+  if (rank === null || rank === undefined) return { level: "unknown", ...neutral };
+  if (rank <= 0.1) return { level: "top01", ...neutral };
+  if (rank <= 1) return { level: "top1", ...neutral };
+  if (rank <= 5) return { level: "top5", ...neutral };
+  if (rank <= 10) return { level: "top10", ...neutral };
+  if (rank <= 25) return { level: "top25", ...neutral };
+  return { level: "top50", ...neutral };
 }
 
-export function RecapPercentileRing({ percentileRank, locale = "en", labels, className }: RecapPercentileRingProps) {
+const EASE = [0.23, 1, 0.32, 1] as const;
+
+/**
+ * 年度回顧的「排名」：100 個刻度點排成一圈，填滿 100 減排名的數量；
+ * 圈中央是大號襯線數字。只有一次整體淡入，沒有粒子、光暈或常駐動態。
+ */
+export function RecapPercentileRing({ percentileRank, accent = "#d4a24c", locale = "en", labels, className }: RecapPercentileRingProps) {
   const reduce = useReducedMotion() ?? false;
   const tr = (t: Transition): Transition => (reduce ? { duration: 0 } : t);
   const base = MESSAGES[resolveLocale(locale)];
@@ -134,7 +145,7 @@ export function RecapPercentileRing({ percentileRank, locale = "en", labels, cla
   const displayValue = formatPercentile(rank);
   const rankLevel = getRankLevel(rank);
 
-  // 生成圓形進度條的點（排名百分比越低越好，所以用 100 - rank）
+  // 生成圓形刻度點（排名百分比越低越好，所以用 100 - rank）
   const progressDots = useMemo(() => {
     const totalDots = 100;
     const activeDots = rank !== null ? Math.round(100 - rank) : 0;
@@ -145,161 +156,65 @@ export function RecapPercentileRing({ percentileRank, locale = "en", labels, cla
     }));
   }, [rank]);
 
-  // 生成光點效果
-  const lightParticles = useMemo(
-    () =>
-      Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        angle: (i / 20) * 360,
-        radius: 35 + Math.random() * 5,
-        delay: Math.random() * 2,
-      })),
-    [],
-  );
-
   return (
     <div
-      className={cn(
-        "@container relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-950/50 via-purple-950/40 to-pink-950/50 p-6",
-        className,
-      )}
-      // 卡片原本的深色底，漸層疊在上面
-      style={{ backgroundColor: "#0f0f0f" }}
+      className={cn("@container relative flex h-full w-full flex-col overflow-hidden p-6 @md:p-8", className)}
+      style={{ backgroundColor: "#0c0a09", color: "#f5f5f4" }}
     >
-      {/* 背景圓形進度條 */}
-      <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-        <svg className="h-full w-full" viewBox="0 0 200 200" style={{ transform: "rotate(-90deg)" }}>
-          {progressDots.map((dot) => {
-            const radian = (dot.angle * Math.PI) / 180;
-            const x = 100 + Math.cos(radian) * 80;
-            const y = 100 + Math.sin(radian) * 80;
-            return (
-              <motion.circle
-                key={dot.id}
-                cx={x}
-                cy={y}
-                r={dot.isActive ? 2 : 1}
-                fill={dot.isActive ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.2)"}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  scale: dot.isActive ? [0, 1.2, 1] : [0, 0.8, 0.5],
-                  opacity: dot.isActive ? [0, 1, 0.8] : [0, 0.3, 0.2],
-                }}
-                transition={tr({ duration: 0.5, delay: dot.id * 0.01 })}
-              />
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* 光點粒子效果 */}
-      <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-        {!reduce &&
-          lightParticles.map((p) => {
-            const radian = (p.angle * Math.PI) / 180;
-            return (
-              <motion.div
-                key={p.id}
-                className="absolute h-1 w-1 rounded-full bg-white"
-                style={{ left: `${50 + Math.cos(radian) * p.radius}%`, top: `${50 + Math.sin(radian) * p.radius}%` }}
-                animate={{ scale: [0, 1.5, 0], opacity: [0, 1, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
-              />
-            );
-          })}
-      </div>
-
-      {/* 中心發光效果 */}
       <motion.div
-        aria-hidden
-        className="absolute inset-0 flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        transition={tr({ duration: 1 })}
+        className="flex h-full flex-col"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={tr({ duration: 0.5, ease: EASE })}
       >
-        <motion.div
-          className={cn("h-64 w-64 rounded-full bg-gradient-to-r blur-3xl", rankLevel.color)}
-          animate={reduce ? { scale: 1, opacity: 0.3 } : { scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={tr({ duration: 3, repeat: Infinity, ease: "easeInOut" })}
-        />
-      </motion.div>
-
-      <div className="relative z-10 w-full max-w-md text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={tr({ duration: 0.6 })}
-          className="mb-8 text-2xl font-bold text-white @md:text-3xl"
-        >
+        <h1 className="border-b pb-3 text-[11px] font-medium uppercase tracking-[0.16em] text-[#a8a29e]" style={{ borderColor: "rgb(255 255 255 / 0.08)" }}>
           {l.title}
-        </motion.h1>
+        </h1>
 
-        {/* 排名百分比顯示 */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0, rotateY: -90 }}
-          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-          transition={tr({ delay: 0.3, duration: 0.8, type: "spring", bounce: 0.4 })}
-          className="relative mb-8"
-          style={{ perspective: "1000px" }}
-        >
-          <div className="relative">
-            {/* 發光效果 */}
-            <motion.div
-              aria-hidden
-              className={cn("absolute inset-0 rounded-full bg-gradient-to-r blur-3xl", rankLevel.color)}
-              style={{ opacity: 0.4 }}
-              animate={reduce ? { scale: 1, opacity: 0.4 } : { scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
-              transition={tr({ duration: 2, repeat: Infinity, ease: "easeInOut" })}
-            />
-            <motion.div
-              className={cn(
-                "relative z-10 mb-4 bg-gradient-to-r bg-clip-text text-8xl font-bold text-transparent @md:text-9xl",
-                rankLevel.color,
+        <div className="relative flex flex-1 items-center justify-center">
+          {/* 刻度圈 */}
+          <svg aria-hidden className="absolute aspect-square w-full max-w-[22rem]" viewBox="0 0 200 200" style={{ transform: "rotate(-90deg)" }}>
+            {progressDots.map((dot) => {
+              const radian = (dot.angle * Math.PI) / 180;
+              return (
+                <circle
+                  key={dot.id}
+                  cx={100 + Math.cos(radian) * 88}
+                  cy={100 + Math.sin(radian) * 88}
+                  r={dot.isActive ? 1.6 : 1}
+                  fill={dot.isActive ? accent : "rgb(255 255 255 / 0.16)"}
+                />
+              );
+            })}
+          </svg>
+
+          <div className="relative text-center">
+            {rank !== null && <div className="mb-1 text-sm font-medium uppercase tracking-[0.14em] text-[#a8a29e]">{l.subtitle}</div>}
+            <div className="font-serif text-7xl leading-none tracking-[-0.03em] tabular-nums lining-nums @md:text-8xl">
+              {rank !== null ? (
+                <>
+                  {displayValue}
+                  <span className="ml-0.5 align-top text-[0.45em] text-[#a8a29e]">%</span>
+                </>
+              ) : (
+                l.notAvailable
               )}
-              style={{ textShadow: `0 0 40px ${rankLevel.glow}`, WebkitTextStroke: "2px rgba(255, 255, 255, 0.1)" }}
-              animate={reduce ? { scale: 1 } : { scale: [1, 1.05, 1] }}
-              transition={tr({ duration: 3, repeat: Infinity, ease: "easeInOut" })}
-            >
-              {rank !== null ? `${displayValue}%` : l.notAvailable}
-            </motion.div>
+            </div>
           </div>
-
-          {rank !== null && (
-            <motion.div
-              className="text-2xl text-white/90 @md:text-3xl"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={tr({ delay: 0.6, duration: 0.5 })}
-            >
-              {l.subtitle}
-            </motion.div>
-          )}
-        </motion.div>
+        </div>
 
         {/* 等級標籤或說明訊息 */}
-        {rank !== null ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={tr({ delay: 0.8, duration: 0.6 })}
-            className={cn(
-              "inline-block rounded-2xl border border-white/20 bg-gradient-to-r bg-opacity-20 p-4 backdrop-blur-md",
-              rankLevel.color,
-            )}
-          >
-            <p className="text-lg font-semibold text-white @md:text-xl">{l.levels[rankLevel.level]}</p>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={tr({ delay: 0.8, duration: 0.6 })}
-            className="inline-block max-w-md rounded-2xl border border-white/20 bg-gray-500/20 p-4 backdrop-blur-md"
-          >
-            <p className="text-center text-base font-semibold text-white/80 @md:text-lg">{l.noData}</p>
-          </motion.div>
-        )}
-      </div>
+        <div className="border-t pt-4" style={{ borderColor: "rgb(255 255 255 / 0.08)" }}>
+          {rank !== null ? (
+            <p className="flex items-center gap-2 text-[15px] font-medium text-[#f5f5f4] @md:text-base">
+              <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ background: accent }} />
+              {l.levels[rankLevel.level]}
+            </p>
+          ) : (
+            <p className="text-[15px] leading-relaxed text-[#a8a29e] @md:text-base">{l.noData}</p>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }

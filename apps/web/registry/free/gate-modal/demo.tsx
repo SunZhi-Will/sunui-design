@@ -19,18 +19,18 @@ export default function GateModalDemo() {
   const t = useDemoText(copy);
 
   return (
-    <div className="relative flex min-h-[42rem] w-full max-w-xl min-w-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e] p-5 text-white/90">
-      <p className="text-[12px] font-bold tracking-[0.2em] text-[#da7756] uppercase">
+    <div className="relative flex min-h-[42rem] w-full max-w-xl min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0e0e0e] p-5 text-white/90">
+      <p className="text-[12px] font-medium tracking-[0.14em] text-white/50 uppercase">
         {t.lesson}
       </p>
-      <p className="mt-2 text-lg font-bold">
+      <p className="mt-2 text-lg font-semibold">
         {t.heading}
       </p>
-      <div className="mt-4 flex aspect-video min-w-0 items-center justify-center rounded-xl bg-white/[0.04]">
+      <div className="mt-4 flex aspect-video min-w-0 items-center justify-center rounded-lg bg-white/[0.04]">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-xl bg-[#da7756] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="rounded-md bg-[#da7756] px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           {t.watch}
         </button>

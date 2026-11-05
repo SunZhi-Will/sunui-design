@@ -6,20 +6,22 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface GradientBackgroundProps {
-  // 主要背景色系（請用 6 碼 hex，光暈與網格會在後面接透明度）
+  // 底色色調（任何 CSS 顏色；不給時用 shadcn token，跟隨網站明暗）
   fromColor?: string;
   viaColor?: string;
   toColor?: string;
-  // 動態光暈效果
+  // 淡色調層：同色相、極低透明度的一層暈染（不給時用朱紅 accent）
   glowFromColor?: string;
   glowViaColor?: string;
-  // 網格效果
+  // 網格效果（不給時用 border token）
   gridColor?: string;
   gridSize?: { width: number; height: number };
-  // 動畫設定
+  // 動畫設定：只有 animated 為 true 時才會套用，預設是靜止的背景
   animationDuration?: number;
   animationScale?: [number, number, number];
   animationOpacity?: [number, number, number];
+  /** 讓淡色調層依 animationScale / animationOpacity 緩慢變化；預設 false，背景保持安靜 */
+  animated?: boolean;
   /** 預設填滿父層（父層需 relative）；true 時改為固定在整個視窗底層，與原版相同 */
   fullScreen?: boolean;
   className?: string;
@@ -28,126 +30,103 @@ export interface GradientBackgroundProps {
   children?: ReactNode;
 }
 
-/** README 與 Storybook 裡的配色組合，可直接展開成 props */
+/**
+ * 內建色調：只換淡色調層與網格，底色仍跟隨網站明暗。
+ * 每組都是單一色相、極低彩度，像紙或石材上的一層薄色。
+ */
 export const gradientBackgroundPresets = {
-  blue: {
-    fromColor: "#172554",
-    viaColor: "#1e3a8a",
-    toColor: "#0f172a",
-    glowFromColor: "#60a5fa",
-    glowViaColor: "#2563eb",
-    gridColor: "#3b82f6",
-    gridSize: { width: 14, height: 24 },
-    animationDuration: 12,
+  stone: {
+    glowFromColor: "#a8a29e",
+    glowViaColor: "#a8a29e",
+    gridSize: { width: 24, height: 24 },
   },
-  ocean: {
-    fromColor: "#0c4a6e",
-    viaColor: "#0369a1",
-    toColor: "#082f49",
-    glowFromColor: "#38bdf8",
-    glowViaColor: "#0ea5e9",
-    gridColor: "#0284c7",
-    gridSize: { width: 16, height: 28 },
-    animationDuration: 8,
-    animationScale: [1, 1.2, 1],
-    animationOpacity: [0.3, 0.1, 0.3],
+  vermilion: {
+    glowFromColor: "#c8361d",
+    glowViaColor: "#c8361d",
+    gridSize: { width: 24, height: 24 },
   },
-  sunset: {
-    fromColor: "#7c2d12",
-    viaColor: "#9a3412",
-    toColor: "#431407",
-    glowFromColor: "#fb923c",
-    glowViaColor: "#f97316",
-    gridColor: "#ea580c",
-    gridSize: { width: 20, height: 30 },
-    animationDuration: 6,
-    animationScale: [1, 1.4, 1],
-    animationOpacity: [0.4, 0.15, 0.4],
+  slate: {
+    glowFromColor: "#64748b",
+    glowViaColor: "#64748b",
+    gridColor: "#64748b",
+    gridSize: { width: 20, height: 20 },
   },
   forest: {
-    fromColor: "#064e3b",
-    viaColor: "#047857",
-    toColor: "#022c22",
-    glowFromColor: "#34d399",
-    glowViaColor: "#10b981",
-    gridColor: "#059669",
-    gridSize: { width: 18, height: 26 },
-    animationDuration: 10,
-    animationScale: [1, 1.3, 1],
-    animationOpacity: [0.35, 0.12, 0.35],
+    glowFromColor: "#4d7c63",
+    glowViaColor: "#4d7c63",
+    gridColor: "#4d7c63",
+    gridSize: { width: 28, height: 28 },
   },
-  purple: {
-    fromColor: "#4c1d95",
-    viaColor: "#6d28d9",
-    toColor: "#2e1065",
-    glowFromColor: "#c084fc",
-    glowViaColor: "#a855f7",
-    gridColor: "#8b5cf6",
-    gridSize: { width: 14, height: 24 },
-    animationDuration: 4,
-    animationScale: [1, 1.5, 1],
-    animationOpacity: [0.4, 0.1, 0.4],
+  sand: {
+    glowFromColor: "#a16207",
+    glowViaColor: "#a16207",
+    gridColor: "#a16207",
+    gridSize: { width: 32, height: 32 },
   },
 } satisfies Record<string, GradientBackgroundProps>;
 
+/** 依透明度百分比把任意 CSS 顏色混成半透明，hex、rgb、var() 都適用 */
+const tint = (color: string, percent: number) => `color-mix(in srgb, ${color} ${percent}%, transparent)`;
+
 export function GradientBackground({
-  fromColor = "#172554",
-  viaColor = "#1e3a8a",
-  toColor = "#0f172a",
-  glowFromColor = "#60a5fa",
-  glowViaColor = "#2563eb",
-  gridColor = "#3b82f6",
-  gridSize = { width: 14, height: 24 },
+  fromColor,
+  viaColor,
+  toColor,
+  glowFromColor,
+  glowViaColor,
+  gridColor,
+  gridSize = { width: 24, height: 24 },
   animationDuration = 12,
-  animationScale = [1, 1.3, 1],
-  animationOpacity = [0.3, 0.1, 0.3],
+  animationScale = [1, 1.04, 1],
+  animationOpacity = [1, 0.7, 1],
+  animated = false,
   fullScreen = false,
   className,
   style,
   children,
 }: GradientBackgroundProps) {
   const reduce = useReducedMotion() ?? false;
+  const moving = animated && !reduce;
+
+  const top = fromColor ?? "var(--muted)";
+  const mid = viaColor ?? "var(--background)";
+  const bottom = toColor ?? "var(--background)";
+  // 淡色調層的顏色：預設朱紅，暗色時改用亮一階的朱紅（見 .cg-wash 的 CSS 變數）
+  const washFrom = glowFromColor ?? "var(--cg-accent)";
+  const washVia = glowViaColor ?? glowFromColor ?? "var(--cg-accent)";
+  const line = gridColor ? tint(gridColor, 18) : "var(--border)";
 
   return (
     <>
       <div
         aria-hidden
-        className={cn("pointer-events-none overflow-hidden", fullScreen ? "fixed inset-0 -z-10" : "absolute inset-0", className)}
+        className={cn(
+          "pointer-events-none overflow-hidden [--cg-accent:#c8361d] dark:[--cg-accent:#ec6a4f]",
+          fullScreen ? "fixed inset-0 -z-10" : "absolute inset-0",
+          className,
+        )}
         style={style}
       >
-        {/* 主要背景，可自訂色系漸層 */}
-        <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at top, ${fromColor}, ${viaColor}, ${toColor})` }} />
+        {/* 底色：同一組中性色由上往下的淡變化 */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${top}, ${mid} 60%, ${bottom})` }} />
 
-        {/* 主要動態光暈效果；減少動態時停在第一格 */}
+        {/* 淡色調層：從上緣往下暈開，透明度很低，只是讓底色有一點溫度 */}
         <motion.div
-          animate={reduce ? { scale: animationScale[0], opacity: animationOpacity[0] } : { scale: animationScale, opacity: animationOpacity }}
-          transition={reduce ? { duration: 0 } : { duration: animationDuration, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0"
-          style={{ background: `radial-gradient(circle at center, ${glowFromColor}40, ${glowViaColor}20, transparent 70%)` }}
+          initial={false}
+          animate={moving ? { scale: animationScale, opacity: animationOpacity } : { scale: 1, opacity: 1 }}
+          transition={moving ? { duration: animationDuration, repeat: Infinity, ease: "easeInOut" } : { duration: 0 }}
+          className="absolute inset-0 origin-top"
+          style={{ background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${tint(washFrom, 7)}, ${tint(washVia, 3)} 50%, transparent 80%)` }}
         />
 
-        {/* 第二層動態光暈，範圍較大 */}
-        <motion.div
-          animate={
-            reduce
-              ? { scale: animationScale[0] * 1.1, opacity: animationOpacity[0] * 0.5 }
-              : { scale: animationScale.map((s) => s * 1.1), opacity: animationOpacity.map((o) => o * 0.5) }
-          }
-          transition={
-            reduce
-              ? { duration: 0 }
-              : { duration: animationDuration * 1.2, repeat: Infinity, ease: "easeInOut", delay: animationDuration * 0.2 }
-          }
-          className="absolute inset-0"
-          style={{ background: `radial-gradient(circle at center, ${glowFromColor}30, ${glowViaColor}10, transparent 70%)` }}
-        />
-
-        {/* 網格效果，可自訂顏色和大小 */}
+        {/* 網格：1px 細線，往下方淡出，避免整片格子搶走內容 */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `linear-gradient(to right,${gridColor}20 1px,transparent 1px),linear-gradient(to bottom,${gridColor}20 1px,transparent 1px)`,
+            backgroundImage: `linear-gradient(to right, ${line} 1px, transparent 1px), linear-gradient(to bottom, ${line} 1px, transparent 1px)`,
             backgroundSize: `${gridSize.width}px ${gridSize.height}px`,
+            maskImage: "linear-gradient(to bottom, black, transparent 85%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black, transparent 85%)",
           }}
         />
       </div>

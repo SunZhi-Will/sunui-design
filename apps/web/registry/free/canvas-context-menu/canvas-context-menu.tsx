@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -90,10 +90,24 @@ export type CanvasContextMenuProps = {
   className?: string;
 };
 
+/* 原版用 emoji 當圖示，改成 1.5px 線條圖示，形狀對應原意 */
+const glyph = (children: ReactNode) => (
+  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+const icons = {
+  group: glyph(<><rect x="3" y="3" width="8" height="8" rx="1.5" /><rect x="13" y="13" width="8" height="8" rx="1.5" /><path d="M7 11v4a2 2 0 0 0 2 2h4M17 13V9a2 2 0 0 0-2-2h-4" /></>),
+  ungroup: glyph(<><rect x="3" y="3" width="8" height="8" rx="1.5" /><rect x="13" y="13" width="8" height="8" rx="1.5" /><path d="M15 5h4v4M9 19H5v-4" /></>),
+  layout: glyph(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>),
+  duplicate: glyph(<><rect x="8" y="8" width="13" height="13" rx="2" /><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" /></>),
+  delete: glyph(<><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /><path d="M10 11v6M14 11v6" /></>),
+};
+
 type Item = {
   key: string;
   label: string;
-  icon: string;
+  icon: ReactNode;
   onClick: () => void;
   shortcut?: string;
   danger?: boolean;
@@ -153,14 +167,14 @@ export function CanvasContextMenu({
 
   const items: Item[] = [
     ...(selectedCount > 1 && !hasGroup
-      ? [{ key: "group", label: labels.group, icon: "👥", onClick: run(onGroup), disabled: false }]
+      ? [{ key: "group", label: labels.group, icon: icons.group, onClick: run(onGroup), disabled: false }]
       : []),
-    ...(hasGroup ? [{ key: "ungroup", label: labels.ungroup, icon: "💔", onClick: run(onUngroup), disabled: false }] : []),
+    ...(hasGroup ? [{ key: "ungroup", label: labels.ungroup, icon: icons.ungroup, onClick: run(onUngroup), disabled: false }] : []),
     ...(onSnapToGrid
-      ? [{ key: "layout", label: labels.layout, icon: "🖼️", onClick: run(onSnapToGrid), shortcut: "Ctrl+Shift+L", disabled: false }]
+      ? [{ key: "layout", label: labels.layout, icon: icons.layout, onClick: run(onSnapToGrid), shortcut: "Ctrl+Shift+L", disabled: false }]
       : []),
-    { key: "duplicate", label: labels.duplicate, icon: "📋", onClick: run(onDuplicate), shortcut: "Ctrl+C", disabled: selectedCount === 0 },
-    { key: "delete", label: labels.delete, icon: "🗑️", onClick: run(onDelete), shortcut: "Delete", danger: true, disabled: selectedCount === 0 },
+    { key: "duplicate", label: labels.duplicate, icon: icons.duplicate, onClick: run(onDuplicate), shortcut: "Ctrl+C", disabled: selectedCount === 0 },
+    { key: "delete", label: labels.delete, icon: icons.delete, onClick: run(onDelete), shortcut: "Delete", danger: true, disabled: selectedCount === 0 },
   ];
 
   // 上下鍵在可用項目間移動
@@ -184,20 +198,20 @@ export function CanvasContextMenu({
       onKeyDown={onKeyDown}
       onContextMenu={(e) => e.preventDefault()}
       className={cn(
-        "cf-glass-menu z-[100] min-w-[180px] overflow-hidden rounded-xl shadow-2xl",
+        "cf-menu z-[100] min-w-[180px] overflow-hidden rounded-lg border border-border bg-card text-foreground shadow-md",
         fixed ? "fixed" : "absolute",
         className,
       )}
       style={{ left: x, top: y }}
     >
       {selectedCount > 0 && (
-        <div className="border-b border-gray-200/50 bg-gray-50/50 px-3 py-2">
-          <span className="text-xs font-medium text-gray-600">{labels.selected(selectedCount)}</span>
+        <div className="border-b border-border px-3 py-2">
+          <span className="text-xs font-medium text-muted-foreground tabular-nums">{labels.selected(selectedCount)}</span>
         </div>
       )}
       <div className="py-1">
         {items.length === 0 ? (
-          <div className="px-3 py-2 text-center text-sm text-gray-400">{labels.empty}</div>
+          <div className="px-3 py-2 text-center text-sm text-muted-foreground">{labels.empty}</div>
         ) : (
           items.map((item) => (
             <button
@@ -211,35 +225,25 @@ export function CanvasContextMenu({
               className={cn(
                 "flex w-full items-center justify-between px-3 py-2 text-left text-sm outline-none transition-colors",
                 item.disabled
-                  ? "cursor-not-allowed text-gray-400 opacity-50"
+                  ? "cursor-not-allowed text-muted-foreground opacity-50"
                   : item.danger
-                    ? "text-red-600 hover:bg-red-50/50 focus-visible:bg-red-50/50"
-                    : "text-gray-700 hover:bg-blue-50/50 focus-visible:bg-blue-50/50",
+                    ? "text-destructive hover:bg-destructive/10 focus-visible:bg-destructive/10"
+                    : "text-foreground hover:bg-muted focus-visible:bg-muted",
               )}
             >
               <span className="flex items-center gap-2">
-                <span aria-hidden="true">{item.icon}</span>
+                <span aria-hidden="true" className={item.danger ? "" : "text-muted-foreground"}>{item.icon}</span>
                 <span>{item.label}</span>
               </span>
-              {item.shortcut && <span className="text-xs text-gray-400">{item.shortcut}</span>}
+              {item.shortcut && <span className="font-mono text-[11px] text-muted-foreground">{item.shortcut}</span>}
             </button>
           ))
         )}
       </div>
 
       <style>{`
-        .cf-glass-menu {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow:
-            0 10px 40px rgba(0, 0, 0, 0.15),
-            0 2px 8px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        }
         @media (prefers-reduced-motion: reduce) {
-          .cf-glass-menu button { transition: none; }
+          .cf-menu button { transition: none; }
         }
       `}</style>
     </div>

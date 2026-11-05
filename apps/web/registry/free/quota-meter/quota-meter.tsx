@@ -141,7 +141,7 @@ export interface QuotaMeterProps {
   nudgeHref?: string;
   /** 低於或等於這個百分比轉成警示色 */
   lowAt?: number;
-  /** 品牌色（簽到提醒），預設為原本的靛藍 */
+  /** 強調色（簽到提醒），預設跟隨主題的 primary */
   accent?: string;
   /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -152,8 +152,8 @@ export interface QuotaMeterProps {
 
 // 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
 const tokens =
-  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-sidebar:#FAFAFA] [--yc-ring:#71717A] [--yc-brand-default:#4F46E5] [--yc-destructive:#DC2626] [--yc-success:#15803D] " +
-  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-sidebar:#09090B] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:#818CF8] dark:[--yc-destructive:#F87171] dark:[--yc-success:#4ADE80]";
+  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-sidebar:#FAFAFA] [--yc-ring:#71717A] [--yc-brand-default:var(--primary,#18181B)] [--yc-destructive:#DC2626] [--yc-success:#15803D] " +
+  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-sidebar:#09090B] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--primary,#FAFAFA)] dark:[--yc-destructive:#F87171] dark:[--yc-success:#4ADE80]";
 const brand = "[--yc-brand-c:var(--yc-brand,var(--yc-brand-default))]";
 const focus = "outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--yc-ring)]";
 

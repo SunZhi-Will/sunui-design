@@ -10,6 +10,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactNode,
 } from "react";
 
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ export interface ProfileCardData {
 }
 
 export interface CardFace {
-  /** Tailwind 漸層類別，或 glassmorphism-front / glassmorphism-back */
+  /** "paper"（中性卡面，跟隨網站明暗）、Tailwind 漸層類別，或 glassmorphism-front / glassmorphism-back */
   gradient: string;
   primary: string;
   secondary: string;
@@ -50,9 +51,16 @@ export interface CardTheme {
 
 export type LightEffect = "none" | "dynamic" | "diagonal" | "center" | "top" | "dual" | "gradient";
 
-/* ---------- 主題（2025 流行配色，色值照原檔） ---------- */
+/* ---------- 主題 ---------- */
+// 預設為 paper：中性卡面加一條強調色細線。其餘是原檔的漸層配色（色值照原檔），買家可透過 theme prop 自行開回來
 
 export const cardThemes = {
+  paper: {
+    name: "Paper",
+    description: "Neutral card that follows the site theme",
+    front: { gradient: "paper", primary: "card", secondary: "muted", accent: "accent" },
+    back: { gradient: "paper", primary: "card", secondary: "muted", accent: "accent" },
+  },
   classic: {
     name: "Classic Violet",
     description: "The classic purple to blue gradient",
@@ -100,13 +108,14 @@ export const cardThemes = {
 export type CardThemeKey = keyof typeof cardThemes;
 
 export const lightEffects: Record<LightEffect, { name: string; description: string; icon: string }> = {
-  none: { name: "No effect", description: "Hide the light effects", icon: "⚪" },
-  dynamic: { name: "Dynamic tracking", description: "Light follows the cursor (default)", icon: "🎯" },
-  diagonal: { name: "Diagonal", description: "A light band cast from the top-left corner", icon: "💫" },
-  center: { name: "Center light", description: "A light source spreading from the center", icon: "🌟" },
-  top: { name: "Top light", description: "Light shining down from the top", icon: "☀️" },
-  dual: { name: "Dual light", description: "Two light sources on opposite corners", icon: "💡" },
-  gradient: { name: "Gradient light", description: "Multi-colour gradient lighting", icon: "🌈" },
+  // icon 留空：選擇器改用單色圓點表示選取，不用 emoji；買家仍可透過 options 傳入自己的圖示
+  none: { name: "No effect", description: "Hide the light effects", icon: "" },
+  dynamic: { name: "Dynamic tracking", description: "Light follows the cursor (default)", icon: "" },
+  diagonal: { name: "Diagonal", description: "A light band cast from the top-left corner", icon: "" },
+  center: { name: "Center light", description: "A light source spreading from the center", icon: "" },
+  top: { name: "Top light", description: "Light shining down from the top", icon: "" },
+  dual: { name: "Dual light", description: "Two light sources on opposite corners", icon: "" },
+  gradient: { name: "Gradient light", description: "A soft sheen that turns with the cursor", icon: "" },
 };
 
 /* ---------- 多語系 ---------- */
@@ -204,13 +213,13 @@ const PICKER_MESSAGES: Record<
     effectHeading: "Light effect",
     effectHint: "Tip: with “Dynamic tracking” the light follows your mouse for an interactive feel.",
     themeHeading: "Colour theme",
-    themeHint: "Tip: picking a theme applies matching gradients to both sides of the card.",
+    themeHint: "Tip: picking a theme applies matching colours to both sides of the card.",
   },
   "zh-TW": {
     effectHeading: "光影效果",
     effectHint: "提示：選擇「動態追蹤」時，光線會跟著滑鼠移動，互動感更強。",
     themeHeading: "配色主題",
-    themeHint: "提示：選好主題後，卡片正反兩面都會套用對應的漸層。",
+    themeHint: "提示：選好主題後，卡片正反兩面都會套用對應的配色。",
     effects: {
       none: { name: "無效果", description: "隱藏光影效果" },
       dynamic: { name: "動態追蹤", description: "光線跟著游標移動（預設）" },
@@ -218,9 +227,10 @@ const PICKER_MESSAGES: Record<
       center: { name: "中心光", description: "從中央向外擴散的光源" },
       top: { name: "頂光", description: "從上方灑下的光線" },
       dual: { name: "雙光源", description: "對角兩側各一個光源" },
-      gradient: { name: "漸層光", description: "多彩的漸層光影" },
+      gradient: { name: "漸層光", description: "隨游標轉動的柔和光澤" },
     },
     themes: {
+      paper: { name: "紙本", description: "跟隨網站明暗的中性卡面" },
       classic: { name: "經典紫羅蘭", description: "經典的紫到藍漸層" },
       peachFuzz: { name: "柔和桃", description: "2025 流行色，溫暖舒適" },
       cobaltBlue: { name: "鈷藍", description: "清爽明亮的鈷藍色調" },
@@ -234,7 +244,7 @@ const PICKER_MESSAGES: Record<
     effectHeading: "光影效果",
     effectHint: "提示：选择“动态追踪”时，光线会跟随鼠标移动，互动感更强。",
     themeHeading: "配色主题",
-    themeHint: "提示：选好主题后，卡片正反两面都会应用对应的渐变。",
+    themeHint: "提示：选好主题后，卡片正反两面都会应用对应的配色。",
     effects: {
       none: { name: "无效果", description: "隐藏光影效果" },
       dynamic: { name: "动态追踪", description: "光线跟随光标移动（默认）" },
@@ -242,9 +252,10 @@ const PICKER_MESSAGES: Record<
       center: { name: "中心光", description: "从中央向外扩散的光源" },
       top: { name: "顶光", description: "从上方洒下的光线" },
       dual: { name: "双光源", description: "对角两侧各一个光源" },
-      gradient: { name: "渐变光", description: "多彩的渐变光影" },
+      gradient: { name: "渐变光", description: "随光标转动的柔和光泽" },
     },
     themes: {
+      paper: { name: "纸本", description: "跟随网站明暗的中性卡面" },
       classic: { name: "经典紫罗兰", description: "经典的紫到蓝渐变" },
       peachFuzz: { name: "柔和桃", description: "2025 流行色，温暖舒适" },
       cobaltBlue: { name: "钴蓝", description: "清爽明亮的钴蓝色调" },
@@ -258,7 +269,7 @@ const PICKER_MESSAGES: Record<
     effectHeading: "ライト効果",
     effectHint: "ヒント：「ダイナミック追従」を選ぶと、光がマウスに合わせて動きます。",
     themeHeading: "カラーテーマ",
-    themeHint: "ヒント：テーマを選ぶと、カードの表と裏に対応するグラデーションが適用されます。",
+    themeHint: "ヒント：テーマを選ぶと、カードの表と裏に対応する配色が適用されます。",
     effects: {
       none: { name: "なし", description: "ライト効果を表示しない" },
       dynamic: { name: "ダイナミック追従", description: "光がカーソルを追う（デフォルト）" },
@@ -266,9 +277,10 @@ const PICKER_MESSAGES: Record<
       center: { name: "センターライト", description: "中央から広がる光源" },
       top: { name: "トップライト", description: "上から降り注ぐ光" },
       dual: { name: "デュアルライト", description: "対角に置いた二つの光源" },
-      gradient: { name: "グラデーションライト", description: "多色のグラデーション照明" },
+      gradient: { name: "グラデーションライト", description: "カーソルに合わせて回る柔らかな光沢" },
     },
     themes: {
+      paper: { name: "ペーパー", description: "サイトの明暗に合わせる無彩色のカード" },
       classic: { name: "クラシックバイオレット", description: "定番の紫から青へのグラデーション" },
       peachFuzz: { name: "ピーチファズ", description: "2025 年のトレンド色、温かく心地よい" },
       cobaltBlue: { name: "コバルトブルー", description: "涼しげで明るいコバルトの色調" },
@@ -308,18 +320,52 @@ function effectClasses(effect: LightEffect) {
   }
 }
 
+/* ---------- 圖示與小工具 ---------- */
+
+// 原版用 emoji 當圖示，改成 1.5px 線條圖示
+const glyph = (children: ReactNode, size = "h-3.5 w-3.5") => (
+  <svg className={cn("shrink-0", size)} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+const icons = {
+  mail: glyph(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3.5 6.5 8.5 6 8.5-6" /></>),
+  phone: glyph(<><rect x="7" y="2.5" width="10" height="19" rx="2" /><path d="M11 18h2" /></>),
+  pin: glyph(<><path d="M12 21s7-6.2 7-11.5a7 7 0 1 0-14 0C5 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></>),
+  github: glyph(<><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></>, "h-4 w-4"),
+  linkedin: glyph(<><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></>, "h-4 w-4"),
+  twitter: glyph(<path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />, "h-4 w-4"),
+  globe: glyph(<><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>, "h-4 w-4"),
+};
+
+/** 字首：中日文取第一個字，拉丁字母取前兩個單字的字首 */
+function monogram(name: string) {
+  const n = name.trim();
+  if (!n) return "?";
+  if (/[\u3040-\u30ff\u3400-\u9fff]/.test(n[0])) return n[0];
+  const parts = n.split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
+const sectionLabel = (paper: boolean) =>
+  paper
+    ? "mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
+    : "mb-2 text-sm font-semibold opacity-90";
+
 /* ---------- 卡片 ---------- */
 
 export interface FlipProfileCardProps {
   data: ProfileCardData;
-  /** 預設 classic */
+  /** 預設 paper（中性卡面）；原版的漸層配色在 cardThemes 裡 */
   theme?: CardTheme;
   /** 預設 dynamic */
   lightEffect?: LightEffect;
   defaultFlipped?: boolean;
   onFlippedChange?: (flipped: boolean) => void;
-  /** 陰影光暈色，"r, g, b"，預設 102, 126, 234（#667eea） */
+  /** 漸層主題的陰影色，"r, g, b"；paper 主題一律用中性陰影 */
   glowColor?: string;
+  /** paper 主題的唯一強調色：正面頂端與背面標題下的細線 */
+  accent?: string;
   className?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -332,11 +378,12 @@ const BASE_SIZE = { w: 320, h: 384 };
 
 export function FlipProfileCard({
   data,
-  theme = cardThemes.classic,
+  theme = cardThemes.paper,
   lightEffect = "dynamic",
   defaultFlipped = false,
   onFlippedChange,
-  glowColor = "102, 126, 234",
+  glowColor = "0, 0, 0",
+  accent = "#c8361d",
   className,
   locale = "en",
   labels,
@@ -445,10 +492,13 @@ export function FlipProfileCard({
   };
 
   const boost = (base: number) => Math.max(base, base + lightIntensity * (1 - base));
+  // 陰影跟著傾斜加深，但只用中性黑；漸層主題才加上 glowColor 的方向陰影
+  const paperFront = theme.front.gradient === "paper";
+  const paperBack = theme.back.gradient === "paper";
+  const tiltShadow = `0 ${Math.abs(tilt.x) * 1.5 + 4}px ${Math.abs(tilt.x) * 2 + 12}px rgba(0, 0, 0, 0.08),
+      0 ${Math.abs(tilt.y) * 1.5 + 2}px ${Math.abs(tilt.y) * 2 + 6}px rgba(0, 0, 0, 0.06)`;
   const faceStyle = {
-    boxShadow: `0 ${Math.abs(tilt.x) * 3 + 15}px ${Math.abs(tilt.x) * 4 + 25}px rgba(0, 0, 0, 0.2),
-      0 ${Math.abs(tilt.y) * 3 + 8}px ${Math.abs(tilt.y) * 5 + 18}px rgba(0, 0, 0, 0.15),
-      ${tilt.y * 0.8}px ${tilt.x * 0.5}px ${Math.abs(tilt.x) + Math.abs(tilt.y) + 15}px rgba(${glowColor}, 0.4)`,
+    boxShadow: tiltShadow,
     "--light-x": `${lightPosition.x}%`,
     "--light-y": `${lightPosition.y}%`,
     "--light-intensity": adjustedLightIntensity,
@@ -500,18 +550,26 @@ export function FlipProfileCard({
     </>
   );
 
+  const gradientShadow = `${tiltShadow},
+      ${tilt.y * 0.8}px ${tilt.x * 0.5}px ${Math.abs(tilt.x) + Math.abs(tilt.y) + 15}px rgba(${glowColor}, 0.25)`;
   const frontGlass = theme.front.gradient === "glassmorphism-front";
   const backGlass = theme.back.gradient === "glassmorphism-back";
-  const faceBase = cn("relative h-full w-full overflow-hidden rounded-2xl fpc-glow fpc-card-hover", effectClasses(lightEffect));
+  const faceBase = cn("relative h-full w-full overflow-hidden rounded-xl fpc-card-hover", effectClasses(lightEffect));
+  const paperFace = "fpc-paper border border-border bg-card text-card-foreground";
+  const faceClass = (paper: boolean, glass: boolean, gradient: string, glassClass: string) =>
+    cn(faceBase, paper ? paperFace : glass ? `${glassClass} fpc-glass-dynamic fpc-glass-liquid` : `bg-gradient-to-br ${gradient}`);
+  const textClass = (paper: boolean, glass: boolean) => (paper ? "" : glass ? "fpc-glass-text" : "text-white");
+  const mutedClass = (paper: boolean) => (paper ? "text-muted-foreground" : "opacity-80");
   const social = data.socialLinks ?? {};
   const socialItems = (
     [
-      ["github", "🐙", "GitHub"],
-      ["linkedin", "💼", "LinkedIn"],
-      ["twitter", "🐦", "Twitter"],
-      ["website", "🌐", l.website],
+      ["github", icons.github, "GitHub"],
+      ["linkedin", icons.linkedin, "LinkedIn"],
+      ["twitter", icons.twitter, "Twitter"],
+      ["website", icons.globe, l.website],
     ] as const
   ).filter(([key]) => social[key]);
+  const accentBar = (className: string) => <div aria-hidden className={className} style={{ backgroundColor: accent }} />;
   const skills = data.skills ?? [];
   const stop = (e: { stopPropagation: () => void }) => e.stopPropagation();
 
@@ -542,59 +600,48 @@ export function FlipProfileCard({
         {/* 正面 */}
         <div className="fpc-backface absolute h-full w-full" aria-hidden={isFlipped} inert={isFlipped}>
           <div
-            className={cn(faceBase, frontGlass ? "fpc-glass-front fpc-glass-dynamic fpc-glass-liquid" : `bg-gradient-to-br ${theme.front.gradient}`)}
-            style={faceStyle}
+            className={faceClass(paperFront, frontGlass, theme.front.gradient, "fpc-glass-front")}
+            style={paperFront ? faceStyle : { ...faceStyle, boxShadow: gradientShadow }}
           >
             {lightLayers}
-            <div aria-hidden className={cn("absolute inset-0", frontGlass ? "opacity-30" : "opacity-20")}>
-              {frontGlass ? (
-                <>
-                  <div className="fpc-glass-decoration absolute top-10 left-10 h-20 w-20 rounded-full blur-xl" />
-                  <div className="fpc-glass-decoration absolute right-10 bottom-10 h-32 w-32 rounded-full blur-2xl" />
-                  <div className="fpc-glass-decoration absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
-                </>
-              ) : (
-                <>
-                  <div className="absolute top-10 left-10 h-20 w-20 rounded-full bg-white blur-xl" />
-                  <div className="absolute right-10 bottom-10 h-32 w-32 rounded-full bg-yellow-300 blur-2xl" />
-                  <div className="absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-300 blur-3xl" />
-                </>
-              )}
-            </div>
+            {paperFront && accentBar("absolute inset-x-0 top-0 z-10 h-0.5")}
 
-            <div className={cn("relative z-10 flex h-full flex-col justify-between p-8", frontGlass ? "fpc-glass-text" : "text-white")}>
+            <div className={cn("relative z-10 flex h-full flex-col justify-between p-8", textClass(paperFront, frontGlass))}>
               <div className="text-center">
                 <div
                   className={cn(
-                    "mx-auto mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full backdrop-blur-sm",
-                    frontGlass ? "fpc-glass-decoration" : "bg-white/20",
+                    "mx-auto mb-5 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full",
+                    paperFront ? "border border-border bg-muted" : "bg-white/20",
                   )}
                 >
                   {data.avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={data.avatar} alt={l.avatarAlt} className="h-full w-full object-cover" />
                   ) : (
-                    <span aria-hidden className="text-3xl font-bold text-white">
-                      {data.name.charAt(0).toUpperCase() || "👤"}
+                    <span aria-hidden className={cn("text-3xl font-semibold tracking-tight", paperFront ? "text-foreground" : "text-white")}>
+                      {monogram(data.name)}
                     </span>
                   )}
                 </div>
-                <h2 className="mb-2 text-2xl font-bold">{data.name || l.namePlaceholder}</h2>
-                <p className="mb-4 text-lg opacity-90">{data.title || l.titlePlaceholder}</p>
-                <div className="space-y-2 text-sm opacity-80">
+                <h2 className="mb-1 text-2xl font-semibold tracking-tight">{data.name || l.namePlaceholder}</h2>
+                <p className={cn("mb-5 text-base", mutedClass(paperFront))}>{data.title || l.titlePlaceholder}</p>
+                {(data.email || data.phone || data.location) && (
+                  <div className={cn("mx-auto mb-5 h-px w-10", paperFront ? "bg-border" : "bg-white/40")} aria-hidden />
+                )}
+                <div className={cn("space-y-2 text-sm", mutedClass(paperFront))}>
                   {data.email && (
                     <p className="flex items-center justify-center gap-2">
-                      <span aria-hidden>📧</span> {data.email}
+                      {icons.mail} {data.email}
                     </p>
                   )}
                   {data.phone && (
-                    <p className="flex items-center justify-center gap-2">
-                      <span aria-hidden>📱</span> {data.phone}
+                    <p className="flex items-center justify-center gap-2 tabular-nums">
+                      {icons.phone} {data.phone}
                     </p>
                   )}
                   {data.location && (
                     <p className="flex items-center justify-center gap-2">
-                      <span aria-hidden>📍</span> {data.location}
+                      {icons.pin} {data.location}
                     </p>
                   )}
                 </div>
@@ -606,46 +653,34 @@ export function FlipProfileCard({
         {/* 背面 */}
         <div className="fpc-backface fpc-rotate-y-180 absolute h-full w-full" aria-hidden={!isFlipped} inert={!isFlipped}>
           <div
-            className={cn(faceBase, backGlass ? "fpc-glass-back fpc-glass-dynamic fpc-glass-liquid" : `bg-gradient-to-br ${theme.back.gradient}`)}
-            style={faceStyle}
+            className={faceClass(paperBack, backGlass, theme.back.gradient, "fpc-glass-back")}
+            style={paperBack ? faceStyle : { ...faceStyle, boxShadow: gradientShadow }}
           >
             {lightLayers}
-            <div aria-hidden className={cn("absolute inset-0", backGlass ? "opacity-30" : "opacity-20")}>
-              {backGlass ? (
-                <>
-                  <div className="fpc-glass-decoration absolute top-5 right-5 h-16 w-16 rounded-full blur-lg" />
-                  <div className="fpc-glass-decoration absolute bottom-5 left-5 h-24 w-24 rounded-full blur-xl" />
-                  <div className="fpc-glass-decoration absolute top-1/3 right-1/3 h-20 w-20 rounded-full blur-lg" />
-                </>
-              ) : (
-                <>
-                  <div className="absolute top-5 right-5 h-16 w-16 rounded-full bg-white blur-lg" />
-                  <div className="absolute bottom-5 left-5 h-24 w-24 rounded-full bg-yellow-200 blur-xl" />
-                  <div className="absolute top-1/3 right-1/3 h-20 w-20 rounded-full bg-blue-200 blur-lg" />
-                </>
-              )}
-            </div>
 
-            <div className={cn("relative z-10 flex h-full flex-col p-6", backGlass ? "fpc-glass-text" : "text-white")}>
+            <div className={cn("relative z-10 flex h-full flex-col p-6", textClass(paperBack, backGlass))}>
               <div className="mb-6 text-center">
-                <h3 className="mb-2 text-xl font-bold">{l.details}</h3>
-                <div className="mx-auto h-0.5 w-12 bg-white/50" />
+                <h3 className="mb-2 text-lg font-semibold tracking-tight">{l.details}</h3>
+                {paperBack ? accentBar("mx-auto h-0.5 w-8") : <div className="mx-auto h-0.5 w-12 bg-white/50" />}
               </div>
 
               <div className="flex-1 space-y-4">
                 {data.bio && (
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold opacity-90">{l.about}</h4>
-                    <p className="text-sm leading-relaxed opacity-80">{data.bio}</p>
+                    <h4 className={sectionLabel(paperBack)}>{l.about}</h4>
+                    <p className={cn("text-sm leading-relaxed", paperBack ? "text-foreground/85" : "opacity-80")}>{data.bio}</p>
                   </div>
                 )}
 
                 {skills.length > 0 && (
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold opacity-90">{l.skills}</h4>
-                    <ul className="flex flex-wrap gap-2">
+                    <h4 className={sectionLabel(paperBack)}>{l.skills}</h4>
+                    <ul className="flex flex-wrap gap-1.5">
                       {skills.map((skill, i) => (
-                        <li key={i} className="rounded-full bg-white/20 px-2 py-1 text-xs backdrop-blur-sm">
+                        <li
+                          key={i}
+                          className={cn("rounded-full px-2 py-0.5 text-xs", paperBack ? "border border-border bg-muted text-foreground" : "bg-white/20")}
+                        >
                           {skill}
                         </li>
                       ))}
@@ -655,8 +690,8 @@ export function FlipProfileCard({
 
                 {socialItems.length > 0 && (
                   <div>
-                    <h4 className="mb-2 text-sm font-semibold opacity-90">{l.social}</h4>
-                    <div className="flex justify-center gap-3">
+                    <h4 className={sectionLabel(paperBack)}>{l.social}</h4>
+                    <div className="flex justify-center gap-2">
                       {socialItems.map(([key, icon, label]) => (
                         <a
                           key={key}
@@ -666,11 +701,14 @@ export function FlipProfileCard({
                           aria-label={label}
                           onClick={stop}
                           onKeyDown={stop}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-colors hover:bg-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                          className={cn(
+                            "flex h-8 w-8 items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+                            paperBack
+                              ? "border border-border text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-ring"
+                              : "bg-white/20 hover:bg-white/30 focus-visible:outline-white",
+                          )}
                         >
-                          <span aria-hidden className="text-sm">
-                            {icon}
-                          </span>
+                          {icon}
                         </a>
                       ))}
                     </div>
@@ -708,9 +746,16 @@ function useRadioKeys<T extends string>(keys: readonly T[], value: T, select: (k
   return { onKeyDown, setRef };
 }
 
-const optionBase = "rounded-lg border-2 p-3 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2";
-const optionOn = "border-purple-500 bg-purple-50 shadow-md";
-const optionOff = "border-gray-200 hover:border-gray-300 hover:shadow-sm";
+const optionBase = "rounded-lg border p-3 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+const optionOn = "border-primary bg-primary/5";
+const optionOff = "border-border hover:border-foreground/20";
+
+/** 單選指示點：取代原版的 emoji 圖示與紫色勾 */
+const radioDot = (on: boolean) => (
+  <span aria-hidden className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-full border", on ? "border-primary" : "border-border")}>
+    {on && <span className="h-2 w-2 rounded-full bg-primary" />}
+  </span>
+);
 
 /* ---------- 光影效果選擇器 ---------- */
 
@@ -752,8 +797,8 @@ export function LightEffectPicker({
   return (
     <div className={cn("space-y-4", className)}>
       <Styles />
-      <h3 id={headingId} className="mb-3 flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <span aria-hidden>💡</span> {heading}
+      <h3 id={headingId} className="mb-3 text-sm font-semibold text-foreground">
+        {heading}
       </h3>
       <div role="radiogroup" aria-labelledby={headingId} className="grid grid-cols-1 gap-2">
         {effectKeys.map((key) => {
@@ -772,29 +817,25 @@ export function LightEffectPicker({
               className={cn(optionBase, "text-left", on ? optionOn : optionOff)}
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden className="text-2xl">
-                  {meta.icon}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-gray-800">{meta.name}</div>
-                  <div className="text-xs text-gray-500">{meta.description}</div>
-                </div>
-                {on && (
-                  <span aria-hidden className="text-lg text-purple-500">
-                    ✓
+                {meta.icon ? (
+                  <span aria-hidden className="text-2xl">
+                    {meta.icon}
                   </span>
+                ) : (
+                  radioDot(on)
                 )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-foreground">{meta.name}</div>
+                  <div className="text-xs text-muted-foreground">{meta.description}</div>
+                </div>
               </div>
             </button>
           );
         })}
       </div>
       {hint && (
-        <div className="mt-4 rounded-lg bg-blue-50 p-3">
-          <p className="text-sm text-blue-700">
-            <span aria-hidden>💡 </span>
-            {hint}
-          </p>
+        <div className="mt-4 rounded-lg border border-border bg-muted/50 p-3">
+          <p className="text-sm text-muted-foreground">{hint}</p>
         </div>
       )}
     </div>
@@ -819,7 +860,7 @@ const themeKeys = Object.keys(cardThemes) as CardThemeKey[];
 
 export function ThemePicker({
   value,
-  defaultValue = "classic",
+  defaultValue = "paper",
   onValueChange,
   className,
   options,
@@ -842,8 +883,8 @@ export function ThemePicker({
   return (
     <div className={cn("space-y-4", className)}>
       <Styles />
-      <h3 id={headingId} className="mb-3 flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <span aria-hidden>🎨</span> {heading}
+      <h3 id={headingId} className="mb-3 text-sm font-semibold text-foreground">
+        {heading}
       </h3>
       <div role="radiogroup" aria-labelledby={headingId} className="grid grid-cols-2 gap-3">
         {themeKeys.map((key) => {
@@ -851,6 +892,9 @@ export function ThemePicker({
           const meta = { name: t.name, description: t.description, ...pm.themes?.[key], ...options?.[key] };
           const on = selected === key;
           const glass = key === "glassmorphism";
+          const paper = key === "paper";
+          const swatch = (gradient: string, glassClass: string) =>
+            cn("h-6 w-8 rounded", paper ? "border border-border bg-card" : glass ? `${glassClass} border border-white/20` : `bg-gradient-to-r ${gradient} border border-border`);
           return (
             <button
               key={key}
@@ -865,12 +909,12 @@ export function ThemePicker({
             >
               <div className="space-y-2">
                 <div aria-hidden className="flex gap-1">
-                  <div className={cn("h-6 w-8 rounded", glass ? "fpc-glass-preview-front border border-white/20" : `bg-gradient-to-r ${t.front.gradient} border border-gray-300`)} />
-                  <div className={cn("h-6 w-8 rounded", glass ? "fpc-glass-preview-back border border-white/20" : `bg-gradient-to-r ${t.back.gradient} border border-gray-300`)} />
+                  <div className={swatch(t.front.gradient, "fpc-glass-preview-front")} />
+                  <div className={swatch(t.back.gradient, "fpc-glass-preview-back")} />
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-medium text-gray-800">{meta.name}</div>
-                  <div className="text-xs text-gray-500">{meta.description}</div>
+                  <div className="text-sm font-medium text-foreground">{meta.name}</div>
+                  <div className="text-xs text-muted-foreground">{meta.description}</div>
                 </div>
               </div>
             </button>
@@ -878,11 +922,8 @@ export function ThemePicker({
         })}
       </div>
       {hint && (
-        <div className="mt-4 rounded-lg bg-blue-50 p-3">
-          <p className="text-sm text-blue-700">
-            <span aria-hidden>💡 </span>
-            {hint}
-          </p>
+        <div className="mt-4 rounded-lg border border-border bg-muted/50 p-3">
+          <p className="text-sm text-muted-foreground">{hint}</p>
         </div>
       )}
     </div>

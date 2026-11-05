@@ -52,8 +52,10 @@ export interface HoldToRedeemProps {
   defaultDone?: boolean;
   /** 兌換完成後顯示的內容，例如兌換碼 */
   result?: ReactNode;
-  /** 進度色，預設是原作的金色 */
+  /** 進度色，預設是 --story-accent */
   color?: string;
+  /** 配色主題，預設 ink */
+  theme?: StoryTheme;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -110,12 +112,54 @@ const MESSAGES: Record<SunLocale, Required<HoldToRedeemLabels>> = {
   },
 };
 
-// 原作 HoldRing.tsx 的尺寸與顏色
+/** DESIGN-story.md 的 token；ink 是預設暗色，rice 是宣紙亮色，moon 是月光藍 */
+export const storyThemes = {
+  ink: {
+    "--story-bg": "#0b0e14",
+    "--story-panel": "rgb(14 18 28 / 0.86)",
+    "--story-line": "rgb(234 228 214 / 0.14)",
+    "--story-text": "#eae4d6",
+    "--story-muted": "rgb(234 228 214 / 0.6)",
+    "--story-accent": "#c9a063",
+    "--story-on-accent": "#17130d",
+    "--story-danger": "#c4553f",
+    "--story-shadow": "0 24px 64px rgb(0 0 0 / 0.45)",
+    "--story-highlight": "rgb(255 255 255 / 0.06)",
+  },
+  rice: {
+    "--story-bg": "#f4efe3",
+    "--story-panel": "rgb(250 246 236 / 0.94)",
+    "--story-line": "rgb(60 48 32 / 0.18)",
+    "--story-text": "#2a2219",
+    "--story-muted": "rgb(42 34 25 / 0.6)",
+    "--story-accent": "#9a6b2a",
+    "--story-on-accent": "#fbf6ea",
+    "--story-danger": "#a33a26",
+    "--story-shadow": "0 8px 24px rgb(60 48 32 / 0.12)",
+    "--story-highlight": "rgb(255 255 255 / 0.6)",
+  },
+  moon: {
+    "--story-bg": "#070a12",
+    "--story-panel": "rgb(12 17 28 / 0.86)",
+    "--story-line": "rgb(233 237 245 / 0.12)",
+    "--story-text": "#e9edf5",
+    "--story-muted": "rgb(233 237 245 / 0.6)",
+    "--story-accent": "#a3b8d9",
+    "--story-on-accent": "#0b0f18",
+    "--story-danger": "#af637a",
+    "--story-shadow": "0 24px 64px rgb(0 0 0 / 0.45)",
+    "--story-highlight": "rgb(255 255 255 / 0.06)",
+  },
+} as const;
+
+export type StoryTheme = keyof typeof storyThemes;
+
+// 原作 HoldRing.tsx 的尺寸；顏色改走 --story-*
 const SIZE = 76;
 const STROKE = 7;
 const R = (SIZE - STROKE) / 2;
 const C = 2 * Math.PI * R;
-const RED = "#ff6b6b";
+const RED = "var(--story-danger)";
 /** 倒退速度（進度／秒）：比填滿快很多，一圈約 0.45 秒退光 */
 const REWIND_PER_SEC = 2.2;
 
@@ -123,21 +167,17 @@ type Phase = "idle" | "filling" | "rewinding" | "confirming";
 
 const STYLES = `
   @keyframes hr-tell { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-  .hr-panel { position: relative; color: #e8edf5;
-    background: linear-gradient(180deg, rgba(17,24,35,0.96), rgba(9,13,20,0.96));
-    border-top: 2px solid #3d4f6b; border-left: 2px solid #3d4f6b; border-bottom: 2px solid #05070b; border-right: 2px solid #05070b;
-    box-shadow: 0 0 0 1px #000, 5px 5px 0 rgba(0,0,0,0.45); }
-  .hr-panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; pointer-events: none;
-    background: linear-gradient(90deg, rgba(245,197,66,0.7), rgba(245,197,66,0) 60%); }
+  .hr-panel { position: relative; color: var(--story-text); background: var(--story-panel);
+    border: 1px solid var(--story-line); border-radius: 2px;
+    box-shadow: inset 0 1px 0 var(--story-highlight), var(--story-shadow); }
   .hr-keycap { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; box-sizing: border-box;
-    font-weight: 900; font-size: 0.76rem; line-height: 1; color: #231600; text-shadow: none;
-    background: linear-gradient(180deg, #ffe08a 0%, #f5c542 55%, #d9981e 100%);
-    border-top: 2px solid #fff1bf; border-left: 2px solid #ffe7a0; border-bottom: 3px solid #7a4d08; border-right: 2px solid #8f5e10;
-    box-shadow: 0 0 0 1px #000; }
-  .hr-keycap.dim { color: #d8dee9; background: rgba(14,20,30,0.9); border-color: #4a5d7c #05070b #05070b #4a5d7c; }
-  .hr-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.06em;
-    color: #f5c542; background: rgba(6,10,18,0.7); border: 1px solid rgba(245,197,66,0.5); white-space: nowrap; }
-  .hr-ring:focus-visible { outline: 2px solid #f5c542; outline-offset: 4px; }
+    font-weight: 700; font-size: 0.76rem; line-height: 1; color: var(--story-on-accent);
+    background: var(--story-accent); border: 1px solid var(--story-accent); border-radius: 2px;
+    box-shadow: inset 0 1px 0 var(--story-highlight); }
+  .hr-keycap.dim { color: var(--story-muted); background: var(--story-bg); border-color: var(--story-line); }
+  .hr-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--story-accent); background: transparent; border: 1px solid var(--story-line); border-radius: 2px; white-space: nowrap; }
+  .hr-ring:focus-visible { outline: 1px solid var(--story-accent); outline-offset: 4px; }
   @media (prefers-reduced-motion: reduce) { .hr-tell { animation: none !important; } }
 `;
 
@@ -153,7 +193,8 @@ export function HoldToRedeem({
   done: doneProp,
   defaultDone = false,
   result,
-  color = "#ffd96b",
+  color = "var(--story-accent)",
+  theme = "ink",
   locale = "en",
   labels,
   className,
@@ -281,31 +322,31 @@ export function HoldToRedeem({
   const fill = (s: string) => s.replace("{key}", keyLabel);
 
   let hint: ReactNode = fill(t.hint);
-  let hintColor = "#bfe3ff";
+  let hintColor = "var(--story-muted)";
   if (done) {
     hint = t.redeemed;
-    hintColor = "#5ee092";
+    hintColor = "var(--story-accent)";
   } else if (disabled) {
     hint = disabledReason ?? fill(t.hint);
-    hintColor = "#8a97ab";
+    hintColor = "var(--story-muted)";
   } else if (busy) {
     hint = t.confirming;
-    hintColor = "#ffd96b";
+    hintColor = "var(--story-accent)";
   } else if (alarm) {
     hint = fill(t.warn);
-    hintColor = "#ff8a8a";
+    hintColor = "var(--story-danger)";
   } else if (failed) {
     hint = t.failed;
-    hintColor = "#ff8a8a";
+    hintColor = "var(--story-danger)";
   }
 
   const tell = alarm && !reduce ? { animation: "hr-tell 0.28s linear infinite" } : undefined;
 
   return (
-    <div className={cn("hr-panel w-full px-4 pt-3 pb-3 select-none", className)}>
+    <div className={cn("hr-panel w-full px-4 pt-3 pb-3 select-none", className)} style={storyThemes[theme] as unknown as CSSProperties}>
       <style>{STYLES}</style>
       <div className="flex items-start justify-between gap-3">
-        <p id={`${id}-label`} className="min-w-0 text-base leading-snug font-black [overflow-wrap:anywhere] text-white [text-shadow:2px_2px_0_#000]">
+        <p id={`${id}-label`} className="min-w-0 text-base leading-snug font-semibold tracking-[0.04em] [overflow-wrap:anywhere] text-(--story-text)">
           {label}
         </p>
         {cost && <span className="hr-chip mt-0.5 shrink-0">{cost}</span>}
@@ -316,7 +357,7 @@ export function HoldToRedeem({
           <span
             aria-hidden="true"
             className="hr-tell pointer-events-none absolute left-1/2 -translate-x-1/2"
-            style={{ top: -32, fontSize: 26, fontWeight: 900, lineHeight: 1, color: "#ff5050", textShadow: "0 0 6px rgba(0,0,0,0.85)", ...tell }}
+            style={{ top: -32, fontSize: 26, fontWeight: 700, lineHeight: 1, color: "var(--story-danger)", ...tell }}
           >
             !
           </span>
@@ -340,7 +381,7 @@ export function HoldToRedeem({
           onContextMenu={(e) => e.preventDefault()}
         >
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} className="block -rotate-90" aria-hidden="true">
-            <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="rgba(10,14,22,0.55)" stroke="rgba(255,255,255,0.22)" strokeWidth={STROKE} />
+            <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="var(--story-bg)" stroke="var(--story-line)" strokeWidth={STROKE} />
             <motion.circle
               cx={SIZE / 2}
               cy={SIZE / 2}
@@ -364,13 +405,13 @@ export function HoldToRedeem({
 
       <p
         id={`${id}-hint`}
-        className="mt-1.5 min-h-5 text-center text-sm leading-5 font-extrabold [overflow-wrap:anywhere]"
-        style={{ color: hintColor, textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}
+        className="mt-1.5 min-h-5 text-center text-sm leading-5 font-medium [overflow-wrap:anywhere]"
+        style={{ color: hintColor }}
       >
         {hint}
       </p>
       {done && result && (
-        <p className="mt-1 text-center font-mono text-sm font-black tracking-[0.12em] text-[#ffe08a] select-all [text-shadow:2px_2px_0_#000]">
+        <p className="mt-1 text-center font-mono text-sm font-semibold tracking-[0.12em] text-(--story-accent) select-all">
           {result}
         </p>
       )}

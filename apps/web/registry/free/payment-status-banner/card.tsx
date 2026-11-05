@@ -7,10 +7,10 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { PaymentStatusBanner } from "./payment-status-banner";
 
 const copy = {
-  en: { pending: "Confirming your payment…", success: "Payment received!", successLink: "Start →", course: "Build small tools with AI", replay: "Replay" },
-  "zh-TW": { pending: "正在確認付款…", success: "付款成功！", successLink: "開始 →", course: "用 AI 打造小工具", replay: "重播" },
-  "zh-CN": { pending: "正在确认支付…", success: "支付成功！", successLink: "开始 →", course: "用 AI 打造小工具", replay: "重播" },
-  ja: { pending: "お支払いを確認中…", success: "お支払い完了！", successLink: "始める →", course: "AI で小さなツールを作る", replay: "もう一度" },
+  en: { pending: "Confirming your payment…", success: "Payment received!", successLink: "Start →", course: "Develop your first roll", replay: "Replay" },
+  "zh-TW": { pending: "正在確認付款…", success: "付款成功！", successLink: "開始 →", course: "沖洗第一卷底片", replay: "重播" },
+  "zh-CN": { pending: "正在确认支付…", success: "支付成功！", successLink: "开始 →", course: "冲洗第一卷胶片", replay: "重播" },
+  ja: { pending: "お支払いを確認中…", success: "お支払い完了！", successLink: "始める →", course: "はじめてのフィルム現像", replay: "もう一度" },
 };
 
 /** 型錄卡片：付款確認中的橫幅自己輪詢，第二次查詢開通後切成成功。 */
@@ -29,10 +29,10 @@ export default function PaymentStatusBannerCard() {
   };
 
   return (
-    <div className="relative mx-auto w-[300px] overflow-hidden rounded-[12px] border border-white/10 bg-black text-[14px] text-white/90">
-      <div className="flex h-11 items-center gap-2 border-b border-white/5 px-4">
-        <span className="size-2 rounded-full bg-[#F5C045]" aria-hidden />
-        <span className="text-[13px] font-bold">AI Studio Class</span>
+    <div className="relative mx-auto w-[300px] overflow-hidden rounded-xl border border-border bg-background text-[14px] text-foreground">
+      <div className="flex h-11 items-center gap-2 border-b border-border px-4">
+        <span className="size-2 rounded-full bg-primary" aria-hidden />
+        <span className="text-[13px] font-semibold">Darkroom School</span>
       </div>
       <PaymentStatusBanner
         key={run}
@@ -51,8 +51,8 @@ export default function PaymentStatusBannerCard() {
         successHref="#lesson-1"
       />
       <div className="flex items-center justify-between gap-3 p-4">
-        <p className="text-[15px] leading-snug font-black">{t.course}</p>
-        <button type="button" onClick={replay} className="shrink-0 text-xs text-white/60 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
+        <p className="text-[15px] leading-snug font-semibold">{t.course}</p>
+        <button type="button" onClick={replay} className="shrink-0 text-xs text-muted-foreground underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
           {t.replay}
         </button>
       </div>

@@ -187,7 +187,7 @@ export function CardFlowLoader({
   if (done && hideOnComplete) return null;
 
   return (
-    <div className={cn(fullScreen ? "fixed inset-0 z-50" : "absolute inset-0 h-full w-full", "flex items-center justify-center bg-white", className)}>
+    <div className={cn(fullScreen ? "fixed inset-0 z-50" : "absolute inset-0 h-full w-full", "flex items-center justify-center bg-background", className)}>
       <style>{`@media (prefers-reduced-motion: reduce) { .cf-loader-ring { transition: none !important; } }`}</style>
       <div className="flex flex-col items-center">
         <div
@@ -199,14 +199,14 @@ export function CardFlowLoader({
           aria-valuenow={progress}
         >
           <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" strokeWidth="8" />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted" />
             <circle
-              className="cf-loader-ring"
+              className="cf-loader-ring text-primary"
               cx="50"
               cy="50"
               r="40"
               fill="none"
-              stroke="#374151"
+              stroke="currentColor"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={DASH}
@@ -215,14 +215,14 @@ export function CardFlowLoader({
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-            <span className="text-lg font-bold text-gray-700">{progress}%</span>
+            <span className="text-lg font-semibold tabular-nums text-foreground">{progress}%</span>
           </div>
         </div>
 
-        <h2 className="mb-4 text-2xl font-semibold text-gray-800">{labels.title}</h2>
+        <h2 className="mb-4 text-2xl font-semibold text-foreground">{labels.title}</h2>
 
         <div className="mb-6 flex h-6 items-center justify-center">
-          <p aria-live="polite" className="text-center text-sm font-medium text-gray-600 transition-all duration-300 ease-in-out">
+          <p aria-live="polite" className="text-center text-sm font-medium text-muted-foreground transition-all duration-300 ease-in-out">
             {messages[currentText % messages.length]}
           </p>
         </div>

@@ -23,7 +23,7 @@ const copy = {
     ate: (n: number) => `ate ${n} ${n === 1 ? "dish" : "dishes"}`,
     remove: (name: string) => `Remove ${name}`,
     removed: (name: string) => `Removed ${name}`,
-    empty: "{t.empty}",
+    empty: "No one here yet. Press Undo on the notice.",
   },
   "zh-TW": {
     names: { m1: "小美", m2: "阿斌", m3: "可欣" } as Record<string, string>,

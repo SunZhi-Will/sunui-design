@@ -22,7 +22,7 @@ const copy = {
     reviews: (n: string) => `${n} reviews`,
     breakdown: "Rating breakdown",
     star: (n: number) => `${n} star`,
-    prompt: "{t.prompt}",
+    prompt: "Bought this pair? Leave a rating",
     yours: "Your rating",
   },
   "zh-TW": {

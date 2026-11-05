@@ -7,12 +7,13 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { ChoiceCards, type ChoiceRow } from "./choice-cards";
 
 // 簡化的像素圖示：錨、握手、水晶
+// 圖示用 currentColor，顏色跟著卡片的 path 走（--story-*）
 const glyph = (d: string, fill: string) => <svg viewBox="0 0 12 12" shapeRendering="crispEdges" aria-hidden="true"><path d={d} fill={fill} /></svg>;
 
 const art = {
-  stop: glyph("M5 1h2v2H5zM5 3h2v7H5zM3 4h6v1H3zM1 7h1v2h1v1h6V9h1V7h1v3h-1v1H2v-1H1z", "#e5e7eb"),
-  talk: glyph("M1 3h2v2h1v1h4V5h1V3h2v4h-1v1H9v1H3V8H2V7H1z", "#34d399"),
-  take: glyph("M5 0h2v1h1v1h1v4H8v1H7v1H5V7H4V6H3V2h1V1h1zM2 8h8v3H2z", "#f87171"),
+  stop: glyph("M5 1h2v2H5zM5 3h2v7H5zM3 4h6v1H3zM1 7h1v2h1v1h6V9h1V7h1v3h-1v1H2v-1H1z", "currentColor"),
+  talk: glyph("M1 3h2v2h1v1h4V5h1V3h2v4h-1v1H9v1H3V8H2V7H1z", "currentColor"),
+  take: glyph("M5 0h2v1h1v1h1v4H8v1H7v1H5V7H4V6H3V2h1V1h1zM2 8h8v3H2z", "currentColor"),
 };
 
 interface Copy {
@@ -105,7 +106,7 @@ export default function ChoiceCardsDemo() {
   ];
 
   return (
-    <div className="w-full max-w-4xl min-w-0 bg-[radial-gradient(ellipse_at_50%_20%,#1c2a44_0%,#070a12_70%)] p-3 sm:p-5">
+    <div className="w-full max-w-4xl min-w-0 overflow-hidden bg-[#0b0e14] p-3 sm:p-5">
       <ChoiceCards
         locale={locale}
         name={t.name}

@@ -95,7 +95,7 @@ export default function RecordsThreadBoardDemo() {
     hint: t.achievements[i][2],
   }));
   return (
-    <div className="w-full max-w-3xl min-w-0 bg-[radial-gradient(ellipse_at_50%_30%,#18223a_0%,#0a0e18_74%)] p-3 sm:p-6">
+    <div className="w-full max-w-3xl min-w-0 overflow-hidden bg-[#070a12] p-3 sm:p-6">
       <RecordsThreadBoard endings={endings} achievements={achievements} locale={locale} />
     </div>
   );

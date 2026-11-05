@@ -25,7 +25,7 @@ export default function ClassicFileUploadCard() {
   const locale = useDemoLocale();
   return (
     <div className="mx-auto w-72">
-      <ClassicFileUpload theme="orange" locale={locale} multiple maxSize={10 * 1024 * 1024} simulateProgress={false} onFileUpload={fakeUpload} className="p-4" />
+      <ClassicFileUpload locale={locale} multiple maxSize={10 * 1024 * 1024} simulateProgress={false} onFileUpload={fakeUpload} className="p-4" />
     </div>
   );
 }

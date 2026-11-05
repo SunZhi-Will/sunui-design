@@ -34,11 +34,12 @@ export interface FileUploadPalette {
   s500: string;
 }
 
-// 原本的 violet/fuchsia、cyan/sky、orange/amber（Tailwind 色票 hex）
-const PALETTES: Record<Exclude<FileUploadTheme, "custom">, FileUploadPalette> = {
-  violet: { p50: "#f5f3ff", p100: "#ede9fe", p300: "#c4b5fd", p500: "#8b5cf6", p600: "#7c3aed", p700: "#6d28d9", s500: "#d946ef" },
-  cyan: { p50: "#ecfeff", p100: "#cffafe", p300: "#67e8f9", p500: "#06b6d4", p600: "#0891b2", p700: "#0e7490", s500: "#0ea5e9" },
-  orange: { p50: "#fff7ed", p100: "#ffedd5", p300: "#fdba74", p500: "#f97316", p600: "#ea580c", p700: "#c2410c", s500: "#f59e0b" },
+// 舊版每個 theme 是一整組彩色色票；現在介面一律用 shadcn token，theme 只決定唯一強調色（進度條）
+// violet 已停用（紫色不符合視覺規範），會改用預設朱紅
+const THEME_ACCENT: Record<Exclude<FileUploadTheme, "custom">, string | undefined> = {
+  violet: undefined,
+  cyan: "#0e7490",
+  orange: undefined,
 };
 
 export interface FileUploadLabels {
@@ -129,9 +130,12 @@ export interface ClassicFileUploadProps {
   /** 取代預設的空狀態內容 */
   children?: ReactNode;
   showProgress?: boolean;
+  /** 舊版配色。現在只影響強調色：orange 與 violet 用預設朱紅，cyan 用深青，custom 用 customColors.p500 */
   theme?: FileUploadTheme;
-  /** theme="custom" 時使用的色票，未給的欄位沿用 violet */
+  /** theme="custom" 時使用；只會讀 p500 當強調色，其餘欄位保留相容 */
   customColors?: Partial<FileUploadPalette>;
+  /** 唯一的強調色，只用在上傳進度條；預設朱紅 #c8361d（暗色 #ec6a4f），優先於 theme */
+  accent?: string;
   showPreview?: boolean;
   previewGridClassName?: string;
   onRemovePreview?: (index: number) => void;
@@ -150,44 +154,25 @@ export interface ClassicFileUploadProps {
 const FILE_PATH = "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z";
 
 function FileIcon({ type, isPreview = true }: { type: string; isPreview?: boolean }) {
-  const size = isPreview ? "size-12" : "size-6";
+  const size = isPreview ? "size-10" : "size-6";
   if (type.startsWith("image/")) return null;
   const extra = type.includes("pdf") ? "M9 13h6m-3-3v6" : type.includes("word") || type.includes("document") ? "M9 12h6" : null;
   return (
     <svg className={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={FILE_PATH} />
-      {extra && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={extra} />}
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={FILE_PATH} />
+      {extra && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={extra} />}
     </svg>
   );
 }
 
-const loop = (y: number[], duration: number, reduce: boolean, extra: Record<string, number[]> = {}) =>
-  reduce ? { y: 0 } : { y, ...extra, transition: { duration, repeat: Infinity, ease: "easeInOut" as const } };
-
-/** 上傳圖示：待機緩慢浮動，上傳中快速彈跳並落下雨線 */
+/** 上傳圖示：待機靜止；上傳中箭頭下方落下雨線，表示真的在處理 */
 function UploadIcon({ isUploading, reduce }: { isUploading: boolean; reduce: boolean }) {
   return (
-    <motion.div className="relative mb-4 size-20" animate={isUploading ? loop([-4, -16, -4], 0.6, reduce) : loop([-2, -6, -2], 1.5, reduce)}>
-      <motion.div
-        className="absolute inset-0 rounded-full opacity-20 blur-xl"
-        style={{ backgroundImage: "linear-gradient(to right, var(--fu-p500), var(--fu-s500))" }}
-        animate={
-          isUploading
-            ? loop([-4, -16, -4], 0.6, reduce, { opacity: [0.2, 0.4, 0.2] })
-            : loop([-2, -6, -2], 1.5, reduce, { opacity: [0.1, 0.2, 0.1] })
-        }
-      />
-      <motion.svg
-        className="relative size-full text-[color:var(--fu-p500)]"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        aria-hidden="true"
-        animate={isUploading ? loop([-2, -8, -2], 0.4, reduce) : loop([-1, -3, -1], 1.5, reduce)}
-      >
+    <div className="mb-4 flex size-12 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
+      <svg className="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
         {isUploading &&
           !reduce &&
-          [4, 8, 12, 16, 20].map((x, index) => (
+          [6, 12, 18].map((x, index) => (
             <motion.line
               key={x}
               x1={x}
@@ -199,14 +184,14 @@ function UploadIcon({ isUploading, reduce }: { isUploading: boolean; reduce: boo
               initial={{ opacity: 0, y: 0 }}
               animate={{
                 opacity: [0, 0.6, 0],
-                y: [0, 12],
+                y: [0, 10],
                 transition: { duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.08 },
               }}
             />
           ))}
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isUploading ? 3 : 2} d="M12 20V4m-7 7l7-7l7 7" />
-      </motion.svg>
-    </motion.div>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 20V4m-7 7l7-7l7 7" />
+      </svg>
+    </div>
   );
 }
 
@@ -218,24 +203,17 @@ function ProgressBar({ progress, reduce }: { progress: number; reduce: boolean }
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={progress}
-        className="relative mt-4 h-2 overflow-hidden rounded-full bg-[color:var(--fu-p100)]"
+        className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-muted"
       >
+        {/* 唯一的強調色 */}
         <motion.div
-          className="absolute top-0 left-0 h-full"
-          style={{ backgroundImage: "linear-gradient(to right, var(--fu-p500), var(--fu-s500))" }}
+          className="absolute top-0 left-0 h-full rounded-full bg-[var(--fu-accent)]"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={reduce ? { duration: 0 } : undefined}
-        >
-          {!reduce && (
-            <motion.div
-              className="absolute inset-0 bg-white/20"
-              animate={{ x: ["-100%", "100%"], transition: { duration: 1, repeat: Infinity, ease: "linear" } }}
-            />
-          )}
-        </motion.div>
+        />
       </div>
-      <p className="mt-2 text-sm text-[color:var(--fu-p500)] tabular-nums">{progress}%</p>
+      <p className="mt-2 text-sm text-muted-foreground tabular-nums">{progress}%</p>
     </>
   );
 }
@@ -252,6 +230,7 @@ export function ClassicFileUpload({
   showProgress = true,
   theme = "orange",
   customColors,
+  accent,
   showPreview = true,
   previewGridClassName,
   onRemovePreview,
@@ -274,20 +253,12 @@ export function ClassicFileUpload({
   const [previews, setPreviews] = useState<FilePreview[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const palette = useMemo<FileUploadPalette>(
-    () => (theme === "custom" ? { ...PALETTES.violet, ...customColors } : PALETTES[theme]),
-    [theme, customColors],
+  // 強調色：accent 優先，其次 theme；都沒有就交給 class 裡的朱紅預設（含暗色）
+  const accentColor = useMemo(
+    () => accent ?? (theme === "custom" ? customColors?.p500 : THEME_ACCENT[theme]),
+    [accent, theme, customColors],
   );
-
-  const vars = {
-    "--fu-p50": palette.p50,
-    "--fu-p100": palette.p100,
-    "--fu-p300": palette.p300,
-    "--fu-p500": palette.p500,
-    "--fu-p600": palette.p600,
-    "--fu-p700": palette.p700,
-    "--fu-s500": palette.s500,
-  } as CSSProperties;
+  const vars = (accentColor ? { "--fu-accent": accentColor } : undefined) as CSSProperties | undefined;
 
   // 驗證大小與類型，不符的檔案剔除並顯示最後一個錯誤
   const validateFiles = useCallback(
@@ -429,69 +400,48 @@ export function ClassicFileUpload({
   const hint = description || (accept && t.supportedTypes(accept.split(",").map((type) => type.replace("/*", "")).join(", ")));
 
   const defaultContent = (
-    <motion.div
-      className="relative flex h-full min-h-[160px] w-full flex-col items-center justify-center text-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
-      {/* 拖曳中的虛線框提示 */}
+    <div className="relative flex h-full min-h-[160px] w-full flex-col items-center justify-center text-center">
+      {/* 拖曳中的提示 */}
       <div
         aria-hidden={!isDragActive}
         className={cn(
-          "pointer-events-none absolute inset-0 transition-opacity duration-300",
+          "pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200",
           isDragActive ? "opacity-100" : "opacity-0",
         )}
       >
-        <div className="absolute inset-2 flex items-center justify-center rounded-lg border-2 border-dashed border-[color:var(--fu-p500)]">
-          <div className="rounded-lg bg-[color:var(--fu-p50)] px-6 py-4 shadow-sm">
-            <p className="font-medium text-[color:var(--fu-p600)]">{t.release}</p>
+        <div className="rounded-md border border-border bg-card px-5 py-3 shadow-sm">
+          <p className="text-sm font-medium text-foreground">{t.release}</p>
+        </div>
+      </div>
+      <div className={cn("flex w-full flex-col items-center transition-opacity duration-200", isDragActive && "opacity-0")}>
+        <UploadIcon isUploading={false} reduce={reduce} />
+        <div className="w-full max-w-[300px]">
+          <p className="text-base font-medium text-foreground">{placeholderText}</p>
+          <div id={descId}>
+            {hint && <p className="mt-2 text-sm text-muted-foreground">{hint}</p>}
+            {maxSize && <p className="mt-1 text-sm text-muted-foreground tabular-nums">{t.maxSize((maxSize / 1024 / 1024).toFixed(0))}</p>}
           </div>
         </div>
       </div>
-      <motion.div
-        className="flex w-full flex-col items-center"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-      >
-        <UploadIcon isUploading={false} reduce={reduce} />
-        <div className="w-full max-w-[300px]">
-          <motion.p
-            className="bg-clip-text text-lg font-medium text-transparent"
-            style={{ backgroundImage: "linear-gradient(to right, var(--fu-p500), var(--fu-s500))" }}
-            animate={reduce ? { opacity: 1 } : { opacity: [0.5, 1, 0.5] }}
-            transition={reduce ? { duration: 0 } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {placeholderText}
-          </motion.p>
-          <div id={descId}>
-            {hint && <p className="mt-2 text-sm text-gray-500">{hint}</p>}
-            {maxSize && <p className="mt-1 text-sm text-gray-500">{t.maxSize((maxSize / 1024 / 1024).toFixed(0))}</p>}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+    </div>
   );
 
   return (
-    <div className="flex w-full flex-col items-center" style={vars}>
+    <div className="flex w-full flex-col items-center [--fu-accent:#c8361d] dark:[--fu-accent:#ec6a4f]" style={vars}>
       <motion.div
         className={cn(
-          "relative min-h-[200px] w-full max-w-[600px] rounded-xl border-2 border-dashed p-8 backdrop-blur-sm transition-all duration-300 hover:shadow-lg",
-          "border-[color:var(--fu-p300)] hover:border-[color-mix(in_srgb,var(--fu-p500)_50%,transparent)]",
-          "bg-[linear-gradient(to_bottom_right,color-mix(in_srgb,var(--fu-p500)_5%,transparent),color-mix(in_srgb,var(--fu-s500)_5%,transparent))]",
+          "relative min-h-[200px] w-full max-w-[600px] rounded-xl border border-dashed border-border bg-card p-8 text-foreground transition-colors duration-200",
+          "hover:border-foreground/30 hover:bg-muted/40",
           className,
-          isDragActive &&
-            (dragActiveClassName ||
-              "scale-[1.02] border-[color:var(--fu-p500)] bg-[linear-gradient(to_bottom_right,color-mix(in_srgb,var(--fu-p500)_10%,transparent),color-mix(in_srgb,var(--fu-s500)_10%,transparent))] shadow-xl hover:border-[color:var(--fu-p500)]"),
+          isDragActive && (dragActiveClassName || "border-foreground/40 bg-muted/60"),
         )}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        initial={reduce ? false : { opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
+        initial={reduce ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.24 }}
       >
         <input
           ref={inputRef}
@@ -510,7 +460,7 @@ export function ClassicFileUpload({
           aria-label={placeholderText}
           aria-describedby={descId}
           aria-busy={isUploading}
-          className="relative flex h-full min-h-[200px] cursor-pointer flex-col items-start justify-start rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--fu-p500)]"
+          className="relative flex h-full min-h-[200px] cursor-pointer flex-col items-start justify-start rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           onClick={() => inputRef.current?.click()}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -520,50 +470,41 @@ export function ClassicFileUpload({
           }}
         >
           {previews.length > 0 && (
-            <motion.ul
-              className={cn("grid w-full grid-cols-4 gap-3 px-4", previewGridClassName)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
+            <ul className={cn("grid w-full grid-cols-4 gap-3 px-4", previewGridClassName)}>
               {previews.map((preview, index) => {
                 const hasThumb = (preview.type?.startsWith("image/") || preview.type === "application/pdf") && preview.url;
                 return (
                   <motion.li
                     key={`${preview.name}-${index}`}
                     className={cn(
-                      "group relative overflow-hidden rounded-lg border border-gray-200 shadow-sm",
+                      "group relative overflow-hidden rounded-md border border-border bg-muted",
                       showPreview ? "aspect-square" : "col-span-2 h-12",
                     )}
-                    initial={reduce ? false : { opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                    whileHover={reduce ? undefined : { scale: 1.02 }}
+                    initial={reduce ? false : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.18 }}
                   >
                     {showPreview ? (
                       hasThumb ? (
-                        <div className="size-full bg-gray-50">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={preview.url} alt={preview.name} className="size-full object-cover" />
-                        </div>
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={preview.url} alt={preview.name} className="size-full object-cover" />
                       ) : (
-                        <div className="flex size-full flex-col items-center justify-center bg-gray-50">
-                          <div className="text-[color:var(--fu-p500)]">
-                            <FileIcon type={preview.type || ""} />
-                          </div>
-                          <p className="mt-1 line-clamp-1 px-2 text-center text-xs text-gray-600">{preview.name}</p>
+                        <div className="flex size-full flex-col items-center justify-center text-muted-foreground">
+                          <FileIcon type={preview.type || ""} />
+                          <p className="mt-1 line-clamp-1 px-2 text-center text-xs">{preview.name}</p>
                         </div>
                       )
                     ) : (
-                      <div className="flex size-full items-center gap-2 bg-gray-50 px-3">
-                        <div className="size-6 shrink-0 text-[color:var(--fu-p500)]">
+                      <div className="flex size-full items-center gap-2 px-3">
+                        <div className="size-6 shrink-0 text-muted-foreground">
                           <FileIcon type={preview.type || ""} isPreview={false} />
                         </div>
-                        <p className="min-w-0 flex-1 truncate text-sm font-medium text-[color:var(--fu-p600)]">{preview.name}</p>
+                        <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{preview.name}</p>
                       </div>
                     )}
                     {/* 滑過時的深色遮罩與移除鈕 */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-                      <motion.button
+                      <button
                         type="button"
                         aria-label={t.remove(preview.name)}
                         onClick={(e) => {
@@ -571,36 +512,34 @@ export function ClassicFileUpload({
                           removePreview(index);
                         }}
                         onKeyDown={(e) => e.stopPropagation()}
-                        className="rounded-full bg-[color:var(--fu-p500)] p-1.5 text-white transition-transform hover:bg-[color:var(--fu-p600)] focus-visible:outline-2 focus-visible:outline-white"
-                        whileHover={reduce ? undefined : { scale: 1.1 }}
-                        whileTap={reduce ? undefined : { scale: 0.9 }}
+                        className="rounded-md border border-border bg-card p-1.5 text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-white"
                       >
                         <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                      </motion.button>
+                      </button>
                     </div>
                   </motion.li>
                 );
               })}
-            </motion.ul>
+            </ul>
           )}
 
-          {/* 上傳中覆蓋層 */}
+          {/* 上傳中覆蓋層：不透明底，蓋住縮圖 */}
           <AnimatePresence>
             {isUploading && (
               <motion.div
-                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[2px]"
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-md bg-card/95"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 aria-live="polite"
               >
                 <UploadIcon isUploading reduce={reduce} />
-                <motion.div className="w-full max-w-[300px] text-center" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <p className="text-lg font-medium text-[color:var(--fu-p600)]">{t.uploading}</p>
+                <div className="w-full max-w-[300px] text-center">
+                  <p className="text-base font-medium text-foreground">{t.uploading}</p>
                   {showProgress && <ProgressBar progress={uploadProgress} reduce={reduce} />}
-                </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -612,52 +551,26 @@ export function ClassicFileUpload({
           {error && !isUploading && (
             <motion.div
               className="absolute bottom-4 left-1/2 z-20 w-[calc(100%-2rem)] max-w-[300px] -translate-x-1/2"
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: reduce ? 0 : 0.2 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: reduce ? 0 : 0.18 }}
             >
-              <div role="alert" className="flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 p-4 text-red-600 shadow-sm backdrop-blur-sm">
-                <motion.svg
-                  className="size-5 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  initial={reduce ? false : { scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <motion.path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    initial={reduce ? false : { pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                  />
-                </motion.svg>
-                <motion.p
-                  className="min-w-0 flex-1 text-sm font-medium break-words"
-                  initial={reduce ? false : { x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 }}
-                >
-                  {error}
-                </motion.p>
-                <motion.button
+              <div role="alert" className="flex items-center gap-2 rounded-md border border-border bg-card p-3 text-foreground shadow-sm">
+                <svg className="size-5 shrink-0 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="min-w-0 flex-1 text-sm font-medium break-words">{error}</p>
+                <button
                   type="button"
                   aria-label={t.dismiss}
                   onClick={() => setError(null)}
-                  className="shrink-0 text-red-500 transition-colors hover:text-red-700"
-                  whileHover={reduce ? undefined : { scale: 1.1 }}
-                  whileTap={reduce ? undefined : { scale: 0.9 }}
+                  className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </motion.button>
+                </button>
               </div>
             </motion.div>
           )}

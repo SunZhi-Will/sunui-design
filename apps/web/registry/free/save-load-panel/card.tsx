@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { SaveLoadPanel, type SaveSlot } from "./save-load-panel";
+import { SaveLoadPanel, storyThemes, type SaveSlot } from "./save-load-panel";
 
 // 山河未歸 的章節與場景名稱
 const story = {
@@ -25,11 +25,11 @@ export default function SaveLoadPanelCard() {
   ]);
 
   return (
-    <div className="relative mx-auto h-[220px] w-72 overflow-hidden rounded-[4px] bg-[#08090c] text-[#eae4d6]">
+    <div style={storyThemes.ink as unknown as CSSProperties} className="relative mx-auto h-[220px] w-72 overflow-hidden rounded-[4px] bg-(--story-bg) text-(--story-text)">
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="absolute top-3 left-4 border-b border-[rgb(201_160_99/0.22)] px-1 py-1.5 text-sm tracking-[0.18em] outline-none hover:text-[#e7c489] focus-visible:text-[#e7c489]"
+        className="absolute top-3 left-4 border-b border-(--story-line) px-1 py-1.5 text-sm tracking-[0.18em] outline-none hover:text-(--story-accent-bright) focus-visible:text-(--story-accent-bright)"
       >
         {t.open}
       </button>

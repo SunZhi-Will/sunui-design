@@ -33,6 +33,14 @@ const menuIcon = (children: ReactNode, small: boolean) => (
   </svg>
 );
 
+/** 預設 LOGO：兩張錯開的卡片，單色、跟隨文字色 */
+const defaultLogo = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true" className="h-[1em] w-[1em]">
+    <rect x="3.5" y="7" width="12" height="13" rx="2" />
+    <path d="M8.5 4.5h10a2 2 0 0 1 2 2v11" />
+  </svg>
+);
+
 /** 原版的兩個入口：個人卡片編輯、網格頁面 */
 export const menuGlyphs = {
   profile: (
@@ -55,7 +63,7 @@ export type LogoMenuProps = {
   items: LogoMenuItem[];
   /** 展開方向：向下或向右 */
   direction?: "down" | "right";
-  /** LOGO 內容，預設為原版的 ✨ */
+  /** LOGO 內容，預設為兩張疊卡的單色標誌（原版是 emoji，已依去 AI 感規則換掉） */
   logo?: ReactNode;
   /** 受控開關；不傳則滑入展開、離開 150ms 後收合 */
   open?: boolean;
@@ -93,7 +101,7 @@ const MESSAGES: Record<SunLocale, LogoMenuLabels> = {
 export function LogoMenu({
   items,
   direction = "down",
-  logo = "✨",
+  logo = defaultLogo,
   open: openProp,
   onOpenChange,
   label: labelProp,
@@ -135,7 +143,7 @@ export function LogoMenu({
   }, [isOpen, onOpenChange]);
 
   const itemClass = cn(
-    "flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg outline-none transition-all duration-200 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600 hover:shadow-xl focus-visible:border-purple-300 focus-visible:bg-purple-50 focus-visible:text-purple-600 motion-reduce:transition-none",
+    "flex items-center justify-center rounded-full border border-border bg-card text-muted-foreground outline-none transition-colors duration-200 hover:border-foreground/20 hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
     isRight ? "h-6 w-6" : "h-8 w-8",
   );
 
@@ -155,13 +163,13 @@ export function LogoMenu({
           aria-expanded={isOpen}
           onClick={() => setOpen(!isOpen)}
           className={cn(
-            "group relative z-50 flex items-center justify-center rounded-full border border-gray-200 bg-white/90 shadow-lg outline-none backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-xl focus-visible:ring-2 focus-visible:ring-purple-300 motion-reduce:transition-none",
+            "group relative z-50 flex items-center justify-center rounded-full border border-border bg-card shadow-sm outline-none transition-colors duration-200 hover:border-foreground/20 focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
             isRight ? "h-8 w-8" : "h-12 w-12",
           )}
         >
           <span
             className={cn(
-              "font-bold leading-none text-gray-800 transition-colors group-hover:text-purple-600",
+              "font-semibold leading-none text-foreground",
               isRight ? "text-base" : "text-xl",
             )}
           >
@@ -172,7 +180,7 @@ export function LogoMenu({
         {/* 向右展開箭頭提示 */}
         {isRight && (
           <div className="ml-1.5 flex items-center justify-center opacity-60" aria-hidden="true">
-            <svg className="h-3 w-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-3 w-3 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>
@@ -197,7 +205,7 @@ export function LogoMenu({
           <nav
             aria-label={label}
             className={cn(
-              "relative flex items-center rounded-full border border-gray-200 bg-white/95 shadow-xl backdrop-blur-sm",
+              "relative flex items-center rounded-full border border-border bg-card shadow-sm",
               isRight ? "h-8 flex-row pl-10 pr-4" : "w-12 flex-col pb-6 pt-14",
             )}
           >
@@ -222,7 +230,7 @@ export function LogoMenu({
             >
               <svg
                 className={cn(
-                  "h-3 w-3 text-gray-400 transition-all duration-300 motion-reduce:transition-none",
+                  "h-3 w-3 text-muted-foreground transition-all duration-300 motion-reduce:transition-none",
                   isOpen ? (isRight ? "rotate-90" : "rotate-180") : isRight ? "-rotate-90" : "",
                 )}
                 fill="none"

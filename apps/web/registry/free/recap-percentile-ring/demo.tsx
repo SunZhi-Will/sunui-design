@@ -9,8 +9,8 @@ function ProgressStrip({ current, total }: { current: number; total: number }) {
   return (
     <div aria-hidden className="mb-2 flex gap-1">
       {Array.from({ length: total }, (_, i) => (
-        <div key={i} className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-white/30">
-          <div className="h-full bg-white" style={{ width: i < current ? "100%" : i === current ? "50%" : "0%" }} />
+        <div key={i} className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-white/15">
+          <div className="h-full bg-[#f5f5f4]" style={{ width: i < current ? "100%" : i === current ? "50%" : "0%" }} />
         </div>
       ))}
     </div>
@@ -21,9 +21,9 @@ function ProgressStrip({ current, total }: { current: number; total: number }) {
 export default function RecapPercentileRingDemo() {
   const locale = useDemoLocale();
   return (
-    <div className="mx-auto w-full max-w-[340px] min-w-0 rounded-3xl bg-[#0f0f0f] p-2">
+    <div className="mx-auto w-full max-w-[340px] min-w-0 rounded-3xl bg-[#0c0a09] p-2">
       <ProgressStrip current={9} total={12} />
-      <div className="aspect-[9/16] w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
+      <div className="aspect-[9/16] w-full overflow-hidden rounded-2xl ring-1 ring-white/[0.08]">
         <RecapPercentileRing percentileRank={3.4} locale={locale} />
       </div>
     </div>

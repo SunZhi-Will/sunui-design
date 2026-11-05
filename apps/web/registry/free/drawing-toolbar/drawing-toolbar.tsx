@@ -10,7 +10,7 @@ export { DrawingSurface, shapePoints, type DrawingSurfaceProps, type DrawingTool
 
 const icon = (d: string) => (
   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={d} />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={d} />
   </svg>
 );
 
@@ -103,7 +103,7 @@ export type DrawingToolbarProps = {
   open?: boolean;
   /** 開啟時啟用 P、1 到 4 快捷鍵與 Escape（同原版） */
   shortcuts?: boolean;
-  /** 選取時的底色、字色、滑過底色 */
+  /** 選取時的底色、字色、滑過底色；預設跟隨主題的 primary（原版為工具藍，可傳 { soft: "rgba(37,99,235,.15)", strong: "#2563eb", hover: "rgba(37,99,235,.22)" } 開回來） */
   accent?: { soft: string; strong: string; hover: string };
   /** 原版為 fixed 貼齊視窗左側；放在相對容器裡時設 false */
   fixed?: boolean;
@@ -120,7 +120,11 @@ export function DrawingToolbar({
   onClose,
   open = true,
   shortcuts = true,
-  accent = { soft: "rgba(59, 130, 246, 0.3)", strong: "#2563eb", hover: "rgba(59, 130, 246, 0.4)" },
+  accent = {
+    soft: "color-mix(in oklab, var(--primary) 12%, transparent)",
+    strong: "var(--primary)",
+    hover: "color-mix(in oklab, var(--primary) 18%, transparent)",
+  },
   fixed = true,
   locale = "en",
   labels: labelsProp,
@@ -171,7 +175,7 @@ export function DrawingToolbar({
                 {labels.back}
               </span>
             </button>
-            <div className="my-0.5 h-px bg-white/20" />
+            <div className="my-0.5 h-px bg-border" />
           </>
         )}
         {tools.map((tool) => {
@@ -201,15 +205,9 @@ export function DrawingToolbar({
       <style>{`
         .cf-dt-wrap { transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1); }
         .cf-dt-glass {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.08),
-            0 2px 8px rgba(0, 0, 0, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+          background: var(--card);
+          border: 1px solid var(--border);
+          box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
         }
         .cf-dt-btn {
           position: relative;
@@ -219,7 +217,7 @@ export function DrawingToolbar({
           width: 32px;
           height: 32px;
           border-radius: 8px;
-          color: #374151;
+          color: var(--muted-foreground);
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           pointer-events: auto;
           outline: none;
@@ -228,18 +226,17 @@ export function DrawingToolbar({
         }
         .cf-dt-btn[data-selected] { background: var(--cf-dt-soft); color: var(--cf-dt-strong); }
         .cf-dt-btn:hover, .cf-dt-btn:focus-visible {
-          background: rgba(59, 130, 246, 0.15);
-          color: #2563eb;
-          transform: scale(1.05);
+          background: var(--muted);
+          color: var(--foreground);
         }
         .cf-dt-btn[data-selected]:hover, .cf-dt-btn[data-selected]:focus-visible { background: var(--cf-dt-hover); color: var(--cf-dt-strong); }
+        .cf-dt-btn:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
         .cf-dt-btn:active { transform: scale(0.95); }
         .cf-dt-tip {
           position: absolute;
           left: calc(100% + 8px);
-          background: rgba(17, 24, 39, 0.95);
-          backdrop-filter: blur(8px);
-          color: white;
+          background: var(--foreground);
+          color: var(--background);
           font-size: 10px;
           font-weight: 500;
           padding: 4px 8px;
@@ -248,7 +245,7 @@ export function DrawingToolbar({
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
           z-index: 1;
         }
         .cf-dt-btn:hover .cf-dt-tip, .cf-dt-btn:focus-visible .cf-dt-tip { opacity: 1; }
@@ -259,11 +256,11 @@ export function DrawingToolbar({
           top: 50%;
           transform: translateY(-50%);
           border: 5px solid transparent;
-          border-right-color: rgba(17, 24, 39, 0.95);
+          border-right-color: var(--foreground);
         }
         @media (prefers-reduced-motion: reduce) {
           .cf-dt-wrap, .cf-dt-btn, .cf-dt-tip { transition: none; }
-          .cf-dt-btn:hover, .cf-dt-btn:focus-visible, .cf-dt-btn:active { transform: none; }
+          .cf-dt-btn:active { transform: none; }
         }
       `}</style>
     </div>
@@ -299,14 +296,14 @@ export function DrawingPanel({
   return (
     <section
       aria-labelledby={`${id}-t`}
-      className={cn("cf-dt-panel right-4 top-4 z-50 w-64 rounded-2xl p-4", fixed ? "fixed" : "absolute", className)}
+      className={cn("cf-dt-panel right-4 top-4 z-50 w-64 rounded-xl p-4", fixed ? "fixed" : "absolute", className)}
     >
-      <h3 id={`${id}-t`} className="mb-3 text-base font-semibold text-gray-800">
+      <h3 id={`${id}-t`} className="mb-3 text-sm font-semibold text-foreground">
         {t.title}
       </h3>
       <div className="space-y-3">
         <div>
-          <label htmlFor={`${id}-c`} className="mb-1.5 block text-xs font-medium text-gray-700">
+          <label htmlFor={`${id}-c`} className="mb-1.5 block text-xs font-medium text-muted-foreground">
             {t.color}
           </label>
           <div className="flex items-center gap-2">
@@ -315,19 +312,19 @@ export function DrawingPanel({
               type="color"
               value={color}
               onChange={(e) => onColorChange(e.target.value)}
-              className="h-10 w-10 cursor-pointer rounded-lg border border-gray-200"
+              className="h-10 w-10 cursor-pointer rounded-md border border-border bg-background"
             />
             <input
               type="text"
               aria-label={`${t.color}, ${t.hex}`}
               value={color}
               onChange={(e) => onColorChange(e.target.value)}
-              className="min-w-0 flex-1 rounded-lg border border-gray-200/50 bg-white/50 px-3 py-2 text-xs text-gray-800 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-400/50"
+              className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 font-mono text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </div>
         <div>
-          <label htmlFor={`${id}-w`} className="mb-1.5 block text-xs font-medium text-gray-700">
+          <label htmlFor={`${id}-w`} className="mb-1.5 block text-xs font-medium text-muted-foreground">
             {t.width(lineWidth)}
           </label>
           <input
@@ -337,21 +334,15 @@ export function DrawingPanel({
             max={20}
             value={lineWidth}
             onChange={(e) => onLineWidthChange(Number(e.target.value))}
-            className="w-full accent-blue-500"
+            className="w-full accent-[var(--primary)]"
           />
         </div>
       </div>
       <style>{`
         .cf-dt-panel {
-          background: rgba(255, 255, 255, 0.75);
-          backdrop-filter: blur(24px) saturate(180%);
-          -webkit-backdrop-filter: blur(24px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow:
-            0 8px 32px rgba(0, 0, 0, 0.08),
-            0 2px 8px rgba(0, 0, 0, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+          background: var(--card);
+          border: 1px solid var(--border);
+          box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
         }
       `}</style>
     </section>

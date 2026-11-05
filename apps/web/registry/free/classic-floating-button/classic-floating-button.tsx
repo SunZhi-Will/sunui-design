@@ -72,9 +72,9 @@ export type SocialButtonConfig = {
   onClick?: () => void;
 };
 
-// 原版 SocialButton 的預設漸層
-const ITEM_GRADIENT = "bg-gradient-to-r from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50";
-const MAIN_GRADIENT = "bg-gradient-to-r from-blue-600 to-blue-800 shadow-md hover:shadow-blue-500/50";
+// 預設樣式：子按鈕是中性的卡片圓鈕，主按鈕用 primary 實色（唯一強調）
+const ITEM_GRADIENT = "border border-border bg-card text-foreground hover:bg-muted";
+const MAIN_GRADIENT = "bg-primary text-primary-foreground hover:opacity-90";
 
 const titlePosClass: Record<TitlePosition, string> = {
   top: "bottom-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2",
@@ -123,14 +123,14 @@ function SocialButton({
       {title && titleDisplay !== "none" && (
         <span
           className={cn(
-            "absolute z-[2000] rounded bg-gray-800/90 px-2 py-1 text-sm whitespace-nowrap text-white transition-opacity duration-200",
+            "absolute z-[2000] rounded-md bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background transition-opacity duration-200",
             titlePosClass[titlePosition],
             titleDisplay === "always"
               ? "pointer-events-auto opacity-100"
               : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:opacity-100",
           )}
         >
-          <span className={cn("absolute h-2 w-2 rotate-45 bg-gray-800/90", titleArrowClass[titlePosition])} />
+          <span className={cn("absolute h-2 w-2 rotate-45 bg-foreground", titleArrowClass[titlePosition])} />
           {title}
         </span>
       )}
@@ -139,18 +139,16 @@ function SocialButton({
 
   const base = cn(
     isMainButton ? "h-12 w-12" : "h-10 w-10",
-    "group relative flex items-center justify-center rounded-full text-white shadow-lg transition-all duration-300 hover:z-[1500]",
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400",
-    "bg-gradient-to-r",
-    className || "from-blue-600/90 to-blue-800/90 hover:shadow-blue-500/50",
+    "group relative flex items-center justify-center rounded-full shadow-sm transition-colors duration-200 hover:z-[1500]",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+    className || ITEM_GRADIENT,
   );
 
   const motionProps = {
-    initial: reduce ? false : ({ scale: 0 } as const),
-    animate: { scale: 1 },
-    exit: { scale: 0 },
-    whileHover: reduce ? undefined : { scale: 1.1 },
-    whileTap: reduce ? undefined : { scale: 0.9 },
+    initial: reduce ? false : ({ opacity: 0 } as const),
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    whileTap: reduce ? undefined : { scale: 0.96 },
     transition: reduce ? { duration: 0 } : { duration: 0.1, ease: [1, 1, 1, 1] as [number, number, number, number] },
   };
 
@@ -217,7 +215,7 @@ export interface FloatingButtonProps {
   onOpenChange?: (isOpen: boolean) => void;
   defaultOpen?: boolean;
   className?: string;
-  /** 主按鈕漸層，預設原版藍色漸層 */
+  /** 主按鈕樣式，預設 primary 實色；要用漸層或品牌色請自行傳入完整 class */
   buttonClassName?: string;
   position?: FloatingPosition;
   buttons?: SocialButtonConfig[];
@@ -436,7 +434,7 @@ export function FloatingButton({
                     pointerEvents: isDragging ? "none" : "auto",
                     zIndex: variant === "vertical" ? 1000 - i : 10,
                   }}
-                  initial={reduce ? { opacity: 1, scale: 1, x: p.x, y: p.y } : { opacity: 0, scale: 0, x: 0, y: 0 }}
+                  initial={reduce ? { opacity: 1, scale: 1, x: p.x, y: p.y } : { opacity: 0, scale: 0.6, x: 0, y: 0 }}
                   animate={{
                     opacity: 1,
                     scale: 1,
@@ -446,7 +444,7 @@ export function FloatingButton({
                   }}
                   exit={{
                     opacity: 0,
-                    scale: reduce ? 1 : 0,
+                    scale: reduce ? 1 : 0.6,
                     x: reduce ? p.x : 0,
                     y: reduce ? p.y : 0,
                     transition: reduce ? { duration: 0 } : { duration: 0.2, delay: (total - i - 1) * 0.05 },
@@ -513,7 +511,7 @@ export function FloatingButton({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
                 />
               </motion.svg>

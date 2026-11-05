@@ -403,7 +403,7 @@ function SourceUnderlay({ src }: { src: string }) {
 
 function SourceChip({ src, label }: { src: string; label: string }) {
   return (
-    <span className="pointer-events-none flex items-center gap-1 rounded-[0.4rem] bg-[color-mix(in_oklab,var(--yc-bg)_80%,transparent)] p-0.5 pr-1.5 text-[11px] backdrop-blur">
+    <span className="pointer-events-none flex items-center gap-1 rounded-[0.4rem] bg-[color-mix(in_oklab,var(--yc-bg)_88%,transparent)] p-0.5 pr-1.5 text-[11px] backdrop-blur-sm">
       <img src={src} alt="" className="size-6 rounded-[4px] object-cover" />
       <Icon d={P.image} className="size-3 text-[var(--yc-muted-fg)]" />
       <span>{label}</span>
@@ -411,7 +411,7 @@ function SourceChip({ src, label }: { src: string; label: string }) {
   );
 }
 
-const glass = "bg-[color-mix(in_oklab,var(--yc-bg)_80%,transparent)] backdrop-blur";
+const glass = "bg-[color-mix(in_oklab,var(--yc-bg)_88%,transparent)] backdrop-blur-sm";
 
 export interface JobTileProps {
   job: Job;

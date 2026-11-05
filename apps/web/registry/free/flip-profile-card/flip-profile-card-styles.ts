@@ -1,5 +1,6 @@
 // 移植自 CardFlow globals.css：類別改成 fpc- 前綴，宣告順序照原檔，讓偽元素的層疊結果一致
 // 差異：hover 規則只在精準指標裝置生效；reduced motion 關掉無限循環動畫
+// 去 AI 感：拿掉彩色外發光（0 0 Npx 彩色陰影）與藍紫粉光源，光影只留同色的白色材質光
 export const FLIP_PROFILE_CARD_CSS = `
 .fpc-perspective { perspective: 1000px; perspective-origin: center center; }
 .fpc-3d { transform-style: preserve-3d; }
@@ -9,7 +10,6 @@ export const FLIP_PROFILE_CARD_CSS = `
 @keyframes fpc-gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes fpc-liquid-flow { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
-.fpc-glow { box-shadow: 0 0 20px rgba(var(--fpc-glow), 0.4); }
 .fpc-card-hover { transition: box-shadow 0.3s ease; }
 
 /* 玻璃擬態 */
@@ -69,7 +69,7 @@ export const FLIP_PROFILE_CARD_CSS = `
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 .fpc-glass-text {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   color: rgba(255, 255, 255, 0.95); font-weight: 500;
 }
 
@@ -99,7 +99,7 @@ export const FLIP_PROFILE_CARD_CSS = `
 }
 /* 多層次陰影 */
 .fpc-multi-shadow {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 40px rgba(var(--fpc-glow), 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 10px 15px -3px rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s ease;
 }
 
@@ -146,8 +146,8 @@ export const FLIP_PROFILE_CARD_CSS = `
 .fpc-light-dual::before {
   content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
   background:
-    radial-gradient(circle 150px at var(--dual-x1, 20%) var(--dual-y1, 20%), rgba(102, 126, 234, 0.6) 0%, rgba(102, 126, 234, 0.3) 30%, transparent 60%),
-    radial-gradient(circle 150px at var(--dual-x2, 80%) var(--dual-y2, 80%), rgba(236, 72, 153, 0.6) 0%, rgba(236, 72, 153, 0.3) 30%, transparent 60%);
+    radial-gradient(circle 150px at var(--dual-x1, 20%) var(--dual-y1, 20%), rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 30%, transparent 60%),
+    radial-gradient(circle 150px at var(--dual-x2, 80%) var(--dual-y2, 80%), rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 60%);
   opacity: var(--dual-intensity, 0.7); pointer-events: none; z-index: 2; border-radius: inherit; filter: blur(12px);
   transition: opacity 0.2s ease; will-change: opacity;
 }
@@ -156,7 +156,7 @@ export const FLIP_PROFILE_CARD_CSS = `
 .fpc-light-gradient { position: relative; overflow: hidden; }
 .fpc-light-gradient::before {
   content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-  background: linear-gradient(var(--gradient-angle, 45deg), rgba(102, 126, 234, 0.5) 0%, rgba(139, 92, 246, 0.5) 20%, rgba(236, 72, 153, 0.5) 40%, rgba(59, 130, 246, 0.5) 60%, rgba(102, 126, 234, 0.5) 80%, rgba(139, 92, 246, 0.5) 100%);
+  background: linear-gradient(var(--gradient-angle, 45deg), rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.35) 30%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.25) 75%, rgba(255, 255, 255, 0) 100%);
   background-size: 200% 200%; background-position: var(--gradient-x, 50%) var(--gradient-y, 50%);
   opacity: var(--gradient-intensity, 0.6); pointer-events: none; z-index: 2; border-radius: inherit; filter: blur(15px);
   animation: fpc-gradient-shift 8s ease infinite;
@@ -165,8 +165,6 @@ export const FLIP_PROFILE_CARD_CSS = `
 
 /* hover 規則：只給精準指標，順序與原檔相同 */
 @media (hover: hover) and (pointer: fine) {
-  .fpc-glow:hover { box-shadow: 0 0 30px rgba(var(--fpc-glow), 0.6); }
-  .fpc-card-hover:hover { box-shadow: 0 0 40px rgba(var(--fpc-glow), 0.4); }
   .fpc-glass-dynamic:hover::after { opacity: 1; }
   .fpc-glass-dynamic:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.08) 100%);
@@ -177,15 +175,14 @@ export const FLIP_PROFILE_CARD_CSS = `
   .fpc-edge-glow:hover {
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, calc(var(--edge-glow-intensity, 0.8) * 0.6)),
-      inset 0 0 0 1px rgba(255, 255, 255, calc(var(--edge-glow-intensity, 0.8) * 0.3)),
-      0 0 20px rgba(255, 255, 255, calc(var(--edge-glow-intensity, 0.8) * 0.4));
+      inset 0 0 0 1px rgba(255, 255, 255, calc(var(--edge-glow-intensity, 0.8) * 0.3));
   }
   .fpc-reflection:hover::after {
     opacity: calc(var(--reflection-opacity, 0.6) * 1.3);
     transform: translateY(calc(var(--reflection-offset, 0) - 2px));
   }
   .fpc-multi-shadow:hover {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 8px 12px -2px rgba(0, 0, 0, 0.15), 0 20px 30px -6px rgba(0, 0, 0, 0.15), 0 40px 50px -10px rgba(0, 0, 0, 0.15), 0 0 60px rgba(var(--fpc-glow), 0.4), 0 0 80px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.1), 0 20px 30px -6px rgba(0, 0, 0, 0.1);
   }
   .fpc-light-diagonal:hover::before { opacity: calc(var(--diagonal-intensity, 0.7) * 1.4); filter: blur(10px); }
   .fpc-light-center:hover .fpc-center-light { opacity: calc(var(--center-intensity, 0.6) * 1.3); }
@@ -195,7 +192,11 @@ export const FLIP_PROFILE_CARD_CSS = `
 }
 
 /* 鍵盤焦點：隱藏的翻面按鈕取得焦點時，在卡片外圍畫框 */
-.fpc-root:has(> .fpc-flip-btn:focus-visible) { outline: 2px solid rgb(168, 85, 247); outline-offset: 4px; border-radius: 1rem; }
+.fpc-root:has(> .fpc-flip-btn:focus-visible) { outline: 2px solid var(--ring, currentColor); outline-offset: 4px; border-radius: 0.75rem; }
+
+/* 中性卡面（paper 主題）：白色材質光改用 soft-light 疊加，靜止時不顯示，只在游標靠近時出現淡淡光澤；不加上半部反光 */
+.fpc-paper::before, .fpc-paper .fpc-top-light, .fpc-paper .fpc-center-light { mix-blend-mode: soft-light; opacity: calc(var(--light-intensity, 0) * 0.35) !important; }
+.fpc-paper::after { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .fpc-glass-liquid, .fpc-light-gradient::before { animation: none; }

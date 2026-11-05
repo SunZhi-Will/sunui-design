@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -41,6 +41,33 @@ export interface InkFateFrame {
   currentStep?: InkFateModifier;
 }
 
+/** DESIGN-story.md 的 token；本元件原作是月光藍，所以預設 moon */
+export const storyThemes = {
+  ink: {
+    "--story-bg": "#0b0e14",
+    "--story-text": "#eae4d6",
+    "--story-muted": "rgb(234 228 214 / 0.6)",
+    "--story-accent": "#c9a063",
+    "--story-danger": "#c4553f",
+  },
+  rice: {
+    "--story-bg": "#f4efe3",
+    "--story-text": "#2a2219",
+    "--story-muted": "rgb(42 34 25 / 0.6)",
+    "--story-accent": "#9a6b2a",
+    "--story-danger": "#a33a26",
+  },
+  moon: {
+    "--story-bg": "#070a12",
+    "--story-text": "#e9edf5",
+    "--story-muted": "rgb(233 237 245 / 0.6)",
+    "--story-accent": "#a3b8d9",
+    "--story-danger": "#af637a",
+  },
+} as const;
+
+export type StoryTheme = keyof typeof storyThemes;
+
 export interface InkFateDialProps {
   /** 1 到 100 的裸骰；省略時盤面中央顯示 centreLabel，不畫指針 */
   rawRoll?: number;
@@ -65,9 +92,11 @@ export interface InkFateDialProps {
   onSettle?: (result: { segment: string; finalScore: number }) => void;
   /** 繪製尺寸（px），viewBox 不變所以等比縮放 */
   size?: number;
-  /** 月光色，預設原本的 #a3b8d9 系列 */
+  /** 月光色，覆寫主題的 --story-accent */
   moon?: string;
   moonBright?: string;
+  /** 配色主題，預設 moon（原作的月光藍） */
+  theme?: StoryTheme;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -137,10 +166,11 @@ const DROP_RADIUS = 82;
 
 /** 預設分區（英文字）；沒給 segments 時元件會依 locale 換成對應語言的字 */
 export const INK_FATE_SEGMENTS: InkFateSegment[] = [
-  { id: "adverse", label: "Woe", from: 0, to: 29.5, fill: "rgba(96, 58, 58, 0.34)", activeFill: "rgba(143, 89, 105, 0.62)", text: "#b99696" },
-  { id: "mixed", label: "Twist", from: 29.5, to: 59.5, fill: "rgba(62, 75, 98, 0.32)", activeFill: "rgba(95, 116, 153, 0.58)", text: "#92a1bb" },
-  { id: "success", label: "Pass", from: 59.5, to: 99.5, fill: "rgba(67, 85, 117, 0.36)", activeFill: "rgba(99, 127, 175, 0.62)", text: "#8ca1c6" },
-  { id: "wonder", label: "Boon", from: 99.5, to: 120, fill: "rgba(99, 125, 169, 0.44)", activeFill: "rgba(137, 162, 205, 0.72)", text: "#b9c8e2" },
+  // 顏色全部由 --story-* 混出：代價用 danger，其餘是 accent 的深淺
+  { id: "adverse", label: "Woe", from: 0, to: 29.5, fill: "color-mix(in srgb, var(--story-danger) 24%, transparent)", activeFill: "color-mix(in srgb, var(--story-danger) 50%, transparent)", text: "color-mix(in srgb, var(--story-danger) 60%, var(--story-text))" },
+  { id: "mixed", label: "Twist", from: 29.5, to: 59.5, fill: "color-mix(in srgb, var(--story-text) 8%, transparent)", activeFill: "color-mix(in srgb, var(--story-text) 20%, transparent)", text: "var(--story-muted)" },
+  { id: "success", label: "Pass", from: 59.5, to: 99.5, fill: "color-mix(in srgb, var(--story-accent) 20%, transparent)", activeFill: "color-mix(in srgb, var(--story-accent) 44%, transparent)", text: "color-mix(in srgb, var(--story-accent) 80%, var(--story-text))" },
+  { id: "wonder", label: "Boon", from: 99.5, to: 120, fill: "color-mix(in srgb, var(--story-accent) 34%, transparent)", activeFill: "color-mix(in srgb, var(--story-accent) 62%, transparent)", text: "color-mix(in srgb, var(--story-accent) 50%, var(--story-text))" },
 ];
 
 // 時間軸常數照原本 fate-odds.ts
@@ -178,25 +208,22 @@ function buildSteps(modifiers: readonly InkFateModifier[], cap: number, capLabel
 }
 
 const css = `
-.ifd{--moon:#a3b8d9;--moon-bright:#d5e1f5;--moon-dim:rgba(163,184,217,.38);--moon-faint:rgba(163,184,217,.14);--text-muted:#808ba1;position:relative;display:inline-block;line-height:0;animation:ifd-settle 600ms cubic-bezier(.2,.8,.24,1) both}
+.ifd{--moon:var(--story-accent);--moon-bright:color-mix(in srgb,var(--moon) 50%,var(--story-text));--moon-dim:color-mix(in srgb,var(--moon) 38%,transparent);--moon-faint:color-mix(in srgb,var(--moon) 14%,transparent);--text-muted:var(--story-muted);position:relative;display:inline-block;line-height:0;animation:ifd-settle 600ms cubic-bezier(.2,.8,.24,1) both}
 @keyframes ifd-settle{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 .ifd .wm-fate-needle{transform-box:view-box;transform-origin:130px 130px;transform:rotate(var(--wm-fate-needle-angle,0deg))}
-.ifd .wm-fate-modifier-arc{filter:drop-shadow(0 0 3px rgba(156,177,214,.55))}
 .ifd .wm-fate-drop-rolling{transform-box:fill-box;transform-origin:50% 50%;animation:ifd-drop-fall 520ms cubic-bezier(.22,1.3,.36,1) both}
-@keyframes ifd-drop-fall{from{opacity:0;transform:scale(.2)}65%{opacity:1;transform:scale(1.5)}to{opacity:1;transform:scale(1)}}
+@keyframes ifd-drop-fall{from{opacity:0;transform:scale(.2)}65%{opacity:1;transform:scale(1.15)}to{opacity:1;transform:scale(1)}}
 .ifd .wm-fate-centre-pop{transform-box:fill-box;transform-origin:50% 50%;animation:ifd-centre-pop 480ms cubic-bezier(.2,1.4,.4,1) both}
-@keyframes ifd-centre-pop{from{transform:scale(1.45)}to{transform:scale(1)}}
+@keyframes ifd-centre-pop{from{transform:scale(1.12)}to{transform:scale(1)}}
 .ifd .wm-fate-wonder-ring{stroke-dasharray:760;stroke-dashoffset:0}
 .ifd .wm-fate-wonder-ring-rolling{animation:ifd-wonder-sweep 800ms ease-out both}
 @keyframes ifd-wonder-sweep{from{stroke-dashoffset:760;opacity:.95}to{stroke-dashoffset:0;opacity:.55}}
-.ifd .wm-fate-band-active{animation:ifd-band-breathe 2.8s ease-in-out infinite}
-@keyframes ifd-band-breathe{0%,100%{opacity:1}50%{opacity:.78}}
 .ifd-skip{position:absolute;inset:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer}
 .ifd-skip:focus-visible{outline:2px solid var(--moon-dim);outline-offset:2px}
 @keyframes ifd-fade{from{opacity:.35}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){
 .ifd,.ifd .wm-fate-drop-rolling,.ifd .wm-fate-wonder-ring-rolling{animation-name:ifd-fade;animation-duration:200ms;animation-delay:0ms}
-.ifd .wm-fate-band-active,.ifd .wm-fate-centre-pop{animation:none}
+.ifd .wm-fate-centre-pop{animation:none}
 }
 `;
 
@@ -232,6 +259,7 @@ export function InkFateDial({
   size = SIZE,
   moon,
   moonBright,
+  theme = "moon",
   locale = "en",
   labels: labelsProp,
   className,
@@ -245,7 +273,6 @@ export function InkFateDial({
     [segmentsProp, segmentLabels],
   );
   const capLabel = labels.cap;
-  const uid = useId().replace(/:/g, "");
   const reduced = usePrefersReducedMotion();
   // 時鐘與完成狀態都綁著 rollKey，換一次 key 立刻視為新的一擲，不會閃出上一擲的畫面
   const [clock, setClock] = useState<{ key: unknown; ms: number }>({ key: NONE, ms: 0 });
@@ -388,7 +415,7 @@ export function InkFateDial({
   return (
     <div
       className={cn("ifd", className)}
-      style={{ ...(moon ? { "--moon": moon } : {}), ...(moonBright ? { "--moon-bright": moonBright } : {}), ...style } as CSSProperties}
+      style={{ ...storyThemes[theme], ...(moon ? { "--moon": moon } : {}), ...(moonBright ? { "--moon-bright": moonBright } : {}), ...style } as CSSProperties}
     >
       <style>{css}</style>
       <svg
@@ -401,28 +428,9 @@ export function InkFateDial({
         focusable="false"
         style={{ display: "block", overflow: "visible", maxWidth: "100%", height: "auto" }}
       >
-        <defs>
-          <radialGradient id={`${uid}-paper`} cx="50%" cy="45%" r="62%">
-            <stop offset="0%" stopColor="rgba(23,26,31,0.94)" />
-            <stop offset="70%" stopColor="rgba(16,15,15,0.92)" />
-            <stop offset="100%" stopColor="rgba(8,8,9,0.96)" />
-          </radialGradient>
-          <radialGradient id={`${uid}-drop`} cx="38%" cy="34%" r="70%">
-            <stop offset="0%" stopColor="#c8d4e8" />
-            <stop offset="55%" stopColor="#7e97c1" />
-            <stop offset="100%" stopColor="#465f8a" />
-          </radialGradient>
-          <filter id={`${uid}-glow`} x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="3.4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
 
         {/* 盤面底紙 */}
-        <circle cx={CENTER} cy={CENTER} r={RING_OUTER} fill={`url(#${uid}-paper)`} />
+        <circle cx={CENTER} cy={CENTER} r={RING_OUTER} fill="var(--story-bg)" />
         <circle cx={CENTER} cy={CENTER} r={RING_OUTER} fill="none" stroke="var(--moon-dim)" strokeWidth="1" />
         <circle cx={CENTER} cy={CENTER} r={RING_INNER} fill="none" stroke="var(--moon-faint)" strokeWidth="1" />
 
@@ -461,18 +469,17 @@ export function InkFateDial({
             <g key={segment.id}>
               <path
                 d={sectorPath(segment.from, segment.to, DISC_INNER, DISC_OUTER)}
-                fill={isActive || isPassing ? (segment.activeFill ?? "rgba(99, 127, 175, 0.62)") : (segment.fill ?? "rgba(67, 85, 117, 0.36)")}
+                fill={isActive || isPassing ? (segment.activeFill ?? "color-mix(in srgb, var(--story-accent) 44%, transparent)") : (segment.fill ?? "color-mix(in srgb, var(--story-accent) 20%, transparent)")}
                 fillOpacity={isPassing ? 0.55 : 1}
                 stroke={isActive ? "var(--moon-bright)" : "var(--moon-faint)"}
                 strokeWidth={isActive ? 1.8 : 0.7}
-                className={isActive ? "wm-fate-band-active" : undefined}
               />
               <text
                 x={labelPoint.x}
                 y={labelPoint.y}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fill={isActive ? "#e5eaf4" : (segment.text ?? "#8ca1c6")}
+                fill={isActive ? "var(--story-text)" : (segment.text ?? "var(--story-muted)")}
                 fontSize={isActive ? 21 : 15}
                 letterSpacing="0.1em"
                 opacity={isActive || isPassing ? 1 : 0.6}
@@ -484,11 +491,11 @@ export function InkFateDial({
         })}
 
         {/* 內圈留白 */}
-        <circle cx={CENTER} cy={CENTER} r={DISC_INNER} fill="rgba(10,10,11,0.92)" stroke="var(--moon-faint)" strokeWidth="1" />
+        <circle cx={CENTER} cy={CENTER} r={DISC_INNER} fill="var(--story-bg)" stroke="var(--moon-faint)" strokeWidth="1" />
 
         {/* 重擲殘影 */}
         {ghost && (
-          <circle cx={ghost.x} cy={ghost.y} r="6" fill="rgba(117,141,183,0.22)" stroke="rgba(117,141,183,0.4)" strokeWidth="0.8" strokeDasharray="2 2" />
+          <circle cx={ghost.x} cy={ghost.y} r="6" fill="var(--moon-faint)" stroke="var(--moon-dim)" strokeWidth="0.8" strokeDasharray="2 2" />
         )}
 
         {hasRoll && (
@@ -513,7 +520,7 @@ export function InkFateDial({
                 className="wm-fate-modifier-arc"
                 d={arcPath(Math.min(rawRoll, liveScore), Math.max(rawRoll, liveScore), RING_INNER + 6)}
                 fill="none"
-                stroke={liveScore < rawRoll ? "#c3909f" : "var(--moon-bright)"}
+                stroke={liveScore < rawRoll ? "var(--story-danger)" : "var(--moon-bright)"}
                 strokeWidth="3"
                 strokeLinecap="round"
                 opacity="0.9"
@@ -524,9 +531,9 @@ export function InkFateDial({
 
         {/* 一滴金墨：落定之後才停在結果區 */}
         {hasRoll && landed && (
-          <g className={playing ? "wm-fate-drop wm-fate-drop-rolling" : "wm-fate-drop"} filter={`url(#${uid}-glow)`}>
-            <circle cx={drop.x} cy={drop.y} r="7.5" fill={`url(#${uid}-drop)`} />
-            <circle cx={drop.x} cy={drop.y} r="7.5" fill="none" stroke="rgba(200,212,232,0.55)" strokeWidth="0.8" />
+          <g className={playing ? "wm-fate-drop wm-fate-drop-rolling" : "wm-fate-drop"} >
+            <circle cx={drop.x} cy={drop.y} r="7.5" fill="var(--moon-bright)" />
+            <circle cx={drop.x} cy={drop.y} r="7.5" fill="none" stroke="var(--story-bg)" strokeWidth="0.8" />
           </g>
         )}
 

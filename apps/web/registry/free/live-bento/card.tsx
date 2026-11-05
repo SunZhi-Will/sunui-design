@@ -4,7 +4,8 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { BentoTile, LiveBento, useTicker } from "./live-bento";
 
-const COLORS = ["#2563EB", "#D97706", "#DB2777", "#7C3AED", "#0891B2", "#E11D48"];
+// 身分色只上在 6px 的點，低彩度、不用紫與粉
+const COLORS = ["#2563EB", "#B45309", "#0F766E", "#78716C", "#0E7490", "#A16207"];
 
 const copy = {
   en: { pool: ["Alex", "Jordan", "Tina", "Ken", "Ivy", "Leo"], locked: "Mia", title: "Locked shifts", body: "Locked shifts stay put when you reshuffle." },

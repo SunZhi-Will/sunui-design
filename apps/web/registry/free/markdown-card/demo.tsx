@@ -93,7 +93,7 @@ function Board() {
   const [content, setContent] = useState(initial);
 
   return (
-    <div className="w-full max-w-lg min-w-0 rounded-xl bg-[#f3f4f6] p-4 sm:p-6">
+    <div className="w-full max-w-lg min-w-0 rounded-xl border border-border bg-muted/50 p-4 sm:p-6">
       <div className="h-[380px] min-w-0">
         <MarkdownCard value={content} onValueChange={setContent} locale={locale} />
       </div>

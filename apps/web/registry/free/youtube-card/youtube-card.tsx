@@ -167,7 +167,7 @@ export function YouTubeCard({
     onPlay?.(id);
   };
 
-  const frame = framed && "rounded-lg bg-white shadow-lg overflow-hidden";
+  const frame = framed && "rounded-lg border border-border bg-card shadow-sm overflow-hidden";
   const draggable = Boolean(onDragHandleMouseDown);
   const grab = draggable ? { cursor: isDragging ? "grabbing" : "grab" } : undefined;
   const displayTitle = title || labels.fallbackTitle;
@@ -176,15 +176,16 @@ export function YouTubeCard({
     return (
       <div className={cn("relative h-full w-full", frame, className)}>
         <div
-          className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-red-50 to-pink-50 p-6"
+          className="flex h-full w-full flex-col items-center justify-center bg-muted/40 p-6"
           onMouseDown={draggable ? handleMouseDown : undefined}
         >
-          <div className="mb-4 text-6xl" aria-hidden>
-            🎥
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-800">{labels.emptyTitle}</h3>
-          <p className="mb-4 text-center text-sm text-gray-600">{labels.emptyHint}</p>
-          <div className="text-center text-xs text-gray-500">
+          <svg className="mb-4 h-10 w-10 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="2.5" y="5.5" width="13" height="13" rx="2" />
+            <path d="m15.5 10 6-3.5v11l-6-3.5" />
+          </svg>
+          <h3 className="mb-2 text-lg font-semibold text-foreground">{labels.emptyTitle}</h3>
+          <p className="mb-4 text-center text-sm text-muted-foreground">{labels.emptyHint}</p>
+          <div className="text-center text-xs text-muted-foreground">
             {labels.formatsTitle}
             {labels.formats.map((f) => (
               <span key={f}>
@@ -225,7 +226,7 @@ export function YouTubeCard({
           <button
             type="button"
             onClick={play}
-            className="group relative z-0 block h-full w-full overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+            className="group relative z-0 block h-full w-full overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             aria-label={labels.play(displayTitle)}
           >
             {thumbnail ?? (
@@ -251,11 +252,11 @@ export function YouTubeCard({
       {title && (
         <div
           data-drag-area={draggable ? "true" : undefined}
-          className="pointer-events-auto border-t border-gray-200 bg-gray-50 px-3 py-2"
+          className="pointer-events-auto border-t border-border bg-card px-3 py-2"
           style={grab}
           onMouseDown={draggable ? handleMouseDown : undefined}
         >
-          <p className="truncate text-sm font-medium text-gray-800">{title}</p>
+          <p className="truncate text-sm font-medium text-foreground">{title}</p>
         </div>
       )}
     </div>

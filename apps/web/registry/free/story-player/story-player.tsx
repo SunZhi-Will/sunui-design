@@ -297,7 +297,7 @@ export function StoryPlayer({
 
   const pulse = reduce
     ? { duration: 0 }
-    : ({ delay: 0.5, repeat: Infinity, repeatType: "reverse", duration: 1.5 } as const);
+    : ({ delay: 0.5, duration: 0.24 } as const);
 
   return (
     <div
@@ -313,13 +313,6 @@ export function StoryPlayer({
       )}
       style={{ touchAction: "pan-x pan-y" }}
     >
-      {/* 點狀網格背景 */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize: "32px 32px" }}
-      />
-
       <div className="relative flex h-full w-full items-center justify-center p-4 md:p-8">
         <div className="relative flex w-full flex-col items-center">
           {/* 進度條，在卡片上方 */}
@@ -354,7 +347,7 @@ export function StoryPlayer({
                 animate="center"
                 exit="exit"
                 transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
-                className="relative z-10 shrink-0 overflow-hidden rounded-[20px] border border-white/[0.08] bg-[#0f0f0f] shadow-[0_8px_24px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.05)] md:rounded-[24px] md:shadow-[0_8px_32px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.03)]"
+                className="relative z-10 shrink-0 overflow-hidden rounded-xl border border-white/[0.08] bg-[#0f0f0f] shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
                 style={{ ...cardStyle, touchAction: "pan-y" }}
                 onPointerDown={handleLongPressStart}
                 onPointerUp={handleLongPressEnd}
@@ -427,7 +420,7 @@ export function StoryPlayer({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: reduce ? 0 : 0.7, duration: reduce ? 0 : 0.4 }}
           >
-            <div className="rounded-full border border-white/10 bg-black/60 px-3 py-2 shadow-2xl backdrop-blur-xl md:px-4 md:py-2.5">
+            <div className="rounded-full border border-white/10 bg-[#161616]/95 px-3 py-2 shadow-sm md:px-4 md:py-2.5">
               <div className="flex flex-row items-center justify-center gap-2 md:gap-2.5">
                 {visibleActions.map((a, i) => {
                   const label = a.loading ? (a.loadingLabel ?? a.label) : a.label;
@@ -473,7 +466,7 @@ export function StoryPlayer({
 
 function ArrowBubble({ d }: { d: string }) {
   return (
-    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/15 backdrop-blur-sm transition-colors hover:bg-white/20 md:h-12 md:w-12">
+    <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] transition-colors hover:bg-white/15 md:h-12 md:w-12">
       <svg className="h-5 w-5 text-white md:h-6 md:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={d} />
       </svg>

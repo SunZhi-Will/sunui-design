@@ -23,7 +23,7 @@ export default function CardFlowLoaderCard() {
   }, [done]);
 
   return (
-    <div className="relative mx-auto h-[230px] w-72 overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div className="relative mx-auto h-[230px] w-72 overflow-hidden rounded-xl border border-border bg-background">
       <CardFlowLoader key={run} locale={locale} hideOnComplete={false} messageInterval={2500} onComplete={() => setDone(true)} />
     </div>
   );

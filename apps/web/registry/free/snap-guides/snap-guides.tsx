@@ -230,7 +230,7 @@ export type SnapGuidesProps = {
 };
 
 /** 對齊輔助線：放在畫布的 relative 容器內、縮放層之外 */
-export function SnapGuides({ guides, scale = 1, offset = { x: 0, y: 0 }, color = "#3b82f6", className }: SnapGuidesProps) {
+export function SnapGuides({ guides, scale = 1, offset = { x: 0, y: 0 }, color = "#2563eb", className }: SnapGuidesProps) {
   if (guides.length === 0) return null;
 
   return (

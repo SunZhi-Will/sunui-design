@@ -1,8 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
+
+/* 原版用 emoji 當圖示，改成 1.5px 線條圖示，形狀對應原意 */
+const svg = (className: string, children: ReactNode) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+const glyphs = {
+  link: (c: string) => svg(c, <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" />),
+  alert: (c: string) => svg(c, <><path d="M12 3 2.5 20h19L12 3z" /><path d="M12 10v4M12 17h.01" /></>),
+  globe: (c: string) => svg(c, <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></>),
+  external: (c: string) => svg(c, <><path d="M14 4h6v6M20 4l-9 9" /><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></>),
+  card: (c: string) => svg(c, <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9h10M7 13h6" /></>),
+};
 
 export interface LinkPreviewData {
   title?: string;
@@ -307,18 +321,16 @@ export function LinkPreviewCard({
     drag.current.isMouseDown = false;
   };
 
-  const frame = framed && "rounded-lg bg-white shadow-lg overflow-hidden";
+  const frame = framed && "rounded-lg bg-card shadow-sm overflow-hidden";
 
   if (!url || !isValidUrl(url)) {
     const empty = !url;
     return (
       <div className={cn("relative h-full w-full", frame, className)}>
-        <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 p-6">
-          <div className="mb-4 text-6xl" aria-hidden>
-            {empty ? "🔗" : "⚠️"}
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-800">{empty ? labels.emptyTitle : labels.invalidTitle}</h3>
-          <p className="text-center text-sm text-gray-600">{empty ? labels.emptyHint : labels.invalidHint}</p>
+        <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border border-border bg-muted/40 p-6">
+          <span className="mb-4 text-muted-foreground">{empty ? glyphs.link("h-10 w-10") : glyphs.alert("h-10 w-10")}</span>
+          <h3 className="mb-2 text-lg font-semibold text-foreground">{empty ? labels.emptyTitle : labels.invalidTitle}</h3>
+          <p className="text-center text-sm text-muted-foreground">{empty ? labels.emptyHint : labels.invalidHint}</p>
         </div>
       </div>
     );
@@ -335,7 +347,7 @@ export function LinkPreviewCard({
     return (
       <div className={cn("relative h-full w-full", frame, className)}>
         <div
-          className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md motion-reduce:transition-none"
+          className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-colors hover:border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none"
           onMouseDown={handleMouseDown}
           onDoubleClick={handleDoubleClick}
           onContextMenu={handleContextMenu}
@@ -352,7 +364,7 @@ export function LinkPreviewCard({
           aria-label={labels.open(displayTitle)}
         >
           {displayImage && (
-            <div className="pointer-events-none h-40 w-full overflow-hidden bg-gray-100">
+            <div className="pointer-events-none h-40 w-full overflow-hidden border-b border-border bg-muted">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={displayImage}
@@ -380,11 +392,11 @@ export function LinkPreviewCard({
                     setIframeError(false);
                     setCspBlocked(false);
                   }}
-                  className="rounded bg-white/90 px-2 py-1 text-xs text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white"
+                  className="rounded-md border border-border bg-card px-1.5 py-1 text-muted-foreground shadow-sm hover:text-foreground"
                   title={labels.switchToWeb}
                   aria-label={labels.switchToWeb}
                 >
-                  <span aria-hidden>🌐</span>
+                  {glyphs.globe("h-3.5 w-3.5")}
                 </button>
               )}
               <button
@@ -393,28 +405,28 @@ export function LinkPreviewCard({
                   e.stopPropagation();
                   openLink();
                 }}
-                className="rounded bg-white/90 px-2 py-1 text-xs text-blue-600 shadow-sm backdrop-blur-sm hover:bg-white"
+                className="rounded-md border border-border bg-card px-1.5 py-1 text-muted-foreground shadow-sm hover:text-foreground"
                 title={labels.openInNewTab}
                 aria-label={labels.openInNewTab}
               >
-                <span aria-hidden>🔗</span>
+                {glyphs.external("h-3.5 w-3.5")}
               </button>
             </div>
 
-            {displaySiteName && <div className="mb-1 text-xs font-medium text-gray-500">{displaySiteName}</div>}
+            {displaySiteName && <div className="mb-1 text-xs font-medium text-muted-foreground">{displaySiteName}</div>}
 
-            <h3 className="mb-2 line-clamp-2 text-lg font-bold text-gray-800">{displayTitle}</h3>
+            <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-foreground">{displayTitle}</h3>
 
-            {displayDescription && <p className="mb-3 line-clamp-3 flex-1 text-sm text-gray-600">{displayDescription}</p>}
+            {displayDescription && <p className="mb-3 line-clamp-3 flex-1 text-sm text-muted-foreground">{displayDescription}</p>}
 
-            <div className="mt-auto border-t border-gray-100 pt-2">
-              <div className="truncate font-mono text-xs text-gray-500">{url}</div>
+            <div className="mt-auto border-t border-border pt-2">
+              <div className="truncate font-mono text-xs text-muted-foreground">{url}</div>
             </div>
           </div>
 
           {loadingPreview && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm" role="status">
-              <div className="text-sm text-gray-600">{labels.loading}</div>
+            <div className="absolute inset-0 flex items-center justify-center bg-card/90" role="status">
+              <div className="text-sm text-muted-foreground">{labels.loading}</div>
             </div>
           )}
         </div>
@@ -426,13 +438,13 @@ export function LinkPreviewCard({
   return (
     <div className={cn("relative h-full w-full", frame, className)}>
       <div
-        className="relative h-full w-full overflow-hidden rounded-lg border border-gray-300 bg-gray-100"
+        className="relative h-full w-full overflow-hidden rounded-lg border border-border bg-muted"
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
       >
-        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white/90 px-3 py-2 backdrop-blur-sm">
+        <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between border-b border-border bg-card px-3 py-2">
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="truncate text-sm font-medium text-gray-700">{title || labels.webFallbackTitle}</div>
+            <div className="truncate text-sm font-medium text-foreground">{title || labels.webFallbackTitle}</div>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -442,11 +454,11 @@ export function LinkPreviewCard({
                 setViewMode("preview");
                 setShowIframe(false);
               }}
-              className="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="rounded px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
               title={labels.switchToCard}
               aria-label={labels.switchToCard}
             >
-              <span aria-hidden>📋</span>
+              {glyphs.card("h-3.5 w-3.5")}
             </button>
             <button
               type="button"
@@ -454,11 +466,11 @@ export function LinkPreviewCard({
                 e.stopPropagation();
                 openLink();
               }}
-              className="rounded px-2 py-1 text-xs text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+              className="rounded px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
               title={labels.openInNewTab}
               aria-label={labels.openInNewTab}
             >
-              <span aria-hidden>🔗</span>
+              {glyphs.external("h-3.5 w-3.5")}
             </button>
           </div>
         </div>

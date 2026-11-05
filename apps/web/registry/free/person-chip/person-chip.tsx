@@ -8,8 +8,8 @@ export const PERSON_PALETTE = [
   { bg: "#DBEAFE", fg: "#2563EB", ring: "#93C5FD" }, // blue
   { bg: "#DCFCE7", fg: "#16A34A", ring: "#86EFAC" }, // green
   { bg: "#FEF3C7", fg: "#D97706", ring: "#FCD34D" }, // amber
-  { bg: "#FCE7F3", fg: "#DB2777", ring: "#F9A8D4" }, // pink
-  { bg: "#EDE9FE", fg: "#7C3AED", ring: "#C4B5FD" }, // violet
+  { bg: "#F5F5F4", fg: "#78716C", ring: "#D6D3D1" }, // stone
+  { bg: "#CCFBF1", fg: "#0F766E", ring: "#5EEAD4" }, // teal
   { bg: "#CFFAFE", fg: "#0891B2", ring: "#67E8F9" }, // cyan
   { bg: "#FFE4E6", fg: "#E11D48", ring: "#FDA4AF" }, // rose
   { bg: "#ECFCCB", fg: "#65A30D", ring: "#BEF264" }, // lime
@@ -39,7 +39,7 @@ export function hashId(id: string): number {
 
 // 中性色系 app（Schedary、usermeld、spliteat、ComfyUI）共用的狀態色，淺色與深色各一組
 const STATUS_TOKENS =
-  "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#4F46E5] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#818CF8]";
+  "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#2563EB] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#60A5FA]";
 
 /* ──────────────────────────────────────────────────────────────
  * PersonChip（usermeld person-chip = spliteat employee-chip）

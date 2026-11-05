@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export interface ScrollTiltStageProps {
   children: ReactNode;
-  /** 倒影光的顏色，預設金色 */
+  /** 地面細線的顏色（唯一強調色），預設琥珀金 #d4a24c */
   accent?: string;
   /** 在可捲動容器裡使用時傳入；預設跟著整個視窗捲動 */
   scrollContainer?: RefObject<HTMLElement | null>;
@@ -17,9 +17,9 @@ const clamp = (x: number) => Math.min(1, Math.max(0, x));
 
 /**
  * 3D 進場舞台：還在畫面下方時往後倒著放，捲上來的過程中慢慢立起來，到畫面中間時正對著看。
- * 下面有一圈倒影光。偏好減少動態時直接正對著。
+ * 下面有一道柔和的黑色落影與一條地面細線。偏好減少動態時直接正對著。
  */
-export function ScrollTiltStage({ children, accent = "#f5b324", scrollContainer, className }: ScrollTiltStageProps) {
+export function ScrollTiltStage({ children, accent = "#d4a24c", scrollContainer, className }: ScrollTiltStageProps) {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
 
@@ -66,10 +66,21 @@ export function ScrollTiltStage({ children, accent = "#f5b324", scrollContainer,
 
   return (
     <div ref={outer} className={cn("relative overflow-x-clip [perspective:1600px]", className)}>
+      {/* 落影：單色黑，不發光 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[8%] -bottom-16 h-32 rounded-[50%] blur-3xl"
-        style={{ background: `color-mix(in srgb, ${accent} 25%, transparent)` }}
+        className="pointer-events-none absolute inset-x-[6%] -bottom-10 h-20"
+        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55), transparent 100%)" }}
+      />
+      {/* 地面細線：兩端淡出 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-[4%] -bottom-6 h-px"
+        style={{
+          background: `color-mix(in srgb, ${accent} 45%, transparent)`,
+          maskImage: "linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent)",
+          WebkitMaskImage: "linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent)",
+        }}
       />
       <div ref={inner} className="relative origin-[50%_85%] will-change-transform">
         {children}

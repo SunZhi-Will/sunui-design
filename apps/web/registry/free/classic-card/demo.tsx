@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { Card, CardContent, CardFooter, CardHeader, CardImage } from "./classic-card";
+import { Card, CardContent, CardFooter, CardHeader, CardImage, cardAccentClass } from "./classic-card";
 
 const copy = {
   en: { title: "Studio Headphones", subtitle: "Wireless, 40h battery", badge: "NEW", buy: "Buy now", add: "Add to wishlist", remove: "Remove from wishlist", cover: "Wireless headphones cover" },
@@ -13,9 +13,9 @@ const copy = {
   ja: { title: "スタジオヘッドホン", subtitle: "ワイヤレス、40 時間再生", badge: "NEW", buy: "今すぐ購入", add: "ウィッシュリストに追加", remove: "ウィッシュリストから削除", cover: "ワイヤレスヘッドホンのカバー" },
 };
 
-// 以 inline SVG 做封面，不用外部圖片
+// 以 inline SVG 做封面，不用外部圖片；中性石色加上簡單的耳機線稿
 const cover = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs><rect width="800" height="450" fill="url(#g)"/><circle cx="560" cy="170" r="120" fill="#fff" fill-opacity=".18"/><rect x="140" y="250" width="300" height="120" rx="24" fill="#fff" fill-opacity=".22"/></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450"><rect width="800" height="450" fill="#e7e5e4"/><rect y="330" width="800" height="120" fill="#d6d3d1"/><path d="M290 270v-40a110 110 0 0 1 220 0v40" fill="none" stroke="#57534e" stroke-width="18" stroke-linecap="round"/><rect x="262" y="250" width="56" height="96" rx="22" fill="#44403c"/><rect x="482" y="250" width="56" height="96" rx="22" fill="#44403c"/></svg>`,
 )}`;
 
 export default function ClassicCardDemo() {
@@ -25,27 +25,27 @@ export default function ClassicCardDemo() {
 
   return (
     <div className="w-full max-w-sm min-w-0">
-      <Card variant="elevated" theme="violet" glow locale={locale} className="group min-w-0">
+      <Card variant="elevated" theme="orange" locale={locale} className="group min-w-0">
         <CardImage src={cover} alt={t.cover} overlay overlayGradient="bottom" />
         <CardHeader showDivider>
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
-              <h4 className="text-xl font-bold">{t.title}</h4>
-              <p className="mt-1 text-sm opacity-70">{t.subtitle}</p>
+              <h4 className="text-xl font-semibold">{t.title}</h4>
+              <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
             </div>
-            <span className="shrink-0 rounded-full bg-violet-500 px-3 py-1 text-xs font-semibold text-white">{t.badge}</span>
+            <span className="shrink-0 rounded-md border border-border px-2 py-0.5 text-[11px] font-medium tracking-wide text-muted-foreground">{t.badge}</span>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-end gap-3">
-            <p className="text-3xl font-bold text-violet-600">NT$ 1,299</p>
-            <p className="pb-1 text-sm line-through opacity-50">NT$ 1,999</p>
+            <p className={`text-3xl font-semibold tabular-nums ${cardAccentClass("orange")}`}>NT$ 1,299</p>
+            <p className="pb-1 text-sm text-muted-foreground line-through tabular-nums">NT$ 1,999</p>
           </div>
         </CardContent>
         <CardFooter justify="between" className="gap-3">
           <button
             type="button"
-            className="rounded-lg bg-linear-to-r from-violet-500 to-purple-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-violet-600 hover:to-purple-700 hover:shadow-xl"
+            className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
             {t.buy}
           </button>
@@ -54,10 +54,10 @@ export default function ClassicCardDemo() {
             aria-label={saved ? t.remove : t.add}
             aria-pressed={saved}
             onClick={() => setSaved((s) => !s)}
-            className="rounded-lg border border-violet-300 px-4 py-3 text-violet-600 transition-all hover:bg-violet-50"
+            className="rounded-md border border-border px-3 py-2.5 text-foreground transition-colors hover:bg-muted"
           >
             <svg className="h-5 w-5" fill={saved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
         </CardFooter>

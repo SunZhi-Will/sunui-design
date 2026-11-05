@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { PauseMenu } from "./pause-menu";
+import { PauseMenu, storyThemes } from "./pause-menu";
 
 const copy = {
   en: {
@@ -53,17 +53,18 @@ export default function PauseMenuDemo() {
     <div
       className="relative h-[30rem] w-full max-w-3xl min-w-0 overflow-hidden rounded-[4px]"
       style={{
-        color: "#eae4d6",
+        ...(storyThemes.ink as unknown as CSSProperties),
+        color: "var(--story-text)",
         fontFamily: '"Noto Serif TC", "Songti TC", serif',
-        background: "radial-gradient(ellipse at 25% 30%, rgb(231 196 137 / 0.16), transparent 40%), linear-gradient(180deg, #1a1d24, #08090c)",
+        background: "var(--story-bg)",
       }}
     >
       <button
         type="button"
         aria-label={t.open}
         onClick={() => setOpen(true)}
-        className="absolute top-2 right-3 flex size-11 items-center justify-center rounded-full outline-none hover:text-[#e7c489] focus-visible:text-[#e7c489]"
-        style={{ color: "#b3aa97" }}
+        className="absolute top-2 right-3 flex size-11 items-center justify-center rounded-full outline-none hover:text-(--story-accent-bright) focus-visible:text-(--story-accent-bright)"
+        style={{ color: "var(--story-secondary)" }}
       >
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
           <path d="M4.5 7h15M4.5 12h15M4.5 17h15" />

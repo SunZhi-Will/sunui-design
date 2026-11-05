@@ -4,7 +4,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { WaterfallShowcase, type WaterfallWork } from "./waterfall-showcase";
 
-// 示意畫面：漸層天空加上簡單的剪影，代替實際生成的作品
+// 示意畫面：單色相的天空加上簡單的剪影，代替實際生成的作品
 function Scene({ sky, ground, sun }: { sky: string; ground: string; sun: string }) {
   return (
     <div className="absolute inset-0" style={{ background: sky }}>
@@ -17,12 +17,13 @@ function Scene({ sky, ground, sun }: { sky: string; ground: string; sun: string 
   );
 }
 
+// 低彩度的單色相天空：每組只在同一個色相裡變深淺，不跨色相
 const palettes = [
-  ["linear-gradient(180deg,#fbc7a4,#f6e3c5)", "#7a4b3a", "#fff4dc"],
-  ["linear-gradient(180deg,#1e2a4a,#4b5d8f)", "#0e1426", "#e9e4c9"],
-  ["linear-gradient(180deg,#c9e4de,#f2efe4)", "#5b7f6e", "#ffffff"],
-  ["linear-gradient(180deg,#3a1c4a,#c0587e)", "#1d0f26", "#ffd29a"],
-  ["linear-gradient(180deg,#a7c5eb,#e7eef8)", "#41608a", "#fffbe8"],
+  ["linear-gradient(180deg,#e7d9c9,#f3ece2)", "#7c6a58", "#faf6f0"],
+  ["linear-gradient(180deg,#2a2723,#4a443d)", "#171513", "#d6d3d1"],
+  ["linear-gradient(180deg,#d5dbd3,#eef0ec)", "#66705f", "#ffffff"],
+  ["linear-gradient(180deg,#3b342c,#6b5e4f)", "#1f1b17", "#e9dcc6"],
+  ["linear-gradient(180deg,#d6d3d1,#f5f5f4)", "#57534e", "#fafaf9"],
 ] as const;
 
 const seeds: Omit<WaterfallWork, "id" | "art">[] = [

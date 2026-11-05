@@ -50,7 +50,7 @@ export interface CheckinStreakProps {
   onClaimed?: (reward: number) => void;
   /** 成功後送出的 window 事件；設為 null 不送 */
   refreshEvent?: string | null;
-  /** 品牌色，預設為原本的靛藍 */
+  /** 強調色，預設跟隨主題的 primary */
   accent?: string;
   /** 提示固定在視窗上方；false 時放在卡片上方 */
   fixed?: boolean;
@@ -170,8 +170,8 @@ const MESSAGES: Record<SunLocale, Required<CheckinStreakLabels>> = {
 
 // 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
 const tokens =
-  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:#4F46E5] [--yc-brand-fg:#FFFFFF] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
-  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:#818CF8] dark:[--yc-brand-fg:#09090B] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
+  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:var(--primary,#18181B)] [--yc-brand-fg:var(--primary-foreground,#FAFAFA)] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
+  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--primary,#FAFAFA)] dark:[--yc-brand-fg:var(--primary-foreground,#09090B)] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 

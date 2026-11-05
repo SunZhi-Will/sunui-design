@@ -24,8 +24,8 @@ export default function HoldToRedeemDemo() {
   const short = COST - shards;
 
   return (
-    <div className="w-full max-w-xs min-w-0 bg-[#070a12] p-4 text-[#e8edf5] shadow-[0_0_0_1px_#000] sm:p-5">
-      <p className="mb-3 text-right text-sm font-black text-[#f5c542] tabular-nums [text-shadow:1px_1px_0_#000]">{t.shards(shards)}</p>
+    <div className="w-full max-w-xs min-w-0 overflow-hidden bg-[#0b0e14] p-4 text-[#eae4d6] sm:p-5">
+      <p className="mb-3 text-right text-sm font-medium text-[rgb(234_228_214/0.6)] tabular-nums">{t.shards(shards)}</p>
       <div className="flex min-w-0">
         <HoldToRedeem
           locale={locale}

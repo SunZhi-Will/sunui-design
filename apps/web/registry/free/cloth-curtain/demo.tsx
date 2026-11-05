@@ -11,7 +11,7 @@ const copy = {
     chapter: "Chapter one",
     title: "The night he first came to the window",
     opened: "The curtain is drawn aside.",
-    closed: "A pink curtain hangs over the window.",
+    closed: "A heavy wine-red curtain hangs over the window.",
     close: "Close curtain",
     open: "Open curtain",
   },
@@ -19,7 +19,7 @@ const copy = {
     chapter: "第一章",
     title: "他第一次來到窗邊的那一夜",
     opened: "簾子被拉開了。",
-    closed: "粉紅色的簾子垂在窗前。",
+    closed: "酒紅色的厚簾垂在窗前。",
     close: "拉上簾子",
     open: "拉開簾子",
   },
@@ -27,7 +27,7 @@ const copy = {
     chapter: "第一章",
     title: "他第一次来到窗边的那一夜",
     opened: "帘子被拉开了。",
-    closed: "粉色的帘子垂在窗前。",
+    closed: "酒红色的厚帘垂在窗前。",
     close: "拉上帘子",
     open: "拉开帘子",
   },
@@ -35,7 +35,7 @@ const copy = {
     chapter: "第一章",
     title: "彼がはじめて窓辺に来た夜",
     opened: "カーテンが開かれた。",
-    closed: "桃色のカーテンが窓にかかっている。",
+    closed: "ワインレッドの厚いカーテンが窓にかかっている。",
     close: "カーテンを閉める",
     open: "カーテンを開ける",
   },
@@ -69,7 +69,7 @@ export default function ClothCurtainDemo() {
           type="button"
           aria-pressed={open}
           onClick={() => setOpen((value) => !value)}
-          className="shrink-0 rounded-md border border-[#eab0c4]/40 bg-[#eab0c4]/10 px-3 py-1.5 text-sm text-[#f4c8d6] transition-colors hover:bg-[#eab0c4]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#eab0c4]"
+          className="shrink-0 rounded-md border border-[#d9a17a]/40 bg-[#d9a17a]/10 px-3 py-1.5 text-sm text-[#ecd2bd] transition-colors hover:bg-[#d9a17a]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d9a17a]"
         >
           {open ? t.close : t.open}
         </button>

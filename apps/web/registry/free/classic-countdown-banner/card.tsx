@@ -9,10 +9,10 @@ import { ClassicCountdownBanner } from "./classic-countdown-banner";
 const DAY = 24 * 60 * 60 * 1000;
 
 const copy = {
-  en: { title: "Limited Time Offer", subtitle: "Hurry, offer ends soon!", discount: "40% OFF", cta: "Shop Now" },
-  "zh-TW": { title: "限時優惠", subtitle: "把握時間，優惠即將結束！", discount: "6 折", cta: "立即選購" },
-  "zh-CN": { title: "限时优惠", subtitle: "抓紧时间，优惠即将结束！", discount: "6 折", cta: "立即抢购" },
-  ja: { title: "期間限定オファー", subtitle: "お急ぎください、まもなく終了！", discount: "40%OFF", cta: "今すぐ購入" },
+  en: { title: "Annual plan, spring pricing", subtitle: "The price goes back to normal when the timer ends.", discount: "40% off", cta: "See annual pricing" },
+  "zh-TW": { title: "年付方案春季價", subtitle: "倒數結束後恢復原價。", discount: "6 折", cta: "查看年付價格" },
+  "zh-CN": { title: "年付方案春季价", subtitle: "倒计时结束后恢复原价。", discount: "6 折", cta: "查看年付价格" },
+  ja: { title: "年額プラン 春の特別価格", subtitle: "カウントダウン終了後は通常価格に戻ります。", discount: "40%OFF", cta: "年額料金を見る" },
 };
 
 /** 型錄卡片：一張倒數橫幅，數字每秒翻動；橫幅比卡片高，放在內部捲動區。 */
@@ -23,7 +23,7 @@ export default function ClassicCountdownBannerCard() {
   const [endDate] = useState(() => new Date(Date.now() + 3 * DAY));
 
   return (
-    <div className="mx-auto h-[230px] w-72 overflow-y-auto overscroll-contain rounded-xl">
+    <div className="mx-auto h-[230px] w-72 overflow-y-auto overscroll-contain rounded-xl border border-border">
       <ClassicCountdownBanner
         locale={locale}
         layout="default"
@@ -34,7 +34,7 @@ export default function ClassicCountdownBannerCard() {
         discountedPrice="$719"
         ctaText={t.cta}
         endDate={endDate}
-        className="p-4"
+        className="rounded-none border-0 p-4 shadow-none"
       />
     </div>
   );

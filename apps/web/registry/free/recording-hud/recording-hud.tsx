@@ -325,11 +325,10 @@ export function RecordingHud({
           aria-hidden="true"
           className={paused ? undefined : "hud-dot-blink"}
           style={{
-            width: 8,
-            height: 8,
+            width: 6,
+            height: 6,
             borderRadius: "50%",
             background: paused ? WARNING : "#ef4444",
-            boxShadow: paused ? `0 0 6px ${WARNING}` : "0 0 6px #ef4444",
             flexShrink: 0,
           }}
         />

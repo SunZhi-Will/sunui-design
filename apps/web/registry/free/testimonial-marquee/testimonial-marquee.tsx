@@ -127,7 +127,7 @@ export interface TestimonialMarqueeProps {
   rows?: 1 | 2 | 3;
   /** 點擊展開詳情視窗與 3D 傾斜 hover，預設 true */
   expandable?: boolean;
-  /** 卡片強調色，必須是 hex 色碼（內部會接透明度尾碼） */
+  /** 唯一強調色（星等、評分條、hover 邊框），必須是 hex 色碼（內部會接透明度尾碼），預設琥珀金 #d4a24c */
   accentColor?: string;
   cardWidth?: number;
   /** 卡片不足時補到這個數量，避免一圈太短看起來原地打轉 */
@@ -144,34 +144,43 @@ export interface TestimonialMarqueeProps {
   className?: string;
 }
 
-/* ───────── 原站暗色 token（元件自帶，不依賴網站主題） ───────── */
+/* ───────── 暗色 token（元件自帶，不依賴網站主題） ───────── */
 
 const THEME = {
-  "--tm-text-primary": "rgba(255,255,255,0.93)",
-  "--tm-text-secondary": "rgba(255,255,255,0.58)",
-  "--tm-text-muted": "rgba(255,255,255,0.50)",
-  "--tm-text-dim": "rgba(255,255,255,0.45)",
-  "--tm-card-subtle": "rgba(255,255,255,0.03)",
-  "--tm-card": "rgba(255,255,255,0.05)",
-  "--tm-card-raised": "rgba(255,255,255,0.08)",
-  "--tm-border-subtle": "rgba(255,255,255,0.06)",
-  "--tm-border": "rgba(255,255,255,0.10)",
-  "--tm-border-hover": "rgba(255,255,255,0.25)",
-  "--tm-dropdown-bg": "rgba(10,10,10,0.97)",
-  "--tm-backdrop": "rgba(0,0,0,0.55)",
-  "--tm-gold": "#F5C045",
+  "--tm-text-primary": "#f5f5f4",
+  "--tm-text-secondary": "#d6d3d1",
+  "--tm-text-muted": "#a8a29e",
+  "--tm-text-dim": "#78716c",
+  "--tm-card-subtle": "#161412",
+  "--tm-card": "#1c1a17",
+  "--tm-card-raised": "#1c1a17",
+  "--tm-border-subtle": "rgb(255 255 255 / 0.08)",
+  "--tm-border": "rgb(255 255 255 / 0.12)",
+  "--tm-border-hover": "rgb(255 255 255 / 0.16)",
+  "--tm-dropdown-bg": "#161412",
+  "--tm-backdrop": "rgba(12,10,9,0.82)",
+  "--tm-gold": "#d4a24c",
 } as CSSProperties;
 
-const TONE: Record<TestimonialTagTone, { color: string; background: string; borderColor: string }> = {
-  neutral: { color: "var(--tm-text-secondary)", background: "var(--tm-card)", borderColor: "var(--tm-border-subtle)" },
-  free: { color: "#34d399", background: "rgba(52,211,153,0.10)", borderColor: "rgba(52,211,153,0.25)" },
-  danger: { color: "rgba(248,113,113,0.96)", background: "rgba(248,113,113,0.12)", borderColor: "rgba(248,113,113,0.36)" },
-  discount: { color: "#F5C045", background: "rgba(245,192,69,0.12)", borderColor: "rgba(245,192,69,0.25)" },
-  refunded: { color: "#a78bfa", background: "rgba(167,139,250,0.08)", borderColor: "rgba(167,139,250,0.20)" },
-  info: { color: "#60a5fa", background: "rgba(59,130,246,0.10)", borderColor: "rgba(96,165,250,0.28)" },
+/** 徽章一律是中性膠囊，狀態只上在 6px 的點上；refunded、info、neutral 不上色 */
+const TONE_DOT: Record<TestimonialTagTone, string | null> = {
+  neutral: null,
+  free: "#34d399",
+  danger: "#f87171",
+  discount: "var(--tm-gold)",
+  refunded: null,
+  info: null,
 };
 
-const DEFAULT_ACCENT = "#F5C045";
+const DEFAULT_ACCENT = "#d4a24c";
+
+/** 依名字雜湊出低彩度的暖灰底色，頭像不用強調色 */
+function avatarTone(name?: string | null) {
+  const key = name?.trim() || "?";
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return `hsl(${h % 360} 14% 24%)`;
+}
 const ROW_DURATIONS_SEC = [26, 34, 30];
 const COMPACT_MAX = 767;
 const FOCUSABLE =
@@ -253,12 +262,13 @@ function StarRating({ value, size = 13, label }: { value: number; size?: number;
 }
 
 function TagBadge({ tag }: { tag: TestimonialTag }) {
-  const s = TONE[tag.tone];
+  const dot = TONE_DOT[tag.tone];
   return (
     <span
-      className="inline-flex h-5 items-center gap-1 px-1.5 align-middle text-[10px] font-semibold whitespace-nowrap"
-      style={{ color: s.color, background: s.background, border: `1px solid ${s.borderColor}`, borderRadius: 999 }}
+      className="inline-flex h-5 items-center gap-1 px-1.5 align-middle text-[10px] font-medium whitespace-nowrap"
+      style={{ color: "var(--tm-text-secondary)", background: "var(--tm-card)", border: "1px solid var(--tm-border-subtle)", borderRadius: 999 }}
     >
+      {dot ? <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ background: dot }} /> : null}
       {tag.icon}
       {tag.label}
     </span>
@@ -371,8 +381,7 @@ function TestimonialCard({
   const style: CSSProperties = {
     width,
     padding: 20,
-    background:
-      "linear-gradient(180deg, color-mix(in srgb, var(--tm-card-subtle) 92%, #ffffff 8%), var(--tm-card-subtle))",
+    background: "var(--tm-card-subtle)",
     border: "1px solid var(--tm-border-subtle)",
     borderRadius: 16,
     minHeight: 168,
@@ -389,7 +398,7 @@ function TestimonialCard({
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <StarRating value={t.rating} size={13} label={labels.stars(formatRating(t.rating))} />
-          <span className="text-[12px] font-semibold" style={{ color: "var(--tm-text-muted)" }}>
+          <span className="text-[12px] font-semibold tabular-nums" style={{ color: "var(--tm-text-muted)" }}>
             {formatRating(t.rating)}
           </span>
         </div>
@@ -431,9 +440,9 @@ function TestimonialCard({
           avatarUrl={t.author.avatarUrl}
           size={28}
           fontSize={12}
-          background={`${accentColor}20`}
-          color={accentColor}
-          border={`1px solid ${accentColor}38`}
+          background={avatarTone(t.author.name)}
+          color="#e7e5e4"
+          border="1px solid var(--tm-border-subtle)"
         />
         <div className="min-w-0 flex-1">
           <div className="truncate text-[12px] font-semibold" style={{ color: "var(--tm-text-primary)" }}>
@@ -543,9 +552,8 @@ function ExpandedDialog({
       className={cn(fixed ? "fixed" : "absolute", "inset-0 z-[100] flex items-end justify-center sm:items-center")}
       style={{
         ...THEME,
+        ["--tm-gold" as string]: accentColor,
         background: "var(--tm-backdrop)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
       }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -592,18 +600,17 @@ function ExpandedDialog({
               avatarUrl={t.author.avatarUrl}
               size={44}
               fontSize={16}
-              weight="black"
-              background={`${accentColor}20`}
-              color={accentColor}
-              border={`1px solid ${accentColor}40`}
+              background={avatarTone(t.author.name)}
+              color="#e7e5e4"
+              border="1px solid var(--tm-border-subtle)"
             />
             <div className="min-w-0 flex-1">
-              <div className="mb-1 text-[15px] font-bold" style={{ color: "var(--tm-text-primary)" }}>
+              <div className="mb-1 text-[15px] font-semibold" style={{ color: "var(--tm-text-primary)" }}>
                 {name}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <StarRating value={t.rating} size={12} label={labels.stars(formatRating(t.rating))} />
-                <span className="text-[12px] font-bold" style={{ color: "var(--tm-text-secondary)" }}>
+                <span className="text-[12px] font-semibold tabular-nums" style={{ color: "var(--tm-text-secondary)" }}>
                   {formatRating(t.rating)}
                 </span>
                 {t.tag ? (
@@ -623,10 +630,10 @@ function ExpandedDialog({
                   <span className="w-16 shrink-0 text-[12px]" style={{ color: "var(--tm-text-muted)" }}>
                     {row.label}
                   </span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: "var(--tm-border-hover)" }}>
+                  <div className="h-1 flex-1 overflow-hidden rounded-full" style={{ background: "var(--tm-border-hover)" }}>
                     <div className="h-full rounded-full" style={{ width: `${(row.value / 5) * 100}%`, background: accentColor }} />
                   </div>
-                  <span className="w-4 shrink-0 text-right text-[12px] font-bold" style={{ color: "var(--tm-text-primary)" }}>
+                  <span className="w-4 shrink-0 text-right text-[12px] font-semibold tabular-nums" style={{ color: "var(--tm-text-primary)" }}>
                     {row.value}
                   </span>
                 </div>
@@ -701,6 +708,8 @@ export function TestimonialMarquee({
 
   if (!testimonials.length) return <>{emptyFallback}</>;
 
+  const themed = { ...THEME, ["--tm-gold" as string]: accentColor } as CSSProperties;
+
   const groups = distributeRows(testimonials, rows, minCardsPerRow);
   const renderCards = (cards: Testimonial[]) =>
     cards.map((t, ci) => (
@@ -722,7 +731,7 @@ export function TestimonialMarquee({
       {allowAnimation ? (
         <div
           className={className}
-          style={THEME}
+          style={themed}
           // JS 驅動暫停：鍵盤使用者 Tab 進卡片時也要停
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
@@ -752,7 +761,7 @@ export function TestimonialMarquee({
         </div>
       ) : (
         // 手機與 reduced motion：每列獨立靜態橫捲，不重複內容
-        <div className={className} style={THEME}>
+        <div className={className} style={themed}>
           {groups.map((cards, ri) => (
             <div key={ri} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ paddingBottom: 8 }}>
               <div className="flex w-max gap-3">

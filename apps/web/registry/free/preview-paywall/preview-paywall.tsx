@@ -83,8 +83,9 @@ export interface PreviewPaywallProps {
   previewCount: number;
   href?: string;
   onClick?: () => void;
-  /** 按鈕漸層，預設原站的品牌金 */
+  /** 按鈕底色；不傳時跟隨主題的 primary */
   ctaFrom?: string;
+  /** 保留給相容舊版，按鈕不再做漸層，此值不使用 */
   ctaTo?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -131,8 +132,7 @@ export function PreviewPaywall({
   previewCount,
   href,
   onClick,
-  ctaFrom = "#F5C045",
-  ctaTo = "#A67C1E",
+  ctaFrom,
   locale = "en",
   labels,
   className,
@@ -147,31 +147,28 @@ export function PreviewPaywall({
         className,
       )}
       style={{
+        // 遮住後面被鎖的內容：同色的不透明遮罩加輕微模糊（功能性，不是裝飾）
         background:
-          "linear-gradient(to top, rgba(6,6,14,0.98) 60%, rgba(6,6,14,0.4) 100%)",
+          "linear-gradient(to top, var(--background) 60%, color-mix(in oklab, var(--background) 55%, transparent) 100%)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
       }}
     >
-      <div style={{ color: "#fff" }}>
-        <LockIcon size={34} />
+      <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
+        <LockIcon size={18} />
       </div>
       <div className="text-center">
-        <p className="mb-1 text-lg font-bold" style={{ color: "#fff" }}>
-          {l.title}
-        </p>
-        <p className="text-sm" style={{ color: "#a3a3a3" }}>
-          {l.body(previewCount)}
-        </p>
+        <p className="mb-1 text-base font-semibold text-foreground sm:text-lg">{l.title}</p>
+        <p className="text-sm text-muted-foreground">{l.body(previewCount)}</p>
       </div>
       <ActionLink
         href={href}
         onClick={onClick}
-        className="rounded-xl px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90"
-        style={{
-          background: `linear-gradient(135deg, ${ctaFrom}, ${ctaTo})`,
-          color: "#fff",
-        }}
+        className={cn(
+          "rounded-md px-5 py-2.5 text-sm font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50",
+          !ctaFrom && "bg-primary text-primary-foreground",
+        )}
+        style={ctaFrom ? { background: ctaFrom, color: "#fff" } : undefined}
       >
         {l.cta}
       </ActionLink>
