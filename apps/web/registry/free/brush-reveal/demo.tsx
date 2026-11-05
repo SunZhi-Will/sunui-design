@@ -1,0 +1,170 @@
+"use client";
+
+import { useDemoText } from "@/lib/demo-locale";
+
+import { BrushReveal } from "./brush-reveal";
+
+// 示範用插圖：同一盞檯燈的線稿與上色版，SVG data URI
+const svg = (body: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500' preserveAspectRatio='xMidYMid slice'>${body}</svg>`)}`;
+
+const lampShape = (stroke: string, fill: string, shade: string, base: string) => `
+<path d='M300 430 H500' stroke='${stroke}' stroke-width='6' stroke-linecap='round'/>
+<rect x='330' y='400' width='140' height='30' rx='8' fill='${base}' stroke='${stroke}' stroke-width='3'/>
+<path d='M400 400 L340 250 L470 150' fill='none' stroke='${stroke}' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
+<circle cx='340' cy='250' r='12' fill='${fill}' stroke='${stroke}' stroke-width='3'/>
+<path d='M440 110 L560 150 L520 250 L410 190 Z' fill='${shade}' stroke='${stroke}' stroke-width='3' stroke-linejoin='round'/>`;
+
+const sketch = svg(`<rect width='800' height='500' fill='#f5f5f4'/>
+<g stroke='#d6d3d1' stroke-width='1'>${Array.from({ length: 20 }, (_, i) => `<path d='M${i * 40} 0 V500'/><path d='M0 ${i * 40} H800'/>`).join("")}</g>
+${lampShape("#44403c", "none", "none", "none")}
+<path d='M540 250 L640 360' stroke='#a8a29e' stroke-width='2' stroke-dasharray='6 6'/>`);
+
+const finished = svg(`<defs>
+<linearGradient id='w' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#292524'/><stop offset='1' stop-color='#0c0a09'/></linearGradient>
+<radialGradient id='glow' cx='.72' cy='.72' r='.45'><stop offset='0' stop-color='#fde68a' stop-opacity='.8'/><stop offset='1' stop-color='#fde68a' stop-opacity='0'/></radialGradient>
+</defs>
+<rect width='800' height='500' fill='url(#w)'/>
+<rect width='800' height='500' fill='url(#glow)'/>
+${lampShape("#0c0a09", "#d97706", "#d97706", "#57534e")}`);
+
+const copy = {
+  en: {
+    lampAlt: "Pencil sketch of a desk lamp on grid paper",
+    lampRevealAlt: "The finished desk lamp in amber, lit at night",
+    lampCaption: "Arc desk lamp, from sketch to finish",
+    lampHint: "Move the pointer across the sketch to see the finished lamp. When focused, the finished lamp shows.",
+    inkEyebrow: "Members' night",
+    inkTitle: "Something is under the ink",
+    inkLead: "Brush over the card to read it.",
+    offerEyebrow: "Friday, 8 pm to midnight",
+    offerTitle: "Extra 15% off everything",
+    offerCode: "INK15",
+    offerNote: "Code works once per account, on top of sale prices.",
+    inkHint: "Brush over the card to uncover the members' offer. When focused, the offer shows.",
+    stayTitle: "Draw your own window",
+    stayLead: "Strokes stay. A gift box waits behind the frost.",
+    stayReveal: "Free gift wrap on every order this week",
+    stayHint: "Paint across the frosted panel to clear it. When focused, the message shows.",
+  },
+  "zh-TW": {
+    lampAlt: "方格紙上的檯燈鉛筆線稿",
+    lampRevealAlt: "完成後的琥珀色檯燈，夜裡點亮",
+    lampCaption: "弧臂檯燈，從線稿到成品",
+    lampHint: "把游標移過線稿就能看到成品。聚焦時會直接顯示成品。",
+    inkEyebrow: "會員之夜",
+    inkTitle: "墨水底下藏了東西",
+    inkLead: "刷過卡片就看得到。",
+    offerEyebrow: "週五晚上 8 點到午夜",
+    offerTitle: "全館再折 15%",
+    offerCode: "INK15",
+    offerNote: "每個帳號限用一次，可與特價併用。",
+    inkHint: "刷過卡片就能看到會員優惠。聚焦時會直接顯示優惠。",
+    stayTitle: "畫出你的窗",
+    stayLead: "筆跡會留著，霧面後面有一個禮物盒。",
+    stayReveal: "本週每筆訂單免費禮品包裝",
+    stayHint: "在霧面上塗抹就能擦亮。聚焦時會直接顯示訊息。",
+  },
+  "zh-CN": {
+    lampAlt: "方格纸上的台灯铅笔线稿",
+    lampRevealAlt: "完成后的琥珀色台灯，夜里点亮",
+    lampCaption: "弧臂台灯，从线稿到成品",
+    lampHint: "把光标移过线稿就能看到成品。聚焦时会直接显示成品。",
+    inkEyebrow: "会员之夜",
+    inkTitle: "墨水底下藏了东西",
+    inkLead: "刷过卡片就看得到。",
+    offerEyebrow: "周五晚上 8 点到午夜",
+    offerTitle: "全场再打 85 折",
+    offerCode: "INK15",
+    offerNote: "每个账号限用一次，可与特价叠加。",
+    inkHint: "刷过卡片就能看到会员优惠。聚焦时会直接显示优惠。",
+    stayTitle: "画出你的窗",
+    stayLead: "笔迹会留着，雾面后面有一个礼物盒。",
+    stayReveal: "本周每笔订单免费礼品包装",
+    stayHint: "在雾面上涂抹就能擦亮。聚焦时会直接显示信息。",
+  },
+  ja: {
+    lampAlt: "方眼紙に描いたデスクランプの鉛筆スケッチ",
+    lampRevealAlt: "完成したアンバー色のデスクランプ、夜に点灯",
+    lampCaption: "アームのデスクランプ、スケッチから完成まで",
+    lampHint: "スケッチの上でポインターを動かすと完成品が見えます。フォーカス時は完成品を表示します。",
+    inkEyebrow: "会員ナイト",
+    inkTitle: "インクの下に何かがあります",
+    inkLead: "カードをなぞると読めます。",
+    offerEyebrow: "金曜 20 時から深夜 0 時まで",
+    offerTitle: "全品さらに 15% オフ",
+    offerCode: "INK15",
+    offerNote: "1 アカウント 1 回まで、セール価格と併用できます。",
+    inkHint: "カードをなぞると会員特典が見えます。フォーカス時は特典を表示します。",
+    stayTitle: "自分の窓を描く",
+    stayLead: "描いた跡は残ります。曇りガラスの奥にギフトボックス。",
+    stayReveal: "今週はすべての注文でギフト包装無料",
+    stayHint: "曇ったパネルをなぞると晴れます。フォーカス時はメッセージを表示します。",
+  },
+};
+
+export default function BrushRevealDemo() {
+  const t = useDemoText(copy);
+  return (
+    <div className="grid w-full max-w-5xl gap-5 p-4 sm:grid-cols-2">
+      <figure className="sm:col-span-2">
+        <BrushReveal
+          hint={t.lampHint}
+          brushSize={120}
+          className="aspect-[16/10] rounded-xl border border-border sm:aspect-[16/7]"
+          reveal={<img src={finished} alt={t.lampRevealAlt} className="h-full w-full object-cover" draggable={false} />}
+        >
+          <img src={sketch} alt={t.lampAlt} className="h-full w-full object-cover" draggable={false} />
+        </BrushReveal>
+        <figcaption className="mt-2 text-sm text-muted-foreground">{t.lampCaption}</figcaption>
+      </figure>
+
+      <BrushReveal
+        shape="ink"
+        fade={2400}
+        brushSize={110}
+        hint={t.inkHint}
+        className="min-h-56 rounded-xl border border-border"
+        reveal={
+          <div className="flex h-full flex-col justify-between bg-foreground p-6 text-background">
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] opacity-70">{t.offerEyebrow}</p>
+            <div>
+              <p className="text-2xl font-semibold tracking-tight">{t.offerTitle}</p>
+              <p className="mt-2 font-mono text-lg tracking-[0.12em]">{t.offerCode}</p>
+              <p className="mt-1 text-sm opacity-70">{t.offerNote}</p>
+            </div>
+          </div>
+        }
+      >
+        <div className="flex h-full min-h-56 flex-col justify-between bg-card p-6">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{t.inkEyebrow}</p>
+          <div>
+            <p className="text-2xl font-semibold tracking-tight">{t.inkTitle}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t.inkLead}</p>
+          </div>
+        </div>
+      </BrushReveal>
+
+      <BrushReveal
+        fade={0}
+        brushSize={70}
+        hint={t.stayHint}
+        className="min-h-56 rounded-xl border border-border"
+        reveal={
+          <div className="flex h-full flex-col items-center justify-center gap-3 bg-background p-6 text-center">
+            <svg viewBox="0 0 48 48" className="h-12 w-12" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
+              <rect x="8" y="18" width="32" height="22" rx="2" />
+              <path d="M6 12h36v6H6zM24 12v28M24 12c-3-6-11-6-9 0M24 12c3-6 11-6 9 0" />
+            </svg>
+            <p className="max-w-[16em] text-lg font-semibold tracking-tight">{t.stayReveal}</p>
+          </div>
+        }
+      >
+        <div className="flex h-full min-h-56 flex-col justify-end bg-muted p-6">
+          <p className="text-2xl font-semibold tracking-tight">{t.stayTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.stayLead}</p>
+        </div>
+      </BrushReveal>
+    </div>
+  );
+}

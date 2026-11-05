@@ -333,6 +333,50 @@
       ]
     },
     {
+      "name": "back-to-top",
+      "type": "registry:block",
+      "title": "Back To Top",
+      "description": "Round paper button that appears after you scroll past a threshold and takes you back to the top, with an ink ring around it that fills as you read. Works on the window or a scroll container, scrolls smoothly unless reduced motion is on, and can sit fixed to the viewport or inside a relative container.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "scroll",
+        "button"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Long category pages, search results and articles"
+          ],
+          "watchOut": [
+            "Keep it clear of chat widgets or cookie banners in the same corner",
+            "Turn off showProgress if scroll-progress is already on the page"
+          ],
+          "aliases": [
+            "back to top",
+            "scroll to top",
+            "go to top button",
+            "top button",
+            "scroll up button"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/back-to-top/back-to-top.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "background-effects",
       "type": "registry:block",
       "title": "Background Effects",
@@ -466,6 +510,61 @@
       "files": [
         {
           "path": "registry/free/browser-frame/browser-frame.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "brush-reveal",
+      "type": "registry:block",
+      "title": "Brush Reveal",
+      "description": "Two stacked layers where the pointer or a finger paints through the top one: a soft airbrush or a blotchy ink drop leaves a trail that uncovers the reveal layer and fades back over a set time, or stays when fade is 0. Both layers are ordinary React content (images, text, cards), masked by a small canvas that only redraws while a stroke is painting or fading. Keyboard focus shows the whole reveal layer, a hidden hint explains the interaction to screen readers, and with reduced motion hovering or tapping shows the layer at once without trails.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media",
+        "marketing",
+        "hero"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Before and after pairs that feel more playful than a slider: sketch and finished product, day and night, plain and styled",
+            "Campaign teasers where a member offer or launch date sits under an ink layer people brush away",
+            "Portfolio or lookbook heroes where the pointer uncovers a second photo of the same product"
+          ],
+          "watchOut": [
+            "The reveal layer ignores the pointer; keep links and buttons in the base layer or outside the block",
+            "On touch screens the area captures the finger, so do not make it taller than most of the viewport",
+            "Both layers stay in the page for screen readers; do not hide information that only some people can uncover",
+            "It is a motion series piece; do not use it for real prize draws or anything that must be fair or verifiable"
+          ],
+          "aliases": [
+            "hover reveal",
+            "ink reveal",
+            "paint reveal",
+            "mask reveal",
+            "cursor reveal image",
+            "brush mask",
+            "reveal on hover",
+            "image reveal brush",
+            "spotlight reveal",
+            "erase to reveal"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/brush-reveal/brush-reveal.tsx",
           "type": "registry:component"
         }
       ]
@@ -1221,6 +1320,163 @@
       ]
     },
     {
+      "name": "depth-hero",
+      "type": "registry:block",
+      "title": "Depth Hero",
+      "description": "A layered hero where a giant headline sits behind the product: a background layer, the headline, a front subject (a transparent image or any node) and readable content on top. Moving a mouse over the section shifts each layer by a different depth through spring-smoothed motion values, and the optional scroll prop also moves the layers at different speeds as the section scrolls past. The content layer never moves. Pointer depth only runs on fine pointers; with reduced motion or depth 0 every layer stays still.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "hero",
+        "landing",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product launch and pre-order heroes where one cut-out product should stand in front of its name",
+            "Campaign or collection openers with a short word (a product name, a season, two CJK characters) set very large",
+            "Founder or portfolio intros with a cut-out portrait in front of a name, with scroll on for a little depth while leaving the section"
+          ],
+          "watchOut": [
+            "The subject needs a transparent background (PNG, WebP or SVG) to read as standing in front of the word",
+            "Keep the headline short: it is sized to fill the width and is set on one line; long words get cut off on small screens",
+            "Put prices, copy and buttons in children so they stay still and readable; do not put them in the moving layers",
+            "One per page: it is a signature hero moment, not a section pattern to repeat"
+          ],
+          "aliases": [
+            "depth hero",
+            "parallax hero",
+            "layered hero",
+            "text behind image",
+            "text behind subject",
+            "mouse parallax",
+            "3d hero",
+            "product launch hero",
+            "big type hero",
+            "depth effect"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/depth-hero/depth-hero.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dial-scrubber",
+      "type": "registry:block",
+      "title": "Dial Scrubber",
+      "description": "A large ruler you scrub through: major and minor ticks with labels slide under a fixed center needle, and the ticks near the needle stretch a little. Drag with momentum, scroll the wheel, or use the arrow, Page and Home/End keys; it always settles on a step with a spring. Pass marks to label points such as years or sizes, formatValue for currency or units, and use it controlled or uncontrolled. It is a real slider for assistive tech (role slider with value text). With reduced motion it jumps straight to each step and drops momentum.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "input",
+        "marketing",
+        "storytelling"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Brand history or campaign timelines where scrubbing through years changes the story next to it",
+            "Showy single-value pickers on landing pages: gift card amount, donation, ring or shoe size, distance",
+            "Pair marks with a caption or image that changes with the value to make a small scrollytelling moment without scrolling the page"
+          ],
+          "watchOut": [
+            "It is a display control; inside dense checkout forms use a plain input or the range-slider block",
+            "The wheel moves the dial while the pointer is over it, so keep it compact on long pages",
+            "Very wide ranges with tiny steps make long drags; raise step or spacing so the whole range is a few swipes",
+            "Give it a label; marks should pass text when their label is not plain text so the value is announced fully"
+          ],
+          "aliases": [
+            "ruler slider",
+            "scrubber",
+            "timeline scrubber",
+            "year picker",
+            "dial picker",
+            "tick slider",
+            "measuring tape slider",
+            "amount picker",
+            "size picker",
+            "wheel picker",
+            "horizontal picker"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/dial-scrubber/dial-scrubber.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dialog-sheet",
+      "type": "registry:block",
+      "title": "Dialog Sheet",
+      "description": "One dialog for both screens: a centred paper card on desktop that becomes a bottom sheet under 640px, with a handle you can drag down to close. Focus trap, Escape and scrim close, focus returns to the trigger, controlled or uncontrolled, and contained mode for previews. Ships useExitIntent to open it when the cursor leaves through the top of the page.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "overlay",
+        "form"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Size guides, shipping details or terms that should not leave the product page",
+            "A sign-up or offer dialog triggered by exit intent with useExitIntent"
+          ],
+          "watchOut": [
+            "Use side-panel instead for long navigation or a cart drawer",
+            "useExitIntent never fires on touch devices; give mobile visitors another way to see the offer"
+          ],
+          "aliases": [
+            "modal",
+            "dialog",
+            "bottom sheet",
+            "popup",
+            "exit intent popup",
+            "responsive dialog",
+            "drawer dialog"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/dialog-sheet/dialog-sheet.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "empty-state",
       "type": "registry:block",
       "title": "Empty State",
@@ -1396,6 +1652,51 @@
       ]
     },
     {
+      "name": "floating-field",
+      "type": "registry:block",
+      "title": "Floating Field",
+      "description": "Paper text field whose label floats onto the top edge on focus or when filled, with inline validation from a validate function: errors appear after the first blur and then update as you type, success shows a check and an optional message, and a failed blur gives a small shake. Supports hint text, server errors, textarea and a trailing slot such as a show password button.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "form",
+        "input"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Checkout, address and sign-up forms",
+            "Fields that need instant format feedback such as email, postcode or password length"
+          ],
+          "watchOut": [
+            "Validation is synchronous; pass async results through the error prop",
+            "Keep labels short so they still fit when shrunk onto the border"
+          ],
+          "aliases": [
+            "floating label",
+            "inline validation",
+            "text field",
+            "material input",
+            "form field",
+            "input with label"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/floating-field/floating-field.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "gradient-backdrop",
       "type": "registry:block",
       "title": "Gradient Backdrop",
@@ -1451,62 +1752,6 @@
       ]
     },
     {
-      "name": "spring-rig",
-      "type": "registry:block",
-      "title": "Spring Rig",
-      "description": "Line drawings with springs inside: point at one and its parts lean, swing, pop and bounce, each part on its own spring (wobbly, snappy, gentle, or a falling drop with a bounce). Five ready-made drawings (shopping bag, price tag, gift box, desk lamp, card stack) switched with the preset prop, plus defineRig to rig your own SVG. Taps and long presses work on touch. Optional autoplay sends a ghost pointer across while on screen and hands over to a real pointer. Pauses off screen; with reduced motion it draws the resting pose.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "animation",
-        "svg",
-        "illustration",
-        "marketing"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "motion",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Feature grids, empty states and landing heroes that want a small drawing which reacts when people point at it",
-            "Category tiles in a shop (bags, gifts, deals) where a playful spot illustration replaces a static icon",
-            "Rigging your own SVG: write a rig that maps the pointer to channel goals and a draw function that turns channel values into paths"
-          ],
-          "watchOut": [
-            "It is a motion series piece; keep it out of paper and product blocks such as checkout or cart",
-            "Autoplay is a loop: use it for one hero drawing, not a whole grid, and leave it off where people need to read",
-            "Define custom rigs outside components so the springs are not reset on every render",
-            "Drawings use currentColor and fill-background; place them on the page background or a card so the overlaps read correctly"
-          ],
-          "aliases": [
-            "spring animation",
-            "elastic animation",
-            "interactive illustration",
-            "animated icon",
-            "hover illustration",
-            "rigged svg",
-            "physics icon",
-            "bouncy icon",
-            "follow pointer",
-            "jelly animation",
-            "isometric animation"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/spring-rig/spring-rig.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
       "name": "hero-billboard-carousel",
       "type": "registry:block",
       "title": "Hero Billboard Carousel",
@@ -1545,6 +1790,52 @@
       "files": [
         {
           "path": "registry/free/hero-billboard-carousel/hero-billboard-carousel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hotspots",
+      "type": "registry:block",
+      "title": "Hotspots",
+      "description": "Numbered pins on a product picture that open a paper note about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a price or add to cart.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "product",
+        "media",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product pages that explain materials and details",
+            "Shop the look photos with several products in one picture"
+          ],
+          "watchOut": [
+            "Keep pins away from the outer 10 percent so notes have room",
+            "Repeat the key details as text on the page for people who skip the picture"
+          ],
+          "aliases": [
+            "hotspots",
+            "image hotspots",
+            "product tour",
+            "shop the look",
+            "annotated image",
+            "pins on image"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hotspots/hotspots.tsx",
           "type": "registry:component"
         }
       ]
@@ -1590,6 +1881,54 @@
       "files": [
         {
           "path": "registry/free/hover-card/hover-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hover-motion",
+      "type": "registry:block",
+      "title": "Hover Motion",
+      "description": "Four small hover pieces for store navigation and campaign pages: Magnetic pulls a button gently toward the cursor and springs back, InkUnderline draws a line in from the left and out to the right, TextRoll rolls each letter up while the same word rolls in from below, and HoverPreviewList shows a row's picture beside the cursor. All switch off on touch screens and with reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "navigation",
+        "cursor"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Header menus and footer links",
+            "One main call to action on a campaign page",
+            "Text-only lookbook or collection lists that preview a photo on hover"
+          ],
+          "watchOut": [
+            "Use Magnetic on one button per view, not every button",
+            "HoverPreviewList previews never show on touch screens, so rows must make sense as text alone"
+          ],
+          "aliases": [
+            "magnetic button",
+            "underline animation",
+            "text roll",
+            "hover image reveal",
+            "link hover",
+            "menu hover",
+            "cursor image preview"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/hover-motion/hover-motion.tsx",
           "type": "registry:component"
         }
       ]
@@ -1647,6 +1986,61 @@
       ]
     },
     {
+      "name": "infinite-canvas",
+      "type": "registry:block",
+      "title": "Infinite Canvas",
+      "description": "A gallery board that never ends: images or your own nodes tile a grid that wraps in both directions, and only the cells near the viewport are rendered and recycled. Drag to pan with inertia, scroll or swipe a trackpad, or use the arrow keys to glide one cell at a time and Enter to open the centered tile. Clicks under the drag threshold call onSelect. An optional slow drift pans it on its own while it is on screen. Loops pause off screen and in hidden tabs; with reduced motion it still pans but drops inertia and drift.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media",
+        "gallery",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Lookbooks, moodboards and collection pages where browsing should feel like wandering a table of products",
+            "Portfolio or campaign archives with more pieces than fit a grid, so visitors explore instead of paging",
+            "A hero backdrop that drifts slowly behind a headline, with drift set and onSelect left out"
+          ],
+          "watchOut": [
+            "The wheel pans the canvas, so the page will not scroll while the pointer is over it; give it a fixed height and leave page room around it, or set wheel={false}",
+            "Items repeat across the plane, so it suits 8 or more pieces; with only a few, the repetition is obvious",
+            "Tiles inside the canvas are hidden from screen readers; a plain list of item labels is rendered for them, so give every item a label or alt",
+            "It is a motion series piece; do not use it for product grids people need to filter, sort or compare"
+          ],
+          "aliases": [
+            "infinite canvas",
+            "infinite gallery",
+            "draggable gallery",
+            "pan and zoom gallery",
+            "endless grid",
+            "moodboard",
+            "lookbook",
+            "infinite scroll grid",
+            "drag to explore",
+            "wrap around grid"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/infinite-canvas/infinite-canvas.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "jobs-tray",
       "type": "registry:block",
       "title": "Jobs Tray",
@@ -1689,6 +2083,98 @@
         },
         {
           "path": "registry/free/jobs-tray/job-views.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "lightbox",
+      "type": "registry:block",
+      "title": "Lightbox",
+      "description": "Product gallery whose thumbnail grows into the full view and shrinks back on close; switching images sends the old one back to its thumbnail while the next grows from its own. Arrow keys and swipe change images, Escape, the scrim or a downward drag closes, focus returns to the thumbnail, and you can control the index or render custom thumbnails.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "product",
+        "overlay"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product photo galleries and review photos",
+            "Lookbooks and user generated photo grids"
+          ],
+          "watchOut": [
+            "Provide real alt text for every image; it is the dialog label",
+            "Custom thumbnails from renderThumb do not get the grow animation"
+          ],
+          "aliases": [
+            "lightbox",
+            "image gallery",
+            "photo viewer",
+            "image zoom modal",
+            "gallery modal",
+            "view transition"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/lightbox/lightbox.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "loading-button",
+      "type": "registry:block",
+      "title": "Loading Button",
+      "description": "A submit button that handles its own async state: return a Promise from onClick and it goes loading, then success with a drawn check or error with a retry label, and resets after a delay. Shrink style collapses into a round spinner, inline style keeps the width. Also accepts a controlled state, announces each state politely and ignores presses while busy.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "button",
+        "feedback",
+        "form"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Subscribe, pay, apply coupon or save buttons that call an API",
+            "Any form submit where people press twice because nothing seemed to happen"
+          ],
+          "watchOut": [
+            "The success check is not a celebration; use a stamp block for rewards",
+            "Pass state yourself if the result arrives through a websocket or polling instead of the click Promise"
+          ],
+          "aliases": [
+            "submit button",
+            "async button",
+            "spinner button",
+            "progress button",
+            "stateful button",
+            "loading state"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/loading-button/loading-button.tsx",
           "type": "registry:component"
         }
       ]
@@ -1838,6 +2324,106 @@
       "files": [
         {
           "path": "registry/free/micro-interactions/micro-interactions.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "notify-badge",
+      "type": "registry:block",
+      "title": "Notify Badge",
+      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It presses in like a stamp when the count rises and stays still when it falls, sits in one of three corners, and offers vermilion, ink or theme primary tones with a screen reader label you phrase yourself.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "badge",
+        "notification",
+        "navigation"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Cart counts, unread messages and new notifications in a store header"
+          ],
+          "watchOut": [
+            "Keep vermilion for one badge per header; use ink or primary for the rest",
+            "The wrapper is a span, so put the button around it, not inside"
+          ],
+          "aliases": [
+            "notification badge",
+            "count badge",
+            "cart count",
+            "unread dot",
+            "badge counter",
+            "indicator"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/notify-badge/notify-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "orbit-gallery",
+      "type": "registry:block",
+      "title": "Orbit Gallery",
+      "description": "Images on a sphere in CSS 3D, spread evenly with a Fibonacci layout. Drag to spin it and it keeps turning and slows down; click or tab to a tile and the sphere turns it to the front and calls onSelect. Tiles facing away fade out and stop taking clicks, a slow auto-rotate runs until someone interacts, and every loop pauses off screen and in hidden tabs. Arrow keys turn it, the chosen image is announced politely, and with reduced motion it becomes a plain grid of all images.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media",
+        "marketing",
+        "hero"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "A hero or campaign section that shows the breadth of a collection, portfolio or community at a glance",
+            "Picking one item out of many in a playful way, with onSelect driving a caption or detail panel",
+            "Brand or event pages where a 3D moment helps more than a long grid"
+          ],
+          "watchOut": [
+            "It is a motion series piece; keep it out of checkout, cart and other paper or product blocks",
+            "With fewer images than count, images repeat; pass at least 8 distinct images so repeats are not obvious",
+            "Vertical drags on touch screens scroll the page; the sphere turns sideways on touch and in both directions with a mouse or keys",
+            "Tiles are small: do not rely on text inside the images"
+          ],
+          "aliases": [
+            "image sphere",
+            "3d gallery",
+            "sphere gallery",
+            "globe gallery",
+            "orbit sphere",
+            "rotating gallery",
+            "photo globe",
+            "3d photo sphere",
+            "spinning gallery",
+            "fibonacci sphere"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/orbit-gallery/orbit-gallery.tsx",
           "type": "registry:component"
         }
       ]
@@ -2170,6 +2756,117 @@
       ]
     },
     {
+      "name": "plush-portrait",
+      "type": "registry:block",
+      "title": "Plush Portrait",
+      "description": "A cut-out portrait visitors can grab and stretch like a soft toy. The skin is a damped spring mesh: a pull drags the cheek out, the head leans on a soft neck, and it wobbles back on release. Faces cross-fade on hover, grab, pull and release, the eyes follow the cursor and blink, and it yawns when the page goes quiet. The bust sits in a circle or square and the head pops out above it. One WebGL draw, no dependencies; without WebGL or with reduced motion it stays a still picture. Bring your own face images, all with the same framing.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "hero",
+        "avatar",
+        "animation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "An about page, personal site or founder section where the portrait should feel alive and playful",
+            "A brand mascot or creator profile on a campaign page that invites visitors to play",
+            "Team pages where each person gets a squishable avatar (one live portrait per screen works best)"
+          ],
+          "watchOut": [
+            "You supply the images: a transparent PNG or WebP per face, all the same size, square, and pixel-aligned, or the cross-fades will jump. Only faces.rest is required",
+            "Images must be same-origin or served with CORS headers; otherwise WebGL cannot read them",
+            "frameBox sets where the circle or square sits in image space; adjust it when the head is not centred like the demo",
+            "The canvas reaches about a third of the portrait's width past each side so skin can stretch. Near a viewport edge, give a parent overflow-x: clip",
+            "Uses WebGL. Keep one per screen, and do not use a real person's photo without their consent"
+          ],
+          "aliases": [
+            "squishy avatar",
+            "stretchy face",
+            "grabbable portrait",
+            "plushie photo",
+            "interactive avatar",
+            "face that follows cursor",
+            "jelly portrait",
+            "about me hero",
+            "founder portrait",
+            "soft body image"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/plush-portrait/plush-portrait.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "point-cloud",
+      "type": "registry:block",
+      "title": "Point Cloud",
+      "description": "A cloud of dots in 3D that forms a sphere, torus, helix, cube, wave or the outline of a word (CJK included), drawn on Canvas 2D with perspective so nearer dots are larger and brighter. Drag to spin it with inertia, and a fine pointer pushes nearby dots aside before they spring back. Changing the shape prop morphs every dot to its new place. It spins slowly while on screen (words only sway so they stay readable), pauses off screen and in hidden tabs, follows the text color, and with reduced motion draws one still frame and switches shapes instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "hero",
+        "marketing",
+        "landing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing heroes that want one technical, three-dimensional visual without a 3D library or model files",
+            "Feature lists where hovering each item morphs the cloud into a matching shape (pass the shape from state)",
+            "Sale or launch banners that spell a short word in dots, such as SALE or a two-character CJK word"
+          ],
+          "watchOut": [
+            "Use one per view: each cloud runs its own animation loop while visible",
+            "Keep text to a short word; long strings get thin and hard to read",
+            "Dots use currentColor; on a dark panel set color or a light text class so they stay visible",
+            "Touch drags rotate horizontally while vertical swipes still scroll the page"
+          ],
+          "aliases": [
+            "particle sphere",
+            "3d particles",
+            "dot sphere",
+            "point cloud",
+            "particle globe",
+            "particle text",
+            "morphing particles",
+            "rotating globe dots",
+            "3d dots",
+            "interactive particles"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/point-cloud/point-cloud.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "product-media",
       "type": "registry:block",
       "title": "Product Media",
@@ -2304,6 +3001,108 @@
       ]
     },
     {
+      "name": "range-slider",
+      "type": "registry:block",
+      "title": "Range Slider",
+      "description": "Price and rating slider that takes a number for one thumb or a [low, high] pair for a range: step snapping, minimum gap, ticks, a value bubble while dragging or focused, custom formatting and hidden inputs for forms. Click the track to jump the nearest thumb, use arrows, Page keys, Home and End, and get onValueCommit once when the drag ends.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "input",
+        "form",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Price range filters on a product listing",
+            "Minimum rating, budget or distance filters"
+          ],
+          "watchOut": [
+            "Run expensive searches from onValueCommit, not onValueChange",
+            "For a handful of exact values, sliding-tabs chips are easier to hit on phones"
+          ],
+          "aliases": [
+            "price slider",
+            "range slider",
+            "dual slider",
+            "double range",
+            "min max slider",
+            "price filter"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/range-slider/range-slider.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "raster-image",
+      "type": "registry:block",
+      "title": "Raster Image",
+      "description": "Redraws any image as print-style marks on a canvas: halftone dots on an angled screen, ASCII characters, a dot matrix, 1-bit ordered dither or engraved lines, switched with the mode prop. Marks take the text color, so they follow Light and Dark themes, and a fine pointer makes nearby marks swell and push aside before they ease back. An optional sweep draws it in the first time it scrolls into view. It redraws only while something moves, pauses off screen and in hidden tabs, keeps the alt text on the wrapper, and with reduced motion shows a still print.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media",
+        "marketing",
+        "hero"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product or campaign images that should read as a print, poster or newspaper photo instead of a plain photo",
+            "Editorial and lookbook sections where one hero image gets a halftone or ASCII treatment that reacts to the pointer",
+            "Dark sections that need a light, low-contrast rendition of a product (use invert with a light color)"
+          ],
+          "watchOut": [
+            "Remote images must send CORS headers or the canvas cannot read their pixels; data URIs and same-origin files always work",
+            "Give the wrapper a size: it defaults to a 4:3 box at full width, override with aspect or height classes",
+            "Small cells over large areas cost more per frame; keep cell at 6px or above for full-width heroes, and ASCII at 8px or above",
+            "It is a motion series piece; do not use it for product photos people need to inspect before buying"
+          ],
+          "aliases": [
+            "halftone image",
+            "ascii art",
+            "ascii image",
+            "dot matrix",
+            "dither effect",
+            "bitmap effect",
+            "newspaper print effect",
+            "engraving effect",
+            "pixel image",
+            "image to dots",
+            "interactive halftone"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/raster-image/raster-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "redeem-key-input",
       "type": "registry:block",
       "title": "License and Redeem Panel",
@@ -2389,6 +3188,61 @@
       ]
     },
     {
+      "name": "ribbon-carousel",
+      "type": "registry:block",
+      "title": "Ribbon Carousel",
+      "description": "Cards on a curved ribbon in CSS 3D. Drag or flick sideways and it snaps to the nearest card with a spring, use the arrow keys or buttons, or click a side card to bring it to the middle. It loops by default, can bend away from you (convex) or wrap around you (concave), and only draws the cards near the middle. Optional autoplay runs only while on screen and pauses on hover, focus and hidden tabs, and announcements are turned off while it plays. With reduced motion it becomes a flat scroll-snap row.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "media",
+        "marketing",
+        "landing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Lookbooks, new arrivals and campaign pages that show 6 to 20 visuals one after another",
+            "A portfolio or case study strip where each card should be seen at full size in turn",
+            "Replacing a flat slider when the section is a visual moment, not a list to compare"
+          ],
+          "watchOut": [
+            "It is a motion series piece; keep it out of paper and product blocks such as cart or checkout",
+            "Use loop={false} when there are fewer than about 2 x visible + 1 cards, or the ends will meet",
+            "Autoplay is off by default; turn it on only where people do not need to read",
+            "Images are decorative cards here; put prices and buttons outside the ribbon or in your own caption via onChange"
+          ],
+          "aliases": [
+            "curved carousel",
+            "3d carousel",
+            "cylinder carousel",
+            "ribbon slider",
+            "cover flow",
+            "drum carousel",
+            "coverflow",
+            "curved slider",
+            "lookbook carousel",
+            "3d slider"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/ribbon-carousel/ribbon-carousel.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "scripted-demo",
       "type": "registry:block",
       "title": "Scripted Demo",
@@ -2428,52 +3282,6 @@
       "files": [
         {
           "path": "registry/free/scripted-demo/scripted-demo.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "step-demo",
-      "type": "registry:block",
-      "title": "Step Demo",
-      "description": "A live product demo window where every frame is a pure function of one number: each step's View draws the app at a fixed design size (default 1200 × 750) from t, the seconds into that step, and the stage scales as one picture. That makes it scrubbable, jumpable and freezable through a controlled time prop. It ships time helpers (ease, typed, cue, held, glide curves) and a cursor that glides to data-aim targets measured from the DOM and presses on cue. It plays only on screen with the tab visible, never fast-forwards on return, labels the stage as an image listing the steps, uses real buttons with aria-current and a labelled range input, and with reduced motion shows each step's finished frame with no cursor.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "marketing",
-        "landing",
-        "demo"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "product",
-        "interaction": "section",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Landing hero or feature section that shows an app working step by step without a video",
-            "Docs or launch pages that need the same demo frame in screenshots, with scrubbing or jump-to-step"
-          ],
-          "watchOut": [
-            "Derive all state from t inside each View; timers, effects or CSS keyframes break scrubbing and reduced motion",
-            "Draw at the fixed stage size with large type: on phones the whole stage shrinks instead of reflowing",
-            "Every step's final frame must read as a complete picture, because reduced motion shows only that frame"
-          ],
-          "aliases": [
-            "html demo",
-            "app demo window",
-            "product walkthrough",
-            "scrubbable demo",
-            "screen recording alternative",
-            "animated screenshot"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/step-demo/step-demo.tsx",
           "type": "registry:component"
         }
       ]
@@ -2711,6 +3519,52 @@
       ]
     },
     {
+      "name": "scroll-timeline",
+      "type": "registry:block",
+      "title": "Scroll Timeline",
+      "description": "Vertical timeline in two modes: scroll mode draws an ink line down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in vermilion. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "scroll",
+        "status",
+        "storytelling"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Order tracking and application status",
+            "Brand history, making-of or campaign schedules"
+          ],
+          "watchOut": [
+            "Progress mode ignores scrolling; pass current from your order data",
+            "Keep descriptions short so dots stay evenly spaced"
+          ],
+          "aliases": [
+            "timeline",
+            "scroll timeline",
+            "order tracking",
+            "progress timeline",
+            "history timeline",
+            "stepper timeline"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/scroll-timeline/scroll-timeline.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "shipping-options",
       "type": "registry:block",
       "title": "Shipping Options",
@@ -2847,6 +3701,215 @@
       ]
     },
     {
+      "name": "sliding-tabs",
+      "type": "registry:block",
+      "title": "Sliding Tabs",
+      "description": "One choice control in three shapes: underline tabs with content panels, a segmented control and filter chips, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "input",
+        "form"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Product detail tabs such as details, care and reviews",
+            "Day, week and month switches on a chart",
+            "Filter chips above a product grid"
+          ],
+          "watchOut": [
+            "Content panels only appear when items have content; without it the control is a pure selector",
+            "For more than about six options use a select instead"
+          ],
+          "aliases": [
+            "tabs",
+            "segmented control",
+            "filter chips",
+            "toggle group",
+            "pill tabs",
+            "chip filter",
+            "tab bar"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/sliding-tabs/sliding-tabs.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "spine-shelf",
+      "type": "registry:block",
+      "title": "Spine Shelf",
+      "description": "A row of spines on a shelf in CSS 3D, each one a box with a spine, a front cover and a page edge. Pointing at a spine tilts it out; choosing one (click, arrow keys, Home and End) pulls it forward and turns it to its front cover while the others close the gap, and the caption below shows its title, subtitle and price. It is a listbox with roving focus, the caption is announced politely, the chosen spine scrolls into view on narrow screens, and with reduced motion the turn switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "commerce",
+        "product",
+        "media",
+        "landing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "showcase",
+        "interaction": "drag",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Bookshops, record stores, tea or perfume ranges where products have a recognisable side and a front",
+            "A landing section that lets people browse a short line-up (8 to 14 items) one at a time",
+            "Staff picks or a collection page that wants a physical, editorial feel instead of a grid"
+          ],
+          "watchOut": [
+            "Pass a cover image with the same aspect ratio as coverRatio (default 0.68) so the front does not crop",
+            "Spines show the title vertically; keep titles short or pass your own spine node",
+            "It is one signature moment: do not repeat it down the page, and keep the full product grid elsewhere for comparison"
+          ],
+          "aliases": [
+            "book shelf",
+            "bookshelf",
+            "spine carousel",
+            "vhs shelf",
+            "record shelf",
+            "product shelf",
+            "book picker",
+            "3d books",
+            "cover flow",
+            "library shelf"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/spine-shelf/spine-shelf.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "spring-rig",
+      "type": "registry:block",
+      "title": "Spring Rig",
+      "description": "Line drawings with springs inside: point at one and its parts lean, swing, pop and bounce, each part on its own spring (wobbly, snappy, gentle, or a falling drop with a bounce). Five ready-made drawings (shopping bag, price tag, gift box, desk lamp, card stack) switched with the preset prop, plus defineRig to rig your own SVG. Taps and long presses work on touch. Optional autoplay sends a ghost pointer across while on screen and hands over to a real pointer. Pauses off screen; with reduced motion it draws the resting pose.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "svg",
+        "illustration",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "hover",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Feature grids, empty states and landing heroes that want a small drawing which reacts when people point at it",
+            "Category tiles in a shop (bags, gifts, deals) where a playful spot illustration replaces a static icon",
+            "Rigging your own SVG: write a rig that maps the pointer to channel goals and a draw function that turns channel values into paths"
+          ],
+          "watchOut": [
+            "It is a motion series piece; keep it out of paper and product blocks such as checkout or cart",
+            "Autoplay is a loop: use it for one hero drawing, not a whole grid, and leave it off where people need to read",
+            "Define custom rigs outside components so the springs are not reset on every render",
+            "Drawings use currentColor and fill-background; place them on the page background or a card so the overlaps read correctly"
+          ],
+          "aliases": [
+            "spring animation",
+            "elastic animation",
+            "interactive illustration",
+            "animated icon",
+            "hover illustration",
+            "rigged svg",
+            "physics icon",
+            "bouncy icon",
+            "follow pointer",
+            "jelly animation",
+            "isometric animation"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/spring-rig/spring-rig.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "stamp",
+      "type": "registry:ui",
+      "title": "Stamp",
+      "description": "The one celebration in SunUI, in five shapes chosen by what the result means: tick for small confirmations, box for transaction status, seal for wins and achievements, date for dated records such as paid or a postmark, and chop for personal marks such as an invitation. Each stamp gets a stable angle, offset and uneven ink texture from its seed, so two stamps on one page never look cloned. Vermilion for positive results and faded ink for ended or sold out, an optional void line, a heavier press for large stamps, and instant display under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "status",
+        "feedback",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Showing the result of a shopper action: claimed, paid, won, sold out, ended",
+            "Building your own block that needs a SunUI style result mark without copying stamp code"
+          ],
+          "watchOut": [
+            "Pick the shape by meaning: tick for minor confirmations, box for status, seal for wins, date for receipts, chop for personal invitations",
+            "Do not use a stamp for labels that are not results, such as Recommended or Popular",
+            "Pass a seed (order id, coupon id) so the angle and ink stay the same across renders"
+          ],
+          "aliases": [
+            "rubber stamp",
+            "stamp badge",
+            "status stamp",
+            "claimed stamp",
+            "paid stamp",
+            "postmark",
+            "hanko",
+            "seal",
+            "success checkmark",
+            "result badge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/stamp/stamp.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "star-rating",
       "type": "registry:block",
       "title": "Star Rating",
@@ -2930,6 +3993,52 @@
       "files": [
         {
           "path": "registry/free/status-dot/status-dot.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "step-demo",
+      "type": "registry:block",
+      "title": "Step Demo",
+      "description": "A live product demo window where every frame is a pure function of one number: each step's View draws the app at a fixed design size (default 1200 × 750) from t, the seconds into that step, and the stage scales as one picture. That makes it scrubbable, jumpable and freezable through a controlled time prop. It ships time helpers (ease, typed, cue, held, glide curves) and a cursor that glides to data-aim targets measured from the DOM and presses on cue. It plays only on screen with the tab visible, never fast-forwards on return, labels the stage as an image listing the steps, uses real buttons with aria-current and a labelled range input, and with reduced motion shows each step's finished frame with no cursor.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "landing",
+        "demo"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Landing hero or feature section that shows an app working step by step without a video",
+            "Docs or launch pages that need the same demo frame in screenshots, with scrubbing or jump-to-step"
+          ],
+          "watchOut": [
+            "Derive all state from t inside each View; timers, effects or CSS keyframes break scrubbing and reduced motion",
+            "Draw at the fixed stage size with large type: on phones the whole stage shrinks instead of reflowing",
+            "Every step's final frame must read as a complete picture, because reduced motion shows only that frame"
+          ],
+          "aliases": [
+            "html demo",
+            "app demo window",
+            "product walkthrough",
+            "scrubbable demo",
+            "screen recording alternative",
+            "animated screenshot"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/step-demo/step-demo.tsx",
           "type": "registry:component"
         }
       ]
@@ -3269,6 +4378,66 @@
       ]
     },
     {
+      "name": "tiny-chart",
+      "type": "registry:block",
+      "title": "Tiny Chart",
+      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks standing on an isometric floor, the current one lifted), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "chart",
+        "diagram",
+        "data-display",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "paper",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Help, FAQ and policy pages that explain a process: order tracking, returns and refunds, pre-order timelines, subscription rules",
+            "Showing which branch a customer is on and what happens next, with the rule behind each step in plain words",
+            "Onboarding or how-it-works sections where a reader should click through the steps instead of reading a paragraph"
+          ],
+          "watchOut": [
+            "Keep it to about 4 to 10 steps; a bigger process reads better as several charts",
+            "Give flow charts explicit at: [column, row] positions once there are branches that rejoin, so arrows do not cross",
+            "Labels are measured, not wrapped: keep step names to a few words, and long sentences in say instead",
+            "It explains a process, it is not live order status: pass the real current step from your data by building a machine that starts there"
+          ],
+          "aliases": [
+            "statechart",
+            "state machine diagram",
+            "flowchart",
+            "process diagram",
+            "interactive diagram",
+            "how it works",
+            "order tracking diagram",
+            "refund process",
+            "decision tree",
+            "timeline to scale",
+            "lifecycle diagram",
+            "explainer chart",
+            "isometric diagram",
+            "2.5D flowchart",
+            "isometric process"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/tiny-chart/tiny-chart.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "toast-stack",
       "type": "registry:block",
       "title": "Toast Stack",
@@ -3308,6 +4477,50 @@
       "files": [
         {
           "path": "registry/free/toast-stack/toast-stack.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "toc-scrollspy",
+      "type": "registry:block",
+      "title": "TOC Scrollspy",
+      "description": "Table of contents that highlights the section being read, with an ink bar that slides between entries. It counts a section as read once its top passes an offset, lights the last entry at the bottom of the page, jumps smoothly on click and moves focus to the heading. Works on the window or a scroll container, with nested entries and a useScrollSpy hook for your own layout.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "scroll"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "scroll",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Long product guides, size and care pages, FAQ or policy pages"
+          ],
+          "watchOut": [
+            "Set offset to your sticky header height plus a little so the right entry lights up",
+            "Every item id must match an element id on the page"
+          ],
+          "aliases": [
+            "scrollspy",
+            "table of contents",
+            "toc",
+            "on this page",
+            "section nav",
+            "active heading"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/toc-scrollspy/toc-scrollspy.tsx",
           "type": "registry:component"
         }
       ]
@@ -3397,723 +4610,6 @@
       "files": [
         {
           "path": "registry/free/variant-picker/variant-picker.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "stamp",
-      "type": "registry:ui",
-      "title": "Stamp",
-      "description": "The one celebration in SunUI, in five shapes chosen by what the result means: tick for small confirmations, box for transaction status, seal for wins and achievements, date for dated records such as paid or a postmark, and chop for personal marks such as an invitation. Each stamp gets a stable angle, offset and uneven ink texture from its seed, so two stamps on one page never look cloned. Vermilion for positive results and faded ink for ended or sold out, an optional void line, a heavier press for large stamps, and instant display under reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "status",
-        "feedback",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Showing the result of a shopper action: claimed, paid, won, sold out, ended",
-            "Building your own block that needs a SunUI style result mark without copying stamp code"
-          ],
-          "watchOut": [
-            "Pick the shape by meaning: tick for minor confirmations, box for status, seal for wins, date for receipts, chop for personal invitations",
-            "Do not use a stamp for labels that are not results, such as Recommended or Popular",
-            "Pass a seed (order id, coupon id) so the angle and ink stay the same across renders"
-          ],
-          "aliases": [
-            "rubber stamp",
-            "stamp badge",
-            "status stamp",
-            "claimed stamp",
-            "paid stamp",
-            "postmark",
-            "hanko",
-            "seal",
-            "success checkmark",
-            "result badge"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/stamp/stamp.tsx",
-          "type": "registry:ui"
-        }
-      ]
-    },
-    {
-      "name": "dialog-sheet",
-      "type": "registry:block",
-      "title": "Dialog Sheet",
-      "description": "One dialog for both screens: a centred paper card on desktop that becomes a bottom sheet under 640px, with a handle you can drag down to close. Focus trap, Escape and scrim close, focus returns to the trigger, controlled or uncontrolled, and contained mode for previews. Ships useExitIntent to open it when the cursor leaves through the top of the page.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "overlay",
-        "form"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Size guides, shipping details or terms that should not leave the product page",
-            "A sign-up or offer dialog triggered by exit intent with useExitIntent"
-          ],
-          "watchOut": [
-            "Use side-panel instead for long navigation or a cart drawer",
-            "useExitIntent never fires on touch devices; give mobile visitors another way to see the offer"
-          ],
-          "aliases": [
-            "modal",
-            "dialog",
-            "bottom sheet",
-            "popup",
-            "exit intent popup",
-            "responsive dialog",
-            "drawer dialog"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/dialog-sheet/dialog-sheet.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "loading-button",
-      "type": "registry:block",
-      "title": "Loading Button",
-      "description": "A submit button that handles its own async state: return a Promise from onClick and it goes loading, then success with a drawn check or error with a retry label, and resets after a delay. Shrink style collapses into a round spinner, inline style keeps the width. Also accepts a controlled state, announces each state politely and ignores presses while busy.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "button",
-        "feedback",
-        "form"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Subscribe, pay, apply coupon or save buttons that call an API",
-            "Any form submit where people press twice because nothing seemed to happen"
-          ],
-          "watchOut": [
-            "The success check is not a celebration; use a stamp block for rewards",
-            "Pass state yourself if the result arrives through a websocket or polling instead of the click Promise"
-          ],
-          "aliases": [
-            "submit button",
-            "async button",
-            "spinner button",
-            "progress button",
-            "stateful button",
-            "loading state"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/loading-button/loading-button.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "floating-field",
-      "type": "registry:block",
-      "title": "Floating Field",
-      "description": "Paper text field whose label floats onto the top edge on focus or when filled, with inline validation from a validate function: errors appear after the first blur and then update as you type, success shows a check and an optional message, and a failed blur gives a small shake. Supports hint text, server errors, textarea and a trailing slot such as a show password button.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "form",
-        "input"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "type",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Checkout, address and sign-up forms",
-            "Fields that need instant format feedback such as email, postcode or password length"
-          ],
-          "watchOut": [
-            "Validation is synchronous; pass async results through the error prop",
-            "Keep labels short so they still fit when shrunk onto the border"
-          ],
-          "aliases": [
-            "floating label",
-            "inline validation",
-            "text field",
-            "material input",
-            "form field",
-            "input with label"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/floating-field/floating-field.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "notify-badge",
-      "type": "registry:block",
-      "title": "Notify Badge",
-      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It presses in like a stamp when the count rises and stays still when it falls, sits in one of three corners, and offers vermilion, ink or theme primary tones with a screen reader label you phrase yourself.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "badge",
-        "notification",
-        "navigation"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Cart counts, unread messages and new notifications in a store header"
-          ],
-          "watchOut": [
-            "Keep vermilion for one badge per header; use ink or primary for the rest",
-            "The wrapper is a span, so put the button around it, not inside"
-          ],
-          "aliases": [
-            "notification badge",
-            "count badge",
-            "cart count",
-            "unread dot",
-            "badge counter",
-            "indicator"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/notify-badge/notify-badge.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "sliding-tabs",
-      "type": "registry:block",
-      "title": "Sliding Tabs",
-      "description": "One choice control in three shapes: underline tabs with content panels, a segmented control and filter chips, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "navigation",
-        "input",
-        "form"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Product detail tabs such as details, care and reviews",
-            "Day, week and month switches on a chart",
-            "Filter chips above a product grid"
-          ],
-          "watchOut": [
-            "Content panels only appear when items have content; without it the control is a pure selector",
-            "For more than about six options use a select instead"
-          ],
-          "aliases": [
-            "tabs",
-            "segmented control",
-            "filter chips",
-            "toggle group",
-            "pill tabs",
-            "chip filter",
-            "tab bar"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/sliding-tabs/sliding-tabs.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "range-slider",
-      "type": "registry:block",
-      "title": "Range Slider",
-      "description": "Price and rating slider that takes a number for one thumb or a [low, high] pair for a range: step snapping, minimum gap, ticks, a value bubble while dragging or focused, custom formatting and hidden inputs for forms. Click the track to jump the nearest thumb, use arrows, Page keys, Home and End, and get onValueCommit once when the drag ends.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "input",
-        "form",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "drag",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Price range filters on a product listing",
-            "Minimum rating, budget or distance filters"
-          ],
-          "watchOut": [
-            "Run expensive searches from onValueCommit, not onValueChange",
-            "For a handful of exact values, sliding-tabs chips are easier to hit on phones"
-          ],
-          "aliases": [
-            "price slider",
-            "range slider",
-            "dual slider",
-            "double range",
-            "min max slider",
-            "price filter"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/range-slider/range-slider.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "hover-motion",
-      "type": "registry:block",
-      "title": "Hover Motion",
-      "description": "Four small hover pieces for store navigation and campaign pages: Magnetic pulls a button gently toward the cursor and springs back, InkUnderline draws a line in from the left and out to the right, TextRoll rolls each letter up while the same word rolls in from below, and HoverPreviewList shows a row's picture beside the cursor. All switch off on touch screens and with reduced motion.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "animation",
-        "navigation",
-        "cursor"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Header menus and footer links",
-            "One main call to action on a campaign page",
-            "Text-only lookbook or collection lists that preview a photo on hover"
-          ],
-          "watchOut": [
-            "Use Magnetic on one button per view, not every button",
-            "HoverPreviewList previews never show on touch screens, so rows must make sense as text alone"
-          ],
-          "aliases": [
-            "magnetic button",
-            "underline animation",
-            "text roll",
-            "hover image reveal",
-            "link hover",
-            "menu hover",
-            "cursor image preview"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/hover-motion/hover-motion.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "toc-scrollspy",
-      "type": "registry:block",
-      "title": "TOC Scrollspy",
-      "description": "Table of contents that highlights the section being read, with an ink bar that slides between entries. It counts a section as read once its top passes an offset, lights the last entry at the bottom of the page, jumps smoothly on click and moves focus to the heading. Works on the window or a scroll container, with nested entries and a useScrollSpy hook for your own layout.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "navigation",
-        "scroll"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "scroll",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Long product guides, size and care pages, FAQ or policy pages"
-          ],
-          "watchOut": [
-            "Set offset to your sticky header height plus a little so the right entry lights up",
-            "Every item id must match an element id on the page"
-          ],
-          "aliases": [
-            "scrollspy",
-            "table of contents",
-            "toc",
-            "on this page",
-            "section nav",
-            "active heading"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/toc-scrollspy/toc-scrollspy.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "back-to-top",
-      "type": "registry:block",
-      "title": "Back To Top",
-      "description": "Round paper button that appears after you scroll past a threshold and takes you back to the top, with an ink ring around it that fills as you read. Works on the window or a scroll container, scrolls smoothly unless reduced motion is on, and can sit fixed to the viewport or inside a relative container.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "navigation",
-        "scroll",
-        "button"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "scroll",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Long category pages, search results and articles"
-          ],
-          "watchOut": [
-            "Keep it clear of chat widgets or cookie banners in the same corner",
-            "Turn off showProgress if scroll-progress is already on the page"
-          ],
-          "aliases": [
-            "back to top",
-            "scroll to top",
-            "go to top button",
-            "top button",
-            "scroll up button"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/back-to-top/back-to-top.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "scroll-timeline",
-      "type": "registry:block",
-      "title": "Scroll Timeline",
-      "description": "Vertical timeline in two modes: scroll mode draws an ink line down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in vermilion. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "scroll",
-        "status",
-        "storytelling"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "scroll",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Order tracking and application status",
-            "Brand history, making-of or campaign schedules"
-          ],
-          "watchOut": [
-            "Progress mode ignores scrolling; pass current from your order data",
-            "Keep descriptions short so dots stay evenly spaced"
-          ],
-          "aliases": [
-            "timeline",
-            "scroll timeline",
-            "order tracking",
-            "progress timeline",
-            "history timeline",
-            "stepper timeline"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/scroll-timeline/scroll-timeline.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "hotspots",
-      "type": "registry:block",
-      "title": "Hotspots",
-      "description": "Numbered pins on a product picture that open a paper note about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a price or add to cart.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "product",
-        "media",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Product pages that explain materials and details",
-            "Shop the look photos with several products in one picture"
-          ],
-          "watchOut": [
-            "Keep pins away from the outer 10 percent so notes have room",
-            "Repeat the key details as text on the page for people who skip the picture"
-          ],
-          "aliases": [
-            "hotspots",
-            "image hotspots",
-            "product tour",
-            "shop the look",
-            "annotated image",
-            "pins on image"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/hotspots/hotspots.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "lightbox",
-      "type": "registry:block",
-      "title": "Lightbox",
-      "description": "Product gallery whose thumbnail grows into the full view and shrinks back on close; switching images sends the old one back to its thumbnail while the next grows from its own. Arrow keys and swipe change images, Escape, the scrim or a downward drag closes, focus returns to the thumbnail, and you can control the index or render custom thumbnails.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "media",
-        "product",
-        "overlay"
-      ],
-      "meta": {
-        "tier": "free",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Product photo galleries and review photos",
-            "Lookbooks and user generated photo grids"
-          ],
-          "watchOut": [
-            "Provide real alt text for every image; it is the dialog label",
-            "Custom thumbnails from renderThumb do not get the grow animation"
-          ],
-          "aliases": [
-            "lightbox",
-            "image gallery",
-            "photo viewer",
-            "image zoom modal",
-            "gallery modal",
-            "view transition"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/lightbox/lightbox.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "plush-portrait",
-      "type": "registry:block",
-      "title": "Plush Portrait",
-      "description": "A cut-out portrait visitors can grab and stretch like a soft toy. The skin is a damped spring mesh: a pull drags the cheek out, the head leans on a soft neck, and it wobbles back on release. Faces cross-fade on hover, grab, pull and release, the eyes follow the cursor and blink, and it yawns when the page goes quiet. The bust sits in a circle or square and the head pops out above it. One WebGL draw, no dependencies; without WebGL or with reduced motion it stays a still picture. Bring your own face images, all with the same framing.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "hero",
-        "avatar",
-        "animation",
-        "marketing"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "motion",
-        "interaction": "section",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "An about page, personal site or founder section where the portrait should feel alive and playful",
-            "A brand mascot or creator profile on a campaign page that invites visitors to play",
-            "Team pages where each person gets a squishable avatar (one live portrait per screen works best)"
-          ],
-          "watchOut": [
-            "You supply the images: a transparent PNG or WebP per face, all the same size, square, and pixel-aligned, or the cross-fades will jump. Only faces.rest is required",
-            "Images must be same-origin or served with CORS headers; otherwise WebGL cannot read them",
-            "frameBox sets where the circle or square sits in image space; adjust it when the head is not centred like the demo",
-            "The canvas reaches about a third of the portrait's width past each side so skin can stretch. Near a viewport edge, give a parent overflow-x: clip",
-            "Uses WebGL. Keep one per screen, and do not use a real person's photo without their consent"
-          ],
-          "aliases": [
-            "squishy avatar",
-            "stretchy face",
-            "grabbable portrait",
-            "plushie photo",
-            "interactive avatar",
-            "face that follows cursor",
-            "jelly portrait",
-            "about me hero",
-            "founder portrait",
-            "soft body image"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/plush-portrait/plush-portrait.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "tiny-chart",
-      "type": "registry:block",
-      "title": "Tiny Chart",
-      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks standing on an isometric floor, the current one lifted), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in vermilion, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "chart",
-        "diagram",
-        "data-display",
-        "commerce"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "paper",
-        "interaction": "section",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Help, FAQ and policy pages that explain a process: order tracking, returns and refunds, pre-order timelines, subscription rules",
-            "Showing which branch a customer is on and what happens next, with the rule behind each step in plain words",
-            "Onboarding or how-it-works sections where a reader should click through the steps instead of reading a paragraph"
-          ],
-          "watchOut": [
-            "Keep it to about 4 to 10 steps; a bigger process reads better as several charts",
-            "Give flow charts explicit at: [column, row] positions once there are branches that rejoin, so arrows do not cross",
-            "Labels are measured, not wrapped: keep step names to a few words, and long sentences in say instead",
-            "It explains a process, it is not live order status: pass the real current step from your data by building a machine that starts there"
-          ],
-          "aliases": [
-            "statechart",
-            "state machine diagram",
-            "flowchart",
-            "process diagram",
-            "interactive diagram",
-            "how it works",
-            "order tracking diagram",
-            "refund process",
-            "decision tree",
-            "timeline to scale",
-            "lifecycle diagram",
-            "explainer chart",
-            "isometric diagram",
-            "2.5D flowchart",
-            "isometric process"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/tiny-chart/tiny-chart.tsx",
           "type": "registry:component"
         }
       ]
