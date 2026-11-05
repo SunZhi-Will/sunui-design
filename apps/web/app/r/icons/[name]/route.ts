@@ -28,11 +28,20 @@ const items = {
   "sunui-pixel-icons": {
     title: "SunUI Pixel Icons",
     description:
-      "SunUI's pixel icon set on a 16px grid: interface controls, paper-commerce signatures and retro game items. Rendered as crisp-edged SVG with an optional vermilion accent via --sunui-icon-accent.",
+      "SunUI's pixel sprite icons on a 16px grid: outline, tinted fill, shade and a white shine, covering interface controls, paper-commerce signatures and retro game items. Crisp-edged SVG with an optional vermilion accent via --sunui-icon-accent.",
     source: "registry/icons/sunui-pixel-icons.tsx",
     target: "components/ui/sunui-pixel-icons.tsx",
     dependencies: [] as string[],
     registryDependencies: [] as string[],
+  },
+  "sunui-animated-pixel-icons": {
+    title: "SunUI Animated Pixel Icons",
+    description:
+      "Frame-by-frame animated versions of SunUI pixel icons: hover icons play once when their button is hovered or focused, toggle icons step between states with an active prop, and loop icons cycle only while active. No animation library; respects reduced motion.",
+    source: "registry/icons/sunui-animated-pixel-icons.tsx",
+    target: "components/ui/sunui-animated-pixel-icons.tsx",
+    dependencies: [] as string[],
+    registryDependencies: ["sunui-pixel-icons"],
   },
 };
 

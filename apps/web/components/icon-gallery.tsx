@@ -7,30 +7,41 @@ import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
+  AnimatedPixelIcon,
+  animatedPixelIconNames,
+  pixelMotionKindOf,
+  type AnimatedPixelIconName,
+} from "@/registry/icons/sunui-animated-pixel-icons";
+import {
   AnimatedIcon,
   animatedIconNames,
   motionKindOf,
   type AnimatedIconName,
   type MotionKind,
 } from "@/registry/icons/sunui-animated-icons";
-import { Icon, type IconName } from "@/registry/icons/sunui-icons";
-import { PixelIcon, pixelIconNames, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
+import { Icon, icons, type IconName } from "@/registry/icons/sunui-icons";
+import { PixelIcon, pixelIconNames, pixelIcons, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
 
 const sizes = [16, 20, 24, 32] as const;
 // 像素圖示只在 16 的整數倍下銳利
 const pixelSizes = [16, 32, 48] as const;
 const strokes = [1.25, 1.5, 1.75] as const;
-type Mode = "static" | "animated" | "pixel";
-const modes: Mode[] = ["static", "animated", "pixel"];
-
+type Style = "line" | "pixel";
+type Motion = "static" | "animated";
 
 const animatedSet = new Set<string>(animatedIconNames);
+const animatedPixelSet = new Set<string>(animatedPixelIconNames);
 const extraKeywords: Record<string, string> = { theme: "dark light mode toggle sun moon 深色 主題" };
+const counts: Record<Style, Record<Motion, number>> = {
+  line: { static: iconGroups.reduce((sum, group) => sum + group.icons.length, 0), animated: animatedIconNames.length },
+  pixel: { static: pixelIconNames.length, animated: animatedPixelIconNames.length },
+};
 
 export function IconGallery({ messages: t }: { messages: Messages["iconGallery"] }) {
   const kindLabel: Record<MotionKind, string> = t.kindLabel;
   const kindHint: Record<MotionKind, string> = t.kindHint;
-  const [mode, setMode] = useState<Mode>("static");
+  const [style, setStyle] = useState<Style>("line");
+  const [motion, setMotion] = useState<Motion>("static");
   const [query, setQuery] = useState("");
   const [strokeSize, setStrokeSize] = useState<number>(24);
   const [pixelSize, setPixelSize] = useState<number>(32);
@@ -41,16 +52,20 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const [copied, setCopied] = useState<string | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const isPixel = style === "pixel";
+  const isMotion = motion === "animated";
+  const motionSet = isPixel ? animatedPixelSet : animatedSet;
+
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
     // 分組標題與說明換成目前語言，缺的沿用英文
-    const source = mode === "pixel" ? pixelIconGroups : iconGroups;
+    const source = isPixel ? pixelIconGroups : iconGroups;
     const base = source.map((group) => ({
       ...group,
       ...t.groups[group.id],
-      icons: (group.icons as string[]).filter((name) => mode !== "animated" || animatedSet.has(name)),
+      icons: (group.icons as string[]).filter((name) => !isMotion || motionSet.has(name)),
     }));
-    if (mode === "animated") {
+    if (isMotion && !isPixel) {
       const grouped = new Set(iconGroups.flatMap((group) => group.icons as string[]));
       const rest = animatedIconNames.filter((name) => !grouped.has(name));
       if (rest.length) base.push({ id: "toggles", ...t.groups.toggles, icons: rest });
@@ -67,7 +82,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           : group.icons,
       }))
       .filter((group) => group.icons.length > 0);
-  }, [query, mode, t]);
+  }, [query, isPixel, isMotion, motionSet, t]);
 
   const total = groups.reduce((sum, group) => sum + group.icons.length, 0);
   const visible = groups.flatMap((group) => group.icons);
@@ -76,36 +91,51 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     if (visible.length && !visible.includes(selected)) setSelected(visible[0]);
   }, [visible, selected]);
 
-  const isPixel = mode === "pixel";
-  const isAnimated = mode === "animated" && animatedSet.has(selected);
-  const kind = isAnimated ? motionKindOf(selected as AnimatedIconName) : null;
+  const kindOf = (name: string): MotionKind | null =>
+    !isMotion || !motionSet.has(name)
+      ? null
+      : isPixel
+        ? pixelMotionKindOf(name as AnimatedPixelIconName)
+        : motionKindOf(name as AnimatedIconName);
+  const kind = kindOf(selected);
+  const isAnimated = kind !== null;
   const size = isPixel ? pixelSize : strokeSize;
   const sizeOptions = isPixel ? pixelSizes : sizes;
-  const sizeProp = `${size !== 24 ? ` size={${size}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}`;
-  const jsx = isPixel
-    ? `<PixelIcon name="${selected}"${pixelSize !== 16 ? ` size={${pixelSize}}` : ""} />`
-    : isAnimated
-      ? `<AnimatedIcon name="${selected}"${kind === "hover" ? "" : ` active={${kind === "loop" ? "loading" : "on"}}`}${sizeProp} />`
-      : `<Icon name="${selected}"${sizeProp} />`;
-  const modeCount: Record<Mode, number> = {
-    static: iconGroups.reduce((sum, group) => sum + group.icons.length, 0),
-    animated: animatedIconNames.length,
-    pixel: pixelIconNames.length,
-  };
-  const modeIcon: Record<Mode, ReactNode> = {
-    static: <Icon name="grid" size={16} />,
-    animated: <AnimatedIcon name="activity" size={16} />,
-    pixel: <PixelIcon name="sparkle" size={16} />,
-  };
+  const activeProp = kind && kind !== "hover" ? ` active={${kind === "loop" ? "loading" : "on"}}` : "";
+  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}`;
+  const pixelProps = pixelSize !== 16 ? ` size={${pixelSize}}` : "";
+  const component = isPixel ? (isAnimated ? "AnimatedPixelIcon" : "PixelIcon") : isAnimated ? "AnimatedIcon" : "Icon";
+  const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
+
+  function renderIcon(name: string, px: number) {
+    // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
+    if (!(name in (isPixel ? pixelIcons : icons)) && !motionSet.has(name)) return null;
+    const k = kindOf(name);
+    const active = k && k !== "hover" ? Boolean(toggled[name]) : undefined;
+    // key 用名稱：換圖示時重新掛載，不沿用上一個圖示的影格
+    if (isPixel) {
+      return k ? (
+        <AnimatedPixelIcon key={name} name={name as AnimatedPixelIconName} size={px} active={active} />
+      ) : (
+        <PixelIcon key={name} name={name as PixelIconName} size={px} />
+      );
+    }
+    return k ? (
+      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} />
+    ) : (
+      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} />
+    );
+  }
 
   async function copy(kind: "jsx" | "svg") {
     let value = jsx;
     if (kind === "svg") {
       const svg = previewRef.current?.querySelector("svg");
       if (!svg) return;
-      // 複製出去的 SVG 要能獨立使用：把朱紅變數換成實際色值或 currentColor
+      // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor
       value = svg.outerHTML
         .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#c8361d" : "currentColor")
+        .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
         .replace(/ data-icon="[^"]*"/, "");
     }
     await navigator.clipboard.writeText(value);
@@ -117,27 +147,45 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     setToggled((prev) => ({ ...prev, [name]: !prev[name] }));
   }
 
+  const styleIcon: Record<Style, ReactNode> = {
+    line: <Icon name="coupon" size={16} />,
+    pixel: <PixelIcon name="heart" size={16} />,
+  };
+  const motionIcon: Record<Motion, ReactNode> = {
+    static: <Icon name="grid" size={16} />,
+    animated: <AnimatedIcon name="activity" size={16} />,
+  };
+
   return (
     <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]")}>
       <div className="min-w-0">
-        <div role="tablist" aria-label={t.styleLabel} className="mb-4 inline-flex rounded-md border border-line bg-card p-0.5">
-          {modes.map((m) => (
-            <button
-              key={m}
-              type="button"
-              role="tab"
-              aria-selected={mode === m}
-              onClick={() => setMode(m)}
-              className={cn(
-                "flex h-8 items-center gap-2 rounded-[5px] px-3 text-sm font-medium transition-colors",
-                mode === m ? "bg-stage text-fg" : "text-subtle hover:text-fg",
-              )}
-            >
-              {modeIcon[m]}
-              {t[m]}
-              <span className="font-mono text-[11px] tabular-nums text-subtle">{modeCount[m]}</span>
-            </button>
-          ))}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Tabs
+            label={t.styleLabel}
+            options={["line", "pixel"] as const}
+            value={style}
+            onChange={setStyle}
+            render={(s) => (
+              <>
+                {styleIcon[s]}
+                {s === "line" ? t.line : t.pixel}
+                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s][motion]}</span>
+              </>
+            )}
+          />
+          <Tabs
+            label={t.motionLabel}
+            options={["static", "animated"] as const}
+            value={motion}
+            onChange={setMotion}
+            render={(m) => (
+              <>
+                {motionIcon[m]}
+                {t[m]}
+                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[style][m]}</span>
+              </>
+            )}
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -173,8 +221,10 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           </button>
         </div>
 
-        {mode !== "static" && (
-          <p className="mt-4 text-xs text-subtle">{isPixel ? t.pixelHint : t.animatedHint}</p>
+        {(isPixel || isMotion) && (
+          <p className="mt-4 text-xs text-subtle">
+            {[isPixel ? t.pixelHint : null, isMotion ? t.animatedHint : null].filter(Boolean).join(" ")}
+          </p>
         )}
 
         {groups.length === 0 && (
@@ -193,8 +243,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             </div>
             <ul className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2">
               {group.icons.map((name) => {
-                const animated = mode === "animated";
-                const k = animated ? motionKindOf(name as AnimatedIconName) : null;
+                const k = kindOf(name);
                 return (
                   <li key={name}>
                     <button
@@ -209,18 +258,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
                         selected === name ? "border-fg text-fg" : "border-line text-fg/85 hover:border-subtle",
                       )}
                     >
-                      {isPixel ? (
-                        <PixelIcon name={name as PixelIconName} size={pixelSize} />
-                      ) : animated ? (
-                        <AnimatedIcon
-                          name={name as AnimatedIconName}
-                          size={size}
-                          strokeWidth={stroke}
-                          active={k === "hover" ? undefined : Boolean(toggled[name])}
-                        />
-                      ) : (
-                        <Icon name={name as IconName} size={size} strokeWidth={stroke} />
-                      )}
+                      {renderIcon(name, size)}
                       <span className="max-w-full truncate font-mono text-[10px] text-subtle">{name}</span>
                       {k && k !== "hover" && (
                         <span className="absolute top-1.5 right-1.5 font-mono text-[9px] tracking-wide text-subtle uppercase">
@@ -238,21 +276,10 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
 
       <aside className="rounded-md border border-[#e7e0d0] bg-[#faf7f0] p-5 text-[#1c1917] lg:sticky lg:top-20 dark:border-[#38332b] dark:bg-[#1f1c18] dark:text-[#ece7dc]">
         <p className="text-[11px] font-medium tracking-[0.14em] text-[#1c1917]/60 uppercase dark:text-[#ece7dc]/60">
-          {isPixel ? t.pixelSelected : isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : t.selected}
+          {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : isPixel ? t.pixelSelected : t.selected}
         </p>
         <div ref={previewRef} className="mt-4 grid place-items-center rounded-sm border border-dashed border-[#e7e0d0] py-8 dark:border-[#38332b]">
-          {isPixel ? (
-            <PixelIcon name={selected as PixelIconName} size={64} />
-          ) : isAnimated ? (
-            <AnimatedIcon
-              name={selected as AnimatedIconName}
-              size={72}
-              strokeWidth={stroke}
-              active={kind === "hover" ? undefined : Boolean(toggled[selected])}
-            />
-          ) : (
-            <Icon name={selected as IconName} size={72} strokeWidth={stroke} />
-          )}
+          {renderIcon(selected, isPixel ? 64 : 72)}
         </div>
         {isAnimated ? (
           <div className="mt-4 flex items-center justify-between gap-3">
@@ -272,11 +299,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           <div className="mt-4 flex items-end justify-center gap-5" aria-label={t.sizeScale}>
             {sizeOptions.map((s) => (
               <div key={s} className="flex flex-col items-center gap-1.5">
-                {isPixel ? (
-                  <PixelIcon name={selected as PixelIconName} size={s} />
-                ) : (
-                  <Icon name={selected as IconName} size={s} strokeWidth={stroke} />
-                )}
+                {renderIcon(selected, s)}
                 <span className="font-mono text-[10px] tabular-nums opacity-60">{s}</span>
               </div>
             ))}
@@ -307,6 +330,40 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           )}
         </div>
       </aside>
+    </div>
+  );
+}
+
+function Tabs<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+  render,
+}: {
+  label: string;
+  options: readonly T[];
+  value: T;
+  onChange: (value: T) => void;
+  render: (option: T) => ReactNode;
+}) {
+  return (
+    <div role="tablist" aria-label={label} className="inline-flex rounded-md border border-line bg-card p-0.5">
+      {options.map((option) => (
+        <button
+          key={option}
+          type="button"
+          role="tab"
+          aria-selected={value === option}
+          onClick={() => onChange(option)}
+          className={cn(
+            "flex h-8 items-center gap-2 rounded-[5px] px-3 text-sm font-medium transition-colors",
+            value === option ? "bg-stage text-fg" : "text-subtle hover:text-fg",
+          )}
+        >
+          {render(option)}
+        </button>
+      ))}
     </div>
   );
 }

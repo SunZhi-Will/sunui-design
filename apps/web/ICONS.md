@@ -3,7 +3,8 @@
 > 靜態：`registry/icons/sunui-icons.tsx`（`<site>/r/icons/sunui-icons.json`，無依賴）
 > 動態：`registry/icons/sunui-animated-icons.tsx`（`<site>/r/icons/sunui-animated-icons.json`，依賴 framer-motion 與靜態版）
 > 像素：`registry/icons/sunui-pixel-icons.tsx`（`<site>/r/icons/sunui-pixel-icons.json`，無依賴）
-> 展示頁：`/icons`，可切換 Static / Animated / Pixel。
+> 像素動態：`registry/icons/sunui-animated-pixel-icons.tsx`（`<site>/r/icons/sunui-animated-pixel-icons.json`，依賴像素靜態版）
+> 展示頁：`/icons`，兩組切換：線條 / 像素 × 靜態 / 動態。
 
 ## 為什麼要做
 
@@ -61,19 +62,33 @@
 
 線條版之外的第二種風格，給復古、遊戲化、集點活動這類想要「點陣感」的畫面用。兩套不混用：同一個畫面選一種。
 
-1. **網格**：16 × 16 點陣，`viewBox="0 0 16 16"`，內容落在 1 到 14 之間（1 格安全邊）。游標這類需要滿版的例外。
-2. **線條**：物件用 1 格外框；勾、叉、加減、箭頭、選單這些控制符號用 2 格粗線，16px 下才不會斷。
-3. **資料格式**：每個圖示是 16 列字串，`#` 墨色、`+` 朱紅點、`.` 留白。渲染時把同列相鄰格合併成一段矩形，墨色與朱紅各一條 path。
-4. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。24px 這類非整數倍會糊，展示頁因此只提供 16、32、48。
-5. **朱紅點**：沿用 `--sunui-icon-accent`，規則同線條版：每個圖示最多一個部位（印章、藥水、旗面這類整體就是主角的例外）。
-6. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
+2026-11-05 改版：第一版是單色細線點陣，被評為「好醜」。比較過「12 格粗線」與「16 格精靈圖」兩個方向後，選定精靈圖。
+
+1. **網格**：16 × 16，`viewBox="0 0 16 16"`，內容落在 1 到 14 之間。
+2. **精靈圖畫法**：1 格墨色外框、半透明填色、右側與下方 1 格陰影、左上角內側白色亮點。光一律從左上來。
+3. **字元**：`#` 外框（墨色）、`=` 填色（墨色 30%）、`:` 陰影（墨色 58%）、`+` 朱紅、`~` 朱紅陰影（62%）、`*` 亮點（`--sunui-pixel-shine`，預設白色）、`.` 留白。每種字元合併成一條 path。
+4. **控制符號例外**：勾、叉、加減、箭頭、chevron、選單、上傳下載維持 2 格粗的實心線，不加填色。
+5. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。
+6. **朱紅**：沿用 `--sunui-icon-accent`。印章、藥水、蘋果、旗面這類整體就是主角的可以整塊用朱紅。
+7. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
    - Gear（裝備）：sword、dagger、axe、hammer、bow、wand、shield、helmet、armor、boots、ring、amulet
    - Items（道具）：potion、key、gem、crown、chest、trophy、bomb、orb、scroll、map、apple、meat、fish、dice、hourglass、book、torch
    - World & HUD（世界與 HUD）：skull、ghost、slime、fire、snowflake、door、flag、heart-half、sparkle、battery、flash、gamepad、cursor
    - 遊戲圖示只畫通用物件，不仿任何現有遊戲的角色或造型。
-7. **不做動態版**：像素圖示的動態應該是逐格換圖，與 framer-motion 的補間不同，等真的有需要再設計。
 
-新增像素圖示：在 `sunui-pixel-icons.tsx` 的 `pixelIcons` 加一筆 16 × 16 字串，放進 `lib/icon-groups.ts` 的 `pixelIconGroups`，再到 `/icons` 的 Pixel 分頁用 16 與 48 檢查。
+### 像素動態
+
+不用補間，像遊戲精靈一樣逐格換圖，不依賴 framer-motion。68 個圖示有動態版。
+
+| 類型 | 觸發 | 例子 |
+|---|---|---|
+| hover | 滑過或聚焦父元素，播一次 | 寶石與皇冠閃光掃過、硬幣翻面、鈴鐺搖、藥水冒泡、骰子滾動、旗子飄 |
+| toggle | `active` | 愛心與星星由下往上填滿、寶箱與鎖打開、門推開、選單變叉、集點卡蓋下一格 |
+| loop | `active` 為真期間 | 沙漏、電池充電、火焰、火把 |
+
+每格存成 16 列字串用 `/` 接起來，並做連續字元壓縮（`6.4#6.`）。`prefers-reduced-motion` 時 toggle 直接跳到結果，hover 與 loop 不播。
+
+新增像素圖示：在 `sunui-pixel-icons.tsx` 加一筆 16 × 16 字串（照上面的字元與光源），放進 `lib/icon-groups.ts` 的 `pixelIconGroups`；要動態版就在 `sunui-animated-pixel-icons.tsx` 的 `pixelRecipes` 加 kind、fps 與各格。
 
 ## 新增圖示
 
