@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { PreviewFrame } from "@/components/preview-frame";
+import { RelatedBlocks as RelatedGrid } from "@/components/related-blocks";
 import { RichText } from "@/components/rich-text";
 import { TierBadge } from "@/components/tier-badge";
 import { getI18n } from "@/lib/i18n-server";
@@ -92,7 +93,7 @@ export default async function BlockPage({ params }: Props) {
         <FreeInstall item={item} manualDeps={manualDeps} sources={sources} t={m.block} />
       )}
 
-      <RelatedBlocks item={item} t={m.block} locale={locale} />
+      <RelatedBlocks item={item} m={m} locale={locale} />
     </article>
   );
 }
@@ -166,7 +167,7 @@ function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
   );
 }
 
-function RelatedBlocks({ item, t, locale }: { item: Item; t: Messages["block"]; locale: Locale }) {
+function RelatedBlocks({ item, m, locale }: { item: Item; m: Messages; locale: Locale }) {
   const related = getItems()
     .filter((other) => other.name !== item.name)
     .map((other) => ({
@@ -182,30 +183,14 @@ function RelatedBlocks({ item, t, locale }: { item: Item; t: Messages["block"]; 
     .slice(0, 6)
     .map(({ other }) => localizeItem(other, locale));
 
-  if (related.length === 0) return null;
-
+  const t = m.block;
   return (
-    <section aria-labelledby="related-title" className="mt-16">
-      <h2 id="related-title" className="mb-4 text-lg font-semibold tracking-tight">
-        {t.similar}
-      </h2>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {related.map((other) => (
-          <li key={other.name}>
-            <Link
-              href={`/blocks/${other.name}`}
-              className="flex items-start justify-between gap-3 rounded-xl border border-line bg-card p-4 transition-colors hover:border-accent/60"
-            >
-              <span className="min-w-0">
-                <span className="block font-medium">{other.title}</span>
-                <span className="mt-1 line-clamp-2 block text-sm text-subtle">{other.description}</span>
-              </span>
-              <TierBadge tier={other.meta.tier} />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <RelatedGrid
+      items={related.map((other) => ({ name: other.name, title: other.title, tier: other.meta.tier }))}
+      locale={locale}
+      heading={t.similar}
+      labels={{ livePreview: m.catalog.livePreview, expand: m.catalog.expand, pro: m.tier.pro }}
+    />
   );
 }
 
