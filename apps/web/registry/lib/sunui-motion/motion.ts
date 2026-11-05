@@ -52,7 +52,7 @@ export function useShake<T extends HTMLElement | SVGElement = HTMLDivElement>() 
   const reduce = useReducedMotion();
   const shake = useCallback(() => {
     if (reduce || !scope.current) return;
-    void animate(scope.current as HTMLElement, shakeKeyframes, shakeTransition);
+    void animate(scope.current as HTMLElement, { x: shakeKeyframes.x }, { duration: 0.32, ease: "easeOut" });
   }, [animate, reduce, scope]);
   return [scope, shake] as const;
 }

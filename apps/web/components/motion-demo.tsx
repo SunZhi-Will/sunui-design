@@ -52,7 +52,7 @@ function PressDemo() {
 function StampDemo({ run }: DemoProps) {
   const reduce = useReducedMotion();
   return (
-    <div className={cn("relative w-44 rounded-md border px-3 py-2.5", paper)}>
+    <div className={cn("relative w-full max-w-60 rounded-md border px-3 py-2.5", paper)}>
       <p className="text-[11px] tracking-[0.12em] uppercase opacity-60">Coupon</p>
       <p className="text-lg font-semibold tracking-tight tabular-nums">NT$150 off</p>
       <AnimatePresence>
