@@ -14,7 +14,12 @@
 
 ### 1. 網域
 
-買 `sunui.dev`（`.env.example` 已經假設這個）或你決定的網域。registry URL 公開後就不要再換。
+2026-11-06 決定用 **`sunui.synvize.com`**（synvize.com 的 DNS 在 Cloudflare）。registry URL 會寫進使用者的 `components.json`，公開後就不要再換；之後若改用獨立網域，舊網址要永久 308 轉址。
+
+1. Vercel 專案 → Settings → Domains → 加 `sunui.synvize.com`。
+2. Cloudflare → synvize.com → DNS → 新增 `CNAME`，名稱 `sunui`，目標 `cname.vercel-dns.com`，**Proxy 設為 DNS only（灰色雲）**。開橘色雲會讓 Vercel 簽不到憑證，也會被 Cloudflare 快取擋住 Pro 的授權回應。
+3. Vercel 環境變數 `NEXT_PUBLIC_SITE_URL=https://sunui.synvize.com`，然後 **Redeploy**（`NEXT_PUBLIC_` 開頭的變數是建置時寫進去的，改完不重新建置不會生效）。
+4. Settings → Deployment Protection：Production 網域不受保護；若打開還是被導到 Vercel 登入頁，把保護改成只套用在 Preview。
 
 ### 2. Pro 私有 repo
 
