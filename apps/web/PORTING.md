@@ -1,6 +1,6 @@
 # 從原始專案移植 block 的規則
 
-> 適用於 `meta.series` 為 product、story、showcase、classic、cardflow 的 block。
+> 適用於 `meta.series` 為 product、story、showcase 的 block。
 > **2026-11-05 修訂**：移植保留的是「功能、行為、結構」，不是「長相」。原專案多半用模板式的紫粉漸層、光暈、霓虹色與漸層字，放進同一個型錄會讓整套看起來像 AI 生成。所以視覺一律收斂到第 3 節的「去 AI 感」規則，原本的顏色只能透過 `accent` prop 或 CSS 變數讓買家自己開回來。
 
 ## 1. 先讀原始碼
@@ -37,7 +37,7 @@
 
 | 系列 | 底與字 | 唯一強調色（預設） | 備註 |
 |---|---|---|---|
-| product、cardflow、classic | shadcn token：`bg-background` `bg-card` `border-border` `text-muted-foreground`，跟隨網站明暗 | `primary`（買家主題）；需要彩色時用 `accent` prop，預設 `#c8361d` 朱紅只用在一處 | 依 DESIGN-product.md。畫布工具的選取框可用 `#2563eb` 藍，這是工具慣例不是裝飾 |
+| product | shadcn token：`bg-background` `bg-card` `border-border` `text-muted-foreground`，跟隨網站明暗 | `primary`（買家主題）；需要彩色時用 `accent` prop，預設 `#c8361d` 朱紅只用在一處 | 依 DESIGN-product.md。畫布工具的選取框可用 `#2563eb` 藍，這是工具慣例不是裝飾 |
 | showcase | 自帶暗色：底 `#0c0a09`，面 `#161412`，線 `rgb(255 255 255 / 0.08)`，字 `#f5f5f4`，次要 `#a8a29e` | 琥珀金 `#d4a24c`，透過 `accent` prop 可換 | 像雜誌與產品發表會，不像霓虹夜店。大數字用 `tabular-nums`，可以用襯線 |
 | story | 依 DESIGN-story.md 的 `--story-*` token | `--story-accent` | 遊戲介面可以保留一層內光與一道深陰影，但不准彩色外發光 |
 

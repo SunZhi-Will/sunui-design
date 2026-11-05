@@ -12,7 +12,7 @@ import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
 
-const seriesKeys: Series[] = ["paper", "product", "story", "showcase", "classic", "cardflow"];
+const seriesKeys: Series[] = ["paper", "product", "story", "showcase"];
 const interactionKeys: Interaction[] = ["press", "hover", "drag", "type", "loading", "scroll", "section"];
 
 /** title、description 已換成目前語言；search 保留英文標題與描述，讓英文關鍵字也搜得到。 */
