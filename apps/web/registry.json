@@ -2613,6 +2613,61 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "gradient-backdrop",
+      "type": "registry:block",
+      "title": "Gradient Backdrop",
+      "description": "A code-drawn gradient background with nine presets: mesh, grain, silk, aurora, color flow, floral, horizon, line maze and a real-time plasma shader on Canvas 2D. Pick a named palette or pass your own colors (hex, oklch or var(--token)), add film grain and an optional pointer light, and put any content on top as children. No image files. Loops pause off screen and in hidden tabs; with reduced motion it draws a still frame.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "background",
+        "hero",
+        "animation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "motion",
+        "interaction": "section",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Behind a landing page hero, launch banner or pricing header that needs atmosphere without image assets",
+            "A branded backdrop for cards, empty states or section dividers, using the brand colors through the colors prop",
+            "Picking a background style quickly: switch preset and palette instead of exporting a new image"
+          ],
+          "watchOut": [
+            "It is a motion series piece. Paper and product series pages stay flat, without gradients",
+            "Check text contrast on top: light palettes (pastel, meadow) need dark text, the rest need light text",
+            "colors[0] is the base color; the rest are accents, so put the background color first",
+            "Keep one animated backdrop per screen; for many small cards set animate={false}"
+          ],
+          "aliases": [
+            "gradient background",
+            "mesh gradient",
+            "grainy gradient",
+            "noise gradient",
+            "aurora background",
+            "animated gradient",
+            "silk gradient",
+            "shader background",
+            "hero background",
+            "blob background"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/gradient-backdrop/gradient-backdrop.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
