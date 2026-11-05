@@ -2,6 +2,7 @@
 
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
 
+import { useShake } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
 /*
@@ -559,6 +560,8 @@ export function RedeemKeyInput({
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState<Busy>(null);
   const [message, setMessage] = useState<Message>(null);
+  // 金鑰被退回時整排輕搖一次；減少動態時不搖，錯誤訊息照常顯示
+  const [keyRowRef, shakeKeyRow] = useShake<HTMLDivElement>();
 
   const isPro = state.tier === "pro";
   const isBasic = state.tier === "basic";
@@ -605,9 +608,11 @@ export function RedeemKeyInput({
       setMessage({ type: "error", text: l.offlineError });
     } else if (k === "supporter") {
       setMessage({ type: "error", text: l.invalidSupporter });
+      shakeKeyRow();
     } else {
       const mapped = mapLicenseError(r.error, l.errors);
       setMessage(mapped ? { type: "error", ...mapped } : { type: "error", text: r.error || l.activateFailed });
+      shakeKeyRow();
     }
   };
 
@@ -839,7 +844,7 @@ export function RedeemKeyInput({
               <label htmlFor={inputId} className="block text-xs text-[var(--rk-text-2)] font-medium">
                 {l.haveKey}
               </label>
-              <div className="flex gap-2">
+              <div ref={keyRowRef} className="flex gap-2">
                 <input
                   id={inputId}
                   type="text"

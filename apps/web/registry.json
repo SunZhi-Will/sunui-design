@@ -2484,7 +2484,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "@sunui/stamp"
+        "@sunui/stamp",
+        "@sunui/sunui-motion"
       ],
       "categories": [
         "form",
@@ -3126,10 +3127,13 @@
       "name": "redeem-key-input",
       "type": "registry:block",
       "title": "License and Redeem Panel",
-      "description": "Dark license panel with one input that tells a 12-character supporter code from a Lemon Squeezy UUID key and sends each the right way. It shows the free, trial, basic, pro and supporter tiers, explains grace, expired and invalid states, and offers activate, deactivate and revalidate. Provider errors become messages that say what to do next. The input is labelled, results are announced in a polite live region, and spinners stop spinning under reduced motion.",
-      "dependencies": [],
+      "description": "Dark license panel with one input that tells a 12-character supporter code from a Lemon Squeezy UUID key and sends each the right way. It shows the free, trial, basic, pro and supporter tiers, explains grace, expired and invalid states, and offers activate, deactivate and revalidate. Provider errors become messages that say what to do next. A rejected key shakes the input row once. The input is labelled, results are announced in a polite live region, and under reduced motion the row does not shake and spinners stop spinning.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/sunui-motion"
       ],
       "categories": [
         "commerce",

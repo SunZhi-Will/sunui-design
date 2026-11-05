@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 
 import { Fragment, useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 
 import { Stamp } from "@/components/ui/stamp";
+import { shakeKeyframes, shakeTransition } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
 export type OtpStatus = "idle" | "success" | "error";
@@ -129,7 +130,7 @@ export function OtpInput({
   // 錯誤時整排輕搖一次，像紙被推回來；減少動態時不搖
   useEffect(() => {
     if (status === "error" && !reduceMotion) {
-      void controls.start({ x: [0, -6, 5, -3, 2, 0], transition: { duration: 0.32, ease: "easeOut" } });
+      void controls.start({ ...shakeKeyframes, transition: shakeTransition });
     }
   }, [status, reduceMotion, controls]);
 
