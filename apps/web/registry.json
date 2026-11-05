@@ -3289,6 +3289,57 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "stamp",
+      "type": "registry:ui",
+      "title": "Stamp",
+      "description": "The one celebration in SunUI, in five shapes chosen by what the result means: tick for small confirmations, box for transaction status, seal for wins and achievements, date for dated records such as paid or a postmark, and chop for personal marks such as an invitation. Each stamp gets a stable angle, offset and uneven ink texture from its seed, so two stamps on one page never look cloned. Vermilion for positive results and faded ink for ended or sold out, an optional void line, a heavier press for large stamps, and instant display under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "status",
+        "feedback",
+        "commerce"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "Showing the result of a shopper action: claimed, paid, won, sold out, ended",
+            "Building your own block that needs a SunUI style result mark without copying stamp code"
+          ],
+          "watchOut": [
+            "Pick the shape by meaning: tick for minor confirmations, box for status, seal for wins, date for receipts, chop for personal invitations",
+            "Do not use a stamp for labels that are not results, such as Recommended or Popular",
+            "Pass a seed (order id, coupon id) so the angle and ink stay the same across renders"
+          ],
+          "aliases": [
+            "rubber stamp",
+            "stamp badge",
+            "status stamp",
+            "claimed stamp",
+            "paid stamp",
+            "postmark",
+            "hanko",
+            "seal",
+            "success checkmark",
+            "result badge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/stamp/stamp.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

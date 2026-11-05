@@ -28,7 +28,7 @@ const errorProbe = `(() => {
 
 /**
  * 圖示自檢頁：只給 scripts/check-icons.mjs 截圖用，不進網站導覽。
- * /preview/icons?set=line|pixel&sheet=sizes|frames&theme=light|dark&only=a,b&with=c,d&accent=off
+ * /preview/icons?set=line|pixel&sheet=sizes|frames&theme=light|dark&only=a,b&with=c,d&accent=off&page=1&per=24
  */
 export default async function IconCheckPage({ searchParams }: Props) {
   const params = await searchParams;
@@ -38,6 +38,8 @@ export default async function IconCheckPage({ searchParams }: Props) {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: errorProbe }} />
+      {/* 開發模式左下角的 Next 徽章會壓到圖示 */}
+      <style>{"nextjs-portal{display:none!important}"}</style>
       <IconCheckSheet
         set={set}
         sheet={sheet}
@@ -45,6 +47,8 @@ export default async function IconCheckPage({ searchParams }: Props) {
         only={list(params.only)}
         refs={list(params.with)}
         accent={one(params.accent) !== "off"}
+        page={Number(one(params.page)) || 1}
+        per={Number(one(params.per)) || (sheet === "frames" ? 24 : 48)}
       />
     </>
   );

@@ -33,6 +33,9 @@ type Props = {
   only: string[];
   refs: string[];
   accent: boolean;
+  /** 1 起算的頁碼；圖示多時分頁，截圖才不會高到看不清 */
+  page: number;
+  per: number;
 };
 
 const themes = {
@@ -45,7 +48,7 @@ const PIXEL_SIZES = [16, 32, 48];
 const FRAME_SIZE = 48;
 const PROGRESS = [0, 0.25, 0.5, 0.75, 1];
 
-export function IconCheckSheet({ set, sheet, theme, only, refs, accent }: Props) {
+export function IconCheckSheet({ set, sheet, theme, only, refs, accent, page, per }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const palette = themes[theme];
 
@@ -54,7 +57,10 @@ export function IconCheckSheet({ set, sheet, theme, only, refs, accent }: Props)
   const requested = [...refs, ...only];
   const unknown = requested.filter((name) => !all.includes(name));
   const base = sheet === "frames" ? animated : all;
-  const names = requested.length ? requested.filter((name) => all.includes(name)) : [...base];
+  const everything = requested.length ? requested.filter((name) => all.includes(name)) : [...base];
+  const pages = Math.max(1, Math.ceil(everything.length / per));
+  const current = Math.min(Math.max(1, page), pages);
+  const names = everything.slice((current - 1) * per, current * per);
   const refSet = new Set(refs);
 
   // 截圖腳本讀這些屬性：尺寸決定視窗大小，unknown 讓它報錯
@@ -63,6 +69,7 @@ export function IconCheckSheet({ set, sheet, theme, only, refs, accent }: Props)
     const el = ref.current;
     if (!el) return;
     root.dataset.unknown = unknown.join(",");
+    root.dataset.pages = String(pages);
     root.dataset.w = String(Math.ceil(el.scrollWidth));
     root.dataset.h = String(Math.ceil(el.scrollHeight));
     root.dataset.ready = "1";
@@ -84,6 +91,7 @@ export function IconCheckSheet({ set, sheet, theme, only, refs, accent }: Props)
       <p style={{ color: palette.muted, marginBottom: 16 }}>
         {set} · {sheet} · {theme}
         {accent ? "" : " · accent off"}
+        {pages > 1 ? ` · page ${current}/${pages}` : ""}
         {unknown.length ? ` · unknown: ${unknown.join(", ")}` : ""}
       </p>
       {sheet === "sizes" ? (

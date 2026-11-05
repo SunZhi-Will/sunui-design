@@ -89,8 +89,17 @@ export async function buildRegistryItem(item: RegistryItem, banner?: string) {
   return {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     ...item,
+    registryDependencies: item.registryDependencies?.map(resolveDependency),
     files,
   };
+}
+
+/**
+ * registry.json 用 @sunui/<name> 表示「也要裝這個免費 block」（例如共用的 stamp）。
+ * 輸出時換成完整網址，買家沒在 components.json 設定 @sunui 也能直接安裝。
+ */
+function resolveDependency(dep: string) {
+  return dep.startsWith("@sunui/") ? `${siteUrl()}/r/${dep.slice("@sunui/".length)}.json` : dep;
 }
 
 // 授權註解放在 "use client" 之後，避免破壞指令必須在檔案開頭的規則

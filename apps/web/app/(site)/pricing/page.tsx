@@ -5,6 +5,7 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
+import { seriesOf } from "@/lib/series";
 import { checkoutUrls, foundingState, foundingWindow, prices } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -22,14 +23,17 @@ export default async function PricingPage() {
   const dateFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
   const state = foundingState();
   const proCount = getItems("pro").length;
-  const freeCount = getItems("free").length;
+  const freeItems = getItems("free");
+  // 動效庫一組含十幾種效果，和一般 block 分開列（見 reports/免費與付費切分規劃-2026-11-05.md）
+  const motionCount = freeItems.filter((item) => seriesOf(item) === "motion").length;
+  const freeCount = freeItems.length - motionCount;
 
   const plans = [
     {
       name: t.free.name,
       price: "$0",
       note: t.free.note,
-      features: t.free.features(freeCount),
+      features: t.free.features(freeCount, motionCount),
       cta: { label: m.common.browseBlocks, href: "/" },
     },
     {

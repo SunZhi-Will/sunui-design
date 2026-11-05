@@ -259,7 +259,8 @@ const en = {
     free: {
       name: "Free",
       note: "MIT license",
-      features: (n: number) => [
+      features: (n: number, motion: number) => [
+        `${motion} motion effect libraries: backgrounds, gradients, text, buttons, cursors and more`,
         `${n} free ${n === 1 ? "block" : "blocks"} and counting`,
         "Install with the shadcn CLI",
         "Use anywhere, commercial included",
@@ -646,7 +647,7 @@ const zhTW: Messages = {
     free: {
       name: "免費",
       note: "MIT 授權",
-      features: (n) => [`${n} 個免費區塊，持續增加`, "用 shadcn CLI 安裝", "任何用途皆可，包含商業使用"],
+      features: (n, motion) => [`${motion} 組動效庫：背景、漸層、文字、按鈕、游標等`, `${n} 個免費區塊，持續增加`, "用 shadcn CLI 安裝", "任何用途皆可，包含商業使用"],
     },
     pro: {
       name: "Pro",
@@ -1013,7 +1014,7 @@ const zhCN: Messages = {
     free: {
       name: "免费",
       note: "MIT 许可",
-      features: (n) => [`${n} 个免费区块，持续增加`, "用 shadcn CLI 安装", "任何用途均可，包括商用"],
+      features: (n, motion) => [`${motion} 组动效库：背景、渐变、文字、按钮、光标等`, `${n} 个免费区块，持续增加`, "用 shadcn CLI 安装", "任何用途均可，包括商用"],
     },
     pro: {
       name: "Pro",
@@ -1378,7 +1379,7 @@ const ja: Messages = {
     free: {
       name: "無料",
       note: "MIT ライセンス",
-      features: (n) => [`${n} 個の無料ブロック、今後も追加`, "shadcn CLI でインストール", "商用を含めどこでも使用可"],
+      features: (n, motion) => [`モーションエフェクト集 ${motion} 種：背景、グラデーション、テキスト、ボタン、カーソルなど`, `${n} 個の無料ブロック、今後も追加`, "shadcn CLI でインストール", "商用を含めどこでも使用可"],
     },
     pro: {
       name: "Pro",
