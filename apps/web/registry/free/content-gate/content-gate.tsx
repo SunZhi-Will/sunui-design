@@ -15,6 +15,13 @@ export interface ContentGateLabels {
   contact?: ReactNode;
 }
 
+/** 覆蓋版（PaywallOverlay）的字串 */
+export interface PaywallOverlayLabels {
+  title?: ReactNode;
+  body?: (previewCount: number) => ReactNode;
+  cta?: ReactNode;
+}
+
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
 /** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
@@ -25,7 +32,7 @@ function resolveLocale(tag?: string): SunLocale {
   return "en";
 }
 
-const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
+const MESSAGES: Record<SunLocale, Required<ContentGateLabels> & { overlay: Required<PaywallOverlayLabels> }> = {
   en: {
     body: (state) =>
       state === "no-access"
@@ -39,6 +46,11 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
     contactPrompt: (state) =>
       state === "no-access" ? "Account looks right?" : "Haven't bought it yet?",
     contact: "Contact the instructor",
+    overlay: {
+      title: "Buy the course to keep watching",
+      body: (n) => `You've previewed ${n} slide${n === 1 ? "" : "s"}. Buy the course to unlock everything.`,
+      cta: "View course & buy",
+    },
   },
   "zh-TW": {
     body: (state) =>
@@ -51,6 +63,11 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
     contactPrompt: (state) =>
       state === "no-access" ? "帳號沒錯？" : "還沒購買？",
     contact: "聯絡講師",
+    overlay: {
+      title: "購買課程即可繼續觀看",
+      body: (n) => `你已試看 ${n} 張投影片，購買課程即可解鎖全部內容。`,
+      cta: "查看課程並購買",
+    },
   },
   "zh-CN": {
     body: (state) =>
@@ -63,6 +80,11 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
     contactPrompt: (state) =>
       state === "no-access" ? "账号没问题？" : "还没购买？",
     contact: "联系讲师",
+    overlay: {
+      title: "购买课程即可继续观看",
+      body: (n) => `你已试看 ${n} 张幻灯片，购买课程即可解锁全部内容。`,
+      cta: "查看课程并购买",
+    },
   },
   ja: {
     body: (state) =>
@@ -77,6 +99,11 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels>> = {
     contactPrompt: (state) =>
       state === "no-access" ? "アカウントは合っていますか？" : "まだ購入していませんか？",
     contact: "講師に問い合わせる",
+    overlay: {
+      title: "続きを見るにはコースを購入",
+      body: (n) => `${n} 枚のスライドを試し見しました。コースを購入するとすべてのコンテンツが見られます。`,
+      cta: "コースを見て購入",
+    },
   },
 };
 
@@ -335,3 +362,75 @@ export function ContentGate({
     </div>
   );
 }
+
+/* ───────── 覆蓋版：試看上限時蓋在播放器上 ───────── */
+
+export interface PaywallOverlayProps {
+  /** 免費試看的張數或集數 */
+  previewCount: number;
+  href?: string;
+  onClick?: () => void;
+  /** 按鈕底色；不傳時跟隨主題的 primary */
+  ctaFrom?: string;
+  /** 保留給相容舊版，按鈕不再做漸層，此值不使用 */
+  ctaTo?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: PaywallOverlayLabels;
+  className?: string;
+}
+
+/** 蓋在播放器上（父層要 relative），試看到最後一張時顯示 */
+export function PaywallOverlay({
+  previewCount,
+  href,
+  onClick,
+  ctaFrom,
+  locale = "en",
+  labels,
+  className,
+}: PaywallOverlayProps) {
+  const l = { ...MESSAGES[resolveLocale(locale)].overlay, ...labels };
+  return (
+    <div
+      role="region"
+      aria-label={typeof l.title === "string" ? l.title : undefined}
+      className={cn(
+        "absolute inset-0 z-40 flex flex-col items-center justify-center gap-5 px-4",
+        className,
+      )}
+      style={{
+        // 遮住後面被鎖的內容：同色的不透明遮罩加輕微模糊（功能性，不是裝飾）
+        background:
+          "linear-gradient(to top, var(--background) 60%, color-mix(in oklab, var(--background) 55%, transparent) 100%)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
+      }}
+    >
+      <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
+        <LockIcon size={18} />
+      </div>
+      <div className="text-center">
+        <p className="mb-1 text-base font-semibold text-foreground sm:text-lg">{l.title}</p>
+        <p className="text-sm text-muted-foreground">{l.body(previewCount)}</p>
+      </div>
+      <ActionLink
+        href={href}
+        onClick={onClick}
+        className={cn(
+          "rounded-md px-5 py-2.5 text-sm font-medium transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50",
+          !ctaFrom && "bg-primary text-primary-foreground",
+        )}
+        style={ctaFrom ? { background: ctaFrom, color: "#fff" } : undefined}
+      >
+        {l.cta}
+      </ActionLink>
+    </div>
+  );
+}
+
+/** 舊 preview-paywall 的名稱，與 PaywallOverlay 相同 */
+export const PreviewPaywall = PaywallOverlay;
+export type PreviewPaywallProps = PaywallOverlayProps;
+export type PreviewPaywallLabels = PaywallOverlayLabels;

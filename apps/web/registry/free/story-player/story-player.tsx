@@ -62,10 +62,10 @@ export interface StoryPlayerLabels {
   slideOf: (n: number, total: number) => string;
 }
 
-type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+export type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
-function resolveLocale(tag?: string): SunLocale {
+/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文（recap-slides.tsx 也共用這一份） */
+export function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
   if (t.startsWith("ja")) return "ja";

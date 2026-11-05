@@ -123,7 +123,18 @@ export function SkeletonList({ rows = 4, className }: { rows?: number; className
   );
 }
 
-export type SkeletonPreset = "text" | "card" | "product" | "list";
+/** 通用的整列版位：不知道內容長怎樣時，用幾條等寬的紙面色塊代表「這裡有幾筆資料」 */
+export function SkeletonRows({ rows = 4, className }: { rows?: number; className?: string }) {
+  return (
+    <div className={cn("flex flex-col gap-3", className)}>
+      {Array.from({ length: rows }, (_, i) => (
+        <Skeleton key={i} className="h-11 w-full rounded-md" />
+      ))}
+    </div>
+  );
+}
+
+export type SkeletonPreset = "text" | "card" | "product" | "list" | "rows";
 
 export interface SkeletonSetProps {
   /** true 時換成真實內容 */
@@ -134,6 +145,8 @@ export interface SkeletonSetProps {
   shimmer?: ShimmerStyle;
   /** preset 的行數或列數 */
   count?: number;
+  /** 載入中時讀屏念的名稱，例如「正在載入過往帳單」；不給時依 locale 用內建字串 */
+  label?: string;
   /** 讀屏文字的語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -162,7 +175,7 @@ const MESSAGES: Record<SunLocale, SkeletonSetLabels> = {
   "zh-CN": { loading: "内容加载中", loaded: "内容已加载" },
   ja: { loading: "コンテンツを読み込み中", loaded: "コンテンツを読み込みました" },
 };
-const presets: SkeletonPreset[] = ["text", "card", "product", "list"];
+const presets: SkeletonPreset[] = ["text", "card", "product", "list", "rows"];
 
 function renderPreset(preset: SkeletonPreset, count?: number) {
   switch (preset) {
@@ -174,11 +187,13 @@ function renderPreset(preset: SkeletonPreset, count?: number) {
       return <SkeletonProductCard />;
     case "list":
       return <SkeletonList rows={count ?? 4} />;
+    case "rows":
+      return <SkeletonRows rows={count ?? 4} />;
   }
 }
 
 /** 包住真實內容：未載入時顯示骨架，載入後短暫交叉淡入 */
-export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, locale = "en", labels, className }: SkeletonSetProps) {
+export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, label, locale = "en", labels, className }: SkeletonSetProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const placeholder = typeof skeleton === "string" && presets.includes(skeleton as SkeletonPreset) ? renderPreset(skeleton as SkeletonPreset, count) : skeleton;
@@ -188,7 +203,7 @@ export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pu
     <ShimmerContext.Provider value={shimmer}>
       <div className={cn("relative", className)}>
         <span className="sr-only" role="status">
-          {loaded ? text.loaded : text.loading}
+          {loaded ? text.loaded : (label ?? text.loading)}
         </span>
         <div aria-busy={!loaded} className="grid grid-cols-[minmax(0,1fr)]">
           <AnimatePresence initial={false}>

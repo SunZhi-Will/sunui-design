@@ -1,170 +1,127 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
+import { RecapActiveMonth, RecapFrame, RecapKeywordCloud, RecapPercentileRing, RecapStreakFlame, recapPalette } from "./recap-slides";
 import { StoryPlayer, storyIcons } from "./story-player";
 
 const copy = {
   en: {
-    hi: "Hi, @mei.writes",
-    remember: "Remember your 2026?",
-    year: "Here is your year on Threads.",
-    views: "Total views",
-    viewsUnit: "views",
-    watching: "People really are watching.",
-    streak: "Longest streak",
-    days: "days in a row",
-    commitment: "That is real commitment.",
+    coverTitle: "2026 Wrapped",
+    handle: "@mei.writes",
+    year: "Your year on Threads",
+    tap: "Tap the right side to start",
+    outroTitle: "That was your 2026",
+    posts: "Posts",
+    views: "Views",
+    topWord: "Top word",
+    thanks: "Thanks for writing with us. See you in 2027.",
     region: "Your 2026 recap",
     download: "Download summary",
     saving: "Saving image...",
     share: "Share to Threads",
     replay: "Watch again",
+    words: ["coffee", "design", "Taipei", "cats", "side project", "rain", "ramen", "books"],
   },
   "zh-TW": {
-    hi: "嗨，@mei.writes",
-    remember: "還記得你的 2026 嗎？",
-    year: "這是你在 Threads 的一年。",
-    views: "總瀏覽次數",
-    viewsUnit: "次瀏覽",
-    watching: "真的有很多人在看。",
-    streak: "最長連續天數",
-    days: "天連續發文",
-    commitment: "這才叫堅持。",
+    coverTitle: "2026 年度回顧",
+    handle: "@mei.writes",
+    year: "你在 Threads 的一年",
+    tap: "點右側開始播放",
+    outroTitle: "這就是你的 2026",
+    posts: "貼文",
+    views: "瀏覽",
+    topWord: "年度關鍵字",
+    thanks: "謝謝你這一年的分享，2027 見。",
     region: "你的 2026 回顧",
     download: "下載回顧圖",
     saving: "正在儲存圖片...",
     share: "分享到 Threads",
     replay: "再看一次",
+    words: ["咖啡", "設計", "台北", "貓", "副業專案", "下雨", "拉麵", "讀書"],
   },
   "zh-CN": {
-    hi: "嗨，@mei.writes",
-    remember: "还记得你的 2026 吗？",
-    year: "这是你在 Threads 的一年。",
-    views: "总浏览量",
-    viewsUnit: "次浏览",
-    watching: "真的有很多人在看。",
-    streak: "最长连续天数",
-    days: "天连续发帖",
-    commitment: "这才叫坚持。",
+    coverTitle: "2026 年度回顾",
+    handle: "@mei.writes",
+    year: "你在 Threads 的一年",
+    tap: "点右侧开始播放",
+    outroTitle: "这就是你的 2026",
+    posts: "动态",
+    views: "浏览",
+    topWord: "年度关键词",
+    thanks: "谢谢你这一年的分享，2027 见。",
     region: "你的 2026 年度回顾",
     download: "下载回顾图",
     saving: "正在保存图片...",
     share: "分享到 Threads",
     replay: "再看一遍",
+    words: ["咖啡", "设计", "台北", "猫", "副业项目", "下雨", "拉面", "读书"],
   },
   ja: {
-    hi: "こんにちは、@mei.writes",
-    remember: "2026年を覚えていますか？",
-    year: "あなたの Threads での1年です。",
-    views: "総閲覧数",
-    viewsUnit: "回閲覧",
-    watching: "たくさんの人が見ています。",
-    streak: "最長連続記録",
-    days: "日連続",
-    commitment: "本物の継続力です。",
+    coverTitle: "2026年のまとめ",
+    handle: "@mei.writes",
+    year: "Threads でのあなたの1年",
+    tap: "右側をタップして再生",
+    outroTitle: "これがあなたの2026年",
+    posts: "投稿",
+    views: "閲覧",
+    topWord: "トップワード",
+    thanks: "1年間ありがとうございました。また2027年に。",
     region: "あなたの2026年まとめ",
     download: "まとめをダウンロード",
     saving: "画像を保存中...",
     share: "Threads でシェア",
     replay: "もう一度見る",
+    words: ["コーヒー", "デザイン", "台北", "猫", "個人開発", "雨", "ラーメン", "読書"],
   },
 };
 
-// 進場只做一次淡入上移；reduced motion 直接顯示最終畫面
-function useEnter() {
-  const reduce = useReducedMotion() ?? false;
-  return (delay = 0) =>
-    reduce
-      ? { initial: false as const }
-      : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.36, ease: [0.23, 1, 0.32, 1] as const } };
-}
+// 一年貼文裡最常出現的字，依次數由多到少
+const KEYWORD_COUNTS = [64, 52, 41, 33, 24, 17, 11, 8];
 
-function Eyebrow({ children }: { children: ReactNode }) {
-  const enter = useEnter();
+type Copy = (typeof copy)["en"];
+
+// 封面：跟回顧投影片共用 RecapFrame，版面一致
+function CoverSlide({ t }: { t: Copy }) {
   return (
-    <motion.p {...enter(0)} className="mb-5 text-[11px] font-medium tracking-[0.14em] text-white/50 uppercase">
-      {children}
-    </motion.p>
+    <RecapFrame title={t.coverTitle} footer={<p className="text-[15px] text-[#a8a29e]">{t.tap}</p>}>
+      <div className="flex flex-1 flex-col justify-center">
+        <div className="mb-6 flex size-12 items-center justify-center rounded-full text-lg font-semibold" style={{ background: recapPalette.surface, color: recapPalette.soft }}>
+          M
+        </div>
+        <p className="text-[15px]" style={{ color: recapPalette.muted }}>
+          {t.handle}
+        </p>
+        <p className="mt-2 font-serif text-4xl leading-[1.08] tracking-[-0.02em]">{t.year}</p>
+        <p className="mt-6 font-serif text-8xl leading-none tracking-[-0.03em] tabular-nums lining-nums">2026</p>
+        <div className="mt-4 h-px w-12" style={{ background: recapPalette.accent }} />
+      </div>
+    </RecapFrame>
   );
 }
 
-function Slide({ children }: { children: ReactNode }) {
-  return <div className="relative flex h-full w-full flex-col justify-center bg-[#0f0f0f] p-7">{children}</div>;
-}
-
-function IntroSlide() {
-  const enter = useEnter();
-  const t = useDemoText(copy);
+// 結尾：三個數字的總表，最後一張會停比較久，底部出現動作列
+function OutroSlide({ t }: { t: Copy }) {
+  const rows = [
+    { label: t.posts, value: "312" },
+    { label: t.views, value: "48.2K" },
+    { label: t.topWord, value: t.words[0] },
+  ];
   return (
-    <Slide>
-      <motion.div {...enter(0)} className="mb-8 flex size-16 items-center justify-center rounded-full bg-[#3a3531] text-2xl font-semibold text-white/90">
-        M
-      </motion.div>
-      <motion.p {...enter(0.12)} className="mb-3 text-2xl leading-tight font-semibold text-white">
-        {t.hi}
-      </motion.p>
-      <motion.p {...enter(0.24)} className="text-lg text-white/80">
-        {t.remember}
-      </motion.p>
-      <motion.p {...enter(0.36)} className="mt-2 text-base text-white/55">
-        {t.year}
-      </motion.p>
-    </Slide>
-  );
-}
-
-// 每月瀏覽數（千），只用白色的深淺
-const MONTHS = [1.2, 1.8, 2.4, 2.1, 3.0, 3.6, 4.2, 3.9, 4.8, 5.4, 6.1, 9.7];
-
-function ViewsSlide({ views }: { views: string }) {
-  const enter = useEnter();
-  const t = useDemoText(copy);
-  const max = Math.max(...MONTHS);
-  return (
-    <Slide>
-      <Eyebrow>{t.views}</Eyebrow>
-      <motion.div {...enter(0.12)} className="text-6xl font-semibold text-white tabular-nums sm:text-7xl">
-        {views}
-      </motion.div>
-      <motion.div {...enter(0.2)} className="mt-1 text-lg text-white/60">
-        {t.viewsUnit}
-      </motion.div>
-      <motion.div {...enter(0.32)} aria-hidden className="mt-8 flex h-20 items-end gap-1">
-        {MONTHS.map((v, i) => (
-          <span key={i} className="min-w-0 flex-1 rounded-sm" style={{ height: `${(v / max) * 100}%`, background: i === MONTHS.length - 1 ? "#fff" : "rgba(255,255,255,0.22)" }} />
+    <RecapFrame title={t.outroTitle} footer={<p className="text-[15px] leading-relaxed text-[#d6d3d1]">{t.thanks}</p>}>
+      <dl className="flex flex-1 flex-col justify-center">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-baseline justify-between gap-4 border-b py-4" style={{ borderColor: recapPalette.line }}>
+            <dt className="text-[15px]" style={{ color: recapPalette.muted }}>
+              {r.label}
+            </dt>
+            <dd className="font-serif text-4xl leading-none tabular-nums lining-nums">{r.value}</dd>
+          </div>
         ))}
-      </motion.div>
-      <motion.p {...enter(0.44)} className="mt-6 text-base text-white/70">
-        {t.watching}
-      </motion.p>
-    </Slide>
-  );
-}
-
-function StreakSlide({ streak }: { streak: number }) {
-  const enter = useEnter();
-  const t = useDemoText(copy);
-  return (
-    <Slide>
-      <Eyebrow>{t.streak}</Eyebrow>
-      <motion.div {...enter(0.12)} className="flex items-baseline gap-3">
-        <span className="text-7xl font-semibold text-white tabular-nums sm:text-8xl">{streak}</span>
-        <span className="text-lg text-white/60">{t.days}</span>
-      </motion.div>
-      {/* 連續的天數畫成一格一格，比光暈更能說明「連續」 */}
-      <motion.div {...enter(0.24)} aria-hidden className="mt-8 grid max-w-[13rem] grid-cols-7 gap-1">
-        {Array.from({ length: 28 }, (_, i) => (
-          <span key={i} className="aspect-square rounded-[3px]" style={{ background: i >= 4 && i < 4 + streak ? "rgba(255,255,255,0.86)" : "rgba(255,255,255,0.1)" }} />
-        ))}
-      </motion.div>
-      <motion.p {...enter(0.4)} className="mt-6 border-l-2 border-white/30 pl-3 text-base text-white/80">
-        {t.commitment}
-      </motion.p>
-    </Slide>
+      </dl>
+    </RecapFrame>
   );
 }
 
@@ -174,7 +131,16 @@ export default function StoryPlayerDemo() {
   const [downloading, setDownloading] = useState(false);
   const [index, setIndex] = useState(0);
 
-  const slides = [<IntroSlide key="intro" />, <ViewsSlide key="views" views="48.2K" />, <StreakSlide key="streak" streak={21} />];
+  const keywords = t.words.map((word, i) => ({ word, count: KEYWORD_COUNTS[i] }));
+
+  const slides = [
+    <CoverSlide key="cover" t={t} />,
+    <RecapActiveMonth key="month" data={{ monthIndex: 9, count: 38 }} locale={locale} />,
+    <RecapKeywordCloud key="keywords" keywords={keywords} locale={locale} />,
+    <RecapStreakFlame key="streak" streak={21} locale={locale} />,
+    <RecapPercentileRing key="rank" percentileRank={3.4} locale={locale} />,
+    <OutroSlide key="outro" t={t} />,
+  ];
 
   return (
     <StoryPlayer
@@ -182,7 +148,8 @@ export default function StoryPlayerDemo() {
       index={index}
       onIndexChange={setIndex}
       cardWidth={360}
-      className="rounded-xl"
+      // 底部留出動作列的高度，最後兩張的頁尾文字才不會被蓋住
+      className="rounded-xl pb-14"
       locale={locale}
       labels={{ region: t.region }}
       actions={[

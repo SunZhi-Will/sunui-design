@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
 // 固定的識別色盤，只用在標籤前的小圓點。用 id 取餘數決定顏色，
@@ -37,6 +39,19 @@ export function hashId(id: string): number {
   return h;
 }
 
+/** 專案的識別色，同一個專案在所有畫面永遠是同一個顏色 */
+export function appColor(appId: string) {
+  return personColor(hashId(appId));
+}
+
+/** 人與專案共用的 6px 識別色圓點，顏色只出現在這裡 */
+function IdentityDot({ color, className }: { color: string; className?: string }) {
+  return <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", className)} style={{ backgroundColor: color }} />;
+}
+
+// 兩種標籤共用的外框：圓角、邊線、字級
+const chipBase = "inline-flex max-w-full items-center gap-1.5 rounded-md border font-medium whitespace-nowrap";
+
 // 中性色系 app（Schedary、usermeld、spliteat、ComfyUI）共用的狀態色，淺色與深色各一組
 const STATUS_TOKENS =
   "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#2563EB] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#60A5FA]";
@@ -68,6 +83,11 @@ export interface PersonChipLabels {
   locked: string;
 }
 
+export interface AppChipLabels {
+  /** 付費標記「$」的無障礙名稱 */
+  paid: string;
+}
+
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
 /** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
@@ -78,11 +98,11 @@ function resolveLocale(tag?: string): SunLocale {
   return "en";
 }
 
-const MESSAGES: Record<SunLocale, PersonChipLabels> = {
-  en: { locked: "Locked" },
-  "zh-TW": { locked: "已鎖定" },
-  "zh-CN": { locked: "已锁定" },
-  ja: { locked: "ロック中" },
+const MESSAGES: Record<SunLocale, PersonChipLabels & AppChipLabels> = {
+  en: { locked: "Locked", paid: "Paid" },
+  "zh-TW": { locked: "已鎖定", paid: "付費" },
+  "zh-CN": { locked: "已锁定", paid: "付费" },
+  ja: { locked: "ロック中", paid: "有料" },
 };
 
 export interface PersonChipProps {
@@ -135,7 +155,7 @@ export function PersonChip({
       onClick={onClick}
       className={cn(
         STATUS_TOKENS,
-        "inline-flex max-w-full items-center gap-1.5 rounded-md border font-medium whitespace-nowrap",
+        chipBase,
         size === "lg" ? "h-8 px-2.5 text-sm" : "h-6 px-2 text-xs",
         emphasized ? "border-foreground bg-foreground text-background" : "border-border bg-card text-foreground",
         muted && "text-muted-foreground opacity-60",
@@ -146,7 +166,7 @@ export function PersonChip({
         className,
       )}
     >
-      <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: emphasized ? "currentColor" : color.fg }} />
+      <IdentityDot color={emphasized ? "currentColor" : color.fg} />
       {locked ? <LockIcon label={t.locked} /> : null}
       {name}
     </Comp>
@@ -156,4 +176,44 @@ export function PersonChip({
 /** spliteat、Schedary 的命名，與 PersonChip 完全相同 */
 export function EmployeeChip({ employeeId, ...props }: Omit<PersonChipProps, "personId"> & { employeeId: number }) {
   return <PersonChip personId={employeeId} {...props} />;
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * AppDot、AppChip（usermeld app-chip）：同一套雜湊色，用字串 id
+ * ────────────────────────────────────────────────────────────── */
+
+/** 專案的識別色圓點，顏色只出現在這個小圓點 */
+export function AppDot({ appId, className }: { appId: string; className?: string }) {
+  return <IdentityDot color={appColor(appId).fg} className={className} />;
+}
+
+export interface AppChipProps {
+  appId: string;
+  /** 顯示名稱，預設用 appId */
+  name?: ReactNode;
+  paid?: boolean;
+  /** 舊版寫法，等同 labels.paid */
+  paidLabel?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+  /** 覆寫內建字串，優先於 locale */
+  labels?: Partial<AppChipLabels>;
+  className?: string;
+}
+
+/** 專案標籤：圓點加名稱，付費的帶「$」 */
+export function AppChip({ appId, name, paid, paidLabel, locale = "en", labels, className }: AppChipProps) {
+  const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const paidName = paidLabel ?? t.paid;
+  return (
+    <span className={cn(STATUS_TOKENS, chipBase, "h-6 border-border bg-card px-2 text-xs text-foreground", className)}>
+      <AppDot appId={appId} />
+      <span className="truncate">{name ?? appId}</span>
+      {paid ? (
+        <span role="img" aria-label={paidName} className="text-(--db-success)">
+          $
+        </span>
+      ) : null}
+    </span>
+  );
 }

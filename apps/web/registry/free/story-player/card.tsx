@@ -4,20 +4,28 @@ import { useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
+import { recapPalette } from "./recap-slides";
 import { StoryPlayer, storyIcons } from "./story-player";
 
 const copy = {
-  en: { year: "Your year on Threads", views: "total views", days: "days in a row", region: "Your 2026 recap", replay: "Watch again" },
-  "zh-TW": { year: "你在 Threads 的一年", views: "總瀏覽次數", days: "天連續發文", region: "你的 2026 回顧", replay: "再看一次" },
-  "zh-CN": { year: "你在 Threads 的一年", views: "总浏览量", days: "天连续发帖", region: "你的 2026 年度回顾", replay: "再看一遍" },
-  ja: { year: "Threads での1年", views: "総閲覧数", days: "日連続", region: "あなたの2026年まとめ", replay: "もう一度見る" },
+  en: { year: "Your year on Threads", month: "posts in October", days: "day streak", rank: "top creators", region: "Your 2026 recap", replay: "Watch again" },
+  "zh-TW": { year: "你在 Threads 的一年", month: "則貼文在十月", days: "天連續發文", rank: "頂尖創作者", region: "你的 2026 回顧", replay: "再看一次" },
+  "zh-CN": { year: "你在 Threads 的一年", month: "条动态在十月", days: "天连续发帖", rank: "顶尖创作者", region: "你的 2026 年度回顾", replay: "再看一遍" },
+  ja: { year: "Threads での1年", month: "件の投稿（10月）", days: "日連続投稿", rank: "上位クリエイター", region: "あなたの2026年まとめ", replay: "もう一度見る" },
 };
 
+// 縮小版的回顧投影片：同一套暗色色票，大號襯線數字加一道強調色短線
 function Slide({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 text-center">
-      <span className="text-3xl font-semibold text-white tabular-nums">{value}</span>
-      <span className="text-[11px] text-white/80">{label}</span>
+    <div
+      className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-2 text-center"
+      style={{ background: recapPalette.base, color: recapPalette.text }}
+    >
+      <span className="font-serif text-3xl leading-none tabular-nums lining-nums">{value}</span>
+      <span aria-hidden className="h-px w-5" style={{ background: recapPalette.accent }} />
+      <span className="text-[10px] leading-tight" style={{ color: recapPalette.muted }}>
+        {label}
+      </span>
     </div>
   );
 }
@@ -29,8 +37,9 @@ export default function StoryPlayerCard() {
   const [index, setIndex] = useState(0);
   const slides = [
     <Slide key="hi" value="2026" label={t.year} />,
-    <Slide key="views" value="48.2K" label={t.views} />,
+    <Slide key="month" value="38" label={t.month} />,
     <Slide key="streak" value="21" label={t.days} />,
+    <Slide key="rank" value="3.4%" label={t.rank} />,
   ];
 
   return (

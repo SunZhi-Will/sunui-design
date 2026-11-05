@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,20 @@ export interface CountdownBannerProps {
   discountedPrice?: string;
   /** 真實的結束時間（必填）。不提供預設值，避免每次載入都重新倒數的假稀缺 */
   endDate: Date | string;
+  /**
+   * 活動或直播的開始時間。給了就先倒數到開始（「距離開始」），開始後顯示「進行中」並倒數到 endDate。
+   * 只倒數到真正的那一刻，不製造假的截止壓力。
+   */
+  startDate?: Date | string;
+  /**
+   * hydration 前顯示的日期文字，例如「11/11（三）23:59」；有 startDate 時指開始時間，否則指結束時間。
+   * 伺服器與瀏覽器都只印這段文字，不印跳動的數字，兩邊輸出一致。不給時顯示 --。
+   */
+  dateLabel?: string;
+  /** 倒數跨過 startDate 時呼叫一次 */
+  onStart?: () => void;
+  /** 倒數結束時呼叫一次 */
+  onEnd?: () => void;
   ctaText?: string;
   /** 提供時 CTA 為連結 */
   ctaHref?: string;
@@ -37,10 +51,20 @@ export interface CountdownBannerLabels {
   seconds: string;
   endsIn: string;
   ended: string;
+  /** 有 startDate 時，開始前的小標 */
+  startsIn: string;
+  /** 有 startDate 時，開始後到結束前的狀態 */
+  live: string;
+  /** 掛載後計時器下方的日期說明 */
+  startsOn: (date: string) => string;
+  endsOn: (date: string) => string;
+  endedOn: (date: string) => string;
   /** 原價前的螢幕閱讀器文字 */
   original: string;
   /** 倒數計時器的無障礙名稱 */
   timer: (p: { days: number; hours: number; minutes: number }) => string;
+  /** 距離開始的倒數的無障礙名稱 */
+  startTimer: (p: { days: number; hours: number; minutes: number }) => string;
   /** 沒有給 title、subtitle、ctaText 時的預設文案 */
   defaultTitle: string;
   defaultSubtitle: string;
@@ -65,8 +89,14 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
     seconds: "Sec",
     endsIn: "Ends in",
     ended: "Ended",
+    startsIn: "Starts in",
+    live: "Live now",
+    startsOn: (d) => `Starts ${d}`,
+    endsOn: (d) => `Ends ${d}`,
+    endedOn: (d) => `Ended ${d}`,
     original: "Was",
     timer: (p) => `Time left: ${p.days} Days ${p.hours} Hrs ${p.minutes} Min`,
+    startTimer: (p) => `Starts in ${p.days} Days ${p.hours} Hrs ${p.minutes} Min`,
     defaultTitle: "Limited-time offer",
     defaultSubtitle: "When the countdown ends, so does the deal.",
     defaultCta: "View the offer",
@@ -78,8 +108,14 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
     seconds: "秒",
     endsIn: "倒數",
     ended: "已結束",
+    startsIn: "距離開始",
+    live: "進行中",
+    startsOn: (d) => `${d} 開始`,
+    endsOn: (d) => `${d} 結束`,
+    endedOn: (d) => `已於 ${d} 結束`,
     original: "原價",
     timer: (p) => `距離結束還有 ${p.days} 天 ${p.hours} 時 ${p.minutes} 分`,
+    startTimer: (p) => `距離開始還有 ${p.days} 天 ${p.hours} 時 ${p.minutes} 分`,
     defaultTitle: "限時優惠活動",
     defaultSubtitle: "倒數結束，錯過不再",
     defaultCta: "立即查看優惠",
@@ -91,8 +127,14 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
     seconds: "秒",
     endsIn: "倒计时",
     ended: "已结束",
+    startsIn: "距离开始",
+    live: "进行中",
+    startsOn: (d) => `${d} 开始`,
+    endsOn: (d) => `${d} 结束`,
+    endedOn: (d) => `已于 ${d} 结束`,
     original: "原价",
     timer: (p) => `距离结束还有 ${p.days} 天 ${p.hours} 小时 ${p.minutes} 分`,
+    startTimer: (p) => `距离开始还有 ${p.days} 天 ${p.hours} 小时 ${p.minutes} 分`,
     defaultTitle: "限时优惠活动",
     defaultSubtitle: "倒计时结束，错过不再",
     defaultCta: "立即查看优惠",
@@ -104,8 +146,14 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
     seconds: "秒",
     endsIn: "終了まで",
     ended: "終了",
+    startsIn: "開始まで",
+    live: "開催中",
+    startsOn: (d) => `${d} 開始`,
+    endsOn: (d) => `${d} 終了`,
+    endedOn: (d) => `${d} に終了しました`,
     original: "通常価格",
     timer: (p) => `終了まで残り ${p.days} 日 ${p.hours} 時間 ${p.minutes} 分`,
+    startTimer: (p) => `開始まで残り ${p.days} 日 ${p.hours} 時間 ${p.minutes} 分`,
     defaultTitle: "期間限定セール",
     defaultSubtitle: "カウントダウンが終わると締め切りです",
     defaultCta: "セール内容を見る",
@@ -132,6 +180,10 @@ export function CountdownBanner({
   originalPrice = "42,000 NTD",
   discountedPrice = "25,200 NTD",
   endDate,
+  startDate,
+  dateLabel,
+  onStart,
+  onEnd,
   ctaText,
   ctaHref,
   onCtaClick,
@@ -141,36 +193,82 @@ export function CountdownBanner({
   className,
   style,
 }: CountdownBannerProps) {
-  const t = { ...MESSAGES[resolveLocale(locale ?? (language === "zh" ? "zh-TW" : language))], ...labels };
+  const lang = resolveLocale(locale ?? (language === "zh" ? "zh-TW" : language));
+  const t = { ...MESSAGES[lang], ...labels };
   title ??= t.defaultTitle;
   subtitle ??= t.defaultSubtitle;
   ctaText ??= t.defaultCta;
   const reduceMotion = !!useReducedMotion();
   const endTime = new Date(endDate).getTime();
   const endKey = Number.isNaN(endTime) ? null : endTime;
+  const startTime = startDate === undefined ? NaN : new Date(startDate).getTime();
+  const startKey = Number.isNaN(startTime) ? null : startTime;
 
-  // 剩餘時間只在瀏覽器計算；SSR 時顯示 --
-  const [remaining, setRemaining] = useState<number | null>(null);
+  // 現在時間只在瀏覽器取得；伺服器與 hydration 前只印 dateLabel，兩邊輸出一致
+  const [now, setNow] = useState<number | null>(null);
   const [wasRunning, setWasRunning] = useState(false);
   useEffect(() => {
-    // 結束時間無效時不倒數，維持顯示 --，絕不自行編造期限
+    // 結束時間無效時不倒數，絕不自行編造期限
     if (endKey === null) return;
     const end = endKey;
-    const tick = () => {
-      const left = Math.max(0, end - Date.now());
-      setRemaining(left);
-      if (left > 0) setWasRunning(true);
+    let id: number | undefined;
+    const stop = () => {
+      window.clearInterval(id);
+      id = undefined;
     };
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
+    const tick = () => {
+      const n = Date.now();
+      setNow(n);
+      if (n < end) setWasRunning(true);
+      else stop();
+    };
+    // 分頁隱藏時停止跳動，回到前景先對時再繼續
+    const resume = () => {
+      tick();
+      if (id === undefined && Date.now() < end) id = window.setInterval(tick, 1000);
+    };
+    const onVisibility = () => (document.hidden ? stop() : resume());
+    if (document.hidden) tick();
+    else resume();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [endKey]);
 
-  const ended = remaining === 0;
+  const phase = now === null ? "idle" : now >= (endKey ?? Infinity) ? "ended" : startKey !== null && now < startKey ? "upcoming" : "running";
+  const ended = phase === "ended";
+  const upcoming = phase === "upcoming";
+  const live = phase === "running" && startKey !== null;
+  const target = upcoming ? (startKey as number) : (endKey ?? 0);
+  const remaining = now === null ? null : Math.max(0, target - now);
+
+  // 跨過開始、結束時各通知一次（只在親眼看到跨越時，重新整理不會補發）
+  const startRef = useRef(onStart);
+  const endRef = useRef(onEnd);
+  useEffect(() => {
+    startRef.current = onStart;
+    endRef.current = onEnd;
+  });
+  const prevPhase = useRef(phase);
+  useEffect(() => {
+    const prev = prevPhase.current;
+    if (prev === "upcoming" && phase === "running") startRef.current?.();
+    if ((prev === "upcoming" || prev === "running") && phase === "ended") endRef.current?.();
+    prevPhase.current = phase;
+  }, [phase]);
+
+  // 日期說明在掛載後才用使用者的時區排版
+  const dateText =
+    now === null ? null : new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(target);
+  const dateLine = dateText && (upcoming ? t.startsOn(dateText) : ended ? t.endedOn(dateText) : t.endsOn(dateText));
+
   const s = Math.floor((remaining ?? 0) / 1000);
   const parts = { days: Math.floor(s / 86400), hours: Math.floor((s % 86400) / 3600), minutes: Math.floor((s % 3600) / 60), seconds: s % 60 };
   const units = (["days", "hours", "minutes", "seconds"] as const).filter((k) => k !== "days" || parts.days > 0 || remaining === null);
-  const timerLabel = t.timer(parts);
+  const timerLabel = upcoming ? t.startTimer(parts) : t.timer(parts);
+  const idleText = now === null && dateLabel ? (startKey !== null ? t.startsOn(dateLabel) : t.endsOn(dateLabel)) : null;
 
   return (
     <section
@@ -213,22 +311,41 @@ export function CountdownBanner({
 
         <div className={cn("flex flex-wrap items-end gap-x-6 gap-y-4 border-t border-dashed pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
           <div>
-            <p className={cn("mb-1.5 text-[11px] font-medium tracking-[0.16em] uppercase", inkMuted)}>{t.endsIn}</p>
-            <div role="timer" aria-live="off" aria-label={remaining === null ? undefined : ended ? t.ended : timerLabel} className={cn("flex items-start gap-1.5", ended && "opacity-40")}>
-              {units.map((k, i) => (
-                <div key={k} aria-hidden="true" className="flex items-start gap-1.5">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="flex gap-0.5 text-lg font-semibold tabular-nums">
-                      {(remaining === null ? "--" : String(parts[k]).padStart(2, "0")).split("").map((d, di) => (
-                        <FlipCard key={di} value={d} reduceMotion={reduceMotion} />
-                      ))}
+            {/* 進行中只在狀態改變時播報一次，不逐秒朗讀 */}
+            <span className="sr-only" role="status">
+              {live ? t.live : ""}
+            </span>
+            {idleText ? (
+              <p className="text-lg leading-snug font-semibold tabular-nums">{idleText}</p>
+            ) : (
+              <>
+                <p className={cn("mb-1.5 flex flex-wrap items-center gap-x-2 text-[11px] font-medium tracking-[0.16em] uppercase", inkMuted)}>
+                  {live && (
+                    <span aria-hidden="true" className={cn("inline-flex items-center gap-1.5 font-semibold", ink)}>
+                      <span className="size-1.5 rounded-full bg-current" />
+                      {t.live}
+                    </span>
+                  )}
+                  <span>{upcoming ? t.startsIn : t.endsIn}</span>
+                </p>
+                <div role="timer" aria-live="off" aria-label={remaining === null ? undefined : ended ? t.ended : timerLabel} className={cn("flex items-start gap-1.5", ended && "opacity-40")}>
+                  {units.map((k, i) => (
+                    <div key={k} aria-hidden="true" className="flex items-start gap-1.5">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="flex gap-0.5 text-lg font-semibold tabular-nums">
+                          {(remaining === null ? "--" : String(parts[k]).padStart(2, "0")).split("").map((d, di) => (
+                            <FlipCard key={di} value={d} reduceMotion={reduceMotion} />
+                          ))}
+                        </div>
+                        <span className={cn("text-[10px] tracking-[0.12em] uppercase", inkMuted)}>{t[k]}</span>
+                      </div>
+                      {i < units.length - 1 && <span className={cn("pt-1.5 text-sm", inkMuted)}>:</span>}
                     </div>
-                    <span className={cn("text-[10px] tracking-[0.12em] uppercase", inkMuted)}>{t[k]}</span>
-                  </div>
-                  {i < units.length - 1 && <span className={cn("pt-1.5 text-sm", inkMuted)}>:</span>}
+                  ))}
                 </div>
-              ))}
-            </div>
+                {dateLine && <p className={cn("mt-2 text-xs tabular-nums", inkMuted)}>{dateLine}</p>}
+              </>
+            )}
           </div>
           {!ended && ctaText && <Cta href={ctaHref} onClick={onCtaClick} label={ctaText} reduceMotion={reduceMotion} />}
         </div>

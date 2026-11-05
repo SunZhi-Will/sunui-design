@@ -1,10 +1,13 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 export type BrowserFrameTone = "default" | "danger" | "success" | "brand";
 /** auto 跟著深淺色切換；dark／light 固定色，給不吃主題的簡報舞台用 */
 export type BrowserFrameScheme = "auto" | "dark" | "light";
+/** 視窗版（WindowFrame）與瀏覽器版共用同一組色調與配色 */
+export type WindowFrameTone = BrowserFrameTone;
+export type WindowFrameScheme = BrowserFrameScheme;
 
 /*
  * 色彩 token。auto 沿用部落格 tokens.css（淺色 stone、深色 zinc），
@@ -33,7 +36,7 @@ const toneRing: Record<BrowserFrameTone, string> = {
 };
 
 /** macOS 紅黃綠三顆燈 */
-function TrafficLights({ className }: { className?: string }) {
+export function TrafficLights({ className }: { className?: string }) {
   return (
     <span aria-hidden="true" className={cn("flex shrink-0 gap-1.5", className)}>
       <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
@@ -68,6 +71,25 @@ function LockIcon({ size }: { size: number }) {
       <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
+  );
+}
+
+/** 兩種外框共用的殼：圓角、配色變數、色調外框 */
+function frameShell(scheme: BrowserFrameScheme, tone: BrowserFrameTone, className?: string) {
+  return cn(
+    "m-0 min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] transition-colors",
+    schemeVars[scheme],
+    toneRing[tone],
+    className,
+  );
+}
+
+/** 內容區，有 maxHeight 時在框內捲動 */
+function FrameBody({ maxHeight, className, children }: { maxHeight?: number; className?: string; children: ReactNode }) {
+  return (
+    <div className={className} style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
+      {children}
+    </div>
   );
 }
 
@@ -128,11 +150,10 @@ export function BrowserFrame({
   return (
     <figure
       aria-label={t.window(url)}
-      className={cn(
-        "m-0 min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] text-[var(--wf-fg)] shadow-[0_12px_30px_rgba(0,0,0,0.22)] transition-colors",
-        schemeVars[scheme],
-        toneRing[tone],
-        className,
+      className={frameShell(
+        scheme,
+        tone,
+        cn("text-[var(--wf-fg)] shadow-[0_12px_30px_rgba(0,0,0,0.22)]", className),
       )}
     >
       <div
@@ -149,12 +170,105 @@ export function BrowserFrame({
         <LockIcon size={12} />
         <span className="truncate text-[var(--wf-fg)]">{url}</span>
       </div>
-      <div
-        className="min-h-[120px]"
-        style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}
-      >
+      <FrameBody maxHeight={maxHeight} className="min-h-[120px]">
         {children}
-      </div>
+      </FrameBody>
     </figure>
+  );
+}
+
+/* ───────── macOS 視窗（原 window-frame） ───────── */
+
+export interface WindowFrameProps {
+  /** 標題列置中的文字（檔名、App 名稱） */
+  title: ReactNode;
+  /** 標題前的小圖示 */
+  icon?: ReactNode;
+  /** 標題列右側插槽 */
+  right?: ReactNode;
+  /** 標題列下方的選單列（窄螢幕隱藏） */
+  menus?: string[];
+  /** 外框顏色表示示範狀態：失敗、成功、品牌 */
+  tone?: WindowFrameTone;
+  scheme?: WindowFrameScheme;
+  /** 有給就在右上角掛小徽章，例如「Simulated」，表示畫面是程式畫的 */
+  badge?: ReactNode;
+  /** 內容區最大高度，超過在框內捲動 */
+  maxHeight?: number;
+  children: ReactNode;
+  className?: string;
+}
+
+/** 像編輯器或 App 的視窗外框：標題置中，沒有網址列 */
+export function WindowFrame({
+  title,
+  icon,
+  right,
+  menus,
+  tone = "default",
+  scheme = "auto",
+  badge,
+  maxHeight,
+  children,
+  className,
+}: WindowFrameProps) {
+  return (
+    <div className={frameShell(scheme, tone, cn("text-[var(--wf-fg-body)] shadow-[var(--wf-shadow)]", className))}>
+      <div className="flex h-9 items-center gap-2 border-b border-[var(--wf-line)] bg-[var(--wf-raised)] px-3">
+        <TrafficLights />
+        <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate font-mono text-[11px] font-semibold text-[var(--wf-fg-body)]">
+          {icon && (
+            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center text-[var(--wf-fg)] [&>svg]:h-3.5 [&>svg]:w-3.5">
+              {icon}
+            </span>
+          )}
+          <span className="truncate">{title}</span>
+        </span>
+        <span className="flex min-w-[42px] items-center justify-end gap-2">
+          {badge && <SimBadge>{badge}</SimBadge>}
+          {right}
+        </span>
+      </div>
+      {menus && menus.length > 0 && (
+        <div
+          aria-hidden="true"
+          className="hidden gap-4 border-b border-[var(--wf-line)] px-3 py-1.5 text-[11px] text-[var(--wf-fg-muted)] sm:flex"
+        >
+          {menus.map((m) => (
+            <span key={m}>{m}</span>
+          ))}
+        </div>
+      )}
+      <FrameBody maxHeight={maxHeight}>{children}</FrameBody>
+    </div>
+  );
+}
+
+/* ───────── 展示區 ───────── */
+
+export interface StageProps {
+  children: ReactNode;
+  scheme?: BrowserFrameScheme;
+  className?: string;
+  style?: CSSProperties;
+}
+
+/** 帶點點底紋的展示區，放圖表、插圖與外框 */
+export function Stage({ children, scheme = "auto", className, style }: StageProps) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-xl border border-[var(--wf-line)] bg-[var(--wf-sunken)]",
+        schemeVars[scheme],
+        className,
+      )}
+      style={{
+        backgroundImage: "radial-gradient(var(--wf-dot) 1px, transparent 1px)",
+        backgroundSize: "18px 18px",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
   );
 }

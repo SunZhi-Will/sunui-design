@@ -1,7 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion, type PanInfo } from "framer-motion";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type KeyboardEvent,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -43,6 +53,52 @@ export function useToasts({ max = 5 }: { max?: number } = {}) {
   return { toasts, push, dismiss, clear };
 }
 
+export interface UndoableOptions<T> {
+  /** 原狀態是空的就不給復原，只跳一般的成功提示 */
+  isEmpty?: (value: T) => boolean;
+  /** 不給時依 locale 用內建文字 */
+  undoLabel?: string;
+  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  locale?: string;
+}
+
+/**
+ * 刪東西、換掉整份資料：變更立刻生效，不跳確認視窗，改給一張帶「復原」的通知。
+ * 帶復原的通知不自動消失；按復原就把變更前的整份狀態放回去。
+ */
+export function useUndoable<T>(
+  value: T,
+  setValue: Dispatch<SetStateAction<T>>,
+  toasts: Pick<ReturnType<typeof useToasts>, "push">,
+  { isEmpty, undoLabel, locale = "en" }: UndoableOptions<T> = {},
+) {
+  // 同一輪 render 內連續變更時，以最新的值當作「變更前」
+  const latest = useRef(value);
+  useLayoutEffect(() => {
+    latest.current = value;
+  }, [value]);
+  const { push } = toasts;
+
+  return useCallback(
+    (change: (prev: T) => T, title: ReactNode, toast: Omit<ToastInput, "title" | "action" | "duration"> = {}) => {
+      const before = latest.current;
+      const next = change(before);
+      latest.current = next;
+      setValue(next);
+      if (isEmpty?.(before)) {
+        push({ tone: "success", ...toast, title });
+        return;
+      }
+      const restore = () => {
+        latest.current = before;
+        setValue(before);
+      };
+      push({ ...toast, title, duration: Infinity, action: { label: undoLabel ?? MESSAGES[resolveLocale(locale)].undo, onClick: restore } });
+    },
+    [setValue, push, isEmpty, undoLabel, locale],
+  );
+}
+
 export interface ToastStackProps {
   toasts: ToastItem[];
   onDismiss: (id: string) => void;
@@ -66,6 +122,8 @@ export interface ToastStackProps {
 export interface ToastStackLabels {
   region: string;
   dismiss: string;
+  /** useUndoable 的復原按鈕 */
+  undo: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
@@ -79,10 +137,10 @@ function resolveLocale(tag?: string): SunLocale {
 }
 
 const MESSAGES: Record<SunLocale, ToastStackLabels> = {
-  en: { region: "Notifications", dismiss: "Dismiss notification" },
-  "zh-TW": { region: "通知", dismiss: "關閉通知" },
-  "zh-CN": { region: "通知", dismiss: "关闭通知" },
-  ja: { region: "通知", dismiss: "通知を閉じる" },
+  en: { region: "Notifications", dismiss: "Dismiss notification", undo: "Undo" },
+  "zh-TW": { region: "通知", dismiss: "關閉通知", undo: "復原" },
+  "zh-CN": { region: "通知", dismiss: "关闭通知", undo: "撤销" },
+  ja: { region: "通知", dismiss: "通知を閉じる", undo: "元に戻す" },
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
@@ -136,6 +194,16 @@ export function ToastStack({
   const [heights, setHeights] = useState<Record<string, number>>({});
   const dir = placement === "bottom" ? -1 : 1;
 
+  // 分頁隱藏時暫停倒數，回來再接著算
+  const [pageHidden, setPageHidden] = useState(false);
+  useEffect(() => {
+    const sync = () => setPageHidden(document.hidden);
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    return () => document.removeEventListener("visibilitychange", sync);
+  }, []);
+  const paused = expanded || pageHidden;
+
   const dismissRef = useRef(onDismiss);
   useLayoutEffect(() => {
     dismissRef.current = onDismiss;
@@ -146,7 +214,7 @@ export function ToastStack({
   useEffect(() => {
     const ids = new Set(toasts.map((t) => t.id));
     for (const id of remaining.current.keys()) if (!ids.has(id)) remaining.current.delete(id);
-    if (expanded) return;
+    if (paused) return;
     const start = Date.now();
     const timers: number[] = [];
     for (const t of toasts) {
@@ -164,7 +232,7 @@ export function ToastStack({
       }
       timers.forEach((id) => window.clearTimeout(id));
     };
-  }, [toasts, expanded, duration]);
+  }, [toasts, paused, duration]);
 
   const measure = useCallback((id: string, h: number) => {
     setHeights((prev) => (prev[id] === h ? prev : { ...prev, [id]: h }));
@@ -224,7 +292,7 @@ export function ToastStack({
               <motion.li
                 key={t.id}
                 className={cn(
-                  "absolute inset-x-0 overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+                  "absolute inset-x-0 overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   paper,
                   edge,
                   ink,
@@ -247,6 +315,15 @@ export function ToastStack({
                   if (Math.abs(info.offset.x) > 90 || Math.abs(info.velocity.x) > 600) onDismiss(t.id);
                 }}
                 aria-hidden={hidden || undefined}
+                aria-atomic="true"
+                tabIndex={hidden ? -1 : 0}
+                onKeyDown={(e) => {
+                  // 聚焦在某張通知上時，Delete 或 Backspace 關掉那一張
+                  if ((e.key === "Delete" || e.key === "Backspace") && e.target === e.currentTarget) {
+                    e.stopPropagation();
+                    onDismiss(t.id);
+                  }
+                }}
               >
                 <ToastBody item={t} dismissLabel={text.dismiss} onDismiss={() => onDismiss(t.id)} onMeasure={(h) => measure(t.id, h)} inert={hidden} />
                 {/* 剩餘時間：底部一條墨線慢慢縮短 */}
@@ -254,7 +331,7 @@ export function ToastStack({
                   <span
                     aria-hidden="true"
                     className="absolute inset-x-0 bottom-0 h-px origin-left bg-current opacity-25"
-                    style={{ animation: `sunui-toast-timer ${d}ms linear forwards`, animationPlayState: expanded ? "paused" : "running" }}
+                    style={{ animation: `sunui-toast-timer ${d}ms linear forwards`, animationPlayState: paused ? "paused" : "running" }}
                   />
                 )}
               </motion.li>
