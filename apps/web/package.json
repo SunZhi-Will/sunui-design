@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "node scripts/generate-previews.mjs",
     "dev": "next dev --turbopack -p 3100",
-    "prebuild": "node scripts/generate-previews.mjs",
+    "prebuild": "node scripts/fetch-pro.mjs && node scripts/generate-previews.mjs",
     "build": "next build",
     "start": "next start -p 3100",
     "pretypecheck": "node scripts/generate-previews.mjs",

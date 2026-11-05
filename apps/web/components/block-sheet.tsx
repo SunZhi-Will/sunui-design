@@ -174,7 +174,9 @@ function CopyLink() {
           await navigator.clipboard.writeText(window.location.href);
           setCopied(true);
           window.setTimeout(() => setCopied(false), 1500);
-        } catch {}
+        } catch {
+          // 剪貼簿被瀏覽器拒絕時不顯示勾勾，使用者仍可從網址列複製
+        }
       }}
       className="grid size-8 shrink-0 place-items-center rounded-full text-subtle transition-colors hover:bg-stage hover:text-fg"
     >

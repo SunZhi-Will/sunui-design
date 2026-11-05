@@ -79,6 +79,8 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
   }
 
   return (
+    // 只是滑鼠的快捷：鍵盤使用者用卡片外層的連結展開同一個面板
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-clip bg-card transition-colors duration-300"
       style={surface ? { backgroundColor: surface } : undefined}
