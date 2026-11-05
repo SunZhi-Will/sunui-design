@@ -126,11 +126,22 @@ export function checkMachine(m: TinyMachine): TinyCheck[] {
 
 /* ---------- 引擎：不畫任何東西，可以拿去驅動自己的插圖 ---------- */
 
+/** 旁白存成資料，不存句子：換語系時畫面上的那句話也會跟著換 */
+type Note =
+  | { kind: "idle" }
+  | { kind: "enter"; id: string }
+  | { kind: "done" }
+  | { kind: "stuck" }
+  | { kind: "choose"; events: string[] }
+  | { kind: "notHere"; event: string; where: string[] };
+
 interface Run {
+  /** 機器的結構指紋；機器換了（步驟或連線不同）就從頭開始，舊的 path 索引不會指到不存在的連線 */
+  sig: string;
   at: string;
   /** 走過的連線（transitions 的索引） */
   path: number[];
-  message: { text: string; refused: boolean };
+  note: Note;
   /** 每次回應加一，用來觸發被拒絕時的輕搖 */
   beat: number;
 }
@@ -141,11 +152,12 @@ type Action = { type: "send"; event: string } | { type: "reset" };
 function autoScript(m: TinyMachine) {
   const out: string[] = [];
   const seen = new Set([m.initial]);
+  const finals = new Set(m.states.filter((s) => s.final).map((s) => s.id));
   let at = m.initial;
   for (let i = 0; i < m.states.length * 2; i++) {
     const exits = m.transitions.filter((t) => t.from === at);
     const t = exits.find((x) => (x.on ?? NEXT) === NEXT) ?? exits[0];
-    if (!t || m.states.find((s) => s.id === at)?.final || seen.has(t.to)) break;
+    if (!t || finals.has(at) || seen.has(t.to)) break;
     out.push(t.on ?? NEXT);
     seen.add(t.to);
     at = t.to;
@@ -153,46 +165,56 @@ function autoScript(m: TinyMachine) {
   return out;
 }
 
+const signature = (m: TinyMachine) =>
+  [m.initial, m.states.map((s) => s.id).join(","), m.transitions.map((t) => `${t.from}>${t.to}:${t.on ?? NEXT}`).join(",")].join("|");
+
 export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaultTinyChartCopy) {
+  const sig = useMemo(() => signature(machine), [machine]);
   const byId = useMemo(() => new Map(machine.states.map((s) => [s.id, s])), [machine]);
   const name = useCallback((id: string) => byId.get(id)?.label ?? id, [byId]);
-  const eventLabel = useCallback(
-    (e: string) => machine.events?.[e] ?? (e === NEXT ? copy.next : e),
-    [machine, copy],
-  );
-  const events = useMemo(
-    () => [...new Set(machine.transitions.map((t) => t.on ?? NEXT))].filter((e) => e !== NEXT),
-    [machine],
-  );
+  const eventLabel = useCallback((e: string) => machine.events?.[e] ?? (e === NEXT ? copy.next : e), [machine, copy]);
+  const events = useMemo(() => [...new Set(machine.transitions.map((t) => t.on ?? NEXT))].filter((e) => e !== NEXT), [machine]);
   const script = useMemo(() => machine.play ?? autoScript(machine), [machine]);
-  const start = (): Run => ({ at: machine.initial, path: [], message: { text: copy.idle, refused: false }, beat: 0 });
+  const fresh = useMemo((): Run => ({ sig, at: machine.initial, path: [], note: { kind: "idle" }, beat: 0 }), [sig, machine.initial]);
 
-  const [run, dispatch] = useReducer((s: Run, a: Action): Run => {
-    if (a.type === "reset") return start();
-    const exits = machine.transitions.map((t, i) => ({ t, i })).filter(({ t }) => t.from === s.at);
+  const [stored, dispatch] = useReducer((prev: Run, a: Action): Run => {
+    const s = prev.sig === sig ? prev : fresh;
+    if (a.type === "reset") return fresh;
+    const exits: { t: TinyTransition; i: number }[] = [];
+    machine.transitions.forEach((t, i) => t.from === s.at && exits.push({ t, i }));
     const hit = exits.find(({ t }) => (t.on ?? NEXT) === a.event);
-    if (hit) {
-      const to = byId.get(hit.t.to);
-      const text = to?.say ?? name(hit.t.to);
-      return { at: hit.t.to, path: [...s.path, hit.i], message: { text, refused: false }, beat: s.beat + 1 };
-    }
-    let text = copy.stuck;
-    if (byId.get(s.at)?.final) text = copy.done;
-    else if (a.event === NEXT && exits.length) text = copy.choose(exits.map(({ t }) => eventLabel(t.on ?? NEXT)).join(" / "));
-    else if (a.event !== NEXT) {
-      const where = [...new Set(machine.transitions.filter((t) => (t.on ?? NEXT) === a.event).map((t) => name(t.from)))];
-      text = copy.notHere(eventLabel(a.event), where.join(", "));
-    }
-    return { ...s, message: { text, refused: true }, beat: s.beat + 1 };
-  }, undefined, start);
+    if (hit) return { ...s, at: hit.t.to, path: [...s.path, hit.i], note: { kind: "enter", id: hit.t.to }, beat: s.beat + 1 };
+    let note: Note = { kind: "stuck" };
+    if (byId.get(s.at)?.final) note = { kind: "done" };
+    else if (a.event === NEXT && exits.length) note = { kind: "choose", events: exits.map(({ t }) => t.on ?? NEXT) };
+    else if (a.event !== NEXT)
+      note = { kind: "notHere", event: a.event, where: [...new Set(machine.transitions.filter((t) => (t.on ?? NEXT) === a.event).map((t) => t.from))] };
+    return { ...s, note, beat: s.beat + 1 };
+  }, fresh);
+  // 機器結構變了：這一輪先用新的起點畫，下一次按鈕時 reducer 也會從新起點算
+  const run = stored.sig === sig ? stored : fresh;
 
-  const can = useCallback(
-    (e: string) => machine.transitions.some((t) => t.from === run.at && (t.on ?? NEXT) === e),
-    [machine, run.at],
-  );
+  const n = run.note;
+  const message = {
+    refused: n.kind !== "idle" && n.kind !== "enter",
+    text:
+      n.kind === "idle" ? copy.idle
+      : n.kind === "enter" ? byId.get(n.id)?.say ?? name(n.id)
+      : n.kind === "done" ? copy.done
+      : n.kind === "choose" ? copy.choose(n.events.map(eventLabel).join(" / "))
+      : n.kind === "notHere" ? copy.notHere(eventLabel(n.event), n.where.map(name).join(", "))
+      : copy.stuck,
+  };
+  const can = useCallback((e: string) => machine.transitions.some((t) => t.from === run.at && (t.on ?? NEXT) === e), [machine, run.at]);
+  const send = useCallback((event: string) => dispatch({ type: "send", event }), []);
+  const reset = useCallback(() => dispatch({ type: "reset" }), []);
 
   return {
-    ...run,
+    sig,
+    at: run.at,
+    path: run.path,
+    beat: run.beat,
+    message,
     state: byId.get(run.at),
     step: run.path.length + 1,
     total: Math.max(script.length + 1, run.path.length + 1),
@@ -201,8 +223,8 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
     can,
     name,
     eventLabel,
-    send: (event: string) => dispatch({ type: "send", event }),
-    reset: () => dispatch({ type: "reset" }),
+    send,
+    reset,
   };
 }
 
@@ -533,18 +555,25 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const checks = useMemo(() => checkMachine(machine), [machine]);
   const [open, setOpen] = useState(false);
   const timer = useRef<number | undefined>(undefined);
-  const edgeEls = useRef<(SVGPathElement | null)[]>([]);
+  const svgRef = useRef<SVGSVGElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const tx = useMotionValue(0), ty = useMotionValue(0), tokenOpacity = useMotionValue(1);
   const [lineRef, animateLine] = useAnimate<HTMLParagraphElement>();
   const { at, path, beat, message, send, reset, script, can } = chart;
   const moved = path.length;
+  const isIso = !!shape.iso;
+  const byId = useMemo(() => new Map(machine.states.map((s) => [s.id, s])), [machine]);
+  // 等角方塊由遠到近畫，近的才會蓋住遠的
+  const isoOrder = useMemo(
+    () => (shape.iso ? [...machine.states].sort((a, b) => shape.iso!.blocks.get(a.id)!.depth - shape.iso!.blocks.get(b.id)!.depth) : []),
+    [shape, machine],
+  );
 
   // 視框依內容算，連線文字也算進去，避免被切掉
   const box = useMemo(() => {
     const xs: number[] = [], ys: number[] = [];
     for (const [id, b] of shape.nodes) {
-      const s = machine.states.find((x) => x.id === id)!;
+      const s = byId.get(id)!;
       const half = Math.max(b.w, textW(s.label.toUpperCase(), NODE_FONT)) / 2;
       const labelW = shape.tick ? 22 + Math.max(textW(s.label.toUpperCase(), NODE_FONT), textW(s.note ?? "", EDGE_FONT)) : half;
       xs.push(b.x - (shape.tick ? b.w / 2 : half), b.x + labelW);
@@ -562,11 +591,13 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     const pad = 14;
     const [minX, maxX, minY, maxY] = [Math.min(...xs) - pad, Math.max(...xs) + pad, Math.min(...ys) - pad, Math.max(...ys) + pad];
     return { minX, minY, w: maxX - minX, h: maxY - minY };
-  }, [shape, machine]);
+  }, [shape, byId]);
 
   // 全部播放：從頭開始，一步一步送出劇本裡的事件；手動按任何按鈕就停
   const stop = () => window.clearTimeout(timer.current);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  // 機器換了就停掉播放，舊劇本的事件不會送進新機器
+  useEffect(() => () => window.clearTimeout(timer.current), [chart.sig]);
 
   const playAll = () => {
     stop();
@@ -602,7 +633,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
 
   // 朱紅小點沿著剛走過的線移動，停在箭頭處
   useEffect(() => {
-    const el = edgeEls.current[path[path.length - 1]];
+    const el = path.length ? svgRef.current?.querySelector<SVGPathElement>(`[data-edge="${path[path.length - 1]}"]`) : null;
     if (!el) return;
     const len = el.getTotalLength();
     const put = (t: number) => {
@@ -611,14 +642,13 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
       ty.set(p.y);
     };
     // 等角版面的小點走到方塊後面就收起來，目前位置交給浮起的方塊表示
-    const settle = () => tokenOpacity.set(shape.iso ? 0 : 1);
+    const settle = () => tokenOpacity.set(isIso ? 0 : 1);
     tokenOpacity.set(1);
     if (reduce) return put(1), settle();
     const run = animate(0, 1, { duration: 0.4, ease: "easeOut", onUpdate: put, onComplete: settle });
     return () => run.stop();
-    // 只在真的移動時跑，被拒絕不重播
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moved, reduce]);
+    // path 只在真的移動或重來時換新陣列，被拒絕時沿用舊的，所以不會重播
+  }, [path, reduce, isIso, tx, ty, tokenOpacity]);
 
   const visited = new Set([machine.initial, ...path.map((i) => machine.transitions[i].to)]);
   const arrow = (tone: "ink" | "red") => `url(#${uid}-${tone})`;
@@ -641,6 +671,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           viewBox={`${r1(box.minX)} ${r1(box.minY)} ${r1(box.w)} ${r1(box.h)}`}
           className="mx-auto block h-auto w-full"
           style={{ minWidth: Math.min(box.w * 0.68, 480), maxWidth: box.w * 1.25 }}
+          ref={svgRef}
           role="img"
           aria-label={`${title}. ${copy.step(chart.step, chart.total)}: ${chart.state?.label ?? ""}`}
         >
@@ -666,9 +697,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           {shape.edges.map((e, i) => (
             <g key={i}>
               <path
-                ref={(el) => {
-                  edgeEls.current[i] = el;
-                }}
+                data-edge={i}
                 d={e.d}
                 fill="none"
                 strokeWidth="1.3"
@@ -701,9 +730,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           ))}
 
           {shape.iso &&
-            [...machine.states]
-              .sort((a, b) => shape.iso!.blocks.get(a.id)!.depth - shape.iso!.blocks.get(b.id)!.depth)
-              .map((s) => {
+            isoOrder.map((s) => {
                 const k = shape.iso!.blocks.get(s.id)!;
                 const here = s.id === at;
                 const labelCls = cn("font-mono uppercase", here ? "fill-[#c8361d] dark:fill-[#ec6a4f]" : "fill-[#1c1917] dark:fill-[#ece7dc]");
