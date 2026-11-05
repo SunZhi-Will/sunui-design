@@ -127,7 +127,7 @@ void main() {
 
 // ---------------------------------------------------------------- engine
 
-type Engine = { destroy: () => void; poke: () => void };
+type Engine = { destroy: () => void; poke: () => void; setFrame: (frame: PlushFrame, box: { y: number; r: number }) => void };
 
 function compile(gl: WebGLRenderingContext, type: number, src: string) {
   const sh = gl.createShader(type)!;
@@ -156,6 +156,7 @@ async function createEngine(
   canvas: HTMLCanvasElement,
   opts: Required<Pick<PlushPortraitProps, "faces" | "frame" | "frameBox" | "wobble" | "reach" | "follow" | "idle">>,
   onReady: () => void,
+  onContextLost: () => void,
 ): Promise<Engine> {
   const gl = canvas.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: true });
   if (!gl) throw new Error("no webgl");
@@ -203,8 +204,13 @@ async function createEngine(
 
   gl.uniform1f(U("uPad"), PAD);
   gl.uniform2f(U("uPivot"), 0.5, 0.85);
-  gl.uniform1i(U("uFrame"), opts.frame === "circle" ? 1 : opts.frame === "square" ? 2 : 0);
-  gl.uniform3f(U("uBox"), 0.5, opts.frameBox.y, opts.frameBox.r);
+  // The frame is two uniforms: switching it needs no rebuild and no reload.
+  const applyFrame = (frame: PlushFrame, box: { y: number; r: number }) => {
+    gl.useProgram(prog);
+    gl.uniform1i(U("uFrame"), frame === "circle" ? 1 : frame === "square" ? 2 : 0);
+    gl.uniform3f(U("uBox"), 0.5, box.y, box.r);
+  };
+  applyFrame(opts.frame, opts.frameBox);
   gl.uniform1i(U("uA"), 0);
   gl.uniform1i(U("uB"), 1);
   gl.enable(gl.BLEND);
@@ -285,10 +291,15 @@ async function createEngine(
   let lastActive = performance.now();
   let pulls = 0;
 
+  // The box is measured once and again only after a scroll or resize, so a
+  // pointer move never forces a layout.
+  let rect = root.getBoundingClientRect(), rectStale = false;
   const toImage = (e: PointerEvent) => {
-    const rect = root.getBoundingClientRect();
+    if (rectStale) { rect = root.getBoundingClientRect(); rectStale = false; }
     return { x: (e.clientX - rect.left) / rect.width, y: (e.clientY - rect.top) / rect.height };
   };
+  const onScroll = () => { rectStale = true; };
+  let gaze = 0; // -1 left, 0 ahead, 1 right
   const nodeAt = (i: number) => [rest[i * 2] + ux[i], rest[i * 2 + 1] + uy[i]] as const;
 
   const impulse = (x: number, y: number, dx: number, dy: number, radius: number) => {
@@ -332,8 +343,26 @@ async function createEngine(
   };
 
   // Loop.
-  let raf = 0, running = false, visible = true, energy = 1, last = performance.now(), dirty = true;
-  const wake = () => { energy = 1; dirty = true; if (!running && visible) { running = true; last = performance.now(); raf = requestAnimationFrame(tick); } };
+  // The loop only runs while something moves: the skin, a fade, a hand. At
+  // rest it sleeps and a timer wakes it for the next blink or yawn.
+  let raf = 0, timer = 0, running = false, onScreen = true, pageShown = document.visibilityState === "visible";
+  let energy = 1, last = performance.now(), dirty = true;
+  const visible = () => onScreen && pageShown;
+  const kick = () => {
+    dirty = true;
+    clearTimeout(timer);
+    if (!running && visible() && !destroyed) { running = true; last = performance.now(); raf = requestAnimationFrame(tick); }
+  };
+  const wake = () => { energy = 1; kick(); };
+  const SLEEP = 2e-5;
+  const nextClock = (now: number) => {
+    const times = [blinkUntil, idleUntil, dazedUntil, flash ? flash.until : 0];
+    if (hover.on) times.push(hover.since + 360);
+    if (opts.idle) times.push(nextBlink, Math.max(nextIdle, lastActive + 9000));
+    let soon = Infinity;
+    for (const t of times) if (t > now && t < soon) soon = t;
+    return soon;
+  };
 
   const step = (dt: number) => {
     laplace(ux, lx); laplace(uy, ly); laplace(vx, lvx); laplace(vy, lvy);
@@ -433,20 +462,30 @@ async function createEngine(
     showFace(face, ms);
     if (mixT < 1) { mixT = Math.min(1, mixT + (dt * 1000) / fadeMs); dirty = true; }
 
-    if (energy > 1e-5 || hand.down) {
+    if (energy > SLEEP || hand.down) {
       const sub = 4;
       for (let s = 0; s < sub; s++) step(dt / sub);
       let e = 0;
       for (let i = 0; i < count; i++) e += Math.abs(ux[i]) + Math.abs(uy[i]) + Math.abs(vx[i]) * 0.1 + Math.abs(vy[i]) * 0.1;
       energy = e / count + Math.abs(tilt) + Math.abs(tiltV) * 0.1 + Math.abs(shiftX);
+      if (energy <= SLEEP && !hand.down) {
+        // Settled: put every node exactly home so the next frame is the plain picture.
+        ux.fill(0); uy.fill(0); vx.fill(0); vy.fill(0);
+        tilt = tiltV = shiftX = shiftV = 0;
+      }
       updateMesh();
       dirty = true;
     }
     if (dirty) { draw(); dirty = false; }
 
-    // Keep ticking while visible: blinks and gaze need the clock.
-    if (visible) raf = requestAnimationFrame(tick);
-    else running = false;
+    if (visible() && (energy > SLEEP || hand.down || mixT < 1)) {
+      raf = requestAnimationFrame(tick);
+      return;
+    }
+    running = false;
+    if (!visible()) return;
+    const soon = nextClock(now);
+    if (soon < Infinity) timer = window.setTimeout(kick, Math.max(16, soon - now));
   }
 
   // Events.
@@ -487,6 +526,11 @@ async function createEngine(
       return;
     }
     if (e.pointerType !== "mouse") return;
+    if (opts.follow) {
+      // Only a change of direction needs a frame.
+      const dx = p.x - 0.5, g = dx < -0.65 ? -1 : dx > 0.65 ? 1 : 0;
+      if (g !== gaze) { gaze = g; kick(); }
+    }
     const over = onPerson(p.x, p.y);
     if (over && !hover.on) hover.since = performance.now();
     if (over) {
@@ -502,6 +546,7 @@ async function createEngine(
       lastActive = performance.now();
       wake();
     }
+    if (hover.on && !over) kick();
     hover.on = over;
     hover.x = p.x;
     hover.y = p.y;
@@ -520,28 +565,30 @@ async function createEngine(
     lastActive = now;
     wake();
   };
-  const onLeave = () => { hover.on = false; };
-  const onWindowMove = (e: PointerEvent) => { if (e.pointerType === "mouse") pointer = toImage(e); };
+  const onLeave = () => { if (hover.on) { hover.on = false; kick(); } };
 
   canvas.addEventListener("pointerdown", onDown);
-  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointermove", onMove, { passive: true });
   window.addEventListener("pointerup", onUp);
   window.addEventListener("pointercancel", onUp);
   canvas.addEventListener("pointerleave", onLeave);
-  window.addEventListener("pointermove", onWindowMove, { passive: true });
+  window.addEventListener("scroll", onScroll, { passive: true, capture: true });
 
-  const ro = new ResizeObserver(resize);
+  const ro = new ResizeObserver(() => { rectStale = true; resize(); });
   ro.observe(canvas);
   const io = new IntersectionObserver(([entry]) => {
-    visible = entry.isIntersecting && document.visibilityState === "visible";
-    if (visible) wake();
+    onScreen = entry.isIntersecting;
+    if (visible()) kick();
   });
   io.observe(root);
   const onVis = () => {
-    visible = document.visibilityState === "visible";
-    if (visible) wake();
+    pageShown = document.visibilityState === "visible";
+    if (visible()) kick();
   };
   document.addEventListener("visibilitychange", onVis);
+  // Phones take WebGL away when they need the memory: fall back to the picture.
+  const onLost = (e: Event) => { e.preventDefault(); destroyed = true; cancelAnimationFrame(raf); clearTimeout(timer); onContextLost(); };
+  canvas.addEventListener("webglcontextlost", onLost);
 
   resize();
   updateMesh();
@@ -549,6 +596,7 @@ async function createEngine(
   onReady();
 
   return {
+    setFrame: (frame, box) => { if (!destroyed) { applyFrame(frame, box); kick(); } },
     poke: () => {
       const now = performance.now();
       flash = { face: "grab", until: now + 500 };
@@ -558,6 +606,7 @@ async function createEngine(
     destroy: () => {
       destroyed = true;
       cancelAnimationFrame(raf);
+      clearTimeout(timer);
       ro.disconnect();
       io.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
@@ -565,8 +614,9 @@ async function createEngine(
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       canvas.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("pointermove", onWindowMove);
+      window.removeEventListener("scroll", onScroll, { capture: true });
       document.removeEventListener("visibilitychange", onVis);
+      canvas.removeEventListener("webglcontextlost", onLost);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     },
   };
@@ -595,6 +645,10 @@ export function PlushPortrait({
 
   const facesKey = JSON.stringify(faces);
   const boxKey = `${frameBox.y},${frameBox.r}`;
+  // A rebuilt engine needs a fresh canvas: the old one's WebGL context is released on destroy.
+  const engineKey = [facesKey, wobble, reach, follow, idle].join("|");
+  const frameRef = useRef({ frame, frameBox });
+  frameRef.current = { frame, frameBox };
 
   useEffect(() => {
     const root = rootRef.current, canvas = canvasRef.current;
@@ -604,9 +658,13 @@ export function PlushPortrait({
     const io = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       io.disconnect();
-      createEngine(root, canvas, { faces, frame, frameBox, wobble, reach, follow, idle }, () => {
-        if (!cancelled) setLive(true);
-      }).then(
+      createEngine(
+        root,
+        canvas,
+        { faces, ...frameRef.current, wobble, reach, follow, idle },
+        () => { if (!cancelled) setLive(true); },
+        () => { engineRef.current = null; if (!cancelled) setLive(false); },
+      ).then(
         (engine) => { if (cancelled) engine.destroy(); else engineRef.current = engine; },
         () => { /* No WebGL: the picture stays. */ },
       );
@@ -620,7 +678,12 @@ export function PlushPortrait({
       setLive(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [facesKey, frame, boxKey, wobble, reach, follow, idle, reduced]);
+  }, [engineKey, reduced]);
+
+  useEffect(() => {
+    engineRef.current?.setFrame(frame, frameBox);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frame, boxKey]);
 
   const { y, r } = frameBox;
   // The still picture gets the same clip as the shader: inside the shape, or above its centre.
@@ -650,6 +713,7 @@ export function PlushPortrait({
       />
       {!reduced && (
         <canvas
+          key={engineKey}
           ref={canvasRef}
           aria-hidden
           className={cn("absolute cursor-grab touch-pan-y active:cursor-grabbing", !live && "invisible")}

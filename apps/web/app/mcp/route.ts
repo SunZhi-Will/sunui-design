@@ -4,7 +4,7 @@ import { z } from "zod";
 import { blockLine, catalogMarkdown, describeBlock, planInstall, proSetup, searchBlocks, suggestNames } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
 import { skillMarkdown } from "@/lib/agent/skill";
-import { buildRegistryItem, getItem, getItems } from "@/lib/registry";
+import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
 
 // SunUI 的遠端 MCP 伺服器（Streamable HTTP，無狀態）。全部唯讀、不需授權；
@@ -85,7 +85,8 @@ const handler = createMcpHandler(
           } else {
             const built = await buildRegistryItem(item);
             body += `\n\n## Source\n\n${built.files
-              .map((f) => `### ${f.path}\n\n\`\`\`tsx\n${f.content}\n\`\`\``)
+              .filter((f, i, all) => all.findIndex((g) => g.path === f.path) === i)
+              .map((f) => `### ${f.target ?? f.path}\n\n\`\`\`${fileLang(f.path)}\n${f.content}\n\`\`\``)
               .join("\n\n")}`;
           }
         }

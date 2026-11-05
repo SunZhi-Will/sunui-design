@@ -73,6 +73,12 @@ export function getItem(name: string, tier?: Tier): RegistryItem | undefined {
   return getItems(tier).find((item) => item.name === name);
 }
 
+/** Shiki language for a registry file, from its extension. */
+export function fileLang(filePath: string) {
+  const ext = filePath.split(".").pop() ?? "";
+  return ({ md: "markdown", mjs: "js", js: "js", ts: "ts", json: "json", css: "css" } as Record<string, string>)[ext] ?? "tsx";
+}
+
 export async function readRegistryFile(file: RegistryFile) {
   return readFile(path.join(process.cwd(), file.path), "utf8");
 }

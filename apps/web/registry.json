@@ -2759,7 +2759,7 @@
       "name": "plush-portrait",
       "type": "registry:block",
       "title": "Plush Portrait",
-      "description": "A cut-out portrait visitors can grab and stretch like a soft toy. The skin is a damped spring mesh: a pull drags the cheek out, the head leans on a soft neck, and it wobbles back on release. Faces cross-fade on hover, grab, pull and release, the eyes follow the cursor and blink, and it yawns when the page goes quiet. The bust sits in a circle or square and the head pops out above it. One WebGL draw, no dependencies; without WebGL or with reduced motion it stays a still picture. Bring your own face images, all with the same framing.",
+      "description": "A cut-out portrait visitors can grab and stretch like a soft toy. The skin is a damped spring mesh: a pull drags the cheek out, the head leans on a soft neck, and it wobbles back on release. Faces cross-fade on hover, grab, pull and release, the eyes follow the cursor and blink, and it yawns when the page goes quiet. The bust sits in a circle or square and the head pops out above it. One WebGL draw, no dependencies; without WebGL or with reduced motion it stays a still picture. Bring your own face images, all with the same framing; the install includes a plush-faces agent skill that generates, checks and converts the set.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2784,7 +2784,7 @@
             "Team pages where each person gets a squishable avatar (one live portrait per screen works best)"
           ],
           "watchOut": [
-            "You supply the images: a transparent PNG or WebP per face, all the same size, square, and pixel-aligned, or the cross-fades will jump. Only faces.rest is required",
+            "You supply the images: a transparent PNG or WebP per face, all the same size, square, and pixel-aligned, or the cross-fades will jump. Only faces.rest is required. The install adds a plush-faces agent skill (.claude/skills and .agents/skills) that makes the set with an image tool, checks alignment and converts it",
             "Images must be same-origin or served with CORS headers; otherwise WebGL cannot read them",
             "frameBox sets where the circle or square sits in image space; adjust it when the head is not centred like the demo",
             "The canvas reaches about a third of the portrait's width past each side so skin can stretch. Near a viewport edge, give a parent overflow-x: clip",
@@ -2808,6 +2808,26 @@
         {
           "path": "registry/free/plush-portrait/plush-portrait.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/free/plush-portrait/skill/SKILL.md",
+          "type": "registry:file",
+          "target": ".claude/skills/plush-faces/SKILL.md"
+        },
+        {
+          "path": "registry/free/plush-portrait/skill/check-faces.mjs",
+          "type": "registry:file",
+          "target": ".claude/skills/plush-faces/check-faces.mjs"
+        },
+        {
+          "path": "registry/free/plush-portrait/skill/SKILL.md",
+          "type": "registry:file",
+          "target": ".agents/skills/plush-faces/SKILL.md"
+        },
+        {
+          "path": "registry/free/plush-portrait/skill/check-faces.mjs",
+          "type": "registry:file",
+          "target": ".agents/skills/plush-faces/check-faces.mjs"
         }
       ]
     },

@@ -11,7 +11,7 @@ import { TierBadge } from "@/components/tier-badge";
 import { getI18n } from "@/lib/i18n-server";
 import type { Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
-import { getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
+import { fileLang, getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { seriesOf } from "@/lib/series";
 import { prices } from "@/lib/site";
@@ -48,7 +48,12 @@ export default async function BlockPage({ params }: Props) {
   // Pro 原始碼只透過授權過的 registry 發放，頁面上不顯示
   const sources = isPro
     ? []
-    : await Promise.all(item.files.map(async (file) => ({ file, code: await readRegistryFile(file) })));
+    : await Promise.all(
+        // A file installed to several targets (a skill in .claude and .agents) is shown once.
+        item.files
+          .filter((file, i, all) => all.findIndex((f) => f.path === file.path) === i)
+          .map(async (file) => ({ file, code: await readRegistryFile(file) })),
+      );
   const deps = item.dependencies ?? [];
   const manualDeps = ["clsx", "tailwind-merge", ...deps];
 
@@ -225,7 +230,7 @@ function FreeInstall({
               <RichText text={t.manualStep2} codeClassName="font-mono text-fg" />
             </span>
             {sources.map(({ file, code }) => (
-              <CodeBlock key={file.path} code={code} lang="tsx" title={file.path.split("/").pop()} />
+              <CodeBlock key={file.path} code={code} lang={fileLang(file.path)} title={file.target ?? file.path.split("/").pop()} />
             ))}
           </li>
         </ol>
