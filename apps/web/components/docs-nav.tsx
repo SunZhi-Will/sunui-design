@@ -12,6 +12,7 @@ const docsPages = [
   { href: "/docs/installation", key: "installation" },
   { href: "/docs/pro", key: "pro" },
   { href: "/docs/ai-agents", key: "aiAgents" },
+  { href: "/docs/motion", key: "motion" },
   { href: "/docs/changelog", key: "changelog" },
 ] as const;
 

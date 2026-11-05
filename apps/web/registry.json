@@ -36,7 +36,9 @@
             "fly to cart",
             "add to bag button",
             "cart animation",
-            "buy button"
+            "buy button",
+            "add to cart fly",
+            "cart badge bounce"
           ]
         }
       },
@@ -126,7 +128,9 @@
             "number ticker",
             "count up",
             "rolling digits",
-            "price animation"
+            "price animation",
+            "number counter",
+            "price roll"
           ]
         }
       },
@@ -352,7 +356,9 @@
             "dynamic island",
             "floating header",
             "pill nav",
-            "sticky navbar"
+            "sticky navbar",
+            "tab indicator slide",
+            "sliding highlight"
           ]
         }
       },
@@ -438,55 +444,14 @@
             "checkout progress",
             "stepper",
             "order steps",
-            "step indicator"
+            "step indicator",
+            "step progress"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/checkout-steps/checkout-steps.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "choice-cards",
-      "type": "registry:block",
-      "title": "Choice Cards",
-      "description": "World-choice dialogue from voxel-world. Equal-height portrait cards deal in one by one, each with a path colour, an art slot, a name banner, a brief, green gains and red costs. Below them a dialogue box with a name plate shows what the selected card means. Supports roving focus, arrow keys and WASD, digit keys, Enter or Space to pick, Escape or gamepad B to close, and gamepad d-pad and A. Disabled cards stay readable with their reason, and reduced motion turns off the deal-in.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "selection",
-        "game-ui"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Story branch points with two to three paths, each with clear gains and costs",
-            "Choices that need art and a one-line explanation of what picking each means"
-          ],
-          "watchOut": [
-            "Picking happens on click, Enter or a digit key, with no extra confirm step, so use it only where the pick is the action",
-            "Keep gains and costs to one short visible fact per line; long reasons wrap inside the card"
-          ],
-          "aliases": [
-            "choice dialogue",
-            "branch cards",
-            "path picker",
-            "decision cards"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/choice-cards/choice-cards.tsx",
           "type": "registry:component"
         }
       ]
@@ -566,7 +531,8 @@
             "before after",
             "image compare",
             "reveal slider",
-            "diff slider"
+            "diff slider",
+            "before-after slider"
           ]
         }
       },
@@ -608,7 +574,9 @@
             "double press",
             "press again to confirm",
             "two-step button",
-            "arm and confirm"
+            "arm and confirm",
+            "button loading state",
+            "success checkmark"
           ]
         }
       },
@@ -694,7 +662,9 @@
             "coupon code",
             "copy to clipboard",
             "promo code chip",
-            "copy button feedback"
+            "copy button feedback",
+            "copy feedback",
+            "copied tooltip"
           ]
         }
       },
@@ -737,7 +707,9 @@
             "sale banner",
             "timer banner",
             "flash sale",
-            "announcement bar"
+            "announcement bar",
+            "split-flap",
+            "flip clock"
           ]
         }
       },
@@ -789,48 +761,6 @@
       "files": [
         {
           "path": "registry/free/coupon-wallet/coupon-wallet.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "dialogue-box",
-      "type": "registry:block",
-      "title": "Dialogue Box",
-      "description": "A visual-novel narration overlay. Narration floats without a box; spoken lines get a seal-dot name plate. Text types out at a jitter-free reserved height, with a kinsoku-safe next-line cue (caret, or a feather in the moon theme) that turns into an autoplay countdown ring. It also has choices with 【requirement】 tags, a log, autoplay and fast-forward controls, and number-key, Enter/Space, A, L and held-Ctrl shortcuts. Screen readers hear each whole line once; with reduced motion the cue and choice animations stop and the ring becomes a static dot.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "overlay"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Ink, Yarn or custom-script visual novels and narrative RPG scenes over a background",
-            "Branching choices that show stat requirements, locked options and already-picked marks"
-          ],
-          "watchOut": [
-            "Place it inside a relative container with a real height; all layers are absolutely positioned",
-            "Pass a stable lineId per line so read state, fast-forward and the typewriter reset correctly"
-          ],
-          "aliases": [
-            "narration overlay",
-            "VN textbox",
-            "typewriter dialogue",
-            "choice menu"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/dialogue-box/dialogue-box.tsx",
           "type": "registry:component"
         }
       ]
@@ -998,57 +928,14 @@
             "heart button",
             "wishlist toggle",
             "save button",
-            "like with burst"
+            "like with burst",
+            "heart burst"
           ]
         }
       },
       "files": [
         {
           "path": "registry/free/favorite-button/favorite-button.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "hold-to-redeem",
-      "type": "registry:block",
-      "title": "Hold to Redeem",
-      "description": "Press-and-hold confirm drawn as the voxel-world HUD ring around a gold keycap. It fills while held, rewinds when released, and turns red and rewinds if the confirm fails. An optional warning zone flashes the ring, shows a \"!\" and asks you to release. Works with pointer and keyboard (Space, Enter or the keycap letter) and has a polite live region. With reduced motion the rewind is instant and there is no pulse or flashing.",
-      "dependencies": [
-        "framer-motion"
-      ],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "buttons",
-        "game-ui"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Spending in-game currency or another irreversible redeem where a held press shows intent",
-            "Game-styled confirms where a last-chance warning near the end of the hold helps"
-          ],
-          "watchOut": [
-            "Holding is harder for some motor abilities; keep holdMs short (default 700 ms, as in the source) and keep keyboard support",
-            "The look is a dark pixel panel built for game UI, not neutral app chrome"
-          ],
-          "aliases": [
-            "hold ring",
-            "press and hold",
-            "charge ring",
-            "long press confirm"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/hold-to-redeem/hold-to-redeem.tsx",
           "type": "registry:component"
         }
       ]
@@ -1190,48 +1077,6 @@
       ]
     },
     {
-      "name": "notice-queue",
-      "type": "registry:block",
-      "title": "Notice Queue",
-      "description": "A first-in, first-out story notice lane that shows one notice at a time: compact found-item cards with a glyph, kicker, shimmering title and +N queue count, or one-line bond notices with an optional seal. Each lives 4.2s, ink-bleeds in and retracts over the last 280ms, pauses on hover or focus, closes with Esc and can open a detail view. It is a polite live region; with reduced motion there is no exit animation, bleed or shimmer.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "feedback",
-        "story"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Announcing clues, items, stat growth or relationship changes in a narrative game without interrupting reading",
-            "A single top-right feedback lane fed by several producers that must never cover each other"
-          ],
-          "watchOut": [
-            "Hold the queue (holding prop) while a detail view opened from a notice is showing, so it is not dismissed underneath",
-            "Keep titles short; long titles are cut off with an ellipsis at 17rem"
-          ],
-          "aliases": [
-            "reward toast",
-            "discovery notice",
-            "bond notice",
-            "story toast"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/notice-queue/notice-queue.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
       "name": "order-history",
       "type": "registry:block",
       "title": "Order History",
@@ -1309,7 +1154,8 @@
             "one-time code input",
             "verification code",
             "pin input",
-            "2fa code"
+            "2fa code",
+            "shake on error"
           ]
         }
       },
@@ -1361,49 +1207,6 @@
       "files": [
         {
           "path": "registry/free/pagination/pagination.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "pause-menu",
-      "type": "registry:block",
-      "title": "Pause Menu",
-      "description": "An in-game system menu: a faded ink band with brush-sweep hover items, the current objective, a save-error banner, and an exit confirmation that names the last autosave and offers a save-first option. The dialog is modal, takes focus and closes with Esc; with reduced motion the entrance animations are dropped.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "overlay",
-        "navigation"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Pause or system menu in a narrative or exploration game",
-            "Any destructive exit that should say exactly what progress will be lost and where the player can resume"
-          ],
-          "watchOut": [
-            "Pass lastAutosave as a readable chapter · scene · time line, never an internal id",
-            "Close the pause menu when opening a save panel so the two Esc handlers do not both fire"
-          ],
-          "aliases": [
-            "system menu",
-            "game menu",
-            "escape menu",
-            "save and quit"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/pause-menu/pause-menu.tsx",
           "type": "registry:component"
         }
       ]
@@ -1570,7 +1373,8 @@
             "counter input",
             "qty picker",
             "spin button",
-            "plus minus input"
+            "plus minus input",
+            "number roll stepper"
           ]
         }
       },
@@ -1654,7 +1458,8 @@
             "license dialog",
             "activate license key",
             "redeem code",
-            "supporter code"
+            "supporter code",
+            "shake on error"
           ]
         }
       },
@@ -1703,48 +1508,6 @@
       "files": [
         {
           "path": "registry/free/reservation-timer/reservation-timer.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "save-load-panel",
-      "type": "registry:block",
-      "title": "Save / Load Panel",
-      "description": "A story-themed save and load dialog listing autosave, quicksave and manual slots with chapter, scene, time and play time, confirming overwrite and delete in place. It is modal, focuses the first action, closes with Esc and reports errors in an alert; button transitions are removed under reduced motion.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "overlay"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Manual save and load slots in a narrative game",
-            "Any slot list where overwriting or deleting must be confirmed with a description of what is lost"
-          ],
-          "watchOut": [
-            "Throw from onSave to keep the panel open and show the error in place",
-            "Reject from onLoad to report a failed load without closing the panel"
-          ],
-          "aliases": [
-            "save slots",
-            "load game",
-            "save menu",
-            "save file picker"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/save-load-panel/save-load-panel.tsx",
           "type": "registry:component"
         }
       ]
@@ -1824,7 +1587,9 @@
           "aliases": [
             "reading progress",
             "progress bar",
-            "scroll indicator"
+            "scroll indicator",
+            "back to top progress",
+            "reading progress ring"
           ]
         }
       },
@@ -1868,7 +1633,9 @@
             "text reveal",
             "scroll highlight",
             "word by word",
-            "scrollytelling"
+            "scrollytelling",
+            "scroll-linked text",
+            "mask reveal"
           ]
         }
       },
@@ -1911,7 +1678,10 @@
             "sticky scroll story",
             "scrollytelling",
             "feature story",
-            "pinned feature panel"
+            "pinned feature panel",
+            "pinned section",
+            "stacking cards",
+            "split screen scroll"
           ]
         }
       },
@@ -2000,7 +1770,9 @@
             "sheet",
             "off-canvas",
             "slide over",
-            "collapsible sidebar"
+            "collapsible sidebar",
+            "drawer slide",
+            "bottom sheet"
           ]
         }
       },
@@ -2043,7 +1815,9 @@
             "shimmer placeholder",
             "loading placeholder",
             "content loader",
-            "ghost ui"
+            "ghost ui",
+            "skeleton shimmer",
+            "pulse placeholder"
           ]
         }
       },
@@ -2311,7 +2085,8 @@
             "toast notification",
             "snackbar",
             "stacked toasts",
-            "alert"
+            "alert",
+            "toast slide-in"
           ]
         }
       },
@@ -2412,49 +2187,6 @@
       ]
     },
     {
-      "name": "archive-cabinet",
-      "type": "registry:block",
-      "title": "Archive Cabinet",
-      "description": "A metal filing cabinet with two pulled-out drawers. Each drawer holds folders in depth rows, front rows wider, with staggered index tabs and a title, date and stamp on each folder; empty slots show a numbered divider. Read and store modes are supported, and hovering or focusing a folder fires a preview callback. Every slot is a real button with a screen-reader name, and with reduced motion the folder lift happens instantly.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "library",
-        "3d"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "A case-file or archive room where each finished run is filed as a folder",
-            "Picking a drawer slot to file something into, with the existing folder highlighted"
-          ],
-          "watchOut": [
-            "The cabinet needs a height (it defaults to clamp(11rem,48vh,22rem)); override it with a className such as h-64",
-            "At 700px wide or below, folder titles hide so the next folder's tab does not cover them; only the date and stamp stay"
-          ],
-          "aliases": [
-            "filing cabinet",
-            "file drawer",
-            "case files",
-            "歸檔櫃"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/archive-cabinet/archive-cabinet.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
       "name": "book-3d",
       "type": "registry:block",
       "title": "3D Book",
@@ -2493,91 +2225,6 @@
       "files": [
         {
           "path": "registry/free/book-3d/book-3d.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "bookshelf-3d",
-      "type": "registry:block",
-      "title": "3D Bookshelf",
-      "description": "One wooden shelf with a fixed number of slots. Each filled slot is a small 3D book (front, page edge and spine faces, with a title slip that shrinks to fit), and each empty slot is a faint outline. Read and store modes are supported, and hovering or focusing a slot fires a preview callback. Every slot is a real button with a screen-reader name, and with reduced motion the pull-out happens instantly.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "story",
-        "library",
-        "3d"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "hover",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "A save-slot style library where each finished playthrough or collected item sits on a shelf",
-            "Picking a slot to store something into, with the existing copy highlighted for overwrite"
-          ],
-          "watchOut": [
-            "Spines are narrow, so show the full title elsewhere using onPreview, as the demo footer does",
-            "Book size follows slot width (cqw); with many slots on a narrow screen the books get small"
-          ],
-          "aliases": [
-            "book shelf",
-            "memoir library",
-            "3D books",
-            "save slot shelf"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/bookshelf-3d/bookshelf-3d.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "cg-gallery",
-      "type": "registry:block",
-      "title": "CG Gallery",
-      "description": "A story CG gallery: a grid of 16:9 tiles with an unlocked x/y counter. Locked tiles show only a lock and 尚未解鎖, so nothing is spoiled. Opening a tile shows a viewer with the title and caption, closed by click, Enter, Space or Escape; focus moves into the viewer and back to the tile, and under reduced motion the fade-in and border transition are off.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "media",
-        "story"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Collectible CG or illustration galleries in visual novels and story games",
-            "Unlockable artwork lists where locked items must not reveal the image or title"
-          ],
-          "watchOut": [
-            "With fixed={false} the viewer covers only the gallery, so give the gallery enough height",
-            "Space and Escape are caught on window while the viewer is open; avoid other global shortcuts on those keys"
-          ],
-          "aliases": [
-            "cg gallery",
-            "art gallery",
-            "unlockable gallery",
-            "memoir gallery"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/cg-gallery/cg-gallery.tsx",
           "type": "registry:component"
         }
       ]
@@ -2679,134 +2326,6 @@
       ]
     },
     {
-      "name": "ink-fate-dial",
-      "type": "registry:block",
-      "title": "Ink Fate Dial",
-      "description": "An ink-wash SVG dial. The needle spins several turns and stops on the raw roll, then an accent-coloured arc steps through each modifier to the final score, and an ink drop in the same accent colour lands in the outcome segment. Esc or clicking the dial skips the roll, an optional aria-label gives it a role of img, and with reduced motion it skips the spin and shows the result with a 200ms fade.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "game",
-        "feedback",
-        "data-display"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Revealing the result of a chance check (skill roll, fate check, gacha) where the player should see the raw roll and each modifier",
-            "A static result dial showing which band a final score fell into, for example in a reroll comparison"
-          ],
-          "watchOut": [
-            "Change rollKey to start a new roll; while rolling it calls onFrame about every 33ms, and onSettle once at the end",
-            "Segments are [from, to) ranges on a 0 to scaleMax scale; the last segment gets the extra outer ring sweep"
-          ],
-          "aliases": [
-            "fate dice",
-            "roll dial",
-            "outcome wheel",
-            "skill check dial"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/ink-fate-dial/ink-fate-dial.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "motion-clip-tabs",
-      "type": "registry:block",
-      "title": "Motion Clip Tabs",
-      "description": "A gameplay clip showcase: a corner-framed screen, numbered clip tabs (壹, 貳, 參) with progress bars, and a caption panel. Only the active video gets a src and plays, the others pause, and clips without a video show a fallback slot timed by fallbackDuration. The tabs are an ARIA tablist with arrow-key navigation; the clips pause when off-screen, and under reduced motion nothing autoplays until the user presses play.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "media",
-        "story"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "Landing pages that show several short muted gameplay clips in one spot",
-            "Feature tours where each step has a short video and a one-line caption"
-          ],
-          "watchOut": [
-            "Videos are muted and playsInline; keep clips short since the active one preloads fully",
-            "Below a 60rem container width the tabs become a horizontal scroll row under the screen"
-          ],
-          "aliases": [
-            "video tabs",
-            "clip carousel",
-            "gameplay showcase",
-            "feature video tabs"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/motion-clip-tabs/motion-clip-tabs.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
-      "name": "records-thread-board",
-      "type": "registry:block",
-      "title": "Records Thread Board",
-      "description": "An endings and achievements board. Case files on the left get a tab and a tilted archived stamp once reached; on the right a thin thread snakes through diamond knots, and only finished links are drawn in the thread colour. Arrow keys move through the grid as laid out on screen with a single tab stop, a polite live readout bar describes the selection, and entrance animations are turned off under reduced motion.",
-      "dependencies": [],
-      "registryDependencies": [
-        "utils"
-      ],
-      "categories": [
-        "game",
-        "data-display",
-        "navigation"
-      ],
-      "meta": {
-        "tier": "free",
-        "series": "story",
-        "interaction": "press",
-        "addedAt": "2026-11-05",
-        "usage": {
-          "whenToUse": [
-            "An endings and achievements page in a story game or interactive fiction",
-            "Any milestone collection where locked items should show only a hint until earned"
-          ],
-          "watchOut": [
-            "Achievements are laid out three per row in snake order (top row left to right, next row right to left), so array order is thread order",
-            "The first thread link lights up only when the first ending is seen and the first achievement is done, as in the source"
-          ],
-          "aliases": [
-            "achievement board",
-            "endings gallery",
-            "case files",
-            "milestone thread"
-          ]
-        }
-      },
-      "files": [
-        {
-          "path": "registry/free/records-thread-board/records-thread-board.tsx",
-          "type": "registry:component"
-        }
-      ]
-    },
-    {
       "name": "scroll-tilt-stage",
       "type": "registry:block",
       "title": "Scroll Tilt Stage",
@@ -2881,7 +2400,9 @@
             "review marquee",
             "testimonial wall",
             "scrolling reviews",
-            "quote carousel"
+            "quote carousel",
+            "marquee",
+            "infinite card wall"
           ]
         }
       },

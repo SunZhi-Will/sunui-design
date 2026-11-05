@@ -50,7 +50,7 @@ const en = {
     descriptions: {
       paper: "Paper, ink and vermilion stamps for storefronts and campaigns.",
       product: "Quiet tool UI: neutral surfaces, one accent, status on dots.",
-      story: "Ink and lantern UI for narrative games, themeable with CSS variables.",
+      story: "Signature pieces in ink and lantern light: a readable 3D book and a WebGL cloth curtain for launch reveals.",
       showcase: "Landing-page signature visuals in a quiet editorial dark: tilts, carousels, marquees and recap slides.",
     } as Record<Series, string>,
   },
@@ -149,6 +149,7 @@ const en = {
     installation: "Installation",
     pro: "Using Pro blocks",
     aiAgents: "AI agents and MCP",
+    motion: "Motion dictionary",
     changelog: "Changelog",
   },
   docsIntro: {
@@ -385,7 +386,7 @@ const en = {
       commerce: { title: "Commerce", note: "Carts, tags, shipping and payment." },
       interface: { title: "Interface", note: "The everyday controls every block needs." },
       product: { title: "Product UI", note: "Quiet tool UI: status, jobs, quotas." },
-      story: { title: "Story", note: "Ink and lantern UI for narrative games." },
+      story: { title: "Story", note: "Ink and lantern signature pieces for launch reveals." },
       toggles: { title: "State toggles", note: "Icons that exist only as a pair of states." },
       "pixel-interface": { title: "Interface", note: "Controls on a 16px grid, 2px strokes for glyphs." },
       "pixel-paper": { title: "Paper", note: "The coupon, receipt and stamp signatures, in pixels." },
@@ -434,7 +435,7 @@ const zhTW: Messages = {
     descriptions: {
       paper: "紙張、墨色與朱紅印章，為商店與檔期活動而做。",
       product: "安靜的工具介面：中性底色、單一強調色，用圓點表示狀態。",
-      story: "墨色與燈籠風格的敘事遊戲介面，可用 CSS 變數換主題。",
+      story: "墨色與燈籠風格的招牌作品：可以翻閱的 3D 書、用於新品揭幕的 WebGL 布簾。",
       showcase: "形象頁的招牌視覺：3D 傾斜、輪播、跑馬燈與回顧投影片。",
     },
   },
@@ -532,6 +533,7 @@ const zhTW: Messages = {
     installation: "安裝",
     pro: "使用 Pro 區塊",
     aiAgents: "AI 代理與 MCP",
+    motion: "動效辭典",
     changelog: "更新紀錄",
   },
   docsIntro: {
@@ -749,7 +751,7 @@ const zhTW: Messages = {
       commerce: { title: "電商", note: "購物車、標籤、運送與付款。" },
       interface: { title: "介面", note: "每個區塊都用得到的日常控制項。" },
       product: { title: "產品介面", note: "安靜的工具介面：狀態、工作、用量。" },
-      story: { title: "故事", note: "敘事遊戲用的墨色與燈籠介面。" },
+      story: { title: "故事", note: "墨色與燈籠風格的招牌揭幕作品。" },
       toggles: { title: "狀態切換", note: "只以一對狀態存在的圖示。" },
       "pixel-interface": { title: "介面", note: "16px 點陣的控制項，符號用 2 格粗線。" },
       "pixel-paper": { title: "紙感", note: "優惠券、收據、印章這些招牌，換成像素。" },
@@ -796,7 +798,7 @@ const zhCN: Messages = {
     descriptions: {
       paper: "纸张、墨色与朱红印章，为店铺与大促活动而做。",
       product: "安静的工具界面：中性底色、单一强调色，用圆点表示状态。",
-      story: "墨色与灯笼风格的叙事游戏界面，可用 CSS 变量换主题。",
+      story: "墨色与灯笼风格的招牌作品：可以翻阅的 3D 书、用于新品揭幕的 WebGL 布帘。",
       showcase: "落地页的招牌视觉：3D 倾斜、轮播、跑马灯与回顾幻灯片。",
     },
   },
@@ -894,6 +896,7 @@ const zhCN: Messages = {
     installation: "安装",
     pro: "使用 Pro 区块",
     aiAgents: "AI 智能体与 MCP",
+    motion: "动效辞典",
     changelog: "更新日志",
   },
   docsIntro: {
@@ -1104,7 +1107,7 @@ const zhCN: Messages = {
       commerce: { title: "电商", note: "购物车、标签、配送与支付。" },
       interface: { title: "界面", note: "每个区块都用得上的日常控件。" },
       product: { title: "产品界面", note: "安静的工具界面：状态、任务、配额。" },
-      story: { title: "故事", note: "叙事游戏用的墨色与灯笼界面。" },
+      story: { title: "故事", note: "墨色与灯笼风格的招牌揭幕作品。" },
       toggles: { title: "状态切换", note: "只以一对状态存在的图标。" },
       "pixel-interface": { title: "界面", note: "16px 点阵的控件，符号用 2 格粗线。" },
       "pixel-paper": { title: "纸感", note: "优惠券、收据、印章这些招牌，换成像素。" },
@@ -1151,7 +1154,7 @@ const ja: Messages = {
     descriptions: {
       paper: "紙とインクと朱色のスタンプ。ストアやキャンペーンのために。",
       product: "静かなツール UI。ニュートラルな面、アクセントは一色、状態はドットで。",
-      story: "墨と灯籠の物語ゲーム UI。CSS 変数でテーマを変えられます。",
+      story: "墨と灯籠の看板作品。めくれる 3D の本と、新商品のお披露目に使える WebGL のカーテン。",
       showcase: "LP の見せ場になるビジュアル。3D チルト、カルーセル、マーキー、振り返りスライド。",
     },
   },
@@ -1249,6 +1252,7 @@ const ja: Messages = {
     installation: "インストール",
     pro: "Pro ブロックの使い方",
     aiAgents: "AI エージェントと MCP",
+    motion: "モーション辞典",
     changelog: "更新履歴",
   },
   docsIntro: {
@@ -1474,7 +1478,7 @@ const ja: Messages = {
       commerce: { title: "コマース", note: "カート、タグ、配送、支払い。" },
       interface: { title: "インターフェース", note: "どのブロックにも必要な日常的なコントロール。" },
       product: { title: "プロダクト UI", note: "静かなツール UI。ステータス、ジョブ、使用量。" },
-      story: { title: "ストーリー", note: "物語ゲーム向けの墨と灯籠の UI。" },
+      story: { title: "ストーリー", note: "お披露目に使う墨と灯籠の看板作品。" },
       toggles: { title: "状態の切り替え", note: "2 つの状態のペアとしてだけ存在するアイコン。" },
       "pixel-interface": { title: "インターフェース", note: "16px 格子の操作アイコン。記号は 2 ドットの太線。" },
       "pixel-paper": { title: "ペーパー", note: "クーポン、レシート、スタンプの看板アイコンをドットで。" },

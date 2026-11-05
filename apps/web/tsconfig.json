@@ -32,9 +32,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next-alt/types/**/*.ts",
+    ".next-prod/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-prod/types/**/*.ts"
+    ".next-protest/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

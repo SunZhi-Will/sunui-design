@@ -58,6 +58,8 @@ const springs = {
 3. 單次動畫 400ms 以內；`useReducedMotion()` 為真時改為立即切換，資訊不能遺失。
 4. 動畫要模擬實體：撕票根是沿打孔線撕開、蓋章是先壓下再彈起，不做沒有物理意義的縮放閃爍。
 
+常見動效名稱（Fade Up、Odometer、Headroom、Confetti…）各自的立場與替代做法見 `/docs/motion`，資料在 `content/motion-dictionary.ts`。彈簧與允許的動態已做成 `registry/lib/sunui-motion/motion.ts`（`/r/sunui-motion.json`），新 block 優先從這裡匯入，數值不要另抄一份。
+
 ## 5. 示範（demo.tsx）
 
 - 預覽區只放元件本身，排成**真實商店會出現的樣子**（例如活動頁的領券區）。

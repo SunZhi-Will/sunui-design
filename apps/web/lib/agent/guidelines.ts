@@ -1,4 +1,7 @@
+import { motionGroups } from "@/content/motion-dictionary";
+import { motionLibName } from "@/lib/motion-lib";
 import type { Series } from "@/lib/registry";
+import { siteUrl } from "@/lib/site";
 
 // 給 AI 代理看的設計規則（英文精簡版）。來源是 DESIGN.md、DESIGN-product.md、DESIGN-story.md；
 // 改了那幾份文件，這裡要一起改。MCP、SKILL.md、llms-full.txt 都從這裡取，保持單一來源。
@@ -21,6 +24,22 @@ const shared = `## Rules for every block
 - One primary action per block. Name buttons after the result ("Claim coupon", not "OK").
 - Be honest: no fake scarcity, no fake timers, no showing 0 as social proof.
 - Check light and dark mode and a 375px wide screen. Chinese and Japanese copy must fit without layout changes.`;
+
+// 使用者用動效名稱提需求時的對照，來源是 /docs/motion 的資料，保持單一來源
+function motionRequests() {
+  const entries = motionGroups.flatMap((g) => g.entries).filter((e) => e.verdict !== "allow");
+  const line = (e: (typeof entries)[number]) =>
+    `- **${e.name}**${e.aliases?.length ? ` (${e.aliases.join(", ")})` : ""}: ${e.how.en}`;
+  return `## When the user asks for a motion by name
+
+Full list with allowed motions: ${siteUrl()}/docs/motion. Shared springs and allowed motions are installable as \`${motionLibName}\` (\`npx shadcn@latest add ${siteUrl()}/r/${motionLibName}.json\`).
+
+Avoid (offer the alternative instead):
+${entries.filter((e) => e.verdict === "avoid").map(line).join("\n")}
+
+Limited (only in this situation):
+${entries.filter((e) => e.verdict === "limit").map(line).join("\n")}`;
+}
 
 const paper = `## Series: paper (default when meta.series is missing)
 
@@ -73,5 +92,5 @@ const bySeries: Record<Series, string> = { paper, product, story, showcase };
 /** 單一系列或全部系列的設計規則（Markdown）。 */
 export function designRules(series?: Series) {
   const sections = series ? [bySeries[series]] : [paper, product, story, showcase];
-  return [`# SunUI design rules`, shared, ...sections].join("\n\n");
+  return [`# SunUI design rules`, shared, motionRequests(), ...sections].join("\n\n");
 }

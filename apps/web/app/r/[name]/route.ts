@@ -1,4 +1,5 @@
 import { skillRegistryItem } from "@/lib/agent/skill";
+import { motionLibName, motionRegistryItem } from "@/lib/motion-lib";
 import { buildRegistryItem, freeManifest, getItem, getItems } from "@/lib/registry";
 
 export const dynamic = "force-static";
@@ -7,6 +8,7 @@ export function generateStaticParams() {
   return [
     { name: "registry.json" },
     { name: "sunui-skill.json" },
+    { name: `${motionLibName}.json` },
     ...getItems("free").map((item) => ({ name: `${item.name}.json` })),
   ];
 }
@@ -25,6 +27,11 @@ export async function GET(
   // AI 代理用的 skill，不是 block，不列進型錄與 registry.json
   if (name === "sunui-skill.json") {
     return Response.json(skillRegistryItem());
+  }
+
+  // 共用動態節奏，registry:lib，同樣不列進型錄
+  if (name === `${motionLibName}.json`) {
+    return Response.json(await motionRegistryItem());
   }
 
   const item = getItem(name.replace(/\.json$/, ""), "free");

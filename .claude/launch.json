@@ -40,6 +40,21 @@
       "env": {
         "NEXT_DIST_DIR": ".next-prod"
       }
+    },
+    {
+      "name": "web-pro-test",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "npm run dev -w @sunui-design/web -- -p ${PORT:-3104}"
+      ],
+      "port": 3104,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-protest",
+        "NEXT_PUBLIC_SITE_URL": "http://localhost:3104",
+        "SUNUI_DEV_LICENSE_KEYS": "sunui-dev-test-key-0001"
+      }
     }
   ]
 }
