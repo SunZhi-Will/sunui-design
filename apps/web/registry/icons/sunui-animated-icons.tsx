@@ -300,17 +300,16 @@ function renderNode(node: IconNode, key: number, part: Part | undefined, kind: M
   const n = typeof node === "string" ? { d: node } : node;
   const paint = n.accent ? ACCENT : "currentColor";
   const props = {
-    key,
     stroke: n.fill ? "none" : n.accent ? paint : undefined,
     fill: n.fill ? paint : undefined,
     strokeDasharray: n.dash,
     variants: part ? variants(part, kind, reduce) : undefined,
     style: part ? origin(part.origin) : undefined,
   };
-  if ("d" in n) return <motion.path {...props} d={n.d} />;
-  if ("c" in n) return <motion.circle {...props} cx={n.c[0]} cy={n.c[1]} r={n.c[2]} />;
+  if ("d" in n) return <motion.path key={key} {...props} d={n.d} />;
+  if ("c" in n) return <motion.circle key={key} {...props} cx={n.c[0]} cy={n.c[1]} r={n.c[2]} />;
   const [x, y, width, height, rx] = n.r;
-  return <motion.rect {...props} x={x} y={y} width={width} height={height} rx={rx} />;
+  return <motion.rect key={key} {...props} x={x} y={y} width={width} height={height} rx={rx} />;
 }
 
 function variants(part: Part, kind: MotionKind, reduce: boolean): Variants {

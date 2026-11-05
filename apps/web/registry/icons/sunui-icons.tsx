@@ -299,13 +299,12 @@ function renderNode(node: IconNode, key: number) {
   if (typeof node === "string") return <path key={key} d={node} />;
   const paint = node.accent ? ACCENT : "currentColor";
   const props = {
-    key,
     stroke: node.fill ? "none" : node.accent ? paint : undefined,
     fill: node.fill ? paint : undefined,
     strokeDasharray: node.dash,
   };
-  if ("d" in node) return <path {...props} d={node.d} />;
-  if ("c" in node) return <circle {...props} cx={node.c[0]} cy={node.c[1]} r={node.c[2]} />;
+  if ("d" in node) return <path key={key} {...props} d={node.d} />;
+  if ("c" in node) return <circle key={key} {...props} cx={node.c[0]} cy={node.c[1]} r={node.c[2]} />;
   const [x, y, width, height, rx] = node.r;
-  return <rect {...props} x={x} y={y} width={width} height={height} rx={rx} />;
+  return <rect key={key} {...props} x={x} y={y} width={width} height={height} rx={rx} />;
 }

@@ -25,6 +25,15 @@ const items = {
     dependencies: ["framer-motion"],
     registryDependencies: ["sunui-icons"],
   },
+  "sunui-pixel-icons": {
+    title: "SunUI Pixel Icons",
+    description:
+      "SunUI's pixel icon set on a 16px grid: interface controls, paper-commerce signatures and retro game items. Rendered as crisp-edged SVG with an optional vermilion accent via --sunui-icon-accent.",
+    source: "registry/icons/sunui-pixel-icons.tsx",
+    target: "components/ui/sunui-pixel-icons.tsx",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+  },
 };
 
 type ItemName = keyof typeof items;

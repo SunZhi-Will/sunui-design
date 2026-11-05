@@ -2,7 +2,8 @@
 
 > 靜態：`registry/icons/sunui-icons.tsx`（`<site>/r/icons/sunui-icons.json`，無依賴）
 > 動態：`registry/icons/sunui-animated-icons.tsx`（`<site>/r/icons/sunui-animated-icons.json`，依賴 framer-motion 與靜態版）
-> 展示頁：`/icons`，可切換 Static / Animated。
+> 像素：`registry/icons/sunui-pixel-icons.tsx`（`<site>/r/icons/sunui-pixel-icons.json`，無依賴）
+> 展示頁：`/icons`，可切換 Static / Animated / Pixel。
 
 ## 為什麼要做
 
@@ -34,7 +35,9 @@
 | Commerce | 購物流程 | cart、bag、tag、percent、gift、truck、package、store、card、wallet、scan、flash、timer |
 | Interface | 通用控制 | check、close、chevron-*、search、copy、retry、alert、lock、eye、bell、star、heart… |
 | Product UI | 工具型介面 | status、loader、activity、gauge、terminal、inbox、shield、caption… |
-| Story | 敘事遊戲 | play、pause、skip、book、dialogue、lantern、scroll、quill、map |
+| Story | 敘事遊戲 | play、pause、skip、book、dialogue、lantern、scroll、quill、map、gem、trophy |
+
+2026-11-05 補上：home、filter、mail、phone、globe、map-pin、sparkle（Interface），coin（Commerce），gem、trophy（Story）。
 
 ## 動態圖示
 
@@ -53,6 +56,20 @@
 3. 旋轉中心一律用 24 網格座標（`origin: [x, y]`），內部轉成 `transform-box: view-box`，不同形狀才能共用同一個軸心。
 4. `useReducedMotion()` 為真：所有轉場改為 0 秒，直接顯示結果；loop 不播放。
 5. 朱紅只出現在 accent 部位（例如填滿後的愛心、集點卡新蓋的一格）。
+
+## 像素圖示
+
+線條版之外的第二種風格，給復古、遊戲化、集點活動這類想要「點陣感」的畫面用。兩套不混用：同一個畫面選一種。
+
+1. **網格**：16 × 16 點陣，`viewBox="0 0 16 16"`，內容落在 1 到 14 之間（1 格安全邊）。游標這類需要滿版的例外。
+2. **線條**：物件用 1 格外框；勾、叉、加減、箭頭、選單這些控制符號用 2 格粗線，16px 下才不會斷。
+3. **資料格式**：每個圖示是 16 列字串，`#` 墨色、`+` 朱紅點、`.` 留白。渲染時把同列相鄰格合併成一段矩形，墨色與朱紅各一條 path。
+4. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。24px 這類非整數倍會糊，展示頁因此只提供 16、32、48。
+5. **朱紅點**：沿用 `--sunui-icon-accent`，規則同線條版：每個圖示最多一個部位（印章、藥水、旗面這類整體就是主角的例外）。
+6. **分組**：Interface、Paper、Commerce、Game。Game 是像素版獨有，含劍、盾、藥水、寶石、皇冠、寶箱、炸彈、手把、游標、沙漏等。
+7. **不做動態版**：像素圖示的動態應該是逐格換圖，與 framer-motion 的補間不同，等真的有需要再設計。
+
+新增像素圖示：在 `sunui-pixel-icons.tsx` 的 `pixelIcons` 加一筆 16 × 16 字串，放進 `lib/icon-groups.ts` 的 `pixelIconGroups`，再到 `/icons` 的 Pixel 分頁用 16 與 48 檢查。
 
 ## 新增圖示
 

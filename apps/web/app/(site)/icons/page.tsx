@@ -39,6 +39,10 @@ export default async function IconsPage() {
             <p className="mb-1.5 text-xs font-medium text-subtle">{t.animatedInstall}</p>
             <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
           </div>
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-subtle">{t.pixelInstall}</p>
+            <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
+          </div>
         </div>
       </section>
 

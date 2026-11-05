@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
@@ -92,7 +92,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     animated: animatedIconNames.length,
     pixel: pixelIconNames.length,
   };
-  const modeIcon: Record<Mode, React.ReactNode> = {
+  const modeIcon: Record<Mode, ReactNode> = {
     static: <Icon name="grid" size={16} />,
     animated: <AnimatedIcon name="activity" size={16} />,
     pixel: <PixelIcon name="sparkle" size={16} />,
@@ -154,7 +154,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           </label>
           <Segmented
             label={t.size}
-            options={sizeOptions}
+            options={sizeOptions as readonly number[]}
             value={size}
             onChange={isPixel ? setPixelSize : setStrokeSize}
           />
