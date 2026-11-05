@@ -2891,6 +2891,68 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "pixel-fx",
+      "type": "registry:block",
+      "title": "Pixel FX",
+      "description": "Code-drawn pixel art effects on a canvas that sits over any element: a collect burst for claiming a reward, two party poppers of paper confetti, and a block dissolve that covers a screen or unveils what is underneath. Ported from the MIT pixelfx engine (two buffers, opaque pixels with ordered dither plus additive light, seeded so each play is repeatable). Effects take a palette and default to the story series' gold and SunUI's vermilion. The canvas ignores the pointer and runs only while playing; with reduced motion nothing animates and onDone fires at once.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "game-ui",
+        "animation",
+        "canvas",
+        "rewards"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "story",
+        "interaction": "press",
+        "addedAt": "2026-11-05",
+        "usage": {
+          "whenToUse": [
+            "The moment a player claims a daily reward, a drop or in-game currency",
+            "Unveiling a prize, a gift code or a gacha result after the player asks for it",
+            "A screen-to-screen transition in a pixel or retro styled game UI"
+          ],
+          "watchOut": [
+            "It is a celebration language for game UI. Paper-series commerce pages celebrate with a stamp, not particles",
+            "Play it in response to a user action, never on a loop or on page load",
+            "Content under pixelReveal is visible to the DOM; mark it inert and aria-hidden until onDone, as the demo does",
+            "Effects are drawn in art pixels: a very large box at pixelSize 1 costs more per frame, keep pixelSize at 2 or more"
+          ],
+          "aliases": [
+            "pixel effects",
+            "particles",
+            "confetti",
+            "reward burst",
+            "sparkle",
+            "pixel transition",
+            "dissolve",
+            "gacha reveal",
+            "game vfx"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/pixel-fx/pixel-fx.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/pixel-fx/pixel-fx-core.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/free/pixel-fx/pixel-fx-effects.ts",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
