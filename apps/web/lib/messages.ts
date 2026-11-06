@@ -61,9 +61,14 @@ const en = {
     eyebrow: "Paper-feel commerce blocks for React",
     title: "Coupons, receipts and loyalty cards your shoppers can feel.",
     lead: "Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign, plus free motion libraries for when you want more of a show. Accessible by default, installed with one command and owned by you.",
-    statBlocks: "blocks",
-    statFree: "free, MIT",
-    statPro: "Pro blocks",
+    compare: {
+      label: "Drag to compare the generic AI coupon with the SunUI coupon",
+      before: "Typical AI output",
+      after: "SunUI",
+      caption: "Same coupon, same offer. Left is what AI tools ship by default: gradients, glow, emoji. Right is paper and ink. Drag the line.",
+      slop: { eyebrow: "Mega deal", amount: "$15 OFF", body: "Unlock exclusive savings today! 🔥", cta: "Claim now 🚀" },
+      paper: { eyebrow: "Double 11 · new customers", amount: "$15", unit: "off", condition: "On orders over US$80", code: "DOUBLE11", cta: "Claim", claimed: "Claimed" },
+    },
     whyTitle: "Why SunUI",
     reasons: [
       {
@@ -464,9 +469,14 @@ const zhTW: Messages = {
     eyebrow: "有紙感的 React 電商區塊",
     title: "讓顧客摸得到的優惠券、收據與集點卡。",
     lead: "撕得開的優惠券、印出來的收據、集點章與促銷海報，下一檔活動直接用；想要更多舞台感時，還有免費的動效庫。預設無障礙，一行指令安裝，程式碼完全屬於你。",
-    statBlocks: "個區塊",
-    statFree: "個免費，MIT",
-    statPro: "個 Pro 區塊",
+    compare: {
+      label: "拖動比較常見 AI 優惠券與 SunUI 優惠券",
+      before: "常見 AI 樣貌",
+      after: "SunUI",
+      caption: "同一張券、同一個優惠。左邊是 AI 工具最常產出的樣子：漸層、光暈、emoji；右邊只有紙和墨。拖動中線比較。",
+      slop: { eyebrow: "超殺優惠", amount: "$15 OFF", body: "立即解鎖你的專屬好康！🔥", cta: "馬上搶 🚀" },
+      paper: { eyebrow: "雙 11 · 新客專屬", amount: "$15", unit: "折扣", condition: "滿 US$80 可用", code: "DOUBLE11", cta: "領取", claimed: "已領取" },
+    },
     whyTitle: "為什麼選 SunUI",
     reasons: [
       {
@@ -843,9 +853,14 @@ const zhCN: Messages = {
     eyebrow: "有纸感的 React 电商区块",
     title: "让顾客摸得到的优惠券、小票与集点卡。",
     lead: "撕得开的优惠券、打印出来的小票、集点章与促销海报，下一场活动直接用；想要更多舞台感时，还有免费的动效库。默认无障碍，一行命令安装，代码完全归你所有。",
-    statBlocks: "个区块",
-    statFree: "个免费，MIT",
-    statPro: "个 Pro 区块",
+    compare: {
+      label: "拖动比较常见 AI 优惠券与 SunUI 优惠券",
+      before: "常见 AI 样貌",
+      after: "SunUI",
+      caption: "同一张券、同一个优惠。左边是 AI 工具最常产出的样子：渐变、光晕、emoji；右边只有纸和墨。拖动中线比较。",
+      slop: { eyebrow: "超值优惠", amount: "$15 OFF", body: "立即解锁你的专属福利！🔥", cta: "马上抢 🚀" },
+      paper: { eyebrow: "双 11 · 新客专享", amount: "$15", unit: "优惠", condition: "满 US$80 可用", code: "DOUBLE11", cta: "领取", claimed: "已领取" },
+    },
     whyTitle: "为什么选 SunUI",
     reasons: [
       {
@@ -1215,9 +1230,14 @@ const ja: Messages = {
     eyebrow: "紙の手ざわりを持つ React コマースブロック",
     title: "手ざわりまで伝わる、クーポンとレシートとスタンプカード。",
     lead: "切り取れるクーポン、印字されるレシート、スタンプカード、セールポスターを次のキャンペーンに。もっと演出がほしいときは、無料のモーションライブラリもあります。最初からアクセシブルで、コマンドひとつで導入でき、コードはすべてあなたのものです。",
-    statBlocks: "ブロック",
-    statFree: "無料（MIT）",
-    statPro: "Pro ブロック",
+    compare: {
+      label: "よくある AI 製クーポンと SunUI のクーポンをドラッグして比較",
+      before: "よくある AI 製",
+      after: "SunUI",
+      caption: "同じクーポン、同じ特典。左は AI ツールが標準で出す見た目（グラデーション、グロー、絵文字）。右は紙とインクだけ。線をドラッグして比べてください。",
+      slop: { eyebrow: "超お得", amount: "$15 OFF", body: "今だけの特典をアンロック！🔥", cta: "今すぐゲット 🚀" },
+      paper: { eyebrow: "ダブルイレブン · 新規のお客さま", amount: "$15", unit: "割引", condition: "US$80 以上で利用可", code: "DOUBLE11", cta: "受け取る", claimed: "受け取り済み" },
+    },
     whyTitle: "SunUI を選ぶ理由",
     reasons: [
       {

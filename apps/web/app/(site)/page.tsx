@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
+import { HeroCompare } from "@/components/hero-compare";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { getItems, installCommand, type Series } from "@/lib/registry";
@@ -50,24 +51,23 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="py-16 sm:py-24">
-        <p className="mb-4 text-sm font-medium text-accent">{m.home.eyebrow}</p>
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-          {m.home.title}
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
-          {m.home.lead}
-        </p>
-        {firstFree && (
-          <div className="mt-8 max-w-2xl">
-            <Command value={installCommand(firstFree)} />
-          </div>
-        )}
-        <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4 text-sm">
-          <Stat label={m.home.statBlocks} value={all.length} />
-          <Stat label={m.home.statFree} value={freeCount} />
-          <Stat label={m.home.statPro} value={proCount} />
-        </dl>
+      {/* 主視覺：左邊說明，右邊直接讓人比較「常見 AI 樣貌」與 SunUI，取代原本的統計數字 */}
+      <section className="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+        <div className="min-w-0">
+          <p className="mb-4 text-sm font-medium text-accent">{m.home.eyebrow}</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            {m.home.title}
+          </h1>
+          <p className="mt-5 text-lg text-pretty text-subtle">
+            {m.home.lead}
+          </p>
+          {firstFree && (
+            <div className="mt-8">
+              <Command value={installCommand(firstFree)} />
+            </div>
+          )}
+        </div>
+        <HeroCompare m={m.home.compare} />
       </section>
 
       <Catalog
@@ -118,12 +118,3 @@ export default async function HomePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    // dt 在前符合 dl 結構，視覺上用 order 讓數字排在前面，標籤只寫一次
-    <div className="flex items-baseline gap-2">
-      <dt className="order-2 text-subtle">{label}</dt>
-      <dd className="order-1 text-3xl font-semibold tabular-nums tracking-tight">{value}</dd>
-    </div>
-  );
-}
