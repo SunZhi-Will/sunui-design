@@ -22,6 +22,7 @@ const shared = `## Rules for every block
 - Numbers, prices and timers use \`tabular-nums\`. Codes and order numbers use \`font-mono\`.
 - Never add gradients, glows, blur, colored shadows, particles or confetti around a block.
 - Motion only answers a user action or a data change. No fade-up on page load, no idle loops (countdowns and loading states are the exception).
+- Continuity: when state changes, reshape the same container instead of swapping it, and keep one anchor (thumbnail, icon, amount) in place across states. Old content leaves fast (about 100ms), new content arrives with the main line first and the secondary line slightly later. Plain crossfades and hard cuts are not enough. For dropdowns, drawers and accordions, also check what the rest of the page does while they move: content below should slide, not jump.
 - One primary action per block. Name buttons after the result ("Claim coupon", not "OK").
 - Be honest: no fake scarcity, no fake timers, no showing 0 as social proof.
 - Check light and dark mode and a 375px wide screen. Chinese and Japanese copy must fit without layout changes.`;

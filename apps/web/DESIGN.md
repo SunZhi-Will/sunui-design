@@ -64,6 +64,7 @@ const springs = {
 2. **不做慶祝**：結果用 `Stamp` 安靜地出現（150ms 淡入，勾線描出），不做縮放、彈跳、旋轉落下。不放煙火、粒子、彩帶。
 3. 單次動畫 400ms 以內；`useReducedMotion()` 為真時改為立即切換，資訊不能遺失。
 4. 動畫要模擬實體：撕票根是沿打孔線撕開，不做沒有物理意義的縮放閃爍。
+5. **連續性**：狀態改變時讓同一個外框變形（寬高用 `gentle`），不要整塊換掉；跨狀態留一個錨點不動（縮圖、圖示、金額），視線停在錨點上，變化才讀得出是「同一個東西變了」。舊內容約 100ms 退場，新內容主文先到、副文晚約 60ms。單純交叉淡化或硬切都不夠。下拉、抽屜、手風琴還要檢查周圍：下方內容要跟著滑動，不能跳。參考做法：`registry/pro/order-island`。
 
 常見動效名稱（Fade Up、Odometer、Headroom、Confetti…）各自的立場與替代做法見 `/docs/motion`，資料在 `content/motion-dictionary.ts`。彈簧與允許的動態已做成 `registry/lib/sunui-motion/motion.ts`（`/r/sunui-motion.json`），新 block 優先從這裡匯入，數值不要另抄一份。
 
@@ -88,5 +89,6 @@ const springs = {
 - [ ] 數字 tabular-nums，代碼 font-mono
 - [ ] Light 與 Dark 都截圖看過，375px 不破版
 - [ ] reduced motion 下資訊完整
+- [ ] 狀態切換是同一個外框變形、有錨點不動，周圍內容滑動而不是跳動
 - [ ] 預覽區沒有測試按鈕
 - [ ] 換成中文文案版面仍正常

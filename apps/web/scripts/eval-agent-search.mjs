@@ -39,6 +39,9 @@ const cases = [
   ["accordion expand collapse", "faq-accordion", true],
   ["file drop upload", "file-dropzone", true],
   ["departure board", "launch-countdown-wall", true],
+  ["multiplayer cursors", "self-building-page", true],
+  ["self building website", "self-building-page", true],
+  ["build on scroll", "self-building-page", true],
 ];
 
 const dir = mkdtempSync(path.join(tmpdir(), "sunui-eval-"));
