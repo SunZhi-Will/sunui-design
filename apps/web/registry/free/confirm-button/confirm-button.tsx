@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -63,7 +64,7 @@ const MESSAGES: Record<SunLocale, Required<ConfirmButtonLabels>> = {
 
 // usermeld components/ui/button.tsx 的 buttonVariants
 const base =
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 const variants: Record<ConfirmButtonVariant, string> = {
   default: "bg-primary text-primary-foreground hover:bg-primary/80",
@@ -85,6 +86,10 @@ const sizes: Record<ConfirmButtonSize, string> = {
 
 type Notice = { text: string; tone: "info" | "success" | "error" };
 
+// product 系列的動態：expo-out 緩動，時長走 120 / 180ms 階梯
+const ease = [0.23, 1, 0.32, 1] as const;
+const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
+
 export function ConfirmButton({
   children,
   confirmLabel,
@@ -101,6 +106,8 @@ export function ConfirmButton({
   className,
 }: ConfirmButtonProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const reduce = useReducedMotion() ?? false;
+  const swap = reduce ? { duration: 0 } : { duration: 0.18, ease };
   const [armed, setArmed] = useState(false);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<Notice>();
@@ -170,31 +177,73 @@ export function ConfirmButton({
 
   return (
     <span className={cn("relative inline-flex flex-col items-end gap-1", className)}>
-      <button
+      {/* 同一顆按鈕變寬變色，不換成另一顆：寬度用 layout 補間，文字上下換行，提示行跟著換 */}
+      <motion.button
         type="button"
         data-slot="button"
         data-active={armed || undefined}
         disabled={disabled || pending}
         aria-busy={pending || undefined}
+        layout={!reduce}
+        transition={reduce ? { duration: 0 } : snappy}
         onClick={(e) => {
           e.stopPropagation();
           press();
         }}
         onKeyDown={onKeyDown}
-        className={cn(base, variants[armed ? armedVariant : variant], sizes[size])}
+        className={cn(base, "overflow-hidden", variants[armed ? armedVariant : variant], sizes[size])}
       >
-        {pending && <Spinner />}
-        {armed ? confirmLabel : children}
-      </button>
+        <AnimatePresence initial={false}>
+          {pending && (
+            <motion.span
+              key="spin"
+              layout={!reduce}
+              initial={{ opacity: 0, scale: reduce ? 1 : 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: reduce ? 1 : 0.6, transition: reduce ? { duration: 0 } : { duration: 0.12, ease } }}
+              transition={swap}
+              className="inline-flex"
+            >
+              <Spinner />
+            </motion.span>
+          )}
+        </AnimatePresence>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={armed ? "armed" : "idle"}
+            layout={!reduce ? "position" : false}
+            initial={{ opacity: 0, y: reduce ? 0 : 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduce ? 0 : -6, transition: reduce ? { duration: 0 } : { duration: 0.12, ease } }}
+            transition={swap}
+            className="inline-block"
+          >
+            {armed ? confirmLabel : children}
+          </motion.span>
+        </AnimatePresence>
+      </motion.button>
       <span
         role="status"
         aria-live="polite"
         className={cn(
-          "min-h-4 max-w-64 text-right text-xs leading-4",
+          "relative min-h-4 max-w-64 text-right text-xs leading-4",
           notice?.tone === "error" ? "text-destructive" : notice?.tone === "success" ? "text-foreground" : "text-muted-foreground",
         )}
       >
-        {notice?.text}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {notice && (
+            <motion.span
+              key={notice.text}
+              initial={{ opacity: 0, y: reduce ? 0 : 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: reduce ? { duration: 0 } : { duration: 0.12, ease } }}
+              transition={swap}
+              className="block"
+            >
+              {notice.text}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </span>
     </span>
   );

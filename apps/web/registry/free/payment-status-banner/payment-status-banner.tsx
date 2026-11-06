@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -98,6 +99,9 @@ const DOT = {
   error: "bg-amber-500",
 } as const;
 
+// product 系列的動態：expo-out 緩動，時長走 120 / 180 / 240ms 階梯
+const ease = [0.23, 1, 0.32, 1] as const;
+
 // lucide 圖示（16px）
 const iconProps = {
   width: 16,
@@ -152,6 +156,7 @@ export function PaymentStatusBanner({
   className,
 }: PaymentStatusBannerProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const reduce = useReducedMotion() ?? false;
   const [banner, setBanner] = useState<string>(status ?? "");
   const refreshRef = useRef(onRefresh);
   refreshRef.current = onRefresh;
@@ -192,48 +197,111 @@ export function PaymentStatusBanner({
     return () => clearTimeout(id);
   }, [banner, dismissAfter]);
 
-  if (!banner) return null;
-
   const urgent = banner !== "success" && banner !== "pending";
   const dot = banner === "success" ? DOT.success : banner === "failed" ? DOT.failed : DOT.error;
+  const swap = reduce ? { duration: 0 } : { duration: 0.18, ease };
+  const leave = reduce ? { duration: 0 } : { duration: 0.12, ease };
+  const message = banner === "success" ? t.success : banner === "pending" ? t.pending : banner === "failed" ? t.failed : t.error;
+
+  // 內容換行時高度跟著變，量測內層後補間，不讓外框跳
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | "auto">("auto");
+  const visible = !!banner;
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const update = () => setHeight(el.offsetHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [visible]);
+
+  // 連續性：同一條 banner 從頭到尾不換。左側圖示格固定是錨點，只換圖形；文字上下換行；
+  // 固定在頂端時從頁首下方滑出，跟著版面流動時改用高度補間，下方內容滑動而不是跳動。
+  const enter = fixed ? { opacity: 0, y: reduce ? 0 : -8 } : { opacity: 0, height: reduce ? "auto" : 0 };
+  const shown = fixed ? { opacity: 1, y: 0, height } : { opacity: 1, height };
+  const gone = fixed ? { opacity: 0, y: reduce ? 0 : -8, transition: leave } : { opacity: 0, height: reduce ? "auto" : 0, transition: reduce ? leave : { duration: 0.18, ease } };
 
   return (
-    <div
-      role={urgent ? "alert" : "status"}
-      className={cn(
-        "flex items-center justify-between gap-4 border-b border-border bg-card px-6 py-3 text-sm text-card-foreground",
-        fixed ? "fixed inset-x-0 z-40" : "relative w-full",
-        className,
-      )}
-      style={{ top: fixed ? top : undefined }}
-    >
-      <span className="inline-flex min-w-0 items-center gap-2.5">
-        <span className="inline-flex size-4 shrink-0 items-center justify-center text-muted-foreground">
-          {banner === "pending" ? <LoaderIcon /> : <span aria-hidden className={cn("size-1.5 rounded-full", dot)} />}
-        </span>
-        <span className="min-w-0 leading-snug">{banner === "success" ? t.success : banner === "pending" ? t.pending : banner === "failed" ? t.failed : t.error}</span>
-      </span>
-      <div className="flex flex-none items-center gap-2">
-        {banner === "success" && successHref && (
-          <a
-            href={successHref}
-            className="inline-flex h-7 items-center rounded-md bg-primary px-3 text-[13px] font-medium whitespace-nowrap text-primary-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            {t.successLink}
-          </a>
-        )}
-        <button
-          type="button"
-          onClick={() => {
-            setBanner("");
-            onDismiss?.();
-          }}
-          aria-label={t.close}
-          className="inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+    <AnimatePresence initial={!reduce}>
+      {banner && (
+        <motion.div
+          key="banner"
+          role={urgent ? "alert" : "status"}
+          initial={enter}
+          animate={shown}
+          exit={gone}
+          transition={reduce ? { duration: 0 } : { duration: 0.24, ease }}
+          className={cn(
+            "overflow-hidden border-b border-border bg-card text-sm text-card-foreground",
+            fixed ? "fixed inset-x-0 z-40" : "relative w-full",
+            className,
+          )}
+          style={{ top: fixed ? top : undefined }}
         >
-          <XIcon />
-        </button>
-      </div>
-    </div>
+          <div ref={innerRef} className="flex items-center justify-between gap-4 px-6 py-3">
+            <span className="inline-flex min-w-0 items-center gap-2.5">
+              <span className="relative inline-flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={banner === "pending" ? "pending" : banner}
+                    initial={{ opacity: 0, scale: reduce ? 1 : 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: reduce ? 1 : 0.5, transition: leave }}
+                    transition={swap}
+                    className="inline-flex"
+                  >
+                    {banner === "pending" ? <LoaderIcon /> : <span aria-hidden className={cn("size-1.5 rounded-full", dot)} />}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+              <span className="relative min-w-0 leading-snug">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={banner}
+                    initial={{ opacity: 0, y: reduce ? 0 : 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: reduce ? 0 : -6, transition: leave }}
+                    transition={swap}
+                    className="block"
+                  >
+                    {message}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </span>
+            <div className="flex flex-none items-center gap-2">
+              <AnimatePresence initial={false}>
+                {banner === "success" && successHref && (
+                  <motion.a
+                    key="link"
+                    href={successHref}
+                    initial={{ opacity: 0, x: reduce ? 0 : 6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, transition: leave }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.18, ease, delay: 0.06 }}
+                    className="inline-flex h-7 items-center rounded-md bg-primary px-3 text-[13px] font-medium whitespace-nowrap text-primary-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50"
+                  >
+                    {t.successLink}
+                  </motion.a>
+                )}
+              </AnimatePresence>
+              <button
+                type="button"
+                onClick={() => {
+                  setBanner("");
+                  onDismiss?.();
+                }}
+                aria-label={t.close}
+                className="inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <XIcon />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

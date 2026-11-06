@@ -1002,7 +1002,9 @@
       "type": "registry:block",
       "title": "Confirm Button",
       "description": "Press-twice confirm with no modal. The first press arms the button, swaps its label to the outcome and shows a short notice. A second press within 2.5 s runs the action, and the result appears in a polite status line. It uses usermeld's shadcn button variants and sizes, Escape disarms it, and the spinner respects reduced motion.",
-      "dependencies": [],
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -2571,7 +2573,9 @@
       "type": "registry:block",
       "title": "Payment Status Banner",
       "description": "Frosted full-width banner shown when a buyer returns from checkout: pending polls every 3 s up to 8 times and turns into success once access is unlocked, success stays and links to the course, failed and error close themselves after 8 s. Uses role=\"status\" for pending and success and role=\"alert\" for failures, has a labelled close button, and the spinner stops under reduced motion.",
-      "dependencies": [],
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
