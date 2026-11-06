@@ -23,6 +23,7 @@ const shared = `## Rules for every block
 - Never add gradients, glows, blur, colored shadows, particles or confetti around a block.
 - Motion only answers a user action or a data change. No fade-up on page load, no idle loops (countdowns and loading states are the exception).
 - Continuity: when state changes, reshape the same container instead of swapping it, and keep one anchor (thumbnail, icon, amount) in place across states. Old content leaves fast (about 100ms), new content arrives with the main line first and the secondary line slightly later. Plain crossfades and hard cuts are not enough. For dropdowns, drawers and accordions, also check what the rest of the page does while they move: content below should slide, not jump.
+- Density by layer: overview surfaces (lists, card grids, dashboards) stay flat, dense and easy to compare. Heavier treatments (3D, large charts, detailed motion) belong only in the drill-down layer the user opens on purpose (drawer, side panel, detail page). Carry the title, numbers and colours from the overview into the drill-down so it reads as the same data in more depth, and keep an exact way to read it there (a flat view toggle, exact values on hover).
 - One primary action per block. Name buttons after the result ("Claim coupon", not "OK").
 - Be honest: no fake scarcity, no fake timers, no showing 0 as social proof.
 - Check light and dark mode and a 375px wide screen. Chinese and Japanese copy must fit without layout changes.`;
