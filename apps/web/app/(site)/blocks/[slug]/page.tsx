@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
+import { CopyButton } from "@/components/copy-button";
 import { PreviewFrame } from "@/components/preview-frame";
 import { RelatedBlocks as RelatedGrid } from "@/components/related-blocks";
 import { RichText } from "@/components/rich-text";
 import { TierBadge } from "@/components/tier-badge";
+import { agentPrompt } from "@/lib/agent/prompt";
+import { propsSignature } from "@/lib/agent/props";
 import { getI18n } from "@/lib/i18n-server";
 import type { Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
@@ -54,6 +57,8 @@ export default async function BlockPage({ params }: Props) {
           .filter((file, i, all) => all.findIndex((f) => f.path === file.path) === i)
           .map(async (file) => ({ file, code: await readRegistryFile(file) })),
       );
+  // 給 agent 的 prompt 用英文原文；props 只從免費 block 的主檔抽，Pro 沒有 sources
+  const prompt = agentPrompt(found, sources[0] ? propsSignature(sources[0].code, found.name) : null);
   const deps = item.dependencies ?? [];
   const manualDeps = ["clsx", "tailwind-merge", ...deps];
 
@@ -92,6 +97,8 @@ export default async function BlockPage({ params }: Props) {
 
       <UsageGuide item={item} t={m.block} />
 
+      <AgentPrompt prompt={prompt} t={m.block} />
+
       {isPro ? (
         <ProInstall item={item} t={m.block} seePricing={m.common.seePricing} />
       ) : (
@@ -104,6 +111,23 @@ export default async function BlockPage({ params }: Props) {
 }
 
 type Item = NonNullable<ReturnType<typeof getItem>>;
+
+// 一鍵把安裝、使用時機、props 與設計規則打包給 coding agent
+function AgentPrompt({ prompt, t }: { prompt: string; t: Messages["block"] }) {
+  return (
+    <section className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-line bg-card p-5">
+      <div className="max-w-xl">
+        <h2 className="text-sm font-semibold">{t.agentTitle}</h2>
+        <p className="mt-1 text-sm text-pretty text-subtle">{t.agentBody}</p>
+      </div>
+      <CopyButton
+        value={prompt}
+        labels={{ copy: t.agentCopy, copied: t.agentCopied }}
+        className="bg-accent px-4 py-2.5 text-sm text-accent-fg hover:text-accent-fg hover:opacity-90"
+      />
+    </section>
+  );
+}
 
 // 參考資料庫式的「何時用、注意什麼、別名」，幫讀者判斷這個 block 是否適合
 function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {

@@ -103,6 +103,11 @@ ${seriesSummary.motion}
 
 const bySeries: Record<Series, string> = { paper, product, story, showcase, motion };
 
+/** 共用規則加上一個系列的規則，不含動效名稱對照表。給區塊頁的「複製給 agent」prompt 用，保持短。 */
+export function seriesRules(series: Series) {
+  return [shared, bySeries[series]].join("\n\n");
+}
+
 /** 單一系列或全部系列的設計規則（Markdown）。 */
 export function designRules(series?: Series) {
   const sections = series ? [bySeries[series]] : [paper, product, story, showcase, motion];
