@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeMenu } from "@/components/theme-menu";
 import { getI18n } from "@/lib/i18n-server";
 import { githubUrl } from "@/lib/site";
 
@@ -13,7 +14,7 @@ export async function SiteHeader() {
           <SunMark />
           SunUI
         </Link>
-        <nav className="flex items-center gap-0.5 text-sm sm:gap-1">
+        <nav className="flex items-center gap-0.5 text-sm sm:gap-1 [&>:last-child]:ml-1">
           <Link href="/" className="rounded-md px-2 py-1.5 text-subtle hover:text-fg sm:px-3">
             {m.nav.blocks}
           </Link>
@@ -30,6 +31,7 @@ export async function SiteHeader() {
             {m.nav.github}
           </a>
           <LocaleSwitcher locale={locale} label={m.nav.language} />
+          <ThemeMenu labels={m.nav} />
         </nav>
       </div>
     </header>

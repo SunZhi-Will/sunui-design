@@ -17,6 +17,11 @@ const en = {
     pricing: "Pricing",
     github: "GitHub",
     language: "Language",
+    theme: "Theme",
+    themeSystem: "System",
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeHint: "Block previews follow this too.",
   },
   footer: {
     tagline: "SunUI by Sun. Free blocks are MIT licensed.",
@@ -433,7 +438,7 @@ const zhTW: Messages = {
     siteDescription:
       "撕得開的優惠券、印出來的收據、集點章與促銷區塊，適用 React 與 Tailwind。無障礙、動態克制，用 shadcn CLI 一行安裝。",
   },
-  nav: { blocks: "區塊", icons: "圖示", docs: "文件", pricing: "價格", github: "GitHub", language: "語言" },
+  nav: { blocks: "區塊", icons: "圖示", docs: "文件", pricing: "價格", github: "GitHub", language: "語言", theme: "主題", themeSystem: "跟隨系統", themeLight: "淺色", themeDark: "深色", themeHint: "區塊預覽也會一起切換。" },
   footer: { tagline: "SunUI，由 Sun 製作。免費區塊採 MIT 授權。", changelog: "更新紀錄", license: "授權條款" },
   common: {
     copy: "複製",
@@ -821,7 +826,7 @@ const zhCN: Messages = {
     siteDescription:
       "撕得开的优惠券、打印出来的小票、集点章与促销区块，适用于 React 与 Tailwind。无障碍、动效克制，用 shadcn CLI 一行安装。",
   },
-  nav: { blocks: "区块", icons: "图标", docs: "文档", pricing: "价格", github: "GitHub", language: "语言" },
+  nav: { blocks: "区块", icons: "图标", docs: "文档", pricing: "价格", github: "GitHub", language: "语言", theme: "主题", themeSystem: "跟随系统", themeLight: "浅色", themeDark: "深色", themeHint: "区块预览也会一起切换。" },
   footer: { tagline: "SunUI，由 Sun 制作。免费区块采用 MIT 许可。", changelog: "更新日志", license: "许可协议" },
   common: {
     copy: "复制",
@@ -1202,7 +1207,7 @@ const ja: Messages = {
     siteDescription:
       "切り取れるクーポン、印字されるレシート、スタンプカード、セール用セクションを React と Tailwind で。アクセシブルで控えめなモーション、shadcn CLI でインストール。",
   },
-  nav: { blocks: "ブロック", icons: "アイコン", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語" },
+  nav: { blocks: "ブロック", icons: "アイコン", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語", theme: "テーマ", themeSystem: "システム", themeLight: "ライト", themeDark: "ダーク", themeHint: "ブロックのプレビューも一緒に切り替わります。" },
   footer: { tagline: "SunUI by Sun。無料ブロックは MIT ライセンスです。", changelog: "更新履歴", license: "ライセンス" },
   common: {
     copy: "コピー",

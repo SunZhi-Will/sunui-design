@@ -3,6 +3,19 @@
 /* registry/pro 在 .gitignore 裡（私有 repo），Tailwind 自動掃描會略過，要明確加入 */
 @source "../registry/pro";
 
+/* 主題：跟 shadcn / next-themes 同一個慣例。<html class="dark"> 或 "light" 是手動指定，
+   沒有 class 就跟系統。block 安裝到買家專案後也是這個行為。沒有 JS 時仍正確跟系統。 */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light), :root:not(.light) *) {
+      @slot;
+    }
+  }
+}
+
 :root {
   /* 黑白灰：純中性灰，不帶暖色或冷色偏移。強調靠字重、尺寸、明度，不靠色相 */
   --bg: #ffffff;
@@ -31,7 +44,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --bg: #0a0a0a;
     --fg: #ededed;
     --subtle: #8f8f8f;
@@ -49,6 +62,52 @@
     --ring: #ededed;
     --destructive: #f97066;
   }
+}
+
+/* 手動指定。也可以套在任何元素上，讓一塊區域固定成淺色或深色（例如 theme-picker 的 demo） */
+.dark {
+  --bg: #0a0a0a;
+  --fg: #ededed;
+  --subtle: #8f8f8f;
+  --line: #262626;
+  --card: #111111;
+  --stage: #171717;
+  --accent: #ededed;
+  --accent-soft: #1c1c1c;
+  --accent-fg: #0a0a0a;
+  color-scheme: dark;
+  --muted: #1c1c1c;
+  --muted-foreground: #8f8f8f;
+  --primary: #ededed;
+  --primary-foreground: #0a0a0a;
+  --ring: #ededed;
+  --destructive: #f97066;
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card-foreground: var(--fg);
+  --border: var(--line);
+}
+.light {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --subtle: #6b6b6b;
+  --line: #e4e4e4;
+  --card: #ffffff;
+  --stage: #f4f4f4;
+  --accent: #0a0a0a;
+  --accent-soft: #f0f0f0;
+  --accent-fg: #ffffff;
+  color-scheme: light;
+  --muted: #f4f4f4;
+  --muted-foreground: #6b6b6b;
+  --primary: #0a0a0a;
+  --primary-foreground: #ffffff;
+  --ring: #0a0a0a;
+  --destructive: #b42318;
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card-foreground: var(--fg);
+  --border: var(--line);
 }
 
 @theme inline {
@@ -89,11 +148,22 @@ body {
   background-color: transparent !important;
 }
 
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
 @media (prefers-color-scheme: dark) {
-  .shiki,
-  .shiki span {
+  :root:not(.light) .shiki,
+  :root:not(.light) .shiki span {
     color: var(--shiki-dark);
   }
+}
+
+/* 切換主題時整頁交叉淡化約 250ms（View Transitions，theme-picker 的 useThemeMode 觸發） */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* 預覽舞台的點狀底紋 */
@@ -111,8 +181,13 @@ body {
   background-color: var(--surround);
   background-image: repeating-linear-gradient(-45deg, var(--surround-stripe) 0 1px, transparent 1px 9px);
 }
+.dark .stage-surround {
+  --surround: #050505;
+  --surround-stripe: rgb(237 237 237 / 0.07);
+  --device-edge: #525252;
+}
 @media (prefers-color-scheme: dark) {
-  .stage-surround {
+  :root:not(.light) .stage-surround {
     --surround: #050505;
     --surround-stripe: rgb(237 237 237 / 0.07);
     --device-edge: #525252;

@@ -1,0 +1,20 @@
+{
+  "zh-TW": {
+    "title": "主題選擇器",
+    "description": "跟隨系統、淺色、深色三張卡片，每張都是縮小的真實介面，跟隨系統是左深右淺各半。附 useThemeMode：寫入 localStorage、在 <html> 套 .light 或 .dark，並用 View Transitions 交叉淡化。",
+    "whenToUse": ["設定頁或頁首的外觀切換", "想讓使用者選之前就看到結果，而不是讀「淺色」「深色」兩個字"],
+    "watchOut": ["把 themeScript() 內嵌在 <head>，否則重新整理時會先閃一下錯的主題", "Tailwind 的 dark 變體要改成認 .dark class，跟 shadcn 預設相同"]
+  },
+  "zh-CN": {
+    "title": "主题选择器",
+    "description": "跟随系统、浅色、深色三张卡片，每张都是缩小的真实界面，跟随系统是左深右浅各一半。附 useThemeMode：写入 localStorage、在 <html> 加 .light 或 .dark，并用 View Transitions 交叉淡化。",
+    "whenToUse": ["设置页或页头的外观切换", "想让用户选择前就看到效果，而不是读“浅色”“深色”两个字"],
+    "watchOut": ["把 themeScript() 内联到 <head>，否则刷新时会先闪一下错误的主题", "Tailwind 的 dark 变体要改成识别 .dark class，与 shadcn 默认一致"]
+  },
+  "ja": {
+    "title": "テーマピッカー",
+    "description": "システム・ライト・ダークの3枚のカード。どれも実際の画面を縮小したもので、システムは左がダーク、右がライトの半分ずつ。useThemeMode 付き：localStorage に保存し、<html> に .light か .dark を付け、View Transitions でクロスフェードします。",
+    "whenToUse": ["設定画面やヘッダーの外観切り替え", "「ライト」「ダーク」の文字を読ませる前に、結果を見せたいとき"],
+    "watchOut": ["themeScript() を <head> にインラインで入れないと、再読み込み時に一瞬違うテーマが見えます", "Tailwind の dark バリアントを .dark クラスに合わせること（shadcn の既定と同じ）"]
+  }
+}

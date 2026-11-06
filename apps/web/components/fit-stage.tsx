@@ -64,6 +64,9 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
     window.addEventListener("resize", update);
     const scheme = window.matchMedia("(prefers-color-scheme: dark)");
     scheme.addEventListener("change", update);
+    // 手動切換主題是改 <html> 的 class，不會觸發 matchMedia
+    const themeObserver = new MutationObserver(update);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     update();
     // block 是動態載入的；背景分頁不繪製影格時 ResizeObserver 也不會觸發，所以再補幾次偵測
     const late = [400, 1200, 2500].map((ms) => window.setTimeout(update, ms));
@@ -71,6 +74,7 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
       observer.disconnect();
       window.removeEventListener("resize", update);
       scheme.removeEventListener("change", update);
+      themeObserver.disconnect();
       late.forEach(window.clearTimeout);
     };
   }, [gutter, mode]);

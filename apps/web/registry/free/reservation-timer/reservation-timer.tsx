@@ -26,7 +26,8 @@ const rule = (sel: string, vars: Record<string, string>) =>
   `${sel}{${Object.entries(vars)
     .map(([k, v]) => `${k}:${v}`)
     .join(";")}}`;
-const SYSTEM_CSS = `${rule(".sunui-vw-hold", LIGHT)}@media (prefers-color-scheme: dark){${rule(".sunui-vw-hold", DARK)}}`;
+// "system" follows the OS, unless the page forces a theme with .light or .dark on <html> (next-themes, shadcn)
+const SYSTEM_CSS = `${rule(".sunui-vw-hold", LIGHT)}@media (prefers-color-scheme: dark){${rule(":root:not(.light) .sunui-vw-hold", DARK)}}${rule(".dark .sunui-vw-hold", DARK)}${rule(".light .sunui-vw-hold", LIGHT)}`;
 
 function themeStyle(theme: ReservationTheme) {
   return theme === "system" ? undefined : ((theme === "dark" ? DARK : LIGHT) as CSSProperties);

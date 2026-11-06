@@ -36,7 +36,8 @@ const rule = (sel: string, vars: Record<string, string>) =>
   `${sel}{${Object.entries(vars)
     .map(([k, v]) => `${k}:${v}`)
     .join(";")}}`;
-const SYSTEM_CSS = `${rule(".sunui-vw-steps", LIGHT)}@media (prefers-color-scheme: dark){${rule(".sunui-vw-steps", DARK)}}`;
+// "system" follows the OS, unless the page forces a theme with .light or .dark on <html> (next-themes, shadcn)
+const SYSTEM_CSS = `${rule(".sunui-vw-steps", LIGHT)}@media (prefers-color-scheme: dark){${rule(":root:not(.light) .sunui-vw-steps", DARK)}}${rule(".dark .sunui-vw-steps", DARK)}${rule(".light .sunui-vw-steps", LIGHT)}`;
 
 function themeStyle(theme: CheckoutStepsTheme) {
   return theme === "system" ? undefined : ((theme === "dark" ? DARK : LIGHT) as CSSProperties);

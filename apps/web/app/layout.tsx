@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "@/lib/i18n-server";
 import { getMessages } from "@/lib/messages";
 import { siteUrl } from "@/lib/site";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
 import "./globals.css";
 
@@ -24,7 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   return (
-    <html lang={locale}>
+    // 主題 class 由下面的內嵌腳本在第一次繪製前加上，伺服器端沒有，所以略過這一層的 hydration 比對
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript(THEME_STORAGE_KEY) }} />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh`}>{children}</body>
     </html>
   );

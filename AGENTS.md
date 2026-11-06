@@ -19,7 +19,7 @@ SunUI is a shadcn registry of animated React + Tailwind blocks for commerce and 
 
 ## Rules by task
 
-- **Free catalog is frozen (decided 2026-11-06, until the 2027-01-12 Product Hunt launch)**: do not add new free blocks or motion effect libraries (now 74 free blocks + 28 motion libraries). A new free item is allowed only if it is an atom pulled out of a Pro scene. Put the time into Pro scenes and launch work. Reasoning: `reports/商業模式深度分析-2026-11-06.md`.
+- **Free catalog is frozen (decided 2026-11-06, until the 2027-01-12 Product Hunt launch)**: do not add new free blocks or motion effect libraries (now 75 free blocks + 28 motion libraries; theme-picker was added 2026-11-07 as an atom of the Pro day-night-hero). A new free item is allowed only if it is an atom pulled out of a Pro scene. Put the time into Pro scenes and launch work. Reasoning: `reports/商業模式深度分析-2026-11-06.md`.
 - **Adding or editing a block**: follow `apps/web/README.md` (steps) and the design doc for its series: `apps/web/DESIGN.md` (paper, default), `DESIGN-product.md`, `DESIGN-story.md`. Ported blocks follow `apps/web/PORTING.md`. Add `meta.usage` (`whenToUse`, `watchOut`, `aliases`): agents search on it.
 - **Changing a design doc**: update `apps/web/lib/agent/guidelines.ts` too. It is the English copy that the MCP server, the skill and `llms-full.txt` serve.
 - **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check.
