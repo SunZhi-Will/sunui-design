@@ -20,6 +20,7 @@ const proLead = [
   "day-night-hero",
   "black-friday-weekend",
   "self-building-page",
+  "curve-rail-hero",
   "festival-banner",
   // B
   "physics-cart-jar",
