@@ -100,7 +100,7 @@ export function StoreHeader({
   const navLink =
     "rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
   const iconButton =
-    "relative grid size-9 place-items-center rounded-md text-foreground hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+    "relative grid size-9 place-items-center rounded-md text-foreground hover:bg-[#171717]/5 dark:hover:bg-[#ededed]/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 
   return (
     <motion.header

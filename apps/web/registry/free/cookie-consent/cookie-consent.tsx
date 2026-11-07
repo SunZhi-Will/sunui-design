@@ -163,7 +163,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
   const choiceButton = cn(
     "min-h-10 rounded-md border px-4 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60",
     edge,
-    "bg-background hover:bg-accent",
+    "bg-white hover:bg-[#efefef] dark:bg-[#0a0a0a] dark:hover:bg-[#262626]",
   );
 
   return (
