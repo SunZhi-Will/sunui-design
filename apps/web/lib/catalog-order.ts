@@ -19,6 +19,7 @@ const proLead = [
   "campaign-landing",
   "day-night-hero",
   "black-friday-weekend",
+  "checkout-flow",
   "self-building-page",
   "curve-rail-hero",
   "festival-banner",
