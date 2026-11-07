@@ -23,6 +23,7 @@ const proLead = [
   "festival-banner",
   // B
   "physics-cart-jar",
+  "hoop-upload",
   "peel-sticker-coupon",
   "order-island",
   "receipt-printer",
