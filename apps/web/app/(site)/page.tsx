@@ -7,7 +7,8 @@ import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
-import { getItems, installCommand, type Series } from "@/lib/registry";
+import { orderCatalog } from "@/lib/catalog-order";
+import { getItems, installCommand } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { localizeItem } from "@/lib/registry-i18n";
 import { variantIds } from "@/registry/__generated__/variants";
@@ -20,16 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const { locale, m } = await getI18n();
   const all = getItems();
-  // 紙感電商是主線，排最前面，其中 Pro 先出現；動效庫排最後，免得首頁第一眼只看到特效
-  const seriesRank: Record<Series, number> = { paper: 0, story: 1, showcase: 2, product: 3, motion: 4 };
-  const items = [...all]
-    .sort(
-      (a, b) =>
-        seriesRank[seriesOf(a)] - seriesRank[seriesOf(b)] ||
-        Number(b.meta.tier === "pro") - Number(a.meta.tier === "pro") ||
-        b.meta.addedAt.localeCompare(a.meta.addedAt) ||
-        a.title.localeCompare(b.title),
-    )
+  // 免費與 Pro 交叉排（每排中間一張 Pro），動效庫排最後；規則見 lib/catalog-order.ts
+  const items = orderCatalog(all)
     .flatMap((item) => {
       const { name, title, description, meta, categories } = localizeItem(item, locale);
       // 保留英文標題與描述給搜尋用
