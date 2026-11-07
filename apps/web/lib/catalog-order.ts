@@ -29,6 +29,7 @@ const proLead = [
   "physics-cart-jar",
   "hoop-upload",
   "vote-terrain",
+  "redline-reveal",
   "cutaway-spec",
   "card-dock",
   "ask-to-shop",
