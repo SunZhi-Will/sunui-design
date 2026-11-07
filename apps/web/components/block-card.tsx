@@ -7,8 +7,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LivePreview } from "@/components/live-preview";
 import { format, type Locale } from "@/lib/i18n";
 import type { Tier } from "@/lib/registry";
+import { useSaved } from "@/lib/saved";
+import { cn } from "@/lib/utils";
 
-export type BlockCardLabels = { livePreview: string; expand: string; pro: string };
+/** save 有給才顯示書籤，例如「收藏 {title}」 */
+export type BlockCardLabels = { livePreview: string; expand: string; pro: string; save?: string };
 
 /**
  * 型錄卡片：元件以原尺寸即時跑、可以直接操作；點空白處或右上角展開成面板。
@@ -77,16 +80,42 @@ export function BlockCard({
           </svg>
         </Link>
       </motion.div>
-      <h3 className="mt-3 px-1 text-sm font-medium tracking-tight">
-        <Link
-          href={href}
-          scroll={false}
-          className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {title}
-        </Link>
-        {note && <span className="ml-2 text-xs font-normal text-subtle">{note}</span>}
-      </h3>
+      <div className="mt-3 flex items-start justify-between gap-2 px-1">
+        <h3 className="min-w-0 text-sm font-medium tracking-tight">
+          <Link
+            href={href}
+            scroll={false}
+            className="rounded-sm text-subtle transition-colors outline-none group-hover:text-fg hover:text-fg focus-visible:text-fg focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            {title}
+          </Link>
+          {note && <span className="ml-2 text-xs font-normal text-subtle">{note}</span>}
+        </h3>
+        {labels.save && <SaveButton name={name} title={title} label={labels.save} />}
+      </div>
     </li>
+  );
+}
+
+/** 書籤：存在這個瀏覽器，不需要帳號。效果庫的單一樣式也存整個庫的名稱。 */
+function SaveButton({ name, title, label }: { name: string; title: string; label: string }) {
+  const { saved, toggle } = useSaved();
+  const on = saved.includes(name);
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      aria-label={format(label, { title })}
+      title={format(label, { title })}
+      onClick={() => toggle(name)}
+      className={cn(
+        "-mt-1 -mr-1 grid size-7 shrink-0 place-items-center rounded-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent",
+        on ? "text-fg" : "text-subtle/60 hover:text-fg",
+      )}
+    >
+      <svg viewBox="0 0 24 24" className="size-4" fill={on ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" aria-hidden="true">
+        <path d="M6 3.5h12v17l-6-4.25-6 4.25z" />
+      </svg>
+    </button>
   );
 }

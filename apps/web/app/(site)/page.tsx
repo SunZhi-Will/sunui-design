@@ -33,7 +33,15 @@ export default async function HomePage() {
     .flatMap((item) => {
       const { name, title, description, meta, categories } = localizeItem(item, locale);
       // 保留英文標題與描述給搜尋用
-      const base = { name, title, description, meta, categories, search: `${item.title} ${item.description}` };
+      const base = {
+        name,
+        title,
+        description,
+        meta,
+        categories,
+        search: `${item.title} ${item.description}`,
+        en: { title: item.title, description: item.description },
+      };
       // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚；型錄預設會收合成一張
       const variants = variantIds[name];
       if (!variants) return [base];
@@ -100,7 +108,7 @@ export default async function HomePage() {
       <Catalog
         items={items}
         locale={locale}
-        messages={{ catalog: m.catalog, interactions: m.interactions, series: m.series, tier: m.tier }}
+        messages={{ catalog: m.catalog, collections: m.collections, interactions: m.interactions, series: m.series, tier: m.tier }}
       />
 
       <AgentSteps m={m.home.agent} />

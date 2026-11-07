@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { BlockCard } from "@/components/block-card";
+import { CopyButton } from "@/components/copy-button";
+import { collections, collectionSlugs, setAgentPrompt, setInstallCommands, type CollectionSlug, type SetBlock } from "@/lib/collections";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
+import { useSaved } from "@/lib/saved";
 import { seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
 import { variantFeatured } from "@/registry/__generated__/variants";
@@ -23,18 +26,25 @@ export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | 
   styleCount?: number;
   /** 收合的效果庫卡片：卡片預覽這一種樣式，連結仍指向整個庫 */
   preview?: string;
+  /** 英文原文，給「複製給 agent」的整組 prompt 用 */
+  en?: { title: string; description: string };
 };
 
-export type CatalogMessages = Pick<Messages, "catalog" | "interactions" | "series" | "tier">;
+export type CatalogMessages = Pick<Messages, "catalog" | "collections" | "interactions" | "series" | "tier">;
+
+/** 型錄上方的「從一整頁開始」：一個合輯，或這個瀏覽器收藏的區塊 */
+type BlockSet = CollectionSlug | "saved";
 
 export function Catalog({ items, locale, messages }: { items: CatalogItem[]; locale: Locale; messages: CatalogMessages }) {
-  const { catalog: t, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
+  const { catalog: t, collections: collectionText, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
   const [tier, setTier] = useState<Tier | "all">("all");
   const [series, setSeries] = useState<Series | "all">("all");
   const [query, setQuery] = useState("");
+  const [blockSet, setBlockSet] = useState<BlockSet | null>(null);
+  const { saved, clear: clearSaved } = useSaved();
   const searchRef = useRef<HTMLInputElement>(null);
-  const cardLabels = { livePreview: t.livePreview, expand: t.expand, pro: tierLabels.pro };
+  const cardLabels = { livePreview: t.livePreview, expand: t.expand, pro: tierLabels.pro, save: t.save };
 
   // 效果庫平常收合成一張卡，選了 Motion 系列或搜尋時才展開成一種樣式一張。
   // 收合的卡預覽代表樣式（variants.tsx 的 featured），點開是整個庫的樣式格子，不是單一樣式
@@ -55,7 +65,37 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       ];
     });
   }, [items]);
-  const viewItems = expandStyles ? items : collapsed;
+
+  // 每個合輯只算這份 clone 找得到的區塊（公開 repo 沒有 Pro 清單時，Pro 名稱會被略過）
+  const available = useMemo(() => new Set(collapsed.map((item) => item.name)), [collapsed]);
+  const setNames = useMemo(() => {
+    const map = new Map<BlockSet, string[]>();
+    for (const c of collections) map.set(c.slug, c.blocks.filter((name) => available.has(name)));
+    map.set("saved", saved.filter((name) => available.has(name)));
+    return map;
+  }, [available, saved]);
+  const activeNames = blockSet ? (setNames.get(blockSet) ?? []) : null;
+
+  // 選了合輯或收藏時，照合輯的頁面順序（收藏則照收藏順序）排，效果庫仍是一個庫一張卡
+  const viewItems = useMemo(() => {
+    if (!activeNames) return expandStyles ? items : collapsed;
+    const order = new Map(activeNames.map((name, i) => [name, i]));
+    const source = expandStyles ? items : collapsed;
+    return source
+      .filter((item) => order.has(item.name))
+      .sort((a, b) => order.get(a.name)! - order.get(b.name)!);
+  }, [activeNames, expandStyles, items, collapsed]);
+
+  const chooseSet = (next: BlockSet | null) => {
+    setBlockSet(next);
+    // 合輯可分享：網址帶 ?collection=，收藏只存在這個瀏覽器所以帶 ?saved
+    const url = new URL(window.location.href);
+    url.searchParams.delete("collection");
+    url.searchParams.delete("saved");
+    if (next === "saved") url.searchParams.set("saved", "1");
+    else if (next) url.searchParams.set("collection", next);
+    window.history.replaceState(window.history.state, "", url);
+  };
 
   // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入，數量條以 ?tier= 帶入
   useEffect(() => {
@@ -67,6 +107,9 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     // 首頁數量條以 ?tier= 帶入方案篩選
     const tierParam = params.get("tier");
     if (tierParam === "free" || tierParam === "pro") setTier(tierParam);
+    const collectionParam = params.get("collection");
+    if (collectionParam && (collectionSlugs as string[]).includes(collectionParam)) setBlockSet(collectionParam as CollectionSlug);
+    else if (params.has("saved")) setBlockSet("saved");
     // 篩選後清單變短，瀏覽器先前的錨點跳轉會落在頁尾，篩完再對準一次
     if (window.location.hash === "#blocks") {
       setTimeout(() => document.getElementById("blocks")?.scrollIntoView(), 0);
@@ -86,12 +129,13 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const filtered = query.trim() !== "" || interaction !== "all" || tier !== "all" || series !== "all";
+  const filtered = query.trim() !== "" || interaction !== "all" || tier !== "all" || series !== "all" || blockSet !== null;
   const reset = () => {
     setQuery("");
     setInteraction("all");
     setTier("all");
     setSeries("all");
+    if (blockSet) chooseSet(null);
   };
 
   // 互動數字跟著目前的系列與方案篩選，避免顯示點下去才發現是 0 的數字
@@ -138,8 +182,55 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     });
   }, [viewItems, interaction, tier, series, query]);
 
+  // 整組複製用英文原文，順序同畫面
+  const setBlocks: SetBlock[] = useMemo(() => {
+    if (!activeNames) return [];
+    const byName = new Map(collapsed.map((item) => [item.name, item]));
+    return activeNames.flatMap((name) => {
+      const item = byName.get(name);
+      if (!item) return [];
+      return [{ name, title: item.en?.title ?? item.title, description: item.en?.description ?? item.description, tier: item.meta.tier }];
+    });
+  }, [activeNames, collapsed]);
+
   return (
     <section id="blocks" aria-label={t.sectionLabel} className="scroll-mt-24">
+      <div role="group" aria-label={t.setsLabel} className="mb-6 flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-sm text-subtle">{t.setsLabel}</span>
+        {collections.map((c) => (
+          <FilterChip
+            key={c.slug}
+            active={blockSet === c.slug}
+            onClick={() => chooseSet(blockSet === c.slug ? null : c.slug)}
+            label={collectionText[c.slug].title}
+            count={setNames.get(c.slug)?.length ?? 0}
+          />
+        ))}
+        <FilterChip
+          active={blockSet === "saved"}
+          onClick={() => chooseSet(blockSet === "saved" ? null : "saved")}
+          label={t.saved}
+          count={setNames.get("saved")?.length ?? 0}
+          icon={
+            <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden="true">
+              <path d="M6 3.5h12v17l-6-4.25-6 4.25z" />
+            </svg>
+          }
+        />
+      </div>
+
+      {blockSet && (
+        <SetPanel
+          title={blockSet === "saved" ? t.savedTitle : collectionText[blockSet].title}
+          intro={blockSet === "saved" ? t.savedIntro : collectionText[blockSet].intro}
+          blocks={setBlocks}
+          heading={collections.find((c) => c.slug === blockSet)?.agentTitle}
+          proLabel={tierLabels.pro}
+          t={t}
+          onClearSaved={blockSet === "saved" && setBlocks.length > 0 ? clearSaved : undefined}
+        />
+      )}
+
       <div className="mb-6 grid gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <label className="relative min-w-0 flex-1 sm:max-w-xs">
@@ -251,7 +342,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
       {visible.length === 0 && (
         <div className="rounded-lg border border-dashed border-line p-10 text-center text-sm text-subtle">
-          <p>{t.empty}</p>
+          <p>{blockSet === "saved" && setBlocks.length === 0 ? t.savedEmpty : t.empty}</p>
           <button
             type="button"
             onClick={reset}
@@ -265,16 +356,70 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   );
 }
 
+function SetPanel({
+  title,
+  intro,
+  blocks,
+  heading,
+  proLabel,
+  t,
+  onClearSaved,
+}: {
+  title: string;
+  intro: string;
+  blocks: SetBlock[];
+  /** 英文的頁面名稱，寫進 prompt 第一句；收藏沒有 */
+  heading?: string;
+  proLabel: string;
+  t: Messages["catalog"];
+  onClearSaved?: () => void;
+}) {
+  const { free, pro } = setInstallCommands(blocks);
+  const install = [free, pro].filter(Boolean).join("\n");
+  const proCount = blocks.filter((b) => b.tier === "pro").length;
+  const copyLabels = { copy: t.copyInstall, copied: t.copied };
+  return (
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 rounded-lg border border-line bg-card p-5">
+      <div className="min-w-0 max-w-xl">
+        <h3 className="font-medium tracking-tight">{title}</h3>
+        <p className="mt-1 text-sm text-pretty text-subtle">{intro}</p>
+        {proCount > 0 && (
+          <p className="mt-2 text-xs text-subtle">
+            {format(t.setProNote, { n: proCount, pro: proLabel })}
+          </p>
+        )}
+      </div>
+      {blocks.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {onClearSaved && (
+            <button type="button" onClick={onClearSaved} className="px-2 py-1.5 text-sm text-subtle underline-offset-4 hover:text-fg hover:underline">
+              {t.clearSaved}
+            </button>
+          )}
+          <CopyButton value={install} labels={copyLabels} className="px-3 py-1.5 text-sm" />
+          <CopyButton
+            value={setAgentPrompt(blocks, heading)}
+            labels={{ copy: t.copyPrompt, copied: t.copied }}
+            className="border-fg bg-fg px-3 py-1.5 text-sm text-bg hover:text-bg hover:opacity-90"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FilterChip({
   active,
   onClick,
   label,
   count,
+  icon,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
   count: number;
+  icon?: ReactNode;
 }) {
   return (
     <button
@@ -286,6 +431,7 @@ function FilterChip({
         active ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
       )}
     >
+      {icon}
       {label}
       <span className={cn("text-xs tabular-nums", active ? "opacity-70" : "opacity-60")}>{count}</span>
     </button>
