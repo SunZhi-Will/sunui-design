@@ -70,26 +70,34 @@ const options: Partial<Record<SceneTransitionName, { direction?: SceneDirection;
   liquid: { colors: ["#2a9d8f"] },
 };
 
-export default function SceneTransitionsDemo() {
+/** 單一轉場的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function SceneTransitionTile({ name }: { name: SceneTransitionName }) {
   const t = useDemoText(copy);
   const scenes = [<Day key="d" label={t.day} />, <Night key="n" label={t.night} />, <Dusk key="k" label={t.dusk} />];
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="font-mono text-xs font-medium">{name}</span>
+      <SceneSlideshow
+        scenes={scenes}
+        transition={name}
+        interval={2600}
+        controls
+        labels={{ next: t.next, previous: t.previous }}
+        className="aspect-video overflow-hidden rounded-md border"
+        {...options[name]}
+      />
+    </div>
+  );
+}
+
+export default function SceneTransitionsDemo() {
+  const t = useDemoText(copy);
   return (
     <div className="w-full max-w-5xl p-4">
       <p className="mb-6 text-sm text-muted-foreground">{t.hint}</p>
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {sceneTransitions.map((name) => (
-          <div key={name} className="flex flex-col gap-2">
-            <span className="font-mono text-xs font-medium">{name}</span>
-            <SceneSlideshow
-              scenes={scenes}
-              transition={name}
-              interval={2600}
-              controls
-              labels={{ next: t.next, previous: t.previous }}
-              className="aspect-video overflow-hidden rounded-md border"
-              {...options[name]}
-            />
-          </div>
+          <SceneTransitionTile key={name} name={name} />
         ))}
       </div>
     </div>

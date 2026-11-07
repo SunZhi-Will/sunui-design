@@ -13,14 +13,14 @@ const variantIds = {};
 const variantFeatured = {};
 
 // variants.tsx：效果庫把每種樣式拆成首頁的一張卡。
-// 樣式清單寫成 `export const variants = <陣列>`，可以是字串陣列、block 檔裡的陣列名稱，或 [...a, ...b]。
+// 樣式清單寫成 `export const variants = <陣列>`，可以是字串陣列、block 檔或 demo.tsx 裡的陣列名稱，或 [...a, ...b]。
 // 這裡在建置時解析成純資料，伺服器端（首頁、靜態路由）才拿得到，不必載入 client 模組。
 function readVariantIds(dir, name) {
   const variantSrc = readFileSync(path.join(dir, name, "variants.tsx"), "utf8");
   const match = variantSrc.match(/export const variants\s*(?::[^=]+)?=\s*([\s\S]*?);/);
   if (!match) throw new Error(`[previews] ${name}/variants.tsx: missing \`export const variants = ...\``);
   const arrays = {};
-  for (const file of [path.join(dir, name, `${name}.tsx`), path.join(dir, name, "variants.tsx")]) {
+  for (const file of ["", "demo.tsx", "variants.tsx"].map((f) => path.join(dir, name, f || `${name}.tsx`))) {
     if (!existsSync(file)) continue;
     const src = readFileSync(file, "utf8");
     for (const m of src.matchAll(/(?:export )?const (\w+)\s*=\s*\[([\s\S]*?)\]\s*as const/g)) {

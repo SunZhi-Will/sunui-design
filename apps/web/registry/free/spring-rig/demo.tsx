@@ -30,6 +30,19 @@ const copy = {
   },
 } satisfies Record<string, { names: Record<SpringRigPreset, string> } & Record<string, unknown>>;
 
+/** 單一彈簧骨架的示範格：首頁型錄（variants.tsx）用，預設自動擺動，卡片不用先拖曳才看得出效果 */
+export function SpringRigTile({ preset }: { preset: SpringRigPreset }) {
+  const t = useDemoText(copy);
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card px-6 pt-6 pb-4">
+      <SpringRig preset={preset} autoplay label={t.names[preset]} className="max-w-44" />
+      <span className="text-xs text-muted-foreground">
+        {t.names[preset]} <code className="font-mono opacity-70">{preset}</code>
+      </span>
+    </div>
+  );
+}
+
 export default function SpringRigDemo() {
   const t = useDemoText(copy);
   const [autoplay, setAutoplay] = useState(false);

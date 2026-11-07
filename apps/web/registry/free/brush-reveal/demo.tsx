@@ -1,6 +1,7 @@
 "use client";
 
 import { useDemoText } from "@/lib/demo-locale";
+import { cn } from "@/lib/utils";
 
 import { BrushReveal } from "./brush-reveal";
 
@@ -103,21 +104,29 @@ const copy = {
   },
 };
 
+/** 線稿刷出上色版：完整 demo 的主圖，也是首頁型錄卡片（card.tsx）的內容 */
+export function LampReveal({ className, wide = false }: { className?: string; wide?: boolean }) {
+  const t = useDemoText(copy);
+  return (
+    <figure className={className}>
+      <BrushReveal
+        hint={t.lampHint}
+        brushSize={120}
+        className={cn("aspect-[16/10] rounded-xl border border-border", wide && "sm:aspect-[16/7]")}
+        reveal={<img src={finished} alt={t.lampRevealAlt} className="h-full w-full object-cover" draggable={false} />}
+      >
+        <img src={sketch} alt={t.lampAlt} className="h-full w-full object-cover" draggable={false} />
+      </BrushReveal>
+      <figcaption className="mt-2 text-sm text-muted-foreground">{t.lampCaption}</figcaption>
+    </figure>
+  );
+}
+
 export default function BrushRevealDemo() {
   const t = useDemoText(copy);
   return (
     <div className="grid w-full max-w-5xl gap-5 p-4 sm:grid-cols-2">
-      <figure className="sm:col-span-2">
-        <BrushReveal
-          hint={t.lampHint}
-          brushSize={120}
-          className="aspect-[16/10] rounded-xl border border-border sm:aspect-[16/7]"
-          reveal={<img src={finished} alt={t.lampRevealAlt} className="h-full w-full object-cover" draggable={false} />}
-        >
-          <img src={sketch} alt={t.lampAlt} className="h-full w-full object-cover" draggable={false} />
-        </BrushReveal>
-        <figcaption className="mt-2 text-sm text-muted-foreground">{t.lampCaption}</figcaption>
-      </figure>
+      <LampReveal className="sm:col-span-2" wide />
 
       <BrushReveal
         shape="ink"

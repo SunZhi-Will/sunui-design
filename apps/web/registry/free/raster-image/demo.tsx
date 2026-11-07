@@ -95,6 +95,32 @@ const copy = {
 
 const images: Record<string, string> = { halftone: bottle, ascii: stillLife, dots: bottle, dither: stillLife, lines: ridge };
 
+/** 單一點陣化樣式的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function RasterTile({ mode, animateIn = false, className }: { mode: RasterMode; animateIn?: boolean; className?: string }) {
+  const t = useDemoText(copy);
+  const item = t.items.find((x) => x.mode === mode)!;
+  const dark = mode === "dots";
+  return (
+    <figure className={className}>
+      <RasterImage
+        src={images[mode]}
+        alt={item.alt}
+        mode={mode}
+        cell={mode === "ascii" ? 9 : mode === "dither" ? 4 : 7}
+        color={dark ? "#f5f5f5" : undefined}
+        background={dark ? "#171717" : undefined}
+        invert={dark}
+        animateIn={animateIn}
+        className="rounded-xl border border-border text-foreground"
+      />
+      <figcaption className="mt-2 flex items-baseline justify-between gap-3 text-sm">
+        <span>{item.caption}</span>
+        <code className="font-mono text-xs text-muted-foreground">{mode}</code>
+      </figcaption>
+    </figure>
+  );
+}
+
 export default function RasterImageDemo() {
   const t = useDemoText(copy);
   return (
@@ -103,28 +129,14 @@ export default function RasterImageDemo() {
       <h2 className="mt-1 text-2xl font-semibold tracking-tight">{t.title}</h2>
       <p className="mt-1 text-sm text-muted-foreground">{t.lead}</p>
       <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {t.items.map((item, i) => {
-          const dark = item.mode === "dots";
-          return (
-            <figure key={item.mode} className={i === 0 ? "sm:col-span-2 lg:col-span-1" : undefined}>
-              <RasterImage
-                src={images[item.mode]}
-                alt={item.alt}
-                mode={item.mode as RasterMode}
-                cell={item.mode === "ascii" ? 9 : item.mode === "dither" ? 4 : 7}
-                color={dark ? "#f5f5f5" : undefined}
-                background={dark ? "#171717" : undefined}
-                invert={dark}
-                animateIn={i === 0}
-                className="rounded-xl border border-border text-foreground"
-              />
-              <figcaption className="mt-2 flex items-baseline justify-between gap-3 text-sm">
-                <span>{item.caption}</span>
-                <code className="font-mono text-xs text-muted-foreground">{item.mode}</code>
-              </figcaption>
-            </figure>
-          );
-        })}
+        {t.items.map((item, i) => (
+          <RasterTile
+            key={item.mode}
+            mode={item.mode as RasterMode}
+            animateIn={i === 0}
+            className={i === 0 ? "sm:col-span-2 lg:col-span-1" : undefined}
+          />
+        ))}
       </div>
     </section>
   );

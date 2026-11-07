@@ -71,26 +71,30 @@ function Tile({ name, hint, replay, children }: { name: string; hint: string; re
   );
 }
 
-export default function PhotoLooksDemo() {
+/** 單一攝影風格的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function PhotoLookTile({ effect }: { effect: PhotoLookName }) {
   const t = useDemoText(copy);
+  const portrait = effect === "double-exposure";
+  return (
+    <Tile name={effect} hint={t.hint} replay={t.replay}>
+      <PhotoLook
+        effect={effect}
+        src={portrait ? PORTRAIT : SCENE}
+        alt={portrait ? t.portrait : t.alt}
+        secondSrc={portrait ? SCENE : undefined}
+        trigger="hover"
+        invert
+      />
+    </Tile>
+  );
+}
 
+export default function PhotoLooksDemo() {
   return (
     <div className="grid w-full max-w-5xl grid-cols-1 gap-x-6 gap-y-10 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {photoLooks.map((effect: PhotoLookName) => {
-        const portrait = effect === "double-exposure";
-        return (
-          <Tile key={effect} name={effect} hint={t.hint} replay={t.replay}>
-            <PhotoLook
-              effect={effect}
-              src={portrait ? PORTRAIT : SCENE}
-              alt={portrait ? t.portrait : t.alt}
-              secondSrc={portrait ? SCENE : undefined}
-              trigger="hover"
-              invert
-            />
-          </Tile>
-        );
-      })}
+      {photoLooks.map((effect: PhotoLookName) => (
+        <PhotoLookTile key={effect} effect={effect} />
+      ))}
     </div>
   );
 }

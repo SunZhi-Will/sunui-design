@@ -94,6 +94,19 @@ const copy = {
 
 const paletteNames = Object.keys(gradientPalettes) as GradientPalette[];
 
+/** 單一漸層樣式的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function GradientPresetTile({ preset, palette }: { preset: GradientPreset; palette?: GradientPalette }) {
+  const t = useDemoText(copy);
+  return (
+    <GradientBackdrop preset={preset} palette={palette} className="aspect-[4/3] rounded-lg border border-border">
+      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] text-white backdrop-blur-sm">
+        <span className="font-medium">{t.names[preset]}</span>
+        <code className="opacity-70">{preset}</code>
+      </div>
+    </GradientBackdrop>
+  );
+}
+
 export default function GradientBackdropDemo() {
   const t = useDemoText(copy);
   const [palette, setPalette] = useState<GradientPalette | undefined>(undefined);
@@ -145,12 +158,7 @@ export default function GradientBackdropDemo() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {gradientPresets.map((preset) => (
-          <GradientBackdrop key={preset} preset={preset} palette={palette} className="aspect-[4/3] rounded-lg border border-border">
-            <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] text-white backdrop-blur-sm">
-              <span className="font-medium">{t.names[preset]}</span>
-              <code className="opacity-70">{preset}</code>
-            </div>
-          </GradientBackdrop>
+          <GradientPresetTile key={preset} preset={preset} palette={palette} />
         ))}
       </div>
     </div>

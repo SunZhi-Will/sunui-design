@@ -66,6 +66,35 @@ const copy = {
   },
 };
 
+/** 單一點雲形狀的示範格：首頁型錄（variants.tsx）用，形狀名稱沿用 demo 的文案 */
+export function PointCloudTile({ shape }: { shape: PointCloudShape }) {
+  const t = useDemoText(copy);
+  const feature = t.features.find((f) => f.shape === shape);
+  const caption = shape === "text" ? t.saleNote : shape === "wave" ? t.wave : feature?.name;
+  const dark = shape === "text";
+  return (
+    <figure className={cn("overflow-hidden rounded-xl border border-border", dark && "bg-[#171717]")}>
+      <PointCloud
+        shape={shape}
+        text={dark ? t.sale : undefined}
+        count={1400}
+        color={dark ? "#f5f5f5" : undefined}
+        label={caption ?? t.label}
+        className={cn("aspect-[4/3]", !dark && "text-foreground")}
+      />
+      <figcaption
+        className={cn(
+          "flex items-baseline justify-between gap-3 border-t px-4 py-2 text-sm",
+          dark ? "border-white/10 text-neutral-300" : "border-border text-muted-foreground",
+        )}
+      >
+        <span className="truncate">{caption}</span>
+        <code className="font-mono text-xs opacity-70">{shape}</code>
+      </figcaption>
+    </figure>
+  );
+}
+
 export default function PointCloudDemo() {
   const t = useDemoText(copy);
   const [active, setActive] = useState(0);

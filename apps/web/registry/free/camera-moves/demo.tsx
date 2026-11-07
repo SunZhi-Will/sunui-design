@@ -357,32 +357,32 @@ function ScrollTile({ label }: { label: string }) {
   );
 }
 
+/** 單一運鏡的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function CameraMoveTile({ move }: { move: CameraMove }) {
+  const t = useDemoText(copy);
+  const kind = kinds[move] ?? "loop";
+  return (
+    <Tile name={move} label={t.names[move]} hint={t[kind]} replay={kind === "entrance" ? t.replay : undefined}>
+      <CameraStage
+        move={move}
+        trigger={triggerOf[kind]}
+        label={t.scene}
+        focusPoint={move === "extreme-close-up" || move === "zoom-in" ? { x: 50, y: 52 } : undefined}
+      >
+        <Scene move={move} />
+      </CameraStage>
+    </Tile>
+  );
+}
+
 export default function CameraMovesDemo() {
   const t = useDemoText(copy);
 
   return (
     <div className="grid w-full max-w-5xl grid-cols-1 gap-x-6 gap-y-10 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {cameraMoves.map((move) => {
-        const kind = kinds[move] ?? "loop";
-        return (
-          <Tile
-            key={move}
-            name={move}
-            label={t.names[move]}
-            hint={t[kind]}
-            replay={kind === "entrance" ? t.replay : undefined}
-          >
-            <CameraStage
-              move={move}
-              trigger={triggerOf[kind]}
-              label={t.scene}
-              focusPoint={move === "extreme-close-up" || move === "zoom-in" ? { x: 50, y: 52 } : undefined}
-            >
-              <Scene move={move} />
-            </CameraStage>
-          </Tile>
-        );
-      })}
+      {cameraMoves.map((move) => (
+        <CameraMoveTile key={move} move={move} />
+      ))}
       <Tile name="dolly-zoom + progress" label={t.scrollName} hint={t.scroll}>
         <ScrollTile label={t.scene} />
       </Tile>

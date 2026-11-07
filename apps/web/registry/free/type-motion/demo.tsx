@@ -96,31 +96,73 @@ function Tile({ name, hint, replay, children }: { name: string; hint: string; re
   );
 }
 
-export default function TypeMotionDemo() {
+// 每一格的代號：首頁型錄（variants.tsx）一格一張卡
+export const typeMotionTiles = [
+  "text-on-path-wave",
+  "text-on-path-circle",
+  "text-on-path-arc",
+  "variable-font-wave",
+  "variable-font-word",
+  "text-mask-gradient",
+  "text-mask-image",
+] as const;
+export type TypeMotionTileId = (typeof typeMotionTiles)[number];
+
+/** 單一字體動態的示範格：完整 demo 與首頁型錄共用 */
+export function TypeMotionTile({ id }: { id: TypeMotionTileId }) {
   const t = useDemoText(copy);
+  switch (id) {
+    case "text-on-path-wave":
+      return (
+        <Tile name="text-on-path · wave" hint={t.loop}>
+          <TextOnPath text={t.path} preset="wave" className="w-full font-semibold" showPath />
+        </Tile>
+      );
+    case "text-on-path-circle":
+      return (
+        <Tile name="text-on-path · circle" hint={t.loop}>
+          <TextOnPath text={t.ring} preset="circle" className="w-40 font-semibold tracking-widest text-primary" />
+        </Tile>
+      );
+    case "text-on-path-arc":
+      return (
+        <Tile name="text-on-path · arc" hint={t.hover}>
+          <TextOnPath text={t.arc} preset="arc" trigger="hover" duration={6} className="w-full font-medium" showPath />
+        </Tile>
+      );
+    case "variable-font-wave":
+      return (
+        <Tile name="variable-font · wave" hint={t.loop}>
+          <VariableWeight text={t.weight} from={100} to={900} className="text-4xl" />
+        </Tile>
+      );
+    case "variable-font-word":
+      return (
+        <Tile name="variable-font · word" hint={t.hover}>
+          <VariableWeight text={t.word} mode="word" trigger="hover" from={300} to={900} className="text-4xl text-primary" />
+        </Tile>
+      );
+    case "text-mask-gradient":
+      return (
+        <Tile name="text-mask · gradient" hint={t.loop}>
+          <TextMask text={t.mask2} duration={6} />
+        </Tile>
+      );
+    case "text-mask-image":
+      return (
+        <Tile name="text-mask · image + reveal" hint={t.entrance} replay={t.replay}>
+          <TextMask text={t.mask} src={sea} reveal trigger="inView" duration={5} />
+        </Tile>
+      );
+  }
+}
+
+export default function TypeMotionDemo() {
   return (
     <div className="grid w-full max-w-5xl grid-cols-1 gap-x-6 gap-y-10 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Tile name="text-on-path · wave" hint={t.loop}>
-        <TextOnPath text={t.path} preset="wave" className="w-full font-semibold" showPath />
-      </Tile>
-      <Tile name="text-on-path · circle" hint={t.loop}>
-        <TextOnPath text={t.ring} preset="circle" className="w-40 font-semibold tracking-widest text-primary" />
-      </Tile>
-      <Tile name="text-on-path · arc" hint={t.hover}>
-        <TextOnPath text={t.arc} preset="arc" trigger="hover" duration={6} className="w-full font-medium" showPath />
-      </Tile>
-      <Tile name="variable-font · wave" hint={t.loop}>
-        <VariableWeight text={t.weight} from={100} to={900} className="text-4xl" />
-      </Tile>
-      <Tile name="variable-font · word" hint={t.hover}>
-        <VariableWeight text={t.word} mode="word" trigger="hover" from={300} to={900} className="text-4xl text-primary" />
-      </Tile>
-      <Tile name="text-mask · gradient" hint={t.loop}>
-        <TextMask text={t.mask2} duration={6} />
-      </Tile>
-      <Tile name="text-mask · image + reveal" hint={t.entrance} replay={t.replay}>
-        <TextMask text={t.mask} src={sea} reveal trigger="inView" duration={5} />
-      </Tile>
+      {typeMotionTiles.map((id) => (
+        <TypeMotionTile key={id} id={id} />
+      ))}
     </div>
   );
 }

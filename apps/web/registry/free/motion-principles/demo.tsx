@@ -330,18 +330,23 @@ function Subject({ effect, sale, linear, eased }: { effect: MotionPrincipleName;
   }
 }
 
-export default function MotionPrinciplesDemo() {
+/** 單一動態原理的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+export function MotionPrincipleTile({ effect }: { effect: MotionPrincipleName }) {
   const t = useDemoText(copy);
+  const looping = isLoopingMotionPrinciple(effect) || effect === "squash-stretch";
+  return (
+    <Tile name={effect} hint={looping ? t.loop : t.entrance} replay={looping ? undefined : t.replay}>
+      <Subject effect={effect} sale={t.sale} linear={t.linear} eased={t.eased} />
+    </Tile>
+  );
+}
+
+export default function MotionPrinciplesDemo() {
   return (
     <div className="grid w-full max-w-5xl grid-cols-1 gap-x-6 gap-y-10 p-4 sm:grid-cols-2 lg:grid-cols-3">
-      {motionPrinciples.map((effect) => {
-        const looping = isLoopingMotionPrinciple(effect) || effect === "squash-stretch";
-        return (
-          <Tile key={effect} name={effect} hint={looping ? t.loop : t.entrance} replay={looping ? undefined : t.replay}>
-            <Subject effect={effect} sale={t.sale} linear={t.linear} eased={t.eased} />
-          </Tile>
-        );
-      })}
+      {motionPrinciples.map((effect) => (
+        <MotionPrincipleTile key={effect} effect={effect} />
+      ))}
     </div>
   );
 }
