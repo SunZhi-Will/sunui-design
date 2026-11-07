@@ -25,6 +25,8 @@ const proLead = [
   "physics-cart-jar",
   "hoop-upload",
   "vote-terrain",
+  "cutaway-spec",
+  "ask-to-shop",
   "pixel-check-in",
   "peel-sticker-coupon",
   "order-island",
@@ -39,6 +41,7 @@ const proLead = [
   "coupon-claim-card",
   "price-history",
   "stamp-card",
+  "recipe-glass",
 ];
 
 /** C：免費層有近親的 Pro，值是它的免費近親；D：通用元件 */
