@@ -64,8 +64,14 @@ const en = {
   home: {
     metaTitle: "SunUI: paper-feel commerce blocks for React",
     eyebrow: "Paper-feel commerce blocks for React",
-    title: "Coupons, receipts and loyalty cards your shoppers can feel.",
-    lead: "Tear-off coupons, printed receipts, loyalty stamps and sale posters for your next campaign, plus free motion libraries for when you want more of a show. Accessible by default, installed with one command and owned by you.",
+    title: "Black Friday, Double 11, the holidays. Every sale page, ready to ship.",
+    lead: "Countdowns, coupons, carts, checkout and loyalty cards in paper and ink, built for the sales on your calendar. Install with one command or let your coding agent do it, and the code is yours.",
+    stats: {
+      label: "What is in the library",
+      free: "free blocks",
+      pro: "Pro blocks",
+      motion: "of them motion libraries",
+    },
     compare: {
       label: "Drag to compare the generic AI coupon with the SunUI coupon",
       before: "Typical AI output",
@@ -489,8 +495,14 @@ const zhTW: Messages = {
   home: {
     metaTitle: "SunUI：有紙感的 React 電商區塊",
     eyebrow: "有紙感的 React 電商區塊",
-    title: "讓顧客摸得到的優惠券、收據與集點卡。",
-    lead: "撕得開的優惠券、印出來的收據、集點章與促銷海報，下一檔活動直接用；想要更多舞台感時，還有免費的動效庫。預設無障礙，一行指令安裝，程式碼完全屬於你。",
+    title: "黑五、雙 11、聖誕、過年，每一檔的活動頁都能直接上線。",
+    lead: "倒數、優惠券、購物車、結帳與集點卡，用紙與墨做成，為行事曆上的每一檔特賣準備。一行指令安裝，或交給你的 coding agent，程式碼完全屬於你。",
+    stats: {
+      label: "目前收錄",
+      free: "個免費區塊",
+      pro: "個 Pro 區塊",
+      motion: "其中為動效庫",
+    },
     compare: {
       label: "拖動比較常見 AI 優惠券與 SunUI 優惠券",
       before: "常見 AI 樣貌",
@@ -890,8 +902,14 @@ const zhCN: Messages = {
   home: {
     metaTitle: "SunUI：有纸感的 React 电商区块",
     eyebrow: "有纸感的 React 电商区块",
-    title: "让顾客摸得到的优惠券、小票与集点卡。",
-    lead: "撕得开的优惠券、打印出来的小票、集点章与促销海报，下一场活动直接用；想要更多舞台感时，还有免费的动效库。默认无障碍，一行命令安装，代码完全归你所有。",
+    title: "黑五、双 11、圣诞、春节，每一场的活动页都能直接上线。",
+    lead: "倒计时、优惠券、购物车、结算与集点卡，用纸与墨做成，为日历上的每一场大促准备。一行命令安装，或交给你的 coding agent，代码完全归你所有。",
+    stats: {
+      label: "目前收录",
+      free: "个免费区块",
+      pro: "个 Pro 区块",
+      motion: "其中为动效库",
+    },
     compare: {
       label: "拖动比较常见 AI 优惠券与 SunUI 优惠券",
       before: "常见 AI 样貌",
@@ -1284,8 +1302,14 @@ const ja: Messages = {
   home: {
     metaTitle: "SunUI：紙の手ざわりを持つ React コマースブロック",
     eyebrow: "紙の手ざわりを持つ React コマースブロック",
-    title: "手ざわりまで伝わる、クーポンとレシートとスタンプカード。",
-    lead: "切り取れるクーポン、印字されるレシート、スタンプカード、セールポスターを次のキャンペーンに。もっと演出がほしいときは、無料のモーションライブラリもあります。最初からアクセシブルで、コマンドひとつで導入でき、コードはすべてあなたのものです。",
+    title: "ブラックフライデーも年末年始も。セールページをそのまま公開。",
+    lead: "カウントダウン、クーポン、カート、購入手続き、スタンプカードを紙と墨で。カレンダーにあるすべてのセールのために作りました。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。コードはすべてあなたのものです。",
+    stats: {
+      label: "収録内容",
+      free: "個の無料ブロック",
+      pro: "個の Pro ブロック",
+      motion: "うちモーションライブラリ",
+    },
     compare: {
       label: "よくある AI 製クーポンと SunUI のクーポンをドラッグして比較",
       before: "よくある AI 製",

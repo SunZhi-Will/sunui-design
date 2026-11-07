@@ -57,13 +57,16 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
   }, [items]);
   const viewItems = expandStyles ? items : collapsed;
 
-  // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入
+  // 區塊頁的「Also called」連結以 ?q= 帶入搜尋字，系列標籤以 ?series= 帶入，數量條以 ?tier= 帶入
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q");
     if (q) setQuery(q);
     const s = params.get("series");
     if (s && (seriesKeys as string[]).includes(s)) setSeries(s as Series);
+    // 首頁數量條以 ?tier= 帶入方案篩選
+    const tierParam = params.get("tier");
+    if (tierParam === "free" || tierParam === "pro") setTier(tierParam);
     // 篩選後清單變短，瀏覽器先前的錨點跳轉會落在頁尾，篩完再對準一次
     if (window.location.hash === "#blocks") {
       setTimeout(() => document.getElementById("blocks")?.scrollIntoView(), 0);

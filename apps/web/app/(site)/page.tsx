@@ -48,6 +48,13 @@ export default async function HomePage() {
     });
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
+  const motionCount = all.filter((item) => seriesOf(item) === "motion").length;
+  // 數量條：數字跟點進去的篩選結果一致；動效庫也是免費的，標成「其中」
+  const stats = [
+    { value: freeCount, label: m.home.stats.free, href: "/?tier=free#blocks" },
+    { value: proCount, label: m.home.stats.pro, href: "/pricing" },
+    { value: motionCount, label: m.home.stats.motion, href: "/?series=motion#blocks" },
+  ];
   const firstFree = all.find((item) => item.meta.tier === "free");
 
   return (
@@ -67,6 +74,25 @@ export default async function HomePage() {
               <Command value={installCommand(firstFree)} />
             </div>
           )}
+          <dl aria-label={m.home.stats.label} className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
+            {stats.map((stat) => (
+              <div key={stat.href} className="flex flex-col-reverse">
+                <dt className="text-xs text-subtle">
+                  {/* 型錄只在載入時讀網址參數，所以同頁的篩選連結用一般 a 重新載入 */}
+                  {stat.href.startsWith("/?") ? (
+                    <a href={stat.href} className="transition-colors hover:text-fg">
+                      {stat.label}
+                    </a>
+                  ) : (
+                    <Link href={stat.href} className="transition-colors hover:text-fg">
+                      {stat.label}
+                    </Link>
+                  )}
+                </dt>
+                <dd className="text-2xl font-semibold tracking-tight tabular-nums">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
         <HeroCompare m={m.home.compare} />
       </section>
