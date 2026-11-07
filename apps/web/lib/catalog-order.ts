@@ -23,6 +23,7 @@ const proLead = [
   "lunar-new-year",
   "self-building-page",
   "curve-rail-hero",
+  "glass-cube-hero",
   "festival-banner",
   // B
   "physics-cart-jar",
