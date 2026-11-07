@@ -189,7 +189,8 @@ export function StarRating({
   const radioLabel = (v: number) => `${t.stars(v)}${labelFor(v) ? `, ${labelFor(v)}` : ""}`;
 
   return (
-    <div className={cn("inline-flex items-center gap-3", ink, className)}>
+    // 容器太窄時文字標籤換到星星下方，不撐出父層
+    <div className={cn("inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-1.5", ink, className)}>
       <div
         role="radiogroup"
         aria-label={ariaLabel}
