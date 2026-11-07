@@ -5039,6 +5039,57 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "morph-menu",
+      "type": "registry:block",
+      "title": "Morph Menu",
+      "description": "An action menu that grows out of its own trigger: the round button stretches from its corner into the full menu, so the eye never loses where it came from. It picks the corner with room inside the viewport and any clipping parent (drawers, scroll lists), shrinks back into the button on close, has full menu keyboard support, and reduced motion swaps the morph for an instant switch.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@sunui/sunui-motion"
+      ],
+      "categories": [
+        "commerce",
+        "overlay",
+        "menu"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "product",
+        "interaction": "press",
+        "addedAt": "2026-11-07",
+        "usage": {
+          "whenToUse": [
+            "Per-row actions in carts, saved lists, order history and admin tables (move to cart, change size, remove)",
+            "Product cards that need three or more secondary actions without crowding the card"
+          ],
+          "watchOut": [
+            "The menu covers its trigger while open; close it with Escape, an outside click or a selection",
+            "Keep the primary action outside the menu; the menu is for secondary actions only",
+            "It is positioned inside its parent, so an overflow hidden ancestor limits where it can open; it flips to the side with room"
+          ],
+          "aliases": [
+            "context menu",
+            "dropdown menu",
+            "kebab menu",
+            "overflow menu",
+            "more actions",
+            "action menu",
+            "popover menu",
+            "morphing popover"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/morph-menu/morph-menu.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
