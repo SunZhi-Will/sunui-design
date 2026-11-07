@@ -48,13 +48,18 @@ function readVariantIds(dir, name) {
 
 // Pro 的 preview.tsx：網站預覽只載入這個展示版，完整元件只由 /r/pro/* 授權後交付。
 // 預覽會編譯成公開的 chunk，所以展示版必須自給自足：不能 import 同資料夾的任何檔案（元件本體、demo、card），
-// 也不能 import 其他 Pro block。default export 是 block 頁的完整預覽，`export function Card` 是型錄卡片（可省略）。
+// 也不能 import 其他 Pro block 的原始碼；組合場景要用其他 block 時，只能 import 對方的展示版（@/registry/pro/<name>/preview）。
+// default export 是 block 頁的完整預覽，`export function Card` 是型錄卡片（可省略）。
 const proPreviewStats = { preview: 0, full: [] };
 
 function readProPreview(dir, name) {
   const src = readFileSync(path.join(dir, name, "preview.tsx"), "utf8");
   for (const [, spec] of src.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
-    if (spec.startsWith(".") || spec.includes("registry/pro")) {
+    const otherPreview = /^@\/registry\/pro\/[\w-]+\/preview$/.test(spec);
+    if (otherPreview && !existsSync(path.join(dir, spec.split("/")[3], "preview.tsx"))) {
+      throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}", which does not exist yet. Write that block's preview first.`);
+    }
+    if (!otherPreview && (spec.startsWith(".") || spec.includes("registry/pro"))) {
       throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}". A Pro preview must not pull in Pro source; inline what the showcase needs.`);
     }
   }
