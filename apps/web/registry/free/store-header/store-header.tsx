@@ -111,6 +111,9 @@ export function StoreHeader({
         focusInside.current = true;
         setHidden(false);
       }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && menuOpen) setMenuOpen(false);
+      }}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) focusInside.current = false;
       }}
@@ -165,30 +168,45 @@ export function StoreHeader({
             </button>
           </div>
         </motion.div>
-
-        <AnimatePresence initial={false}>
-          {menuOpen && (
-            <motion.nav
-              aria-label={t.nav}
-              initial={reduce ? { opacity: 0 } : { height: 0 }}
-              animate={reduce ? { opacity: 1 } : { height: "auto" }}
-              exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0 }}
-              transition={springs.gentle}
-              className={cn("overflow-hidden border-t md:hidden", edge)}
-            >
-              <ul className="flex flex-col px-4 py-2">
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a href={link.href} onClick={() => setMenuOpen(false)} className={cn(navLink, "block py-2.5 text-base")}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </motion.nav>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* 手機選單疊在頁面上方，不推擠下面的內容 */}
+      <AnimatePresence initial={false}>
+        {menuOpen && (
+          <motion.div
+            key="scrim"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.2 }}
+            onClick={() => setMenuOpen(false)}
+            className="absolute inset-x-0 top-full h-dvh bg-[#171717]/30 dark:bg-black/50 md:hidden"
+          />
+        )}
+        {menuOpen && (
+          <motion.nav
+            key="menu"
+            aria-label={t.nav}
+            initial={reduce ? { opacity: 0 } : { height: 0 }}
+            animate={reduce ? { opacity: 1 } : { height: "auto" }}
+            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0 }}
+            transition={springs.gentle}
+            className={cn("absolute inset-x-0 top-full overflow-hidden border-b bg-background md:hidden", edge)}
+          >
+            {/* 收合狀態頁首已有底線，展開時不再疊一條 */}
+            <ul className={cn("flex flex-col px-4 py-2 sm:px-6", !compact && cn("border-t", edge))}>
+              {links.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} onClick={() => setMenuOpen(false)} className={cn(navLink, "block py-2.5 text-base")}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
