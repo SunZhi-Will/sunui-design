@@ -37,6 +37,9 @@ const proLead = [
   "pickup-ticket",
   "holiday-cutoff",
   "size-finder",
+  "subscription-manager",
+  "referral-queue",
+  "review-request",
   "ask-to-shop",
   "lineup-shelf",
   "sticker-board",
@@ -81,6 +84,7 @@ const proSiblings: Record<string, string[]> = {
   "free-shipping-progress": ["tier-progress"],
   "upgrade-modal": ["dialog-sheet"],
   "restock-notify": ["variant-picker", "low-stock-indicator"],
+  "volume-tiers": ["tier-progress", "quantity-stepper"],
 };
 
 const proTail = [

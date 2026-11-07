@@ -99,6 +99,22 @@
 
 `holiday-cutoff` 直接服務季節包（聖誕、農曆新年），是三個裡離營收最近的。倒數只在分頁可見時走，符合 DESIGN.md 的倒數例外。
 
+## 5c. 第三批：從 React Bits Pro 的 App UI 與頁面 blocks 找電商缺口
+
+再往下看了 React Bits Pro 的 pricing（15）、CTA（14）、waitlist（6）、social proof（16）、stats（18）頁面 blocks，以及 billing（8）、paywall（7）、feedback（6）、onboarding（7）App UI【已驗證】。兩個觀察：
+
+1. **它開始往電商靠**：stats-18 是「以黑色星期五為高峰的每日結帳流量」山脊圖，ecommerce 從 0 長到 11 個。SunUI 的電商檔期定位要在上線前站穩，不然會被量淹過去。
+2. **它的 App UI 是 SaaS 後台語彙**（proration、seat gate、metered reads）。同一個需求換到 DTC 電商，就是訂閱制商品管理、數量折扣、到貨後評價、排隊名單。這四個 SunUI 都沒有。
+
+| block | React Bits 的對應 | SunUI 的做法與差異 |
+|---|---|---|
+| `subscription-manager` | billing-5 改方案與按比例計價 | 咖啡豆、寵物食品這類定期便：下次到貨日與金額是錨點；接下來四批像一排票根，點一張就跳過；換口味、週期、數量；取消前的挽留優惠和「仍要取消」一樣顯眼，優惠只折下一批 |
+| `volume-tiers` | pricing-14 方案加購開關 | 買越多越便宜：級距卡、數量步進器、外框跟著級距滑動；差兩件以內才推一把，而且把算式寫出來 |
+| `review-request` | feedback-3 星等加理由 | 理由依星等換整組；回饋碼**不管幾顆星都給**，避免變成「好評換折扣」（FTC 與歐盟對誘因評價的規定）；低分有協助連結 |
+| `referral-queue` | waitlist-4 即時排隊人數 | 限量發售的排隊名單：大號碼、分享連結、從加入位置到第 1 名的軌道與門檻；推薦數由伺服器帶入，不在前端假裝移動 |
+
+這批四個都把「誠實」寫進元件行為，而不只是文件：取消按鈕不藏、推一把只在真的差幾件時出現、回饋不綁好評、排隊名次不在前端造假。這是跟 React Bits 和一般 Shopify 外掛最明顯的差別，也可以寫進定價頁。
+
 ## 6. 後續建議（不在這次範圍）
 
 - 修正 `reports/SunUI 商業化深度規劃.md` 對「沒有人做電商」的說法（第 49 行）。
