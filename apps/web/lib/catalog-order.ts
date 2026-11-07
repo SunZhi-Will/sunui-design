@@ -32,6 +32,8 @@ const proLead = [
   "redline-reveal",
   "cutaway-spec",
   "card-dock",
+  "shoppable-lookbook",
+  "product-finder",
   "ask-to-shop",
   "lineup-shelf",
   "sticker-board",
@@ -75,6 +77,7 @@ const proSiblings: Record<string, string[]> = {
   "shader-campaign-banner": ["gradient-backdrop", "background-effects"],
   "free-shipping-progress": ["tier-progress"],
   "upgrade-modal": ["dialog-sheet"],
+  "restock-notify": ["variant-picker", "low-stock-indicator"],
 };
 
 const proTail = [
