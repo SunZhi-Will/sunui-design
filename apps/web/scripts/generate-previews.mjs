@@ -46,10 +46,33 @@ function readVariantIds(dir, name) {
   return ids;
 }
 
+// Pro 的 preview.tsx：網站預覽只載入這個展示版，完整元件只由 /r/pro/* 授權後交付。
+// 預覽會編譯成公開的 chunk，所以展示版必須自給自足：不能 import 同資料夾的任何檔案（元件本體、demo、card），
+// 也不能 import 其他 Pro block。default export 是 block 頁的完整預覽，`export function Card` 是型錄卡片（可省略）。
+const proPreviewStats = { preview: 0, full: [] };
+
+function readProPreview(dir, name) {
+  const src = readFileSync(path.join(dir, name, "preview.tsx"), "utf8");
+  for (const [, spec] of src.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
+    if (spec.startsWith(".") || spec.includes("registry/pro")) {
+      throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}". A Pro preview must not pull in Pro source; inline what the showcase needs.`);
+    }
+  }
+  return { hasCard: /export function Card\b/.test(src) };
+}
+
 for (const tier of tiers) {
   const dir = path.join(root, "registry", tier);
   if (!existsSync(dir)) continue;
   for (const name of readdirSync(dir).sort()) {
+    if (tier === "pro" && existsSync(path.join(dir, name, "preview.tsx"))) {
+      const { hasCard } = readProPreview(dir, name);
+      entries.push(`  "${name}": dynamic(() => import("../pro/${name}/preview"), { ssr: false }),`);
+      if (hasCard) cardEntries.push(`  "${name}": dynamic(() => import("../pro/${name}/preview").then((m) => m.Card), { ssr: false }),`);
+      proPreviewStats.preview++;
+      continue;
+    }
+    if (tier === "pro" && existsSync(path.join(dir, name, "demo.tsx"))) proPreviewStats.full.push(name);
     if (existsSync(path.join(dir, name, "demo.tsx"))) {
       entries.push(`  "${name}": dynamic(() => import("../${tier}/${name}/demo"), { ssr: false }),`);
     }
@@ -101,3 +124,8 @@ writeFileSync(path.join(root, "registry", "__generated__", "previews.tsx"), out)
 writeFileSync(path.join(root, "registry", "__generated__", "variants.ts"), idsOut);
 const variantCount = Object.values(variantIds).reduce((n, ids) => n + ids.length, 0);
 console.log(`[previews] ${entries.length} demo(s), ${cardEntries.length} card(s), ${variantCount} variant(s)`);
+if (proPreviewStats.preview || proPreviewStats.full.length) {
+  console.log(
+    `[previews] Pro: ${proPreviewStats.preview} showcase preview(s); ${proPreviewStats.full.length} still ship full source to the browser (add preview.tsx)`,
+  );
+}
