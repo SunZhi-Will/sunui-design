@@ -134,6 +134,42 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* 捲軸：
+   1. 頁面高度跨過視窗高度（篩選型錄、動態載入、展開面板鎖捲動）時，傳統捲軸會出現又消失，
+      整頁寬度跟著少 15px 又長回來，置中的內容左右跳。scrollbar-gutter: stable 永遠保留這條溝，
+      overflow: hidden 鎖捲動時也照樣保留，所以寬度不再變。
+   2. 型錄 iframe（FitStage）的根元素不捲動，舞台是 fixed 滿版，保留溝會在右邊留一條空白，所以排除。
+   3. 外觀：細、淺灰、圓頭，跟著主題的 --line / --subtle 走，不用系統預設的灰色粗條。 */
+html:not(:has([data-fit-stage])) {
+  scrollbar-gutter: stable;
+}
+
+/* Firefox 只認標準屬性；Chrome / Safari 用 ::-webkit-scrollbar 才能做出圓頭與內距 */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--line);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--subtle);
+}
+
 body {
   background: var(--bg);
   color: var(--fg);

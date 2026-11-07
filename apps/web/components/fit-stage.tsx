@@ -82,7 +82,9 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
   if (mode === "sheet") {
     return (
       <div
-        className="fixed inset-0 overflow-y-auto bg-card transition-colors duration-300"
+        data-fit-stage=""
+        // 內容長高跨過舞台高度時，捲軸出現會吃掉寬度、block 重排、高度又變，可能來回抖動：保留捲軸溝
+        className="fixed inset-0 overflow-y-auto bg-card transition-colors duration-300 [scrollbar-gutter:stable]"
         style={surface ? { backgroundColor: surface } : undefined}
       >
         <style>{BLEED_CSS}</style>
@@ -99,6 +101,7 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
     // 只是滑鼠的快捷：鍵盤使用者用卡片外層的連結展開同一個面板
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
+      data-fit-stage=""
       className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-clip bg-card transition-colors duration-300"
       style={surface ? { backgroundColor: surface } : undefined}
       // 點到元件以外的空白處（舞台或滿版的外框本身），請外層型錄展開成面板
