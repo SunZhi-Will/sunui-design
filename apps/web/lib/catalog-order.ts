@@ -20,6 +20,7 @@ const proLead = [
   "day-night-hero",
   "black-friday-weekend",
   "checkout-flow",
+  "lunar-new-year",
   "self-building-page",
   "curve-rail-hero",
   "festival-banner",
