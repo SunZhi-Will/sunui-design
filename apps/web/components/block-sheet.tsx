@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { CopyButton } from "@/components/copy-button";
-import { format } from "@/lib/i18n";
+import { previewUrl } from "@/lib/demo-locale";
+import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
 
 export type BlockSheetItem = {
@@ -17,6 +18,8 @@ export type BlockSheetItem = {
   description: string;
   tier: "free" | "pro";
   install: string | null;
+  /** 網站目前的語言，帶進預覽 iframe 的網址（預覽頁是靜態檔，自己讀不到 cookie） */
+  locale: Locale;
 };
 
 const spring = { type: "spring", stiffness: 240, damping: 30 } as const;
@@ -112,11 +115,12 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
             <div className="relative min-h-0 flex-1">
               <iframe
                 key={run}
-                src={
+                src={previewUrl(
                   item.variant
-                    ? `/preview/${item.name}/v/${encodeURIComponent(item.variant)}?mode=sheet`
-                    : `/preview/${item.name}/sheet`
-                }
+                    ? `/preview/${item.name}/v/${encodeURIComponent(item.variant)}/sheet`
+                    : `/preview/${item.name}/sheet`,
+                  item.locale,
+                )}
                 title={format(labels.frameTitle, { title: item.title })}
                 onLoad={() => setLoaded(true)}
                 className="size-full border-0 transition-opacity duration-300"

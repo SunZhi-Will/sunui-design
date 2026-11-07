@@ -96,6 +96,19 @@
       "name": "web-alt-attach",
       "url": "http://localhost:3102",
       "port": 3102
+    },
+    {
+      "name": "web-perf",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd apps/web && npx next build --no-lint --experimental-build-mode=compile && npx next build --no-lint --experimental-build-mode=generate && npx next start -p 3110"
+      ],
+      "port": 3110,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-perf"
+      }
     }
   ]
 }

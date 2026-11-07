@@ -32,6 +32,7 @@ export default async function BlockSheetPage({ params, searchParams }: Props) {
         description: localized.description,
         tier: item.meta.tier,
         install: item.meta.tier === "free" ? installCommand(item) : null,
+        locale,
       }}
     />
   );

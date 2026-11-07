@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { previewUrl } from "@/lib/demo-locale";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
@@ -76,7 +77,7 @@ export function PreviewFrame({ name, locale, labels }: { name: string; locale: L
           // 換語言時 router.refresh() 會帶來新的 locale，iframe 跟著重新載入
           key={`${locale}-${run}`}
           ref={iframeRef}
-          src={`/preview/${name}`}
+          src={previewUrl(`/preview/${name}`, locale)}
           title={format(labels.frameTitle, { name })}
           onLoad={handleLoad}
           className={cn(

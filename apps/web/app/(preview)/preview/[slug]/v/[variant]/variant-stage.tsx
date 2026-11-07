@@ -1,39 +1,29 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { FitStage } from "@/components/fit-stage";
 import { VariantPreview } from "@/components/variant-preview";
 import { DemoLocaleProvider } from "@/lib/demo-locale";
-import { getLocale } from "@/lib/i18n-server";
 import { getItem } from "@/lib/registry";
 import { variantIds } from "@/registry/__generated__/variants";
 
-type Props = {
-  params: Promise<{ slug: string; variant: string }>;
-  searchParams: Promise<{ mode?: string }>;
-};
+export type VariantParams = Promise<{ slug: string; variant: string }>;
 
-export const metadata: Metadata = {
-  robots: { index: false },
-};
-
-export function generateStaticParams() {
+export function variantStaticParams() {
   return Object.entries(variantIds).flatMap(([slug, ids]) => ids.map((variant) => ({ slug, variant })));
 }
 
-/** 效果庫拆開後的單一樣式：首頁卡片與展開面板共用，?mode=sheet 時用面板舞台。 */
-export default async function VariantPreviewPage({ params, searchParams }: Props) {
+/** 效果庫拆開後的單一樣式：卡片（page.tsx）與展開面板（sheet/page.tsx）共用。 */
+export async function VariantStage({ params, mode }: { params: VariantParams; mode: "card" | "sheet" }) {
   const { slug, variant } = await params;
   const item = getItem(slug);
   if (!item || !variantIds[slug]?.includes(variant)) notFound();
-  const mode = (await searchParams).mode === "sheet" ? "sheet" : "card";
-  const locale = await getLocale();
 
   return (
     <>
+      {/* 開發模式的 Next.js 標誌會出現在每張卡片裡，一律隱藏 */}
       <style>{"nextjs-portal{display:none}"}</style>
       <FitStage mode={mode}>
-        <DemoLocaleProvider locale={locale}>
+        <DemoLocaleProvider>
           <VariantPreview name={slug} variant={variant} />
         </DemoLocaleProvider>
       </FitStage>
