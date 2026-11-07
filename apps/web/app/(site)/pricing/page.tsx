@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { SavingsCalculator } from "@/components/savings-calculator";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
@@ -140,6 +141,8 @@ export default async function PricingPage() {
       <p className="mt-6 text-center text-sm text-subtle">
         {t.footnote(proCount)}
       </p>
+
+      <SavingsCalculator price={prices.pro} locale={locale} t={t.calculator} />
 
       {!foundingHasForm && (
         <section id="waitlist" aria-labelledby="waitlist-title" className="mx-auto mt-20 max-w-md scroll-mt-24 text-center">

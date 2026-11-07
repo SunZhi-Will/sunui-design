@@ -34,6 +34,7 @@ const proLead = [
   "card-dock",
   "shoppable-lookbook",
   "product-finder",
+  "swipe-shortlist",
   "pickup-ticket",
   "holiday-cutoff",
   "size-finder",
