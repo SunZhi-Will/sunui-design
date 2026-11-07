@@ -5,11 +5,11 @@ import { AgentSteps } from "@/components/agent-steps";
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
+import { PhraseText } from "@/components/phrase-text";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { orderCatalog } from "@/lib/catalog-order";
 import { getItems, installCommand } from "@/lib/registry";
-import { seriesOf } from "@/lib/series";
 import { localizeItem } from "@/lib/registry-i18n";
 import { variantIds } from "@/registry/__generated__/variants";
 
@@ -49,13 +49,6 @@ export default async function HomePage() {
     });
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
-  const motionCount = all.filter((item) => seriesOf(item) === "motion").length;
-  // 數量條：數字跟點進去的篩選結果一致；動效庫也是免費的，標成「其中」
-  const stats = [
-    { value: freeCount, label: m.home.stats.free, href: "/?tier=free#blocks" },
-    { value: proCount, label: m.home.stats.pro, href: "/pricing" },
-    { value: motionCount, label: m.home.stats.motion, href: "/?series=motion#blocks" },
-  ];
   const firstFree = all.find((item) => item.meta.tier === "free");
 
   return (
@@ -64,8 +57,8 @@ export default async function HomePage() {
       <section className="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
         <div className="min-w-0">
           <p className="mb-4 text-sm font-medium text-accent">{m.home.eyebrow}</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            {m.home.title}
+          <h1 className="text-4xl font-semibold tracking-tight text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] sm:text-5xl">
+            <PhraseText text={m.home.title} />
           </h1>
           <p className="mt-5 text-lg text-pretty text-subtle">
             {m.home.lead}
@@ -75,21 +68,11 @@ export default async function HomePage() {
               <Command value={installCommand(firstFree)} />
             </div>
           )}
+          {/* 差異點：只放競品沒有的東西，不跟對手比區塊數量 */}
           <dl aria-label={m.home.stats.label} className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
-            {stats.map((stat) => (
-              <div key={stat.href} className="flex flex-col-reverse">
-                <dt className="text-xs text-subtle">
-                  {/* 型錄只在載入時讀網址參數，所以同頁的篩選連結用一般 a 重新載入 */}
-                  {stat.href.startsWith("/?") ? (
-                    <a href={stat.href} className="transition-colors hover:text-fg">
-                      {stat.label}
-                    </a>
-                  ) : (
-                    <Link href={stat.href} className="transition-colors hover:text-fg">
-                      {stat.label}
-                    </Link>
-                  )}
-                </dt>
+            {m.home.stats.items.map((stat) => (
+              <div key={stat.label} className="flex flex-col-reverse">
+                <dt className="text-xs text-subtle">{stat.label}</dt>
                 <dd className="text-2xl font-semibold tracking-tight tabular-nums">{stat.value}</dd>
               </div>
             ))}

@@ -65,31 +65,33 @@ const en = {
   home: {
     metaTitle: "SunUI: paper-feel commerce blocks for React",
     eyebrow: "Paper-feel commerce blocks for React",
-    title: "Black Friday, Double 11, the holidays. Every sale page, ready to ship.",
-    lead: "Countdowns, coupons, carts, checkout and loyalty cards in paper and ink, built for the sales on your calendar. Install with one command or let your coding agent do it, and the code is yours.",
+    title: "Less glow, more checkouts.",
+    lead: "Countdowns, coupons, carts, checkout and loyalty cards. No gradients, no glow: every piece is built to convert. Install with one command or hand it to your coding agent, and the source is yours.",
     stats: {
-      label: "What is in the library",
-      free: "free blocks",
-      pro: "Pro blocks",
-      motion: "of them motion libraries",
+      label: "What sets SunUI apart",
+      items: [
+        { value: "4", label: "languages of copy, built in" },
+        { value: "CJK", label: "punctuation and line breaks done right" },
+        { value: "0", label: "fake countdowns" },
+      ],
     },
     compare: {
       label: "Drag to compare the generic AI coupon with the SunUI coupon",
       before: "Typical AI output",
       after: "SunUI",
-      caption: "Same coupon, same offer. Left is what AI tools ship by default: gradients, glow, emoji. Right is paper and ink. Drag the line.",
+      caption: "Same coupon, same $15 off. Left is what AI tools ship by default: gradients, glow, emoji. Right is SunUI: paper and ink. Drag the line.",
       slop: { eyebrow: "Mega deal", amount: "$15 OFF", body: "Unlock exclusive savings today! 🔥", cta: "Claim now 🚀" },
       paper: { eyebrow: "Double 11 · new customers", amount: "$15", unit: "off", condition: "On orders over US$80", code: "DOUBLE11", cta: "Claim", claimed: "Claimed" },
     },
     whyTitle: "Why SunUI",
     reasons: [
       {
-        title: "A material, not a theme",
-        body: "Paper and ink, nothing else. Coupons tear along the perforation, receipts print, and a result is one quiet line of ink where the button was. No gradients, no glow, no confetti.",
+        title: "A stance, not a texture",
+        body: "Paper and ink, because a sale page should be easy to read, not dazzling. Conditions sit on the coupon, receipts print, and a result is one quiet line of ink where the button was. No gradients, no glow, no confetti.",
       },
       {
         title: "Built for sales moments",
-        body: "Flash sales, coupons, free shipping goals, carts, checkout and loyalty. Sections you can ship for Double 11, Black Friday or 週年慶, not demos.",
+        body: "Flash sales, coupons, free shipping goals, carts, checkout and loyalty. Countdowns tell the truth and conditions come first. Sections you can use for Double 11, Black Friday or an anniversary sale, not demos.",
       },
       {
         title: "Calm where shoppers act",
@@ -519,31 +521,33 @@ const zhTW: Messages = {
   home: {
     metaTitle: "SunUI：有紙感的 React 電商區塊",
     eyebrow: "有紙感的 React 電商區塊",
-    title: "黑五、雙 11、聖誕、過年，每一檔的活動頁都能直接上線。",
-    lead: "倒數、優惠券、購物車、結帳與集點卡，用紙與墨做成，為行事曆上的每一檔特賣準備。一行指令安裝，或交給你的 coding agent，程式碼完全屬於你。",
+    title: "少一點閃爍，多一點下單。",
+    lead: "倒數、優惠券、購物車、結帳到集點卡，不靠漸層和光暈，每一塊都為成交而設計。一行指令裝進專案，或交給你的 coding agent，原始碼歸你。",
     stats: {
-      label: "目前收錄",
-      free: "個免費區塊",
-      pro: "個 Pro 區塊",
-      motion: "其中為動效庫",
+      label: "SunUI 的不同",
+      items: [
+        { value: "4", label: "種語言文案，內建" },
+        { value: "CJK", label: "中日文標點與換行" },
+        { value: "0", label: "個假倒數" },
+      ],
     },
     compare: {
       label: "拖動比較常見 AI 優惠券與 SunUI 優惠券",
       before: "常見 AI 樣貌",
       after: "SunUI",
-      caption: "同一張券、同一個優惠。左邊是 AI 工具最常產出的樣子：漸層、光暈、emoji；右邊只有紙和墨。拖動中線比較。",
+      caption: "同一張券，同樣折 $15。左邊是 AI 工具的預設長相：漸層、光暈、emoji；右邊是 SunUI，只有紙和墨。拖動中線看差別。",
       slop: { eyebrow: "超殺優惠", amount: "$15 OFF", body: "立即解鎖你的專屬好康！🔥", cta: "馬上搶 🚀" },
       paper: { eyebrow: "雙 11 · 新客專屬", amount: "$15", unit: "折扣", condition: "滿 US$80 可用", code: "DOUBLE11", cta: "領取", claimed: "已領取" },
     },
     whyTitle: "為什麼選 SunUI",
     reasons: [
       {
-        title: "是一種材質，不只是主題",
-        body: "只有紙和墨。優惠券沿著齒孔撕開，收據一張張印出，結果就在按鈕原本的位置，安靜地寫成一行字。沒有漸層、光暈，也沒有彩帶。",
+        title: "是一種立場，不只是質感",
+        body: "只有紙和墨，因為促銷頁該讓人看清楚，而不是看花眼。優惠條件寫在券面上，收據一張張印出，結果就在按鈕原本的位置，安靜地寫成一行字。沒有漸層、光暈，也沒有彩帶。",
       },
       {
         title: "為促銷時刻而生",
-        body: "限時搶購、優惠券、免運門檻、購物車、結帳與集點。雙 11、黑色星期五或週年慶都能直接上線，不是展示用的樣品。",
+        body: "限時搶購、優惠券、免運門檻、購物車、結帳與集點。倒數照實走，條件先講清楚。雙 11、黑色星期五或週年慶都用得上，不是展示用的樣品。",
       },
       {
         title: "顧客動手的地方保持沉穩",
@@ -949,31 +953,33 @@ const zhCN: Messages = {
   home: {
     metaTitle: "SunUI：有纸感的 React 电商区块",
     eyebrow: "有纸感的 React 电商区块",
-    title: "黑五、双 11、圣诞、春节，每一场的活动页都能直接上线。",
-    lead: "倒计时、优惠券、购物车、结算与集点卡，用纸与墨做成，为日历上的每一场大促准备。一行命令安装，或交给你的 coding agent，代码完全归你所有。",
+    title: "少一点闪烁，多一点下单。",
+    lead: "倒计时、优惠券、购物车、结算到集点卡，不靠渐变和光晕，每一块都为成交而设计。一行命令装进项目，或交给你的 coding agent，源码归你。",
     stats: {
-      label: "目前收录",
-      free: "个免费区块",
-      pro: "个 Pro 区块",
-      motion: "其中为动效库",
+      label: "SunUI 的不同",
+      items: [
+        { value: "4", label: "种语言文案，内置" },
+        { value: "CJK", label: "中日文标点与换行" },
+        { value: "0", label: "个假倒计时" },
+      ],
     },
     compare: {
       label: "拖动比较常见 AI 优惠券与 SunUI 优惠券",
       before: "常见 AI 样貌",
       after: "SunUI",
-      caption: "同一张券、同一个优惠。左边是 AI 工具最常产出的样子：渐变、光晕、emoji；右边只有纸和墨。拖动中线比较。",
+      caption: "同一张券，同样减 $15。左边是 AI 工具的默认样子：渐变、光晕、emoji；右边是 SunUI，只有纸和墨。拖动中线看区别。",
       slop: { eyebrow: "超值优惠", amount: "$15 OFF", body: "立即解锁你的专属福利！🔥", cta: "马上抢 🚀" },
       paper: { eyebrow: "双 11 · 新客专享", amount: "$15", unit: "优惠", condition: "满 US$80 可用", code: "DOUBLE11", cta: "领取", claimed: "已领取" },
     },
     whyTitle: "为什么选 SunUI",
     reasons: [
       {
-        title: "是一种材质，不只是主题",
-        body: "只有纸和墨。优惠券沿着齿孔撕开，小票一张张打印出来，结果就在按钮原来的位置，安静地写成一行字。没有渐变、光晕，也没有彩带。",
+        title: "是一种立场，不只是质感",
+        body: "只有纸和墨，因为大促页该让人看清楚，而不是看花眼。优惠条件写在券面上，小票一张张打印出来，结果就在按钮原来的位置，安静地写成一行字。没有渐变、光晕，也没有彩带。",
       },
       {
         title: "为大促时刻而生",
-        body: "限时秒杀、优惠券、包邮门槛、购物车、结算与集点。双 11、黑色星期五或店庆都能直接上线，不是演示用的样品。",
+        body: "限时秒杀、优惠券、包邮门槛、购物车、结算与集点。倒计时如实走，条件先讲清楚。双 11、黑色星期五或店庆都用得上，不是演示用的样品。",
       },
       {
         title: "顾客操作的地方保持沉稳",
@@ -1372,31 +1378,33 @@ const ja: Messages = {
   home: {
     metaTitle: "SunUI：紙の手ざわりを持つ React コマースブロック",
     eyebrow: "紙の手ざわりを持つ React コマースブロック",
-    title: "ブラックフライデーも年末年始も。セールページをそのまま公開。",
-    lead: "カウントダウン、クーポン、カート、購入手続き、スタンプカードを紙と墨で。カレンダーにあるすべてのセールのために作りました。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。コードはすべてあなたのものです。",
+    title: "きらめきは控えめに、注文はもっと。",
+    lead: "カウントダウン、クーポン、カート、購入手続き、スタンプカードまで。グラデーションやグローに頼らず、どのブロックも購入率を上げるために設計しています。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。ソースはあなたのものです。",
     stats: {
-      label: "収録内容",
-      free: "個の無料ブロック",
-      pro: "個の Pro ブロック",
-      motion: "うちモーションライブラリ",
+      label: "SunUI の違い",
+      items: [
+        { value: "4", label: "言語のコピーを同梱" },
+        { value: "CJK", label: "和文の約物と改行に対応" },
+        { value: "0", label: "件の偽カウントダウン" },
+      ],
     },
     compare: {
       label: "よくある AI 製クーポンと SunUI のクーポンをドラッグして比較",
       before: "よくある AI 製",
       after: "SunUI",
-      caption: "同じクーポン、同じ特典。左は AI ツールが標準で出す見た目（グラデーション、グロー、絵文字）。右は紙とインクだけ。線をドラッグして比べてください。",
+      caption: "同じクーポン、同じ $15 引き。左は AI ツールが標準で出す見た目（グラデーション、グロー、絵文字）。右は SunUI、紙とインクだけ。線をドラッグして比べてください。",
       slop: { eyebrow: "超お得", amount: "$15 OFF", body: "今だけの特典をアンロック！🔥", cta: "今すぐゲット 🚀" },
       paper: { eyebrow: "ダブルイレブン · 新規のお客さま", amount: "$15", unit: "割引", condition: "US$80 以上で利用可", code: "DOUBLE11", cta: "受け取る", claimed: "受け取り済み" },
     },
     whyTitle: "SunUI を選ぶ理由",
     reasons: [
       {
-        title: "テーマではなく、素材",
-        body: "紙とインクだけ。クーポンはミシン目で切れ、レシートは印字され、結果はボタンのあった場所に一行のインクで静かに表示されます。グラデーションも光も紙吹雪もありません。",
+        title: "質感ではなく、姿勢",
+        body: "紙とインクだけ。セールページは目を奪うより、読みやすくあるべきだからです。条件はクーポンの券面に書き、レシートは印字され、結果はボタンのあった場所に一行のインクで静かに表示されます。グラデーションも光も紙吹雪もありません。",
       },
       {
         title: "セールの瞬間のために",
-        body: "タイムセール、クーポン、送料無料ライン、カート、チェックアウト、ポイント。独身の日やブラックフライデー、周年祭にそのまま出せるセクションで、デモではありません。",
+        body: "タイムセール、クーポン、送料無料ライン、カート、チェックアウト、ポイント。カウントダウンは正直に進み、条件は先に伝えます。独身の日やブラックフライデー、周年祭にそのまま使えるセクションで、デモではありません。",
       },
       {
         title: "操作する場所は、落ち着いて",
