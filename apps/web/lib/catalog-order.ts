@@ -34,6 +34,7 @@ const proLead = [
   "ask-to-shop",
   "lineup-shelf",
   "sticker-board",
+  "count-chart",
   "pixel-check-in",
   "pixel-gacha",
   "pixel-boss-sale",
