@@ -24,6 +24,7 @@ const proLead = [
   // B
   "physics-cart-jar",
   "hoop-upload",
+  "vote-terrain",
   "peel-sticker-coupon",
   "order-island",
   "receipt-printer",
