@@ -30,6 +30,7 @@ const proLead = [
   "hoop-upload",
   "vote-terrain",
   "cutaway-spec",
+  "card-dock",
   "ask-to-shop",
   "lineup-shelf",
   "sticker-board",
