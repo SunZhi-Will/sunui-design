@@ -28,6 +28,7 @@ const proLead = [
   "vote-terrain",
   "cutaway-spec",
   "ask-to-shop",
+  "lineup-shelf",
   "pixel-check-in",
   "pixel-gacha",
   "pixel-boss-sale",
