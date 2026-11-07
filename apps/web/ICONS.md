@@ -71,9 +71,9 @@
 5. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。
 6. **accent**：沿用 `--sunui-icon-accent`。藥水、蘋果、旗面這類整體就是主角的，`+` 可以畫整塊。
 7. **物件本色（`tone="pigment"`）**：2026-11-07 加入，背景見 `reports/顏色系統分析-黑白灰之外-2026-11-07.md`。
-   - 預設仍是 `ink`。`pigment` 時外框與亮點不變，`=` 改本色 45%、`:` 本色混 22% 黑、`+` 本色、`~` 本色混 34% 黑。
+   - 預設仍是 `ink`。`pigment` 時外框與亮點不變，填色、陰影、accent 改成**不透明、色相偏移**的本色色階：`+` 是基準色，`=` 略亮，`:` 與 `~` 變暗並往冷色偏（見 `ramps`）。不透明才不會吃到底色，亮暗紙上顏色一致。
    - 只有本身就有顏色的物件有對照（`pixelPigments`：藥水紅、金幣金、寶石藍、史萊姆綠…），控制符號、紙品、介面永遠是墨色。
-   - 7 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown，OKLCH 低彩度，一個值同時用在亮暗紙上；可用 `--sunui-pigment-<name>` 覆寫。
+   - 7 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown，OKLCH 低彩度；金色偏亮偏綠、橙色偏暗偏紅，暗色紙上才分得開。覆寫 `--sunui-pigment-<name>` 時整條色階用 `oklch(from …)` 跟著推算。
    - `pigment` prop 可指定顏色，覆蓋對照，例如寶石依稀有度換成 blue、violet、gold。
    - 一個畫面選一種：全墨或全 pigment，不混。
 8. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：

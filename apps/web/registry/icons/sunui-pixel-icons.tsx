@@ -489,15 +489,15 @@ export const pixelIcons = {
     "................",
     "................",
     "...###....###...",
-    "..#+++#..#+++#..",
-    ".#+**++##++++~#.",
-    ".#+*+++++++++~#.",
-    ".#+++++++++++~#.",
-    "..#+++++++++~#..",
-    "...#+++++++~#...",
-    "....#+++++~#....",
-    ".....#+++~#.....",
-    "......#+~#......",
+    "..#===#..#===#..",
+    ".#=**==##====:#.",
+    ".#=*=========:#.",
+    ".#===========:#.",
+    "..#=========:#..",
+    "...#=======:#...",
+    "....#=====:#....",
+    ".....#===:#.....",
+    "......#=:#......",
     ".......##.......",
     "................",
     "................",
@@ -1267,15 +1267,15 @@ export const pixelIcons = {
     "........#.::....",
     "........#::.....",
     "...####.#.####..",
-    "..#*+++###+++~#.",
-    ".#*++++++++++~#.",
-    ".#*++++++++++~#.",
-    ".#+++++++++++~#.",
-    ".#+++++++++++~#.",
-    ".#+++++++++++~#.",
-    "..#+++++++++~#..",
-    "..#++++++++~~#..",
-    "...#++~##+~~#...",
+    "..#*===###===:#.",
+    ".#*==========:#.",
+    ".#*==========:#.",
+    ".#===========:#.",
+    ".#===========:#.",
+    ".#===========:#.",
+    "..#=========:#..",
+    "..#========::#..",
+    "...#==:##=::#...",
     "....###..###....",
     "................",
     "................",
@@ -1628,16 +1628,32 @@ export const pixelIcons = {
 export type PixelIconName = keyof typeof pixelIcons;
 export const pixelIconNames = Object.keys(pixelIcons) as PixelIconName[];
 
-/** 物件本色。油墨感：彩度壓低，一個值在亮、暗紙上都讀得出來 */
+/** 物件本色的基準色。油墨感：彩度壓低。金色偏亮偏綠、橙色偏暗偏紅，兩者在暗色紙上才拉得開 */
 export const pigments = {
   red: "oklch(0.62 0.15 25)",
-  orange: "oklch(0.72 0.15 58)",
-  gold: "oklch(0.80 0.13 88)",
+  orange: "oklch(0.68 0.15 50)",
+  gold: "oklch(0.82 0.13 92)",
   green: "oklch(0.66 0.12 148)",
   blue: "oklch(0.62 0.12 248)",
   violet: "oklch(0.60 0.13 305)",
   brown: "oklch(0.60 0.08 60)",
 } as const;
+
+type Step = readonly [dL: number, kC: number, dH: number];
+/**
+ * 每個本色的色階：主體填色（=）、陰影（:）、深陰影（~）相對基準色（+）的明度差、彩度倍率、色相差。
+ * 主體只比基準色亮一點，物件才讀得出本色；真正的亮部交給白色亮點。
+ * 色相會偏移（亮部偏暖、陰影偏冷），不是單純混黑，像素畫的色階才不會發悶。
+ */
+const ramps: Record<keyof typeof pigments, { light: Step; shade: Step; deep: Step }> = {
+  red: { light: [0.07, 0.85, 8], shade: [-0.14, 0.95, -10], deep: [-0.24, 0.8, -15] },
+  orange: { light: [0.06, 0.85, 8], shade: [-0.14, 0.95, -12], deep: [-0.24, 0.8, -18] },
+  gold: { light: [0.04, 0.8, 4], shade: [-0.16, 0.9, -22], deep: [-0.28, 0.75, -30] },
+  green: { light: [0.07, 0.85, -10], shade: [-0.15, 0.9, 12], deep: [-0.25, 0.8, 20] },
+  blue: { light: [0.08, 0.8, -12], shade: [-0.15, 0.95, 12], deep: [-0.25, 0.85, 18] },
+  violet: { light: [0.08, 0.8, 10], shade: [-0.15, 0.95, -15], deep: [-0.25, 0.85, -20] },
+  brown: { light: [0.07, 0.85, 8], shade: [-0.15, 0.9, -10], deep: [-0.24, 0.8, -15] },
+};
 
 export type Pigment = keyof typeof pigments;
 export type PixelTone = "ink" | "pigment";
@@ -1713,15 +1729,22 @@ export const pixelTones = [
 type PixelToneList = readonly { char: string; fill: string; opacity: number }[];
 const pigmentToneCache = new Map<Pigment, PixelToneList>();
 
-/** pigment 版的上色：填色是本色半透明，陰影與 accent 陰影往黑混，外框與亮點不變 */
+const shift = (base: string, [dL, kC, dH]: Step) => `oklch(from ${base} calc(l + ${dL}) calc(c * ${kC}) calc(h + ${dH}))`;
+
+/**
+ * pigment 版的上色：外框與亮點不變；填色、陰影、accent 都是不透明的本色色階，
+ * 同一個圖示在亮、暗紙上顏色一致（半透明會吃到底色而發灰）。
+ * 覆寫 --sunui-pigment-<name> 時，整條色階跟著它推算。
+ */
 export function pigmentTones(pigment: Pigment): PixelToneList {
   let hit = pigmentToneCache.get(pigment);
   if (!hit) {
     const base = `var(--sunui-pigment-${pigment}, ${pigments[pigment]})`;
+    const r = ramps[pigment];
     hit = [
-      { char: "=", fill: base, opacity: 0.45 },
-      { char: ":", fill: `color-mix(in oklch, ${base} 78%, black)`, opacity: 1 },
-      { char: "~", fill: `color-mix(in oklch, ${base} 66%, black)`, opacity: 1 },
+      { char: "=", fill: shift(base, r.light), opacity: 1 },
+      { char: ":", fill: shift(base, r.shade), opacity: 1 },
+      { char: "~", fill: shift(base, r.deep), opacity: 1 },
       { char: "+", fill: base, opacity: 1 },
       { char: "#", fill: "currentColor", opacity: 1 },
       { char: "*", fill: SHINE, opacity: 1 },

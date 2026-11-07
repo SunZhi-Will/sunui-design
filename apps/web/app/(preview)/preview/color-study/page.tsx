@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 
 import { Icon, type IconName } from "@/registry/icons/sunui-icons";
-import { pixelIcons, toPixelPaths, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
+import { PixelIcon, pigments, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
 
 export const metadata: Metadata = {
   title: "Color study: pigment",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
  * 背景：reports/顏色系統分析-黑白灰之外-2026-11-07.md
  */
 
-type Pigment = "red" | "orange" | "gold" | "green" | "blue" | "violet" | "brown";
+type Pigment = keyof typeof pigments;
 type Swatch = { tint: string; shade: string; main: string; deep: string };
 
 // 油墨感：彩度壓低，明度分四階。tint 給「=」填色，shade 給「:」陰影，main 給「+」，deep 給「~」
@@ -80,36 +80,9 @@ const OBJECT: Partial<Record<PixelIconName, Pigment>> = {
   map: "brown",
 };
 
-const INK = "currentColor";
-const SHINE = "var(--shine)";
-
-function PigmentIcon({
-  name,
-  pigment,
-  size = 32,
-}: {
-  name: PixelIconName;
-  pigment?: Pigment;
-  size?: number;
-}) {
-  const paths = toPixelPaths(pixelIcons[name]);
-  const v = pigment ? (k: keyof Swatch) => `var(--${pigment}-${k})` : null;
-  // 順序同 pixelTones：填色、陰影、accent 陰影、accent、外框、亮點
-  const tones = [
-    { char: "=", fill: v ? v("tint") : INK, opacity: v ? 1 : 0.3 },
-    { char: ":", fill: v ? v("shade") : INK, opacity: v ? 1 : 0.58 },
-    { char: "~", fill: v ? v("deep") : INK, opacity: v ? 1 : 0.62 },
-    { char: "+", fill: v ? v("main") : INK, opacity: 1 },
-    { char: "#", fill: INK, opacity: 1 },
-    { char: "*", fill: SHINE, opacity: 1 },
-  ];
-  return (
-    <svg viewBox="0 0 16 16" width={size} height={size} shapeRendering="crispEdges" aria-hidden>
-      {tones.map(({ char, fill, opacity }) =>
-        paths[char] ? <path key={char} d={paths[char]} fill={fill} fillOpacity={opacity === 1 ? undefined : opacity} /> : null,
-      )}
-    </svg>
-  );
+function PigmentIcon({ name, pigment, size = 32 }: { name: PixelIconName; pigment?: Pigment; size?: number }) {
+  // 用正式元件：pigment 有值就上色，沒有就是墨色
+  return <PixelIcon name={name} size={size} pigment={pigment} />;
 }
 
 function vars(swatches: Record<Pigment, Swatch>) {
@@ -179,7 +152,7 @@ function Panel({ mode }: { mode: "light" | "dark" }) {
       <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0 }}>{mode === "light" ? "Light" : "Dark"}</h2>
 
       <div>
-        <Label>Pigments (tint / shade / main / deep)</Label>
+        <Label>Study palettes (first draft, for reference; icons below use the shipped ramps)</Label>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           {(Object.keys(p.sw) as Pigment[]).map((k) => (
             <div key={k} style={{ display: "grid", gap: 4, justifyItems: "start" }}>
