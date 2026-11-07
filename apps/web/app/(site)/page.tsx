@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AgentSteps } from "@/components/agent-steps";
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
@@ -75,6 +76,8 @@ export default async function HomePage() {
         locale={locale}
         messages={{ catalog: m.catalog, interactions: m.interactions, series: m.series, tier: m.tier }}
       />
+
+      <AgentSteps m={m.home.agent} />
 
       <section aria-labelledby="why-title" className="mt-24">
         <h2 id="why-title" className="text-2xl font-semibold tracking-tight">
