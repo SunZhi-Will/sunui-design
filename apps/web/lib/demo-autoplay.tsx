@@ -19,6 +19,10 @@ export interface DemoDriver {
   wait: (ms: number) => Promise<void>;
   /** 游標滑到目標再點下去，觸發元件真正的 onClick */
   click: (target: Target) => Promise<void>;
+  /** 游標滑到目標並停住，觸發 pointerenter（懸停預覽用），不點擊 */
+  hover: (target: Target) => Promise<void>;
+  /** 游標離開目標，觸發 pointerleave */
+  unhover: (target: Target) => Promise<void>;
   /** 逐字輸入到 input（走 React 的 onChange） */
   type: (target: Target, text: string, opts?: { cps?: number }) => Promise<void>;
   /** 清空 input */
@@ -151,6 +155,20 @@ export function useDemoAutoplay(
         if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) el.focus({ preventScroll: true });
         else el.click();
         await wait(rm ? 0 : 80);
+      },
+      async hover(t) {
+        const el = resolveTarget(t);
+        await moveTo(el);
+        check();
+        // React 的 onPointerEnter / onMouseEnter 聽的是 over 事件
+        el.dispatchEvent(new PointerEvent("pointerover", { bubbles: true }));
+        el.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      },
+      async unhover(t) {
+        const el = resolveTarget(t);
+        check();
+        el.dispatchEvent(new PointerEvent("pointerout", { bubbles: true, relatedTarget: document.body }));
+        el.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
       },
       async type(t, text, { cps = 17 } = {}) {
         const el = resolveTarget(t) as HTMLInputElement;

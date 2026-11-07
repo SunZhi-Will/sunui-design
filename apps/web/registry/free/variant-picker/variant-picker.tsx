@@ -1,8 +1,10 @@
 "use client";
 
-import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
+import { Stamp } from "@/components/ui/stamp";
+import { instant, roll, springs } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
 export interface VariantColor {
@@ -23,6 +25,11 @@ export interface VariantValue {
   size?: string;
 }
 
+/** onChange 的第二個參數：選中的組合現在買不買得到 */
+export interface VariantChangeInfo {
+  available: boolean;
+}
+
 export interface VariantPickerLabels {
   color?: ReactNode;
   size?: ReactNode;
@@ -32,6 +39,16 @@ export interface VariantPickerLabels {
   pickSize?: ReactNode;
   /** 售完選項的無障礙名稱 */
   soldOutItem?: (name: string) => string;
+  /** 有 onNotify 時售完選項的無障礙名稱 */
+  soldOutNotify?: (name: string) => string;
+  /** 「白色的 M 已售完」 */
+  soldOutIn?: (size: string, color: string) => string;
+  /** 「M 還有：」，後面接可切換的顏色 */
+  availableIn?: (size: string) => string;
+  /** 到貨通知按鈕 */
+  notify?: (size: string) => string;
+  /** 登記到貨通知之後的結果 */
+  notified?: string;
 }
 
 export interface VariantPickerProps {
@@ -41,10 +58,15 @@ export interface VariantPickerProps {
   stock: Record<string, number>;
   value?: VariantValue;
   defaultValue?: VariantValue;
-  onChange?: (value: VariantValue) => void;
+  /** 換顏色時尺寸會保留，即使在新顏色售完；用第二個參數的 available 決定能不能加入購物車 */
+  onChange?: (value: VariantValue, info: VariantChangeInfo) => void;
+  /** 傳入時，售完的尺寸可以點，在原位展開「到貨通知我」 */
+  onNotify?: (value: { color: string; size: string }) => void;
+  /** 底部顯示「霧灰 · M · 只剩 2 件」，只有改到的那段會滾動 */
+  showSummary?: boolean;
   /** 庫存小於等於此數字時顯示「剩 N 件」 */
   lowStockAt?: number;
-  /** 尺寸列樣式：stamp 是紙面格子加售完小章；chips 是文字膠囊，一個墨色外框滑動、售完劃線 */
+  /** 尺寸列樣式：stamp 是紙面格子加售完小字；chips 是文字膠囊，一個墨色外框滑動、售完劃線 */
   sizeStyle?: "stamp" | "chips";
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -70,57 +92,62 @@ function resolveLocale(tag?: string): SunLocale {
 
 const MESSAGES: Record<SunLocale, Required<VariantPickerLabels> & OptionChipsLabels> = {
   en: {
-    color: "Colour",
-    size: "Size",
-    soldOut: "Sold out",
-    inStock: "In stock",
+    color: "Colour", size: "Size", soldOut: "Sold out", inStock: "In stock",
     lowStock: (n) => <>Only {n} left</>,
     pickSize: "Select a size",
     soldOutItem: (name) => `${name}, sold out`,
-    group: "Options",
+    soldOutNotify: (name) => `${name}, sold out, notify available`,
+    soldOutIn: (s, c) => `${s} is sold out in ${c}`,
+    availableIn: (s) => `${s} is available in:`,
+    notify: (s) => `Email me when ${s} is back`,
+    notified: "We will email you", group: "Options",
   },
   "zh-TW": {
-    color: "顏色",
-    size: "尺寸",
-    soldOut: "售完",
-    inStock: "有現貨",
+    color: "顏色", size: "尺寸", soldOut: "售完", inStock: "有現貨",
     lowStock: (n) => <>只剩 {n} 件</>,
     pickSize: "請選擇尺寸",
     soldOutItem: (name) => `${name}，售完`,
-    group: "選項",
+    soldOutNotify: (name) => `${name}，售完，可登記到貨通知`,
+    soldOutIn: (s, c) => `${c}的 ${s} 已售完`,
+    availableIn: (s) => `${s} 還有：`,
+    notify: (s) => `${s} 到貨時寄信通知我`,
+    notified: "到貨會寄信通知你", group: "選項",
   },
   "zh-CN": {
-    color: "颜色",
-    size: "尺码",
-    soldOut: "售罄",
-    inStock: "有现货",
+    color: "颜色", size: "尺码", soldOut: "售罄", inStock: "有现货",
     lowStock: (n) => <>仅剩 {n} 件</>,
     pickSize: "请选择尺码",
     soldOutItem: (name) => `${name}，售罄`,
-    group: "选项",
+    soldOutNotify: (name) => `${name}，售罄，可登记到货通知`,
+    soldOutIn: (s, c) => `${c}的 ${s} 已售罄`,
+    availableIn: (s) => `${s} 还有：`,
+    notify: (s) => `${s} 到货时发邮件通知我`,
+    notified: "到货后会发邮件通知你", group: "选项",
   },
   ja: {
-    color: "カラー",
-    size: "サイズ",
-    soldOut: "売り切れ",
-    inStock: "在庫あり",
+    color: "カラー", size: "サイズ", soldOut: "売り切れ", inStock: "在庫あり",
     lowStock: (n) => <>残り {n} 点</>,
     pickSize: "サイズを選択してください",
     soldOutItem: (name) => `${name}、売り切れ`,
-    group: "オプション",
+    soldOutNotify: (name) => `${name}、売り切れ、再入荷通知を受け取れます`,
+    soldOutIn: (s, c) => `${c}の ${s} は売り切れです`,
+    availableIn: (s) => `${s} の在庫があるカラー：`,
+    notify: (s) => `${s} の再入荷をメールで受け取る`,
+    notified: "再入荷したらメールでお知らせします", group: "オプション",
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// 設計語言（DESIGN.md）：紙、紙邊、墨，全部是中性灰
 const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+// 預覽庫存時只動不透明度與刪除線顏色，不換版面
+const fade = "transition-[color,opacity,translate,text-decoration-color] duration-150 motion-reduce:transition-none";
 
-const springs = {
-  snappy: { type: "spring", stiffness: 520, damping: 34 },
-} as const;
+/** 只在滑鼠這類精準指標上懸停預覽；觸控的 pointerenter 不算 */
+const finePointer = (e: { pointerType?: string }) =>
+  e.pointerType !== "touch" && typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches;
 
 export function VariantPicker({
   colors,
@@ -129,6 +156,8 @@ export function VariantPicker({
   value,
   defaultValue,
   onChange,
+  onNotify,
+  showSummary = false,
   lowStockAt = 3,
   sizeStyle = "stamp",
   locale = "en",
@@ -138,30 +167,46 @@ export function VariantPicker({
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   // 只覆寫 soldOut 時，無障礙名稱沿用舊格式「名稱, soldOut」
   const soldOutItem = labels?.soldOutItem ?? (labels?.soldOut ? (n: string) => `${n}, ${labels.soldOut}` : t.soldOutItem);
-  const reduceMotion = useReducedMotion();
+  const reduce = !!useReducedMotion();
   const [inner, setInner] = useState<VariantValue>(defaultValue ?? { color: colors[0]?.id });
+  const [peek, setPeek] = useState<string>();
+  const [notifyFor, setNotifyFor] = useState<string>();
+  const [notified, setNotified] = useState<string[]>([]);
   const current = value ?? inner;
 
   const qty = (c?: string, s?: string) => (c && s ? (stock[`${c}:${s}`] ?? 0) : 0);
   const colorSoldOut = (c: string) => sizes.every((s) => qty(c, s.id) <= 0);
-  const colorName = colors.find((c) => c.id === current.color)?.name;
+  const nameOf = (id?: string) => colors.find((c) => c.id === id)?.name ?? "";
+  const labelOf = (id?: string) => sizes.find((s) => s.id === id)?.label ?? "";
+  // 尺寸列顯示的庫存：懸停或聚焦某個顏色時先看那個顏色的
+  const shown = peek ?? current.color;
   const left = qty(current.color, current.size);
+  const kept = !!current.size && left <= 0;
 
   function commit(next: VariantValue) {
     if (value === undefined) setInner(next);
-    onChange?.(next);
+    onChange?.(next, { available: qty(next.color, next.size) > 0 });
   }
 
-  // 換顏色時，原尺寸在新顏色售完就清掉，避免停在不能買的組合
-  const pickColor = (id: string) => commit({ color: id, size: current.size && qty(id, current.size) > 0 ? current.size : undefined });
-  const pickSize = (id: string) => commit({ ...current, size: id });
+  // 換顏色時保留尺寸：在新顏色售完就標示出來，並列出還有這個尺寸的顏色，不默默清掉
+  const pickColor = (id: string) => commit({ color: id, size: current.size });
+  const pickSize = (id: string) => {
+    setNotifyFor(undefined);
+    commit({ ...current, size: id });
+  };
+  const pressSoldOut = (id: string) => onNotify && setNotifyFor((f) => (f === id ? undefined : id));
+
+  // 提示行：點過的售完尺寸優先，其次是換顏色後保留下來的尺寸
+  const noteSize = (notifyFor && qty(current.color, notifyFor) <= 0 ? notifyFor : undefined) ?? (kept ? current.size : undefined);
+  const note = noteSize && current.color ? { size: noteSize, color: current.color } : undefined;
+  const sizeName = (id: string, off: boolean) => (!off ? labelOf(id) : onNotify ? t.soldOutNotify(labelOf(id)) : soldOutItem(labelOf(id)));
 
   return (
-    <div className={cn("w-full max-w-sm space-y-5 font-sans", ink, className)}>
+    <div className={cn("w-full max-w-sm font-sans", ink, className)}>
       <fieldset>
         <legend className="flex gap-2 text-sm">
           <span className={inkMuted}>{t.color}</span>
-          <span className="font-medium">{colorName}</span>
+          <span className="font-medium">{nameOf(shown)}</span>
         </legend>
         <RadioRow
           label={typeof t.color === "string" ? t.color : undefined}
@@ -169,6 +214,7 @@ export function VariantPicker({
           items={colors.map((c) => ({ id: c.id, disabled: colorSoldOut(c.id) }))}
           selected={current.color}
           onSelect={pickColor}
+          onPeek={setPeek}
           render={(id, on, disabled) => {
             const c = colors.find((x) => x.id === id)!;
             return {
@@ -182,11 +228,11 @@ export function VariantPicker({
               ),
             };
           }}
-          reduceMotion={!!reduceMotion}
+          reduceMotion={reduce}
         />
       </fieldset>
 
-      <fieldset>
+      <fieldset className="mt-5">
         <legend className={cn("text-sm", inkMuted)}>{t.size}</legend>
         {sizeStyle === "chips" ? (
           <OptionChips
@@ -195,52 +241,109 @@ export function VariantPicker({
             className="mt-2.5"
             value={current.size ?? null}
             onValueChange={pickSize}
+            onDisabledPress={onNotify ? pressSoldOut : undefined}
             options={sizes.map((s) => {
-              const soldOut = qty(current.color, s.id) <= 0;
-              return { value: s.id, label: s.label, disabled: soldOut, ariaLabel: soldOut ? soldOutItem(s.label) : undefined };
+              const off = qty(shown, s.id) <= 0;
+              return { value: s.id, label: s.label, disabled: off, ariaLabel: off ? sizeName(s.id, true) : undefined };
             })}
           />
         ) : (
           <RadioRow
             label={typeof t.size === "string" ? t.size : undefined}
             className="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-2"
-            items={sizes.map((s) => ({ id: s.id, disabled: qty(current.color, s.id) <= 0 }))}
+            items={sizes.map((s) => ({ id: s.id, disabled: qty(shown, s.id) <= 0, focusable: !!onNotify }))}
             selected={current.size}
             onSelect={pickSize}
-            render={(id, on, disabled) => {
-              const s = sizes.find((x) => x.id === id)!;
-              return {
-                label: disabled ? soldOutItem(s.label) : s.label,
-                className: cn("relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums", paper, on ? "border-current" : edge),
-                children: (
-                  <>
-                    <span className={cn("inline-block", disabled && "-translate-y-1.5 line-through opacity-50")}>{s.label}</span>
-                    {disabled && (
-                      // 售完：墨色淡化小章放在尺寸下方，不蓋住尺寸名稱（DESIGN.md 規定售完不用朱紅）
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute bottom-1 left-1/2 -translate-x-1/2 -rotate-[8deg] rounded-[2px] border border-current px-0.5 text-[8px] leading-[10px] font-bold tracking-[0.12em] whitespace-nowrap uppercase",
-                          inkMuted,
-                        )}
-                      >
-                        {t.soldOut}
-                      </span>
+            onPressDisabled={pressSoldOut}
+            render={(id, on, off) => ({
+              label: sizeName(id, off),
+              className: cn(
+                "relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums",
+                paper,
+                // 選中但這個顏色售完：外框改虛線，選擇還在
+                on ? cn("border-current", off && "border-dashed") : edge,
+              ),
+              children: (
+                <>
+                  <span
+                    className={cn(
+                      "inline-block line-through decoration-1",
+                      fade,
+                      off ? "-translate-y-1.5 decoration-current opacity-50" : "decoration-transparent",
                     )}
-                  </>
-                ),
-              };
-            }}
-            reduceMotion={!!reduceMotion}
+                  >
+                    {labelOf(id)}
+                  </span>
+                  {/* 售完：淡墨小字放在尺寸下方，不蓋住尺寸名稱；一直在版面裡，只淡入淡出 */}
+                  <span
+                    aria-hidden="true"
+                    className={cn("absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] leading-[10px] whitespace-nowrap", inkMuted, fade, !off && "opacity-0")}
+                  >
+                    {t.soldOut}
+                  </span>
+                </>
+              ),
+            })}
+            reduceMotion={reduce}
           />
         )}
       </fieldset>
 
-      <p className="text-sm tabular-nums" role="status" aria-live="polite">
-        {!current.size ? (
+      <Expand open={!!note} reduce={reduce}>
+        {note && (
+          <SoldOutNote
+            key={`${note.color}:${note.size}`}
+            text={{
+              line: t.soldOutIn(labelOf(note.size), nameOf(note.color)),
+              alt: t.availableIn(labelOf(note.size)),
+              notify: t.notify(labelOf(note.size)),
+              done: t.notified,
+            }}
+            alternatives={colors.filter((c) => qty(c.id, note.size) > 0)}
+            onAlternative={(id) => {
+              setNotifyFor(undefined);
+              commit({ color: id, size: note.size });
+            }}
+            done={notified.includes(`${note.color}:${note.size}`)}
+            onNotify={
+              onNotify &&
+              (() => {
+                onNotify(note as { color: string; size: string });
+                setNotified((n) => [...n, `${note.color}:${note.size}`]);
+              })
+            }
+          />
+        )}
+      </Expand>
+
+      <p className="mt-5 text-sm tabular-nums" role="status" aria-live="polite">
+        {showSummary ? (
+          <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+            <Roll k={current.color ?? ""} reduce={reduce} className="font-medium">
+              {nameOf(current.color)}
+            </Roll>
+            <span aria-hidden="true" className={inkMuted}>·</span>
+            <Roll k={current.size ?? "-"} reduce={reduce} className={current.size ? "font-medium" : inkMuted}>
+              {current.size ? labelOf(current.size) : t.pickSize}
+            </Roll>
+            {current.size && (
+              <>
+                <span aria-hidden="true" className={inkMuted}>·</span>
+                <Roll k={kept ? "out" : left <= lowStockAt ? `low${left}` : "in"} reduce={reduce} className={kept ? inkMuted : undefined}>
+                  {kept ? t.soldOut : left <= lowStockAt ? t.lowStock(left) : t.inStock}
+                </Roll>
+              </>
+            )}
+          </span>
+        ) : !current.size ? (
           <span className={inkMuted}>{t.pickSize}</span>
+        ) : kept ? (
+          <span className={inkMuted}>
+            {t.soldOut}
+            <span className="sr-only">: {t.soldOutIn(labelOf(current.size), nameOf(current.color))}</span>
+          </span>
         ) : left <= lowStockAt ? (
-          <span className={cn("font-medium", vermilion)}>{t.lowStock(left)}</span>
+          <span className="font-medium">{t.lowStock(left)}</span>
         ) : (
           <span className="text-emerald-700 dark:text-emerald-400">{t.inStock}</span>
         )}
@@ -249,10 +352,117 @@ export function VariantPicker({
   );
 }
 
+/** 高度跟著內容走（gentle 彈簧），下方內容一起滑動；收起時保留最後的內容直到高度歸零 */
+function Expand({ open, reduce, children }: { open: boolean; reduce: boolean; children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const last = useRef<ReactNode>(null);
+  // 量到高度之前用 auto：一開始就展開時（例如靜態卡片）不會從 0 長出來
+  const [h, setH] = useState<number | null>(null);
+  if (open) last.current = children;
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setH(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <motion.div
+      initial={false}
+      animate={{ height: open ? (h ?? "auto") : 0, opacity: open ? 1 : 0 }}
+      transition={reduce || h === null ? instant : springs.gentle}
+      className="overflow-hidden"
+      inert={!open}
+    >
+      <div ref={box}>{open ? children : last.current}</div>
+    </motion.div>
+  );
+}
+
+interface SoldOutNoteProps {
+  text: { line: string; alt: string; notify: string; done: string };
+  alternatives: VariantColor[];
+  onAlternative: (id: string) => void;
+  onNotify?: () => void;
+  done: boolean;
+}
+
+/** 售完提示：哪個顏色還有這個尺寸（一鍵切過去），以及到貨通知；結果放在原本按鈕的位置 */
+function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: SoldOutNoteProps) {
+  return (
+    <div className={cn("mt-3 space-y-2 rounded-md border p-3 text-sm", paper, edge)}>
+      <p className="font-medium">{text.line}</p>
+      {alternatives.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={inkMuted}>{text.alt}</span>
+          {alternatives.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onAlternative(c.id)}
+              className={cn(
+                "inline-flex h-7 items-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium outline-none hover:border-current/40",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+                edge,
+              )}
+            >
+              <span aria-hidden="true" className={cn("size-3 rounded-full border", edge)} style={{ backgroundColor: c.swatch }} />
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {onNotify && (
+        <div className="flex min-h-9 items-center">
+          {done ? (
+            <span role="status">
+              <Stamp shape="tick" size="sm">{text.done}</Stamp>
+              <span className="sr-only">{text.done}</span>
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={onNotify}
+              className={cn(
+                "inline-flex h-9 items-center gap-2 rounded-md border border-current/25 px-3 text-sm font-medium outline-none hover:border-current/60",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+              )}
+            >
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
+                <rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.25" />
+                <path d="m2.25 4 5.75 4.5L13.75 4" strokeLinecap="round" />
+              </svg>
+              {text.notify}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 摘要的一段：值改變時舊值往上離開、新值從下面進來；沒變的段落不動 */
+function Roll({ k, reduce, className, children }: { k: string; reduce: boolean; className?: string; children: ReactNode }) {
+  if (reduce) return <span className={className}>{children}</span>;
+  return (
+    <span className="relative inline-flex overflow-hidden">
+      <AnimatePresence initial={false} mode="popLayout" custom={1}>
+        <motion.span key={k} custom={1} variants={roll} initial="enter" animate="center" exit="exit" className={cn("inline-block whitespace-nowrap", className)}>
+          {children}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
 interface RadioRowProps {
-  items: { id: string; disabled: boolean }[];
+  /** focusable：停用但仍可聚焦、可點（售完但能登記到貨通知） */
+  items: { id: string; disabled: boolean; focusable?: boolean }[];
   selected?: string;
   onSelect: (id: string) => void;
+  onPressDisabled?: (id: string) => void;
+  /** 懸停或聚焦某一項時回報它，離開時回報 undefined */
+  onPeek?: (id: string | undefined) => void;
   render: (id: string, on: boolean, disabled: boolean) => { label: string; className: string; children: ReactNode };
   reduceMotion: boolean;
   label?: string;
@@ -260,30 +470,23 @@ interface RadioRowProps {
 }
 
 // 方向鍵移動焦點並同時選取（radio 的標準行為），Home／End 到頭尾，跳過停用項
-const keyMap: Record<string, 1 | -1 | "first" | "last"> = {
-  ArrowRight: 1,
-  ArrowDown: 1,
-  ArrowLeft: -1,
-  ArrowUp: -1,
-  Home: "first",
-  End: "last",
-};
+const keyMap: Record<string, 1 | -1 | "first" | "last"> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: "first", End: "last", };
 
-/** 兩種選項列共用的 roving focus：回傳 ref 收集器與 keydown 處理 */
-function useRovingRadio(disabled: boolean[], onSelect: (index: number) => void) {
+/** 兩種選項列共用的 roving focus：skip 為 true 的項目不會被聚焦；onMove 由呼叫端決定要不要選取 */
+function useRovingRadio(skip: boolean[], onMove: (index: number) => void) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const onKeyDown = (e: KeyboardEvent, from: number) => {
     const dir = keyMap[e.key];
     if (dir === undefined) return;
     e.preventDefault();
-    const n = disabled.length;
+    const n = skip.length;
     let i = dir === "first" ? -1 : dir === "last" ? n : from;
     const step = dir === "first" ? 1 : dir === "last" ? -1 : dir;
     for (let k = 0; k < n; k++) {
       i = (i + step + n) % n;
-      if (!disabled[i]) {
+      if (!skip[i]) {
         refs.current[i]?.focus();
-        onSelect(i);
+        onMove(i);
         return;
       }
     }
@@ -295,12 +498,11 @@ function useRovingRadio(disabled: boolean[], onSelect: (index: number) => void) 
 }
 
 /** radiogroup：方向鍵在可選項目間移動並選取，售完項目略過但仍會被朗讀 */
-function RadioRow({ items, selected, onSelect, render, reduceMotion, label, className }: RadioRowProps) {
-  const roving = useRovingRadio(
-    items.map((it) => it.disabled),
-    (i) => onSelect(items[i].id),
-  );
-  const sel = items.findIndex((it) => it.id === selected && !it.disabled);
+function RadioRow({ items, selected, onSelect, onPressDisabled, onPeek, render, reduceMotion, label, className }: RadioRowProps) {
+  const skip = items.map((it) => it.disabled && !it.focusable);
+  // 移到售完但可聚焦的項目只移焦點，不選取
+  const roving = useRovingRadio(skip, (i) => !items[i].disabled && onSelect(items[i].id));
+  const sel = items.findIndex((it, i) => it.id === selected && !skip[i]);
   const tabStop = sel >= 0 ? sel : items.findIndex((it) => !it.disabled);
 
   return (
@@ -308,6 +510,7 @@ function RadioRow({ items, selected, onSelect, render, reduceMotion, label, clas
       {items.map((it, i) => {
         const on = it.id === selected;
         const r = render(it.id, on, it.disabled);
+        const pressable = !it.disabled || (it.focusable && onPressDisabled);
         return (
           <motion.button
             key={it.id}
@@ -318,13 +521,17 @@ function RadioRow({ items, selected, onSelect, render, reduceMotion, label, clas
             aria-disabled={it.disabled || undefined}
             aria-label={r.label}
             tabIndex={i === tabStop ? 0 : -1}
-            onClick={() => !it.disabled && onSelect(it.id)}
+            onClick={() => (it.disabled ? it.focusable && onPressDisabled?.(it.id) : onSelect(it.id))}
             onKeyDown={(e) => roving.onKeyDown(e, i)}
-            whileTap={reduceMotion || it.disabled ? undefined : { scale: 0.94 }}
+            onPointerEnter={onPeek && ((e) => finePointer(e) && onPeek(it.id))}
+            onPointerLeave={onPeek && (() => onPeek(undefined))}
+            onFocus={onPeek && (() => onPeek(it.id))}
+            onBlur={onPeek && (() => onPeek(undefined))}
+            whileTap={reduceMotion || !pressable ? undefined : { scale: 0.94 }}
             transition={springs.snappy}
             className={cn(
               "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
-              it.disabled && "cursor-not-allowed",
+              !pressable && "cursor-not-allowed",
               r.className,
             )}
           >
@@ -356,6 +563,8 @@ export interface OptionChipsProps<T extends string = string> {
   /** 非受控時的初始值，預設為第一個可用選項 */
   defaultValue?: T;
   onValueChange?: (value: T) => void;
+  /** 傳入時，停用的選項仍可聚焦與點擊（不會被選取），例如售完時展開到貨通知 */
+  onDisabledPress?: (value: T) => void;
   size?: "sm" | "md" | "lg";
   /** 撐滿父層寬度，各選項等寬 */
   fullWidth?: boolean;
@@ -382,6 +591,7 @@ export function OptionChips<T extends string = string>({
   value,
   defaultValue,
   onValueChange,
+  onDisabledPress,
   size = "md",
   fullWidth = false,
   iconOnly = false,
@@ -405,8 +615,8 @@ export function OptionChips<T extends string = string>({
     if (next !== selected) onValueChange?.(next);
   };
   const roving = useRovingRadio(
-    options.map((o) => !!o.disabled),
-    (i) => select(options[i].value),
+    options.map((o) => !!o.disabled && !onDisabledPress),
+    (i) => !options[i].disabled && select(options[i].value),
   );
 
   // 沒有任何選取時，讓第一個可用項可被 Tab 聚焦
@@ -428,6 +638,9 @@ export function OptionChips<T extends string = string>({
       >
         {options.map((o, i) => {
           const active = o.value === selected;
+          const off = disabled || !!o.disabled;
+          // 有 onDisabledPress 時停用項用 aria-disabled，才能聚焦與點擊
+          const soft = !disabled && !!o.disabled && !!onDisabledPress;
           return (
             <button
               key={o.value}
@@ -436,26 +649,29 @@ export function OptionChips<T extends string = string>({
               role="radio"
               aria-checked={active}
               aria-label={iconOnly ? (o.ariaLabel ?? (typeof o.label === "string" ? o.label : undefined)) : o.ariaLabel}
-              disabled={disabled || o.disabled}
+              disabled={off && !soft}
+              aria-disabled={soft || undefined}
               tabIndex={o.value === tabStop ? 0 : -1}
-              onClick={() => select(o.value)}
+              onClick={() => (soft ? onDisabledPress?.(o.value) : select(o.value))}
               onKeyDown={(e) => roving.onKeyDown(e, i)}
               className={cn(
-                "relative inline-flex shrink-0 items-center justify-center rounded-md border border-border font-medium whitespace-nowrap tabular-nums transition-colors outline-none select-none",
+                "relative inline-flex shrink-0 items-center justify-center rounded-md border border-border font-medium whitespace-nowrap tabular-nums outline-none select-none",
+                "line-through decoration-1 transition-[color,border-color,text-decoration-color] duration-150 motion-reduce:transition-none",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                "disabled:cursor-not-allowed disabled:text-current/35 disabled:line-through disabled:decoration-1",
                 iconOnly ? s.iconOnly : s.item,
                 s.icon,
                 fullWidth && "flex-1",
-                active ? "text-current" : "text-current/70 enabled:hover:border-current/40 enabled:hover:text-current",
+                off
+                  ? cn("text-current/35 decoration-current", soft ? "cursor-pointer" : "cursor-not-allowed")
+                  : cn("decoration-transparent", active ? "text-current" : "text-current/70 hover:border-current/40 hover:text-current"),
               )}
             >
-              {/* 唯一一個選取外框，在選項之間滑動 */}
+              {/* 唯一一個選取外框，在選項之間滑動；選中的項目售完時改成虛線 */}
               {active && (
                 <motion.span
                   layoutId="variant-outline"
                   aria-hidden="true"
-                  className="pointer-events-none absolute -inset-px rounded-[inherit] border-[1.5px] border-current"
+                  className={cn("pointer-events-none absolute -inset-px rounded-[inherit] border-[1.5px] border-current", off && "border-dashed")}
                   transition={reduceMotion ? { duration: 0 } : springs.snappy}
                 />
               )}

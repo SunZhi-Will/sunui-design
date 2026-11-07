@@ -1,8 +1,8 @@
 "use client";
 
-import { useDemoText } from "@/lib/demo-locale";
+import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { FloatingField } from "./floating-field";
+import { FloatingField, suggestEmail } from "./floating-field";
 
 const copy = {
   en: { heading: "Shipping details", name: "Full name", email: "Email", emailBad: "Missing something, like name@example.com", emailOk: "We will send tracking here" },
@@ -11,9 +11,10 @@ const copy = {
   ja: { heading: "お届け先", name: "お名前", email: "メールアドレス", emailBad: "name@example.com の形式で入力してください", emailOk: "配送状況をこちらにお送りします" },
 };
 
-/** 型錄卡片：兩個浮動標籤欄位，點進去標籤縮到框線上；Email 打完整後錯誤訊息換成成功提示。 */
+/** 型錄卡片：Email 網域打錯，欄位下方直接建議修正，點一下只換掉錯的字母。 */
 export default function FloatingFieldCard() {
   const t = useDemoText(copy);
+  const locale = useDemoLocale();
   return (
     <form className="mx-auto w-80 rounded-lg border bg-background p-5" onSubmit={(e) => e.preventDefault()} noValidate>
       <p className="mb-3 text-base font-semibold tracking-tight">{t.heading}</p>
@@ -24,7 +25,9 @@ export default function FloatingFieldCard() {
           name="email"
           type="email"
           autoComplete="email"
-          defaultValue="lin@exam"
+          defaultValue="lin@gmial.com"
+          locale={locale}
+          suggest={suggestEmail}
           validate={(v) => (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? true : t.emailBad)}
           successMessage={t.emailOk}
           required

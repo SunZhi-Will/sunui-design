@@ -1661,7 +1661,7 @@
       "name": "floating-field",
       "type": "registry:block",
       "title": "Floating Field",
-      "description": "Paper text field whose label floats onto the top edge on focus or when filled, with inline validation from a validate function: errors appear after the first blur and then update as you type, success shows a check and an optional message, and a failed blur gives a small shake. Supports hint text, server errors, textarea and a trailing slot such as a show password button.",
+      "description": "A paper text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in faint ink and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1679,11 +1679,12 @@
         "usage": {
           "whenToUse": [
             "Checkout, address and sign-up forms",
-            "Fields that need instant format feedback such as email, postcode or password length"
+            "Fixed-format fields such as postcodes and phone numbers, and email fields where domain typos are common"
           ],
           "watchOut": [
             "Validation is synchronous; pass async results through the error prop",
-            "Keep labels short so they still fit when shrunk onto the border"
+            "mask suits fixed-length formats; textareas do not show remaining slots",
+            "suggestEmail ships with common domains; pass your own list as the second argument"
           ],
           "aliases": [
             "floating label",
@@ -1691,7 +1692,10 @@
             "text field",
             "material input",
             "form field",
-            "input with label"
+            "input with label",
+            "input mask",
+            "email typo",
+            "did you mean"
           ]
         }
       },
@@ -3950,7 +3954,7 @@
       "name": "star-rating",
       "type": "registry:block",
       "title": "Star Rating",
-      "description": "Ink star rating with half stars, keyboard roving focus, optional clear and a hidden form input; read-only mode for review summaries.",
+      "description": "Ink star rating that asks why: after a score is chosen, the same frame grows reason chips (what went wrong at or below the threshold, what they liked above it) that swap in place when the score crosses it, plus an optional \"same as N% of buyers\" line from a distribution; the level label rolls in the direction of change. Half stars, keyboard roving focus, optional clear, hidden form input, and a read-only mode for review summaries. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3968,19 +3972,23 @@
         "addedAt": "2026-11-05",
         "usage": {
           "whenToUse": [
-            "Collecting product or order reviews",
+            "Collecting product or order reviews and the reason behind the score",
             "Showing an average rating next to a review count"
           ],
           "watchOut": [
             "Half-star hit areas are small on mobile; use precision 1 on touch-first forms",
-            "Pass a name prop if the value must be submitted with a native form"
+            "Reasons are not part of the native form value; read them with onReasonsChange",
+            "Keep each reason set to 3 to 5 chips so the frame stays short"
           ],
           "aliases": [
             "rating input",
             "review stars",
             "emoji rating",
             "feedback rating",
-            "score picker"
+            "score picker",
+            "rating with reasons",
+            "feedback tags",
+            "what went wrong"
           ]
         }
       },
@@ -4622,12 +4630,14 @@
       "name": "variant-picker",
       "type": "registry:block",
       "title": "Variant Picker",
-      "description": "Product colour swatches and size options driven by per-combination stock, with sizes shown either as paper chips carrying a faded ink Sold out label or, with sizeStyle=\"chips\", as typographic chips with one ink outline that slides between them and sold-out sizes struck through; OptionChips exports that chip row on its own for any single choice such as fit. Every row is a labelled radiogroup with arrow, Home and End keys that skip sold-out options, stock changes are announced politely, and press feedback and the sliding outline are instant under reduced motion.",
+      "description": "Product colour swatches and size options driven by per-combination stock. Hovering or focusing a colour previews its stock on the size row in place, and switching to a colour where the chosen size is sold out keeps the size and opens an inline note listing the colours that still have it. With onNotify, sold-out sizes open an Email me when it is back action in place, and showSummary adds a line such as Fog grey · M · Only 2 left where only the changed part rolls. Sizes are paper chips or, with sizeStyle=\"chips\", typographic chips with one sliding ink outline; OptionChips exports that row on its own. Every row is a labelled radiogroup whose arrow, Home and End keys skip sold-out options, stock changes are announced politely, and all motion is instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/sunui-motion",
+        "@sunui/stamp"
       ],
       "categories": [
         "commerce",
@@ -4641,18 +4651,22 @@
         "usage": {
           "whenToUse": [
             "Apparel and goods product pages with colour and size variants",
-            "Showing low stock and sold-out combinations before add to cart"
+            "Showing low stock and sold-out combinations before add to cart without trying each colour",
+            "Letting shoppers ask to be told when a sold-out size is back"
           ],
           "watchOut": [
             "Stock keys are colorId:sizeId and missing keys count as sold out",
-            "Switching to a colour where the chosen size is sold out clears the size"
+            "Switching to a colour where the chosen size is sold out keeps the size and marks it sold out; enable add to cart from onChange info.available, not from whether a size is set",
+            "Without onNotify, sold-out sizes cannot be pressed and no notify action appears"
           ],
           "aliases": [
             "colour swatches",
             "size selector",
             "product options",
             "variant selector",
-            "SKU picker"
+            "SKU picker",
+            "back in stock",
+            "notify me"
           ]
         }
       },
