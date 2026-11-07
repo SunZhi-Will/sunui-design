@@ -10,26 +10,26 @@ const copy = {
   en: {
     rate: "Rate it",
     yours: "Your rating",
-    low: ["Runs small", "Sole quality", "Shipping was slow"],
-    high: ["Comfortable", "True to size", "Good value"],
+    low: ["Canvas feels thin", "Loose stitching", "Shipping was slow"],
+    high: ["Holds a lot", "Sturdy straps", "Good value"],
   },
   "zh-TW": {
     rate: "給個評分",
     yours: "你的評分",
-    low: ["尺寸偏小", "鞋底做工", "物流太慢"],
-    high: ["好穿", "尺寸剛好", "CP 值高"],
+    low: ["布料偏薄", "車線鬆脫", "物流太慢"],
+    high: ["容量很大", "提把耐用", "CP 值高"],
   },
   "zh-CN": {
     rate: "打个分",
     yours: "你的评分",
-    low: ["尺码偏小", "鞋底做工", "物流太慢"],
-    high: ["穿着舒服", "尺码标准", "性价比高"],
+    low: ["布料偏薄", "走线松脱", "物流太慢"],
+    high: ["容量很大", "提手结实", "性价比高"],
   },
   ja: {
     rate: "評価する",
     yours: "あなたの評価",
-    low: ["サイズが小さめ", "ソールの作り", "配送が遅い"],
-    high: ["履き心地が良い", "サイズ感がぴったり", "コスパが良い"],
+    low: ["生地が薄い", "縫い目がほつれる", "配送が遅い"],
+    high: ["たっぷり入る", "持ち手が丈夫", "コスパが良い"],
   },
 };
 

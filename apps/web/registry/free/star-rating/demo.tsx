@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 
 import { useDemoAutoplay } from "@/lib/demo-autoplay";
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
-import { ProductArt, useProductNames } from "@/registry/_demo/product-art";
+import { useProductNames } from "@/registry/_demo/product-art";
 
 import { StarRating } from "./star-rating";
 
@@ -25,27 +25,27 @@ const copy = {
     reviews: (n: string) => `${n} reviews`,
     breakdown: "Rating breakdown",
     star: (n: number) => `${n} star`,
-    prompt: "Bought this pair? Leave a rating",
+    prompt: "Bought this tote? Leave a rating",
     yours: "Your rating",
-    reasons: { low: ["Runs small", "Sole quality", "Shipping was slow", "Colour differs from photo"], high: ["Comfortable", "True to size", "Colour matches photo", "Good value"] },
+    reasons: { low: ["Canvas feels thin", "Loose stitching", "Shipping was slow", "Colour differs from photo"], high: ["Holds a lot", "Sturdy straps", "Colour matches photo", "Good value"] },
   },
   "zh-TW": {
     heading: "評價",
     reviews: (n: string) => `${n} 則評價`,
     breakdown: "評分分布",
     star: (n: number) => `${n} 星`,
-    prompt: "買過這雙嗎？給個評分",
+    prompt: "買過這個包嗎？給個評分",
     yours: "你的評分",
-    reasons: { low: ["尺寸偏小", "鞋底做工", "物流太慢", "顏色跟照片不同"], high: ["好穿", "尺寸剛好", "顏色跟照片一樣", "CP 值高"] },
+    reasons: { low: ["布料偏薄", "車線鬆脫", "物流太慢", "顏色跟照片不同"], high: ["容量很大", "提把耐用", "顏色跟照片一樣", "CP 值高"] },
   },
   "zh-CN": {
     heading: "评价",
     reviews: (n: string) => `${n} 条评价`,
     breakdown: "评分分布",
     star: (n: number) => `${n} 星`,
-    prompt: "买过这双吗？打个分吧",
+    prompt: "买过这个包吗？打个分吧",
     yours: "你的评分",
-    reasons: { low: ["尺码偏小", "鞋底做工", "物流太慢", "颜色和图片不一样"], high: ["穿着舒服", "尺码标准", "颜色和图片一致", "性价比高"] },
+    reasons: { low: ["布料偏薄", "走线松脱", "物流太慢", "颜色和图片不一样"], high: ["容量很大", "提手结实", "颜色和图片一致", "性价比高"] },
   },
   ja: {
     heading: "レビュー",
@@ -54,7 +54,7 @@ const copy = {
     star: (n: number) => `星 ${n}`,
     prompt: "購入済みですか？評価してください",
     yours: "あなたの評価",
-    reasons: { low: ["サイズが小さめ", "ソールの作り", "配送が遅い", "写真と色が違う"], high: ["履き心地が良い", "サイズ感がぴったり", "写真どおりの色", "コスパが良い"] },
+    reasons: { low: ["生地が薄い", "縫い目がほつれる", "配送が遅い", "写真と色が違う"], high: ["たっぷり入る", "持ち手が丈夫", "写真どおりの色", "コスパが良い"] },
   },
 };
 
@@ -93,12 +93,12 @@ export default function StarRatingDemo() {
   return (
     <section ref={ref} aria-labelledby="reviews-heading" className="relative w-full max-w-2xl rounded-md border border-border bg-card p-4 text-card-foreground sm:p-6">
       <div className="flex items-center gap-3">
-        <ProductArt kind="sneaker" className="size-12 shrink-0 rounded-md" />
+        <img src="/blocks/upsell-drawer/tote.webp" alt="" decoding="async" className="size-12 shrink-0 rounded-md border border-border object-cover" />
         <div className="min-w-0">
           <h2 id="reviews-heading" className="font-semibold tracking-tight">
             {t.heading}
           </h2>
-          <p className="truncate text-sm text-muted-foreground">{productNames.sneaker}</p>
+          <p className="truncate text-sm text-muted-foreground">{productNames.tote}</p>
         </div>
       </div>
 
