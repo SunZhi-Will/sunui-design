@@ -51,6 +51,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const [selected, setSelected] = useState<string>("coupon");
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
   const [copied, setCopied] = useState<string | null>(null);
+  const [keylines, setKeylines] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isPixel = style === "pixel";
@@ -85,6 +86,25 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       .filter((group) => group.icons.length > 0);
   }, [query, isPixel, isMotion, motionSet, t]);
 
+  // 網址帶 ?icon=coupon&style=pixel 可直接打開某個圖示（參考 iconmcp.com 的分享方式）
+  const [linked, setLinked] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("style");
+    const name = params.get("icon");
+    if (s === "pixel" || s === "line") setStyle(s);
+    if (name && name in (s === "pixel" ? pixelIcons : icons)) setSelected(name);
+    setLinked(true);
+  }, []);
+  useEffect(() => {
+    if (!linked) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("icon", selected);
+    if (isPixel) url.searchParams.set("style", "pixel");
+    else url.searchParams.delete("style");
+    window.history.replaceState(null, "", url);
+  }, [linked, selected, isPixel]);
+
   const total = groups.reduce((sum, group) => sum + group.icons.length, 0);
   const visible = groups.flatMap((group) => group.icons);
   // 切換模式後，選取的圖示若不在清單裡，改選第一個
@@ -109,6 +129,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
 
   const tone = pigment ? "pigment" : "ink";
+  const tags = `${iconKeywords[selected as IconName | PixelIconName] ?? ""}`.split(/\s+/).filter(Boolean);
+  const related = (groups.find((group) => group.icons.includes(selected))?.icons ?? []).filter((name) => name !== selected).slice(0, 8);
 
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
@@ -130,18 +152,31 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     );
   }
 
+  function standaloneSvg() {
+    const svg = previewRef.current?.querySelector("svg[data-icon]");
+    if (!svg) return null;
+    // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor，尺寸改成目前選的大小
+    return svg.outerHTML
+      .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
+      .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
+      .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
+      .replace(/ width="[^"]*" height="[^"]*"/, ` width="${size}" height="${size}"`)
+      .replace(/ data-icon="[^"]*"/, "")
+      .replace(/ data-tone="[^"]*"/, "");
+  }
+
+  function download() {
+    const value = standaloneSvg();
+    if (!value) return;
+    const url = URL.createObjectURL(new Blob([value], { type: "image/svg+xml" }));
+    const link = Object.assign(document.createElement("a"), { href: url, download: `${selected}${isPixel ? "-pixel" : ""}.svg` });
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function copy(kind: "jsx" | "svg") {
-    let value = jsx;
-    if (kind === "svg") {
-      const svg = previewRef.current?.querySelector("svg");
-      if (!svg) return;
-      // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor
-      value = svg.outerHTML
-        .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
-        .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
-        .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
-        .replace(/ data-icon="[^"]*"/, "");
-    }
+    const value = kind === "svg" ? standaloneSvg() : jsx;
+    if (!value) return;
     await navigator.clipboard.writeText(value);
     setCopied(kind);
     setTimeout(() => setCopied(null), 1400);
@@ -296,8 +331,24 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">
           {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : isPixel ? t.pixelSelected : t.selected}
         </p>
-        <div ref={previewRef} className="mt-4 grid place-items-center rounded-sm border border-dashed border-[#e2e2e2] py-8 dark:border-[#333333]">
-          {renderIcon(selected, isPixel ? 64 : 72)}
+        <div ref={previewRef} className="relative mt-4 grid place-items-center rounded-sm border border-dashed border-[#e2e2e2] py-8 dark:border-[#333333]">
+          <div className="relative">
+            {keylines && <Keylines pixel={isPixel} size={128} />}
+            {renderIcon(selected, 128)}
+          </div>
+          <button
+            type="button"
+            aria-pressed={keylines}
+            onClick={() => setKeylines((on) => !on)}
+            className={cn(
+              "absolute right-2 bottom-2 h-6 rounded-[5px] border px-2 font-mono text-[10px] transition-colors",
+              keylines
+                ? "border-[#171717]/30 text-[#171717] dark:border-[#ededed]/30 dark:text-[#ededed]"
+                : "border-transparent text-[#171717]/50 hover:text-[#171717] dark:text-[#ededed]/50 dark:hover:text-[#ededed]",
+            )}
+          >
+            {t.keylines}
+          </button>
         </div>
         {isAnimated ? (
           <div className="mt-4 flex items-center justify-between gap-3">
@@ -347,8 +398,88 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             </button>
           )}
         </div>
+        {!isAnimated && (
+          <button
+            type="button"
+            onClick={download}
+            className="mt-2 flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-[#e2e2e2] text-xs font-medium dark:border-[#333333]"
+          >
+            <Icon name="download" size={14} />
+            {t.downloadSvg}
+          </button>
+        )}
+        {tags.length > 0 && (
+          <div className="mt-5">
+            <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">{t.tags}</p>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {tags.map((tag) => (
+                <li key={tag}>
+                  <button
+                    type="button"
+                    onClick={() => setQuery(tag)}
+                    className="h-6 rounded-[5px] bg-[#171717]/[0.05] px-2 text-[11px] hover:bg-[#171717]/10 dark:bg-[#ededed]/[0.07] dark:hover:bg-[#ededed]/15"
+                  >
+                    {tag}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {related.length > 0 && (
+          <div className="mt-5">
+            <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">{t.related}</p>
+            <ul className="mt-2 grid grid-cols-8 gap-1">
+              {related.map((name) => (
+                <li key={name}>
+                  <button
+                    type="button"
+                    title={name}
+                    aria-label={name}
+                    onClick={() => setSelected(name)}
+                    className="grid aspect-square w-full place-items-center rounded-[5px] hover:bg-[#171717]/[0.06] dark:hover:bg-[#ededed]/10"
+                  >
+                    {renderIcon(name, isPixel ? 16 : 20)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </aside>
     </div>
+  );
+}
+
+/** 預覽的網格與 keyline（參考 iconmcp.com 的 Grid / Keylines）。數字照 ICONS.md：線條版 24 格、內容 3 到 21、圓 8.5、方 7；像素版 16 格、內容 1 到 14 */
+function Keylines({ pixel, size }: { pixel: boolean; size: number }) {
+  const n = pixel ? 16 : 24;
+  const lines = Array.from({ length: n + 1 }, (_, i) => i);
+  return (
+    <svg
+      aria-hidden
+      viewBox={`0 0 ${n} ${n}`}
+      width={size}
+      height={size}
+      className="pointer-events-none absolute inset-0 text-sky-600 dark:text-sky-400"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1}
+      overflow="visible"
+    >
+      {lines.map((i) => (
+        <path key={i} d={`M${i} 0V${n}M0 ${i}H${n}`} vectorEffect="non-scaling-stroke" opacity={i % (pixel ? 4 : 6) === 0 ? 0.35 : 0.14} />
+      ))}
+      {pixel ? (
+        <rect x={1} y={1} width={14} height={14} vectorEffect="non-scaling-stroke" opacity={0.7} />
+      ) : (
+        <g opacity={0.7}>
+          <rect x={3} y={3} width={18} height={18} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
+          <circle cx={12} cy={12} r={8.5} vectorEffect="non-scaling-stroke" />
+          <rect x={5} y={5} width={14} height={14} rx={1} vectorEffect="non-scaling-stroke" />
+        </g>
+      )}
+    </svg>
   );
 }
 

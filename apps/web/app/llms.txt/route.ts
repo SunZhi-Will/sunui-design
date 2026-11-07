@@ -21,7 +21,7 @@ export function GET() {
 - [Using Pro blocks](${base}/docs/pro): private @sunui-pro registry with a license key in SUNUI_LICENSE_KEY
 - [AI agents and MCP](${base}/docs/ai-agents): SunUI MCP server, agent skill and shadcn MCP setup
 - [Full text](${base}/llms-full.txt): every block with when-to-use notes, plus the design rules
-- [MCP server](${base}/mcp): Streamable HTTP, tools search_blocks, get_block, plan_install, get_design_rules
+- [MCP server](${base}/mcp): Streamable HTTP, tools search_blocks, get_block, plan_install, get_design_rules, search_icons, get_icon
 - [Agent skill](${base}/skills/sunui/SKILL.md): install with \`npx shadcn@latest add ${base}/r/sunui-skill.json\`
 - [Registry index](${base}/r/registry.json): free registry in shadcn format
 

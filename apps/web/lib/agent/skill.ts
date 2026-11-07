@@ -22,7 +22,7 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 
 ## Tools, in order of preference
 
-1. **SunUI MCP server** (\`${base}/mcp\`): \`search_blocks\`, \`get_block\`, \`plan_install\`, \`get_design_rules\`. Use it when it is connected.
+1. **SunUI MCP server** (\`${base}/mcp\`): \`search_blocks\`, \`get_block\`, \`plan_install\`, \`get_design_rules\`, plus \`search_icons\` and \`get_icon\` for icons. Use it when it is connected.
 2. **Plain HTTP** when no MCP is connected: \`${base}/llms-full.txt\` (every block with when-to-use notes) and \`${base}/r/<name>.json\` (free block source).
 3. **shadcn MCP** (\`npx shadcn@latest mcp\`) can also install SunUI blocks, but it does not see the usage notes or design rules, so pick blocks with 1 or 2 first.
 
@@ -51,6 +51,7 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 - Pick a new accent color per block. Paper blocks use ink only; product blocks use the theme primary.
 - Remove \`useReducedMotion\` branches or \`aria-live\` regions while editing.
 - Invent block names. If a name is not in search results, it does not exist.
+- Draw a new SVG icon before checking \`search_icons\`. SunUI icons share one grid and stroke; a hand-drawn one breaks the set.
 
 ## References
 

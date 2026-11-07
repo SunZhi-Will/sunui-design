@@ -135,7 +135,7 @@ node apps/web/scripts/check-icons.mjs --only coupon,receipt --with cart,stamp,ch
 
 ## 與 block 的關係
 
-Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block 需要圖示時，從 `/icons` 按 Copy SVG 貼成 inline SVG，形狀就會和整套一致。既有 block 逐步替換即可，不必一次改完。
+Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block 需要圖示時，從 `/icons` 按 Copy SVG 貼成 inline SVG（agent 用 MCP 的 `get_icon`，見下節），形狀就會和整套一致。既有 block 逐步替換即可，不必一次改完。
 
 替換範圍（2026-11-05 決定）：
 
@@ -144,3 +144,21 @@ Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block �
 | pro、free 的 paper 系列 | 已換成 24 網格的 SunUI 圖示 |
 | product、story、classic | **保留來源專案的原圖示**，因為這些是忠實移植，圖示屬於原作外觀的一部分，不要換成 SunUI 圖示 |
 | 評分與收藏（star-rating、favorite-button）、animated-number 的箭頭 | 刻意保留，屬於元件本身的造型 |
+
+## 給 agent：MCP 與網址
+
+2026-11-07 參考 iconmcp.com 加入，分析見 `reports/iconmcp 參考分析-2026-11-07.md`。
+
+| 入口 | 作用 |
+|---|---|
+| MCP `search_icons` | 用意思找圖示（英、中、日），容忍複數與一個錯字，原型排在變體前（stamp 先於 stamp-check）。不帶 query 列出分組，帶 `group` 列出一組。同名的線條與像素版合併成一筆 |
+| MCP `get_icon` | 回傳獨立 SVG 或 TSX 元件，可調 size、stroke、color、accent、像素版的 tone；附上整套安裝指令 |
+| `/icons?icon=<name>&style=pixel` | 直接打開某個圖示，選取時網址會跟著更新，可以分享 |
+
+規則：
+
+1. 搜尋只讀 `lib/icon-groups.ts` 的分組與 `iconKeywords`，新增圖示時補上關鍵字，agent 才找得到。
+2. 輸出直接讀 `registry/icons` 的幾何（`lib/agent/icons.ts`），不另存一份，改圖示不必同步。
+3. 伺服器維持唯讀：不做 iconmcp 的 request、report、fix（需要佇列與審核，和 SunUI 的人工設計流程不合）。
+
+展示頁的選取面板另有：網格線（線條版 24 格、3 到 21 虛線框、圓 8.5、方 7；像素版 16 格與 1 到 14 框）、下載 SVG、關鍵字標籤（按下即搜尋）、同組相關圖示。

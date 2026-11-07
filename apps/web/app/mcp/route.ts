@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { blockLine, catalogMarkdown, describeBlock, planInstall, proSetup, searchBlocks, suggestNames } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
+import { findIcon, iconLibraryUsage, iconSetsSummary, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
 import { skillMarkdown } from "@/lib/agent/skill";
 import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
@@ -140,6 +141,77 @@ const handler = createMcpHandler(
       async ({ series }) => text(designRules(series)),
     );
 
+    server.registerTool(
+      "search_icons",
+      {
+        title: "Search SunUI icons",
+        description:
+          "Find a SunUI icon by meaning, described in plain words the way you would to a designer: 'claimed coupon', 'free shipping', 'loyalty stamp card', 'dark mode'. English, Chinese or Japanese. Tolerates plurals and one typo, and ranks the base icon above its variants (stamp above stamp-check). Pass a returned name to get_icon. weak: true means nothing matched well: try other words, or call with no query to browse a group. Use these icons instead of drawing new SVG so blocks keep one look.",
+        inputSchema: z.object({
+          query: z.string().max(200).optional().describe("What the icon should mean, e.g. 'redeem voucher'. Omit to list a group."),
+          style: z.enum(["line", "pixel"]).optional().describe("line: 24px stroke icons (default look). pixel: 16px sprites for retro or game-style screens. One style per screen."),
+          group: z.string().optional().describe("Group id from the list returned with no query, e.g. 'paper', 'commerce', 'pixel-gear'."),
+          limit: z.number().int().min(1).max(50).default(10),
+        }),
+        annotations: readOnly,
+      },
+      async (args) => {
+        const { weak, results } = searchIcons(args);
+        if (!args.query) {
+          if (!args.group) return text(iconSetsSummary());
+          if (results.length === 0) return { ...text(`No icon group "${args.group}". Call search_icons with no arguments to list groups.`), isError: true };
+        }
+        if (results.length === 0) {
+          return text(`No SunUI icon matches "${args.query}". Try another wording, or browse a group (call with no query). If nothing fits, draw it on the same grid: get_design_rules covers the icon spec.`);
+        }
+        const lines = results.map(
+          (h) => `- ${h.name} (${h.styles.join(" + ")}, ${h.groupTitle})${h.keywords.length ? `: ${h.keywords.join(" ")}` : ""}`,
+        );
+        return {
+          ...text([weak ? "Weak match: no icon fits every word. Closest:" : `${results.length} result(s):`, ...lines].join("\n")),
+          structuredContent: {
+            weak,
+            results: results.map(({ name, styles, group, keywords, score, matchedAllWords }) => ({ name, styles, group, keywords, score, matchedAllWords })),
+          },
+        };
+      },
+    );
+
+    server.registerTool(
+      "get_icon",
+      {
+        title: "Get a SunUI icon",
+        description:
+          "One SunUI icon as ready-to-paste code: a standalone SVG string or a typed React (TSX) component, plus how to install the whole icon set when you need several. Use an exact name from search_icons. Colors follow currentColor; the one accent part follows --sunui-icon-accent unless you pass accent.",
+        inputSchema: z.object({
+          name: z.string().min(1).max(60).describe("Exact icon name, kebab-case, e.g. 'stamp-check'."),
+          style: z.enum(["line", "pixel"]).default("line"),
+          format: z.enum(["svg", "tsx"]).default("svg").describe("svg: an <svg> string. tsx: an exported React component."),
+          size: z.number().int().min(12).max(512).optional().describe("px. Default 24 for line, 16 for pixel (use multiples of 16 for pixel)."),
+          stroke: z.number().min(1).max(2.5).default(1.5).describe("Line only. 1.5 is the house stroke; 1.25 above 32px."),
+          color: z.string().max(64).optional().describe("CSS color. Omit to inherit currentColor."),
+          accent: z.string().max(64).optional().describe("CSS color for the single accent part. Omit to follow --sunui-icon-accent (ink when unset)."),
+          tone: z.enum(["ink", "pigment"]).default("ink").describe("Pixel only. pigment gives objects with a real color (potion, coin, gem) a muted hue."),
+        }),
+        annotations: readOnly,
+      },
+      async ({ name, style, format, size, stroke, color, accent, tone }) => {
+        const entry = findIcon(name, style);
+        if (!entry) {
+          const other = findIcon(name, style === "line" ? "pixel" : "line");
+          const close = suggestIcons(name, style);
+          return {
+            ...text(
+              `No ${style} icon named "${name}".${other ? ` It exists as a ${other.style} icon: pass style "${other.style}".` : ""}${close.length ? ` Closest: ${close.join(", ")}.` : ""}`,
+            ),
+            isError: true,
+          };
+        }
+        const code = renderIcon(entry, { format, size: size ?? (style === "pixel" ? 16 : 24), stroke, color, accent, tone });
+        return text(`\`\`\`${format === "tsx" ? "tsx" : "svg"}\n${code}\n\`\`\`\n\n${iconLibraryUsage(entry)}`);
+      },
+    );
+
     server.registerResource(
       "design-rules",
       "sunui://design-rules",
@@ -191,7 +263,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: "sunui", version: "1.0.0" },
-    instructions: `SunUI: ${getItems().length} paper-feel React + Tailwind blocks for commerce and campaign pages, installed with the shadcn CLI. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
+    instructions: `SunUI: ${getItems().length} paper-feel React + Tailwind blocks for commerce and campaign pages, installed with the shadcn CLI. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
   },
 );
 
