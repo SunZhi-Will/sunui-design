@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type SVGProps } from "react";
 
-import { pixelIcons, PixelPathsGroup, toPixelPaths, type PixelIconName, type PixelPaths } from "./sunui-pixel-icons";
+import {
+  pixelIcons,
+  PixelPathsGroup,
+  resolvePigment,
+  toPixelPaths,
+  type Pigment,
+  type PixelIconName,
+  type PixelPaths,
+  type PixelTone,
+} from "./sunui-pixel-icons";
 
 /**
  * SunUI Animated Pixel Icons
@@ -747,6 +756,10 @@ export type AnimatedPixelIconProps = Omit<SVGProps<SVGSVGElement>, "children" | 
   trigger?: "parent" | "self";
   size?: number | string;
   title?: string;
+  /** ink（預設）或 pigment（物件本色），同 PixelIcon */
+  tone?: PixelTone;
+  /** 指定顏色，覆蓋預設對照；傳了就視為 pigment */
+  pigment?: Pigment;
 };
 
 const cache = new Map<string, PixelPaths>();
@@ -781,8 +794,11 @@ export function AnimatedPixelIcon({
   trigger = "parent",
   size = 16,
   title,
+  tone,
+  pigment,
   ...rest
 }: AnimatedPixelIconProps) {
+  const color = resolvePigment(name, tone, pigment);
   const recipe: Recipe = pixelRecipes[name];
   const reduce = useReducedMotion();
   const ref = useRef<SVGSVGElement>(null);
@@ -873,11 +889,12 @@ export function AnimatedPixelIcon({
       focusable="false"
       data-icon={name}
       data-state={on ? "active" : "rest"}
+      data-tone={color ? "pigment" : undefined}
       overflow="visible"
       {...rest}
     >
       {title && <title>{title}</title>}
-      <PixelPathsGroup paths={paths} />
+      <PixelPathsGroup paths={paths} pigment={color} />
     </svg>
   );
 }

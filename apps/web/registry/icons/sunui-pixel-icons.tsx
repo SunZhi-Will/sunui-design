@@ -6,8 +6,10 @@ import type { SVGProps } from "react";
  * 規格（見 apps/web/ICONS.md「像素圖示」）：
  * - 16 × 16 點陣的小精靈圖：外框、半透明填色、右下陰影、左上亮點，光一律從左上來。
  * - 字元：「#」墨色外框、「=」填色（墨色 30%）、「:」陰影（墨色 58%）、
- *   「+」朱紅（--sunui-icon-accent，未設定時同 currentColor）、「~」朱紅陰影、
+ *   「+」accent（--sunui-icon-accent，未設定時同 currentColor）、「~」accent 陰影、
  *   「*」亮點（--sunui-pixel-shine，預設白色）、「.」留白。
+ * - tone="pigment"：外框與亮點不變，填色、陰影、accent 換成物件本色（pixelPigments）。
+ *   只有本身就有顏色的物件有對照，其餘維持墨色。顏色可用 --sunui-pigment-<name> 覆寫。
  * - 勾、叉、箭頭、選單這些控制符號維持 2 格粗的實心線，不加填色。
  * - 以 16 的整數倍顯示（16、32、48、64）才會銳利；shape-rendering 設為 crispEdges。
  */
@@ -1626,12 +1628,73 @@ export const pixelIcons = {
 export type PixelIconName = keyof typeof pixelIcons;
 export const pixelIconNames = Object.keys(pixelIcons) as PixelIconName[];
 
+/** 物件本色。油墨感：彩度壓低，一個值在亮、暗紙上都讀得出來 */
+export const pigments = {
+  red: "oklch(0.62 0.15 25)",
+  orange: "oklch(0.72 0.15 58)",
+  gold: "oklch(0.80 0.13 88)",
+  green: "oklch(0.66 0.12 148)",
+  blue: "oklch(0.62 0.12 248)",
+  violet: "oklch(0.60 0.13 305)",
+  brown: "oklch(0.60 0.08 60)",
+} as const;
+
+export type Pigment = keyof typeof pigments;
+export type PixelTone = "ink" | "pigment";
+
+/**
+ * tone="pigment" 時每個圖示用的顏色。只標本身就有顏色的物件；
+ * 控制符號、紙品、介面不在表內，永遠是墨色。
+ */
+export const pixelPigments: Partial<Record<PixelIconName, Pigment>> = {
+  heart: "red",
+  "heart-half": "red",
+  apple: "red",
+  potion: "red",
+  meat: "red",
+  flag: "red",
+  gift: "red",
+  fire: "orange",
+  torch: "orange",
+  coin: "gold",
+  crown: "gold",
+  key: "gold",
+  trophy: "gold",
+  star: "gold",
+  sparkle: "gold",
+  ring: "gold",
+  bell: "gold",
+  flash: "gold",
+  hourglass: "gold",
+  slime: "green",
+  battery: "green",
+  gem: "blue",
+  orb: "blue",
+  snowflake: "blue",
+  fish: "blue",
+  shield: "blue",
+  book: "blue",
+  wand: "violet",
+  amulet: "violet",
+  dice: "violet",
+  chest: "brown",
+  door: "brown",
+  bow: "brown",
+  boots: "brown",
+  scroll: "brown",
+  map: "brown",
+};
+
 export type PixelIconProps = Omit<SVGProps<SVGSVGElement>, "children"> & {
   name: PixelIconName;
   /** 寬高，預設 16；用 16 的整數倍最銳利 */
   size?: number | string;
   /** 提供時圖示會被讀出；不提供時視為裝飾，aria-hidden */
   title?: string;
+  /** ink（預設）：全部墨色。pigment：物件本色，一個畫面只選一種 */
+  tone?: PixelTone;
+  /** 指定顏色，覆蓋 pixelPigments（例如寶石依稀有度換色）；傳了就視為 pigment */
+  pigment?: Pigment;
 };
 
 const ACCENT = "var(--sunui-icon-accent, currentColor)";
@@ -1646,6 +1709,34 @@ export const pixelTones = [
   { char: "#", fill: "currentColor", opacity: 1 },
   { char: "*", fill: SHINE, opacity: 1 },
 ] as const;
+
+type PixelToneList = readonly { char: string; fill: string; opacity: number }[];
+const pigmentToneCache = new Map<Pigment, PixelToneList>();
+
+/** pigment 版的上色：填色是本色半透明，陰影與 accent 陰影往黑混，外框與亮點不變 */
+export function pigmentTones(pigment: Pigment): PixelToneList {
+  let hit = pigmentToneCache.get(pigment);
+  if (!hit) {
+    const base = `var(--sunui-pigment-${pigment}, ${pigments[pigment]})`;
+    hit = [
+      { char: "=", fill: base, opacity: 0.45 },
+      { char: ":", fill: `color-mix(in oklch, ${base} 78%, black)`, opacity: 1 },
+      { char: "~", fill: `color-mix(in oklch, ${base} 66%, black)`, opacity: 1 },
+      { char: "+", fill: base, opacity: 1 },
+      { char: "#", fill: "currentColor", opacity: 1 },
+      { char: "*", fill: SHINE, opacity: 1 },
+    ];
+    pigmentToneCache.set(pigment, hit);
+  }
+  return hit;
+}
+
+/** 依 tone 與圖示名稱決定要用的顏色；回傳 undefined 代表墨色 */
+export function resolvePigment(name: string, tone?: PixelTone, pigment?: Pigment): Pigment | undefined {
+  if (pigment) return pigment;
+  if (tone !== "pigment") return undefined;
+  return pixelPigments[name as PixelIconName];
+}
 
 export type PixelPaths = Record<string, string>;
 
@@ -1675,10 +1766,11 @@ export function pixelPaths(name: PixelIconName) {
   return hit;
 }
 
-export function PixelPathsGroup({ paths }: { paths: PixelPaths }) {
+export function PixelPathsGroup({ paths, pigment }: { paths: PixelPaths; pigment?: Pigment }) {
+  const tones: PixelToneList = pigment ? pigmentTones(pigment) : pixelTones;
   return (
     <>
-      {pixelTones.map(({ char, fill, opacity }) =>
+      {tones.map(({ char, fill, opacity }) =>
         paths[char] ? (
           <path key={char} d={paths[char]} fill={fill} fillOpacity={opacity === 1 ? undefined : opacity} />
         ) : null,
@@ -1687,7 +1779,8 @@ export function PixelPathsGroup({ paths }: { paths: PixelPaths }) {
   );
 }
 
-export function PixelIcon({ name, size = 16, title, ...rest }: PixelIconProps) {
+export function PixelIcon({ name, size = 16, title, tone, pigment, ...rest }: PixelIconProps) {
+  const color = resolvePigment(name, tone, pigment);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -1699,10 +1792,11 @@ export function PixelIcon({ name, size = 16, title, ...rest }: PixelIconProps) {
       aria-hidden={title ? undefined : true}
       focusable="false"
       data-icon={name}
+      data-tone={color ? "pigment" : undefined}
       {...rest}
     >
       {title && <title>{title}</title>}
-      <PixelPathsGroup paths={pixelPaths(name)} />
+      <PixelPathsGroup paths={pixelPaths(name)} pigment={color} />
     </svg>
   );
 }

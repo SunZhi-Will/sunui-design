@@ -24,7 +24,7 @@
 1. **網格**：`viewBox="0 0 24 24"`，內容落在 3 到 21 之間（2px 安全邊）。圓形半徑上限 8.5，方形距中心 7。
 2. **線條**：`strokeWidth` 1.5、`strokeLinecap="round"`、`strokeLinejoin="round"`，顏色 `currentColor`。32px 以上可降到 1.25。
 3. **填色**：只有點（`more` 的三點、`info` 的 i 點、集點卡已蓋的格子）用實心，其餘全部是線條。
-4. **朱紅點**：每個圖示最多標一個 accent 部位。預設跟著 `currentColor`，設定 `--sunui-icon-accent` 才上色。一個畫面只開一處，對應 DESIGN.md「朱紅每個 block 最多一處」。
+4. **accent 部位**：每個圖示最多標一個 accent 部位。預設跟著 `currentColor`，設定 `--sunui-icon-accent` 才上色，建議指向買家的品牌色（`var(--primary)`）或狀態色。一個畫面只開一處。
 5. **紙品細節**：票券要有半圓缺口與打孔虛線、收據底部是鋸齒、印章內文字傾斜約 -10°。不加陰影、漸層。
 6. **無障礙**：預設 `aria-hidden`；單獨出現、沒有文字標籤時傳 `title`。
 
@@ -56,7 +56,7 @@
 2. 單次 400ms 以內（`ONCE` 預設 0.4 秒）。
 3. 旋轉中心一律用 24 網格座標（`origin: [x, y]`），內部轉成 `transform-box: view-box`，不同形狀才能共用同一個軸心。
 4. `useReducedMotion()` 為真：所有轉場改為 0 秒，直接顯示結果；loop 不播放。
-5. 朱紅只出現在 accent 部位（例如填滿後的愛心、集點卡新蓋的一格）。
+5. 顏色只出現在 accent 部位（例如填滿後的愛心、集點卡新蓋的一格），沒設 `--sunui-icon-accent` 時就是墨色。
 
 ## 像素圖示
 
@@ -66,11 +66,17 @@
 
 1. **網格**：16 × 16，`viewBox="0 0 16 16"`，內容落在 1 到 14 之間。
 2. **精靈圖畫法**：1 格墨色外框、半透明填色、右側與下方 1 格陰影、左上角內側白色亮點。光一律從左上來。
-3. **字元**：`#` 外框（墨色）、`=` 填色（墨色 30%）、`:` 陰影（墨色 58%）、`+` 朱紅、`~` 朱紅陰影（62%）、`*` 亮點（`--sunui-pixel-shine`，預設白色）、`.` 留白。每種字元合併成一條 path。
+3. **字元**：`#` 外框（墨色）、`=` 填色（墨色 30%）、`:` 陰影（墨色 58%）、`+` accent、`~` accent 陰影（62%）、`*` 亮點（`--sunui-pixel-shine`，預設白色）、`.` 留白。每種字元合併成一條 path。
 4. **控制符號例外**：勾、叉、加減、箭頭、chevron、選單、上傳下載維持 2 格粗的實心線，不加填色。
 5. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。
-6. **朱紅**：沿用 `--sunui-icon-accent`。印章、藥水、蘋果、旗面這類整體就是主角的可以整塊用朱紅。
-7. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
+6. **accent**：沿用 `--sunui-icon-accent`。藥水、蘋果、旗面這類整體就是主角的，`+` 可以畫整塊。
+7. **物件本色（`tone="pigment"`）**：2026-11-07 加入，背景見 `reports/顏色系統分析-黑白灰之外-2026-11-07.md`。
+   - 預設仍是 `ink`。`pigment` 時外框與亮點不變，`=` 改本色 45%、`:` 本色混 22% 黑、`+` 本色、`~` 本色混 34% 黑。
+   - 只有本身就有顏色的物件有對照（`pixelPigments`：藥水紅、金幣金、寶石藍、史萊姆綠…），控制符號、紙品、介面永遠是墨色。
+   - 7 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown，OKLCH 低彩度，一個值同時用在亮暗紙上；可用 `--sunui-pigment-<name>` 覆寫。
+   - `pigment` prop 可指定顏色，覆蓋對照，例如寶石依稀有度換成 blue、violet、gold。
+   - 一個畫面選一種：全墨或全 pigment，不混。
+8. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
    - Gear（裝備）：sword、dagger、axe、hammer、bow、wand、shield、helmet、armor、boots、ring、amulet
    - Items（道具）：potion、key、gem、crown、chest、trophy、bomb、orb、scroll、map、apple、meat、fish、dice、hourglass、book、torch
    - World & HUD（世界與 HUD）：skull、ghost、slime、fire、snowflake、door、flag、heart-half、sparkle、battery、flash、gamepad、cursor
@@ -111,7 +117,7 @@ node apps/web/scripts/check-icons.mjs --only coupon,receipt --with cart,stamp,ch
 | `--only a,b` | 只看這些圖示；不加就是整套 |
 | `--with c,d` | 把既有圖示放在前面一起比較，標成 ref |
 | `--theme light\|dark\|both` | 預設兩種都截 |
-| `--no-accent` | 關掉朱紅，確認 accent 部位在單色下還分得出來 |
+| `--no-accent` | 關掉 accent 顏色，確認 accent 部位在單色下還分得出來 |
 | `--scale 3` | 放大找細縫，預設 2 |
 | `--base`、`--out` | 網站網址（預設 `http://localhost:3100`）與輸出目錄（預設 `apps/web/check-out/icons/`） |
 

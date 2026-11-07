@@ -6,8 +6,8 @@ import type { SVGProps } from "react";
  * 規格（見 apps/web/ICONS.md）：
  * - 24 × 24 網格，主要內容落在 3 到 21 之間，2px 安全邊。
  * - 線寬 1.5，圓頭圓角，顏色跟隨 currentColor。
- * - 每個圖示最多一處「朱紅點」（accent），預設也是 currentColor；
- *   設定 CSS 變數 --sunui-icon-accent 才會上色，對應 DESIGN.md「朱紅只用一處」。
+ * - 每個圖示最多一處 accent 部位，預設也是 currentColor；
+ *   設定 CSS 變數 --sunui-icon-accent 才會上色（建議指向品牌色），一個畫面只開一處。
  * - 紙品類圖示帶實體細節：票券有半圓缺口與打孔線、收據有鋸齒底、印章微微傾斜。
  */
 

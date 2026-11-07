@@ -10,7 +10,7 @@ const items = {
   "sunui-icons": {
     title: "SunUI Icons",
     description:
-      "SunUI's stroke icon set on a 24px grid with a 1.5 stroke, including paper-commerce signatures (notched coupon, zigzag receipt, tilted stamp, punch card) and an optional vermilion accent via --sunui-icon-accent.",
+      "SunUI's stroke icon set on a 24px grid with a 1.5 stroke, including paper-commerce signatures (notched coupon, zigzag receipt, tilted stamp, punch card) and one optional accent part via --sunui-icon-accent (point it at your brand color).",
     source: "registry/icons/sunui-icons.tsx",
     target: "components/ui/sunui-icons.tsx",
     dependencies: [] as string[],
@@ -28,7 +28,7 @@ const items = {
   "sunui-pixel-icons": {
     title: "SunUI Pixel Icons",
     description:
-      "SunUI's pixel sprite icons on a 16px grid: outline, tinted fill, shade and a white shine, covering interface controls, paper-commerce signatures and retro game items. Crisp-edged SVG with an optional vermilion accent via --sunui-icon-accent.",
+      "SunUI's pixel sprite icons on a 16px grid: outline, tinted fill, shade and a white shine, covering interface controls, paper-commerce signatures and retro game items. Crisp-edged SVG. Ink by default; tone=\"pigment\" gives objects that have a real color (potions, coins, gems, slime) a muted ink-like hue, overridable with --sunui-pigment-<name>.",
     source: "registry/icons/sunui-pixel-icons.tsx",
     target: "components/ui/sunui-pixel-icons.tsx",
     dependencies: [] as string[],

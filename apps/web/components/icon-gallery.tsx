@@ -47,6 +47,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const [pixelSize, setPixelSize] = useState<number>(32);
   const [stroke, setStroke] = useState<number>(1.5);
   const [accent, setAccent] = useState(true);
+  const [pigment, setPigment] = useState(false);
   const [selected, setSelected] = useState<string>("coupon");
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
   const [copied, setCopied] = useState<string | null>(null);
@@ -103,9 +104,11 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const sizeOptions = isPixel ? pixelSizes : sizes;
   const activeProp = kind && kind !== "hover" ? ` active={${kind === "loop" ? "loading" : "on"}}` : "";
   const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}`;
-  const pixelProps = pixelSize !== 16 ? ` size={${pixelSize}}` : "";
+  const pixelProps = `${pixelSize !== 16 ? ` size={${pixelSize}}` : ""}${pigment ? ` tone="pigment"` : ""}`;
   const component = isPixel ? (isAnimated ? "AnimatedPixelIcon" : "PixelIcon") : isAnimated ? "AnimatedIcon" : "Icon";
   const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
+
+  const tone = pigment ? "pigment" : "ink";
 
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
@@ -115,9 +118,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     // key 用名稱：換圖示時重新掛載，不沿用上一個圖示的影格
     if (isPixel) {
       return k ? (
-        <AnimatedPixelIcon key={name} name={name as AnimatedPixelIconName} size={px} active={active} />
+        <AnimatedPixelIcon key={name} name={name as AnimatedPixelIconName} size={px} active={active} tone={tone} />
       ) : (
-        <PixelIcon key={name} name={name as PixelIconName} size={px} />
+        <PixelIcon key={name} name={name as PixelIconName} size={px} tone={tone} />
       );
     }
     return k ? (
@@ -136,6 +139,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       value = svg.outerHTML
         .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
         .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
+        .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
         .replace(/ data-icon="[^"]*"/, "");
     }
     await navigator.clipboard.writeText(value);
@@ -219,6 +223,20 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             <span className={cn("size-2 rounded-full", accent ? "bg-accent" : "bg-line")} />
             {t.accent}
           </button>
+          {isPixel && (
+            <button
+              type="button"
+              aria-pressed={pigment}
+              onClick={() => setPigment((on) => !on)}
+              className={cn(
+                "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
+                pigment ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
+              )}
+            >
+              <PixelIcon name="potion" size={16} tone={pigment ? "pigment" : "ink"} />
+              {t.pigment}
+            </button>
+          )}
         </div>
 
         {(isPixel || isMotion) && (
