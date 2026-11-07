@@ -148,6 +148,8 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -398,7 +400,7 @@ function ToastBody({
             item.action?.onClick();
             onDismiss();
           }}
-          className="mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring"
+          className={cn("mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring", spot)}
         >
           {item.action.label}
         </button>

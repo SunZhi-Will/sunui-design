@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { previewUrl } from "@/lib/demo-locale";
 import type { Locale } from "@/lib/i18n";
+import type { SpotKey } from "@/lib/spot";
 import { cn } from "@/lib/utils";
 
 // 卡片進入預載範圍後等多久才掛載 iframe（毫秒）
@@ -17,12 +18,15 @@ const MOUNT_DELAY = 150;
 export function LivePreview({
   name,
   variant,
+  spot,
   title,
   locale,
   onExpand,
 }: {
   name: string;
   variant?: string;
+  /** 示範品牌色，預覽頁的 layout 腳本讀 ?spot= 套上 */
+  spot?: SpotKey;
   title: string;
   locale: Locale;
   onExpand?: () => void;
@@ -77,7 +81,7 @@ export function LivePreview({
         <iframe
           key={locale}
           ref={iframeRef}
-          src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`, locale)}
+          src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`, locale) + (spot ? `&spot=${spot}` : "")}
           title={title}
           onLoad={() => setLoadedLocale(locale)}
           className={cn("size-full border-0 transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}

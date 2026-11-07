@@ -34,12 +34,15 @@ export interface ScrollTimelineProps {
   className?: string;
 }
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
+
 function Dot({ reached, current, reduce }: { reached: boolean; current: boolean; reduce: boolean | null }) {
   return (
     <span className="absolute left-0 top-1 grid size-4 -translate-x-1/2 place-items-center">
       <span className="absolute inset-0 rounded-full border-[1.5px] border-[#171717]/25 bg-[#f7f7f7] dark:border-[#ededed]/25 dark:bg-[#1c1c1c]" />
       <motion.span
-        className={cn("absolute inset-0 rounded-full", current ? "bg-[#171717] dark:bg-[#ededed]" : "bg-[#a3a3a3] dark:bg-[#737373]")}
+        className={cn("absolute inset-0 rounded-full", current ? spotBg : "bg-[#a3a3a3] dark:bg-[#737373]")}
         initial={false}
         animate={{ scale: reached ? 1 : 0 }}
         transition={reduce ? { duration: 0 } : springs.stamp}
@@ -90,11 +93,11 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
     <ol ref={listRef} className={cn("relative ml-2 space-y-8 pl-8", className)}>
       <span aria-hidden="true" className="absolute bottom-2 left-0 top-2 w-px bg-[#e2e2e2] dark:bg-[#333333]" />
       {mode === "scroll" ? (
-        <motion.span aria-hidden="true" className="absolute bottom-2 left-0 top-2 w-px origin-top bg-[#171717] dark:bg-[#ededed]" style={{ scaleY: smooth }} />
+        <motion.span aria-hidden="true" className={cn("absolute bottom-2 left-0 top-2 w-px origin-top", spotBg)} style={{ scaleY: smooth }} />
       ) : (
         <motion.span
           aria-hidden="true"
-          className="absolute bottom-2 left-0 top-2 w-px origin-top bg-[#171717] dark:bg-[#ededed]"
+          className={cn("absolute bottom-2 left-0 top-2 w-px origin-top", spotBg)}
           initial={false}
           animate={{ scaleY: progressFraction }}
           transition={reduce ? { duration: 0 } : springs.gentle}

@@ -20,9 +20,6 @@ export const spotSwatches: Record<Exclude<SpotKey, "ink">, Swatch> = {
 
 export const spotKeys: SpotKey[] = ["ink", "wine", "forest", "navy", "magenta"];
 
-/** 已改用 --sunui-spot 的區塊。試做中，確認效果後再推到其餘區塊 */
-export const spotBlocks = new Set(["coupon-wallet", "add-to-cart-button", "addon-checklist", "shipping-options", "tier-progress"]);
-
 /** 注入預覽 iframe 的樣式；ink 回傳空字串，回到出廠樣子 */
 export function spotCss(key: SpotKey): string {
   if (key === "ink") return "";

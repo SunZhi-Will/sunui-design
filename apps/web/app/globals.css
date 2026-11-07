@@ -23,7 +23,7 @@
   --subtle: #6b6b6b;
   --line: #e4e4e4;
   --card: #ffffff;
-  --stage: #f4f4f4;
+  --stage: #ececec; /* 比紙 #f7f7f7 深一階，block 放上舞台才分得出邊（2026-11-08） */
   /* 站台不設彩色強調：accent 就是墨色，accent-soft 是最淺的灰 */
   --accent: #0a0a0a;
   --accent-soft: #f0f0f0;
@@ -93,7 +93,7 @@
   --subtle: #6b6b6b;
   --line: #e4e4e4;
   --card: #ffffff;
-  --stage: #f4f4f4;
+  --stage: #ececec;
   --accent: #0a0a0a;
   --accent-soft: #f0f0f0;
   --accent-fg: #ffffff;

@@ -82,6 +82,8 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#171717]/25 dark:border-[#ededed]/25";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -172,6 +174,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
           id={codeId}
           className={cn(
             "font-mono font-semibold tracking-[0.12em] uppercase transition-opacity select-all",
+            spot,
             copied && "opacity-20",
           )}
         >

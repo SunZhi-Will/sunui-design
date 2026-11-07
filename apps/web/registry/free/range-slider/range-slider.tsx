@@ -5,6 +5,10 @@ import { useCallback, useId, useRef, useState, type KeyboardEvent, type PointerE
 
 import { cn } from "@/lib/utils";
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
 } as const;
@@ -162,7 +166,7 @@ export function RangeSlider<V extends RangeValue>({
       >
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#e2e2e2] dark:bg-[#333333]" />
         <motion.div
-          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#171717] dark:bg-[#ededed]"
+          className={cn("absolute top-1/2 h-1 -translate-y-1/2 rounded-full", spotBg)}
           initial={false}
           animate={{ left: `${lo}%`, width: `${hi - lo}%` }}
           transition={t}
@@ -190,7 +194,7 @@ export function RangeSlider<V extends RangeValue>({
             onKeyDown={(e) => onKeyDown(e, i)}
             onFocus={() => setFocused(i)}
             onBlur={() => setFocused(null)}
-            className="absolute top-1/2 z-10 -ml-2.5 -mt-2.5 size-5 rounded-full border-[1.5px] border-[#171717] bg-[#f7f7f7] outline-offset-2 focus-visible:outline-2 dark:border-[#ededed] dark:bg-[#1c1c1c]"
+            className={cn("absolute top-1/2 z-10 -ml-2.5 -mt-2.5 size-5 rounded-full border-[1.5px] bg-[#f7f7f7] outline-offset-2 focus-visible:outline-2 dark:bg-[#1c1c1c]", spotBorder)}
             initial={false}
             animate={{ left: `${pct(v)}%`, scale: dragging === i && !reduce ? 1.15 : 1 }}
             transition={t}

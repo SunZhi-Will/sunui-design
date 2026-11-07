@@ -42,9 +42,10 @@ const MESSAGES: Record<SunLocale, FavoriteButtonLabels> = {
   ja: { add: "お気に入りに追加", remove: "お気に入りから削除" },
 };
 
-// 設計語言（DESIGN.md）：墨色外框，收藏時朱紅實心
+// 設計語言（DESIGN.md）：墨色外框，收藏時品牌專色實心
 const ink = "text-[#171717] dark:text-[#ededed]";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -112,7 +113,7 @@ export function FavoriteButton({
                 key="fill"
                 d={HEART}
                 fill="currentColor"
-                className={vermilion}
+                className={spot}
                 style={{ transformBox: "fill-box", transformOrigin: "center" }}
                 initial={reduceMotion ? false : { scale: 1.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -127,7 +128,7 @@ export function FavoriteButton({
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinejoin="round"
-            className={cn("transition-colors", pressed && vermilion)}
+            className={cn("transition-colors", pressed && spot)}
           />
         </svg>
       </motion.span>

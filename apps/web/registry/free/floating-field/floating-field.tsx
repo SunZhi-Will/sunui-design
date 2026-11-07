@@ -65,6 +65,9 @@ export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
 const SLOT: Record<string, RegExp> = { "9": /\d/, A: /[a-z]/i, "*": /\S/ };
 const GHOST: Record<string, string> = { "9": "0", A: "A", "*": "_" };
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+
 /** 依範本整理輸入：只留填得進格子的字，分隔符在下一格有字時自動補上 */
 export function applyMask(input: string, mask: string): string {
   const chars = input.split("").filter((c) => Object.values(SLOT).some((r) => r.test(c)));
@@ -235,7 +238,7 @@ export function FloatingField({
         ref={scope}
         className={cn(
           "relative rounded-md border bg-[#f7f7f7] transition-colors dark:bg-[#1c1c1c]",
-          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? "border-[#171717] dark:border-[#ededed]" : "border-[#e2e2e2] dark:border-[#333333]",
+          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? spotBorder : "border-[#e2e2e2] dark:border-[#333333]",
         )}
       >
         {multiline ? <textarea rows={rows} {...common} /> : <input {...common} />}

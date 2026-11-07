@@ -55,9 +55,10 @@ const MESSAGES: Record<SunLocale, ScrollProgressLabels> = {
   ja: { progress: "読書の進捗", jumpTo: (label) => `「${label}」へ移動` },
 };
 
-// 設計語言（DESIGN.md）：紙邊作底線，墨色作進度
+// 設計語言（DESIGN.md）：紙邊作底線，品牌專色作進度
 const edgeLine = "bg-[#e2e2e2] dark:bg-[#333333]";
-const inkLine = "bg-[#171717] dark:bg-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/50 dark:text-[#ededed]/50";
 
@@ -155,7 +156,7 @@ export function ScrollProgress({
         <span aria-hidden="true" className={cn("absolute inset-x-0 bottom-0 h-px", edgeLine)} />
         <motion.span
           aria-hidden="true"
-          className={cn("absolute inset-0 origin-left", inkLine, barClassName)}
+          className={cn("absolute inset-0 origin-left", spotBg, barClassName)}
           style={{ scaleX: value }}
         />
       </div>

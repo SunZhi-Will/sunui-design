@@ -92,7 +92,8 @@ export function InkUnderline({ children, as: Tag = "a", active = false, tone = "
         "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none",
         "hover:after:origin-left hover:after:scale-x-100 focus-visible:after:origin-left focus-visible:after:scale-x-100",
         active && "after:scale-x-100",
-        tone === "ink" ? "after:bg-[#171717] dark:after:bg-[#ededed]" : "after:bg-[#171717] dark:after:bg-[#ededed]",
+        // 目前頁的底線用品牌專色，其餘維持墨色
+        active ? "after:bg-[color:var(--sunui-spot,var(--primary))]" : tone === "ink" ? "after:bg-[#171717] dark:after:bg-[#ededed]" : "after:bg-[#171717] dark:after:bg-[#ededed]",
         className,
       )}
     >

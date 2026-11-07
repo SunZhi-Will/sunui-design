@@ -11,6 +11,7 @@ import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
 import { useSaved } from "@/lib/saved";
 import { seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
+import { spotKeys, type SpotKey } from "@/lib/spot";
 import { variantFeatured } from "@/registry/__generated__/variants";
 
 const seriesKeys: Series[] = ["paper", "product", "story", "showcase", "motion"];
@@ -26,6 +27,8 @@ export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | 
   styleCount?: number;
   /** 收合的效果庫卡片：卡片預覽這一種樣式，連結仍指向整個庫 */
   preview?: string;
+  /** 已改用品牌專色 --sunui-spot 的 block */
+  spot?: boolean;
   /** 英文原文，給「複製給 agent」的整組 prompt 用 */
   en?: { title: string; description: string };
 };
@@ -325,8 +328,9 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
       </div>
 
       <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((item) => (
+        {visible.map((item, i) => (
           <BlockCard
+            spot={spotFor(visible, i)}
             key={item.variant ? `${item.name}~${item.variant}` : item.name}
             name={item.name}
             variant={item.variant}
@@ -436,4 +440,16 @@ function FilterChip({
       <span className={cn("text-xs tabular-nums", active ? "opacity-70" : "opacity-60")}>{count}</span>
     </button>
   );
+}
+
+/**
+ * 型錄牆的品牌色示範：支援專色的卡片每三張有一張換成示範品牌色，依序輪流，其餘維持墨色。
+ * 固定分配不隨機，篩選後也照可見順序重排。說明見 reports/網站灰階單調診斷-2026-11-08.md。
+ */
+function spotFor(items: CatalogItem[], index: number): SpotKey | undefined {
+  if (!items[index].spot) return undefined;
+  const k = items.slice(0, index).filter((item) => item.spot).length;
+  if (k % 3 !== 1) return undefined;
+  const colors = spotKeys.filter((key) => key !== "ink");
+  return colors[Math.floor(k / 3) % colors.length];
 }

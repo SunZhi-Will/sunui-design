@@ -54,6 +54,8 @@ const MESSAGES: Record<SunLocale, Required<StoreHeaderLabels>> = {
 };
 
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -159,7 +161,7 @@ export function StoreHeader({
                     initial={reduce ? false : { scale: 0.6 }}
                     animate={{ scale: 1 }}
                     transition={springs.snappy}
-                    className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] leading-none font-semibold text-primary-foreground tabular-nums"
+                    className={cn("absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] leading-none font-semibold tabular-nums", spotFill)}
                   >
                     {cartCount > 99 ? "99+" : cartCount}
                   </motion.span>

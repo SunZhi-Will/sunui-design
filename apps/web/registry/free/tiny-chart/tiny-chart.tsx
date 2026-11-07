@@ -567,7 +567,10 @@ export interface TinyChartProps {
 }
 
 const INK = "stroke-[#171717] dark:stroke-[#ededed]";
-const RED = "stroke-[#171717] dark:stroke-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+// RED：走過的路與目前所在的狀態外框
+const RED = "stroke-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const PAPER = "fill-[#f7f7f7] dark:fill-[#1c1c1c]";
 const MUTED = "stroke-[#a3a3a3] dark:stroke-[#737373]";
 // 等角方塊的兩個側面：同一張紙的兩階明度，平塗，不用漸層
@@ -767,7 +770,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             </g>
           ))}
 
-          {/* 走過的路用朱紅描一遍，最新的一段畫出來 */}
+          {/* 走過的路用品牌專色描一遍，最新的一段畫出來 */}
           {path.map((ti, k) => (
             <motion.path
               key={k}
@@ -914,7 +917,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={playAll} className="inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 active:scale-[0.97]">
+        <button type="button" onClick={playAll} className={cn("inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-opacity hover:opacity-90 active:scale-[0.97]", spotFill)}>
           <svg viewBox="0 0 16 16" className="size-3.5" aria-hidden>
             <path d="M5 3.5v9l7-4.5z" fill="currentColor" />
           </svg>

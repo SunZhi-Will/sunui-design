@@ -108,6 +108,9 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/65 dark:text-[#ededed]/65";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotTrack = "border-[color:var(--sunui-spot,var(--primary))] bg-[color:var(--sunui-spot,var(--primary))]";
+const spotThumb = "bg-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -277,10 +280,10 @@ function Switch({ on, labelledBy, reduce, onToggle }: { on: boolean; labelledBy:
       onClick={onToggle}
       className={cn(
         "relative flex h-6 w-10 shrink-0 items-center rounded-full border px-0.5 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        on ? "justify-end border-primary bg-primary" : cn("justify-start bg-background", edge),
+        on ? cn("justify-end", spotTrack) : cn("justify-start bg-background", edge),
       )}
     >
-      <motion.span layout transition={reduce ? { duration: 0 } : springs.snappy} className={cn("block size-4 rounded-full", on ? "bg-primary-foreground" : "bg-muted-foreground/50")} />
+      <motion.span layout transition={reduce ? { duration: 0 } : springs.snappy} className={cn("block size-4 rounded-full", on ? spotThumb : "bg-muted-foreground/50")} />
     </button>
   );
 }

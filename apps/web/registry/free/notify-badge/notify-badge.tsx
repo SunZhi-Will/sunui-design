@@ -28,8 +28,11 @@ export interface NotifyBadgeProps {
   className?: string;
 }
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
+
 const tones = {
-  accent: "bg-[#171717] text-white dark:bg-[#ededed] dark:text-[#1c1c1c]",
+  accent: spotFill,
   ink: "bg-[#171717] text-[#f7f7f7] dark:bg-[#ededed] dark:text-[#1c1c1c]",
   primary: "bg-primary text-primary-foreground",
 };

@@ -124,10 +124,11 @@ const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙邊、墨、朱紅
+// 設計語言（DESIGN.md）：紙邊、墨、品牌專色
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -181,7 +182,7 @@ export function LowStockIndicator({
   const message = level === "critical" ? t.critical(safeStock) : level === "low" ? t.low(safeStock) : t.inStock(safeStock);
 
   return (
-    <CountContext.Provider value={{ dir, reduceMotion, tone: critical ? vermilion : "" }}>
+    <CountContext.Provider value={{ dir, reduceMotion, tone: critical ? spot : "" }}>
       <div className={cn("w-full space-y-2 font-sans", className)}>
         <div className="flex min-h-7 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
           <p id={labelId} role="status" aria-live="polite" className="flex items-center">
@@ -206,7 +207,7 @@ export function LowStockIndicator({
           aria-valuemin={0}
           aria-valuemax={capacity}
           aria-valuenow={Math.min(safeStock, capacity)}
-          className={cn(critical && vermilion)}
+          className={cn(critical && spot)}
         >
           {slips > 0 ? (
             // 每格一件，像撕剩的票根

@@ -74,6 +74,9 @@ export interface TocScrollspyProps extends ScrollSpyOptions {
   className?: string;
 }
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
+
 export function TocScrollspy({ items, title, container, offset = 96, smooth = true, onNavigate, className }: TocScrollspyProps) {
   const reduce = useReducedMotion();
   const group = useId();
@@ -109,7 +112,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
                 <motion.span
                   layoutId={`${group}-bar`}
                   transition={reduce ? { duration: 0 } : springs.snappy}
-                  className="absolute -left-px inset-y-0 w-0.5 bg-[#171717] dark:bg-[#ededed]"
+                  className={cn("absolute -left-px inset-y-0 w-0.5", spotBg)}
                 />
               )}
               <a

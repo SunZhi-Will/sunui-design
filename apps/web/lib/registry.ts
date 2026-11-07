@@ -72,6 +72,19 @@ export function getItems(tier?: Tier): RegistryItem[] {
   return tier ? items.filter((item) => item.meta.tier === tier) : items;
 }
 
+const spotCache = new Map<string, boolean>();
+
+/** free block 是否已改用品牌專色 --sunui-spot：讀主檔原始碼判斷，不用另外維護清單 */
+export function usesSpot(item: RegistryItem): boolean {
+  if (item.meta.tier !== "free" || !item.files[0]) return false;
+  const cached = spotCache.get(item.name);
+  if (cached !== undefined && process.env.NODE_ENV !== "development") return cached;
+  const file = path.join(process.cwd(), item.files[0].path);
+  const result = existsSync(file) && readFileSync(file, "utf8").includes("--sunui-spot");
+  spotCache.set(item.name, result);
+  return result;
+}
+
 export function getItem(name: string, tier?: Tier): RegistryItem | undefined {
   return getItems(tier).find((item) => item.name === name);
 }

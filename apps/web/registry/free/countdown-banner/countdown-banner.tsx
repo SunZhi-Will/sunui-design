@@ -167,7 +167,9 @@ const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -282,7 +284,7 @@ export function CountdownBanner({
         </div>
 
         <div className={cn("relative border-t border-dashed pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
-          <p className={cn("text-4xl leading-none font-black tracking-tight tabular-nums transition-opacity", ended ? cn(inkMuted, "opacity-40") : vermilion)}>{discount}</p>
+          <p className={cn("text-4xl leading-none font-black tracking-tight tabular-nums transition-opacity", ended ? cn(inkMuted, "opacity-40") : spot)}>{discount}</p>
           {(discountedPrice || originalPrice) && (
             <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm tabular-nums">
               {discountedPrice && <span className="font-semibold">{discountedPrice}</span>}
@@ -402,8 +404,10 @@ function Half({ top, flap, value }: { top?: boolean; flap?: boolean; value: stri
 }
 
 function Cta({ href, onClick, label, reduceMotion }: { href?: string; onClick?: () => void; label: string; reduceMotion: boolean }) {
-  const cls =
-    "inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium whitespace-nowrap text-primary-foreground hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none";
+  const cls = cn(
+    spotFill,
+    "inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium whitespace-nowrap hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
+  );
   const tap = reduceMotion ? undefined : { scale: 0.97 };
   return href ? (
     <motion.a href={href} onClick={onClick} whileTap={tap} transition={springs.snappy} className={cls}>

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import { Stamp } from "@/components/ui/stamp";
 import type { Messages } from "@/lib/messages";
+import { spotKeys, spotSwatches, type SpotKey } from "@/lib/spot";
+import { cn } from "@/lib/utils";
 
 type CompareMessages = Messages["home"]["compare"];
 
@@ -11,15 +13,27 @@ type CompareMessages = Messages["home"]["compare"];
  * 首頁主視覺：同一張優惠券，左邊是 AI 工具最常產出的樣子，右邊是 SunUI 的紙感版本。
  * 拖動中線比較。用原生 range input 當控制項，鍵盤、觸控、讀屏都直接可用。
  * 只在使用者拖動時改變，不自動播放（DESIGN.md：不做常駐循環）。
+ * 下方的色票把右邊的券換成買家的品牌色：SunUI 不替你選顏色，顏色是你的（reports/網站灰階單調診斷-2026-11-08.md）。
  */
 export function HeroCompare({ m }: { m: CompareMessages }) {
   const [pos, setPos] = useState(50);
+  const [spot, setSpot] = useState<SpotKey>("ink");
+  const spotStyle =
+    spot === "ink"
+      ? undefined
+      : ({ "--sunui-spot": spotSwatches[spot].light, "--spot-dark": spotSwatches[spot].dark, "--sunui-spot-foreground": "#ffffff" } as CSSProperties);
 
   return (
     <figure className="w-full">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-line bg-stage select-none sm:aspect-[5/4]">
         {/* 右邊（After）：SunUI 紙感，墊在底層 */}
-        <div className="absolute inset-0 flex items-center justify-center p-6">
+        <div
+          style={spotStyle}
+          className={cn(
+            "absolute inset-0 flex items-center justify-center p-6",
+            spotStyle && "dark:[--sunui-spot-foreground:#0a0a0a] dark:[--sunui-spot:var(--spot-dark)]",
+          )}
+        >
           <PaperCoupon m={m} />
         </div>
 
@@ -66,7 +80,33 @@ export function HeroCompare({ m }: { m: CompareMessages }) {
         />
         <div className="pointer-events-none absolute inset-0 rounded-lg ring-fg ring-offset-2 ring-offset-bg peer-focus-visible:ring-2" aria-hidden="true" />
       </div>
-      <figcaption className="mt-3 text-sm text-pretty text-subtle">{m.caption}</figcaption>
+      <div className="mt-3 flex items-center gap-2 text-sm text-subtle">
+        <span>{m.spotLabel}</span>
+        <div role="radiogroup" aria-label={m.spotLabel} className="flex items-center gap-1">
+          {spotKeys.map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={spot === key}
+              aria-label={m.spotColors[key]}
+              title={m.spotColors[key]}
+              onClick={() => setSpot(key)}
+              className={cn(
+                "grid size-6 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+                spot === key ? "border-fg" : "border-transparent hover:border-line",
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className={cn("size-3.5 rounded-full", key === "ink" && "bg-fg")}
+                style={key === "ink" ? undefined : { background: spotSwatches[key].light }}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+      <figcaption className="mt-2 text-sm text-pretty text-subtle">{m.caption}</figcaption>
     </figure>
   );
 }
@@ -98,7 +138,7 @@ function PaperCoupon({ m }: { m: CompareMessages }) {
       <div className="min-w-0 flex-1 p-5">
         <p className="text-xs text-[#737373]">{m.paper.eyebrow}</p>
         <p className="mt-1 flex items-baseline gap-1.5">
-          <span className="text-4xl font-semibold tracking-tight tabular-nums">{m.paper.amount}</span>
+          <span className="text-4xl font-semibold tracking-tight text-[color:var(--sunui-spot,var(--primary))] tabular-nums">{m.paper.amount}</span>
           <span className="text-sm">{m.paper.unit}</span>
         </p>
         <p className="mt-1 text-sm text-[#737373]">{m.paper.condition}</p>
@@ -116,7 +156,7 @@ function PaperCoupon({ m }: { m: CompareMessages }) {
           <button
             type="button"
             onClick={() => setClaimed(true)}
-            className="rounded-md bg-[#171717] px-3 py-1.5 text-sm font-medium text-white dark:bg-[#ededed] dark:text-[#171717]"
+            className="rounded-md bg-[color:var(--sunui-spot,var(--primary))] px-3 py-1.5 text-sm font-medium text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]"
           >
             {m.paper.cta}
           </button>

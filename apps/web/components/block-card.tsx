@@ -8,6 +8,7 @@ import { LivePreview } from "@/components/live-preview";
 import { format, type Locale } from "@/lib/i18n";
 import type { Tier } from "@/lib/registry";
 import { useSaved } from "@/lib/saved";
+import type { SpotKey } from "@/lib/spot";
 import { cn } from "@/lib/utils";
 
 /** save 有給才顯示書籤，例如「收藏 {title}」 */
@@ -21,6 +22,7 @@ export function BlockCard({
   name,
   variant,
   preview,
+  spot,
   title,
   note,
   tier,
@@ -32,6 +34,8 @@ export function BlockCard({
   variant?: string;
   /** 只換預覽、不換連結：收合的效果庫卡片跑代表樣式，點開仍是整個庫 */
   preview?: string;
+  /** 卡片預覽套用的示範品牌色，省略時是出廠墨色 */
+  spot?: SpotKey;
   title: string;
   /** 標題旁的小字，例如效果庫收合時的樣式數 */
   note?: string;
@@ -58,6 +62,7 @@ export function BlockCard({
         <LivePreview
           name={name}
           variant={variant ?? preview}
+          spot={spot}
           title={format(labels.livePreview, { title })}
           locale={locale}
           onExpand={() => router.push(href, { scroll: false })}

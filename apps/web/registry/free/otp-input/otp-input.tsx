@@ -90,6 +90,8 @@ const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 
 // 游標不在選取狀態時，新輸入會與舊字元並存，先去掉舊字元
@@ -245,7 +247,7 @@ export function OtpInput({
                   />
                   {/* 墨線游標：印刷表格上的填寫位置 */}
                   {focused === i && !disabled && status !== "success" && (
-                    <span aria-hidden="true" className="pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 bg-current sm:inset-x-3" />
+                    <span aria-hidden="true" className={cn("pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 bg-current sm:inset-x-3", spot)} />
                   )}
                 </span>
               </Fragment>

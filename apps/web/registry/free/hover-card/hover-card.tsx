@@ -68,12 +68,14 @@ const MESSAGES: Record<SunLocale, Required<HoverCardLabels>> = {
   ja: { addToCart: "カートに追加", quickView: "クイックビュー", off: (pct) => <>{pct}%オフ</> },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// 設計語言（DESIGN.md）：紙、紙邊、墨、品牌專色
 const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -238,7 +240,7 @@ export function HoverCard({
               {product.compareAt && (
                 <>
                   <s className={cn("text-xs", inkMuted)}>{fmt.format(product.compareAt)}</s>
-                  <span className={cn("ml-auto text-xs font-medium", vermilion)}>{t.off(pct)}</span>
+                  <span className={cn("ml-auto text-xs font-medium", spot)}>{t.off(pct)}</span>
                 </>
               )}
             </span>
@@ -246,7 +248,7 @@ export function HoverCard({
               <button
                 type="button"
                 onClick={onAddToCart}
-                className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className={cn("mt-3 inline-flex h-9 w-full items-center justify-center rounded-md px-3 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", spotFill)}
               >
                 {t.addToCart}
               </button>

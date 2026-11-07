@@ -52,7 +52,8 @@ const MESSAGES: Record<SunLocale, Required<ProductMediaLabels>> = {
 };
 
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "bg-[#171717] dark:bg-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 
@@ -173,7 +174,7 @@ export function ProductMedia({
                 onClick={() => go(i)}
                 className="grid size-6 place-items-center rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
-                <span className={cn("block h-1 rounded-full transition-all duration-200", i === index ? cn("w-4", ink) : "w-1.5 bg-muted-foreground/40")} />
+                <span className={cn("block h-1 rounded-full transition-all duration-200", i === index ? cn("w-4", spotBg) : "w-1.5 bg-muted-foreground/40")} />
               </button>
             ))}
           </div>

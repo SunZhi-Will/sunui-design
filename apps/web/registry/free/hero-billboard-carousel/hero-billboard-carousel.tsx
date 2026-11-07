@@ -664,8 +664,9 @@ const BILLBOARD_CSS = `
   border-radius: 12px;
   font-weight: 600;
   font-size: 15px;
-  background: var(--text-primary);
-  color: var(--bg);
+  /* 品牌專色：買家設 --sunui-spot 就換成自己的品牌色，沒設時維持原本的配色 */
+  background: var(--sunui-spot, var(--text-primary));
+  color: var(--sunui-spot-foreground, var(--bg));
   transition: transform 0.2s ease;
   white-space: nowrap;
 }
@@ -719,7 +720,7 @@ const BILLBOARD_CSS = `
   border-radius: 999px;
   transform-origin: 0 50%;
   transform: scaleX(0);
-  background: var(--accent-gold);
+  background: var(--sunui-spot, var(--accent-gold));
   opacity: 0;
 }
 .hbc-dot[aria-current="true"] .hbc-dot-fill {

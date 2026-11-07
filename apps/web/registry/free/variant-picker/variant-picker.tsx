@@ -142,6 +142,8 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 // 預覽庫存時只動不透明度與刪除線顏色，不換版面
 const fade = "transition-[color,opacity,translate,text-decoration-color] duration-150 motion-reduce:transition-none";
 
@@ -219,7 +221,7 @@ export function VariantPicker({
             const c = colors.find((x) => x.id === id)!;
             return {
               label: disabled ? soldOutItem(c.name) : c.name,
-              className: cn("relative grid size-9 place-items-center rounded-full border", on ? "border-current" : "border-transparent"),
+              className: cn("relative grid size-9 place-items-center rounded-full border", on ? spotBorder : "border-transparent"),
               children: (
                 <>
                   <span className={cn("size-7 rounded-full border", edge)} style={{ backgroundColor: c.swatch }} />
@@ -261,7 +263,7 @@ export function VariantPicker({
                 "relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums",
                 paper,
                 // 選中但這個顏色售完：外框改虛線，選擇還在
-                on ? cn("border-current", off && "border-dashed") : edge,
+                on ? cn(spotBorder, off && "border-dashed") : edge,
               ),
               children: (
                 <>
@@ -671,7 +673,7 @@ export function OptionChips<T extends string = string>({
                 <motion.span
                   layoutId="variant-outline"
                   aria-hidden="true"
-                  className={cn("pointer-events-none absolute -inset-px rounded-[inherit] border-[1.5px] border-current", off && "border-dashed")}
+                  className={cn("pointer-events-none absolute -inset-px rounded-[inherit] border-[1.5px]", spotBorder, off && "border-dashed")}
                   transition={reduceMotion ? { duration: 0 } : springs.snappy}
                 />
               )}

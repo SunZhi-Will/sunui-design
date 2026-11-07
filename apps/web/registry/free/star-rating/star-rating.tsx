@@ -105,6 +105,10 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
 
 // 設計語言（DESIGN.md）：墨線星星，不用金色
 const ink = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 const instant = { duration: 0 } as const;
@@ -114,14 +118,14 @@ const labelSize: Record<StarRatingSize, string> = { sm: "text-xs", md: "text-sm"
 
 const STAR = "M12 3.2l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6-4.4-4.2 6-.8z";
 
-/** 一顆星：底層墨線外框，上層依 fill 比例裁出實心 */
-function Star({ fill, className }: { fill: number; className?: string }) {
+/** 一顆星：底層墨線外框，上層依 fill 比例裁出實心；可點的選分器裡，實心部分用品牌專色 */
+function Star({ fill, className, fillClassName }: { fill: number; className?: string; fillClassName?: string }) {
   return (
     <span aria-hidden="true" className={cn("relative block", className)}>
       <svg viewBox="0 0 24 24" className="absolute inset-0 size-full" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
         <path d={STAR} className="opacity-45" />
       </svg>
-      <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
+      <span className={cn("absolute inset-0 overflow-hidden", fillClassName)} style={{ width: `${fill * 100}%` }}>
         <svg viewBox="0 0 24 24" className={cn("block", className)} fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
           <path d={STAR} />
         </svg>
@@ -280,7 +284,7 @@ export function StarRating({
               <span key={i} className={cn("relative block", starSize[size])}>
                 {/* 按下時輕壓一下再回來，不做蓋章回彈 */}
                 <motion.span className="absolute inset-0 block" animate={{ scale: pressed === i && !reduce ? 0.92 : 1 }} transition={snappy}>
-                  <Star fill={fillOf(i)} className={starSize[size]} />
+                  <Star fill={fillOf(i)} className={starSize[size]} fillClassName={spot} />
                 </motion.span>
                 {hits.map((v, k) => (
                   <span
@@ -353,7 +357,7 @@ export function StarRating({
                               className={cn(
                                 "rounded-md border px-2.5 py-1 text-xs leading-tight transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
                                 on
-                                  ? "border-[#171717] bg-[#171717] text-[#f7f7f7] dark:border-[#ededed] dark:bg-[#ededed] dark:text-[#171717]"
+                                  ? cn(spotBorder, spotFill)
                                   : "border-[#e2e2e2] text-current/80 hover:border-[#a3a3a3] dark:border-[#333333] dark:hover:border-[#737373]",
                               )}
                             >

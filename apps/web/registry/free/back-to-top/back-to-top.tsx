@@ -23,6 +23,9 @@ export interface BackToTopProps {
   className?: string;
 }
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+
 const R = 21;
 const C = 2 * Math.PI * R;
 
@@ -59,7 +62,7 @@ export function BackToTop({ container, threshold = 400, showProgress = true, pos
         >
           {showProgress && (
             <svg viewBox="0 0 48 48" className="absolute inset-0 size-full -rotate-90" aria-hidden="true">
-              <circle cx="24" cy="24" r={R} fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray={C} strokeDashoffset={C * (1 - progress)} strokeLinecap="round" />
+              <circle cx="24" cy="24" r={R} className={spot} fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray={C} strokeDashoffset={C * (1 - progress)} strokeLinecap="round" />
             </svg>
           )}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="relative size-5" aria-hidden="true">

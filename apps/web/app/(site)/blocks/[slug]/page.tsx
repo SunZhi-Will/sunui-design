@@ -14,7 +14,7 @@ import { propsSignature } from "@/lib/agent/props";
 import { getI18n } from "@/lib/i18n-server";
 import type { Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
-import { fileLang, getItem, getItems, installCommand, proRegistryConfig, readRegistryFile } from "@/lib/registry";
+import { fileLang, getItem, getItems, installCommand, proRegistryConfig, readRegistryFile, usesSpot } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { seriesOf } from "@/lib/series";
 import { prices } from "@/lib/site";
@@ -91,7 +91,7 @@ export default async function BlockPage({ params }: Props) {
         </div>
       </header>
 
-      <PreviewFrame name={item.name} locale={locale} labels={m.preview} />
+      <PreviewFrame name={item.name} spot={usesSpot(item)} locale={locale} labels={m.preview} />
 
       <UsageGuide item={item} t={m.block} />
 

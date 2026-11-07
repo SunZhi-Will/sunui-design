@@ -5,6 +5,10 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
+
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -91,7 +95,7 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
             className={cn(
               "absolute z-10 -ml-3.5 -mt-3.5 grid size-7 place-items-center rounded-full border-[1.5px] text-xs font-semibold tabular-nums outline-offset-2 transition-colors focus-visible:outline-2",
               on
-                ? "border-[#171717] bg-[#171717] text-[#f7f7f7] dark:border-[#ededed] dark:bg-[#ededed] dark:text-[#1c1c1c]"
+                ? cn(spotBorder, spotFill)
                 : "border-[#171717] bg-[#f7f7f7] text-[#171717] hover:bg-[#e2e2e2] dark:border-[#ededed] dark:bg-[#1c1c1c] dark:text-[#ededed]",
             )}
             style={{ left: `${s.x}%`, top: `${s.y}%` }}

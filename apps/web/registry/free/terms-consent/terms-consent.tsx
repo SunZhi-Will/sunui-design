@@ -98,6 +98,9 @@ const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
 const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -164,7 +167,7 @@ export function TermsConsent({
                   className={cn(
                     "mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-[4px] border transition-colors",
                     "peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
-                    on ? "border-primary bg-primary text-primary-foreground" : "border-[#171717]/30 dark:border-[#ededed]/30",
+                    on ? cn(spotBorder, spotFill) : "border-[#171717]/30 dark:border-[#ededed]/30",
                   )}
                 >
                   <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -209,7 +212,8 @@ export function TermsConsent({
           aria-describedby={hintId}
           onClick={() => ready && onSubmit?.(checked)}
           className={cn(
-            "inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity outline-none",
+            spotFill,
+            "inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-medium transition-opacity outline-none",
             "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             !ready && "cursor-not-allowed opacity-45",
           )}

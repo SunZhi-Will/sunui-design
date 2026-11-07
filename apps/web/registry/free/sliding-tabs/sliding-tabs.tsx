@@ -10,6 +10,11 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
+const spotOn = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
+
 export interface SlidingTabItem {
   value: string;
   label: ReactNode;
@@ -118,12 +123,12 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
                   variant === "chips" ? "rounded-full border" : "rounded-md",
-                  variant === "chips" && (on ? "border-[#171717] dark:border-[#ededed]" : "border-[#e2e2e2] hover:border-[#171717]/40 dark:border-[#333333]"),
-                  on ? (variant === "chips" ? "text-[#f7f7f7] dark:text-[#1c1c1c]" : "text-[#171717] dark:text-[#ededed]") : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
+                  variant === "chips" && (on ? spotBorder : "border-[#e2e2e2] hover:border-[#171717]/40 dark:border-[#333333]"),
+                  on ? (variant === "chips" ? spotOn : "text-[#171717] dark:text-[#ededed]") : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
                 )}
               >
                 {on && variant === "underline" && (
-                  <motion.span layoutId="ind" transition={t} className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-[#171717] dark:bg-[#ededed]" />
+                  <motion.span layoutId="ind" transition={t} className={cn("absolute inset-x-2 bottom-0 h-0.5 rounded-full", spotBg)} />
                 )}
                 {on && variant === "segment" && (
                   <motion.span
@@ -137,7 +142,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                     initial={false}
                     animate={{ opacity: on ? 1 : 0 }}
                     transition={{ duration: reduce ? 0 : 0.15 }}
-                    className="absolute inset-0 rounded-full bg-[#171717] dark:bg-[#ededed]"
+                    className={cn("absolute inset-0 rounded-full", spotBg)}
                   />
                 )}
                 <AnimatePresence initial={false}>

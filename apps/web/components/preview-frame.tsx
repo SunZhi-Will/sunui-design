@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { previewUrl } from "@/lib/demo-locale";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
-import { spotBlocks, spotCss, spotKeys, spotSwatches, type SpotKey } from "@/lib/spot";
+import { spotCss, spotKeys, spotSwatches, type SpotKey } from "@/lib/spot";
 import { cn } from "@/lib/utils";
 
 const viewports = [
@@ -16,7 +16,18 @@ const viewports = [
 
 const MIN_HEIGHT = 448;
 
-export function PreviewFrame({ name, locale, labels }: { name: string; locale: Locale; labels: Messages["preview"] }) {
+export function PreviewFrame({
+  name,
+  spot: spotSupported,
+  locale,
+  labels,
+}: {
+  name: string;
+  /** block 已改用 --sunui-spot 時顯示品牌色樣本 */
+  spot?: boolean;
+  locale: Locale;
+  labels: Messages["preview"];
+}) {
   const [viewport, setViewport] = useState<(typeof viewports)[number]["key"]>("desktop");
   const [run, setRun] = useState(0);
   const [height, setHeight] = useState(MIN_HEIGHT);
@@ -79,7 +90,7 @@ export function PreviewFrame({ name, locale, labels }: { name: string; locale: L
           ))}
         </div>
         <div className="flex items-center gap-2">
-          {spotBlocks.has(name) && (
+          {spotSupported && (
             <div role="radiogroup" aria-label={labels.spot} className="flex items-center gap-1.5 border-r border-line pr-2">
               {spotKeys.map((key) => (
                 <button

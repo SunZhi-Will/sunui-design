@@ -5,6 +5,9 @@ import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode 
 
 import { cn } from "@/lib/utils";
 
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
+
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -113,7 +116,7 @@ export function LoadingButton({
       className={cn(
         "relative inline-flex h-10 items-center justify-center overflow-hidden whitespace-nowrap text-sm font-medium outline-offset-2 focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-50",
         shrunk ? "w-10 px-0" : "px-4",
-        variant === "primary" && "bg-primary text-primary-foreground",
+        variant === "primary" && state !== "error" && spotFill,
         variant === "paper" && "border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]",
         state === "error" && "bg-destructive text-white",
         className,
