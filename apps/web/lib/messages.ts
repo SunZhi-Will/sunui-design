@@ -477,6 +477,8 @@ const en = {
       "pixel-gear": { title: "Gear", note: "Weapons, armor and trinkets for an inventory screen." },
       "pixel-game": { title: "Items", note: "Loot, food and consumables." },
       "pixel-world": { title: "World & HUD", note: "Monsters, elements and the bits of a game HUD." },
+      "pixel-cute": { title: "Cute", note: "Sweets, critters and weather for cheerful campaign pages." },
+      "pixel-season": { title: "Seasonal", note: "Halloween, Christmas, Lunar New Year, Valentine's, Easter and parties." },
     } as Record<string, { title: string; note: string }>,
   },
 };
@@ -917,6 +919,8 @@ const zhTW: Messages = {
       "pixel-gear": { title: "裝備", note: "武器、防具與飾品，放進背包畫面剛好。" },
       "pixel-game": { title: "道具", note: "寶物、食物與消耗品。" },
       "pixel-world": { title: "世界與 HUD", note: "怪物、元素與遊戲 HUD 的零件。" },
+      "pixel-cute": { title: "可愛", note: "甜點、小動物與天氣，給熱鬧的活動頁。" },
+      "pixel-season": { title: "節慶", note: "萬聖、聖誕、農曆新年、情人節、復活節與派對。" },
     },
   },
 };
@@ -1348,6 +1352,8 @@ const zhCN: Messages = {
       "pixel-gear": { title: "装备", note: "武器、防具与饰品，放进背包画面刚好。" },
       "pixel-game": { title: "道具", note: "宝物、食物与消耗品。" },
       "pixel-world": { title: "世界与 HUD", note: "怪物、元素与游戏 HUD 的零件。" },
+      "pixel-cute": { title: "可爱", note: "甜点、小动物与天气，给热闹的活动页。" },
+      "pixel-season": { title: "节庆", note: "万圣、圣诞、农历新年、情人节、复活节与派对。" },
     },
   },
 };
@@ -1794,6 +1800,8 @@ const ja: Messages = {
       "pixel-gear": { title: "装備", note: "武器、防具、アクセサリー。インベントリ画面向け。" },
       "pixel-game": { title: "アイテム", note: "お宝、食べ物、消耗品。" },
       "pixel-world": { title: "ワールドと HUD", note: "モンスター、属性、ゲーム HUD のパーツ。" },
+      "pixel-cute": { title: "かわいい", note: "スイーツ、小さな動物、天気。にぎやかなキャンペーンページに。" },
+      "pixel-season": { title: "季節のイベント", note: "ハロウィン、クリスマス、旧正月、バレンタイン、イースター、パーティー。" },
     },
   },
 };

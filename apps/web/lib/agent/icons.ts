@@ -5,8 +5,8 @@ import {
   pigmentTones,
   pixelIcons,
   pixelPaths,
-  pixelPigments,
-  type Pigment,
+  pixelTones,
+  resolvePalette,
   type PixelIconName,
 } from "@/registry/icons/sunui-pixel-icons";
 
@@ -160,21 +160,18 @@ function lineBody(nodes: readonly IconNode[], accent: string, jsx: boolean) {
 
 function pixelBody(name: PixelIconName, tone: "ink" | "pigment", accent: string, jsx: boolean) {
   const paths = pixelPaths(name);
-  const pigment: Pigment | undefined = tone === "pigment" ? pixelPigments[name] : undefined;
-  // 獨立使用時不依賴 CSS 變數：沿用元件的色階，只把 var(--sunui-pigment-x, 基準色) 換成基準色
-  const tones: { char: string; fill: string; opacity?: number }[] = pigment
-    ? pigmentTones(pigment).map((t) => ({
-        char: t.char,
-        fill: t.fill.replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1").replace("var(--sunui-pixel-shine, #fff)", "#fff"),
-      }))
-    : [
-        { char: "=", fill: "currentColor", opacity: 0.3 },
-        { char: ":", fill: "currentColor", opacity: 0.58 },
-        { char: "~", fill: accent, opacity: 0.62 },
-        { char: "+", fill: accent },
-        { char: "#", fill: "currentColor" },
-        { char: "*", fill: "#fff" },
-      ];
+  const palette = resolvePalette(name, tone);
+  // 獨立使用時不依賴 CSS 變數：沿用元件的色階，只把 var(--sunui-pigment-x, 基準色) 換成基準色、亮點換成白色
+  const plain = (fill: string) =>
+    fill
+      .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
+      .replace("var(--sunui-pixel-shine, #fff)", "#fff")
+      .replace("var(--sunui-icon-accent, currentColor)", accent);
+  const tones = (palette ? pigmentTones(palette.pigment, palette.accent, palette.second) : pixelTones).map((t) => ({
+    char: t.char,
+    fill: plain(t.fill),
+    opacity: t.opacity === 1 ? undefined : t.opacity,
+  }));
   return tones
     .filter((t) => paths[t.char])
     .map((t) => `<path d="${paths[t.char]}" fill="${t.fill}"${t.opacity ? ` ${jsx ? "fillOpacity" : "fill-opacity"}="${t.opacity}"` : ""}/>`)

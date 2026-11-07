@@ -15,7 +15,8 @@ export const metadata: Metadata = {
  * 背景：reports/顏色系統分析-黑白灰之外-2026-11-07.md
  */
 
-type Pigment = keyof typeof pigments;
+// 這頁是 11-07 的研究稿，只比較最初的七種本色（鋼、骨、粉紅是之後補的）
+type Pigment = Exclude<keyof typeof pigments, "steel" | "bone" | "pink">;
 type Swatch = { tint: string; shade: string; main: string; deep: string };
 
 // 油墨感：彩度壓低，明度分四階。tint 給「=」填色，shade 給「:」陰影，main 給「+」，deep 給「~」

@@ -66,14 +66,15 @@
 
 1. **網格**：16 × 16，`viewBox="0 0 16 16"`，內容落在 1 到 14 之間。
 2. **精靈圖畫法**：1 格墨色外框、半透明填色、右側與下方 1 格陰影、左上角內側白色亮點。光一律從左上來。
-3. **字元**：`#` 外框（墨色）、`=` 填色（墨色 30%）、`:` 陰影（墨色 58%）、`+` accent、`~` accent 陰影（62%）、`*` 亮點（`--sunui-pixel-shine`，預設白色）、`.` 留白。每種字元合併成一條 path。
+3. **字元**：`#` 外框（墨色）、`=` 填色（墨色 30%）、`:` 陰影（墨色 58%）、`+` accent、`~` accent 陰影（62%）、`-` 第二材質填色、`_` 第二材質陰影（墨色時同 `=` `:`）、`*` 亮點（`--sunui-pixel-shine`，預設白色）、`.` 留白。每種字元合併成一條 path。
 4. **控制符號例外**：勾、叉、加減、箭頭、chevron、選單、上傳下載維持 2 格粗的實心線，不加填色。
 5. **銳利度**：`shape-rendering="crispEdges"`，尺寸用 16 的整數倍（16、32、48、64）。
 6. **accent**：沿用 `--sunui-icon-accent`。藥水、蘋果、旗面這類整體就是主角的，`+` 可以畫整塊。
 7. **物件本色（`tone="pigment"`）**：2026-11-07 加入，背景見 `reports/顏色系統分析-黑白灰之外-2026-11-07.md`。
    - 預設仍是 `ink`。`pigment` 時外框與亮點不變，填色、陰影、accent 改成**不透明、色相偏移**的本色色階：`+` 是基準色，`=` 略亮，`:` 與 `~` 變暗並往冷色偏（見 `ramps`）。不透明才不會吃到底色，亮暗紙上顏色一致。
    - 只有本身就有顏色的物件有對照（`pixelPigments`：藥水紅、金幣金、寶石藍、史萊姆綠…），控制符號、紙品、介面永遠是墨色。
-   - 7 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown，OKLCH 低彩度；金色偏亮偏綠、橙色偏暗偏紅，暗色紙上才分得開。覆寫 `--sunui-pigment-<name>` 時整條色階用 `oklch(from …)` 跟著推算。
+   - **多材質**（2026-11-08 加入）：一個物件最多三種顏色，在 `pixelPalettes` 設定。`= :` 是主體、`+ ~` 是 accent、`- _` 是第二材質。例如劍是鋼刃、金護手、木柄，肉是紅肉加骨頭，蘋果的葉子是綠色。墨色版不受影響。
+   - 10 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown、steel（鋼）、bone（骨與羊皮紙）、pink（粉紅，給甜點與腮紅），OKLCH 低彩度；金色偏亮偏綠、橙色偏暗偏紅，暗色紙上才分得開。steel 與 bone 幾乎無彩，陰影靠明度拉開。覆寫 `--sunui-pigment-<name>` 時整條色階用 `oklch(from …)` 跟著推算。
    - `pigment` prop 可指定顏色，覆蓋對照，例如寶石依稀有度換成 blue、violet、gold。
    - 一個畫面選一種：全墨或全 pigment，不混。
 8. **線的份量**（2026-11-07 起，11-08 修正）：16 格裡外框已是 1 格，不能再細，所以分三種份量畫「#」。
@@ -83,21 +84,28 @@
    - 只有外框的控制符號不拆，維持全墨。
    - `pigment` 時，亮色紙上的邊用本色最深一階混 35% 墨，暗色紙（`color-scheme: dark`）上回到墨色；內線用本色最深一階。
    - **畫新圖示時，分層用色塊（`=` `:` `*`），不要用墨線分割**：寶石的切面是亮面與陰影面，火是外焰深、內焰淺、焰心白。比較樣張：`/preview/outline-study`。
-9. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
+9. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示、可愛與節慶兩組：
    - Gear（裝備）：sword、dagger、axe、hammer、bow、wand、shield、helmet、armor、boots、ring、amulet
    - Items（道具）：potion、key、gem、crown、chest、trophy、bomb、orb、scroll、map、apple、meat、fish、dice、hourglass、book、torch
    - World & HUD（世界與 HUD）：skull、ghost、slime、fire、snowflake、door、flag、heart-half、sparkle、battery、flash、gamepad、cursor
+   - Cute（可愛，2026-11-08 加入）：cake、cupcake、donut、candy、lollipop、ice-cream、cookie、boba、strawberry、cherry、cat、chick、paw、flower、mushroom、cloud、sun、moon、rainbow、balloon、music
+   - Seasonal（節慶，2026-11-08 加入）：pumpkin、bat、xmas-tree、snowman、candy-cane、red-envelope、lantern、firework、party-popper、chocolate、love-letter、egg、bunny、clover、medal
    - 遊戲圖示只畫通用物件，不仿任何現有遊戲的角色或造型。
+10. **可愛的畫法**：輪廓切掉直角變圓、亮點放大；有臉的（貓、小雞、史萊姆、幽靈、雲、太陽、月亮）眼睛用 2 × 2 全墨塊或單格，嘴巴是小小的弧線。腮紅、貓耳內側這類裝飾用 `-` 第二材質（粉紅）而不是 `+`，墨色版才會是淡灰而不是黑塊。
 
 ### 像素動態
 
-不用補間，像遊戲精靈一樣逐格換圖，不依賴 framer-motion。68 個圖示有動態版。
+不用補間，像遊戲精靈一樣逐格換圖，不依賴 framer-motion。全部 125 個圖示都有動態版（2026-11-08 補齊）。
 
 | 類型 | 觸發 | 例子 |
 |---|---|---|
 | hover | 滑過或聚焦父元素，播一次 | 寶石與皇冠閃光掃過、硬幣翻面、鈴鐺搖、藥水冒泡、骰子滾動、旗子飄 |
 | toggle | `active` | 愛心與星星由下往上填滿、寶箱與鎖打開、門推開、選單變叉、集點卡蓋下一格 |
 | loop | `active` 為真期間 | 沙漏、電池充電、火焰、火把 |
+
+hover 動作要跟物件本身有關，不要整張圖一起彈跳或左右晃（整張平移只留給箭頭與 chevron，因為它們本來就代表方向）。2026-11-08 的做法：鈴鐺、燈籠、櫻桃、標籤以頂端或孔為軸擺動；斧頭、鎚子先往後舉再揮下；史萊姆、包裹、蘑菇先壓扁再拉長；蘋果、肉、餅乾、巧克力一口一口被咬掉；貓、兔子、幽靈、雲會眨眼，兔子耳朵會垂下；信封打開、信紙升起；紅包與錢包冒出金幣；時鐘指針轉一圈；珍珠沿吸管往上跑；半顆心由下往上填滿；腳印先蓋肉墊再一根根腳趾；彩虹從左畫到右；拐杖糖條紋像理髮廳燈柱一樣流動。
+
+注意：16 格的圖示旋轉超過 15 度會破圖（齒輪、叉叉），這類改用別的動作，例如齒輪中心有一道光繞圈。所有影格都要留在 20 × 20 之內，產生後檢查有沒有像素被推出邊界（被截斷）。
 
 每格存成 16 列字串用 `/` 接起來，並做連續字元壓縮（`6.4#6.`）。`prefers-reduced-motion` 時 toggle 直接跳到結果，hover 與 loop 不播。
 
