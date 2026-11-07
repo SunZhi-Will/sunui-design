@@ -55,8 +55,8 @@ export default function Book3DCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   return (
-    <div className="w-[560px] overflow-hidden rounded-[4px]">
-      <Book3D locale={locale} title={t.title} summary={t.summary} date={t.date} keyboard="self" className="h-[448px]">
+    <div className="w-[440px] overflow-hidden rounded-[4px]">
+      <Book3D locale={locale} title={t.title} summary={t.summary} date={t.date} keyboard="self" className="h-[352px]">
         <section className="novella-title-page">
           <div className="novella-title-kicker">{t.kicker}</div>
           <h2 className="novella-title">{t.title}</h2>

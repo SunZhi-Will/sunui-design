@@ -25,7 +25,7 @@ export default function AppShellCard() {
   const label = groups[0].items.flatMap((e) => ("children" in e ? e.children : [e])).find((i) => i.href === href)?.label;
 
   return (
-    <div className="mx-auto h-[420px] w-[340px] overflow-hidden rounded-[24px] border border-border">
+    <div className="mx-auto h-[340px] w-[320px] overflow-hidden rounded-[24px] border border-border">
       <AppShell
         key={locale}
         locale={locale}

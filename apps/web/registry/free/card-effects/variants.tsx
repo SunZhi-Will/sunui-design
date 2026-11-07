@@ -63,12 +63,14 @@ export default function CardEffectsVariant({ variant }: { variant: string }) {
           <StackFan items={items.slice(0, 4)} cardWidth={110} />
         </div>
       ) : group === "focus-dim" ? (
-        <div className="w-[560px]">
-          <FocusGrid items={items.slice(0, 3)} className="grid-cols-3 sm:grid-cols-3 lg:grid-cols-3" />
+        // 三欄排成 560px 寬會在卡片裡縮到一半以下：兩張並排就看得出「滑過一張、旁邊變暗」
+        <div className="w-[26rem]">
+          <FocusGrid items={items.slice(0, 2)} className="grid-cols-2 sm:grid-cols-2 lg:grid-cols-2" />
         </div>
       ) : group === "border-spotlight-grid" ? (
-        <div className="w-[560px]">
-          <SpotlightGrid items={items.slice(3, 6).map((it) => ({ ...it, media: undefined }))} className="grid-cols-3 sm:grid-cols-3" />
+        // 2×2 比一排三張窄，游標經過時光暈跨越相鄰邊框的效果也看得更清楚
+        <div className="w-[22rem]">
+          <SpotlightGrid items={items.slice(2, 6).map((it) => ({ ...it, media: undefined }))} className="grid-cols-2 sm:grid-cols-2" />
         </div>
       ) : group === "expanding-panels" ? (
         <div className="w-[480px]">

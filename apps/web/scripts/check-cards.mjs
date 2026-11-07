@@ -136,7 +136,10 @@ async function launch() {
   });
   const close = () => {
     proc.kill();
-    rmSync(profile, { recursive: true, force: true });
+    // Chrome 收到 kill 後還會寫一下設定檔，刪不掉就留給系統清暫存
+    try {
+      rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    } catch {}
   };
   return { wsUrl, close };
 }

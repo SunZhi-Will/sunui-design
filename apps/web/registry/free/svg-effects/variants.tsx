@@ -26,7 +26,10 @@ export const variants = svgEffects;
 // 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
 export const featured = "animated-beam";
 
-/** 首頁型錄：一種 SVG 效果一張卡，內容與 demo 的同名格子一致。 */
+/**
+ * 首頁型錄：一種 SVG 效果一張卡，內容與 demo 的同名格子一致。
+ * 根元素若是 <svg>，FitStage 量不到它的寬度、只依高度放大，寬圖會超出卡片邊緣，所以一律包一層定寬的 div。
+ */
 export default function SvgEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const [drawKey, setDrawKey] = useState(0);
@@ -47,13 +50,29 @@ export default function SvgEffectsVariant({ variant }: { variant: string }) {
         </div>
       );
     case "blob-morph":
-      return <BlobMorph className="w-40" />;
+      return (
+        <div className="w-40">
+          <BlobMorph className="w-full" />
+        </div>
+      );
     case "gooey":
-      return <Gooey className="w-40" />;
+      return (
+        <div className="w-40">
+          <Gooey className="w-full" />
+        </div>
+      );
     case "orbiting-circles":
-      return <OrbitingCircles className="w-48" />;
+      return (
+        <div className="w-48">
+          <OrbitingCircles className="w-full" />
+        </div>
+      );
     case "motion-path":
-      return <MotionPath className="w-64" />;
+      return (
+        <div className="w-64">
+          <MotionPath className="w-full" />
+        </div>
+      );
     case "icon-morph":
       return (
         <div className="flex flex-col items-center gap-3">
@@ -66,11 +85,23 @@ export default function SvgEffectsVariant({ variant }: { variant: string }) {
         </div>
       );
     case "animated-beam":
-      return <AnimatedBeam className="w-72" />;
+      return (
+        <div className="w-72">
+          <AnimatedBeam className="w-full" />
+        </div>
+      );
     case "flowing-connectors":
-      return <FlowingConnectors className="w-72" />;
+      return (
+        <div className="w-72">
+          <FlowingConnectors className="w-full" />
+        </div>
+      );
     case "radar-sweep":
-      return <RadarSweep className="w-48" />;
+      return (
+        <div className="w-48">
+          <RadarSweep className="w-full" />
+        </div>
+      );
     case "liquid-fill":
       return (
         <div className="flex flex-col items-center gap-3">
