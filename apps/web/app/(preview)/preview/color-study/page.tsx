@@ -155,6 +155,7 @@ function Panel({ mode }: { mode: "light" | "dark" }) {
     ...vars(p.sw),
     "--shine": p.shine,
     "--soft": p.soft,
+    colorScheme: mode,
     background: p.bg,
     color: p.ink,
     padding: 28,

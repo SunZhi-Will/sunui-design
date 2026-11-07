@@ -4,28 +4,10 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { Lightbox } from "./lightbox";
 
-// 中性色的示意圖（SVG data URI），換成真實商品照即可
-function tile(bg: string, fg: string, shape: "crew" | "detail" | "fold" | "flat" | "cuff" | "tag") {
-  const shapes = {
-    crew: `<path d="M140 90 L110 100 L70 140 L60 330 L100 340 L110 200 L115 400 L285 400 L290 200 L300 340 L340 330 L330 140 L290 100 L260 90 Q200 130 140 90Z" fill="${fg}"/>`,
-    detail: `<g stroke="${fg}" stroke-width="10" fill="none">${Array.from({ length: 9 }, (_, i) => `<path d="M${40 + i * 40} 60 V440"/>`).join("")}</g>`,
-    fold: `<rect x="90" y="150" width="220" height="70" rx="8" fill="${fg}"/><rect x="90" y="230" width="220" height="70" rx="8" fill="${fg}" opacity=".8"/><rect x="90" y="310" width="220" height="70" rx="8" fill="${fg}" opacity=".6"/>`,
-    flat: `<rect x="80" y="100" width="240" height="300" rx="10" fill="${fg}"/><path d="M160 100 Q200 150 240 100" stroke="${bg}" stroke-width="10" fill="none"/>`,
-    cuff: `<rect x="120" y="80" width="160" height="260" rx="10" fill="${fg}"/><g stroke="${bg}" stroke-width="6">${Array.from({ length: 6 }, (_, i) => `<path d="M${140 + i * 24} 280 V340"/>`).join("")}</g>`,
-    tag: `<rect x="130" y="140" width="140" height="200" rx="8" fill="${fg}"/><circle cx="200" cy="175" r="12" fill="${bg}"/>`,
-  };
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><rect width="400" height="500" fill="${bg}"/>${shapes[shape]}</svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-const sources = [
-  tile("#e6e6e6", "#8e8e8e", "crew"),
-  tile("#dcdcdc", "#a7a7a7", "detail"),
-  tile("#eaeaea", "#7d7d7d", "fold"),
-  tile("#e1e1e1", "#646464", "flat"),
-  tile("#e5e5e5", "#969696", "cuff"),
-  tile("#e3e3e3", "#171717", "tag"),
-];
+// 示範照片（AI 生成），放在 public/blocks/lightbox；縮圖另存 480 px 的 -thumb 版
+const photos = ["front", "rib", "stack", "back", "cuff", "label"];
+const sources = photos.map((name) => `/blocks/lightbox/${name}.webp`);
+const thumbs = photos.map((name) => `/blocks/lightbox/${name}-thumb.webp`);
 
 const copy = {
   en: {
@@ -62,7 +44,7 @@ export default function LightboxDemo() {
       <Lightbox
         position="contained"
         labels={t.labels}
-        images={sources.map((src, i) => ({ id: String(i), src, alt: t.alts[i], caption: t.captions[i] }))}
+        images={sources.map((src, i) => ({ id: String(i), src, thumbSrc: thumbs[i], alt: t.alts[i], caption: t.captions[i] }))}
       />
     </div>
   );

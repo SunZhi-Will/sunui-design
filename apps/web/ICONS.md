@@ -76,7 +76,14 @@
    - 7 種本色（`pigments`）：red、orange、gold、green、blue、violet、brown，OKLCH 低彩度；金色偏亮偏綠、橙色偏暗偏紅，暗色紙上才分得開。覆寫 `--sunui-pigment-<name>` 時整條色階用 `oklch(from …)` 跟著推算。
    - `pigment` prop 可指定顏色，覆蓋對照，例如寶石依稀有度換成 blue、violet、gold。
    - 一個畫面選一種：全墨或全 pigment，不混。
-8. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
+8. **線的份量**（2026-11-07 起，11-08 修正）：16 格裡外框已是 1 格，不能再細，所以分三種份量畫「#」。
+   - **邊**（碰到空格，含外框與中間的孔）：墨色 85%。
+   - **內線**（被填色包圍、只有 1 格粗）：墨色 50%。內線比邊還黑時，圖示中間像多了一道裂縫，所以一定要比邊淡。
+   - **記號**（至少 2 × 2 的墨色塊：驚嘆號、骰子點、眼珠）：全墨，這是符號本身。
+   - 只有外框的控制符號不拆，維持全墨。
+   - `pigment` 時，亮色紙上的邊用本色最深一階混 35% 墨，暗色紙（`color-scheme: dark`）上回到墨色；內線用本色最深一階。
+   - **畫新圖示時，分層用色塊（`=` `:` `*`），不要用墨線分割**：寶石的切面是亮面與陰影面，火是外焰深、內焰淺、焰心白。比較樣張：`/preview/outline-study`。
+9. **分組**：Interface、Paper、Commerce，加上像素版獨有的三組遊戲圖示：
    - Gear（裝備）：sword、dagger、axe、hammer、bow、wand、shield、helmet、armor、boots、ring、amulet
    - Items（道具）：potion、key、gem、crown、chest、trophy、bomb、orb、scroll、map、apple、meat、fish、dice、hourglass、book、torch
    - World & HUD（世界與 HUD）：skull、ghost、slime、fire、snowflake、door、flag、heart-half、sparkle、battery、flash、gamepad、cursor

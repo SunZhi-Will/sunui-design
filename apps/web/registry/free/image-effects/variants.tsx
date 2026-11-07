@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useDemoText } from "@/lib/demo-locale";
 
 import { ImageEffect, Lightbox, SliceSlideshow, imageEffects, imageGroupEffects, type ImageEffectName, type ImageItem } from "./image-effects";
-import { copy, demoArt, kinds } from "./demo";
+import { copy, demoArt, harborArt, kinds } from "./demo";
 
 export const variants = [...imageEffects, ...imageGroupEffects];
 
@@ -32,8 +32,8 @@ export default function ImageEffectsVariant({ variant }: { variant: string }) {
       <ImageEffect
         key={run}
         effect={effect}
-        src={image.src}
-        alt={image.alt}
+        src={effect === "hover-zoom" ? harborArt : image.src}
+        alt={effect === "hover-zoom" ? t.caption : image.alt}
         images={effect === "image-swap" ? images.slice(0, 3) : undefined}
         caption={effect === "hover-zoom" ? t.caption : undefined}
         direction={effect === "clip-reveal" ? "circle" : undefined}

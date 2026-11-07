@@ -6,22 +6,15 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { ImageEffect, Lightbox, SliceSlideshow, imageEffects, type ImageEffectName, type ImageItem } from "./image-effects";
 
-// 示範用的佔位插畫：SVG data URI，不讀任何外部圖片
-const palettes = [
-  ["#0f766e", "#99f6e4", "#fde68a", "#134e4a"],
-  ["#b45309", "#fde68a", "#fff7ed", "#78350f"],
-  ["#1d4ed8", "#bfdbfe", "#f8fafc", "#1e3a8a"],
-  ["#15803d", "#bbf7d0", "#fef9c3", "#14532d"],
-  ["#c2410c", "#fed7aa", "#fef3c7", "#7c2d12"],
-  ["#334155", "#cbd5e1", "#f1f5f9", "#0f172a"],
-];
+// 示範照片（AI 生成），放在 public/blocks/image-effects，順序對應 copy.alts
+const photos = ["lagoon", "desert", "fjord", "valley", "canyon", "peaks"];
 
 export function demoArt(i: number) {
-  const [a, b, sun, dark] = palettes[i % palettes.length];
-  const cx = 180 + ((i * 137) % 440);
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${b}'/><stop offset='1' stop-color='${a}'/></linearGradient></defs><rect width='800' height='600' fill='url(#g)'/><circle cx='${cx}' cy='200' r='72' fill='${sun}'/><circle cx='${cx}' cy='200' r='110' fill='${sun}' opacity='.25'/><path d='M0 420 L${150 + i * 20} 250 L330 400 L${470 - i * 15} 240 L800 440 V600 H0Z' fill='${dark}' opacity='.5'/><path d='M0 500 L220 370 L420 480 L620 350 L800 470 V600 H0Z' fill='${dark}'/><g fill='${dark}'><rect x='90' y='455' width='14' height='60'/><path d='M97 400 L130 470 H64Z'/><rect x='690' y='445' width='12' height='50'/><path d='M696 395 L724 460 H668Z'/></g></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return `/blocks/image-effects/${photos[i % photos.length]}.webp`;
 }
+
+/** hover-zoom 那格配的照片，和 copy.caption（黃昏的港口）一致 */
+export const harborArt = "/blocks/image-effects/harbor.webp";
 
 export const copy = {
   en: {
@@ -120,8 +113,8 @@ export default function ImageEffectsDemo() {
           <Tile key={effect} name={effect} hint={t[kind]} replay={kind === "entrance" ? t.replay : undefined}>
             <ImageEffect
               effect={effect}
-              src={image.src}
-              alt={image.alt}
+              src={effect === "hover-zoom" ? harborArt : image.src}
+              alt={effect === "hover-zoom" ? t.caption : image.alt}
               images={effect === "image-swap" ? images.slice(0, 3) : undefined}
               caption={effect === "hover-zoom" ? t.caption : undefined}
               direction={effect === "clip-reveal" ? "circle" : undefined}

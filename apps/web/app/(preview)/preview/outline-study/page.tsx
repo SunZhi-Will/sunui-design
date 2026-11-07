@@ -111,6 +111,7 @@ function Panel({ mode }: { mode: "light" | "dark" }) {
   const p = PAPER[mode];
   const style = {
     "--sunui-pixel-shine": p.shine,
+    colorScheme: mode,
     background: p.bg,
     color: p.ink,
     padding: 24,

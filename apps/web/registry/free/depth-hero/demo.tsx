@@ -4,22 +4,8 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { DepthHero } from "./depth-hero";
 
-// 示範用的商品圖：透明底的保溫瓶 SVG data URI，不讀外部圖片
-const bottle = (() => {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 520'>
-<ellipse cx='110' cy='506' rx='78' ry='10' fill='#000' opacity='.18'/>
-<rect x='70' y='18' width='80' height='54' rx='12' fill='#2b2a27'/>
-<rect x='78' y='26' width='10' height='38' rx='5' fill='#fff' opacity='.18'/>
-<rect x='62' y='68' width='96' height='22' rx='6' fill='#3a3934'/>
-<path d='M58 98 q0 -10 10 -10 h84 q10 0 10 10 v386 q0 18 -18 18 h-68 q-18 0 -18 -18z' fill='#d9d2c3'/>
-<path d='M58 98 q0 -10 10 -10 h16 v414 h-8 q-18 0 -18 -18z' fill='#fff' opacity='.35'/>
-<path d='M136 88 h16 q10 0 10 10 v386 q0 18 -18 18 h-8z' fill='#000' opacity='.12'/>
-<rect x='58' y='230' width='104' height='120' fill='#2b2a27'/>
-<text x='110' y='282' text-anchor='middle' font-family='Helvetica, Arial, sans-serif' font-weight='700' font-size='22' fill='#d9d2c3' letter-spacing='3'>STILL</text>
-<text x='110' y='308' text-anchor='middle' font-family='monospace' font-size='11' fill='#d9d2c3' opacity='.7'>750 ML</text>
-</svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-})();
+// 示範照片（AI 生成）：去背的砂色保溫瓶，透明 WebP，放在 public/blocks/depth-hero
+const bottle = "/blocks/depth-hero/bottle.webp";
 
 const copy = {
   en: {

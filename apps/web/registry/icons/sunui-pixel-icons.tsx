@@ -11,6 +11,7 @@ import type { SVGProps } from "react";
  * - tone="pigment"：外框與亮點不變，填色、陰影、accent 換成物件本色（pixelPigments）。
  *   只有本身就有顏色的物件有對照，其餘維持墨色。顏色可用 --sunui-pigment-<name> 覆寫。
  * - 勾、叉、箭頭、選單這些控制符號維持 2 格粗的實心線，不加填色。
+ * - 邊（碰到空格的「#」）墨色 85%，1 格粗的內線墨色 50%，2 × 2 以上的記號全墨；pigment 時亮色紙上邊跟著本色，暗色紙上回到墨色，內線用本色最深一階。
  * - 以 16 的整數倍顯示（16、32、48、64）才會銳利；shape-rendering 設為 crispEdges。
  */
 
@@ -1123,14 +1124,14 @@ export const pixelIcons = {
     "................",
     "................",
     "....########....",
-    "...#=:#=:#::#...",
-    "..#::#::::#::#..",
-    ".##############.",
-    "..#:=:#::#==:#..",
-    "...#:=:##==:#...",
-    "....#::##=:#....",
-    ".....#:##:#.....",
-    "......####......",
+    "...#*====:::#...",
+    "..#*=====::::#..",
+    ".#::::::::::::#.",
+    "..#====::::::#..",
+    "...#===:::::#...",
+    "....#==::::#....",
+    ".....#=:::#.....",
+    "......#=:#......",
     ".......##.......",
     "................",
     "................",
@@ -1445,20 +1446,20 @@ export const pixelIcons = {
   ],
   fire: [
     "................",
-    ".......#........",
-    "......##........",
-    "......###.......",
-    ".....##:#...#...",
-    "....##=:#..##...",
-    "....#:::##.###..",
-    "...#########:#..",
-    "..####+~##:=:#..",
-    "..#:#*++~##::#..",
-    "..###++++~##:#..",
-    "..##~+++++~###..",
-    "...##~~~~~###...",
-    "....#######.....",
-    "................",
+    "........#.......",
+    ".......#:#......",
+    "....#.#::#......",
+    "...#:##:::#..#..",
+    "...#::#:::#.#:#.",
+    "...#:::::=:##:#.",
+    "..#::::==::#::#.",
+    "..#:::====::::#.",
+    "..#::===*==:::#.",
+    "..#::==***==::#.",
+    "..#::===*===::#.",
+    "...#::=====::#..",
+    "....#:::::::#...",
+    ".....#######....",
     "................",
   ],
   snowflake: [
@@ -1722,6 +1723,8 @@ export const pixelTones = [
   { char: ":", fill: "currentColor", opacity: 0.58 },
   { char: "~", fill: ACCENT, opacity: 0.62 },
   { char: "+", fill: ACCENT, opacity: 1 },
+  { char: "i", fill: "currentColor", opacity: 0.5 },
+  { char: "o", fill: "currentColor", opacity: 0.85 },
   { char: "#", fill: "currentColor", opacity: 1 },
   { char: "*", fill: SHINE, opacity: 1 },
 ] as const;
@@ -1746,6 +1749,10 @@ export function pigmentTones(pigment: Pigment): PixelToneList {
       { char: ":", fill: shift(base, r.shade), opacity: 1 },
       { char: "~", fill: shift(base, r.deep), opacity: 1 },
       { char: "+", fill: base, opacity: 1 },
+      // 亮色紙：外框用本色最深一階混一點墨，線條有顏色、份量變輕。
+      // 暗色紙（color-scheme: dark）：深色外框會消失，改回墨色。混進 currentColor 是保險，沒設 color-scheme 的暗底也看得到
+      { char: "i", fill: shift(base, r.deep), opacity: 1 },
+      { char: "o", fill: `light-dark(color-mix(in oklch, ${shift(base, r.deep)} 65%, currentColor), currentColor)`, opacity: 1 },
       { char: "#", fill: "currentColor", opacity: 1 },
       { char: "*", fill: SHINE, opacity: 1 },
     ];
@@ -1763,8 +1770,36 @@ export function resolvePigment(name: string, tone?: PixelTone, pigment?: Pigment
 
 export type PixelPaths = Record<string, string>;
 
+const FILLED = /[=:~+*]/;
+
+/**
+ * 把「#」分成三種：
+ * - 「o」邊：碰到任何空格（外部或中間的孔）。比內部的記號淡一點（墨色 85%）。
+ * - 「i」內線：被填色包圍、只有 1 格粗的線（寶石切面、火焰分層、盾牌與箱子的分隔線）。畫成比邊更淡的線，
+ *   否則線會比外框還黑，圖示中間像多了一條裂縫。
+ * - 「#」記號：至少 2 × 2 的墨色塊（驚嘆號、骰子點、眼珠）。這是符號本身，維持全墨。
+ * 只有外框沒有填色的控制符號（勾、叉、箭頭）不拆，維持全墨。
+ */
+function markOuter(rows: readonly string[]): string[] {
+  if (!rows.some((r) => FILLED.test(r))) return [...rows];
+  const h = rows.length;
+  const w = rows[0]?.length ?? 0;
+  const at = (x: number, y: number) => (x < 0 || y < 0 || x >= w || y >= h ? "." : rows[y][x]);
+  const ink = (x: number, y: number) => at(x, y) === "#";
+  const block = (x: number, y: number) => ink(x, y) && ink(x + 1, y) && ink(x, y + 1) && ink(x + 1, y + 1);
+  return rows.map((r, y) =>
+    Array.from(r, (c, x) => {
+      if (c !== "#") return c;
+      if (at(x, y - 1) === "." || at(x - 1, y) === "." || at(x, y + 1) === "." || at(x + 1, y) === ".") return "o";
+      if (block(x, y) || block(x - 1, y) || block(x, y - 1) || block(x - 1, y - 1)) return "#";
+      return "i";
+    }).join(""),
+  );
+}
+
 /** 把點陣轉成每種字元一條路徑：同一列相鄰的同色格合併成一段，路徑短、縮放不留縫。origin 是左上角的座標偏移 */
-export function toPixelPaths(rows: readonly string[], origin = 0): PixelPaths {
+export function toPixelPaths(source: readonly string[], origin = 0): PixelPaths {
+  const rows = markOuter(source);
   const paths: PixelPaths = {};
   rows.forEach((row, y) => {
     let x = 0;

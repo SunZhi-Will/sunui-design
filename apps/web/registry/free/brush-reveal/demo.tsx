@@ -5,29 +5,9 @@ import { cn } from "@/lib/utils";
 
 import { BrushReveal } from "./brush-reveal";
 
-// 示範用插圖：同一盞檯燈的線稿與上色版，SVG data URI
-const svg = (body: string) =>
-  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500' preserveAspectRatio='xMidYMid slice'>${body}</svg>`)}`;
-
-const lampShape = (stroke: string, fill: string, shade: string, base: string) => `
-<path d='M300 430 H500' stroke='${stroke}' stroke-width='6' stroke-linecap='round'/>
-<rect x='330' y='400' width='140' height='30' rx='8' fill='${base}' stroke='${stroke}' stroke-width='3'/>
-<path d='M400 400 L340 250 L470 150' fill='none' stroke='${stroke}' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/>
-<circle cx='340' cy='250' r='12' fill='${fill}' stroke='${stroke}' stroke-width='3'/>
-<path d='M440 110 L560 150 L520 250 L410 190 Z' fill='${shade}' stroke='${stroke}' stroke-width='3' stroke-linejoin='round'/>`;
-
-const sketch = svg(`<rect width='800' height='500' fill='#f5f5f5'/>
-<g stroke='#d4d4d4' stroke-width='1'>${Array.from({ length: 20 }, (_, i) => `<path d='M${i * 40} 0 V500'/><path d='M0 ${i * 40} H800'/>`).join("")}</g>
-${lampShape("#404040", "none", "none", "none")}
-<path d='M540 250 L640 360' stroke='#a3a3a3' stroke-width='2' stroke-dasharray='6 6'/>`);
-
-const finished = svg(`<defs>
-<linearGradient id='w' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#262626'/><stop offset='1' stop-color='#0a0a0a'/></linearGradient>
-<radialGradient id='glow' cx='.72' cy='.72' r='.45'><stop offset='0' stop-color='#fde68a' stop-opacity='.8'/><stop offset='1' stop-color='#fde68a' stop-opacity='0'/></radialGradient>
-</defs>
-<rect width='800' height='500' fill='url(#w)'/>
-<rect width='800' height='500' fill='url(#glow)'/>
-${lampShape("#0a0a0a", "#d97706", "#d97706", "#525252")}`);
+// 示範照片（AI 生成），放在 public/blocks/brush-reveal：同一盞檯燈的方格紙鉛筆線稿與夜間點燈實拍，兩張像素對齊
+const sketch = "/blocks/brush-reveal/lamp-sketch.webp";
+const finished = "/blocks/brush-reveal/lamp-finished.webp";
 
 const copy = {
   en: {
