@@ -11,7 +11,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  // app/ 底下的 opengraph-image 也套到預覽頁，沒有 metadataBase 時建置會警告
+  // 相對網址的 metadata 需要 metadataBase，沒有時建置會警告
   metadataBase: new URL(siteUrl()),
   title: "SunUI preview",
   robots: { index: false },

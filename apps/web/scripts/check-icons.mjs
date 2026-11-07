@@ -16,8 +16,9 @@
 // 檢查 accent 部位在單色下還分得出來；--scale 預設 2，查細縫時用 3 或 4。CHROME 可指定瀏覽器路徑。
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
+
+import { findChrome } from "./find-chrome.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const args = process.argv.slice(2);
@@ -44,42 +45,9 @@ if (!["light", "dark", "both"].includes(themeArg)) fail("--theme takes light, da
 const sets = setArg === "all" ? ["line", "pixel"] : [setArg];
 const themes = themeArg === "both" ? ["light", "dark"] : [themeArg];
 
-// Playwright 下載的瀏覽器（macOS 與 Linux 的快取位置），版本新的優先
-const playwright = [path.join(os.homedir(), "Library/Caches/ms-playwright"), path.join(os.homedir(), ".cache/ms-playwright")];
-const fromPlaywright = (prefix, rel) =>
-  playwright
-    .filter((dir) => fs.existsSync(dir))
-    .flatMap((dir) =>
-      fs
-        .readdirSync(dir)
-        .filter((d) => new RegExp(`^${prefix}-\\d+$`).test(d))
-        .sort((a, b) => Number(b.split("-").pop()) - Number(a.split("-").pop()))
-        .flatMap((d) => rel.map((r) => path.join(dir, d, r))),
-    );
-// headless shell 最快也最穩；Brave 這類日常用的瀏覽器在無頭模式下可能卡住，排最後
-const chrome = [
-  process.env.CHROME,
-  ...fromPlaywright("chromium_headless_shell", [
-    "chrome-headless-shell-mac-arm64/chrome-headless-shell",
-    "chrome-headless-shell-mac-x64/chrome-headless-shell",
-    "chrome-headless-shell-linux64/chrome-headless-shell",
-    "chrome-linux/headless_shell",
-  ]),
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "/Applications/Chromium.app/Contents/MacOS/Chromium",
-  ...fromPlaywright("chromium", [
-    "chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
-    "chrome-mac/Chromium.app/Contents/MacOS/Chromium",
-    "chrome-linux/chrome",
-  ]),
-  "/usr/bin/google-chrome",
-  "/usr/bin/chromium",
-  "/usr/bin/chromium-browser",
-  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-  "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
-].find((p) => p && fs.existsSync(p));
-if (!chrome) fail("找不到 Chrome。用環境變數 CHROME 指定瀏覽器執行檔。");
-const shell = /headless[_-]shell/.test(chrome);
+const found = findChrome();
+if (!found) fail("找不到 Chrome。用環境變數 CHROME 指定瀏覽器執行檔。");
+const { chrome, shell } = found;
 // 單次瀏覽器呼叫的上限，避免卡住
 const TIMEOUT = 90_000;
 

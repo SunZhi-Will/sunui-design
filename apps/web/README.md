@@ -22,6 +22,9 @@ npm run web:dev              # 在 repo 根目錄執行，http://localhost:3100
 2. 同一資料夾加 `demo.tsx`（預設匯出、不需要 props）。`predev` / `prebuild` 會自動註冊到預覽清單。
 3. 在對應的 `registry.json`（免費：本資料夾；Pro：`registry/pro/registry.json`）加一筆 item。
    多人同時開發時，可改寫到 `registry/_incoming/<group>.json`，再執行 `node scripts/merge-incoming.mjs` 一次併入。
+4. 截分享圖（OG）：網站跑著時執行 `node apps/web/scripts/capture-og.mjs --only <name>`，存成 `public/og/blocks/<name>.jpg` 並一起 commit。
+   block 頁的 `opengraph-image.tsx` 會把這張畫面放進該 block 自己的分享圖；沒截的話退回純文字版，建置不會壞。
+   demo 改過外觀後重截一次；`--missing` 只補還沒有圖的。
 
 型錄、block 頁、`/preview/<name>`（iframe 預覽）和 registry 端點都會自動產生。
 
