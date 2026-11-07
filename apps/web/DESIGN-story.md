@@ -22,6 +22,7 @@
 | `--story-muted` | `rgb(234 228 214 / 0.6)` | `rgb(42 34 25 / 0.6)` | 次要文字 |
 | `--story-accent` | `#c9a063` | `#9a6b2a` | 唯一強調：名牌、選中、提示符號 |
 | `--story-danger` | `#c4553f` | `#a33a26` | 代價、危險 |
+| `--story-rare` | `#7fb0de` | `#2b5280` | 只用在稀有度（稀有等級的標示、光環）；選用，不是強調色 |
 
 匯出 `storyThemes = { ink, rice, moon }`（moon：DeathsBlessing 月光藍 `--story-accent: #a3b8d9`）。
 
@@ -57,7 +58,7 @@ const ease = [0.22, 0.72, 0.2, 1] as const; // 柔和 ease-out
 ## 檢查表
 
 - [ ] 所有顏色經過 `--story-*` 變數，換 `theme` 能整套換皮
-- [ ] 強調色只有 `--story-accent`
+- [ ] 強調色只有 `--story-accent`（`--story-rare` 只標稀有度，不拿來做選中、提示或主要按鈕）
 - [ ] 唯一的常駐循環是「下一句」提示，且 reduced motion 會停
 - [ ] 鍵盤可以完整操作
 - [ ] ink 與 rice 主題、375px 都看過
