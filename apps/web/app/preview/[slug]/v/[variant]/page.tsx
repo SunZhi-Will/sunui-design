@@ -13,8 +13,6 @@ type Props = {
   searchParams: Promise<{ mode?: string }>;
 };
 
-export const dynamicParams = false;
-
 export const metadata: Metadata = {
   robots: { index: false },
 };

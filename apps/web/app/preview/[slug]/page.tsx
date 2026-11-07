@@ -8,8 +8,6 @@ import { getItem, getItems } from "@/lib/registry";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
-
 export const metadata: Metadata = {
   robots: { index: false },
 };

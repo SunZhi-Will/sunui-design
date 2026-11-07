@@ -188,6 +188,10 @@ const en = {
     title: "This page took the day off.",
     body: "The block or page you are looking for does not exist.",
     cta: "Browse blocks",
+    tried: "You asked for",
+    suggest: "Maybe one of these?",
+    docs: "Read the docs",
+    preview: "This preview is not available.",
   },
   docsNav: {
     label: "Docs",
@@ -617,6 +621,10 @@ const zhTW: Messages = {
     title: "這一頁今天請假了。",
     body: "你要找的區塊或頁面不存在。",
     cta: "瀏覽區塊",
+    tried: "你要找的是",
+    suggest: "也許是這幾個？",
+    docs: "看文件",
+    preview: "這個預覽目前無法顯示。",
   },
   docsNav: {
     label: "文件",
@@ -1024,6 +1032,10 @@ const zhCN: Messages = {
     title: "这一页今天休息了。",
     body: "你要找的区块或页面不存在。",
     cta: "浏览区块",
+    tried: "你要找的是",
+    suggest: "也许是这几个？",
+    docs: "看文档",
+    preview: "这个预览目前无法显示。",
   },
   docsNav: {
     label: "文档",
@@ -1424,6 +1436,10 @@ const ja: Messages = {
     title: "このページは本日お休みです。",
     body: "お探しのブロックまたはページは存在しません。",
     cta: "ブロックを見る",
+    tried: "お探しのページ",
+    suggest: "こちらのブロックでしょうか？",
+    docs: "ドキュメントを読む",
+    preview: "このプレビューは表示できません。",
   },
   docsNav: {
     label: "ドキュメント",

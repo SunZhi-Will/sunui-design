@@ -25,8 +25,6 @@ export function generateStaticParams() {
   return getItems().map((item) => ({ slug: item.name }));
 }
 
-export const dynamicParams = false;
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const found = getItem((await params).slug);
   if (!found) return {};

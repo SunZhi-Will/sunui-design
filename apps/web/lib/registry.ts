@@ -62,10 +62,13 @@ function loadProManifest(): Manifest | null {
 }
 
 export const freeManifest = freeRegistry as Manifest;
-export const proManifest = loadProManifest();
+
+// 這個檔案是用 fs 讀的，bundler 不會監看它：dev 時每次重讀，否則 dev server 執行中新增的 Pro block 會一直 404
+const cachedProManifest = loadProManifest();
+const getProManifest = () => (process.env.NODE_ENV === "development" ? loadProManifest() : cachedProManifest);
 
 export function getItems(tier?: Tier): RegistryItem[] {
-  const items = [...freeManifest.items, ...(proManifest?.items ?? [])];
+  const items = [...freeManifest.items, ...(getProManifest()?.items ?? [])];
   return tier ? items.filter((item) => item.meta.tier === tier) : items;
 }
 
