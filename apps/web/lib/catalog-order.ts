@@ -30,6 +30,7 @@ const proLead = [
   "cutaway-spec",
   "ask-to-shop",
   "lineup-shelf",
+  "sticker-board",
   "pixel-check-in",
   "pixel-gacha",
   "pixel-boss-sale",
