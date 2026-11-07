@@ -6,35 +6,8 @@ import { HeroBillboardCarousel, type HeroBillboardSlide } from "./hero-billboard
 
 type PosterKind = "kiln" | "type" | "run";
 
-// 示意封面：和完整 demo 同樣的中性色塊海報，卡片只留三張
-function PosterArt({ kind }: { kind: PosterKind }) {
-  const ink = "#e5e5e5";
-  return (
-    <svg viewBox="0 0 160 90" className="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
-      <rect width="160" height="90" fill={kind === "type" ? "#1a1a1a" : kind === "run" ? "#23211e" : "#262320"} />
-      {kind === "kiln" && (
-        <g fill="none" stroke={ink} strokeWidth="0.6" opacity="0.55">
-          <path d="M104 18 C96 30 92 44 98 60 C102 70 126 70 130 60 C136 44 132 30 124 18 Z" />
-          <path d="M108 18 H120" />
-          <ellipse cx="114" cy="70" rx="26" ry="3" opacity="0.5" />
-          <path d="M60 64 C58 54 62 46 70 44 C78 46 82 54 80 64 Z" />
-        </g>
-      )}
-      {kind === "type" && (
-        <text x="92" y="66" fontFamily="Georgia, 'Times New Roman', serif" fontSize="58" fill={ink} opacity="0.55">
-          Aa
-        </text>
-      )}
-      {kind === "run" && (
-        <g stroke={ink} strokeWidth="0.5" opacity="0.4">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <path key={i} d={`M0 ${30 + i * 8} C50 ${20 + i * 8} 110 ${44 + i * 8} 160 ${28 + i * 8}`} fill="none" />
-          ))}
-        </g>
-      )}
-    </svg>
-  );
-}
+// 示範照片（AI 生成），放在 public/blocks/hero-billboard-carousel，16:9，主體在右半邊，左下留給疊字
+const poster = (kind: PosterKind) => `/blocks/hero-billboard-carousel/${kind}.webp`;
 
 type SlideText = Pick<HeroBillboardSlide, "title" | "badge" | "eyebrow" | "cta">;
 
@@ -83,7 +56,8 @@ export default function HeroBillboardCarouselCard() {
     key: b.key,
     ...t.slides[i],
     overlayTitle: false,
-    cover: <PosterArt kind={b.kind} />,
+    image: poster(b.kind),
+    imageAlt: "",
     href: `#${b.key}`,
   }));
 

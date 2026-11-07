@@ -29,12 +29,11 @@ const LOOP = timeline.length + 4;
 const frameAt = (n: number) => timeline[Math.min(((n % LOOP) + LOOP) % LOOP, timeline.length - 1)];
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// 參考圖用內嵌 SVG 畫一張簡單的人像剪影，不用外部圖片
-const reference =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><rect width="200" height="300" fill="#e5e5e5"/><circle cx="150" cy="60" r="26" fill="#fafafa"/><path d="M0 230 Q60 190 110 220 T200 210 V300 H0Z" fill="#a3a3a3"/><circle cx="100" cy="130" r="34" fill="#475569"/><path d="M48 300 Q50 190 100 180 Q150 190 152 300Z" fill="#334155"/></svg>`,
-  );
+// 示範照片（AI 生成），放在 public/blocks/jobs-tray：
+// reference 是使用者上傳的參考照（雨中火車窗邊、人背對鏡頭）；preview 是生成中的低解析度即時預覽；result 是完成後的成品
+const reference = "/blocks/jobs-tray/reference.webp";
+const preview = "/blocks/jobs-tray/preview.webp";
+const result = "/blocks/jobs-tray/result.webp";
 
 const copy = {
   en: {
@@ -152,7 +151,7 @@ export default function JobsTrayDemo() {
   const [tileCanceled, setTileCanceled] = useState(false);
   const [errorRemoved, setErrorRemoved] = useState(false);
   const tileFrame = frameAt(tick - tileStart);
-  const tileJob: Job = { id: "job_31c0", prompt: t.tiles[0], sourceSrc: reference, aspect: "2 / 3", ...tileFrame, ...(tileCanceled ? { status: "canceled" } : null) };
+  const tileJob: Job = { id: "job_31c0", prompt: t.tiles[0], sourceSrc: reference, previewSrc: preview, aspect: "2 / 3", ...tileFrame, ...(tileCanceled ? { status: "canceled" } : null) };
 
   const rows: Job[] = [
     { id: "job_a1", prompt: t.rows[0], ...frameAt(tick + 7) },
@@ -221,7 +220,7 @@ export default function JobsTrayDemo() {
             </h4>
             <div className="grid grid-cols-2 items-start gap-2 sm:grid-cols-3">
               {tileJob.status === "done" ? (
-                <img src={reference} alt={tileJob.prompt} className="aspect-[2/3] w-full rounded-lg object-cover" />
+                <img src={result} alt={tileJob.prompt} className="aspect-[2/3] w-full rounded-lg object-cover" />
               ) : (
                 <JobTile
                   job={tileJob}

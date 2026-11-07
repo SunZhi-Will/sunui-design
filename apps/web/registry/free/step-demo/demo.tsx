@@ -109,14 +109,23 @@ function Spinner({ t }: { t: number }) {
   );
 }
 
+// 示範照片（AI 生成），放在 public/blocks/step-demo；三個版本各配一張，順序對應 TONES
+const BANNER_PHOTOS = ["tea-dark", "tea-tray", "tea-glass"].map((name) => `/blocks/step-demo/${name}.webp`);
+
 function Banner({ c, tone = 0, small }: { c: Copy; tone?: number; small?: boolean }) {
   return (
     <div className={cn("relative h-full overflow-hidden rounded-xl", TONES[tone], small ? "p-3" : "p-10")}>
-      <span className={cn("absolute rounded-full bg-current opacity-10", small ? "-right-4 -bottom-6 size-16" : "-right-16 -bottom-24 size-80")} />
-      <span className={cn("absolute rounded-full bg-current opacity-10", small ? "right-6 -top-6 size-10" : "right-28 -top-20 size-48")} />
-      <p className={cn("font-medium tracking-[0.14em] opacity-70", small ? "text-[8px]" : "text-sm")}>{c.kicker}</p>
-      <p className={cn("font-semibold tracking-tight", small ? "mt-1 text-sm" : "mt-4 text-6xl")}>{c.headline}</p>
-      {!small ? <p className="mt-5 text-lg opacity-80">{c.sub}</p> : null}
+      <img
+        src={BANNER_PHOTOS[tone]}
+        alt=""
+        draggable={false}
+        className={cn("absolute inset-y-0 right-0 h-full object-cover select-none", small ? "w-2/5" : "w-1/2")}
+      />
+      <div className={cn("relative", small ? "w-3/5 pr-1" : "w-1/2 pr-8")}>
+        <p className={cn("font-medium tracking-[0.14em] opacity-70", small ? "text-[8px]" : "text-sm")}>{c.kicker}</p>
+        <p className={cn("font-semibold tracking-tight", small ? "mt-1 text-sm leading-tight" : "mt-4 text-6xl")}>{c.headline}</p>
+        {!small ? <p className="mt-5 text-lg opacity-80">{c.sub}</p> : null}
+      </div>
     </div>
   );
 }

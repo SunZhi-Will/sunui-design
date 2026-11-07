@@ -6,11 +6,8 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { TextMask, TextOnPath, VariableWeight } from "./type-motion";
 
-// 示範用的海景插畫：SVG data URI，不讀任何外部圖片
-const sea = (() => {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#fbbf24'/><stop offset='.45' stop-color='#f97316'/><stop offset='.55' stop-color='#0e7490'/><stop offset='1' stop-color='#164e63'/></linearGradient></defs><rect width='800' height='400' fill='url(#s)'/><circle cx='520' cy='170' r='70' fill='#fef3c7'/><g fill='none' stroke='#a5f3fc' stroke-width='6' opacity='.6'><path d='M0 250 Q50 235 100 250 T200 250 T300 250 T400 250 T500 250 T600 250 T700 250 T800 250'/><path d='M0 300 Q50 285 100 300 T200 300 T300 300 T400 300 T500 300 T600 300 T700 300 T800 300'/><path d='M0 350 Q50 335 100 350 T200 350 T300 350 T400 350 T500 350 T600 350 T700 350 T800 350'/></g></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-})();
+// 示範照片（AI 生成）：和 image-effects 共用的潟湖海景，字形挖空後看得到水色與沙灘
+const sea = "/blocks/image-effects/lagoon.webp";
 
 const copy = {
   en: {

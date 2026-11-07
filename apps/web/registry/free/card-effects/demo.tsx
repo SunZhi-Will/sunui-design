@@ -16,21 +16,11 @@ import {
   type EffectCardItem,
 } from "./card-effects";
 
-// 示範用的佔位插畫：SVG data URI，不讀任何外部圖片
-const palettes = [
-  ["#0f766e", "#99f6e4", "#fde68a", "#134e4a"],
-  ["#b45309", "#fde68a", "#fff7ed", "#78350f"],
-  ["#1d4ed8", "#bfdbfe", "#f8fafc", "#1e3a8a"],
-  ["#15803d", "#bbf7d0", "#fef9c3", "#14532d"],
-  ["#c2410c", "#fed7aa", "#fef3c7", "#7c2d12"],
-  ["#334155", "#cbd5e1", "#f1f5f9", "#0f172a"],
-];
+// 示範照片（AI 生成），和 image-effects 共用 public/blocks/image-effects；順序對應 copy.cards
+const photos = ["lagoon", "desert", "harbor", "valley", "canyon", "peaks"];
 
 export function demoArt(i: number) {
-  const [a, b, sun, dark] = palettes[i % palettes.length];
-  const cx = 180 + ((i * 137) % 440);
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${b}'/><stop offset='1' stop-color='${a}'/></linearGradient></defs><rect width='800' height='600' fill='url(#g)'/><circle cx='${cx}' cy='200' r='72' fill='${sun}'/><path d='M0 420 L${150 + i * 20} 250 L330 400 L${470 - i * 15} 240 L800 440 V600 H0Z' fill='${dark}' opacity='.5'/><path d='M0 500 L220 370 L420 480 L620 350 L800 470 V600 H0Z' fill='${dark}'/></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return `/blocks/image-effects/${photos[i % photos.length]}.webp`;
 }
 
 export const copy = {
