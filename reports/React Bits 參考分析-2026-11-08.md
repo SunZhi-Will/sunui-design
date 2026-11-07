@@ -89,6 +89,16 @@
 
 三個都附 `preview.tsx` 展示版（寫死資料、沒有 labels 覆寫與型別匯出），型錄排序已加進 `lib/catalog-order.ts`：前兩個放 B 組，`restock-notify` 放 C 組，近親是 `variant-picker`、`low-stock-indicator`。
 
+## 5b. 第二批：再加三個 Pro 場景
+
+| block | 從 React Bits 借的概念 | SunUI 的做法 |
+|---|---|---|
+| `size-finder` | Ecommerce-1 的版型切換 | 身高、體重、版型三個輸入推動捲尺上的指針；指針是連續位置，靠近格線就寫「介於 M 和 L 之間，依版型建議 L」；`runsLarge` 處理偏大偏小的款式並寫出來 |
+| `pickup-ticket` | Micro tear-ticket | 用在「門市取貨、活動入場」這個電商情境：沿打孔線從左往右撕，撕開不會癒合，過 60% 自動撕完掉落，原位出現有日期的 Stamp；鍵盤有「標記為已取貨」 |
+| `holiday-cutoff` | 無（React Bits 沒有檔期元件） | 每種寄送方式各自的最後下單時間與即時倒數；選中的方式在眼前截止時，自動改選下一個來得及的並寫出原因；全部截止時誠實說趕不上，接 fallback（例如電子禮物卡） |
+
+`holiday-cutoff` 直接服務季節包（聖誕、農曆新年），是三個裡離營收最近的。倒數只在分頁可見時走，符合 DESIGN.md 的倒數例外。
+
 ## 6. 後續建議（不在這次範圍）
 
 - 修正 `reports/SunUI 商業化深度規劃.md` 對「沒有人做電商」的說法（第 49 行）。
