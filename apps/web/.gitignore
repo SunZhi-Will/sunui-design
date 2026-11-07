@@ -9,3 +9,6 @@ registry/pro/
 
 # 圖示自檢截圖（scripts/check-icons.mjs）
 check-out/
+.vercel
+.env*
+!.env.example
