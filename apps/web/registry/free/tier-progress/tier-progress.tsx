@@ -108,6 +108,8 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -154,6 +156,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
           <path d={ARC} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={10} strokeDasharray="2 5" />
           <motion.path
             d={ARC}
+            className={spot}
             fill="none"
             stroke="currentColor"
             strokeWidth={10}
@@ -162,7 +165,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
             animate={{ pathLength: fraction }}
             transition={move}
           />
-          <motion.circle r={5} fill="currentColor" initial={false} animate={{ cx: tip.x, cy: tip.y }} transition={move} />
+          <motion.circle r={5} className={spot} fill="currentColor" initial={false} animate={{ cx: tip.x, cy: tip.y }} transition={move} />
         </svg>
         <div className="absolute inset-x-0 bottom-0 text-center">
           <p id={titleId} className="text-2xl leading-none font-semibold tracking-tight">
@@ -187,7 +190,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
               aria-current={i === currentIndex ? "step" : undefined}
               className={cn("min-w-0 flex-1 text-center", !reached && inkMuted)}
             >
-              <span aria-hidden="true" className="mx-auto mb-1 grid size-4 place-items-center">
+              <span aria-hidden="true" className={cn("mx-auto mb-1 grid size-4 place-items-center", reached && spot)}>
                 {reached ? <CheckIcon /> : <span className="size-1.5 rounded-full bg-current" />}
               </span>
               <span className={cn("block truncate text-xs", i === currentIndex && "font-semibold")}>{tier.name}</span>

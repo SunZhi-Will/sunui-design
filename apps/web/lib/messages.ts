@@ -186,6 +186,8 @@ const en = {
     mobile: "Mobile",
     replay: "Replay",
     frameTitle: "{name} preview",
+    spot: "Brand color",
+    spotColors: { ink: "Ink (default)", wine: "Wine", forest: "Forest", navy: "Navy", magenta: "Magenta" },
   },
   sheet: {
     replay: "Replay",
@@ -648,6 +650,8 @@ const zhTW: Messages = {
     mobile: "手機",
     replay: "重播",
     frameTitle: "{name} 預覽",
+    spot: "品牌色",
+    spotColors: { ink: "墨色（預設）", wine: "酒紅", forest: "森林綠", navy: "海軍藍", magenta: "洋紅" },
   },
   sheet: {
     replay: "重播",
@@ -1088,6 +1092,8 @@ const zhCN: Messages = {
     mobile: "手机",
     replay: "重播",
     frameTitle: "{name} 预览",
+    spot: "品牌色",
+    spotColors: { ink: "墨色（默认）", wine: "酒红", forest: "森林绿", navy: "海军蓝", magenta: "洋红" },
   },
   sheet: {
     replay: "重播",
@@ -1521,6 +1527,8 @@ const ja: Messages = {
     mobile: "モバイル",
     replay: "再生",
     frameTitle: "{name} のプレビュー",
+    spot: "ブランドカラー",
+    spotColors: { ink: "墨（デフォルト）", wine: "ワインレッド", forest: "フォレストグリーン", navy: "ネイビー", magenta: "マゼンタ" },
   },
   sheet: {
     replay: "再生",

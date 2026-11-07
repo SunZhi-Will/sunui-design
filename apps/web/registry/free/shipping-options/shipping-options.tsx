@@ -63,7 +63,9 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -157,7 +159,7 @@ export function ShippingOptions({
               className={cn(
                 "absolute inset-0 -z-10 rounded-md border",
                 paper,
-                on ? "border-current" : edge,
+                on ? spotBorder : edge,
                 !on && !o.disabled && "group-hover:border-[#171717]/30 dark:group-hover:border-[#ededed]/30",
               )}
             />
@@ -174,7 +176,7 @@ export function ShippingOptions({
                 <span className="mt-0.5 block text-sm font-medium tabular-nums">{o.eta}</span>
                 {o.note && <span className={cn("mt-1 block text-xs", inkMuted)}>{o.note}</span>}
               </span>
-              <span className={cn("shrink-0 text-base font-semibold tracking-tight tabular-nums", o.fee === 0 && vermilion)}>
+              <span className={cn("shrink-0 text-base font-semibold tracking-tight tabular-nums", o.fee === 0 && spot)}>
                 {o.fee === 0 ? freeLabel : fmt.format(o.fee)}
               </span>
             </span>
@@ -188,7 +190,7 @@ export function ShippingOptions({
 /** 選取圈：選中時中心墨點以 snappy 彈簧壓入 */
 function Dot({ on, reduceMotion }: { on: boolean; reduceMotion: boolean }) {
   return (
-    <span aria-hidden="true" className={cn("grid size-4 place-items-center rounded-full border", on ? "border-current" : edge)}>
+    <span aria-hidden="true" className={cn("grid size-4 place-items-center rounded-full border", on ? cn("border-current", spot) : edge)}>
       <motion.span
         className="size-2 rounded-full bg-current"
         initial={false}

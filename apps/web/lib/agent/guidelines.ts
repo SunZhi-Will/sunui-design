@@ -7,7 +7,7 @@ import { siteUrl } from "@/lib/site";
 // 改了那幾份文件，這裡要一起改。MCP、SKILL.md、llms-full.txt 都從這裡取，保持單一來源。
 
 export const seriesSummary: Record<Series, string> = {
-  paper: "Paper commerce: coupons, receipts, stamp cards and tickets on neutral gray paper with ink text and no accent colour.",
+  paper: "Paper commerce: coupons, receipts, stamp cards and tickets on neutral gray paper with ink text; the only colour is the store brand spot colour, taken from the theme.",
   product: "Quiet tool UI: neutral shadcn tokens, one accent color, status shown only as small dots, the reason written on screen.",
   story: "Ink and lamp: near-black panels, warm white serif text, one gold accent, all colors through --story-* CSS variables.",
   showcase: "Landing-page signature visuals in a quiet editorial dark, ported from real launch pages.",
@@ -58,7 +58,8 @@ ${seriesSummary.paper}
 | Muted ink | #a3a3a3 | #737373 | \`text-[#a3a3a3] dark:text-[#737373]\` |
 
 - Paper and ink are neutral grays with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
-- No accent colour. Discount values, promo emphasis and the current step use ink, set apart by weight, size and contrast; when "current" must differ from "others", draw the others in muted ink. Do not pick an accent color per block; tell coupons apart with copy and layout.
+- Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress and the main button read \`var(--sunui-spot, var(--primary))\` (text: \`text-[color:var(--sunui-spot,var(--primary))]\`; on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Out of the box this is the theme primary; set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and paper edges stay ink. Being rolled out: coupon-wallet, add-to-cart-button, addon-checklist, shipping-options and tier-progress use it today; other blocks still use ink for emphasis.
+- Discount values, promo emphasis and the current step are also set apart by weight, size and contrast; when "current" must differ from "others", draw the others in muted ink. Do not pick an accent color per block; tell coupons apart with copy and layout.
 - Paper is flat: 1px paper edge, no shadow or at most \`shadow-[0_1px_0_rgb(0_0_0/0.04)]\`, radius \`rounded-md\` or less.
 - Results are shown with the shared \`Stamp\` component (install \`stamp\` from the SunUI registry, import from \`@/components/ui/stamp\`). Despite the name it is not a rubber stamp: it is one upright line of ink with a check for positive results and faded ink for negative ones. Place it where the action happened (for example where the button was), never absolutely positioned over other content. \`shape\` only adds detail: \`date\` adds a printed date, \`seal\` adds a second line; the look is the same.
 - Use the default tone for positive results and \`tone="ink"\` for expired, sold out, ended or no prize; \`void\` adds a strikethrough. Never tilt it, add ink texture, mix-blend, double borders, wide uppercase tracking or colour. There is no celebration: results fade in over 150ms. Labels that are not results (Recommended, Popular) must not use it.

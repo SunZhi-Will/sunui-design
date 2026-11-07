@@ -102,6 +102,8 @@ const MESSAGES: Record<SunLocale, AddToCartLabels> = {
 const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -189,7 +191,8 @@ export function AddToCartButton({
         whileTap={reduceMotion || disabled ? undefined : { scale: 0.97 }}
         transition={springs.snappy}
         className={cn(
-          "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90",
+          spotFill,
+          "inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium transition-opacity hover:opacity-90",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
           className,
@@ -348,7 +351,7 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, ref, o
           <motion.span
             key={count}
             aria-hidden="true"
-            className="absolute -top-1.5 -right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-foreground px-1 font-mono text-[10px] leading-none font-semibold text-background tabular-nums ring-2 ring-background"
+            className={cn("absolute -top-1.5 -right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 font-mono text-[10px] leading-none font-semibold tabular-nums ring-2 ring-background", spotFill)}
             initial={reduceMotion ? false : { scale: 1.5, opacity: 0.4 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0 } }}

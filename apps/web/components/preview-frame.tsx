@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { previewUrl } from "@/lib/demo-locale";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
+import { spotBlocks, spotCss, spotKeys, spotSwatches, type SpotKey } from "@/lib/spot";
 import { cn } from "@/lib/utils";
 
 const viewports = [
@@ -19,16 +20,33 @@ export function PreviewFrame({ name, locale, labels }: { name: string; locale: L
   const [viewport, setViewport] = useState<(typeof viewports)[number]["key"]>("desktop");
   const [run, setRun] = useState(0);
   const [height, setHeight] = useState(MIN_HEIGHT);
+  const [spot, setSpot] = useState<SpotKey>("ink");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
   const width = viewports.find((v) => v.key === viewport)!.width;
 
   useEffect(() => () => observerRef.current?.disconnect(), []);
 
+  // 同源 iframe：把示範品牌色寫進一個 <style>，換色不用重新載入
+  function applySpot(key: SpotKey) {
+    const doc = iframeRef.current?.contentDocument;
+    if (!doc?.head) return;
+    let style = doc.getElementById("sunui-spot-demo");
+    if (!style) {
+      style = doc.createElement("style");
+      style.id = "sunui-spot-demo";
+      doc.head.appendChild(style);
+    }
+    style.textContent = spotCss(key);
+  }
+
+  useEffect(() => applySpot(spot), [spot]);
+
   // 同源 iframe：直接觀察內容高度，讓外框跟著長高
   function handleLoad() {
     const doc = iframeRef.current?.contentDocument;
     if (!doc) return;
+    applySpot(spot);
     observerRef.current?.disconnect();
     // 量 block 本身而非舞台：舞台是 min-h-dvh，會跟著 iframe 一起長而無法縮回
     const content = doc.querySelector<HTMLElement>("[data-preview-stage] > *");
@@ -61,6 +79,31 @@ export function PreviewFrame({ name, locale, labels }: { name: string; locale: L
           ))}
         </div>
         <div className="flex items-center gap-2">
+          {spotBlocks.has(name) && (
+            <div role="radiogroup" aria-label={labels.spot} className="flex items-center gap-1.5 border-r border-line pr-2">
+              {spotKeys.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={spot === key}
+                  aria-label={labels.spotColors[key]}
+                  title={labels.spotColors[key]}
+                  onClick={() => setSpot(key)}
+                  className={cn(
+                    "grid size-5 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+                    spot === key ? "border-fg" : "border-transparent hover:border-line",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn("size-3 rounded-full", key === "ink" && "bg-fg")}
+                    style={key === "ink" ? undefined : { background: spotSwatches[key].light }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
           {viewport !== "desktop" && <span className="font-mono text-[11px] text-subtle">{width}</span>}
           <button
           type="button"

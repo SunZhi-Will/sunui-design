@@ -90,6 +90,9 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -217,7 +220,7 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                 className={cn(
                   "relative flex h-full overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)]",
                   paper,
-                  edge,
+                  isOn ? spotBorder : edge,
                 )}
               >
                 {/* 不可用時只淡化內容，紙面保持不透明，扇形展開時後面的券才不會透出來 */}
@@ -225,7 +228,7 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                   className={cn("flex shrink-0 flex-col items-center justify-center border-r border-dashed", edge, c.unavailableReason && "opacity-55")}
                   style={{ width: STUB }}
                 >
-                  <span className="text-2xl leading-none font-semibold tracking-tight tabular-nums">{c.amount}</span>
+                  <span className={cn("text-2xl leading-none font-semibold tracking-tight tabular-nums", spot)}>{c.amount}</span>
                   <span className={cn("mt-1 text-[10px] font-medium tracking-[0.14em]", inkMuted)}>{t.off}</span>
                 </span>
                 <span className={cn("flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3", c.unavailableReason && "opacity-55")}>

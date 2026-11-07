@@ -94,6 +94,9 @@ const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
 const edge = "border-[#e2e2e2] dark:border-[#333333]";
 const ink = "text-[#171717] dark:text-[#ededed]";
 const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -179,7 +182,7 @@ export function AddonChecklist({
                   transition={springs.snappy}
                   className={cn(
                     "mt-0.5 grid size-4 shrink-0 place-items-center rounded-[3px] border",
-                    on ? "border-current" : edge,
+                    on ? cn(spotBorder, spot) : edge,
                     item.required && inkMuted,
                   )}
                 >
