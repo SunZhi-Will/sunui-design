@@ -8,7 +8,7 @@ import { RedeemKeyInput, type LicenseState } from "./redeem-key-input";
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-/** 型錄卡片：同一格輸入兌換碼或授權碼，打字時即時判斷是哪一種，按啟用看結果，可在框內捲動。 */
+/** 型錄卡片：同一格輸入兌換碼或授權碼，打字時自動分組並判斷是哪一種；兌換成功時輸入列變成贊助卡。可在框內捲動。 */
 export default function RedeemKeyInputCard() {
   const locale = useDemoLocale();
   const haveKey = useDemoText({

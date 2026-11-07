@@ -818,8 +818,10 @@
       "name": "checkout-steps",
       "type": "registry:block",
       "title": "Checkout Steps",
-      "description": "Compact checkout step row from the V窩 checkout: numbered pills that turn accent-filled with a check once done. Uses an ordered list with aria-current=\"step\" and screen-reader text for completed steps; it is static, so nothing animates under reduced motion.",
-      "dependencies": [],
+      "description": "Checkout steps that keep their answers: completed steps collapse into a compact line with a small check and the buyer's choice (\"7-Eleven pickup\", \"Visa ·· 4242\"), clickable to go back with onStepClick; the current step expands into a labelled pill and future steps shrink to quiet numbered ticks. When the step changes the same track morphs on a spring and an ink line advances; under 420px it becomes \"2/4 Payment\" with a segmented bar and the answers stay reachable. Ordered list with aria-current=\"step\", shadcn tokens only; reduced motion switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -846,7 +848,9 @@
             "stepper",
             "order steps",
             "step indicator",
-            "step progress"
+            "step progress",
+            "step summary",
+            "wizard steps"
           ]
         }
       },
@@ -2616,8 +2620,10 @@
       "name": "person-chip",
       "type": "registry:block",
       "title": "Person Chip",
-      "description": "Name and project chips with a stable identity-colour dot hashed from the id: PersonChip has states for emphasized (self), selected, highlighted (changed), muted and locked, EmployeeChip is the same keyed by employeeId, and AppChip tags an app or project with an optional paid mark, with AppDot for the dot alone. Clickable person chips render as buttons with aria-pressed, the lock icon and paid mark are labelled, dots are aria-hidden, and the hover transition is removed under reduced motion.",
-      "dependencies": [],
+      "description": "Name and project chips with a stable identity dot hashed from the id, drawn from 8 equal-lightness, low-chroma OKLCH hues that read the same in light and dark; text stays ink, colour lives only on the dot. PersonChip has emphasized (self), selected, highlighted (changed, dashed), muted and locked states, EmployeeChip is the same keyed by employeeId, AppChip tags an app with an optional paid mark, and AppDot is the dot alone. PersonChipGroup collapses people past max into a +N chip that expands in place, names sliding out of it while surrounding content slides, and one shared selection frame slides between chips; arrow keys move between chips. Clickable chips are buttons with aria-pressed, the toggle has aria-expanded, dots are aria-hidden, and reduced motion switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -2644,7 +2650,8 @@
             "person chip",
             "employee chip",
             "staff tag",
-            "member pill"
+            "member pill",
+            "avatar group"
           ]
         }
       },
@@ -3131,13 +3138,14 @@
       "name": "redeem-key-input",
       "type": "registry:block",
       "title": "License and Redeem Panel",
-      "description": "Dark license panel with one input that tells a 12-character supporter code from a Lemon Squeezy UUID key and sends each the right way. It shows the free, trial, basic, pro and supporter tiers, explains grace, expired and invalid states, and offers activate, deactivate and revalidate. Provider errors become messages that say what to do next. A rejected key shakes the input row once. The input is labelled, results are announced in a polite live region, and under reduced motion the row does not shake and spinners stop spinning.",
+      "description": "Dark, monochrome license panel with one input for a 12-character supporter code or a Lemon Squeezy UUID key. As you type it detects which one it is and groups it (XXXX-XXXX-XXXX or 8-4-4-4-12); each group settles only when it is complete, and the label shows what was detected and how many characters are in. A paste fills it at once. On success the input row morphs in place into the license card: the masked key stays as the anchor and the tier name and an Activated stamp appear where the button was; deactivating morphs it back. It shows the free, trial, basic, pro and supporter tiers, explains grace, expired and invalid states, offers activate, deactivate and revalidate, and turns provider errors into next steps. A rejected key shakes the row once. The accent defaults to neutral ink and can be overridden. Results are announced in a polite live region, and under reduced motion every morph is instant.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
         "utils",
-        "@sunui/sunui-motion"
+        "@sunui/sunui-motion",
+        "@sunui/stamp"
       ],
       "categories": [
         "commerce",
@@ -3177,10 +3185,13 @@
       "name": "reservation-timer",
       "type": "registry:block",
       "title": "Reservation Timer",
-      "description": "The \"held for you\" panel from the V窩 checkout: deadline date, a live hr/min/sec countdown that updates every second, and an honest note about what happens on expiry, plus an expired-state panel. The remaining time has role=\"timer\" (not read aloud every second), the expired panel is role=\"status\", and nothing animates, so reduced motion needs no change.",
-      "dependencies": [],
+      "description": "A calm hold ticket: it leads with the absolute time (Held until 18:30, with the date if not today) and gets more precise as time runs down: about N h left above an hour, minutes under an hour, seconds only in the last five minutes, rolling only the digits that change. With startedAt or holdMs a row of 12 ink dots goes out one by one; item pins what is held as the ticket's anchor. On expiry the same ticket morphs in place: the time is struck through, a void Released stamp takes the countdown's place and the note says the item went back on sale. Optional one-time extension. shadcn tokens only, accent via primary. The remaining time is role=\"timer\" (not read every second), aria-live fires only on expiry, and reduced motion switches instantly. Includes ReservationExpiredPanel.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
-        "utils"
+        "utils",
+        "@sunui/stamp"
       ],
       "categories": [
         "checkout",
@@ -3984,8 +3995,10 @@
       "name": "status-dot",
       "type": "registry:block",
       "title": "Status Dot",
-      "description": "A status label where colour lives only on a small dot and the text keeps the normal foreground, so a column of states never turns into a rainbow. The dot is aria-hidden so the text carries the meaning; it is static, so reduced motion needs no change.",
-      "dependencies": [],
+      "description": "A status label where shape shows progress and time shows freshness: an empty ring is pending, a half pie is in progress, a full dot is done and a slashed ring is cancelled, or pass progress for any amount, so it reads even in monochrome. Only live, in-flight states animate with one calm ring, and since adds a muted relative time (\"· 2h ago\"). When the state changes it morphs in place: the pie fills, the label rolls and the width follows while the dot stays still. Colour lives only on the dot; the default is still the classic 6px dot. Reduced motion switches instantly with no pulse.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -4012,7 +4025,9 @@
             "status dot",
             "status indicator",
             "state label",
-            "dot label"
+            "dot label",
+            "progress dot",
+            "last updated"
           ]
         }
       },

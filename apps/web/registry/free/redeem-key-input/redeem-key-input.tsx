@@ -1,8 +1,10 @@
 "use client";
 
-import { useId, useState, type CSSProperties, type ReactNode } from "react";
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
+import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from "react";
 
-import { useShake } from "@/lib/sunui-motion";
+import { Stamp } from "@/components/ui/stamp";
+import { instant, springs, useShake } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
 /*
@@ -10,6 +12,8 @@ import { cn } from "@/lib/utils";
  * - Supporter 兌換碼（12 碼，印成 ABCD-EFGH-JKLM）
  * - Pro 授權碼（Lemon Squeezy 的 UUID）
  * 版面與狀態流程移植自 KapZoom 的 LicenseDialog，偵測邏輯移植自 PostVault 的 redeem-input。
+ * 打字時即時判斷是哪一種碼並自動分組，每組湊滿才「落座」；啟用成功時輸入列就地變形成授權卡，
+ * 遮罩過的金鑰留在卡上當錨點，停用時反向變回輸入列。預設強調色是中性墨色，面板維持暗色。
  */
 
 export type LicenseTier = "free" | "trial" | "basic" | "pro" | "supporter";
@@ -82,6 +86,11 @@ export interface RedeemKeyInputLabels {
   field: string;
   detectedSupporter: string;
   detectedPro: string;
+  /** 啟用成功後，授權卡上取代按鈕的結果標記 */
+  stampActivated: string;
+  stampRedeemed: string;
+  /** 兌換後的贊助卡下方，回到輸入框輸入 Pro 授權碼 */
+  useAnotherKey: string;
   activate: string;
   revalidate: string;
   revalidateNow: string;
@@ -152,6 +161,9 @@ const MESSAGES: Record<SunLocale, RedeemKeyInputLabels> = {
     field: "License key or supporter code",
     detectedSupporter: "Supporter code",
     detectedPro: "Pro license key",
+    stampActivated: "Activated",
+    stampRedeemed: "Redeemed",
+    useAnotherKey: "Enter a license key",
     activate: "Activate",
     revalidate: "Revalidate license",
     revalidateNow: "Verify now",
@@ -221,6 +233,9 @@ const MESSAGES: Record<SunLocale, RedeemKeyInputLabels> = {
     field: "授權碼或贊助兌換碼",
     detectedSupporter: "贊助兌換碼",
     detectedPro: "Pro 授權碼",
+    stampActivated: "已啟用",
+    stampRedeemed: "已兌換",
+    useAnotherKey: "改輸入授權碼",
     activate: "啟用",
     revalidate: "重新驗證授權",
     revalidateNow: "立即驗證",
@@ -290,6 +305,9 @@ const MESSAGES: Record<SunLocale, RedeemKeyInputLabels> = {
     field: "许可证密钥或赞助兑换码",
     detectedSupporter: "赞助兑换码",
     detectedPro: "Pro 许可证密钥",
+    stampActivated: "已激活",
+    stampRedeemed: "已兑换",
+    useAnotherKey: "改为输入许可证密钥",
     activate: "激活",
     revalidate: "重新验证授权",
     revalidateNow: "立即验证",
@@ -359,6 +377,9 @@ const MESSAGES: Record<SunLocale, RedeemKeyInputLabels> = {
     field: "ライセンスキーまたはサポーターコード",
     detectedSupporter: "サポーターコード",
     detectedPro: "Pro ライセンスキー",
+    stampActivated: "有効化済み",
+    stampRedeemed: "引き換え済み",
+    useAnotherKey: "ライセンスキーを入力",
     activate: "有効化",
     revalidate: "ライセンスを再確認",
     revalidateNow: "今すぐ確認",
@@ -428,68 +449,63 @@ export function mapLicenseError(
   return null;
 }
 
-/* lucide 圖示的 inline 版本 */
+
+/* 輸入時的分組：兌換碼 4-4-4，授權碼照 UUID 的 8-4-4-4-12 */
+const GROUPS: Record<RedeemKeyKind, number[]> = { supporter: [4, 4, 4], pro: [8, 4, 4, 4, 12] };
+const TOTAL: Record<RedeemKeyKind, number> = { supporter: 12, pro: 32 };
+const STRIP = /[^0-9a-z]/gi;
+
+/** 還沒打完時猜是哪一種：有非十六進位字元是兌換碼；超過 12 碼或有小寫 a-f 是授權碼 */
+function guessKeyKind(raw: string): RedeemKeyKind | null {
+  if (!raw) return null;
+  if (/[^0-9a-f]/i.test(raw)) return "supporter";
+  return raw.length > 12 || /[a-f]/.test(raw) ? "pro" : "supporter";
+}
+
+/** 把去掉連字號的字元重新分組；多出來的字元接在最後一組，那一組就不會落座 */
+function formatKey(raw: string): string {
+  const kind = guessKeyKind(raw);
+  if (!kind) return "";
+  const s = kind === "supporter" ? raw.toUpperCase() : raw;
+  const sizes = GROUPS[kind];
+  const parts: string[] = [];
+  for (let i = 0, j = 0; i < s.length; j++) {
+    const end = j === sizes.length - 1 ? s.length : i + sizes[j];
+    parts.push(s.slice(i, end));
+    i = end;
+  }
+  return parts.join("-");
+}
+
+/** 第 n 個字元之後的游標位置（跳過連字號） */
+function caretAfter(value: string, n: number) {
+  let i = 0;
+  for (; i < value.length && n > 0; i++) if (value[i] !== "-") n--;
+  return i;
+}
+
+/** 卡上的金鑰存根：前四碼與後四碼 */
+const maskKey = (value: string) => {
+  const r = value.replace(/-/g, "").toUpperCase();
+  return r.length > 8 ? `${r.slice(0, 4)}····${r.slice(-4)}` : r;
+};
+
+/* lucide 圖示的 inline 版本，線寬 1.5 */
 type IconProps = { className?: string };
 const svg = (className: string | undefined, children: ReactNode) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className={className}
-  >
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
     {children}
   </svg>
 );
 const XIcon = ({ className }: IconProps) => svg(className, <path d="M18 6 6 18M6 6l12 12" />);
 const CheckIcon = ({ className }: IconProps) => svg(className, <path d="M20 6 9 17l-5-5" />);
-const CrownIcon = ({ className }: IconProps) =>
-  svg(
-    className,
-    <>
-      <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-      <path d="M5 21h14" />
-    </>,
-  );
-const UnlockIcon = ({ className }: IconProps) =>
-  svg(
-    className,
-    <>
-      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-    </>,
-  );
-const ShieldCheckIcon = ({ className }: IconProps) =>
-  svg(
-    className,
-    <>
-      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-      <path d="m9 12 2 2 4-4" />
-    </>,
-  );
-const ClockIcon = ({ className }: IconProps) =>
-  svg(
-    className,
-    <>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 6v6l4 2" />
-    </>,
-  );
-const AlertIcon = ({ className }: IconProps) =>
-  svg(
-    className,
-    <>
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
-      <path d="M12 9v4M12 17h.01" />
-    </>,
-  );
-const ExternalIcon = ({ className }: IconProps) =>
-  svg(className, <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />);
-const Spinner = ({ className }: IconProps) =>
-  svg(cn("motion-safe:animate-spin", className), <path d="M21 12a9 9 0 1 1-6.219-8.56" />);
+const CrownIcon = ({ className }: IconProps) => svg(className, <><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></>);
+const UnlockIcon = ({ className }: IconProps) => svg(className, <><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></>);
+const ShieldCheckIcon = ({ className }: IconProps) => svg(className, <><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></>);
+const ClockIcon = ({ className }: IconProps) => svg(className, <><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></>);
+const AlertIcon = ({ className }: IconProps) => svg(className, <><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4M12 17h.01" /></>);
+const ExternalIcon = ({ className }: IconProps) => svg(className, <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />);
+const Spinner = ({ className }: IconProps) => svg(cn("motion-safe:animate-spin", className), <path d="M21 12a9 9 0 1 1-6.219-8.56" />);
 /* PostVault 贊助按鈕的咖啡杯 */
 const CoffeeIcon = ({ className }: IconProps) => (
   <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
@@ -501,7 +517,9 @@ const CoffeeIcon = ({ className }: IconProps) => (
 
 const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rk-accent)]";
 const PRIMARY_CTA =
-  "w-full py-2.5 rounded-lg bg-gradient-to-r from-[var(--rk-accent)] to-[var(--rk-accent-2)] hover:brightness-110 text-neutral-900 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[color-mix(in_srgb,var(--rk-accent)_20%,transparent)]";
+  "w-full py-2.5 rounded-lg bg-[var(--rk-accent)] hover:opacity-90 text-[#111111] text-sm font-semibold transition-opacity flex items-center justify-center gap-1.5";
+const BOX = "rounded-lg border border-[var(--rk-border)] bg-white/[0.03]";
+const GHOST = "w-full py-2 rounded-lg text-xs font-medium border border-[var(--rk-border)] hover:bg-white/5 transition-colors disabled:opacity-50";
 
 type Busy = "activate" | "deactivate" | "revalidate" | "retry" | null;
 type Message = { type: "error" | "ok"; text: string; hint?: string } | null;
@@ -523,7 +541,7 @@ export interface RedeemKeyInputProps {
   onClose?: () => void;
   /** 面板底部的額外內容（例如版本資訊） */
   footer?: ReactNode;
-  /** 強調色，預設 KapZoom 黃 */
+  /** 強調色，預設中性墨色 #ededed（原本的 KapZoom 黃是 #eab308） */
   accent?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -546,7 +564,7 @@ export function RedeemKeyInput({
   onPurchaseBasic,
   onClose,
   footer,
-  accent = "#eab308",
+  accent = "#ededed",
   locale = "en",
   labels: labelsProp,
   className,
@@ -557,11 +575,22 @@ export function RedeemKeyInput({
   const titleId = useId();
   const inputId = useId();
   const kindId = useId();
+  const groupId = useId();
+  const reduce = useReducedMotion() ?? false;
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState<Busy>(null);
   const [message, setMessage] = useState<Message>(null);
+  // 這次啟用成功的金鑰存根（贊助卡用，Pro 優先用 state.maskedKey）
+  const [stub, setStub] = useState<string | null>(null);
+  // 這次有按過啟用：之後出現的授權卡與結果標記才淡入，重新整理後直接顯示
+  const [fresh, setFresh] = useState(false);
   // 金鑰被退回時整排輕搖一次；減少動態時不搖，錯誤訊息照常顯示
   const [keyRowRef, shakeKeyRow] = useShake<HTMLDivElement>();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const overlayRef = useRef<HTMLSpanElement>(null);
+  const pendingCaret = useRef<number | null>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [bodyHeight, setBodyHeight] = useState<number | "auto">("auto");
 
   const isPro = state.tier === "pro";
   const isBasic = state.tier === "basic";
@@ -570,6 +599,7 @@ export function RedeemKeyInput({
   const days = state.trialDaysLeft ?? 0;
   const hasKey = state.hasKey === true;
   const showKeyControls = isPro || isBasic || hasKey;
+  const showSupporterCard = !showKeyControls && isSupporter && stub !== null;
   const statusNotice =
     hasKey && state.status === "grace"
       ? l.statusGrace
@@ -579,6 +609,46 @@ export function RedeemKeyInput({
           ? l.statusInvalid
           : null;
   const kind = detectKeyKind(key);
+  const raw = key.replace(/-/g, "");
+  const guess = guessKeyKind(raw);
+  const tierName = isPro ? l.tierPro : isBasic ? l.tierBasic : isSupporter ? l.tierSupporter : isTrial ? l.tierTrial : l.tierFree;
+  const layoutT = reduce ? instant : springs.gentle;
+
+  // 輸入框捲動時，墨色分組跟著平移，和真正的文字對齊
+  const syncOverlay = () => {
+    if (overlayRef.current && inputRef.current) overlayRef.current.style.transform = `translateX(${-inputRef.current.scrollLeft}px)`;
+  };
+
+  useLayoutEffect(() => {
+    const el = inputRef.current;
+    if (el && pendingCaret.current !== null && document.activeElement === el) el.setSelectionRange(pendingCaret.current, pendingCaret.current);
+    pendingCaret.current = null;
+    syncOverlay();
+  }, [key]);
+
+  // 面板高度跟著內容用 gentle 彈簧變，下面的內容滑動而不是跳動
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setBodyHeight(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const handleKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    let n = v.slice(0, e.target.selectionStart ?? v.length).replace(STRIP, "").length;
+    let next = v.replace(STRIP, "");
+    // 只刪到連字號時順手刪掉旁邊那一碼，不然刪除鍵會卡在連字號上
+    if (next === raw && v.length < key.length) {
+      const type = (e.nativeEvent as InputEvent).inputType;
+      if (type === "deleteContentBackward" && n > 0) next = next.slice(0, --n) + next.slice(n + 1);
+      else if (type === "deleteContentForward") next = next.slice(0, n) + next.slice(n + 1);
+    }
+    const formatted = formatKey(next);
+    pendingCaret.current = caretAfter(formatted, n);
+    setKey(formatted);
+  };
 
   const handleRetryRead = async () => {
     setBusy("retry");
@@ -592,6 +662,7 @@ export function RedeemKeyInput({
     if (!value) return;
     // 偵測不出時照原本的作法交給 supporter 兌換路徑判定為無效
     const k = kind ?? "supporter";
+    setFresh(true);
     setBusy("activate");
     setMessage(null);
     let r: RedeemOutcome;
@@ -603,6 +674,7 @@ export function RedeemKeyInput({
     setBusy(null);
     if (r.ok) {
       setMessage({ type: "ok", text: k === "pro" ? l.activated : l.redeemed });
+      setStub(maskKey(value));
       setKey("");
     } else if (r.offline) {
       setMessage({ type: "error", text: l.offlineError });
@@ -621,6 +693,7 @@ export function RedeemKeyInput({
     setMessage(null);
     await onDeactivate?.();
     setBusy(null);
+    setStub(null);
     setMessage({ type: "ok", text: l.deactivated });
   };
 
@@ -642,26 +715,51 @@ export function RedeemKeyInput({
 
   const style = {
     "--rk-accent": accent,
-    "--rk-accent-2": "#f59e0b",
     "--rk-surface": "#1c1c1c",
-    "--rk-border": "rgba(255,255,255,0.06)",
-    "--rk-text": "#e5e5e5",
+    "--rk-border": "rgba(255,255,255,0.08)",
+    "--rk-text": "#ededed",
     "--rk-text-2": "#a3a3a3",
     "--rk-muted": "#8a8a8a",
     "--rk-warning": "#f59e0b",
   } as CSSProperties;
 
+  /* 同一個外框：輸入列與授權卡共用 layoutId，啟用時就地變形，停用時變回來 */
+  const slot = { layoutId: "key-slot", transition: layoutT, style: { borderRadius: 8 }, className: "border border-[var(--rk-border)] bg-black/20" };
+
+  const licenseCard = (cardStub: string, result: string | null, name: string) => (
+    <motion.div {...slot}>
+      <motion.div
+        layout="position"
+        transition={layoutT}
+        initial={fresh && !reduce ? { opacity: 0 } : false}
+        animate={{ opacity: 1 }}
+        className="flex min-h-11 items-center gap-3 px-3 py-2"
+      >
+        <div className="min-w-0 flex-1">
+          {/* 錨點：遮罩過的金鑰停在原本文字的位置 */}
+          <p className="truncate font-mono text-xs tracking-[0.04em] text-[var(--rk-text)] tabular-nums">{cardStub}</p>
+          <p className="text-[11px] text-[var(--rk-muted)]">{name}</p>
+        </div>
+        {result && (
+          <Stamp shape="tick" size="sm" appear={fresh} delay={0.06} className="text-[color:var(--rk-text)] dark:text-[color:var(--rk-text)]">
+            {result}
+          </Stamp>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+
+  const groups = key ? key.split("-") : [];
+  const sizes = guess ? GROUPS[guess] : [];
+
   return (
     <section
       aria-labelledby={titleId}
       style={style}
-      className={cn(
-        "w-[440px] max-w-full flex flex-col rounded-[14px] border border-[var(--rk-border)] bg-[var(--rk-surface)] shadow-2xl overflow-hidden text-left",
-        className,
-      )}
+      className={cn("w-[440px] max-w-full flex flex-col rounded-[14px] border border-[var(--rk-border)] bg-[var(--rk-surface)] shadow-sm overflow-hidden text-left", className)}
     >
       {/* 標頭 */}
-      <div className="relative shrink-0 px-5 py-4 bg-gradient-to-br from-[color-mix(in_srgb,var(--rk-accent)_20%,transparent)] to-[color-mix(in_srgb,var(--rk-accent-2)_20%,transparent)] border-b border-[var(--rk-border)]">
+      <div className="relative shrink-0 px-5 py-4 border-b border-[var(--rk-border)]">
         {onClose && (
           <button
             type="button"
@@ -673,7 +771,7 @@ export function RedeemKeyInput({
           </button>
         )}
         <div className="flex items-center gap-2.5 pr-6">
-          <div className="w-9 h-9 shrink-0 rounded-lg bg-gradient-to-br from-[var(--rk-accent)] to-[var(--rk-accent-2)] flex items-center justify-center text-neutral-900">
+          <div className={cn(BOX, "w-9 h-9 shrink-0 flex items-center justify-center text-[var(--rk-text)]")}>
             {isPro ? <CrownIcon className="w-5 h-5" /> : isBasic ? <UnlockIcon className="w-5 h-5" /> : isSupporter ? <CoffeeIcon className="w-5 h-5" /> : <ShieldCheckIcon className="w-5 h-5" />}
           </div>
           <div className="min-w-0">
@@ -687,230 +785,284 @@ export function RedeemKeyInput({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 p-5 space-y-4">
-        {/* 讀不到授權狀態時最先講清楚，不把人丟到購買頁 */}
-        {degraded && (
-          <div role="alert" className="rounded-lg border border-[color-mix(in_srgb,var(--rk-warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--rk-warning)_10%,transparent)] p-3 space-y-2">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-[var(--rk-text)]">
-              <AlertIcon className="w-3.5 h-3.5 shrink-0 text-[var(--rk-warning)]" />
-              {l.degradedTitle}
-            </p>
-            <p className="text-[11px] text-[var(--rk-text-2)] leading-relaxed">{l.degradedBody}</p>
-            <button
-              type="button"
-              onClick={handleRetryRead}
-              disabled={busy !== null}
-              className={cn("w-full py-2 rounded-lg text-xs font-medium border border-[var(--rk-border)] text-[var(--rk-text)] hover:bg-white/5 transition-colors disabled:opacity-50", FOCUS)}
-            >
-              {busy === "retry" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
-              {l.degradedRetry}
-            </button>
-          </div>
-        )}
-
-        {/* 目前方案 */}
-        <div className="rounded-lg border border-[var(--rk-border)] bg-black/10 p-3 flex items-center gap-3">
-          {isPro ? (
-            <CrownIcon className="w-5 h-5 text-amber-400 shrink-0" />
-          ) : isBasic ? (
-            <UnlockIcon className="w-5 h-5 text-amber-400 shrink-0" />
-          ) : isSupporter ? (
-            <CoffeeIcon className="w-5 h-5 text-amber-400 shrink-0" />
-          ) : isTrial ? (
-            <ClockIcon className="w-5 h-5 text-yellow-400 shrink-0" />
-          ) : (
-            <ShieldCheckIcon className="w-5 h-5 text-[var(--rk-muted)] shrink-0" />
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-[var(--rk-text)] font-medium">
-              {isPro ? l.tierPro : isBasic ? l.tierBasic : isSupporter ? l.tierSupporter : isTrial ? l.tierTrial : l.tierFree}
-              {isTrial && <span className="text-yellow-400 ml-1.5">{l.daysLeft(days)}</span>}
-            </p>
-            <p className="text-[11px] text-[var(--rk-muted)] truncate">
-              {isPro || isBasic
-                ? `${state.customerName ? `${state.customerName} · ` : ""}${state.maskedKey ?? ""}`
-                : isSupporter
-                  ? l.supporterNote
-                  : isTrial
-                    ? l.freeLimits
-                    : freeSubtitle}
-            </p>
-          </div>
-        </div>
-
-        {showKeyControls ? (
-          <div className="space-y-2">
-            {/* grace / expired / invalid 各給一段說明，並把重新驗證抬成主要按鈕 */}
-            {statusNotice && (
-              <div className="rounded-lg border border-[color-mix(in_srgb,var(--rk-warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--rk-warning)_10%,transparent)] px-3 py-2 text-[11px] text-[var(--rk-text-2)] flex items-start gap-1.5">
-                <ClockIcon className="w-3.5 h-3.5 shrink-0 mt-px text-[var(--rk-warning)]" />
-                <span>{statusNotice}</span>
+      <motion.div initial={false} animate={{ height: bodyHeight }} transition={layoutT} className="overflow-hidden">
+        <LayoutGroup id={groupId}>
+          <div ref={bodyRef} className="p-5 space-y-4">
+            {/* 讀不到授權狀態時最先講清楚，不把人丟到購買頁 */}
+            {degraded && (
+              <div role="alert" className={cn(BOX, "p-3 space-y-2")}>
+                <p className="flex items-center gap-1.5 text-xs font-medium text-[var(--rk-text)]">
+                  <AlertIcon className="w-3.5 h-3.5 shrink-0 text-[var(--rk-warning)]" />
+                  {l.degradedTitle}
+                </p>
+                <p className="text-[11px] text-[var(--rk-text-2)] leading-relaxed">{l.degradedBody}</p>
+                <button type="button" onClick={handleRetryRead} disabled={busy !== null} className={cn(GHOST, "text-[var(--rk-text)]", FOCUS)}>
+                  {busy === "retry" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
+                  {l.degradedRetry}
+                </button>
               </div>
             )}
-            {isBasic && pricing && (
-              <button type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
-                <CrownIcon className="w-4 h-4" />
-                {l.upgradePro} · {pricing.current}
-                <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
-              </button>
-            )}
-            {(state.needsRevalidation || statusNotice !== null) && (
-              <button
-                type="button"
-                onClick={handleRevalidate}
-                disabled={busy !== null}
-                className={cn(
-                  "w-full py-2 rounded-lg text-xs font-medium transition-colors disabled:opacity-50",
-                  FOCUS,
-                  statusNotice
-                    ? "bg-[var(--rk-accent)] text-[#111111] hover:brightness-110"
-                    : "border border-[var(--rk-border)] text-[var(--rk-text-2)] hover:bg-white/5",
-                )}
-              >
-                {busy === "revalidate" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
-                {statusNotice ? l.revalidateNow : l.revalidate}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleDeactivate}
-              disabled={busy !== null}
-              className={cn("w-full py-2 rounded-lg text-xs font-medium border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50", FOCUS)}
-            >
-              {busy === "deactivate" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
-              {l.deactivate}
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* 免費 / 試用 / Supporter：升級區（degraded 時整塊拿掉） */}
-            {!degraded && pricing && (
-              <>
-                <div className="rounded-lg border border-[color-mix(in_srgb,var(--rk-accent)_30%,transparent)] bg-gradient-to-b from-[color-mix(in_srgb,var(--rk-accent)_9%,transparent)] to-transparent p-3">
-                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                    <span className="text-2xl font-bold text-[var(--rk-text)] whitespace-nowrap">{pricing.current}</span>
-                    {pricing.strike && <span className="text-sm text-[var(--rk-muted)] line-through whitespace-nowrap">{pricing.strike}</span>}
-                    {pricing.earlyBird && (
-                      <span className="ml-auto rounded-full bg-[color-mix(in_srgb,var(--rk-accent)_20%,transparent)] px-2 py-0.5 text-[10px] font-medium text-yellow-300 whitespace-nowrap">
-                        {l.priceEarlyBirdBadge}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-[11px] text-[var(--rk-muted)]">{l.priceOneTime}</p>
-                  <p className="mt-1.5 text-[10px] text-[var(--rk-muted)]">{l.priceSubnote}</p>
-                  {pricing.competitorYearly && <p className="mt-0.5 text-[10px] text-yellow-300/80">{l.priceAnchor(pricing.competitorYearly)}</p>}
-                  {pricing.checkoutNote && <p className="mt-1 text-[10px] text-[var(--rk-muted)]">{pricing.checkoutNote}</p>}
-                </div>
 
-                {pricing.basic && (
-                  <div className="rounded-lg border border-[var(--rk-border)] bg-white/[0.03] p-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-[var(--rk-text)] flex items-center gap-1.5">
-                        <UnlockIcon className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
-                        {l.unlockBasicTitle}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[var(--rk-muted)]">{l.priceBasicSubnote}</p>
-                      <p className="mt-0.5 text-[10px] text-yellow-300/70">{l.basicWatermarkNote}</p>
+            {/* 目前方案 */}
+            <div className={cn(BOX, "p-3 flex items-center gap-3 text-[var(--rk-text-2)]")}>
+              {isPro ? (
+                <CrownIcon className="w-5 h-5 shrink-0" />
+              ) : isBasic ? (
+                <UnlockIcon className="w-5 h-5 shrink-0" />
+              ) : isSupporter ? (
+                <CoffeeIcon className="w-5 h-5 shrink-0" />
+              ) : isTrial ? (
+                <ClockIcon className="w-5 h-5 shrink-0" />
+              ) : (
+                <ShieldCheckIcon className="w-5 h-5 shrink-0 text-[var(--rk-muted)]" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-[var(--rk-text)] font-medium">
+                  {tierName}
+                  {isTrial && <span className="text-[var(--rk-accent)] ml-1.5 tabular-nums">{l.daysLeft(days)}</span>}
+                </p>
+                <p className="text-[11px] text-[var(--rk-muted)] truncate">
+                  {isPro || isBasic
+                    ? `${state.customerName ? `${state.customerName} · ` : ""}${state.maskedKey ?? ""}`
+                    : isSupporter
+                      ? l.supporterNote
+                      : isTrial
+                        ? l.freeLimits
+                        : freeSubtitle}
+                </p>
+              </div>
+            </div>
+
+            {showKeyControls ? (
+              <div className="space-y-2">
+                {licenseCard(state.maskedKey ?? stub ?? "", (isPro || isBasic) && !statusNotice ? l.stampActivated : null, tierName)}
+                {/* grace / expired / invalid 各給一段說明，並把重新驗證抬成主要按鈕 */}
+                {statusNotice && (
+                  <div className={cn(BOX, "px-3 py-2 text-[11px] text-[var(--rk-text-2)] flex items-start gap-1.5")}>
+                    <ClockIcon className="w-3.5 h-3.5 shrink-0 mt-px text-[var(--rk-warning)]" />
+                    <span>{statusNotice}</span>
+                  </div>
+                )}
+                {isBasic && pricing && (
+                  <button type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
+                    <CrownIcon className="w-4 h-4" />
+                    {l.upgradePro} · {pricing.current}
+                    <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
+                  </button>
+                )}
+                {(state.needsRevalidation || statusNotice !== null) && (
+                  <button
+                    type="button"
+                    onClick={handleRevalidate}
+                    disabled={busy !== null}
+                    className={cn(
+                      GHOST,
+                      FOCUS,
+                      statusNotice ? "border-transparent bg-[var(--rk-accent)] text-[#111111] hover:bg-[var(--rk-accent)] hover:opacity-90" : "text-[var(--rk-text-2)]",
+                    )}
+                  >
+                    {busy === "revalidate" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
+                    {statusNotice ? l.revalidateNow : l.revalidate}
+                  </button>
+                )}
+                <button type="button" onClick={handleDeactivate} disabled={busy !== null} className={cn(GHOST, "text-red-400 hover:bg-red-500/10", FOCUS)}>
+                  {busy === "deactivate" ? <Spinner className="w-3.5 h-3.5 inline mr-1" /> : null}
+                  {l.deactivate}
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* 免費 / 試用 / Supporter：升級區（degraded 時整塊拿掉） */}
+                {!degraded && pricing && (
+                  <>
+                    <div className={cn(BOX, "p-3")}>
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                        <span className="text-2xl font-semibold tracking-tight tabular-nums text-[var(--rk-text)] whitespace-nowrap">{pricing.current}</span>
+                        {pricing.strike && <span className="text-sm text-[var(--rk-muted)] line-through tabular-nums whitespace-nowrap">{pricing.strike}</span>}
+                        {pricing.earlyBird && (
+                          <span className="ml-auto rounded-full border border-[var(--rk-border)] px-2 py-0.5 text-[10px] font-medium text-[var(--rk-accent)] whitespace-nowrap">
+                            {l.priceEarlyBirdBadge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-[11px] text-[var(--rk-muted)]">{l.priceOneTime}</p>
+                      <p className="mt-1.5 text-[10px] text-[var(--rk-muted)]">{l.priceSubnote}</p>
+                      {pricing.competitorYearly && <p className="mt-0.5 text-[10px] text-[var(--rk-text-2)]">{l.priceAnchor(pricing.competitorYearly)}</p>}
+                      {pricing.checkoutNote && <p className="mt-1 text-[10px] text-[var(--rk-muted)]">{pricing.checkoutNote}</p>}
                     </div>
+
+                    {pricing.basic && (
+                      <div className={cn(BOX, "p-3 flex flex-wrap items-center justify-between gap-3")}>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-[var(--rk-text)] flex items-center gap-1.5">
+                            <UnlockIcon className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
+                            {l.unlockBasicTitle}
+                          </p>
+                          <p className="mt-0.5 text-[10px] text-[var(--rk-muted)]">{l.priceBasicSubnote}</p>
+                          <p className="mt-0.5 text-[10px] text-[var(--rk-text-2)]">{l.basicWatermarkNote}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={onPurchaseBasic}
+                          className={cn("shrink-0 px-3 py-2 rounded-lg border border-[var(--rk-border)] text-[var(--rk-text)] text-xs font-medium hover:bg-white/5 transition-colors whitespace-nowrap", FOCUS)}
+                        >
+                          {l.upgradeBasic} · {pricing.basic}
+                        </button>
+                      </div>
+                    )}
+
+                    <div className={cn(BOX, "p-3")}>
+                      <p className="text-xs font-medium text-[var(--rk-text)] mb-2 flex items-center gap-1.5">
+                        <CrownIcon className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
+                        {l.unlockTitle}
+                      </p>
+                      <ul className="space-y-1">
+                        {proFeatures.map((f) => (
+                          <li key={f} className="text-[11px] text-[var(--rk-text-2)] flex items-center gap-1.5">
+                            <CheckIcon className="w-3 h-3 text-[var(--rk-text)] shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {showSupporterCard ? (
+                  /* 兌換成功：輸入列變成贊助卡，下面留一個回到輸入框的入口給之後要輸入 Pro 授權碼的人 */
+                  <div className="space-y-1.5">
+                    {licenseCard(stub ?? "", l.stampRedeemed, l.tierSupporter)}
                     <button
                       type="button"
-                      onClick={onPurchaseBasic}
-                      className={cn("shrink-0 px-3 py-2 rounded-lg border border-[var(--rk-border)] text-[var(--rk-text)] text-xs font-medium hover:bg-white/5 transition-colors whitespace-nowrap", FOCUS)}
+                      onClick={() => setStub(null)}
+                      className={cn("text-[11px] text-[var(--rk-text-2)] underline-offset-2 hover:text-[var(--rk-text)] hover:underline rounded-sm", FOCUS)}
                     >
-                      {l.upgradeBasic} · {pricing.basic}
+                      {l.useAnotherKey}
                     </button>
+                  </div>
+                ) : (
+                  /* 輸入金鑰：同一格收 12 碼兌換碼與 UUID 授權碼，打字時自動分組 */
+                  <div className="space-y-2">
+                    <div className="relative min-h-4 text-xs">
+                      <label htmlFor={inputId} className="sr-only">
+                        {l.haveKey}
+                      </label>
+                      <AnimatePresence initial={false} mode="popLayout">
+                        <motion.p
+                          key={guess ?? "none"}
+                          id={guess ? kindId : undefined}
+                          aria-hidden={guess ? undefined : true}
+                          initial={reduce ? false : { opacity: 0, y: 3 }}
+                          animate={{ opacity: 1, y: 0, transition: reduce ? instant : { duration: 0.18, ease: [0.23, 1, 0.32, 1] } }}
+                          exit={{ opacity: 0, transition: reduce ? instant : { duration: 0.1 } }}
+                          className="font-medium text-[var(--rk-text-2)]"
+                        >
+                          {guess ? (
+                            <>
+                              <span className="text-[var(--rk-text)]">{guess === "pro" ? l.detectedPro : l.detectedSupporter}</span>
+                              <span className="tabular-nums">
+                                {" · "}
+                                {raw.length}/{TOTAL[guess]}
+                              </span>
+                            </>
+                          ) : (
+                            l.haveKey
+                          )}
+                        </motion.p>
+                      </AnimatePresence>
+                    </div>
+                    <div ref={keyRowRef}>
+                      <motion.div {...slot} className={cn(slot.className, "focus-within:border-[color-mix(in_srgb,var(--rk-accent)_45%,transparent)] transition-colors")}>
+                        <motion.div layout="position" transition={layoutT} className="flex items-center gap-1 p-1">
+                          <div className={cn("relative min-w-0 flex-1", (busy !== null || !available) && "opacity-50")}>
+                            {/* 墨色分組疊在透明文字下面：湊滿且格式正確的一組才落座 */}
+                            <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center overflow-hidden px-2 font-mono text-xs tracking-[0.04em]">
+                              <span ref={overlayRef} className="whitespace-pre text-[var(--rk-text)]">
+                                {groups.map((g, i) => {
+                                  const seated = i < sizes.length && g.length === sizes[i];
+                                  return (
+                                    <Fragment key={i}>
+                                      {i > 0 && <span className="text-[var(--rk-muted)]">-</span>}
+                                      <motion.span
+                                        className="inline-block"
+                                        initial={false}
+                                        animate={seated ? { opacity: 1, y: reduce ? 0 : [-1.5, 0] } : { opacity: 0.55, y: 0 }}
+                                        transition={reduce ? instant : { opacity: { duration: 0.12 }, y: springs.snappy }}
+                                      >
+                                        {g}
+                                      </motion.span>
+                                    </Fragment>
+                                  );
+                                })}
+                              </span>
+                            </div>
+                            <input
+                              ref={inputRef}
+                              id={inputId}
+                              type="text"
+                              value={key}
+                              onChange={handleKeyChange}
+                              onScroll={syncOverlay}
+                              onSelect={syncOverlay}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") void handleActivate();
+                              }}
+                              placeholder={l.placeholder}
+                              aria-describedby={kind ? kindId : undefined}
+                              autoComplete="off"
+                              spellCheck={false}
+                              disabled={busy !== null || !available}
+                              className="relative w-full bg-transparent px-2 py-1.5 font-mono text-xs tracking-[0.04em] text-transparent caret-[var(--rk-text)] placeholder:text-[var(--rk-muted)] focus:outline-none selection:bg-white/20"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => void handleActivate()}
+                            disabled={busy !== null || !key.trim() || !available}
+                            aria-busy={busy === "activate"}
+                            className={cn("shrink-0 px-3.5 py-1.5 rounded-md bg-[var(--rk-accent)] hover:opacity-90 text-[#111111] text-xs font-medium transition-opacity disabled:opacity-40", FOCUS)}
+                          >
+                            {busy === "activate" ? <Spinner className="w-3.5 h-3.5" /> : l.activate}
+                          </button>
+                        </motion.div>
+                      </motion.div>
+                    </div>
                   </div>
                 )}
 
-                <div className="rounded-lg border border-[color-mix(in_srgb,var(--rk-accent)_20%,transparent)] bg-[color-mix(in_srgb,var(--rk-accent)_6%,transparent)] p-3">
-                  <p className="text-xs font-medium text-[var(--rk-text)] mb-2 flex items-center gap-1.5">
-                    <CrownIcon className="w-3.5 h-3.5 text-amber-400" />
-                    {l.unlockTitle}
-                  </p>
-                  <ul className="space-y-1">
-                    {proFeatures.map((f) => (
-                      <li key={f} className="text-[11px] text-[var(--rk-text-2)] flex items-center gap-1.5">
-                        <CheckIcon className="w-3 h-3 text-neutral-300 shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {!degraded && pricing && (
+                  <motion.button layout="position" transition={layoutT} type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
+                    <CrownIcon className="w-4 h-4" />
+                    {l.upgradePro} · {pricing.current}
+                    <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
+                  </motion.button>
+                )}
               </>
             )}
 
-            {/* 輸入金鑰：同一格收 12 碼兌換碼與 UUID 授權碼 */}
-            <div className="space-y-2">
-              <label htmlFor={inputId} className="block text-xs text-[var(--rk-text-2)] font-medium">
-                {l.haveKey}
-              </label>
-              <div ref={keyRowRef} className="flex gap-2">
-                <input
-                  id={inputId}
-                  type="text"
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void handleActivate();
-                  }}
-                  placeholder={l.placeholder}
-                  aria-describedby={kind ? kindId : undefined}
-                  autoComplete="off"
-                  spellCheck={false}
-                  disabled={busy !== null || !available}
-                  className="min-w-0 flex-1 px-3 py-2 rounded-lg bg-black/20 border border-[var(--rk-border)] text-[var(--rk-text)] text-xs placeholder:text-[var(--rk-muted)] focus:outline-none focus:border-[color-mix(in_srgb,var(--rk-accent)_60%,transparent)] transition-colors disabled:opacity-50 font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={() => void handleActivate()}
-                  disabled={busy !== null || !key.trim() || !available}
-                  aria-busy={busy === "activate"}
-                  className={cn("px-4 py-2 rounded-lg bg-[var(--rk-accent)] hover:brightness-110 text-neutral-900 text-xs font-medium transition-colors disabled:opacity-40 shrink-0", FOCUS)}
-                >
-                  {busy === "activate" ? <Spinner className="w-3.5 h-3.5" /> : l.activate}
-                </button>
-              </div>
-              {kind && (
-                <p id={kindId} className="text-[10px] text-[var(--rk-muted)]">
-                  {kind === "pro" ? l.detectedPro : l.detectedSupporter}
-                </p>
+            {/* 訊息 */}
+            <motion.div layout="position" transition={layoutT} role="status" aria-live="polite">
+              {message && (
+                <div className={cn(BOX, "text-xs px-3 py-2 flex items-center gap-1.5", message.type === "ok" ? "text-[var(--rk-text)]" : "text-red-400")}>
+                  {message.type === "ok" ? <CheckIcon className="w-3.5 h-3.5 shrink-0" /> : <XIcon className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="min-w-0">
+                    {message.text}
+                    {message.hint && <span className="mt-1 block text-[var(--rk-text-2)]">{message.hint}</span>}
+                  </span>
+                </div>
               )}
-            </div>
+            </motion.div>
 
-            {!degraded && pricing && (
-              <button type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
-                <CrownIcon className="w-4 h-4" />
-                {l.upgradePro} · {pricing.current}
-                <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
-              </button>
+            {!available && <p className="text-[10px] text-[var(--rk-muted)] text-center">{l.desktopOnly}</p>}
+
+            {footer && (
+              <motion.div layout="position" transition={layoutT}>
+                {footer}
+              </motion.div>
             )}
-          </>
-        )}
-
-        {/* 訊息 */}
-        <div role="status" aria-live="polite">
-          {message && (
-            <div
-              className={cn(
-                "text-xs px-3 py-2 rounded-lg flex items-center gap-1.5",
-                message.type === "ok"
-                  ? "bg-neutral-700/30 text-neutral-200 border border-neutral-600/40"
-                  : "bg-red-500/10 text-red-400 border border-red-500/20",
-              )}
-            >
-              {message.type === "ok" ? <CheckIcon className="w-3.5 h-3.5 shrink-0" /> : <XIcon className="w-3.5 h-3.5 shrink-0" />}
-              <span className="min-w-0">
-                {message.text}
-                {message.hint && <span className="mt-1 block text-[var(--rk-text-2)]">{message.hint}</span>}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {!available && <p className="text-[10px] text-[var(--rk-muted)] text-center">{l.desktopOnly}</p>}
-
-        {footer}
-      </div>
+          </div>
+        </LayoutGroup>
+      </motion.div>
     </section>
   );
 }
