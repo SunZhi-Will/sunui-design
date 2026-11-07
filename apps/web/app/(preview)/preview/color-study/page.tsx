@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 
 import { Icon, type IconName } from "@/registry/icons/sunui-icons";
-import { PixelIcon, pigments, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
+import { PixelIcon, pigments, pixelIcons, toPixelPaths, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
 
 export const metadata: Metadata = {
   title: "Color study: pigment",
@@ -85,6 +85,23 @@ function PigmentIcon({ name, pigment, size = 32 }: { name: PixelIconName; pigmen
   return <PixelIcon name={name} size={size} pigment={pigment} />;
 }
 
+/** 剪影測試：所有非空格子都塗成墨色，1x 並排看輪廓認不認得出來 */
+function Silhouette({ name, size = 16 }: { name: PixelIconName; size?: number }) {
+  const d = Object.entries(toPixelPaths(pixelIcons[name]))
+    .map(([, path]) => path)
+    .join("");
+  return (
+    <svg viewBox="0 0 16 16" width={size} height={size} shapeRendering="crispEdges" aria-hidden>
+      <path d={d} fill="currentColor" />
+    </svg>
+  );
+}
+
+const SILHOUETTE: PixelIconName[] = [
+  "potion", "orb", "bomb", "gem", "apple", "slime", "key", "sword", "dagger", "wand", "star", "crown",
+  "trophy", "coin", "ring", "amulet", "heart", "shield", "chest", "scroll", "map", "fish", "meat", "fire",
+];
+
 function vars(swatches: Record<Pigment, Swatch>) {
   const out: Record<string, string> = {};
   for (const [p, s] of Object.entries(swatches)) {
@@ -105,7 +122,7 @@ const STATUS = {
 } as const;
 
 const GAME: PixelIconName[] = [
-  "potion", "apple", "meat", "heart", "fire", "torch", "coin", "crown", "key", "trophy", "star", "ring",
+  "potion", "apple", "meat", "heart", "fire", "torch", "coin", "crown", "key", "sword", "star", "ring",
   "slime", "gem", "orb", "snowflake", "fish", "shield", "wand", "amulet", "dice", "chest", "door", "scroll",
 ];
 
@@ -222,6 +239,21 @@ function Panel({ mode }: { mode: "light" | "dark" }) {
               ))}
             </div>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <Label>F. Silhouette test at 16px (every pixel in ink), then the real ink icon</Label>
+        <div style={{ ...card, display: "grid", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12 }}>
+            {SILHOUETTE.map((n) => <Silhouette key={n} name={n} />)}
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            {SILHOUETTE.map((n) => <PixelIcon key={n} name={n} size={16} />)}
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            {SILHOUETTE.map((n) => <PixelIcon key={n} name={n} size={16} tone="pigment" />)}
+          </div>
         </div>
       </div>
 
