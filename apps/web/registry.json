@@ -2644,11 +2644,13 @@
         "usage": {
           "whenToUse": [
             "Staff or member rows on schedules and rosters where each person keeps the same colour on every screen",
+            "Busy team panels that show the first few people and collapse the rest into +N",
             "Selecting one person to open details in a side panel"
           ],
           "watchOut": [
             "personColor cycles 8 colours by id modulo, so different ids can share a colour; never use colour as the only identifier",
-            "Pass onClick to get a button with aria-pressed; without it the chip is a plain span"
+            "Pass onClick (onSelect on a group) to get a button with aria-pressed; without it the chip is a plain span",
+            "When PersonChipGroup is collapsed, the selected person always stays visible"
           ],
           "aliases": [
             "person chip",
@@ -3213,6 +3215,8 @@
           ],
           "watchOut": [
             "onExpire fires once when time reaches zero; refetch the order there instead of trusting the client clock",
+            "The ink dots need the full hold length: pass startedAt or holdMs or they are not shown",
+            "The onExtend button shows only once; after extending, pass the new expiresAt",
             "Only show it for a real hold; never use it to invent urgency"
           ],
           "aliases": [
@@ -3973,11 +3977,12 @@
         "usage": {
           "whenToUse": [
             "Collecting product or order reviews and the reason behind the score",
-            "Showing an average rating next to a review count"
+            "Showing an average rating next to a review count",
+            "Low scores that should come with set reasons you can count"
           ],
           "watchOut": [
             "Half-star hit areas are small on mobile; use precision 1 on touch-first forms",
-            "Reasons are not part of the native form value; read them with onReasonsChange",
+            "Pass name to submit the value with a native form; reasons are not part of the form value, read them with onReasonsChange",
             "Keep each reason set to 3 to 5 chips so the frame stays short"
           ],
           "aliases": [
