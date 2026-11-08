@@ -34,17 +34,20 @@ export default function ThemePickerDemo() {
 
   return (
     <section className={`${resolved} w-full max-w-sm overflow-hidden rounded-xl border bg-card text-card-foreground transition-colors duration-500`}>
-      <div className="relative grid h-44 place-items-center">
+      <div
+        className="relative grid h-60 place-items-center transition-colors duration-700"
+        style={{ backgroundColor: resolved === "dark" ? "#1c1c22" : "#ecebe8" }}
+      >
         {/* Ambient light from the switch, warm by day and cool at night. */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: resolved === "dark" ? 0 : 1, background: "radial-gradient(60% 70% at 50% 50%, rgba(255,190,90,0.22), transparent 70%)" }}
+          style={{ opacity: resolved === "dark" ? 0 : 1, background: "radial-gradient(45% 55% at 55% 45%, rgba(255,186,80,0.28), transparent 70%)" }}
         />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: resolved === "dark" ? 1 : 0, background: "radial-gradient(60% 70% at 50% 50%, rgba(120,130,255,0.2), transparent 70%)" }}
+          style={{ opacity: resolved === "dark" ? 1 : 0, background: "radial-gradient(45% 55% at 45% 55%, rgba(110,122,255,0.24), transparent 70%)" }}
         />
         <ThemeSwitch value={resolved} onValueChange={setMode} aria-label={t.dark} />
       </div>

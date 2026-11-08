@@ -1,14 +1,15 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useMotionTemplate, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
-/* Theme switch: a glowing key that slides along a track. Its pixel    */
-/* sun breaks into loose pixels on the way and lands as a pixel moon.  */
-/* Pair it with useThemeMode() from theme-picker.tsx:                   */
+/* Theme switch: a glass key on a recessed track. A rim of light runs  */
+/* around the key as it slides, and its pixel sun breaks apart and     */
+/* lands as a pixel moon. Pair it with useThemeMode() from             */
+/* theme-picker.tsx:                                                   */
 /*   const { resolved, setMode } = useThemeMode();                     */
 /*   <ThemeSwitch value={resolved} onValueChange={setMode} />          */
 /* ------------------------------------------------------------------ */
@@ -17,40 +18,41 @@ export type ThemeSwitchValue = "light" | "dark";
 
 type Pixel = { x: number; y: number; a: number };
 
-const GRID = 13;
+/** The key is this many pixel cells across. The glyphs use about half of it. */
+const CELLS = 32;
 
-/** Both glyphs are built from a 13 by 13 grid. a is pixel opacity. */
+/** Glyph pixels in cell units, centered on the key. a is pixel opacity. */
 function buildGlyphs() {
-  const sun = new Map<string, Pixel>();
-  const moon = new Map<string, Pixel>();
-  const put = (m: Map<string, Pixel>, x: number, y: number, a: number) => {
-    if (x < 0 || y < 0 || x >= GRID || y >= GRID) return;
-    const k = `${x},${y}`;
-    m.set(k, { x, y, a: Math.max(a, m.get(k)?.a ?? 0) });
-  };
-  const c = 6;
-  for (let y = 0; y < GRID; y++) {
-    for (let x = 0; x < GRID; x++) {
-      if ((x - c) ** 2 + (y - c) ** 2 <= 6.6) put(sun, x, y, 1);
-      const inA = (x - 5.6) ** 2 + (y - 6.6) ** 2 <= 4.7 ** 2;
-      const inB = (x - 8) ** 2 + (y - 4.6) ** 2 <= 3.8 ** 2;
-      if (inA && !inB) put(moon, x, y, 1);
-      else if (inA && inB && (x + y) % 2 === 0) put(moon, x, y, 0.3); // dithered night side
+  const sun: Pixel[] = [];
+  for (let y = -3.5; y <= 3.5; y++) {
+    for (let x = -3.5; x <= 3.5; x++) {
+      if (Math.abs(x) === 3.5 && Math.abs(y) === 3.5) continue;
+      sun.push({ x, y, a: 1 });
     }
   }
-  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-    put(sun, c + 4 * dx, c + 4 * dy, 1);
-    put(sun, c + 5 * dx, c + 5 * dy, 0.5);
+  for (const d of [7, 8, 9]) {
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) sun.push({ x: dx * d, y: dy * d, a: 1 });
   }
-  for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
-    put(sun, c + 3 * dx, c + 3 * dy, 1);
-    put(sun, c + 4 * dx, c + 4 * dy, 0.5);
+  for (const d of [5, 6]) {
+    for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) sun.push({ x: dx * d, y: dy * d, a: 1 });
   }
-  put(moon, 10, 2, 1);
-  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) put(moon, 10 + dx, 2 + dy, 0.5);
-  put(moon, 12, 5, 0.6);
-  put(moon, 8, 0, 0.4);
-  return { sun: [...sun.values()], moon: [...moon.values()] };
+
+  const moon: Pixel[] = [];
+  const push = (x: number, y: number, a: number) => moon.push({ x: x - 1, y: y + 1, a });
+  for (let y = -6; y <= 6; y++) {
+    for (let x = -6; x <= 6; x++) {
+      const inDisc = x * x + y * y <= 6.3 ** 2;
+      const inShadow = (x - 2.6) ** 2 + (y + 2.2) ** 2 <= 5.4 ** 2;
+      if (inDisc && !inShadow) push(x, y, 1);
+      else if (inDisc && (x + y) % 2 === 0) push(x, y, 0.3); // dithered night side of the disc
+    }
+  }
+  // A twinkle star and two specks
+  push(7, -7, 1);
+  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) push(7 + dx, -7 + dy, 0.5);
+  push(3, -8, 0.7);
+  push(7, -4, 0.5);
+  return { sun, moon };
 }
 
 /** Seeded random, so the server and every render agree. */
@@ -64,11 +66,10 @@ function rng(seed: number) {
 type Particle = {
   light: Pixel;
   dark: Pixel;
-  /** where it drifts to halfway, in grid cells */
-  jx: number;
-  jy: number;
-  delay: number;
-  flicker: number;
+  /** how far it trails behind, and how far it floats, in cells */
+  trail: number;
+  float: number;
+  sparkle: number;
   /** current state, so a second click mid-flight starts from here */
   x: number;
   y: number;
@@ -77,7 +78,7 @@ type Particle = {
 
 function buildParticles(): Particle[] {
   const { sun, moon } = buildGlyphs();
-  const rand = rng(7);
+  const rand = rng(11);
   const n = Math.max(sun.length, moon.length);
   const shuffle = (list: Pixel[]) => {
     const out = [...list];
@@ -87,7 +88,7 @@ function buildParticles(): Particle[] {
     }
     return out;
   };
-  // The shorter glyph gets invisible extras near its pixels, so every particle has a home in both.
+  // The smaller glyph gets invisible extras on its own pixels, so every particle has a home in both.
   const pad = (list: Pixel[]) => {
     const out = shuffle(list);
     while (out.length < n) {
@@ -98,32 +99,23 @@ function buildParticles(): Particle[] {
   };
   const light = pad(sun);
   const dark = pad(moon);
-  return light.map((l, i) => {
-    const angle = rand() * Math.PI * 2;
-    const dist = 1.5 + rand() * 3.5;
-    return {
-      light: l,
-      dark: dark[i],
-      jx: Math.cos(angle) * dist,
-      jy: Math.sin(angle) * dist,
-      delay: rand() * 0.18,
-      flicker: rand(),
-      x: l.x,
-      y: l.y,
-      a: l.a,
-    };
-  });
+  return light.map((l, i) => ({
+    light: l,
+    dark: dark[i],
+    trail: 3 + rand() * 7,
+    float: -5 + rand() * 7,
+    sparkle: rand(),
+    x: l.x,
+    y: l.y,
+    a: l.a,
+  }));
 }
 
 // The switch shows a specific theme, so its colors are fixed on purpose.
-const INK = { light: [87, 83, 78], dark: [244, 245, 255] } as const;
-
-const SIZES = {
-  sm: { w: 80, h: 46, pad: 4, key: 38, radius: 12 },
-  md: { w: 120, h: 68, pad: 6, key: 56, radius: 18 },
-} as const;
+const INK = { light: [92, 86, 80], dark: [246, 243, 236] } as const;
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
 
 function PixelGlyph({ dark, px, reduce }: { dark: boolean; px: number; reduce: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -136,17 +128,22 @@ function PixelGlyph({ dark, px, reduce }: { dark: boolean; px: number; reduce: b
     if (!canvas || !ctx) return;
     particles.current ??= buildParticles();
     const list = particles.current;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = px * dpr;
-    canvas.height = px * dpr;
-    const cell = px / GRID;
-    const dot = cell * 0.8;
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    canvas.width = Math.round(px * dpr);
+    canvas.height = Math.round(px * dpr);
+    const cell = px / CELLS;
+    const dot = cell * 0.78;
+    const snap = (v: number) => Math.round(v * dpr) / dpr;
 
     const from = list.map((p) => ({ x: p.x, y: p.y, a: p.a }));
+    // The key slides left into dark and right into light. The leading side lands first,
+    // the trailing side is left behind as loose sparks.
+    const dir = dark ? -1 : 1;
     const inkFrom = dark ? INK.light : INK.dark;
     const inkTo = dark ? INK.dark : INK.light;
-    const duration = reduce || first.current ? 0 : 720;
+    const duration = reduce || first.current ? 0 : 950;
     first.current = false;
+    const SPREAD = 0.4;
     let raf = 0;
     const start = performance.now();
 
@@ -154,26 +151,36 @@ function PixelGlyph({ dark, px, reduce }: { dark: boolean; px: number; reduce: b
       const p = duration ? Math.min((now - start) / duration, 1) : 1;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, px, px);
-      const ink = inkTo.map((v, i) => Math.round(inkFrom[i] + (v - inkFrom[i]) * easeInOut(p)));
-      ctx.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]})`;
-      // Night pixels glow a little, like the screen behind the glass.
-      ctx.shadowColor = dark ? `rgba(190, 200, 255, ${0.85 * p})` : `rgba(190, 200, 255, ${0.85 * (1 - p)})`;
-      ctx.shadowBlur = cell * 0.9;
+      const glow = dark ? p : 1 - p;
+      ctx.shadowColor = `rgba(205, 210, 255, ${0.9 * glow})`;
+      ctx.shadowBlur = glow > 0.05 ? cell * 1.6 : 0;
+
       list.forEach((q, i) => {
-        const t = Math.min(Math.max((p - q.delay) / (1 - 0.18), 0), 1);
+        const to = dark ? q.dark : q.light;
+        const o = from[i];
+        const lead = clamp01((to.x * dir + 10) / 20); // 1 on the leading side
+        const t = clamp01((p - (1 - lead) * SPREAD) / (1 - SPREAD));
         const e = easeInOut(t);
         const lift = Math.sin(Math.PI * t);
-        const o = from[i];
-        const to = dark ? q.dark : q.light;
-        q.x = o.x + (to.x - o.x) * e + q.jx * lift;
-        q.y = o.y + (to.y - o.y) * e + q.jy * lift;
+        q.x = o.x + (to.x - o.x) * e - dir * q.trail * lift;
+        q.y = o.y + (to.y - o.y) * e + q.float * lift;
         q.a = o.a + (to.a - o.a) * e;
-        // Loose pixels twinkle while they travel.
-        const alpha = q.a * (1 - lift * 0.55 * q.flicker) + lift * 0.25 * q.flicker;
+        const alpha = Math.min(q.a * (1 - lift * 0.4) + lift * 0.35 * q.sparkle, 1);
         if (alpha <= 0.01) return;
-        ctx.globalAlpha = Math.min(alpha, 1);
-        const s = dot * (1 - lift * 0.35);
-        ctx.fillRect(q.x * cell + (cell - s) / 2, q.y * cell + (cell - s) / 2, s, s);
+        // Ink follows the glyph; loose sparks catch the light and flash pale.
+        const mix = easeInOut(t);
+        // On the pale day key a white spark would vanish, so only the night side flashes.
+        const flash = dark ? lift * (q.sparkle > 0.55 ? 0.7 : 0.2) : 0;
+        const ch = inkTo.map((v, k) => {
+          const base = inkFrom[k] + (v - inkFrom[k]) * mix;
+          return Math.round(base + (255 - base) * flash);
+        });
+        ctx.fillStyle = `rgb(${ch[0]} ${ch[1]} ${ch[2]})`;
+        ctx.globalAlpha = alpha;
+        const s = dot * (1 - lift * 0.45);
+        const cx = px / 2 + q.x * cell;
+        const cy = px / 2 + q.y * cell;
+        ctx.fillRect(snap(cx - s / 2), snap(cy - s / 2), snap(s), snap(s));
       });
       ctx.globalAlpha = 1;
       if (p < 1) raf = requestAnimationFrame(draw);
@@ -182,7 +189,39 @@ function PixelGlyph({ dark, px, reduce }: { dark: boolean; px: number; reduce: b
     return () => cancelAnimationFrame(raf);
   }, [dark, px, reduce]);
 
-  return <canvas ref={canvasRef} aria-hidden="true" style={{ width: px, height: px }} />;
+  return <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0" style={{ width: px, height: px }} />;
+}
+
+const SIZES = {
+  sm: { w: 96, h: 50, pad: 4, key: 42, trackRadius: 17, keyRadius: 12, ring: 2, stroke: 1.25 },
+  md: { w: 200, h: 104, pad: 7, key: 90, trackRadius: 36, keyRadius: 24, ring: 3, stroke: 2 },
+} as const;
+
+/** The rim light sits bottom left at night and top right by day, in conic degrees. */
+const RIM_DARK = 205;
+const RIM_LIGHT = 50;
+const RIM_SPAN = 150;
+
+function Ring({ start, color, inset, stroke, radius, blur, opacity }: { start: MotionValue<number>; color: MotionValue<string>; inset: number; stroke: number; radius: number; blur: number; opacity: number }) {
+  return (
+    <motion.span
+      aria-hidden="true"
+      className="pointer-events-none absolute"
+      style={{
+        inset: -inset,
+        padding: stroke,
+        borderRadius: radius + inset,
+        opacity,
+        filter: blur ? `blur(${blur}px)` : undefined,
+        background: useMotionTemplate`conic-gradient(from ${start}deg, transparent 0deg, ${color} 28deg, ${color} ${RIM_SPAN - 28}deg, transparent ${RIM_SPAN}deg)`,
+        // Only the padding shows, so the gradient draws a ring around the key.
+        WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        WebkitMaskComposite: "xor",
+        mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+        maskComposite: "exclude",
+      }}
+    />
+  );
 }
 
 export interface ThemeSwitchProps {
@@ -200,7 +239,18 @@ export function ThemeSwitch({ value, onValueChange, size = "md", "aria-label": a
   const dark = value === "dark";
   const s = SIZES[size];
   const travel = s.w - s.pad * 2 - s.key;
-  const keyY = (s.h - s.key) / 2;
+
+  // One spring drives the slide, the rim light and the materials: 0 is night, 1 is day.
+  const day = useSpring(dark ? 0 : 1, reduce ? { duration: 0 } : { stiffness: 140, damping: 21, mass: 1 });
+  useEffect(() => {
+    day.set(dark ? 0 : 1);
+  }, [dark, day]);
+
+  const x = useTransform(day, [0, 1], [s.pad, s.pad + travel]);
+  const night = useTransform(day, [0, 1], [1, 0]);
+  const rimStart = useTransform(day, [0, 1], [RIM_DARK - RIM_SPAN / 2, RIM_LIGHT - RIM_SPAN / 2]);
+  const rimColor = useTransform(day, [0, 0.5, 1], ["#e6e8ff", "#ffffff", "#ffcf45"]);
+  const bloomColor = useTransform(day, [0, 0.5, 1], ["#6a78ff", "#d9ccff", "#ff9410"]);
 
   return (
     <button
@@ -209,62 +259,62 @@ export function ThemeSwitch({ value, onValueChange, size = "md", "aria-label": a
       aria-checked={dark}
       aria-label={ariaLabel}
       onClick={() => onValueChange(dark ? "light" : "dark")}
-      className={cn(
-        "relative shrink-0 rounded-full outline-none transition-[background-color,box-shadow] duration-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        className,
-      )}
-      style={{
-        width: s.w,
-        height: s.h,
-        borderRadius: s.h / 2.4,
-        backgroundColor: dark ? "#0b0b0f" : "#e7e5e1",
-        boxShadow: dark
-          ? "inset 0 2px 10px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(255,255,255,0.05), 0 1px 0 rgba(255,255,255,0.06)"
-          : "inset 0 2px 8px rgba(0,0,0,0.13), inset 0 0 0 1px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.9)",
-      }}
+      className={cn("relative isolate shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background", className)}
+      style={{ width: s.w, height: s.h, borderRadius: s.trackRadius }}
     >
-      {/* Sun on the right in daylight, moon on the left at night. */}
+      {/* Track: recessed, pale by day and nearly black at night */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          borderRadius: s.trackRadius,
+          background: "linear-gradient(180deg, #e4e3e0, #efeeeb)",
+          boxShadow: "inset 0 3px 8px rgba(0,0,0,0.14), inset 0 0 0 1px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(255,255,255,0.5)",
+        }}
+      />
       <motion.span
-        className="absolute left-0 top-0 block"
-        initial={false}
-        animate={{ x: s.pad + (dark ? 0 : travel), y: keyY }}
-        whileTap={reduce ? undefined : { scale: 0.94 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
-        style={{ width: s.key, height: s.key }}
-      >
-        {/* Rim light: warm on the outer edge by day, cool underneath at night. */}
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{
-            borderRadius: s.radius,
-            opacity: dark ? 0 : 1,
-            boxShadow: "3px 1px 0 -0.5px #ffb43c, 5px 2px 16px rgba(255,160,20,0.55)",
-          }}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{
-            borderRadius: s.radius,
-            opacity: dark ? 1 : 0,
-            boxShadow: "-2px 3px 0 -0.5px #b4bcff, -4px 6px 20px rgba(110,120,255,0.7)",
-          }}
-        />
-        <span
-          className="absolute inset-0 grid place-items-center overflow-hidden transition-[background,box-shadow] duration-500"
-          style={{
-            borderRadius: s.radius,
-            background: dark
-              ? "linear-gradient(160deg, rgba(160,162,190,0.42), rgba(70,72,96,0.5))"
-              : "linear-gradient(160deg, #ffffff, #f1efea)",
-            boxShadow: dark
-              ? "inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 1px rgba(255,255,255,0.12), 0 6px 16px rgba(0,0,0,0.6)"
-              : "inset 0 1px 0 #ffffff, inset 0 0 0 1px rgba(0,0,0,0.04), 0 6px 14px rgba(0,0,0,0.14)",
-          }}
-        >
-          <PixelGlyph dark={dark} px={Math.round(s.key * 0.56)} reduce={reduce} />
-        </span>
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          opacity: night,
+          borderRadius: s.trackRadius,
+          background: "linear-gradient(180deg, #050507, #0e0e14)",
+          boxShadow: "inset 0 3px 12px rgba(0,0,0,0.95), inset 0 0 0 1px rgba(255,255,255,0.04), 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(0,0,0,0.4)",
+        }}
+      />
+
+      <motion.span className="absolute left-0 block" initial={false} style={{ x, top: (s.h - s.key) / 2, width: s.key, height: s.key }}>
+        <motion.span className="absolute inset-0 block" whileTap={reduce ? undefined : { scale: 0.96 }}>
+          {/* Key by day: warm white, lit from the top right */}
+          <motion.span
+            className="absolute inset-0 overflow-hidden"
+            style={{
+              opacity: day,
+              borderRadius: s.keyRadius,
+              background: "radial-gradient(90% 90% at 100% 15%, rgba(255,196,90,0.38), transparent 60%), linear-gradient(160deg, #ffffff 30%, #f5f0e6)",
+              boxShadow: "inset 0 1px 0 #ffffff, inset 0 0 0 1px rgba(0,0,0,0.035), 0 8px 18px rgba(60,40,10,0.16), 0 2px 4px rgba(0,0,0,0.06)",
+            }}
+          />
+          {/* Key at night: frosted glass, lit from below */}
+          <motion.span
+            className="absolute inset-0 overflow-hidden"
+            style={{
+              opacity: night,
+              borderRadius: s.keyRadius,
+              background:
+                "radial-gradient(110% 70% at 30% 110%, rgba(120,132,255,0.45), transparent 65%), linear-gradient(165deg, rgba(128,128,146,0.62), rgba(52,52,66,0.7) 75%)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 0 0 1px rgba(255,255,255,0.12), inset 0 -1px 0 rgba(200,205,255,0.5), 0 10px 22px rgba(0,0,0,0.7)",
+              backdropFilter: "blur(6px)",
+            }}
+          />
+          <span className="absolute inset-0 overflow-hidden" style={{ borderRadius: s.keyRadius }}>
+            <PixelGlyph dark={dark} px={s.key} reduce={reduce} />
+          </span>
+          {/* Rim light, drawn over the key's shadow: a wide bloom, a soft halo and the thin bright line */}
+          <Ring start={rimStart} color={bloomColor} inset={s.ring + s.stroke * 3} stroke={s.stroke * 5} radius={s.keyRadius} blur={s.key / 8} opacity={0.6} />
+          <Ring start={rimStart} color={rimColor} inset={s.ring + s.stroke * 0.5} stroke={s.stroke * 1.8} radius={s.keyRadius} blur={s.key / 45} opacity={0.5} />
+          <Ring start={rimStart} color={rimColor} inset={s.ring} stroke={s.stroke} radius={s.keyRadius} blur={0} opacity={1} />
+        </motion.span>
       </motion.span>
     </button>
   );
