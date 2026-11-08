@@ -39,7 +39,8 @@ export interface MorphMenuProps {
 
 /** 觸發鈕落在選單的哪個角；選單從這個角長出來 */
 type Corner = { x: "left" | "right"; y: "top" | "bottom" };
-type Geometry = { corner: Corner; start: string; end: string };
+/** 起點裁切：上、右、下、左的內縮與圓角半徑；終點是全部 0、圓角 RADIUS */
+type Inset = [number, number, number, number, number];
 
 const RADIUS = 10;
 const LABELS = { en: "More actions", "zh-TW": "更多動作", "zh-CN": "更多操作", ja: "その他の操作" } as const;
@@ -77,17 +78,16 @@ function pickCorner(trigger: DOMRect, h: number, b: ReturnType<typeof visibleBou
 }
 
 /** 起點是觸發鈕大小、落在對應角的圓；終點是整張選單 */
-function clipFor({ x, y }: Corner, w: number, h: number, tw: number, th: number) {
+function insetFor({ x, y }: Corner, w: number, h: number, tw: number, th: number): Inset {
   const dx = Math.max(0, w - tw);
   const dy = Math.max(0, h - th);
-  const top = y === "top" ? 0 : dy;
-  const bottom = y === "top" ? dy : 0;
-  const left = x === "left" ? 0 : dx;
-  const right = x === "left" ? dx : 0;
-  return {
-    start: `inset(${top}px ${right}px ${bottom}px ${left}px round ${th / 2}px)`,
-    end: `inset(0px 0px 0px 0px round ${RADIUS}px)`,
-  };
+  return [y === "top" ? 0 : dy, x === "left" ? dx : 0, y === "top" ? dy : 0, x === "left" ? 0 : dx, th / 2];
+}
+
+/** 進度 0 是觸發鈕形狀，1 是整張選單；彈簧過衝時可略超出 0 到 1 */
+function clipAt(start: Inset, p: number) {
+  const [t, r, b, l, rad] = start.map((v, i) => v + ((i === 4 ? RADIUS : 0) - v) * p);
+  return `inset(${t}px ${r}px ${b}px ${l}px round ${Math.max(0, rad)}px)`;
 }
 
 function Dots() {
@@ -105,7 +105,9 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
   const id = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const geo = useRef<Geometry | null>(null);
+  const geo = useRef<Inset | null>(null);
+  /** 目前的展開進度、內容與圖示的不透明度；中途反向時從這裡接續 */
+  const now = useRef({ p: 0, content: 0, ghost: 1 });
   const running = useRef<{ stop: () => void }[]>([]);
   const returnFocus = useRef(false);
   const [open, setOpen] = useState(false);
@@ -126,40 +128,52 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     const trigger = triggerRef.current;
     if (!mounted || !menu || !trigger) return;
     running.current.forEach((a) => a.stop());
+    running.current = [];
     const content = menu.querySelector<HTMLElement>("[data-content]")!;
     const ghost = menu.querySelector<HTMLElement>("[data-ghost]")!;
+    // 只補間數字、每格自己寫 style，不交給 WAAPI：WAAPI 結束時會有一格退回 inline 的舊值，
+    // 選單每次開完、關完都會閃一下起點形狀
+    const v = now.current;
+    const paint = () => {
+      if (geo.current) menu.style.clipPath = clipAt(geo.current, v.p);
+      content.style.opacity = String(v.content);
+      ghost.style.opacity = String(v.ghost);
+    };
+    const tween = (key: keyof typeof v, to: number, options: object) =>
+      animate(v[key], to, { ...options, onUpdate: (n: number) => { v[key] = n; paint(); } });
 
     if (open) {
       const t = trigger.getBoundingClientRect();
       const corner = pickCorner(t, menu.offsetHeight, visibleBounds(trigger));
       Object.assign(menu.style, { left: "", right: "", top: "", bottom: "", [corner.x]: "0px", [corner.y]: "0px" });
       Object.assign(ghost.style, { left: "", right: "", top: "", bottom: "", width: `${t.width}px`, height: `${t.height}px`, [corner.x]: "0px", [corner.y]: "0px" });
-      geo.current = { corner, ...clipFor(corner, menu.offsetWidth, menu.offsetHeight, t.width, t.height) };
+      geo.current = insetFor(corner, menu.offsetWidth, menu.offsetHeight, t.width, t.height);
       enabled()[0]?.focus({ preventScroll: true });
       if (reduce) {
-        menu.style.clipPath = geo.current.end;
-        return;
+        Object.assign(v, { p: 1, content: 1, ghost: 0 });
+        return paint();
       }
-      menu.style.clipPath = geo.current.start;
-      content.style.opacity = "0";
+      paint();
       // 依序：外框先從角落長開，圖示 100ms 退場，內容晚約 60ms 進場
       running.current = [
-        animate(menu, { clipPath: geo.current.end }, springs.gentle),
-        animate(ghost, { opacity: [1, 0] }, { duration: 0.1 }),
-        animate(content, { opacity: [0, 1] }, { duration: 0.15, delay: 0.06 }),
+        tween("p", 1, springs.gentle),
+        tween("ghost", 0, { duration: 0.1 }),
+        tween("content", 1, { duration: 0.15, delay: 0.06 }),
       ];
       return;
     }
 
-    const done = () => setMounted(false);
+    const done = () => {
+      Object.assign(v, { p: 0, content: 0, ghost: 1 });
+      setMounted(false);
+    };
     if (reduce || !geo.current) return done();
-    running.current = [
-      animate(content, { opacity: 0 }, { duration: 0.08 }),
-      animate(ghost, { opacity: 1 }, { duration: 0.12, delay: 0.1 }),
-    ];
-    const shrink = animate(menu, { clipPath: geo.current.start }, { ...springs.snappy, restDelta: 0.5 });
-    running.current.push(shrink);
-    void shrink.then(done);
+    const shrink = tween("p", 0, { ...springs.snappy, restDelta: 0.005, restSpeed: 0.05 });
+    running.current = [tween("content", 0, { duration: 0.08 }), tween("ghost", 1, { duration: 0.12, delay: 0.1 }), shrink];
+    // stop() 也會讓 promise 完成，被重新打開打斷時不能卸載
+    void shrink.then(() => {
+      if (running.current.includes(shrink)) done();
+    });
   }, [open, mounted, reduce]);
 
   const wasMounted = useRef(false);
