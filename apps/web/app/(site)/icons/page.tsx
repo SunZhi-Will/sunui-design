@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { IconGallery } from "@/components/icon-gallery";
+import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
+import { proIconInstall, proIconSets } from "@/lib/pro-icons";
 import { siteUrl } from "@/lib/site";
 import { Icon } from "@/registry/icons/sunui-icons";
 
@@ -61,6 +63,20 @@ export default async function IconsPage() {
       </ul>
 
       <IconGallery messages={m.iconGallery} />
+
+      {proIconSets.map((set) => (
+        <ProIconShowcase
+          key={set.id}
+          set={set}
+          messages={m.proIcons}
+          installs={{
+            line: <Command value={proIconInstall(set, "line") ?? ""} />,
+            pixel: <Command value={proIconInstall(set, "pixel") ?? ""} />,
+            "line-animated": <Command value={proIconInstall(set, "line", true) ?? ""} />,
+            "pixel-animated": <Command value={proIconInstall(set, "pixel", true) ?? ""} />,
+          }}
+        />
+      ))}
 
       <section aria-labelledby="usage-title" className="docs mt-20 max-w-3xl">
         <h2 id="usage-title">{t.usageTitle}</h2>

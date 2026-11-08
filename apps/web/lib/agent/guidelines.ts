@@ -17,7 +17,7 @@ export const seriesSummary: Record<Series, string> = {
 const shared = `## Rules for every block
 
 - Blocks are copied into the project by the shadcn CLI. After install they are the user's code: edit props and copy, do not wrap them in extra providers.
-- Each block is one file that depends only on \`framer-motion\` and \`cn\` (\`@/lib/utils\`). Icons are inline SVG at stroke width 1.5 using \`currentColor\`.
+- Each block is one file that depends only on \`framer-motion\` and \`cn\` (\`@/lib/utils\`). Icons are inline SVG at stroke width 1.5 using \`currentColor\`. Take icon shapes from SunUI icons (\`search_icons\`, \`get_icon\`). Icons marked Pro belong to seasonal packs that install with a Pro license; Pro scenes depend on them, free blocks never do.
 - Every block supports \`prefers-reduced-motion\` (\`useReducedMotion()\`): motion becomes an instant switch and no information is lost. Keep that when you edit.
 - Numbers, prices and timers use \`tabular-nums\`. Codes and order numbers use \`font-mono\`.
 - Never add gradients, glows, blur, colored shadows, particles or confetti around a block.

@@ -9,6 +9,7 @@ import {
   toPixelPaths,
   type Pigment,
   type PixelIconName,
+  type PixelPalette,
   type PixelPaths,
   type PixelTone,
 } from "./sunui-pixel-icons";
@@ -26,7 +27,9 @@ import {
  */
 
 export type PixelMotionKind = "hover" | "toggle" | "loop";
-type Recipe = { kind: PixelMotionKind; fps: number; rest?: string; frames: readonly string[] };
+/** frames 與 rest 是 20 列點陣用「/」接起的字串，可以壓縮（「6.」）也可以不壓縮 */
+export type PixelRecipe = { kind: PixelMotionKind; fps: number; rest?: string; frames: readonly string[] };
+type Recipe = PixelRecipe;
 
 export const pixelRecipes = {
   check: {
@@ -1425,18 +1428,37 @@ function useReducedMotion() {
   );
 }
 
-export function AnimatedPixelIcon({
-  name,
+export function AnimatedPixelIcon({ name, tone, pigment, ...rest }: AnimatedPixelIconProps) {
+  return (
+    <AnimatedPixelSprite
+      recipe={pixelRecipes[name]}
+      base={pixelIcons[name]}
+      palette={resolvePalette(name, tone, pigment)}
+      data-icon={name}
+      {...rest}
+    />
+  );
+}
+
+export type AnimatedPixelSpriteProps = Omit<AnimatedPixelIconProps, "name" | "tone" | "pigment"> & {
+  recipe: PixelRecipe;
+  /** 靜止時的 16 列點陣（沒有 recipe.rest 時使用） */
+  base: readonly string[];
+  /** 物件本色；省略是墨色 */
+  palette?: PixelPalette;
+};
+
+/** 用任意點陣與影格畫一個動態像素圖示（擴充圖示組沿用同一套觸發、影格與減少動態處理） */
+export function AnimatedPixelSprite({
+  recipe,
+  base,
+  palette,
   active,
   trigger = "parent",
   size = 16,
   title,
-  tone,
-  pigment,
   ...rest
-}: AnimatedPixelIconProps) {
-  const palette = resolvePalette(name, tone, pigment);
-  const recipe: Recipe = pixelRecipes[name];
+}: AnimatedPixelSpriteProps) {
   const reduce = useReducedMotion();
   const ref = useRef<SVGSVGElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -1511,7 +1533,7 @@ export function AnimatedPixelIcon({
       ? framePaths(recipe.frames[frame])
       : recipe.rest
         ? framePaths(recipe.rest)
-        : toPixelPathsCached(name);
+        : framePaths(base.join("/"));
   const paths = palette && isStrokeOnly(raw) && isMixed(recipe) ? asEdge(raw) : raw;
 
   return (
@@ -1525,7 +1547,6 @@ export function AnimatedPixelIcon({
       role={title ? "img" : undefined}
       aria-hidden={title ? undefined : true}
       focusable="false"
-      data-icon={name}
       data-state={on ? "active" : "rest"}
       data-tone={palette ? "pigment" : undefined}
       overflow="visible"
@@ -1535,8 +1556,4 @@ export function AnimatedPixelIcon({
       <PixelPathsGroup paths={paths} palette={palette} />
     </svg>
   );
-}
-
-function toPixelPathsCached(name: PixelIconName) {
-  return framePaths(pixelIcons[name].join("/"));
 }

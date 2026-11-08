@@ -1,4 +1,5 @@
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
+import { proIconSets, type ProIconSet } from "@/lib/pro-icons";
 import { siteUrl } from "@/lib/site";
 import { icons, type IconName, type IconNode } from "@/registry/icons/sunui-icons";
 import {
@@ -14,7 +15,16 @@ import {
 // 只讀取 registry/icons 的幾何，不另存一份。
 
 export type IconStyle = "line" | "pixel";
-export type IconEntry = { name: string; style: IconStyle; group: string; groupTitle: string; keywords: string[] };
+/** tier pro：SunUI Pro 檔期圖示組。只給名稱與安裝方式，不輸出幾何（幾何只在私有 repo，憑授權安裝） */
+export type IconEntry = {
+  name: string;
+  style: IconStyle;
+  group: string;
+  groupTitle: string;
+  keywords: string[];
+  tier: "free" | "pro";
+  set?: ProIconSet;
+};
 
 const pixelExtraGroups = new Map(pixelIconGroups.flatMap((g) => g.icons.map((name) => [name as string, g] as const)));
 const lineGroupOf = new Map(iconGroups.flatMap((g) => g.icons.map((name) => [name as string, g] as const)));
@@ -26,17 +36,50 @@ function keywordsOf(name: string) {
 export const iconIndex: IconEntry[] = [
   ...(Object.keys(icons) as IconName[]).map((name) => {
     const group = lineGroupOf.get(name);
-    return { name, style: "line" as const, group: group?.id ?? "other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name) };
+    return { name, style: "line" as const, group: group?.id ?? "other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name), tier: "free" as const };
   }),
   ...(Object.keys(pixelIcons) as PixelIconName[]).map((name) => {
     const group = pixelExtraGroups.get(name);
-    return { name, style: "pixel" as const, group: group?.id ?? "pixel-other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name) };
+    return { name, style: "pixel" as const, group: group?.id ?? "pixel-other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name), tier: "free" as const };
   }),
+  ...proIconSets.flatMap((set) =>
+    (["line", "pixel"] as const).flatMap((style) =>
+      set.icons.map((icon) => ({
+        name: icon.name,
+        style,
+        group: `pro-${set.id}`,
+        groupTitle: `${set.title} (Pro)`,
+        keywords: icon.keywords.split(/\s+/).filter(Boolean),
+        tier: "pro" as const,
+        set,
+      })),
+    ),
+  ),
 ];
 
 export function findIcon(name: string, style: IconStyle) {
   const clean = name.trim().toLowerCase();
+  // 免費版排在前面：同名時優先回免費圖示
   return iconIndex.find((entry) => entry.style === style && entry.name === clean);
+}
+
+/** Pro 圖示的取得方式：不給幾何，給安裝指令與元件用法 */
+export function proIconUsage(entry: IconEntry) {
+  const set = entry.set;
+  if (!set) return "";
+  const item = set.items.find((i) => i.style === entry.style && !i.animated);
+  const animated = set.items.find((i) => i.style === entry.style && i.animated);
+  const motion = set.icons.find((i) => i.name === entry.name)?.[entry.style === "pixel" ? "pixelMotion" : "motion"];
+  const component = entry.style === "pixel" ? "LunarPixelIcon" : "LunarIcon";
+  return [
+    `"${entry.name}" is a SunUI Pro icon (${set.title} pack), included with every Pro license. Its source is not served here.`,
+    `Install with a license key: \`npx shadcn@latest add @sunui-pro/${item?.name}\` (setup: ${siteUrl()}/docs/pro)`,
+    `Then: \`import { ${component} } from "@/components/ui/${item?.name}"\` and \`<${component} name="${entry.name}" />\``,
+    motion && animated ? `Animated (${motion}): \`npx shadcn@latest add @sunui-pro/${animated.name}\`` : "",
+    `No license? Pick a free icon instead (search_icons with tier: "free"), or get Pro at ${siteUrl()}/pricing.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 // ---------- 搜尋 ----------
@@ -85,15 +128,30 @@ export type IconHit = IconEntry & { score: number; matchedAllWords: boolean; sty
 function mergeStyles(hits: IconHit[]) {
   const byName = new Map<string, IconHit>();
   for (const hit of hits) {
-    const seen = byName.get(hit.name);
-    if (!seen) byName.set(hit.name, hit);
+    const key = `${hit.tier}:${hit.name}`;
+    const seen = byName.get(key);
+    if (!seen) byName.set(key, hit);
     else seen.styles = [...new Set([...seen.styles, hit.style])];
   }
   return [...byName.values()];
 }
 
-export function searchIcons({ query, style, group, limit = 10 }: { query?: string; style?: IconStyle; group?: string; limit?: number }) {
-  const pool = iconIndex.filter((entry) => (!style || entry.style === style) && (!group || entry.group === group));
+export function searchIcons({
+  query,
+  style,
+  group,
+  tier = "any",
+  limit = 10,
+}: {
+  query?: string;
+  style?: IconStyle;
+  group?: string;
+  tier?: "free" | "pro" | "any";
+  limit?: number;
+}) {
+  const pool = iconIndex.filter(
+    (entry) => (!style || entry.style === style) && (!group || entry.group === group) && (tier === "any" || entry.tier === tier),
+  );
   const q = (query ?? "").trim().toLowerCase();
   if (!q) {
     const all = pool.map((e) => ({ ...e, score: 0, matchedAllWords: true, styles: [e.style] }));
@@ -112,6 +170,8 @@ export function searchIcons({ query, style, group, limit = 10 }: { query?: strin
     score -= (entry.name.split("-").length - 1) * 0.5;
     // 同名時線條版優先，除非指定 pixel
     if (!style && entry.style === "pixel") score -= 0.25;
+    // 免費與 Pro 都符合時，免費的排前面：沒有授權的人也能直接用
+    if (entry.tier === "pro" && tier === "any") score -= 0.5;
     hits.push({ ...entry, score: Math.round(score * 100) / 100, matchedAllWords: scores.every((s) => s > 0), styles: [entry.style] });
   }
   hits.sort((a, b) => Number(b.matchedAllWords) - Number(a.matchedAllWords) || b.score - a.score || a.name.localeCompare(b.name));
@@ -121,7 +181,7 @@ export function searchIcons({ query, style, group, limit = 10 }: { query?: strin
 
 /** 名稱打錯時給最接近的幾個 */
 export function suggestIcons(name: string, style: IconStyle) {
-  return searchIcons({ query: name.replace(/-/g, " "), style, limit: 5 }).results.map((h) => h.name);
+  return searchIcons({ query: name.replace(/-/g, " "), style, limit: 5 }).results.map((h) => (h.tier === "pro" ? `${h.name} [Pro]` : h.name));
 }
 
 // ---------- 輸出 ----------
@@ -234,6 +294,9 @@ export function iconLibraryUsage(entry: IconEntry) {
 export function iconSetsSummary() {
   const line = iconGroups.map((g) => `- line/${g.id} (${g.icons.length}): ${g.title}. ${g.note}`);
   const pixel = pixelIconGroups.map((g) => `- pixel/${g.id} (${g.icons.length}): ${g.title}. ${g.note}`);
+  const pro = proIconSets.map(
+    (set) => `- pro-${set.id} (${set.icons.length}, line + pixel): ${set.title}. Needs a Pro license; get_icon returns install steps, not code.`,
+  );
   return [
     `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen.`,
     "",
@@ -242,5 +305,8 @@ export function iconSetsSummary() {
     "",
     "Pixel groups:",
     ...pixel,
+    "",
+    "SunUI Pro seasonal packs:",
+    ...pro,
   ].join("\n");
 }

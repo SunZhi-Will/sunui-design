@@ -5,6 +5,7 @@
 > 像素：`registry/icons/sunui-pixel-icons.tsx`（`<site>/r/icons/sunui-pixel-icons.json`，無依賴）
 > 像素動態：`registry/icons/sunui-animated-pixel-icons.tsx`（`<site>/r/icons/sunui-animated-pixel-icons.json`，依賴像素靜態版）
 > 展示頁：`/icons`，兩組切換：線條 / 像素 × 靜態 / 動態。
+> Pro 檔期圖示組：`registry/pro/icons/`（私有 repo），索引在 `lib/pro-icons.ts`，憑授權從 `<site>/r/pro/<name>.json` 安裝。見文末「Pro 檔期圖示組」。
 
 ## 為什麼要做
 
@@ -39,6 +40,8 @@
 | Story | 敘事遊戲 | play、pause、skip、book、dialogue、lantern、scroll、quill、map、gem、trophy |
 
 2026-11-05 補上：home、filter、mail、phone、globe、map-pin、sparkle（Interface），coin（Commerce），gem、trophy（Story）。
+
+2026-11-09 補上 Festive 組：red-envelope、firework。像素版原本就有，Pro 農曆新年場景也要用，屬於免費型錄凍結規則裡「從 Pro 場景抽出的原子」。
 
 ## 動態圖示
 
@@ -177,3 +180,22 @@ Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block �
 3. 伺服器維持唯讀：不做 iconmcp 的 request、report、fix（需要佇列與審核，和 SunUI 的人工設計流程不合）。
 
 展示頁的選取面板另有：網格線（線條版 24 格、3 到 21 虛線框、圓 8.5、方 7；像素版 16 格與 1 到 14 框）、下載 SVG、關鍵字標籤（按下即搜尋）、同組相關圖示。
+
+## Pro 檔期圖示組
+
+2026-11-08 決定、11-09 實作，規劃與理由見 `reports/Pro 圖示包規劃-2026-11-08.md`。
+
+1. **分層**：上面四套永遠免費（已用 MIT 推出，收不回來）。Pro 只收**檔期限定**的物件，一個檔期一組，跟著季節包與 Pro 場景上架。**所有 Pro 授權都包含所有圖示組**，季節包賣的是整頁與素材組裝，不是圖示。
+2. **規格不另開**：線條、像素、本色、動態規則全部沿用本文件。免費庫已有的物件（紅包、燈籠、煙火、禮物、鈴鐺）不重畫；某個物件只有一種風格在免費庫時，把另一種補進免費庫，不放 Pro（`tests/pro-icons.test.ts` 會擋同名）。
+3. **每組四個 registry 項目**：線條、線條動態、像素、像素動態，例如 `sunui-lunar-icons`、`sunui-animated-lunar-icons`、`sunui-lunar-pixel-icons`、`sunui-animated-lunar-pixel-icons`。不寫進 Pro 的 `registry.json`（那份是 block 型錄），而是寫在公開的 `lib/pro-icons.ts`，`/r/pro/[name]` 找不到 block 時改找這裡，原始碼仍從私有 repo 讀、要授權。
+4. **共用免費的渲染元件**：免費庫匯出 `Glyph`、`AnimatedGlyph`、`AnimatedPixelSprite` 與 `PixelPathsGroup`，Pro 檔只放幾何、動作配方與一層薄元件（`LunarIcon` 等），從 `@/components/ui/sunui-*` 匯入（repo 內由 `components/ui/sunui-*.tsx` 轉接）。像素動態的影格由靜態點陣推出（位移、翻轉、壓扁），不手畫。
+5. **公開索引**：`lib/pro-icons.ts` 只有名稱、關鍵字、動作類型與安裝資訊，沒有幾何。公開 clone 沒有 Pro 目錄也能建置。新增或改名時同步改這裡，`npm test` 會比對索引與 Pro 原始碼。
+6. **展示**：`/icons` 頁下方的 Pro 區塊由 `components/pro-icon-showcase.tsx` 畫；圖示本身由 `registry/pro/icons/showcase.tsx` 渲染，經 `generate-previews.mjs` 產生的 `loadProIconRenderers` 動態載入，沒有 Pro 目錄時改畫鎖頭。只給 JSX 與安裝指令，**不給複製或下載 SVG**。
+7. **Pro 場景的 preview 可以 import `@/registry/pro/icons/sunui-*`**：這是 `generate-previews.mjs` 對「preview 不可 import Pro 原始碼」的唯一例外。圖示一畫到畫面上幾何就看得到，不必在每個 preview 抄一份。完整場景元件仍不能 import。
+8. **MCP**：`search_icons` 會列出 Pro 圖示並標 `[Pro]`，同分時免費排前面，`tier: "free"` 可只看免費。`get_icon` 對 Pro 圖示只回安裝步驟，不回 SVG 或 TSX。
+
+| 檔期 | 圖示組 | 圖示 | 用在 |
+|---|---|---|---|
+| 農曆新年（2027 羊年） | lunar-new-year | fu（倒福 toggle）、firecracker、gold-ingot、mandarin、koi、dumpling、plum-blossom、couplet、goat、coin-string、tea、knot | `lunar-new-year` 各區塊標題、`festival-banner` 農曆新年的小尺寸裝飾 |
+
+生肖每年換：2028 年只補一隻猴，其他物件沿用。

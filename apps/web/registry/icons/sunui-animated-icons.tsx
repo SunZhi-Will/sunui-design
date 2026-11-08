@@ -15,7 +15,7 @@ import { icons, type IconName, type IconNode } from "./sunui-icons";
  * - useReducedMotion 為真時直接切到結果，資訊不遺失。
  */
 
-const springs = {
+export const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   gentle: { type: "spring", stiffness: 240, damping: 30 },
   stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
@@ -30,19 +30,19 @@ const ONCE: Transition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] };
  */
 export type MotionKind = "hover" | "toggle" | "loop";
 
-type Part = {
+export type IconPart = {
   active: TargetAndTransition;
   rest?: TargetAndTransition;
   /** 變形中心，使用圖示座標（0 到 24），預設 [12, 12] */
   origin?: [number, number];
 };
 
-type Recipe = {
+export type IconRecipe = {
   kind: MotionKind;
   /** 需要拆開或變形的圖示自帶幾何，否則沿用同名靜態圖示 */
   nodes?: IconNode[];
-  parts?: Record<number, Part>;
-  whole?: Part;
+  parts?: Record<number, IconPart>;
+  whole?: IconPart;
 };
 
 const HEART = "M12 19.5s-7.5-4.4-7.5-10A4.25 4.25 0 0 1 12 7a4.25 4.25 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z";
@@ -204,7 +204,7 @@ export const recipes = {
   },
   dialogue: { kind: "hover", parts: { 1: { active: { pathLength: [0, 1] } } } },
   lantern: { kind: "hover", whole: { active: { rotate: [0, 8, -6, 3, 0] }, origin: [12, 3.5] } },
-} satisfies Record<string, Recipe>;
+} satisfies Record<string, IconRecipe>;
 
 export type AnimatedIconName = keyof typeof recipes;
 export const animatedIconNames = Object.keys(recipes) as AnimatedIconName[];
@@ -224,16 +224,28 @@ export type AnimatedIconProps = Omit<SVGProps<SVGSVGElement>, "children" | "ref"
 const ACCENT = "var(--sunui-icon-accent, currentColor)";
 const IDENTITY: Record<string, number> = { x: 0, y: 0, rotate: 0, scale: 1, scaleX: 1, scaleY: 1, opacity: 1, pathLength: 1 };
 
-export function AnimatedIcon({
-  name,
+export function AnimatedIcon({ name, ...rest }: AnimatedIconProps) {
+  const recipe: IconRecipe = recipes[name];
+  return <AnimatedGlyph recipe={recipe} nodes={recipe.nodes ?? icons[name as IconName]} data-icon={name} {...rest} />;
+}
+
+export type AnimatedGlyphProps = Omit<AnimatedIconProps, "name"> & {
+  recipe: IconRecipe;
+  /** 這個動作要用的幾何；通常是 recipe.nodes 或同名靜態圖示 */
+  nodes: readonly IconNode[];
+};
+
+/** 用任意幾何與動作配方畫一個動態圖示（擴充圖示組沿用同一套觸發、彈簧與減少動態處理） */
+export function AnimatedGlyph({
+  recipe,
+  nodes,
   active,
   trigger = "parent",
   size = 24,
   strokeWidth = 1.5,
   title,
   ...rest
-}: AnimatedIconProps) {
-  const recipe: Recipe = recipes[name];
+}: AnimatedGlyphProps) {
   const reduce = useReducedMotion() ?? false;
   const ref = useRef<SVGSVGElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -259,7 +271,6 @@ export function AnimatedIcon({
 
   // 減少動態時，循環直接不播；其他動作以 0 秒切到結果
   const on = (controlled ? active : hovered) && !(reduce && recipe.kind === "loop");
-  const nodes: readonly IconNode[] = recipe.nodes ?? icons[name as IconName];
   const children = nodes.map((node, i) => renderNode(node, i, recipe.parts?.[i], recipe.kind, reduce));
 
   return (
@@ -277,7 +288,6 @@ export function AnimatedIcon({
       role={title ? "img" : undefined}
       aria-hidden={title ? undefined : true}
       focusable="false"
-      data-icon={name}
       data-state={on ? "active" : "rest"}
       initial={false}
       animate={on ? "active" : "rest"}
@@ -296,7 +306,7 @@ export function AnimatedIcon({
   );
 }
 
-function renderNode(node: IconNode, key: number, part: Part | undefined, kind: MotionKind, reduce: boolean) {
+function renderNode(node: IconNode, key: number, part: IconPart | undefined, kind: MotionKind, reduce: boolean) {
   const n = typeof node === "string" ? { d: node } : node;
   const paint = n.accent ? ACCENT : "currentColor";
   const props = {
@@ -312,7 +322,7 @@ function renderNode(node: IconNode, key: number, part: Part | undefined, kind: M
   return <motion.rect key={key} {...props} x={x} y={y} width={width} height={height} rx={rx} />;
 }
 
-function variants(part: Part, kind: MotionKind, reduce: boolean): Variants {
+function variants(part: IconPart, kind: MotionKind, reduce: boolean): Variants {
   const { transition: custom, ...active } = part.active;
   const values = active as Record<string, unknown>;
   const once = Object.values(values).some(Array.isArray);

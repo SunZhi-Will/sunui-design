@@ -253,6 +253,18 @@ export const icons = {
     "M7.5 6.5H5a3 3 0 0 0 3 4M16.5 6.5H19a3 3 0 0 1-3 4",
     "M12 13.5v4M8.5 19.5h7",
   ],
+
+  // 節慶（2026-11-09 從 Pro 農曆新年場景抽出的原子；像素版已有同名圖示）
+  "red-envelope": [
+    { r: [5.5, 3.5, 13, 17, 1.5] },
+    "M5.5 7.5c2.5 2 4.5 3 6.5 3s4-1 6.5-3",
+    { c: [12, 10.5, 2.25], accent: true },
+  ],
+  firework: [
+    "M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3",
+    "M6 6l2.1 2.1M15.9 15.9L18 18M6 18l2.1-2.1M15.9 8.1L18 6",
+    { c: [12, 12, 1.5], fill: true, accent: true },
+  ],
 } satisfies Record<string, IconNode[]>;
 
 export type IconName = keyof typeof icons;
@@ -270,8 +282,17 @@ export type IconProps = Omit<SVGProps<SVGSVGElement>, "children"> & {
 
 const ACCENT = "var(--sunui-icon-accent, currentColor)";
 
-export function Icon({ name, size = 24, strokeWidth = 1.5, title, ...rest }: IconProps) {
-  const nodes: readonly IconNode[] = icons[name];
+export function Icon({ name, ...rest }: IconProps) {
+  return <Glyph nodes={icons[name]} data-icon={name} {...rest} />;
+}
+
+export type GlyphProps = Omit<IconProps, "name"> & {
+  /** 任何符合同一套 24 網格規格的幾何（例如 SunUI Pro 的檔期圖示組） */
+  nodes: readonly IconNode[];
+};
+
+/** 直接畫一組幾何。Icon 就是 Glyph 加上內建圖示表；擴充圖示組用它沿用同一套線寬、accent 與無障礙處理 */
+export function Glyph({ nodes, size = 24, strokeWidth = 1.5, title, ...rest }: GlyphProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -286,7 +307,6 @@ export function Icon({ name, size = 24, strokeWidth = 1.5, title, ...rest }: Ico
       role={title ? "img" : undefined}
       aria-hidden={title ? undefined : true}
       focusable="false"
-      data-icon={name}
       {...rest}
     >
       {title && <title>{title}</title>}

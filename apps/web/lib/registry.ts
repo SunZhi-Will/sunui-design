@@ -125,7 +125,7 @@ function resolveDependency(dep: string) {
 }
 
 // 授權註解放在 "use client" 之後，避免破壞指令必須在檔案開頭的規則
-function withBanner(content: string, banner: string) {
+export function withBanner(content: string, banner: string) {
   const directive = content.match(/^\s*["']use client["'];?\s*\n/);
   if (!directive) return `${banner}\n${content}`;
   return `${directive[0].trimEnd()}\n\n${banner}\n${content.slice(directive[0].length)}`;

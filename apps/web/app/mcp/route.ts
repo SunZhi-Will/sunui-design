@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { blockLine, catalogMarkdown, describeBlock, planInstall, proSetup, searchBlocks, suggestNames } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
-import { findIcon, iconLibraryUsage, iconSetsSummary, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
+import { findIcon, iconLibraryUsage, iconSetsSummary, proIconUsage, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
 import { skillMarkdown } from "@/lib/agent/skill";
 import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
@@ -146,11 +146,12 @@ const handler = createMcpHandler(
       {
         title: "Search SunUI icons",
         description:
-          "Find a SunUI icon by meaning, described in plain words the way you would to a designer: 'claimed coupon', 'free shipping', 'loyalty stamp card', 'dark mode'. English, Chinese or Japanese. Tolerates plurals and one typo, and ranks the base icon above its variants (stamp above stamp-check). Pass a returned name to get_icon. weak: true means nothing matched well: try other words, or call with no query to browse a group. Use these icons instead of drawing new SVG so blocks keep one look.",
+          "Find a SunUI icon by meaning, described in plain words the way you would to a designer: 'claimed coupon', 'free shipping', 'loyalty stamp card', 'dark mode'. English, Chinese or Japanese. Tolerates plurals and one typo, and ranks the base icon above its variants (stamp above stamp-check). Pass a returned name to get_icon. weak: true means nothing matched well: try other words, or call with no query to browse a group. Results marked [Pro] come from SunUI Pro seasonal packs (Lunar New Year and later seasons): they install with a license key, so pass tier: 'free' when the user has none. Use these icons instead of drawing new SVG so blocks keep one look.",
         inputSchema: z.object({
           query: z.string().max(200).optional().describe("What the icon should mean, e.g. 'redeem voucher'. Omit to list a group."),
           style: z.enum(["line", "pixel"]).optional().describe("line: 24px stroke icons (default look). pixel: 16px sprites for retro or game-style screens. One style per screen."),
-          group: z.string().optional().describe("Group id from the list returned with no query, e.g. 'paper', 'commerce', 'pixel-gear'."),
+          group: z.string().optional().describe("Group id from the list returned with no query, e.g. 'paper', 'commerce', 'pixel-gear', 'pro-lunar-new-year'."),
+          tier: z.enum(["free", "pro", "any"]).default("any").describe("free: only icons anyone can paste. pro: SunUI Pro seasonal packs (need a license). any: both, free ranked first."),
           limit: z.number().int().min(1).max(50).default(10),
         }),
         annotations: readOnly,
@@ -165,13 +166,13 @@ const handler = createMcpHandler(
           return text(`No SunUI icon matches "${args.query}". Try another wording, or browse a group (call with no query). If nothing fits, draw it on the same grid: get_design_rules covers the icon spec.`);
         }
         const lines = results.map(
-          (h) => `- ${h.name} (${h.styles.join(" + ")}, ${h.groupTitle})${h.keywords.length ? `: ${h.keywords.join(" ")}` : ""}`,
+          (h) => `- ${h.name}${h.tier === "pro" ? " [Pro]" : ""} (${h.styles.join(" + ")}, ${h.groupTitle})${h.keywords.length ? `: ${h.keywords.join(" ")}` : ""}`,
         );
         return {
           ...text([weak ? "Weak match: no icon fits every word. Closest:" : `${results.length} result(s):`, ...lines].join("\n")),
           structuredContent: {
             weak,
-            results: results.map(({ name, styles, group, keywords, score, matchedAllWords }) => ({ name, styles, group, keywords, score, matchedAllWords })),
+            results: results.map(({ name, styles, group, keywords, score, matchedAllWords, tier }) => ({ name, styles, group, keywords, score, matchedAllWords, tier })),
           },
         };
       },
@@ -182,7 +183,7 @@ const handler = createMcpHandler(
       {
         title: "Get a SunUI icon",
         description:
-          "One SunUI icon as ready-to-paste code: a standalone SVG string or a typed React (TSX) component, plus how to install the whole icon set when you need several. Use an exact name from search_icons. Colors follow currentColor; the one accent part follows --sunui-icon-accent unless you pass accent.",
+          "One SunUI icon as ready-to-paste code: a standalone SVG string or a typed React (TSX) component, plus how to install the whole icon set when you need several. Use an exact name from search_icons. Colors follow currentColor; the one accent part follows --sunui-icon-accent unless you pass accent. SunUI Pro icons ([Pro] in search_icons) return install steps instead of code.",
         inputSchema: z.object({
           name: z.string().min(1).max(60).describe("Exact icon name, kebab-case, e.g. 'stamp-check'."),
           style: z.enum(["line", "pixel"]).default("line"),
@@ -207,6 +208,7 @@ const handler = createMcpHandler(
             isError: true,
           };
         }
+        if (entry.tier === "pro") return text(proIconUsage(entry));
         const code = renderIcon(entry, { format, size: size ?? (style === "pixel" ? 16 : 24), stroke, color, accent, tone });
         return text(`\`\`\`${format === "tsx" ? "tsx" : "svg"}\n${code}\n\`\`\`\n\n${iconLibraryUsage(entry)}`);
       },

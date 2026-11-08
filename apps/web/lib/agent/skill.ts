@@ -52,6 +52,7 @@ SunUI is a shadcn registry of production-ready animated blocks for commerce and 
 - Remove \`useReducedMotion\` branches or \`aria-live\` regions while editing.
 - Invent block names. If a name is not in search results, it does not exist.
 - Draw a new SVG icon before checking \`search_icons\`. SunUI icons share one grid and stroke; a hand-drawn one breaks the set.
+- Paste or redraw a SunUI Pro icon (marked [Pro] in \`search_icons\`) when the user has no Pro license. Use a free icon, or tell them it needs Pro.
 
 ## References
 

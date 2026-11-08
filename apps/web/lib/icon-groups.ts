@@ -41,6 +41,12 @@ export const iconGroups: IconGroup[] = [
     note: "Ink and lantern UI for narrative games.",
     icons: ["play", "pause", "skip", "volume", "book", "bookmark", "dialogue", "lantern", "scroll", "quill", "map", "gem", "trophy"],
   },
+  {
+    id: "festive",
+    title: "Festive",
+    note: "Lunar New Year basics. Seasonal packs with more live in SunUI Pro.",
+    icons: ["red-envelope", "firework"],
+  },
 ];
 
 export type PixelIconGroup = { id: string; title: string; note: string; icons: PixelIconName[] };

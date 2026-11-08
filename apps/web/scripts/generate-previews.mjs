@@ -56,6 +56,9 @@ function readProPreview(dir, name) {
   const src = readFileSync(path.join(dir, name, "preview.tsx"), "utf8");
   for (const [, spec] of src.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
     const otherPreview = /^@\/registry\/pro\/[\w-]+\/preview$/.test(spec);
+    // 例外：Pro 檔期圖示組（registry/pro/icons/sunui-*）。圖示一畫到畫面上幾何就看得到，展示版直接沿用同一份，
+    // 不在每個場景的 preview 裡各抄一份點陣。完整場景元件仍然不能 import。
+    if (/^@\/registry\/pro\/icons\/sunui-[\w-]+$/.test(spec)) continue;
     if (otherPreview && !existsSync(path.join(dir, spec.split("/")[3], "preview.tsx"))) {
       throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}", which does not exist yet. Write that block's preview first.`);
     }
@@ -96,11 +99,15 @@ for (const tier of tiers) {
   }
 }
 
+const hasProIcons = existsSync(path.join(root, "registry", "pro", "icons", "showcase.tsx"));
+
 const out = `// 自動產生，請勿手動修改（scripts/generate-previews.mjs）
 "use client";
 
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+
+import type { ProIconRenderer } from "@/lib/pro-icons";
 
 export const previews: Record<string, ComponentType> = {
 ${entries.join("\n")}
@@ -112,6 +119,11 @@ ${cardEntries.join("\n")}
 
 export const variantPreviews: Record<string, ComponentType<{ variant: string }>> = {
 ${variantEntries.join("\n")}
+};
+
+// /icons 頁的 Pro 檔期圖示組渲染器；公開 clone 沒有 registry/pro/icons 時是 null
+export const loadProIconRenderers: (() => Promise<Record<string, ProIconRenderer>>) | null = ${
+  hasProIcons ? `() => import("../pro/icons/showcase").then((m) => m.proIconRenderers)` : "null"
 };
 `;
 
