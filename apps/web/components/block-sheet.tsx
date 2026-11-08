@@ -41,7 +41,18 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
   const leave = () => {
     if (leftRef.current) return;
     leftRef.current = true;
-    router.back();
+    const sheetPath = window.location.pathname;
+    // 連點展開可能疊出兩筆同樣的 /blocks/<name>，退一步網址沒變就再退；
+    // 沒有上一頁可退（例如歷史被換掉）時改回首頁，面板才會真的卸下
+    const back = (tries: number) => {
+      router.back();
+      window.setTimeout(() => {
+        if (window.location.pathname !== sheetPath) return;
+        if (tries > 1) back(tries - 1);
+        else router.replace("/", { scroll: false });
+      }, 400);
+    };
+    back(3);
   };
   const close = () => {
     setOpen(false);
@@ -51,17 +62,22 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
   const closeRef = useRef(close);
   closeRef.current = close;
 
+  // 鎖捲動只跟著面板開著：一關就還原，不等路由切換才卸下元件
   useEffect(() => {
+    if (!open) return;
     const root = document.documentElement;
     const prev = root.style.overflow;
     root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = prev;
+    };
+  }, [open]);
+
+  useEffect(() => {
     panelRef.current?.focus();
     const onKey = (event: KeyboardEvent) => event.key === "Escape" && closeRef.current();
     window.addEventListener("keydown", onKey);
-    return () => {
-      root.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   return (
