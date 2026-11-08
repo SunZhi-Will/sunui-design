@@ -5027,7 +5027,7 @@
       "name": "theme-picker",
       "type": "registry:block",
       "title": "Theme Picker",
-      "description": "System, light and dark as three tiny previews of the real interface; system is split dark and light down the middle. Includes useThemeMode: saves to localStorage, puts .light or .dark on <html> and crossfades with View Transitions.",
+      "description": "System, light and dark as three tiny previews of the real interface; system is split dark and light down the middle. Also ThemeSwitch, a glowing key whose pixel sun scatters and lands as a pixel moon as it slides. Includes useThemeMode: saves to localStorage, puts .light or .dark on <html> and crossfades with View Transitions.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5047,11 +5047,13 @@
         "usage": {
           "whenToUse": [
             "Appearance setting in a settings page or a header popover",
-            "When people should see the result before they choose, instead of reading Light and Dark"
+            "When people should see the result before they choose, instead of reading Light and Dark",
+            "ThemeSwitch: a one-click light and dark switch for a header, or as the showpiece on a landing page"
           ],
           "watchOut": [
             "Inline themeScript() in <head>, or a reload shows the wrong theme for a frame",
-            "Point Tailwind's dark variant at the .dark class, the same as the shadcn default"
+            "Point Tailwind's dark variant at the .dark class, the same as the shadcn default",
+            "ThemeSwitch only has light and dark. Pass useThemeMode().resolved as its value so system mode shows the right side"
           ],
           "aliases": [
             "dark mode toggle",
@@ -5059,7 +5061,9 @@
             "appearance picker",
             "light dark switch",
             "color scheme picker",
-            "theme toggle"
+            "theme toggle",
+            "pixel sun moon switch",
+            "glowing toggle"
           ]
         }
       },
@@ -5071,6 +5075,10 @@
         {
           "path": "registry/free/theme-picker/theme-script.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "registry/free/theme-picker/theme-switch.tsx",
+          "type": "registry:ui"
         }
       ]
     },
