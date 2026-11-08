@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { FoundingBar } from "@/components/founding-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getLocale } from "@/lib/i18n-server";
@@ -38,6 +39,7 @@ export default async function SiteLayout({ children, modal }: { children: React.
         <script dangerouslySetInnerHTML={{ __html: themeScript(THEME_STORAGE_KEY) }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh`}>
+        <FoundingBar />
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-6">{children}</main>
         <SiteFooter />

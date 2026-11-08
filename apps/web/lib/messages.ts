@@ -360,6 +360,13 @@ const en = {
     opensCta: (date: string) => `Opens ${date}, get notified`,
     footnote: (n: number) =>
       `${n} Pro ${n === 1 ? "block" : "blocks"} today, new ones every week. Prices in USD, taxes handled at checkout.`,
+    bar: {
+      upcoming: "Founding member: lifetime Pro for $79, {seats} seats, opens {opens}.",
+      open: "Founding member: lifetime Pro for $79, {seats} seats, on sale until {closes}.",
+      upcomingCta: "Get notified",
+      openCta: "Claim a seat",
+      dismiss: "Dismiss",
+    },
     calculator: {
       title: "What Pro saves an agency",
       lead: "Count the campaign pages you build in a year and the days SunUI takes off each one.",
@@ -830,6 +837,13 @@ const zhTW: Messages = {
     joinWaitlist: "加入候補名單",
     opensCta: (date) => `${date} 開賣，通知我`,
     footnote: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。價格以美元計，稅金於結帳時處理。`,
+    bar: {
+      upcoming: "創始會員：$79 終身使用 Pro，限量 {seats} 位，{opens}開賣。",
+      open: "創始會員：$79 終身使用 Pro，限量 {seats} 位，販售至{closes}。",
+      upcomingCta: "開賣時通知我",
+      openCta: "搶一個席位",
+      dismiss: "關閉",
+    },
     calculator: {
       title: "Pro 能幫 agency 省下多少",
       lead: "算一下你一年做幾檔活動頁，以及 SunUI 每檔幫你省掉幾天。",
@@ -1280,6 +1294,13 @@ const zhCN: Messages = {
     joinWaitlist: "加入候补名单",
     opensCta: (date) => `${date} 开卖，通知我`,
     footnote: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。价格以美元计，税费在结算时处理。`,
+    bar: {
+      upcoming: "创始会员：$79 终身使用 Pro，限量 {seats} 名，{opens}开售。",
+      open: "创始会员：$79 终身使用 Pro，限量 {seats} 名，销售至{closes}。",
+      upcomingCta: "开售时通知我",
+      openCta: "抢一个名额",
+      dismiss: "关闭",
+    },
     calculator: {
       title: "Pro 能帮 agency 省下多少",
       lead: "算一下你一年做几档活动页，以及 SunUI 每档帮你省掉几天。",
@@ -1738,6 +1759,13 @@ const ja: Messages = {
     joinWaitlist: "ウェイトリストに登録",
     opensCta: (date) => `${date} 発売、通知を受け取る`,
     footnote: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。価格は米ドル、税金はチェックアウト時に計算されます。`,
+    bar: {
+      upcoming: "創設メンバー：$79 で Pro を永久に。先着 {seats} 名、{opens}発売。",
+      open: "創設メンバー：$79 で Pro を永久に。先着 {seats} 名、{closes}まで販売中。",
+      upcomingCta: "発売時に通知を受け取る",
+      openCta: "枠を確保する",
+      dismiss: "閉じる",
+    },
     calculator: {
       title: "Pro で制作会社が節約できる金額",
       lead: "1 年に作るキャンペーンページの数と、SunUI で 1 本あたり何日短縮できるかを入れてください。",
