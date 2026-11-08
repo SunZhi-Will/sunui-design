@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": ["./registry/**/*", "./content/**/*", "./lib/**/*", "./registry.json"],
   },
+  // public/blocks/<block>/<檔名> 的示範照片給一週快取：預設的 max-age=0 會讓每個新掛上的 <img> 先回伺服器確認，
+  // 翻頁、換系列這類動態會先畫出空白再補圖。只比對兩層的圖片路徑，/blocks/<slug> 區塊頁本身不受影響
+  async headers() {
+    return [
+      {
+        source: "/blocks/:block/:file((?:.+)\\.(?:webp|png|jpe?g|avif))",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=2592000" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
