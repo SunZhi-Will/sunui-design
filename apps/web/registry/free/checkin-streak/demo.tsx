@@ -44,6 +44,7 @@ export default function CheckinStreakDemo() {
         week={[isoDaysAgo(6), isoDaysAgo(4), isoDaysAgo(3), isoDaysAgo(2), isoDaysAgo(1)]}
         streak={4}
         reward={5}
+        milestone={{ every: 7, bonus: 20 }}
         onCheckIn={() => new Promise((resolve) => setTimeout(() => resolve({ reward: 5 }), 700))}
         onClaimed={(n) => setLeft((v) => v + n)}
       />

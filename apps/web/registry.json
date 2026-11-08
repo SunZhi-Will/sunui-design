@@ -774,7 +774,7 @@
       "name": "checkin-streak",
       "type": "registry:block",
       "title": "Check-in Streak",
-      "description": "Daily check-in card with the last 7 days as circles (done filled, today outlined, missed dashed), a streak count, a reward toast, and a window event that tells quota displays to refresh. Days carry aria labels, the toast is a live region with a close button, and under reduced motion the spinner and toast motion are turned off.",
+      "description": "Daily check-in card led by a large streak count and one line on what today does (\"check in to make it 5 days\"). The last 7 days form a chain: consecutive days are joined by a line, today is linked by a dashed line that turns solid on check-in, and missed days read as missed, not claimable. An optional milestone (for example a bonus every 7 days) adds a segmented progress track. Includes a reward toast and a window event that tells quota displays to refresh. Days carry aria labels, and under reduced motion every change is instant.",
       "dependencies": [
         "framer-motion"
       ],
@@ -797,13 +797,16 @@
           ],
           "watchOut": [
             "Pass today as a local YYYY-MM-DD so the 7-day window matches the server",
-            "Keep refreshEvent the same as the one your quota display listens to"
+            "Keep refreshEvent the same as the one your quota display listens to",
+            "Set milestone only if your backend pays the bonus too; without onCheckIn returning reward the card adds the bonus itself"
           ],
           "aliases": [
             "daily check-in",
             "streak",
             "login reward",
-            "attendance"
+            "attendance",
+            "streak milestone",
+            "login bonus"
           ]
         }
       },
