@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -5,6 +8,7 @@ import { AgentSteps } from "@/components/agent-steps";
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
+import { HeroOpening } from "@/components/hero-opening";
 import { PhraseText } from "@/components/phrase-text";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
@@ -12,6 +16,17 @@ import { orderCatalog } from "@/lib/catalog-order";
 import { getItems, installCommand, usesSpot } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { variantIds } from "@/registry/__generated__/variants";
+
+const HERO_TILES = [
+  "day-night-hero", "glass-cube-hero", "flash-sale-hero", "launch-stage-hero", "drop-release-hero", "curve-rail-hero",
+  "depth-hero", "gift-box-reveal", "order-island", "receipt-printer", "coupon-wallet", "peel-sticker-coupon",
+  "scratch-card", "prize-wheel", "stamp-card", "physics-cart-jar", "pixel-boss-sale", "pixel-gacha", "festival-banner",
+  "black-friday-weekend", "countdown-banner", "cart-drawer", "checkout-steps", "product-gallery", "flash-sale-product-card",
+  "coupon-claim-card", "free-shipping-progress", "gift-card-designer", "fold-invite-card", "launch-countdown-wall",
+  "book-3d", "orbit-gallery", "spine-shelf", "photo-looks", "vote-terrain", "showcase-mosaic", "self-building-page",
+  "shader-campaign-banner", "price-history", "order-tracker", "variant-picker", "plan-comparison", "testimonial-wall",
+  "hotspots", "cloth-curtain", "plush-portrait", "point-cloud", "theme-picker", "loop-shader-hero",
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
@@ -51,42 +66,33 @@ export default async function HomePage() {
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
   const firstFree = all.find((item) => item.meta.tier === "free");
+  // 開場紙牆：挑畫面最有份量的區塊，只放有分享圖的
+  const heroTiles = HERO_TILES.filter((name) => existsSync(path.join(process.cwd(), "public/og/blocks", `${name}.jpg`)));
 
   return (
     <>
-      {/* 主視覺：左邊說明，右邊直接讓人比較「常見 AI 樣貌」與 SunUI，取代原本的統計數字 */}
-      <section className="grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
-        <div className="min-w-0">
-          <p className="mb-4 text-sm font-medium text-accent">{m.home.eyebrow}</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] sm:text-5xl">
-            <PhraseText text={m.home.title} />
-          </h1>
-          <p className="mt-5 text-lg text-pretty text-subtle">
-            {m.home.lead}
-          </p>
-          {firstFree && (
-            <div className="mt-8">
-              <Command value={installCommand(firstFree)} />
-            </div>
-          )}
-          {/* 差異點：只放競品沒有的東西，不跟對手比區塊數量 */}
-          <dl aria-label={m.home.stats.label} className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
-            {m.home.stats.items.map((stat) => (
-              <div key={stat.label} className="flex flex-col-reverse">
-                <dt className="text-xs text-subtle">{stat.label}</dt>
-                <dd className="text-2xl font-semibold tracking-tight tabular-nums">{stat.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-        <HeroCompare m={m.home.compare} />
-      </section>
+      {/* 開場：真實區塊鋪成的 3D 紙牆佔滿主視覺，上面只留一句話和安裝指令 */}
+      <HeroOpening tiles={heroTiles} featured="day-night-hero">
+        <h1 className="text-center text-4xl font-semibold tracking-tight text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] sm:text-6xl">
+          <PhraseText text={m.home.title} />
+        </h1>
+        {firstFree && (
+          <div className="mx-auto mt-6 max-w-2xl">
+            <Command value={installCommand(firstFree)} />
+          </div>
+        )}
+      </HeroOpening>
 
       <Catalog
         items={items}
         locale={locale}
         messages={{ catalog: m.catalog, collections: m.collections, interactions: m.interactions, series: m.series, tier: m.tier }}
       />
+
+      {/* 和常見 AI 樣貌並排比較：原本在主視覺，開場改成動畫後移到這裡 */}
+      <section aria-label={m.home.compare.label} className="mx-auto mt-24 max-w-xl">
+        <HeroCompare m={m.home.compare} />
+      </section>
 
       <AgentSteps m={m.home.agent} />
 
