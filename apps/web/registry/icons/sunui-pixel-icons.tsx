@@ -12,7 +12,7 @@ import type { SVGProps } from "react";
  * - tone="pigment"：外框與亮點不變，填色、陰影、accent 換成物件本色（pixelPigments）。
  *   一個物件可以有三種材質（pixelPalettes）：「= :」主體、「+ ~」accent、「- _」第二材質，
  *   例如劍是鋼刃、金護手、木柄。只有本身就有顏色的物件有對照，其餘維持墨色。顏色可用 --sunui-pigment-<name> 覆寫。
- * - 勾、叉、箭頭、選單這些控制符號維持 2 格粗的實心線，不加填色。
+ * - 勾、叉、箭頭、選單這些控制符號維持 2 格粗的實心線，不加填色；pigment 時整條線換成本色（strokeTones）。
  * - 邊（碰到空格的「#」）墨色 85%，1 格粗的內線墨色 50%，2 × 2 以上的記號全墨；pigment 時亮色紙上邊跟著本色，暗色紙上回到墨色，內線用本色最深一階。
  * - 以 16 的整數倍顯示（16、32、48、64）才會銳利；shape-rendering 設為 crispEdges。
  */
@@ -275,11 +275,11 @@ export const pixelIcons = {
     "................",
     ".......##.......",
     "......####......",
-    ".....##=:##.....",
-    "....##*==:##....",
-    "...##=====:##...",
-    "..##=======:##..",
-    ".##:========:##.",
+    ".....##-_##.....",
+    "....##*--_##....",
+    "...##-----_##...",
+    "..##-------_##..",
+    ".##_--------_##.",
     "...#=======:#...",
     "...#==::::=:#...",
     "...#=:####=:#...",
@@ -293,9 +293,9 @@ export const pixelIcons = {
     "................",
     "................",
     "......####......",
-    ".....#===:#.....",
-    ".....#===:#.....",
-    ".....#::::#.....",
+    ".....#---_#.....",
+    ".....#---_#.....",
+    ".....#____#.....",
     "......####......",
     "................",
     "....########....",
@@ -766,10 +766,10 @@ export const pixelIcons = {
     ".#########......",
     ".#=*====:#......",
     ".#*=====:#####..",
-    ".#======:#=*:#..",
-    ".#======:#*==:#.",
-    ".#======:#===:#.",
-    ".#:::::::#::::#.",
+    ".#======:#-*_#..",
+    ".#======:#*--_#.",
+    ".#======:#---_#.",
+    ".#:::::::#____#.",
     ".##############.",
     "...##......##...",
     "..#::#....#::#..",
@@ -799,9 +799,9 @@ export const pixelIcons = {
     "................",
     "................",
     "..############..",
-    ".#::#::##::#::#.",
+    ".#++#++##++#++#.",
     ".##############.",
-    "..#:##:##:##:#..",
+    "..#+##+##+##+#..",
     "..#*========:#..",
     "..#=:::==::::#..",
     "..#:###=:###:#..",
@@ -2319,8 +2319,7 @@ export type Pigment = keyof typeof pigments;
 export type PixelTone = "ink" | "pigment";
 
 /**
- * tone="pigment" 時每個圖示用的顏色。只標本身就有顏色的物件；
- * 控制符號、紙品、介面不在表內，永遠是墨色。
+ * tone="pigment" 時每個圖示用的顏色。只有外框的控制符號（勾、叉、箭頭）整條線換成這個顏色。
  */
 export const pixelPigments: Partial<Record<PixelIconName, Pigment>> = {
   heart: "red",
@@ -2407,6 +2406,50 @@ export const pixelPigments: Partial<Record<PixelIconName, Pigment>> = {
   bunny: "bone",
   clover: "green",
   medal: "gold",
+  // 介面：只有線的控制符號整條線上色（見 strokeTones），其餘照物件本色
+  check: "green",
+  close: "red",
+  plus: "green",
+  minus: "red",
+  "arrow-left": "blue",
+  "arrow-right": "blue",
+  "arrow-up": "blue",
+  "arrow-down": "blue",
+  "chevron-left": "violet",
+  "chevron-right": "violet",
+  "chevron-up": "violet",
+  "chevron-down": "violet",
+  menu: "violet",
+  download: "green",
+  upload: "blue",
+  search: "blue",
+  home: "brown",
+  user: "green",
+  lock: "gold",
+  settings: "steel",
+  trash: "green",
+  mail: "blue",
+  eye: "blue",
+  info: "blue",
+  alert: "gold",
+  clock: "orange",
+  calendar: "bone",
+  // 紙品
+  coupon: "gold",
+  receipt: "bone",
+  stamp: "red",
+  "stamp-check": "red",
+  "punch-card": "blue",
+  envelope: "bone",
+  scissors: "red",
+  // 電商
+  cart: "blue",
+  bag: "orange",
+  tag: "pink",
+  truck: "red",
+  store: "brown",
+  card: "violet",
+  cursor: "gold",
 };
 
 /**
@@ -2470,6 +2513,18 @@ export const pixelPalettes: Partial<Record<PixelIconName, { accent?: Pigment; se
   egg: { accent: "pink", second: "gold" },
   bunny: { second: "pink" },
   medal: { second: "blue" },
+  home: { second: "red" },
+  user: { second: "bone" },
+  lock: { accent: "brown" },
+  alert: { accent: "red" },
+  calendar: { accent: "red" },
+  coupon: { accent: "red" },
+  receipt: { accent: "green" },
+  "punch-card": { accent: "gold" },
+  envelope: { accent: "red" },
+  tag: { accent: "steel" },
+  truck: { second: "blue" },
+  store: { accent: "red" },
 };
 
 export type PixelIconProps = Omit<SVGProps<SVGSVGElement>, "children"> & {
@@ -2538,6 +2593,30 @@ export function pigmentTones(pigment: Pigment, accent: Pigment = pigment, second
     pigmentToneCache.set(key, hit);
   }
   return hit;
+}
+
+const strokeToneCache = new Map<Pigment, PixelToneList>();
+
+/**
+ * 只有外框的控制符號（勾、叉、箭頭）在 pigment 時的上色：整條線換成本色。
+ * 亮色紙用陰影那一階（金色、骨色才讀得到），暗色紙用基準色。
+ */
+export function strokeTones(pigment: Pigment): PixelToneList {
+  let hit = strokeToneCache.get(pigment);
+  if (!hit) {
+    const base = `var(--sunui-pigment-${pigment}, ${pigments[pigment]})`;
+    hit = [{ char: "#", fill: `light-dark(${shift(base, ramps[pigment].shade)}, ${base})`, opacity: 1 }];
+    strokeToneCache.set(pigment, hit);
+  }
+  return hit;
+}
+
+/** 一組路徑實際要用的色階：墨色、物件本色，或只有線時的整條上色 */
+export function tonesFor(paths: PixelPaths, palette?: PixelPalette): PixelToneList {
+  if (!palette) return pixelTones;
+  const keys = Object.keys(paths);
+  if (keys.length === 1 && keys[0] === "#") return strokeTones(palette.pigment);
+  return pigmentTones(palette.pigment, palette.accent, palette.second);
 }
 
 /** 依 tone 與圖示名稱決定要用的顏色；回傳 undefined 代表墨色 */
@@ -2614,7 +2693,7 @@ export function pixelPaths(name: PixelIconName) {
 
 export function PixelPathsGroup({ paths, pigment, palette }: { paths: PixelPaths; pigment?: Pigment; palette?: PixelPalette }) {
   const main = palette?.pigment ?? pigment;
-  const tones: PixelToneList = main ? pigmentTones(main, palette?.accent, palette?.second) : pixelTones;
+  const tones = tonesFor(paths, main ? { pigment: main, accent: palette?.accent, second: palette?.second } : undefined);
   return (
     <>
       {tones.map(({ char, fill, opacity }) =>

@@ -2,11 +2,10 @@ import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
 import { siteUrl } from "@/lib/site";
 import { icons, type IconName, type IconNode } from "@/registry/icons/sunui-icons";
 import {
-  pigmentTones,
   pixelIcons,
   pixelPaths,
-  pixelTones,
   resolvePalette,
+  tonesFor,
   type PixelIconName,
 } from "@/registry/icons/sunui-pixel-icons";
 
@@ -167,7 +166,7 @@ function pixelBody(name: PixelIconName, tone: "ink" | "pigment", accent: string,
       .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
       .replace("var(--sunui-pixel-shine, #fff)", "#fff")
       .replace("var(--sunui-icon-accent, currentColor)", accent);
-  const tones = (palette ? pigmentTones(palette.pigment, palette.accent, palette.second) : pixelTones).map((t) => ({
+  const tones = tonesFor(paths, palette).map((t) => ({
     char: t.char,
     fill: plain(t.fill),
     opacity: t.opacity === 1 ? undefined : t.opacity,
