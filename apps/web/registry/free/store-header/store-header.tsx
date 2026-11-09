@@ -23,6 +23,8 @@ export interface StoreHeaderProps {
   /** 掛在購物車按鈕上，可直接當 add-to-cart-button 的 cartRef（飛行終點） */
   cartRef?: Ref<HTMLButtonElement>;
   onCartClick?: () => void;
+  /** 換掉預設的購物袋圖示，例如 <ShoppingCart />；任何 SVG 都會縮到 20px */
+  cartIcon?: ReactNode;
   /** 購物車左邊的額外按鈕，例如搜尋、帳號 */
   actions?: ReactNode;
   /** 頁首最上方的一條，例如 AnnouncementStrip；收起時一起收 */
@@ -71,6 +73,7 @@ export function StoreHeader({
   cartCount = 0,
   cartRef,
   onCartClick,
+  cartIcon,
   actions,
   announcement,
   scrollContainer,
@@ -152,7 +155,7 @@ export function StoreHeader({
           <div className="ml-auto flex items-center gap-1">
             {actions}
             <button ref={cartRef} type="button" aria-label={t.cart(cartCount)} onClick={onCartClick} className={iconButton}>
-              <BagIcon />
+              <span aria-hidden="true" className="grid place-items-center [&_svg]:size-5">{cartIcon ?? <BagIcon />}</span>
               <AnimatePresence initial={false}>
                 {cartCount > 0 && (
                   <motion.span

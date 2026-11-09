@@ -49,6 +49,8 @@ export interface OrderHistoryProps {
   renderActions?: (order: HistoryOrder) => ReactNode;
   /** 沒有訂單時放在提示文字下方，例如回到商店的連結 */
   emptyAction?: ReactNode;
+  /** 換掉沒有訂單時的收據圖示；任何 SVG 都會縮到 32px */
+  emptyIcon?: ReactNode;
   defaultExpandedId?: string;
   /** 覆寫內建字串，優先於 locale */
   labels?: OrderHistoryLabels;
@@ -139,6 +141,7 @@ export function OrderHistory({
   currency = "USD",
   renderActions,
   emptyAction,
+  emptyIcon,
   defaultExpandedId,
   labels,
   className,
@@ -161,7 +164,13 @@ export function OrderHistory({
 
       {orders.length === 0 ? (
         <div className="px-6 py-10 text-center">
-          <ReceiptIcon className={cn("mx-auto", inkMuted)} />
+          {emptyIcon ? (
+            <span aria-hidden="true" className={cn("mx-auto grid w-fit place-items-center [&_svg]:size-8", inkMuted)}>
+              {emptyIcon}
+            </span>
+          ) : (
+            <ReceiptIcon className={cn("mx-auto", inkMuted)} />
+          )}
           <p className={cn("mx-auto mt-3 max-w-[18rem] text-sm text-pretty", inkMuted)}>{t.empty}</p>
           {emptyAction && <div className="mt-4">{emptyAction}</div>}
         </div>

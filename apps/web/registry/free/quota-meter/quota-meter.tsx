@@ -141,6 +141,8 @@ export interface QuotaMeterProps {
   nudgeHref?: string;
   /** 低於或等於這個百分比轉成警示色 */
   lowAt?: number;
+  /** 換掉簽到獎勵的禮物圖示，例如 <Coins />；任何 SVG 都會縮到原本的 12 或 16px */
+  rewardIcon?: ReactNode;
   /** 強調色（簽到提醒），預設跟隨主題的 primary */
   accent?: string;
   /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
@@ -165,6 +167,16 @@ function GiftIcon({ className }: { className?: string }) {
       <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
       <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
     </svg>
+  );
+}
+
+/** 有傳 rewardIcon 就用它，否則用內建禮物 */
+function RewardIcon({ icon, className }: { icon?: ReactNode; className?: string }) {
+  if (!icon) return <GiftIcon className={className} />;
+  return (
+    <span aria-hidden className={cn("grid shrink-0 place-items-center [&_svg]:size-full", className)}>
+      {icon}
+    </span>
   );
 }
 
@@ -216,6 +228,7 @@ export function QuotaMeter({
   hint,
   nudgeHref = "#rewards",
   lowAt = 10,
+  rewardIcon,
   accent,
   locale,
   labels,
@@ -240,7 +253,7 @@ export function QuotaMeter({
         <span className="flex items-baseline justify-between gap-2 text-sm">
           <span className="font-medium">{t.head}</span>
           <span className={cn("flex min-w-0 items-center gap-1 text-xs tabular-nums", t.gift ? "text-[var(--yc-brand-c)]" : "text-[var(--yc-muted-fg)]")}>
-            {t.gift ? <GiftIcon className="size-3" /> : null}
+            {t.gift ? <RewardIcon icon={rewardIcon} className="size-3" /> : null}
             <span className="truncate">{t.sub}</span>
           </span>
         </span>
@@ -286,7 +299,7 @@ export function QuotaMeter({
               "flex items-center gap-2 border-t border-[var(--yc-border)] bg-[color-mix(in_oklab,var(--yc-brand-c)_10%,transparent)] px-5 py-2.5 text-sm transition-colors hover:bg-[color-mix(in_oklab,var(--yc-brand-c)_15%,transparent)] focus-visible:-outline-offset-2",
             )}
           >
-            <GiftIcon className="size-4 text-[var(--yc-brand-c)]" />
+            <RewardIcon icon={rewardIcon} className="size-4 text-[var(--yc-brand-c)]" />
             <span className="min-w-0 flex-1">{l.nudge(usage.checkin)}</span>
             <ChevronDownIcon className="size-4 text-[var(--yc-muted-fg)]" />
           </a>
@@ -337,7 +350,7 @@ export function QuotaMeter({
         >
           <span className="text-xs font-medium">{t.head}</span>
           <span className={cn("flex items-center gap-1 truncate text-[11px] tabular-nums", t.gift ? "text-[var(--yc-brand-c)]" : "text-[var(--yc-muted-fg)]")}>
-            {t.gift ? <GiftIcon className="size-3" /> : null}
+            {t.gift ? <RewardIcon icon={rewardIcon} className="size-3" /> : null}
             {t.sub}
           </span>
         </span>

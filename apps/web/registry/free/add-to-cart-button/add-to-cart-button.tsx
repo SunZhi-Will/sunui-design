@@ -30,6 +30,8 @@ export interface AddToCartButtonProps {
   /** added 狀態維持多久後回到 idle（ms） */
   resetAfter?: number;
   disabled?: boolean;
+  /** 換掉按鈕上的購物袋圖示（idle、adding 時顯示；added 仍是勾），任何 SVG 都會縮到 16px */
+  icon?: ReactNode;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -123,6 +125,7 @@ export function AddToCartButton({
   arcHeight = 120,
   resetAfter = 1600,
   disabled,
+  icon,
   locale = "en",
   labels,
   className,
@@ -198,16 +201,13 @@ export function AddToCartButton({
           className,
         )}
       >
-        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          {state === "added" ? (
-            <path d="M5 12.5l4.5 4.5L19 7.5" />
-          ) : (
-            <>
-              <path d="M5.5 7.5h13l-.9 11.6a1.5 1.5 0 0 1-1.5 1.4H7.9a1.5 1.5 0 0 1-1.5-1.4z" />
-              <path d="M9 10V6.5a3 3 0 0 1 6 0V10" />
-            </>
-          )}
-        </svg>
+        {state !== "added" && icon ? (
+          <span aria-hidden="true" className="grid shrink-0 place-items-center [&_svg]:size-4">{icon}</span>
+        ) : (
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {state === "added" ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : <BagPaths />}
+          </svg>
+        )}
         <span className="whitespace-nowrap">{state === "idle" ? t.idle : state === "adding" ? t.adding : t.added}</span>
       </motion.button>
 
@@ -319,13 +319,25 @@ export interface CartIconProps {
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
   labels?: Partial<Pick<AddToCartLabels, "cart" | "items">>;
+  /** 換掉預設的購物袋圖示，與 AddToCartButton 的 icon 用同一個；任何 SVG 都會縮到 18px */
+  icon?: ReactNode;
   ref?: Ref<HTMLButtonElement>;
   onClick?: () => void;
   className?: string;
 }
 
+/** 購物袋，按鈕與 CartIcon 共用 */
+function BagPaths() {
+  return (
+    <>
+      <path d="M5.5 7.5h13l-.9 11.6a1.5 1.5 0 0 1-1.5 1.4H7.9a1.5 1.5 0 0 1-1.5-1.4z" />
+      <path d="M9 10V6.5a3 3 0 0 1 6 0V10" />
+    </>
+  );
+}
+
 /** 搭配 AddToCartButton 的購物車目標 */
-export function CartIcon({ count, max = 99, label, locale = "en", labels, ref, onClick, className }: CartIconProps) {
+export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, ref, onClick, className }: CartIconProps) {
   const reduceMotion = useReducedMotion();
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
 
@@ -341,10 +353,13 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, ref, o
         className,
       )}
     >
-      <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M5.5 7.5h13l-.9 11.6a1.5 1.5 0 0 1-1.5 1.4H7.9a1.5 1.5 0 0 1-1.5-1.4z" />
-        <path d="M9 10V6.5a3 3 0 0 1 6 0V10" />
-      </svg>
+      {icon ? (
+        <span aria-hidden="true" className="grid place-items-center [&_svg]:size-[18px]">{icon}</span>
+      ) : (
+        <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <BagPaths />
+        </svg>
+      )}
       <AnimatePresence initial={false}>
         {count > 0 && (
           // 以 count 當 key 重新掛載，每次加入都重新「壓」一次

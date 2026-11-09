@@ -518,6 +518,28 @@ const CoffeeIcon = ({ className }: IconProps) => (
 const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rk-accent)]";
 const PRIMARY_CTA =
   "w-full py-2.5 rounded-lg bg-[var(--rk-accent)] hover:opacity-90 text-[#111111] text-sm font-semibold transition-opacity flex items-center justify-center gap-1.5";
+const TIER_ICONS: Record<LicenseTier, (p: IconProps) => ReactNode> = {
+  pro: CrownIcon,
+  basic: UnlockIcon,
+  supporter: CoffeeIcon,
+  trial: ClockIcon,
+  free: ShieldCheckIcon,
+};
+
+/** 有傳 tierIcons 就用它，否則用內建圖示 */
+function TierIcon({ tier, icons, className }: { tier: LicenseTier; icons?: Partial<Record<LicenseTier, ReactNode>>; className?: string }) {
+  const custom = icons?.[tier];
+  if (custom) {
+    return (
+      <span aria-hidden="true" className={cn("grid shrink-0 place-items-center [&_svg]:size-full", className)}>
+        {custom}
+      </span>
+    );
+  }
+  const Icon = TIER_ICONS[tier];
+  return <Icon className={className} />;
+}
+
 const BOX = "rounded-lg border border-[var(--rk-border)] bg-white/[0.03]";
 const GHOST = "w-full py-2 rounded-lg text-xs font-medium border border-[var(--rk-border)] hover:bg-white/5 transition-colors disabled:opacity-50";
 
@@ -541,6 +563,8 @@ export interface RedeemKeyInputProps {
   onClose?: () => void;
   /** 面板底部的額外內容（例如版本資訊） */
   footer?: ReactNode;
+  /** 換掉各方案的圖示，沒給的沿用內建：pro 皇冠、basic 解鎖、supporter 咖啡、trial 時鐘、free 盾牌；任何 SVG 都會縮到原本的尺寸 */
+  tierIcons?: Partial<Record<LicenseTier, ReactNode>>;
   /** 強調色，預設中性墨色 #ededed（原本的 KapZoom 黃是 #eab308） */
   accent?: string;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
@@ -564,6 +588,7 @@ export function RedeemKeyInput({
   onPurchaseBasic,
   onClose,
   footer,
+  tierIcons,
   accent = "#ededed",
   locale = "en",
   labels: labelsProp,
@@ -772,7 +797,7 @@ export function RedeemKeyInput({
         )}
         <div className="flex items-center gap-2.5 pr-6">
           <div className={cn(BOX, "w-9 h-9 shrink-0 flex items-center justify-center text-[var(--rk-text)]")}>
-            {isPro ? <CrownIcon className="w-5 h-5" /> : isBasic ? <UnlockIcon className="w-5 h-5" /> : isSupporter ? <CoffeeIcon className="w-5 h-5" /> : <ShieldCheckIcon className="w-5 h-5" />}
+            <TierIcon tier={isPro ? "pro" : isBasic ? "basic" : isSupporter ? "supporter" : "free"} icons={tierIcons} className="w-5 h-5" />
           </div>
           <div className="min-w-0">
             <h2 id={titleId} className="text-[var(--rk-text)] font-semibold text-sm">
@@ -805,17 +830,11 @@ export function RedeemKeyInput({
 
             {/* 目前方案 */}
             <div className={cn(BOX, "p-3 flex items-center gap-3 text-[var(--rk-text-2)]")}>
-              {isPro ? (
-                <CrownIcon className="w-5 h-5 shrink-0" />
-              ) : isBasic ? (
-                <UnlockIcon className="w-5 h-5 shrink-0" />
-              ) : isSupporter ? (
-                <CoffeeIcon className="w-5 h-5 shrink-0" />
-              ) : isTrial ? (
-                <ClockIcon className="w-5 h-5 shrink-0" />
-              ) : (
-                <ShieldCheckIcon className="w-5 h-5 shrink-0 text-[var(--rk-muted)]" />
-              )}
+              <TierIcon
+                tier={isPro ? "pro" : isBasic ? "basic" : isSupporter ? "supporter" : isTrial ? "trial" : "free"}
+                icons={tierIcons}
+                className={cn("w-5 h-5 shrink-0", !isPro && !isBasic && !isSupporter && !isTrial && "text-[var(--rk-muted)]")}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-[var(--rk-text)] font-medium">
                   {tierName}
@@ -845,7 +864,7 @@ export function RedeemKeyInput({
                 )}
                 {isBasic && pricing && (
                   <button type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
-                    <CrownIcon className="w-4 h-4" />
+                    <TierIcon tier="pro" icons={tierIcons} className="w-4 h-4" />
                     {l.upgradePro} · {pricing.current}
                     <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
                   </button>
@@ -895,7 +914,7 @@ export function RedeemKeyInput({
                       <div className={cn(BOX, "p-3 flex flex-wrap items-center justify-between gap-3")}>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-[var(--rk-text)] flex items-center gap-1.5">
-                            <UnlockIcon className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
+                            <TierIcon tier="basic" icons={tierIcons} className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
                             {l.unlockBasicTitle}
                           </p>
                           <p className="mt-0.5 text-[10px] text-[var(--rk-muted)]">{l.priceBasicSubnote}</p>
@@ -913,7 +932,7 @@ export function RedeemKeyInput({
 
                     <div className={cn(BOX, "p-3")}>
                       <p className="text-xs font-medium text-[var(--rk-text)] mb-2 flex items-center gap-1.5">
-                        <CrownIcon className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
+                        <TierIcon tier="pro" icons={tierIcons} className="w-3.5 h-3.5 text-[var(--rk-text-2)]" />
                         {l.unlockTitle}
                       </p>
                       <ul className="space-y-1">
@@ -1032,7 +1051,7 @@ export function RedeemKeyInput({
 
                 {!degraded && pricing && (
                   <motion.button layout="position" transition={layoutT} type="button" onClick={onPurchase} className={cn(PRIMARY_CTA, FOCUS)}>
-                    <CrownIcon className="w-4 h-4" />
+                    <TierIcon tier="pro" icons={tierIcons} className="w-4 h-4" />
                     {l.upgradePro} · {pricing.current}
                     <ExternalIcon className="w-3.5 h-3.5 opacity-70" />
                   </motion.button>

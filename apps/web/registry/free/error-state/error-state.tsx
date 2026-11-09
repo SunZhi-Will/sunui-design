@@ -71,6 +71,8 @@ export interface ErrorStateProps {
   /** 給使用者看的友善訊息；不要傳原始例外或技術訊息 */
   message?: ReactNode;
   onRetry?: () => void;
+  /** 換掉預設的警示三角形，跟 EmptyState 的 icon 一樣；任何 SVG 都會縮到 24px */
+  icon?: ReactNode;
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
@@ -78,13 +80,13 @@ export interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({ title, message, onRetry, locale = "en", labels, className }: ErrorStateProps) {
+export function ErrorState({ title, message, onRetry, icon, locale = "en", labels, className }: ErrorStateProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   return (
     <div role="alert" className={cn("flex flex-col overflow-hidden rounded-xl border border-border bg-card text-sm text-card-foreground", className)}>
       <div className="flex flex-col items-center gap-4 px-5 py-12 text-center">
-        <span className="text-destructive [&_svg]:size-6">
-          <AlertTriangleIcon />
+        <span aria-hidden="true" className="text-destructive [&_svg]:size-6">
+          {icon ?? <AlertTriangleIcon />}
         </span>
         <div>
           <p className="text-sm font-medium text-foreground">{title ?? t.title}</p>
