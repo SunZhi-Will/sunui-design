@@ -214,3 +214,45 @@ Kubai Icons License 摘要（第 2、3、6 條）：
 - 有順序動作的實例：郵件，`o` 前 55% 翻蓋、35% 之後抽信
 - 鉸鏈翻頁：筆記本、日曆（縮放越過鉸鏈後換背面並移到內容後方）
 - 無頭截圖參數：`check.mjs` 的 `shot()`，`--headless=new --force-prefers-reduced-motion --virtual-time-budget=3000 --screenshot=...`
+
+---
+
+## 2026-11-09 更新：從 skill 變成圖示庫
+
+> 來源：https://github.com/kubai087/kubai-icons （`kubai-icons@0.3.1`，2026-11-09）、https://icons.kubai.design/ 。推文 https://x.com/Kubai087/status/2119603850210635910 無法抓取（X 回 402），以 repo 與網站內容為準。
+
+### 變了什麼
+
+| 面向 | 11-05 | 11-09 |
+|---|---|---|
+| 數量 | 66 個範例 | 2,800+（約 900 個物件，加上角標版與斜線 off 版；badges/ 有 20 種角標） |
+| 形態 | 全域腳本 + skill | npm：`kubai-icons`（core）、`-react`、`-vue`、`-static`，另有 web component 與 CDN 合併版 |
+| 打包 | 無 | 每個圖示一個 ES module，`sideEffects: false`，單個約 1.1 KB gzip，可 SSR |
+| 顏色 | 引擎用 JS 解算，不吃 `currentColor` | 改由 CSS 推導，預設跟隨 `currentColor`；`variant="soft"`、`badgeColor` 等 props |
+| 網站 | 無 | 16 種語言，可依名稱、形狀、語意搜尋，複製程式碼或「給 agent 的 prompt」，SVG/PNG 下載、收藏打包 ZIP |
+| 發版 | 無 | changesets，一天三版（0.2.2 → 0.3.1），npm provenance |
+| 熱度 | 不詳 | 448 stars |
+
+### 授權拆成三份（關鍵變化）
+
+| 範圍 | 授權 | 對 SunUI 的意思 |
+|---|---|---|
+| `icons/`、`badges/`、`packages/` | **MIT** | 圖示現在**可以**修改、重新散佈、收進 library，只要保留版權聲明 |
+| `site/`、`tools/`、`tests/`、`docs/`、網站文案與版面 | All rights reserved | 網站不能抄（搜尋頁、收藏 ZIP 的介面設計） |
+| `SKILL.md`、`PROMPT.md`、`src/`、`scripts/`、`history/` | Kubai Icons License（不變） | 第 6 節的限制全部還在：不搬引擎、不改寫或翻譯規則 |
+
+所以第 6、8 節「不收錄它的任何範例圖示」對 `icons/` 底下的 MIT 圖示**已不再是授權問題**。但 `src/icons.js` 裡的 66 個範例仍屬 skill 授權，兩者不要混用。
+
+### 結論：仍然不收錄，理由從授權變成策略
+
+1. **風格**：層次感仍然靠漸層、投影、外描邊，違反 `DESIGN.md`「不准為了好看加漸層、光暈、模糊、彩色陰影」。`currentColor` 解決的是嵌入問題，不是風格問題。
+2. **凍結**：免費目錄凍結到 2027-01-12（見 AGENTS.md），不加新圖示集。
+3. **定位**：2,800 個 MIT 動態圖示讓「免費動態圖示數量」這條路沒得比。SunUI 四套圖示的價值要放在**電商與檔期語意**（券、購物車、結帳、節慶）、**像素風**與**和區塊一起被組裝**，不在數量。Pro 檔期圖示組（見 `reports/Pro 圖示包規劃-2026-11-08.md`）方向不變。
+4. **相容而不取代**：SunUI 區塊收 icon 的 props 應該接受任意 React 圖示元件（lucide、kubai 都能放）。這比收錄更有用，也不違反凍結。若現有區塊有寫死自家圖示的地方，值得盤點。
+
+### 新增可學的做法（補第 7 節）
+
+- **P8. 角標與 off 變體是組合，不是新圖示**：它用 20 種角標乘以物件得到大量變體。SunUI 線條圖示可以考慮一個 `badge` prop（數量點、勾、加號），購物車數量、通知點是電商頁最常見的需求。這是既有圖示集的功能，不是新的免費項目。
+- **P9. 「複製給 agent 的 prompt」**：網站每個圖示都能複製一段 prompt 給 agent。SunUI 的 `/icons` 與區塊頁可以加同類按鈕，內容導向 MCP 或 `npx shadcn add`，直接對應 AI-facing 定位。
+- **P10. 單一圖示 ES module + `./icons/*` exports**：如果之後 `registry/icons/*.tsx` 檔案過大，參考它的 exports 寫法拆成每個圖示一個檔案。目前 shadcn 複製進專案的模式下不急。
+- **P11. changesets + provenance**：若 SunUI 之後要發 npm 套件，這套發版流程可以直接照用（通用工具，無授權問題）。
