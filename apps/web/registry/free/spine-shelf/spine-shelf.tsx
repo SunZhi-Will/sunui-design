@@ -78,17 +78,16 @@ export function SpineShelf({
   const coverWidth = Math.round(height * coverRatio);
   const item = items[active];
 
-  // Keep the chosen spine in view on narrow screens (not on first paint).
+  // Keep the chosen spine centered on narrow screens. The first paint jumps
+  // there without animating, so the open cover is never cut off at the edge.
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    const instant = firstRender.current;
+    firstRender.current = false;
     // Scroll only the shelf sideways; scrollIntoView would also scroll the page.
     const el = scroller.current;
     if (!el || el.scrollWidth <= el.clientWidth) return;
     const center = PAD + active * (spineWidth + GAP) + coverWidth / 2;
-    el.scrollTo({ left: center - el.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
+    el.scrollTo({ left: center - el.clientWidth / 2, behavior: reduce || instant ? "auto" : "smooth" });
   }, [active, reduce, spineWidth, coverWidth]);
 
   const choose = (index: number, focus = false) => {
@@ -208,22 +207,22 @@ export function SpineShelf({
                       entry.cover
                     )}
                   </span>
-                  {/* page block on the left-hand side, seen while turning */}
-                  <span
-                    className="absolute top-[3px] bg-[#f2f2f2] dark:bg-[#d9d4c8]"
-                    style={{
-                      width: coverWidth - 4,
-                      height: height - 6,
-                      left: (spineWidth - coverWidth) / 2 + 2,
-                      transform: `rotateY(-90deg) translateZ(${spineWidth / 2 - 1}px)`,
-                    }}
-                  />
+                  {/* No left-hand (page) face: each spine is flattened into the
+                      row on its own and painted in DOM order, so a side face
+                      would draw over the spine before it instead of hiding
+                      behind it. The cover's backface is hidden, so spines left
+                      of the open book show nothing either. */}
                 </motion.span>
               </motion.button>
             );
           })}
+          {/* the shelf: as wide as the row of books, not the whole container */}
+          <div
+            aria-hidden
+            className="absolute bottom-0 h-px bg-border"
+            style={{ left: PAD - 8, right: PAD - 8 }}
+          />
         </div>
-        <div aria-hidden className="mx-6 h-px bg-border" />
       </div>
 
       {/* All captions share one grid cell, so the area is as tall as the longest
