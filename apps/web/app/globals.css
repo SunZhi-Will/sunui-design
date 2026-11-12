@@ -110,6 +110,14 @@
   --border: var(--line);
 }
 
+/* 網站動效 tokens，規範見 SITE-MOTION.md；JS 端同一組數字在 lib/motion.ts。
+   預設 transition 改成 150ms + 站台曲線，所有 transition-colors / transition-opacity 自動一致 */
+@theme {
+  --ease-site: cubic-bezier(0.23, 1, 0.32, 1);
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-fg: var(--fg);

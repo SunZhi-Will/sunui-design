@@ -1,8 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { LivePreview } from "@/components/live-preview";
 import { format, type Locale } from "@/lib/i18n";
@@ -16,7 +15,7 @@ export type BlockCardLabels = { livePreview: string; expand: string; pro: string
 
 /**
  * 型錄卡片：元件以原尺寸即時跑、可以直接操作；點空白處或右上角展開成面板。
- * 首頁型錄與區塊頁的相似區塊共用，面板靠同一個 layoutId 從卡片長出來。
+ * 首頁型錄與區塊頁的相似區塊共用。
  */
 export function BlockCard({
   name,
@@ -46,22 +45,13 @@ export function BlockCard({
   locale: Locale;
   labels: BlockCardLabels;
 }) {
-  const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const path = `/blocks/${name}`;
   const href = variant ? `${path}?style=${encodeURIComponent(variant)}` : path;
-  // 展開中的卡片先藏起來，面板會從它的位置長出來、關閉時再縮回去
-  const expanded = pathname === path && (searchParams.get("style") ?? undefined) === variant;
 
   return (
     <li className="group">
-      <motion.div
-        layoutId={`block-card-${variant ? `${name}~${variant}` : name}`}
-        transition={{ type: "spring", stiffness: 240, damping: 30 }}
-        style={{ borderRadius: 10, opacity: expanded ? 0 : 1 }}
-        className="relative aspect-[5/4] overflow-hidden bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line"
-      >
+      <div className="relative aspect-[5/4] overflow-hidden rounded-[10px] bg-card ring-1 ring-line/70 transition-shadow group-hover:ring-line">
         <LivePreview
           name={name}
           variant={variant ?? preview}
@@ -88,7 +78,7 @@ export function BlockCard({
             <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
           </svg>
         </Link>
-      </motion.div>
+      </div>
       <div className="mt-3 flex items-start justify-between gap-2 px-1">
         <h3 className="min-w-0 text-sm font-medium tracking-tight">
           <Link

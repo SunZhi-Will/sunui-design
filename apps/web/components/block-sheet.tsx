@@ -9,6 +9,7 @@ import { CopyButton } from "@/components/copy-button";
 import { previewUrl } from "@/lib/demo-locale";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
+import { DURATION, EASE_SITE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export type BlockSheetItem = {
@@ -23,7 +24,6 @@ export type BlockSheetItem = {
   locale: Locale;
 };
 
-const spring = { type: "spring", stiffness: 240, damping: 30 } as const;
 
 // 和區塊頁 PreviewFrame 同一組尺寸：面板裡也能直接看平板、手機寬，不必先跳到區塊頁
 const viewports = [
@@ -34,7 +34,8 @@ const viewports = [
 type Viewport = (typeof viewports)[number]["key"];
 
 /**
- * 從型錄點卡片時，卡片就地展開成這個面板，網址同時變成 /blocks/<name>。
+ * 從型錄點卡片時打開這個面板，網址同時變成 /blocks/<name>。
+ * 面板只做淡入加小位移（SITE-MOTION.md）：以前用 layoutId 從卡片放大，會把 iframe 一起縮放拉伸，看起來卡。
  * 直接打開或重新整理該網址時不會經過這裡，而是完整的 block 頁，方便分享。
  */
 export function BlockSheet({
@@ -75,7 +76,7 @@ export function BlockSheet({
   };
   const close = () => {
     setOpen(false);
-    window.setTimeout(leave, 600);
+    window.setTimeout(leave, 400);
   };
 
   const closeRef = useRef(close);
@@ -108,7 +109,7 @@ export function BlockSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.2 }}
+            transition={{ duration: reduce ? 0 : DURATION.base, ease: EASE_SITE }}
             onClick={close}
           />
           <motion.div
@@ -117,10 +118,10 @@ export function BlockSheet({
             aria-modal="true"
             aria-labelledby="block-sheet-title"
             tabIndex={-1}
-            layoutId={reduce ? undefined : `block-card-${item.variant ? `${item.name}~${item.variant}` : item.name}`}
-            transition={spring}
-            style={{ borderRadius: 12 }}
-            className="relative flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden bg-card shadow-2xl ring-1 ring-line outline-none"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: DURATION.panelIn, ease: EASE_SITE } }}
+            exit={reduce ? { opacity: 0, transition: { duration: DURATION.panelOut } } : { opacity: 0, y: 8, transition: { duration: DURATION.panelOut, ease: "easeIn" } }}
+            className="relative rounded-xl flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden bg-card shadow-2xl ring-1 ring-line outline-none"
           >
             <header className="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-5">
               <div className="min-w-0 flex-1">

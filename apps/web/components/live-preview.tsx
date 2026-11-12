@@ -81,15 +81,16 @@ export function LivePreview({
 
   return (
     <div ref={frameRef} className="absolute inset-0">
-      {/* 載入前的佔位：淺色是分享圖，深色是緩慢呼吸的骨架；iframe 淡入蓋上後一起淡出 */}
+      {/* 載入前的佔位：淺色是分享圖，深色是靜態的淺底（不脈動，一整面卡片同時閃很吵）。
+          iframe 先花 300ms 淡入蓋上，佔位等它蓋滿才退場，中間不會露出空白或疊影（SITE-MOTION.md §4） */}
       <div
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute inset-0 transition-opacity duration-500",
-          loaded ? "opacity-0" : "opacity-100",
+          "pointer-events-none absolute inset-0 transition-opacity",
+          loaded ? "opacity-0 delay-300 duration-0" : "opacity-100 duration-0",
         )}
       >
-        <div className="absolute inset-0 animate-pulse bg-stage/60 motion-reduce:animate-none" />
+        <div className="absolute inset-0 bg-stage/60" />
         {poster && (
           <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover dark:hidden" />
         )}
@@ -101,7 +102,7 @@ export function LivePreview({
           src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`, locale) + (spot ? `&spot=${spot}` : "")}
           title={title}
           onLoad={() => setLoadedLocale(locale)}
-          className={cn("relative size-full border-0 transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}
+          className={cn("relative size-full border-0 transition-opacity duration-300 motion-reduce:duration-0", loaded ? "opacity-100" : "opacity-0")}
         />
       )}
     </div>
