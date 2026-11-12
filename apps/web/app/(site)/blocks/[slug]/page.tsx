@@ -59,6 +59,8 @@ export default async function BlockPage({ params }: Props) {
   const prompt = agentPrompt(found, sources[0] ? propsSignature(sources[0].code, found.name) : null);
   const deps = item.dependencies ?? [];
   const manualDeps = ["clsx", "tailwind-merge", ...deps];
+  // 描述常是一整段規格：頁面只放首句當導言，讓預覽留在第一屏；完整規格留在 registry 的描述檔裡給自己看
+  const lede = firstSentence(item.description);
 
   return (
     <article className="py-10">
@@ -70,16 +72,13 @@ export default async function BlockPage({ params }: Props) {
         <span className="text-fg">{item.title}</span>
       </nav>
 
-      <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-2xl">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{item.title}</h1>
-          <p className="mt-3 text-pretty text-subtle">{item.description}</p>
-        </div>
-        <div className="flex items-center gap-2">
+      <header className="mb-8 max-w-3xl">
+        <div className="flex flex-wrap items-center gap-2">
+          <TierBadge tier={item.meta.tier} />
           {seriesOf(item) !== "paper" && (
             <Link
               href={`/?series=${seriesOf(item)}#blocks`}
-              className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:text-fg"
+              className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:border-fg hover:text-fg"
             >
               {m.series.labels[seriesOf(item)]}
             </Link>
@@ -87,7 +86,25 @@ export default async function BlockPage({ params }: Props) {
           <span className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
             {m.interactions[item.meta.interaction]}
           </span>
-          <TierBadge tier={item.meta.tier} />
+        </div>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{item.title}</h1>
+        <p className="mt-3 text-lg text-pretty text-fg/85">{lede}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          {isPro && (
+            <Link href="/pricing" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90">
+              {m.common.seePricing}
+            </Link>
+          )}
+          <a
+            href="#install"
+            className={
+              isPro
+                ? "rounded-md border border-line px-4 py-2 text-sm font-medium text-fg transition-colors hover:border-fg"
+                : "rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
+            }
+          >
+            {isPro ? m.block.proInstallTitle : m.block.cliTitle}
+          </a>
         </div>
       </header>
 
@@ -109,6 +126,11 @@ export default async function BlockPage({ params }: Props) {
 }
 
 type Item = NonNullable<ReturnType<typeof getItem>>;
+
+// 取第一句（中日文到「。！？」，英文到句點加空白）
+function firstSentence(text: string): string {
+  return text.match(/^.+?(?:[。！？]|[.!?](?=\s))/)?.[0] ?? text;
+}
 
 // 一鍵把安裝、使用時機、props 與設計規則打包給 coding agent
 function AgentPrompt({ prompt, t }: { prompt: string; t: Messages["block"] }) {
@@ -233,7 +255,7 @@ function FreeInstall({
   t: Messages["block"];
 }) {
   return (
-    <section className="mt-12 grid gap-10">
+    <section id="install" className="mt-12 grid scroll-mt-24 gap-10">
       <div>
         <h2 className="mb-3 text-lg font-semibold tracking-tight">{t.cliTitle}</h2>
         <p className="mb-4 text-sm text-subtle">{t.cliBody}</p>
@@ -263,7 +285,7 @@ function FreeInstall({
 
 function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"]; seePricing: string }) {
   return (
-    <section className="mt-12 grid gap-10">
+    <section id="install" className="mt-12 grid scroll-mt-24 gap-10">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-fg/80 bg-card p-6">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">{t.proTitle}</h2>
