@@ -50,6 +50,8 @@ export default async function HomePage() {
         search: `${item.title} ${item.description}`,
         en: { title: item.title, description: item.description },
         spot: usesSpot(item) || undefined,
+        // 有分享圖的區塊，卡片在 iframe 載入前先顯示它，捲動時才不會一片空白
+        poster: existsSync(path.join(process.cwd(), "public/og/blocks", `${item.name}.jpg`)) || undefined,
       };
       // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚；型錄預設會收合成一張
       const variants = variantIds[name];
@@ -73,6 +75,8 @@ export default async function HomePage() {
     <>
       {/* 開場：真實區塊鋪成的 3D 紙牆佔滿主視覺，上面只留一句話和安裝指令 */}
       <HeroOpening tiles={heroTiles} featured="day-night-hero">
+        {/* 一行小字先說這是什麼，標題才有上下文；不加按鈕列，維持開場只有一句話的份量 */}
+        <p className="mb-3 text-center text-sm font-medium text-subtle">{m.home.eyebrow}</p>
         <h1 className="text-center text-4xl font-semibold tracking-tight text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] sm:text-6xl">
           <PhraseText text={m.home.title} />
         </h1>
@@ -81,6 +85,15 @@ export default async function HomePage() {
             <Command value={installCommand(firstFree)} />
           </div>
         )}
+        <p className="mt-4 text-center text-sm">
+          <a href="#blocks" className="group inline-flex items-center gap-1.5 text-subtle transition-colors hover:text-fg">
+            {m.common.browseBlocks}
+            <span className="tabular-nums opacity-70">{all.length}</span>
+            <svg viewBox="0 0 24 24" className="size-3.5 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 5v14M6 13l6 6 6-6" />
+            </svg>
+          </a>
+        </p>
       </HeroOpening>
 
       <Catalog

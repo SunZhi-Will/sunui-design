@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { previewUrl } from "@/lib/demo-locale";
@@ -19,6 +20,7 @@ export function LivePreview({
   name,
   variant,
   spot,
+  poster,
   title,
   locale,
   onExpand,
@@ -27,6 +29,8 @@ export function LivePreview({
   variant?: string;
   /** 示範品牌色，預覽頁的 layout 腳本讀 ?spot= 套上 */
   spot?: SpotKey;
+  /** iframe 載入前的底圖（區塊的分享圖），淺色主題才顯示；深色主題用骨架，避免一張白圖閃過 */
+  poster?: string;
   title: string;
   locale: Locale;
   onExpand?: () => void;
@@ -77,6 +81,19 @@ export function LivePreview({
 
   return (
     <div ref={frameRef} className="absolute inset-0">
+      {/* 載入前的佔位：淺色是分享圖，深色是緩慢呼吸的骨架；iframe 淡入蓋上後一起淡出 */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-0 transition-opacity duration-500",
+          loaded ? "opacity-0" : "opacity-100",
+        )}
+      >
+        <div className="absolute inset-0 animate-pulse bg-stage/60 motion-reduce:animate-none" />
+        {poster && (
+          <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover dark:hidden" />
+        )}
+      </div>
       {near && (
         <iframe
           key={locale}
@@ -84,7 +101,7 @@ export function LivePreview({
           src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`, locale) + (spot ? `&spot=${spot}` : "")}
           title={title}
           onLoad={() => setLoadedLocale(locale)}
-          className={cn("size-full border-0 transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}
+          className={cn("relative size-full border-0 transition-opacity duration-300", loaded ? "opacity-100" : "opacity-0")}
         />
       )}
     </div>

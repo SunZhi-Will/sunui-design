@@ -25,6 +25,7 @@ export default async function BlockSheetPage({ params, searchParams }: Props) {
   return (
     <BlockSheet
       labels={m.sheet}
+      viewportLabels={m.preview}
       item={{
         name: item.name,
         variant,

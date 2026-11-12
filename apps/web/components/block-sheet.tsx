@@ -9,6 +9,7 @@ import { CopyButton } from "@/components/copy-button";
 import { previewUrl } from "@/lib/demo-locale";
 import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
+import { cn } from "@/lib/utils";
 
 export type BlockSheetItem = {
   name: string;
@@ -24,16 +25,34 @@ export type BlockSheetItem = {
 
 const spring = { type: "spring", stiffness: 240, damping: 30 } as const;
 
+// 和區塊頁 PreviewFrame 同一組尺寸：面板裡也能直接看平板、手機寬，不必先跳到區塊頁
+const viewports = [
+  { key: "desktop", width: "100%", icon: "M3 5h18v11H3zM8 20h8M12 16v4" },
+  { key: "tablet", width: "768px", icon: "M6 3h12v18H6zM11 18h2" },
+  { key: "mobile", width: "375px", icon: "M8 3h8v18H8zM11.5 18h1" },
+] as const;
+type Viewport = (typeof viewports)[number]["key"];
+
 /**
  * 從型錄點卡片時，卡片就地展開成這個面板，網址同時變成 /blocks/<name>。
  * 直接打開或重新整理該網址時不會經過這裡，而是完整的 block 頁，方便分享。
  */
-export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Messages["sheet"] }) {
+export function BlockSheet({
+  item,
+  labels,
+  viewportLabels,
+}: {
+  item: BlockSheetItem;
+  labels: Messages["sheet"];
+  viewportLabels: Messages["preview"];
+}) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [run, setRun] = useState(0);
+  const [viewport, setViewport] = useState<Viewport>("desktop");
+  const width = viewports.find((v) => v.key === viewport)!.width;
   const panelRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef(false);
 
@@ -112,6 +131,28 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
                   )}
                 </h2>
               </div>
+              {/* 面板夠寬時才有意義：sm 以下整個面板就是手機寬，不顯示 */}
+              <div role="radiogroup" aria-label={viewportLabels.viewport} className="hidden rounded-md border border-line p-0.5 sm:flex">
+                {viewports.map((v) => (
+                  <button
+                    key={v.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={viewport === v.key}
+                    aria-label={viewportLabels[v.key]}
+                    title={`${viewportLabels[v.key]}${v.key === "desktop" ? "" : ` · ${v.width}`}`}
+                    onClick={() => setViewport(v.key)}
+                    className={cn(
+                      "grid h-7 w-8 place-items-center rounded-[5px] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                      viewport === v.key ? "bg-fg text-bg" : "text-subtle hover:text-fg",
+                    )}
+                  >
+                    <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d={v.icon} />
+                    </svg>
+                  </button>
+                ))}
+              </div>
               <IconButton label={labels.replay} onClick={() => { setLoaded(false); setRun((n) => n + 1); }}>
                 <path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4" />
               </IconButton>
@@ -128,7 +169,7 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
               </IconButton>
             </header>
 
-            <div className="relative min-h-0 flex-1">
+            <div className={cn("relative flex min-h-0 flex-1 justify-center", viewport !== "desktop" && "stage-surround")}>
               <iframe
                 key={run}
                 src={previewUrl(
@@ -139,8 +180,8 @@ export function BlockSheet({ item, labels }: { item: BlockSheetItem; labels: Mes
                 )}
                 title={format(labels.frameTitle, { title: item.title })}
                 onLoad={() => setLoaded(true)}
-                className="size-full border-0 transition-opacity duration-300"
-                style={{ opacity: loaded ? 1 : 0 }}
+                className={cn("h-full border-0 transition-[opacity,width] duration-300", viewport !== "desktop" && "device-frame")}
+                style={{ opacity: loaded ? 1 : 0, width, maxWidth: "100%" }}
               />
             </div>
 

@@ -29,6 +29,8 @@ export type CatalogItem = Pick<RegistryItem, "name" | "title" | "description" | 
   preview?: string;
   /** 已改用品牌專色 --sunui-spot 的 block */
   spot?: boolean;
+  /** public/og/blocks 有這個區塊的分享圖，卡片載入前先當底圖 */
+  poster?: boolean;
   /** 英文原文，給「複製給 agent」的整組 prompt 用 */
   en?: { title: string; description: string };
 };
@@ -37,6 +39,10 @@ export type CatalogMessages = Pick<Messages, "catalog" | "collections" | "intera
 
 /** 型錄上方的「從一整頁開始」：一個合輯，或這個瀏覽器收藏的區塊 */
 type BlockSet = CollectionSlug | "saved";
+
+const chipRow =
+  // 手機上每一排篩選改成橫向捲動的一列，不再折成好幾行把第一張卡推到第二個畫面；sm 以上照常換行
+  "-mx-4 flex items-center gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden";
 
 export function Catalog({ items, locale, messages }: { items: CatalogItem[]; locale: Locale; messages: CatalogMessages }) {
   const { catalog: t, collections: collectionText, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
@@ -198,8 +204,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
   return (
     <section id="blocks" aria-label={t.sectionLabel} className="scroll-mt-24">
-      <div role="group" aria-label={t.setsLabel} className="mb-6 flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-sm text-subtle">{t.setsLabel}</span>
+      <div role="group" aria-label={t.setsLabel} className={cn(chipRow, "mb-6")}>
+        <span className="mr-1 shrink-0 text-sm whitespace-nowrap text-subtle">{t.setsLabel}</span>
         {collections.map((c) => (
           <FilterChip
             key={c.slug}
@@ -283,7 +289,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
           </div>
         </div>
 
-        <div role="group" aria-label={t.filterSeries} className="flex flex-wrap items-center gap-2">
+        <div role="group" aria-label={t.filterSeries} className={chipRow}>
           <FilterChip active={series === "all"} onClick={() => setSeries("all")} label={t.allSeries} count={collapsed.length} />
           {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
           {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
@@ -295,10 +301,10 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
               count={seriesCounts.get(key) ?? 0}
             />
           ))}
-          {series !== "all" && <p className="text-sm text-subtle">{seriesText.descriptions[series]}</p>}
         </div>
+        {series !== "all" && <p className="-mt-1 text-sm text-pretty text-subtle">{seriesText.descriptions[series]}</p>}
 
-        <div role="group" aria-label={t.filterInteraction} className="flex flex-wrap gap-2">
+        <div role="group" aria-label={t.filterInteraction} className={chipRow}>
           <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label={t.allInteractions} count={scoped.length} />
           {interactionKeys.map((key) => (
             <FilterChip
@@ -335,6 +341,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
             name={item.name}
             variant={item.variant}
             preview={item.preview}
+            poster={item.poster && !item.variant}
             title={item.title}
             note={!expandStyles && item.styleCount ? format(t.styles, { n: item.styleCount }) : undefined}
             tier={item.meta.tier}
@@ -431,7 +438,7 @@ function FilterChip({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-sm border px-3 py-1 text-sm transition-colors",
+        "flex shrink-0 items-center gap-1.5 rounded-sm border px-3 py-1 text-sm whitespace-nowrap transition-colors",
         active ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
       )}
     >

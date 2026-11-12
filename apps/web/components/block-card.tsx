@@ -23,6 +23,7 @@ export function BlockCard({
   variant,
   preview,
   spot,
+  poster,
   title,
   note,
   tier,
@@ -36,6 +37,8 @@ export function BlockCard({
   preview?: string;
   /** 卡片預覽套用的示範品牌色，省略時是出廠墨色 */
   spot?: SpotKey;
+  /** 有分享圖時，iframe 載入前先顯示 /og/blocks/<name>.jpg */
+  poster?: boolean;
   title: string;
   /** 標題旁的小字，例如效果庫收合時的樣式數 */
   note?: string;
@@ -63,6 +66,7 @@ export function BlockCard({
           name={name}
           variant={variant ?? preview}
           spot={spot}
+          poster={poster ? `/og/blocks/${name}.jpg` : undefined}
           title={format(labels.livePreview, { title })}
           locale={locale}
           onExpand={() => router.push(href, { scroll: false })}
