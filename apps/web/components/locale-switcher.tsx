@@ -17,7 +17,7 @@ export function LocaleSwitcher({ locale, label }: { locale: Locale; label: strin
   }
 
   return (
-    <label className="relative ml-1 flex h-8 items-center rounded-md border border-line text-xs text-subtle hover:text-fg has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent">
+    <label className="relative flex h-8 items-center rounded-md border border-line text-xs text-subtle hover:text-fg has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent">
       <span className="sr-only">{label}</span>
       <svg viewBox="0 0 24 24" aria-hidden="true" className="pointer-events-none absolute left-2 size-3.5 text-subtle">
         <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
