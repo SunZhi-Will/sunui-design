@@ -50,8 +50,8 @@ git -C apps/web/registry/pro push -u origin master
 | `SUNUI_PRO_REPO` | `SunZhi-Will/sunui-design-pro` |
 | `SUNUI_PRO_TOKEN` | 上一步的 token |
 | `SUNUI_STATS_TOKEN` | 自己產生：`openssl rand -hex 24` |
-| `POLAR_ORGANIZATION_ID` | 第 4 步拿到後再填 |
-| `POLAR_API_URL` | 先填 `https://sandbox-api.polar.sh`，正式開賣前改回 `https://api.polar.sh` |
+| `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`、`SHOPLINE_SIGN_KEY` | 第 4 步 |
+| `SHOPLINE_ENV` | 先填 `sandbox`，正式開賣前改成 `live` |
 | `RESEND_API_KEY`、`RESEND_WAITLIST_SEGMENT_ID` | 第 5 步 |
 
 部署後驗證：
@@ -66,13 +66,17 @@ curl -s https://<網域>/r/pro/coupon-claim-card.json
 
 第二個應該回 401，`message` 寫著價格與購買連結。
 
-### 4. Polar（最重要，最可能卡關）
+### 4. SHOPLINE Payments（2026-11-14 從 Polar 改過來）
 
-- 以台灣個人身分註冊，走完 Stripe Connect Express KYC。不能用 Wise、Payoneer 虛擬帳戶。
-- 建三個產品：Founding US$79、Pro US$129、Team US$349，每個都加 License Key benefit（Team activation 上限 5）。
-- 把三個結帳連結填進 `NEXT_PUBLIC_CHECKOUT_FOUNDING_URL`、`_PRO_URL`、`_TEAM_URL`。
-- 先在 sandbox 用測試卡買一次，拿到的 key 實際跑一次 `npx shadcn add @sunui-pro/coupon-claim-card`。
-- 同時申請 Dodo Payments 當備援。
+改用作者其他產品（萬寶箱、PostVault、課程平台）已在用的 SHOPLINE 商家帳號，不用再開戶與 KYC。
+新台幣收款（Founding NT$2,490、Pro NT$4,090、Team NT$10,990，約等於網站上的美金價，見 `lib/site.ts` 的 `pricesTwd`），
+授權碼由 SunUI 自己發（`lib/orders.ts`，存在 Upstash Redis）。
+
+- SHOPLINE 後台，設定、開發者管理、Webhook 管理，新增 `https://sunui.synvize.com/api/shopline/webhook`，勾選 `trade.succeeded`、`trade.failed`、`trade.expired`、`trade.refund.succeeded` 與 `dispute.*`。這一列的 Sign Key 填進 `SHOPLINE_SIGN_KEY`。
+- 商家 ID 與 API key 和其他產品相同，填進 `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`。
+- 先用 `SHOPLINE_ENV=sandbox` 走一次測試卡付款，拿完成頁的授權碼實際跑 `npx shadcn add @sunui-pro/coupon-claim-card`，再退款一次確認授權被撤銷。
+- 寄授權碼信給買家需要在 Resend 驗證 synvize.com，並設定 `RESEND_FROM`；沒設定前買家只能從完成頁拿授權碼。
+- 海外營收變大後再評估加一個代收代付平台（Polar 或 Dodo Payments）處理各國消費稅。
 
 ### 5. Resend（waitlist）
 
@@ -86,5 +90,5 @@ curl -s https://<網域>/r/pro/coupon-claim-card.json
 
 - [ ] 正式網址可以用 shadcn CLI 裝免費 block
 - [ ] `/api/installs` 看得到自己剛剛那次安裝
-- [ ] Polar sandbox 完成一筆購買，拿 key 裝到 Pro block
+- [ ] SHOPLINE sandbox 完成一筆購買，拿 key 裝到 Pro block
 - [ ] waitlist 送出後 Resend 看得到

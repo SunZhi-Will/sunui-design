@@ -6,9 +6,8 @@ import { formatDate, isAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { RAIL_COOKIE } from "@/lib/admin-session";
 import { webhookLast } from "@/lib/events";
-import { polarConfigured } from "@/lib/polar";
 import { redisEnabled } from "@/lib/redis";
-import { foundingState, foundingWindow } from "@/lib/site";
+import { checkoutReady, foundingState, foundingWindow } from "@/lib/site";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
@@ -39,17 +38,16 @@ async function sources(): Promise<SourceStatus[]> {
   const latest = last ? Object.values(last).sort().at(-1) : undefined;
   return [
     { label: "Upstash Redis", ok: redis, detail: "安裝、Pro 使用、漏斗" },
-    { label: "Polar API", ok: polarConfigured(), detail: "訂單、授權、轉換" },
+    { label: "SHOPLINE", ok: checkoutReady(), detail: process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境" },
     {
-      label: "Polar webhook",
-      ok: Boolean(process.env.POLAR_WEBHOOK_SECRET),
+      label: "付款通知",
+      ok: Boolean(process.env.SHOPLINE_SIGN_KEY),
       detail: latest ? `最後收到 ${formatDate(latest)}` : "尚未收到事件",
     },
   ];
 }
 
 async function dormantCount() {
-  if (!polarConfigured()) return 0;
   const overview = await licenseOverview().catch(() => null);
   return overview?.ok ? overview.dormant.length : 0;
 }

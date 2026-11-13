@@ -85,7 +85,7 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       // 沒有驗證寄件網域時，Resend 只允許 onboarding@resend.dev 寄給帳號本人
-      from: process.env.RESEND_ADMIN_FROM ?? "SunUI Admin <onboarding@resend.dev>",
+      from: process.env.RESEND_FROM ?? process.env.RESEND_ADMIN_FROM ?? "SunUI Admin <onboarding@resend.dev>",
       to: [email],
       subject: "SunUI Admin 登入連結",
       text: `點這個連結登入 SunUI Admin（${minutes} 分鐘內有效，只能在送出申請的同一個瀏覽器開啟）：\n\n${link}\n\n如果不是你申請的，忽略這封信即可。`,

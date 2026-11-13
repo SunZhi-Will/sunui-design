@@ -1,5 +1,5 @@
 // Pro 授權使用與購買漏斗的匿名計數，給 /admin 看。
-// 不存 license key 本身（只存 Polar 的 license id）、不存 IP 或 user agent 原文。
+// 不存 license key 本身（只存 SunUI 的授權 id）、不存 IP 或 user agent 原文。
 // 寫入一律不等待、失敗不拋出：統計壞掉不能影響安裝或結帳。
 
 import { dayKey, hashToRecord, lastDays, pipeline, RETENTION_SECONDS, sumRecords, type RedisCommand } from "./redis";
@@ -88,7 +88,7 @@ export async function eventStats(days: number, now = new Date()) {
 
 export type LicenseUsage = { first?: string; last?: string; count: number; blocks: string[] };
 
-/** 讀多把 license 的使用紀錄（以 Polar license id 為鍵）。 */
+/** 讀多把 license 的使用紀錄（以授權 id 為鍵）。 */
 export async function licenseUsage(licenseIds: string[]) {
   const usage = new Map<string, LicenseUsage>();
   if (licenseIds.length === 0) return usage;

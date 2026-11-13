@@ -61,3 +61,16 @@ export async function sha256(text: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+/** HGETALL 回傳的扁平陣列轉成字串物件（不轉數字）。 */
+export function hashToStrings(result: unknown) {
+  const record: Record<string, string> = {};
+  if (!Array.isArray(result)) return record;
+  for (let i = 0; i + 1 < result.length; i += 2) record[String(result[i])] = String(result[i + 1]);
+  return record;
+}
+
+/** 隨機十六進位字串。 */
+export function randomHex(bytes: number) {
+  return Array.from(crypto.getRandomValues(new Uint8Array(bytes)), (b) => b.toString(16).padStart(2, "0")).join("");
+}

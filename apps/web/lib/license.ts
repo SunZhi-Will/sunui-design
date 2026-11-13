@@ -1,7 +1,9 @@
-// Pro registry 的授權驗證：Polar license key + 記憶體快取 + 以 key 為單位限流。
-// 限流、IP 計數與撤銷名單放在 Redis（多個 serverless instance 共用）；沒設定 Redis 時退回單一 instance 記憶體。
+// Pro registry 的授權驗證：SunUI 自己發的授權碼（lib/orders.ts，存在 Redis）+ 短暫記憶體快取 + 以 key 為單位限流。
+// 限流與 IP 計數放在 Redis（多個 serverless instance 共用）；沒設定 Redis 時退回單一 instance 記憶體。
 // Redis 裡只存 key 的 SHA-256 與加鹽雜湊後的 IP，不存原文。
 
+import { LICENSE_KEY_PATTERN } from "./license-key";
+import { lookupLicense } from "./orders";
 import { dayKey, pipeline, redisEnabled, sha256 } from "./redis";
 
 export type LicenseResult =
@@ -10,7 +12,8 @@ export type LicenseResult =
 
 type CacheEntry = { result: LicenseResult; expiresAt: number };
 
-const CACHE_TTL_MS = 10 * 60 * 1000;
+// 只快取「無效的授權碼」，擋住亂猜的請求；有效的每次都查 Redis（很便宜），退款撤銷才會立刻生效
+const CACHE_TTL_MS = 60 * 1000;
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT = 100;
 // 同一把 key 在一天內出現的不同 IP 超過這個數，視為 key 被分享
@@ -46,13 +49,7 @@ export async function checkLicense(key: string, ip: string): Promise<LicenseResu
     result = cached.result;
   } else {
     result = await validateKey(key);
-    // 只快取確定的結果，Polar 暫時失敗（503）不快取
-    if (result.ok || result.status !== 503) cache.set(key, { result, expiresAt: now + CACHE_TTL_MS });
-  }
-
-  // 退款撤銷由 webhook 寫進 Redis，所有 instance 立即生效，不必等記憶體快取過期
-  if (result.ok && (await isRevoked(result.licenseId))) {
-    return { ok: false, status: 403, message: "This license key has been disabled or revoked." };
+    if (!result.ok && result.status === 401) cache.set(key, { result, expiresAt: now + CACHE_TTL_MS });
   }
   return result;
 }
@@ -108,31 +105,6 @@ function memoryLimits(key: string, ip: string, now: number): LicenseResult | fal
   return false;
 }
 
-const memoryRevoked = new Set<string>();
-
-async function isRevoked(licenseId: string) {
-  if (memoryRevoked.has(licenseId)) return true;
-  try {
-    const replies = await pipeline([["SISMEMBER", "revoked", licenseId]]);
-    return Number(replies?.[0]?.result) === 1;
-  } catch {
-    // Redis 失敗時不擋付費客戶；Polar validate 本身也會回報 revoked 狀態（快取過期後）
-    return false;
-  }
-}
-
-/** Polar webhook 收到 benefit_grant.revoked 時呼叫（退款、手動撤銷）。 */
-export async function revokeLicense(licenseId: string) {
-  memoryRevoked.add(licenseId);
-  await pipeline([["SADD", "revoked", licenseId]]);
-}
-
-/** 撤銷後又重新發放（benefit_grant.created / updated 且 is_granted）時呼叫。 */
-export async function restoreLicense(licenseId: string) {
-  memoryRevoked.delete(licenseId);
-  await pipeline([["SREM", "revoked", licenseId]]);
-}
-
 async function validateKey(key: string): Promise<LicenseResult> {
   // 本機開發用的測試 key，正式環境一律忽略
   if (process.env.NODE_ENV !== "production") {
@@ -140,32 +112,14 @@ async function validateKey(key: string): Promise<LicenseResult> {
     if (devKeys.includes(key)) return { ok: true, licenseId: "dev", displayKey: `dev-${key.slice(-4)}` };
   }
 
-  const organizationId = process.env.POLAR_ORGANIZATION_ID;
-  if (!organizationId) {
-    return { ok: false, status: 503, message: "License validation is not configured yet. Please try again later." };
-  }
-
-  const apiUrl = (process.env.POLAR_API_URL ?? "https://api.polar.sh").replace(/\/$/, "");
+  if (!LICENSE_KEY_PATTERN.test(key)) return { ok: false, status: 401, message: invalidKeyMessage() };
   try {
-    const response = await fetch(`${apiUrl}/v1/customer-portal/license-keys/validate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, organization_id: organizationId }),
-      cache: "no-store",
-    });
-
-    if (response.status === 404 || response.status === 422) {
-      return { ok: false, status: 401, message: invalidKeyMessage() };
-    }
-    if (!response.ok) {
-      return { ok: false, status: 503, message: "License server is unavailable. Please try again shortly." };
-    }
-
-    const license = (await response.json()) as { id: string; display_key: string; status: string };
-    if (license.status !== "granted") {
+    const license = await lookupLicense(key);
+    if (!license) return { ok: false, status: 401, message: invalidKeyMessage() };
+    if (license.status !== "active") {
       return { ok: false, status: 403, message: "This license key has been disabled or revoked." };
     }
-    return { ok: true, licenseId: license.id, displayKey: license.display_key };
+    return { ok: true, licenseId: license.id, displayKey: license.display };
   } catch {
     return { ok: false, status: 503, message: "License server is unavailable. Please try again shortly." };
   }

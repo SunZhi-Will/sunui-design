@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { daysBetween, formatDate, maskEmail, requireAdmin } from "@/lib/admin";
 import { DORMANT_DAYS, licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
-import { polarConfigured } from "@/lib/polar";
 import { redisEnabled } from "@/lib/redis";
 
 import { DataTable, KpiStrip, Notice, PageHeader, parseRange, pct, RangeTabs, Section, StatTile, StatusDot } from "../ui";
@@ -16,10 +15,10 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
   const days = parseRange((await searchParams).days);
 
   const [overview, events] = await Promise.all([
-    polarConfigured() ? licenseOverview() : Promise.resolve(null),
+    licenseOverview(),
     eventStats(days).catch(() => null),
   ]);
-  const ok = overview?.ok ? overview : null;
+  const ok = overview.ok ? overview : null;
   const now = new Date().toISOString();
 
   // Pro block：授權安裝對照 401（沒買但想裝）
@@ -32,13 +31,12 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         title="授權使用"
-        description="買了授權的人有沒有真的在用。紀錄以 Polar license id 為鍵，不存授權碼本身。"
+        description="買了授權的人有沒有真的在用。只存授權碼的雜湊與最後 4 碼，不存授權碼本身。"
         actions={<RangeTabs value={days} basePath="/admin/licenses" />}
       />
 
-      {!polarConfigured() && <Notice>尚未設定 Polar API（POLAR_ACCESS_TOKEN、POLAR_ORGANIZATION_ID），讀不到授權清單。</Notice>}
       {!redisEnabled() && <Notice>尚未設定 Upstash Redis，沒有使用紀錄。</Notice>}
-      {overview && !overview.ok && <Notice tone="bad">Polar 讀取失敗：{overview.error}</Notice>}
+      {redisEnabled() && !overview.ok && <Notice tone="bad">{overview.error}</Notice>}
 
       <KpiStrip>
         <StatTile
@@ -63,16 +61,16 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
         />
       </KpiStrip>
 
-      <Section id="dormant" title="沉睡名單" description="寄一封安裝教學信。email 只顯示部分，完整資料在 Polar 後台。" flush>
+      <Section id="dormant" title="沉睡名單" description="寄一封安裝教學信。email 只顯示部分。" flush>
         <DataTable
           columns={[{ label: "授權碼" }, { label: "客戶" }, { label: "購買時間", hideOnMobile: true }, { label: "已過天數", num: true }]}
           rows={(ok?.dormant ?? []).map((k) => [
             <code key="k" className="font-mono text-xs">
-              {k.display_key}
+              {k.display}
             </code>,
-            maskEmail(k.customer.email),
-            formatDate(k.created_at),
-            daysBetween(k.created_at, now),
+            maskEmail(k.email),
+            formatDate(k.createdAt),
+            daysBetween(k.createdAt, now),
           ])}
           empty={{ title: "沒有沉睡授權", description: "每位買家都已經裝過至少一個 Pro block。", icon: "check" }}
         />
@@ -112,18 +110,18 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
           ]}
           rows={(ok?.rows ?? []).map((k) => [
             <code key="k" className="font-mono text-xs">
-              {k.display_key}
+              {k.display}
             </code>,
-            maskEmail(k.customer.email),
-            <StatusDot key="s" tone={k.status === "granted" ? (k.usage.count > 0 ? "ok" : "warn") : "idle"}>
-              {k.status === "granted" ? (k.usage.count > 0 ? "使用中" : "未安裝") : k.status === "revoked" ? "已撤銷" : "停用"}
+            maskEmail(k.email),
+            <StatusDot key="s" tone={k.status === "active" ? (k.usage.count > 0 ? "ok" : "warn") : "idle"}>
+              {k.status === "active" ? (k.usage.count > 0 ? "使用中" : "未安裝") : "已撤銷"}
             </StatusDot>,
             <span key="c" className="whitespace-nowrap text-subtle tabular-nums">
-              {formatDate(k.created_at)}
+              {formatDate(k.createdAt)}
             </span>,
             k.usage.first ? (
               <span key="f" className="whitespace-nowrap">
-                第 {daysBetween(k.created_at, k.usage.first)} 天
+                第 {daysBetween(k.createdAt, k.usage.first)} 天
               </span>
             ) : (
               ""
@@ -136,7 +134,7 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
               {k.usage.blocks.join("、")}
             </span>,
           ])}
-          empty={{ title: "還沒有授權", description: "有人購買後，Polar 發出的授權碼會列在這裡。", icon: "license" }}
+          empty={{ title: "還沒有授權", description: "有人付款完成後，SunUI 發出的授權碼會列在這裡。", icon: "license" }}
         />
       </Section>
     </>

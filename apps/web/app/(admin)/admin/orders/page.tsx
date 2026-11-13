@@ -1,132 +1,158 @@
 import type { Metadata } from "next";
 
-import { formatDate, formatMoney, maskEmail, requireAdmin } from "@/lib/admin";
-import { isCounted, listOrders, planOf, polarConfigured, type Plan, type PolarOrder } from "@/lib/polar";
+import { formatDate, maskEmail, requireAdmin } from "@/lib/admin";
+import { listOrders, webhookLog, type Order } from "@/lib/orders";
+import { redisEnabled } from "@/lib/redis";
+import type { Plan } from "@/lib/site";
 
 import { BarList, DataTable, EmptyState, KpiStrip, Notice, PageHeader, pct, Section, StatTile, StatusDot } from "../ui";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "訂單" };
 
-const PLAN_LABEL: Record<Plan, string> = { founding: "Founding", pro: "Pro", team: "Team", other: "其他" };
-const STATUS: Record<PolarOrder["status"], { label: string; tone: "ok" | "warn" | "bad" | "idle" }> = {
+const PLAN_LABEL: Record<Plan, string> = { founding: "Founding", pro: "Pro", team: "Team" };
+const STATUS: Record<Order["status"], { label: string; tone: "ok" | "warn" | "bad" | "idle" }> = {
   paid: { label: "已付款", tone: "ok" },
-  partially_refunded: { label: "部分退款", tone: "warn" },
+  pending: { label: "未完成", tone: "idle" },
   refunded: { label: "已退款", tone: "bad" },
-  pending: { label: "處理中", tone: "idle" },
-  draft: { label: "草稿", tone: "idle" },
-  void: { label: "作廢", tone: "idle" },
+  amount_mismatch: { label: "金額不符", tone: "warn" },
+  disputed: { label: "爭議中", tone: "bad" },
 };
+const RESULT_TONE: Record<string, "ok" | "warn" | "bad" | "idle"> = {
+  paid: "ok",
+  refunded: "warn",
+  duplicate: "idle",
+  foreign: "idle",
+  ignored: "idle",
+  dispute: "bad",
+  amount_mismatch: "bad",
+  refund_review: "warn",
+  order_not_found: "bad",
+  bad_signature: "bad",
+  store_failed: "bad",
+};
+
+const twd = (n: number) => `NT$${n.toLocaleString("en-US")}`;
 
 export default async function AdminOrders() {
   await requireAdmin();
-  const header = <PageHeader title="訂單" description="來自 Polar，金額未稅。退款與發票請到 Polar 後台處理。" />;
+  const header = <PageHeader title="訂單" description="SHOPLINE Payments 收款，訂單與授權存在 Upstash Redis。金額為新台幣。退款請到 SHOPLINE 後台操作，付款通知會自動撤銷授權。" />;
 
-  if (!polarConfigured()) {
+  if (!redisEnabled()) {
     return (
       <>
         {header}
         <div className="rounded-xl border border-dashed border-line">
-          <EmptyState icon="orders" title="尚未連接 Polar" description="設定 POLAR_ACCESS_TOKEN 與 POLAR_ORGANIZATION_ID 後，訂單會出現在這裡。" />
+          <EmptyState icon="orders" title="尚未設定 Upstash Redis" description="訂單和授權碼都存在 Redis，設定後訂單會出現在這裡。" />
         </div>
       </>
     );
   }
 
-  const orders = await listOrders();
-  if (!orders.ok) {
+  const [orders, log] = await Promise.all([listOrders().catch(() => null), webhookLog(30).catch(() => [])]);
+  if (!orders) {
     return (
       <>
         {header}
-        <Notice tone="bad">Polar 讀取失敗：{orders.error}</Notice>
+        <Notice tone="bad">讀不到 Redis 的訂單資料。</Notice>
       </>
     );
   }
 
-  const all = orders.data.filter((o) => o.status !== "draft" && o.status !== "void");
-  const counted = all.filter(isCounted);
-  const refunded = all.filter((o) => o.status === "refunded" || o.status === "partially_refunded");
-  const currency = all[0]?.currency ?? "usd";
-  const amount = (o: PolarOrder) => o.net_amount - o.refunded_amount;
-  const sales = counted.reduce((s, o) => s + amount(o), 0);
+  const paid = orders.filter((o) => o.status === "paid");
+  const refunded = orders.filter((o) => o.status === "refunded");
+  const finished = orders.filter((o) => o.status !== "pending");
+  const sales = paid.reduce((s, o) => s + o.amountTwd, 0);
+  const attention = orders.filter((o) => o.status === "amount_mismatch" || o.status === "disputed");
 
   const byPlan = new Map<Plan, { count: number; amount: number }>();
-  for (const o of counted) {
-    const plan = planOf(o.product?.name);
-    const row = byPlan.get(plan) ?? { count: 0, amount: 0 };
+  for (const o of paid) {
+    const row = byPlan.get(o.plan) ?? { count: 0, amount: 0 };
     row.count += 1;
-    row.amount += amount(o);
-    byPlan.set(plan, row);
-  }
-  const byCountry = new Map<string, number>();
-  for (const o of counted) {
-    const country = o.billing_address?.country ?? "未知";
-    byCountry.set(country, (byCountry.get(country) ?? 0) + 1);
+    row.amount += o.amountTwd;
+    byPlan.set(o.plan, row);
   }
 
   return (
     <>
       {header}
+      {attention.length > 0 && (
+        <Notice tone="bad">有 {attention.length} 筆訂單需要處理（金額不符或爭議中），請到 SHOPLINE 後台確認。</Notice>
+      )}
 
       <KpiStrip cols={4}>
-        <StatTile icon="orders" label="有效訂單" value={counted.length} hint="已付款與部分退款" />
-        <StatTile icon="dollar" label="銷售額" value={formatMoney(sales, currency)} hint="已扣退款，未扣 Polar 手續費" />
+        <StatTile icon="orders" label="有效訂單" value={paid.length} hint={`另有 ${orders.length - finished.length} 筆未完成付款`} />
+        <StatTile icon="dollar" label="銷售額" value={twd(sales)} hint="已扣退款，未扣金流手續費" />
         <StatTile
-          icon="users"
-          label="客單價"
-          value={counted.length ? formatMoney(Math.round(sales / counted.length), currency) : "–"}
+          icon="check"
+          label="付款完成率"
+          value={pct(finished.length, orders.length)}
+          hint="填完 email 前往付款後，實際付款的比例"
         />
         <StatTile
           icon="alert"
           label="退款率"
-          value={pct(refunded.length, all.length)}
-          hint={`${refunded.length} 筆全額或部分退款`}
-          tone={all.length >= 10 && refunded.length / all.length > 0.1 ? "warn" : undefined}
+          value={pct(refunded.length, paid.length + refunded.length)}
+          hint={`${refunded.length} 筆全額退款`}
+          tone={paid.length + refunded.length >= 10 && refunded.length / (paid.length + refunded.length) > 0.1 ? "warn" : undefined}
         />
       </KpiStrip>
 
-      <div className="grid gap-x-6 lg:grid-cols-2">
-        <Section title="方案組合" description="依金額排序">
-          <BarList
-            items={[...byPlan.entries()]
-              .sort((a, b) => b[1].amount - a[1].amount)
-              .map(([plan, row]) => ({ label: PLAN_LABEL[plan], value: row.count, extra: formatMoney(row.amount, currency) }))}
-            empty={{ title: "還沒有訂單", icon: "orders" }}
-          />
-        </Section>
-        <Section title="國家分布" description="依帳單地址，報稅與換匯費用估算用">
-          <BarList
-            items={[...byCountry.entries()].sort((a, b) => b[1] - a[1]).map(([country, count]) => ({ label: country, value: count }))}
-            empty={{ title: "還沒有訂單", icon: "orders" }}
-          />
-        </Section>
-      </div>
+      <Section title="方案組合" description="已付款訂單，依金額排序">
+        <BarList
+          items={[...byPlan.entries()]
+            .sort((a, b) => b[1].amount - a[1].amount)
+            .map(([plan, row]) => ({ label: PLAN_LABEL[plan], value: row.count, extra: twd(row.amount) }))}
+          empty={{ title: "還沒有付款完成的訂單", icon: "orders" }}
+        />
+      </Section>
 
-      <Section title="訂單明細" description={`最近 ${orders.data.length} 筆（最多讀 500 筆），時間為台北時間`} flush>
+      <Section title="訂單明細" description={`最近 ${orders.length} 筆（最多 500 筆），時間為台北時間`} flush>
         <DataTable
           columns={[
             { label: "時間" },
+            { label: "訂單" , hideOnMobile: true },
             { label: "方案" },
             { label: "客戶" },
-            { label: "國家", hideOnMobile: true },
             { label: "金額", num: true },
-            { label: "退款", num: true, hideOnMobile: true },
             { label: "狀態" },
           ]}
-          rows={all.map((o) => [
+          rows={orders.map((o) => [
             <span key="t" className="whitespace-nowrap text-subtle tabular-nums">
-              {formatDate(o.created_at)}
+              {formatDate(o.createdAt)}
             </span>,
-            PLAN_LABEL[planOf(o.product?.name)],
-            maskEmail(o.customer.email),
-            o.billing_address?.country ?? "",
-            formatMoney(o.net_amount, o.currency),
-            o.refunded_amount ? formatMoney(o.refunded_amount, o.currency) : "",
+            <code key="i" className="font-mono text-xs text-subtle">
+              {o.id}
+            </code>,
+            PLAN_LABEL[o.plan],
+            maskEmail(o.email),
+            twd(o.amountTwd),
             <StatusDot key="s" tone={STATUS[o.status].tone}>
               {STATUS[o.status].label}
             </StatusDot>,
           ])}
-          empty={{ title: "還沒有訂單", description: "Founding 2026-11-27 開賣後，第一筆會出現在這裡。", icon: "orders" }}
+          empty={{ title: "還沒有訂單", description: "有人在結帳頁填完 email 前往付款後，訂單就會出現在這裡。", icon: "orders" }}
+        />
+      </Section>
+
+      <Section title="付款通知紀錄" description="SHOPLINE 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
+        <DataTable
+          columns={[{ label: "時間" }, { label: "事件" }, { label: "訂單", hideOnMobile: true }, { label: "結果" }]}
+          rows={log.map((e) => [
+            <span key="t" className="whitespace-nowrap text-subtle tabular-nums">
+              {formatDate(e.at)}
+            </span>,
+            <code key="e" className="font-mono text-xs">
+              {e.type || "（無）"}
+            </code>,
+            <code key="o" className="font-mono text-xs text-subtle">
+              {e.order ?? ""}
+            </code>,
+            <StatusDot key="r" tone={RESULT_TONE[e.result] ?? "idle"}>
+              {e.result}
+            </StatusDot>,
+          ])}
+          empty={{ title: "還沒收到付款通知", icon: "pulse" }}
         />
       </Section>
     </>

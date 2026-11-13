@@ -5,7 +5,7 @@
 | Registry | 網址 | 內容 | 驗證 |
 |---|---|---|---|
 | `@sunui`（公開） | `/r/<name>.json`、`/r/registry.json` | 免費 block，MIT | 無，靜態產生 |
-| `@sunui-pro`（付費） | `/r/pro/<name>.json` | Pro block | `Authorization: Bearer <license key>`，經 Polar 驗證 |
+| `@sunui-pro`（付費） | `/r/pro/<name>.json` | Pro block | `Authorization: Bearer <license key>`，比對 SunUI 自己發的授權碼（Redis） |
 
 ```bash
 cp .env.example .env.local   # 依註解填值
@@ -52,8 +52,8 @@ npx shadcn@latest add @sunui-pro/<name>
 | 項目 | 環境變數 | 狀態 |
 |---|---|---|
 | 正式網域 | `NEXT_PUBLIC_SITE_URL` | 待買網域 |
-| Polar 組織 | `POLAR_ORGANIZATION_ID`（測試用 `POLAR_API_URL=https://sandbox-api.polar.sh`） | 待開戶與 KYC |
-| Polar 結帳連結 | `NEXT_PUBLIC_CHECKOUT_*_URL` | 未設定時定價頁顯示 waitlist |
+| SHOPLINE Payments | `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`、`SHOPLINE_SIGN_KEY`、`SHOPLINE_ENV` | 商家帳號沿用作者其他產品；未設定時定價頁顯示 waitlist |
+| 訂單與授權碼 | Upstash Redis（`KV_REST_API_URL`、`KV_REST_API_TOKEN`） | 結帳與 Pro 驗證都需要 |
 | Waitlist | `RESEND_API_KEY`、`RESEND_WAITLIST_SEGMENT_ID` | 未設定時本機寫到 `.data/waitlist.jsonl`，正式環境回 503 |
 
 授權驗證的快取與限流目前存在單一 instance 記憶體；流量變大後改用 Redis。Team 方案的 5 席目前只靠授權條款與異常 IP 偵測，尚未做逐席 activation。

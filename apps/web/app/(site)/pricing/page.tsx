@@ -8,7 +8,7 @@ import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
-import { checkoutUrls, foundingState, foundingWindow, prices } from "@/lib/site";
+import { checkoutReady, foundingState, foundingWindow, prices } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,13 +24,15 @@ export default async function PricingPage() {
   const t = m.pricing;
   const dateFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
   const state = foundingState();
+  // SHOPLINE 設定好才開放結帳；否則按鈕導到 waitlist
+  const canBuy = checkoutReady();
   const proCount = getItems("pro").length;
   const freeItems = getItems("free");
   // 動效庫一組含十幾種效果，和一般 block 分開列（見 reports/免費與付費切分規劃-2026-11-05.md）
   const motionCount = freeItems.filter((item) => seriesOf(item) === "motion").length;
   const freeCount = freeItems.length - motionCount;
   // 開賣前整頁只留一個候補表單：創始方案區塊有表單時用它，否則才在下方放一個
-  const foundingHasForm = state !== "closed" && !(state === "open" && checkoutUrls.founding);
+  const foundingHasForm = state !== "closed" && !(state === "open" && canBuy);
   // 還不能結帳的方案按鈕寫出開賣日，點了捲到那唯一的表單，而不是再放一個一樣的「加入候補名單」
   const waitlistCta =
     state === "upcoming"
@@ -51,14 +53,14 @@ export default async function PricingPage() {
       note: t.pro.note,
       highlight: true,
       features: t.pro.features,
-      cta: checkoutUrls.pro ? { label: t.pro.cta, href: "/go/checkout/pro" } : waitlistCta,
+      cta: canBuy ? { label: t.pro.cta, href: "/go/checkout/pro" } : waitlistCta,
     },
     {
       name: t.team.name,
       price: `$${prices.team}`,
       note: t.team.note,
       features: t.team.features,
-      cta: checkoutUrls.team ? { label: t.team.cta, href: "/go/checkout/team" } : waitlistCta,
+      cta: canBuy ? { label: t.team.cta, href: "/go/checkout/team" } : waitlistCta,
     },
   ];
 
@@ -89,7 +91,7 @@ export default async function PricingPage() {
               : t.foundingOpen(dateFormat.format(new Date(foundingWindow.closesAt.getTime() - 1)))}
           </p>
           <div className="mt-5 max-w-md">
-            {state === "open" && checkoutUrls.founding ? (
+            {state === "open" && canBuy ? (
               <a
                 href="/go/checkout/founding"
                 className="inline-flex rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg hover:opacity-90"
@@ -127,7 +129,7 @@ export default async function PricingPage() {
                 </li>
               ))}
             </ul>
-            {/* 結帳走 /go/checkout 計數後轉到 Polar：用一般連結，Link 的預先載入會把瀏覽也算成點擊 */}
+            {/* 結帳走 /go/checkout 計數後轉到結帳頁：用一般連結，Link 的預先載入會把瀏覽也算成點擊 */}
             {(() => {
               const className = cn(
                 "mt-8 rounded-md px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90",

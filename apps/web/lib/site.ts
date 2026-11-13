@@ -30,9 +30,17 @@ export function licenseSummary(now = new Date()) {
     : base;
 }
 
-/** Polar 結帳連結；未設定時頁面改導向 waitlist。 */
-export const checkoutUrls = {
-  founding: process.env.NEXT_PUBLIC_CHECKOUT_FOUNDING_URL,
-  pro: process.env.NEXT_PUBLIC_CHECKOUT_PRO_URL,
-  team: process.env.NEXT_PUBLIC_CHECKOUT_TEAM_URL,
-};
+/** 實際結帳金額（新台幣，SHOPLINE Payments 只收台幣）。約等於上面的美金價，網站仍以美金標價並註明以台幣結帳。 */
+export const pricesTwd = { founding: 2490, pro: 4090, team: 10990 } as const;
+
+export type Plan = keyof typeof pricesTwd;
+
+export function isPlan(value: string): value is Plan {
+  return value === "founding" || value === "pro" || value === "team";
+}
+
+/** SHOPLINE 已設定（或本機的開發模式）才開放結帳；否則定價頁改顯示 waitlist。 */
+export function checkoutReady() {
+  if (process.env.SHOPLINE_ENV === "dev" && process.env.NODE_ENV !== "production") return true;
+  return Boolean(process.env.SHOPLINE_MERCHANT_ID && process.env.SHOPLINE_API_KEY && process.env.SHOPLINE_SIGN_KEY);
+}

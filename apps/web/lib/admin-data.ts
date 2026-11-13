@@ -1,24 +1,30 @@
-// /admin 多個頁面共用的資料組合：Polar 授權清單 × Redis 使用紀錄。
+// /admin 多個頁面共用的資料組合：SunUI 自己的授權（Redis）× 安裝使用紀錄（Redis）。
 
 import { daysBetween } from "./admin";
 import { licenseUsage, type LicenseUsage } from "./events";
-import { listLicenseKeys, type PolarLicenseKey } from "./polar";
+import { listLicenses, type License } from "./orders";
+import { redisEnabled } from "./redis";
 
 /** 買超過這麼多天仍然 0 安裝，列入沉睡名單。 */
 export const DORMANT_DAYS = 3;
 
-export type LicenseRow = PolarLicenseKey & { usage: LicenseUsage };
+export type LicenseRow = License & { usage: LicenseUsage };
 
 export async function licenseOverview(now = new Date()) {
-  const keys = await listLicenseKeys();
-  if (!keys.ok) return { ok: false as const, error: keys.error };
-  const usage = keys.data.length ? await licenseUsage(keys.data.map((k) => k.id)).catch(() => null) : null;
-  const rows: LicenseRow[] = keys.data.map((k) => ({ ...k, usage: usage?.get(k.id) ?? { count: 0, blocks: [] } }));
+  if (!redisEnabled()) return { ok: false as const, error: "尚未設定 Upstash Redis" };
+  let licenses: License[];
+  try {
+    licenses = await listLicenses();
+  } catch {
+    return { ok: false as const, error: "讀不到 Redis" };
+  }
+  const usage = licenses.length ? await licenseUsage(licenses.map((l) => l.id)).catch(() => null) : null;
+  const rows: LicenseRow[] = licenses.map((l) => ({ ...l, usage: usage?.get(l.id) ?? { count: 0, blocks: [] } }));
   const iso = now.toISOString();
-  const granted = rows.filter((r) => r.status === "granted");
+  const granted = rows.filter((r) => r.status === "active");
   const activated = granted.filter((r) => r.usage.count > 0);
-  const dormant = granted.filter((r) => r.usage.count === 0 && daysBetween(r.created_at, iso) >= DORMANT_DAYS);
-  const firstInstallDays = activated.flatMap((r) => (r.usage.first ? [daysBetween(r.created_at, r.usage.first)] : []));
+  const dormant = granted.filter((r) => r.usage.count === 0 && daysBetween(r.createdAt, iso) >= DORMANT_DAYS);
+  const firstInstallDays = activated.flatMap((r) => (r.usage.first ? [daysBetween(r.createdAt, r.usage.first)] : []));
   return { ok: true as const, rows, granted, activated, dormant, medianFirstInstall: median(firstInstallDays) };
 }
 

@@ -1,10 +1,10 @@
-import { formatMoney, requireAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
 import { installStats } from "@/lib/installs";
-import { getMetrics, isCounted, listOrders, planOf, polarConfigured } from "@/lib/polar";
+import { listOrders, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
-import { foundingState, foundingWindow } from "@/lib/site";
+import { checkoutReady, foundingState, foundingWindow } from "@/lib/site";
 
 import { DailyChart } from "./daily-chart";
 import {
@@ -48,25 +48,29 @@ function sumPeriod(byDay: ByDay, days: number) {
   return total;
 }
 
-const DENY_LABEL: Record<string, string> = { "401": "沒帶授權碼", "403": "撤銷或疑似分享", "429": "限流", "503": "Polar 無法連線" };
+const DENY_LABEL: Record<string, string> = { "401": "沒帶授權碼", "403": "撤銷或疑似分享", "429": "限流", "503": "授權資料讀取失敗" };
 
 export default async function AdminOverview({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   await requireAdmin();
   const days = parseRange((await searchParams).days);
 
-  const [installs, events, orders, licenses, metrics] = await Promise.all([
+  const [installs, events, orderList, licenses] = await Promise.all([
     installStats(days * 2).catch(() => null),
     eventStats(days * 2).catch(() => null),
-    listOrders(),
+    redisEnabled() ? listOrders().catch(() => null) : Promise.resolve(null),
     licenseOverview(),
-    getMetrics(days),
   ]);
 
-  const counted = orders.ok ? orders.data.filter(isCounted) : [];
-  const founding = counted.filter((o) => planOf(o.product?.name) === "founding").length;
-  const sales = counted.reduce((s, o) => s + o.net_amount - o.refunded_amount, 0);
-  const currency = counted[0]?.currency ?? "usd";
-  const m = metrics.ok ? metrics.data.totals : null;
+  const orders: Order[] = orderList ?? [];
+  const counted = orders.filter((o) => o.status === "paid");
+  const founding = counted.filter((o) => o.plan === "founding").length;
+  const sales = counted.reduce((sum, o) => sum + o.amountTwd, 0);
+  // 本期建立的結帳與成功付款（SunUI 自己的訂單，結帳頁送出 email 才會建立）
+  const since = Date.now() - days * 86_400_000;
+  const periodOrders = orders.filter((o) => Date.parse(o.createdAt) >= since);
+  const periodPaid = counted.filter((o) => o.paidAt && Date.parse(o.paidAt) >= since);
+  const periodSales = periodPaid.reduce((sum, o) => sum + o.amountTwd, 0);
+  const twd = (n: number) => `NT$${n.toLocaleString("en-US")}`;
 
   const free = installs ? split(installs.perDay.map((d) => ({ day: d.day, value: d.installs })), days) : null;
   const pro = events ? split(events.pro.perDay, days) : null;
@@ -94,28 +98,26 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
       count: behind ? FOUNDING_GATE - founding : 0,
       tone: "bad",
     },
-    { label: "Polar 授權伺服器失敗", hint: "付費客戶裝不到 Pro，檢查 Polar 狀態", count: denied["503"] ?? 0, tone: "bad" },
+    { label: "授權驗證失敗", hint: "付費客戶裝不到 Pro，檢查 Upstash Redis 狀態", count: denied["503"] ?? 0, tone: "bad" },
     { label: "撤銷或疑似分享", hint: "退款撤銷，或同一把 key 一天超過 20 個 IP", count: denied["403"] ?? 0 },
   ];
 
   const missing = [
-    !redisEnabled() && "Upstash Redis（安裝、Pro 使用、漏斗計數）",
-    !polarConfigured() && "Polar API（訂單、授權、結帳轉換）",
+    !redisEnabled() && "Upstash Redis（訂單、授權、安裝與漏斗計數）",
+    !checkoutReady() && "SHOPLINE（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
   ].filter(Boolean) as string[];
-  const errors = polarConfigured()
-    ? [orders, metrics, licenses].flatMap((r) => (r.ok ? [] : [r.error]))
-    : [];
+  const errors = redisEnabled() && (!orderList || !licenses.ok) ? ["讀不到 Redis 的訂單或授權資料"] : [];
 
   return (
     <>
       <PageHeader
         title="總覽"
-        description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC，Polar 資料快取 5 分鐘。`}
+        description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC，金額為新台幣。`}
         actions={<RangeTabs value={days} basePath="/admin" />}
       />
 
       {missing.length > 0 && <Notice>尚未設定：{missing.join("、")}。相關數字會是空的。</Notice>}
-      {errors.length > 0 && <Notice tone="bad">Polar 讀取失敗：{errors.join("；")}</Notice>}
+      {errors.length > 0 && <Notice tone="bad">{errors.join("；")}</Notice>}
 
       <QueueStrip items={queue} />
 
@@ -138,11 +140,9 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
         <StatTile
           icon="dollar"
           label="累計銷售額"
-          value={formatMoney(sales, currency)}
+          value={twd(sales)}
           hint={
-            m?.net_revenue !== undefined
-              ? `${counted.length} 筆有效訂單；近 ${days} 天 Polar 淨收入 ${formatMoney(m.net_revenue, currency)}`
-              : `${counted.length} 筆有效訂單，未稅、已扣退款`
+            `${counted.length} 筆有效訂單；近 ${days} 天 ${twd(periodSales)}`
           }
           href="/admin/orders"
         />
@@ -150,7 +150,7 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
           icon="license"
           label="授權啟用率"
           value={licenses.ok ? pct(licenses.activated.length, licenses.granted.length) : "–"}
-          hint={licenses.ok ? `${licenses.activated.length} / ${licenses.granted.length} 把有效授權裝過 Pro` : "需要 Polar API"}
+          hint={licenses.ok ? `${licenses.activated.length} / ${licenses.granted.length} 把有效授權裝過 Pro` : "需要 Upstash Redis"}
           tone={
             licenses.ok && licenses.granted.length >= 5 && licenses.activated.length / licenses.granted.length < 0.6
               ? "warn"
@@ -201,13 +201,13 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
       </Section>
 
       <div className="grid gap-x-6 lg:grid-cols-2">
-        <Section id="funnel" title="購買漏斗" description={`近 ${days} 天。前兩步由本站計數，後兩步來自 Polar。`}>
+        <Section id="funnel" title="購買漏斗" description={`近 ${days} 天，全部由本站計數。`}>
           <Funnel
             steps={[
               { label: "定價頁瀏覽", value: funnel?.pricing_view ?? (funnel ? 0 : undefined), source: "本站" },
               { label: "點結帳", value: checkoutClicks, source: "本站" },
-              { label: "Polar 結帳建立", value: m?.checkouts, source: "Polar" },
-              { label: "付款成功", value: m?.succeeded_checkouts, source: "Polar" },
+              { label: "填完 email 前往付款", value: orderList ? periodOrders.length : undefined, source: "結帳頁" },
+              { label: "付款成功", value: orderList ? periodPaid.length : undefined, source: "SHOPLINE 通知" },
             ]}
           />
         </Section>
