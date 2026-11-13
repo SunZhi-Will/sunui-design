@@ -7,7 +7,7 @@ import { licenseOverview } from "@/lib/admin-data";
 import { RAIL_COOKIE } from "@/lib/admin-session";
 import { webhookLast } from "@/lib/events";
 import { redisEnabled } from "@/lib/redis";
-import { checkoutReady, foundingState, foundingWindow } from "@/lib/site";
+import { foundingState, foundingWindow, salesOpen, shoplineConfigured } from "@/lib/site";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
@@ -38,7 +38,7 @@ async function sources(): Promise<SourceStatus[]> {
   const latest = last ? Object.values(last).sort().at(-1) : undefined;
   return [
     { label: "Upstash Redis", ok: redis, detail: "安裝、Pro 使用、漏斗" },
-    { label: "SHOPLINE", ok: checkoutReady(), detail: process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境" },
+    { label: "SHOPLINE", ok: shoplineConfigured(), detail: `${process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境"}，${salesOpen() ? "已開賣" : "未開賣"}` },
     {
       label: "付款通知",
       ok: Boolean(process.env.SHOPLINE_SIGN_KEY),

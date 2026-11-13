@@ -39,8 +39,22 @@ export function isPlan(value: string): value is Plan {
   return value === "founding" || value === "pro" || value === "team";
 }
 
-/** SHOPLINE 已設定（或本機的開發模式）才開放結帳；否則定價頁改顯示 waitlist。 */
-export function checkoutReady() {
-  if (process.env.SHOPLINE_ENV === "dev" && process.env.NODE_ENV !== "production") return true;
+function devShopline() {
+  return process.env.SHOPLINE_ENV === "dev" && process.env.NODE_ENV !== "production";
+}
+
+/** SHOPLINE 金鑰都設定好了（付款通知、後台的測試連線靠這個）。 */
+export function shoplineConfigured() {
+  if (devShopline()) return true;
   return Boolean(process.env.SHOPLINE_MERCHANT_ID && process.env.SHOPLINE_API_KEY && process.env.SHOPLINE_SIGN_KEY);
+}
+
+/** 開賣開關：SUNUI_SALES_OPEN=1 才開放公開結帳。接上金鑰不會自動開賣，未開賣時定價頁顯示 waitlist。 */
+export function salesOpen() {
+  return devShopline() || process.env.SUNUI_SALES_OPEN === "1";
+}
+
+/** 公開結帳可用：金鑰齊全，而且已經開賣。 */
+export function checkoutReady() {
+  return shoplineConfigured() && salesOpen();
 }

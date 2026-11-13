@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { formatDate, maskEmail, requireAdmin } from "@/lib/admin";
 import { listOrders, webhookLog, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
-import type { Plan } from "@/lib/site";
+import { salesOpen, shoplineConfigured, type Plan } from "@/lib/site";
 
+import { TestConnection } from "./test-connection";
 import { BarList, DataTable, EmptyState, KpiStrip, Notice, PageHeader, pct, Section, StatTile, StatusDot } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -59,11 +60,12 @@ export default async function AdminOrders() {
     );
   }
 
-  const paid = orders.filter((o) => o.status === "paid");
-  const refunded = orders.filter((o) => o.status === "refunded");
-  const finished = orders.filter((o) => o.status !== "pending");
+  const real = orders.filter((o) => !o.test);
+  const paid = real.filter((o) => o.status === "paid");
+  const refunded = real.filter((o) => o.status === "refunded");
+  const finished = real.filter((o) => o.status !== "pending");
   const sales = paid.reduce((s, o) => s + o.amountTwd, 0);
-  const attention = orders.filter((o) => o.status === "amount_mismatch" || o.status === "disputed");
+  const attention = real.filter((o) => o.status === "amount_mismatch" || o.status === "disputed");
 
   const byPlan = new Map<Plan, { count: number; amount: number }>();
   for (const o of paid) {
@@ -81,12 +83,12 @@ export default async function AdminOrders() {
       )}
 
       <KpiStrip cols={4}>
-        <StatTile icon="orders" label="有效訂單" value={paid.length} hint={`另有 ${orders.length - finished.length} 筆未完成付款`} />
+        <StatTile icon="orders" label="有效訂單" value={paid.length} hint={`另有 ${real.length - finished.length} 筆未完成付款`} />
         <StatTile icon="dollar" label="銷售額" value={twd(sales)} hint="已扣退款，未扣金流手續費" />
         <StatTile
           icon="check"
           label="付款完成率"
-          value={pct(finished.length, orders.length)}
+          value={pct(finished.length, real.length)}
           hint="填完 email 前往付款後，實際付款的比例"
         />
         <StatTile
@@ -124,7 +126,10 @@ export default async function AdminOrders() {
             <code key="i" className="font-mono text-xs text-subtle">
               {o.id}
             </code>,
-            PLAN_LABEL[o.plan],
+            <span key="p" className="whitespace-nowrap">
+              {PLAN_LABEL[o.plan]}
+              {o.test && <span className="ml-1.5 rounded border border-line px-1 text-[10px] text-subtle">測試</span>}
+            </span>,
             maskEmail(o.email),
             twd(o.amountTwd),
             <StatusDot key="s" tone={STATUS[o.status].tone}>
@@ -134,6 +139,15 @@ export default async function AdminOrders() {
           empty={{ title: "還沒有訂單", description: "有人在結帳頁填完 email 前往付款後，訂單就會出現在這裡。", icon: "orders" }}
         />
       </Section>
+
+      {shoplineConfigured() && (
+        <Section
+          title="SHOPLINE 連線"
+          description={`${process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境"}。公開結帳${salesOpen() ? "已開賣" : "未開賣（SUNUI_SALES_OPEN=1 才會開放定價頁的購買按鈕）"}。`}
+        >
+          <TestConnection />
+        </Section>
+      )}
 
       <Section title="付款通知紀錄" description="SHOPLINE 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
         <DataTable

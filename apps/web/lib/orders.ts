@@ -38,6 +38,8 @@ export type Order = {
   keyEnc?: string;
   viewToken: string;
   refundedTwd?: number;
+  /** 後台「測試 SHOPLINE 連線」建立的訂單，不算進統計 */
+  test?: boolean;
 };
 
 export type License = {
@@ -74,6 +76,7 @@ function toOrder(raw: Record<string, string>): Order | null {
     keyEnc: raw.keyEnc || undefined,
     viewToken: raw.viewToken ?? "",
     refundedTwd: raw.refundedTwd ? Number(raw.refundedTwd) : undefined,
+    test: raw.test === "1",
   };
 }
 
@@ -90,7 +93,7 @@ function toLicense(raw: Record<string, string>): License | null {
   };
 }
 
-export async function createOrder(plan: Plan, email: string) {
+export async function createOrder(plan: Plan, email: string, options: { test?: boolean } = {}) {
   const order: Order = {
     id: `SU${randomHex(11)}`,
     plan,
@@ -99,8 +102,9 @@ export async function createOrder(plan: Plan, email: string) {
     status: "pending",
     createdAt: new Date().toISOString(),
     viewToken: randomHex(16),
+    ...(options.test ? { test: true } : {}),
   };
-  const fields = Object.entries(order).flatMap(([k, v]) => [k, String(v)]);
+  const fields = Object.entries(order).flatMap(([k, v]) => [k, k === "test" ? "1" : String(v)]);
   await run([
     ["HSET", `order:${order.id}`, ...fields],
     ["ZADD", "orders", Date.now(), order.id],

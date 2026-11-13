@@ -4,7 +4,7 @@ import { eventStats } from "@/lib/events";
 import { installStats } from "@/lib/installs";
 import { listOrders, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
-import { checkoutReady, foundingState, foundingWindow } from "@/lib/site";
+import { foundingState, foundingWindow, shoplineConfigured } from "@/lib/site";
 
 import { DailyChart } from "./daily-chart";
 import {
@@ -61,7 +61,7 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
     licenseOverview(),
   ]);
 
-  const orders: Order[] = orderList ?? [];
+  const orders: Order[] = (orderList ?? []).filter((o) => !o.test);
   const counted = orders.filter((o) => o.status === "paid");
   const founding = counted.filter((o) => o.plan === "founding").length;
   const sales = counted.reduce((sum, o) => sum + o.amountTwd, 0);
@@ -104,7 +104,7 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
 
   const missing = [
     !redisEnabled() && "Upstash Redis（訂單、授權、安裝與漏斗計數）",
-    !checkoutReady() && "SHOPLINE（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
+    !shoplineConfigured() && "SHOPLINE（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
   ].filter(Boolean) as string[];
   const errors = redisEnabled() && (!orderList || !licenses.ok) ? ["讀不到 Redis 的訂單或授權資料"] : [];
 
