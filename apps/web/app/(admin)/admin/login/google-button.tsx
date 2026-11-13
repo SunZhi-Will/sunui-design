@@ -14,13 +14,6 @@ declare global {
   }
 }
 
-function isDark() {
-  const root = document.documentElement;
-  if (root.classList.contains("dark")) return true;
-  if (root.classList.contains("light")) return false;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
 /**
  * Google 官方登入按鈕（Google Identity Services），寫法沿用 VideoAligner 的 AccountView。
  * 按鈕拿到 ID token 後交給 server action 驗證，白名單內的帳號才會登入。
@@ -49,7 +42,8 @@ export function GoogleButton({ clientId }: { clientId: string }) {
       });
       google.accounts.id.renderButton(el, {
         type: "standard",
-        theme: isDark() ? "filled_black" : "outline",
+        // 一律用白色 outline 款：暗色的 filled_black 在 iframe 邊緣會露出一圈白框
+        theme: "outline",
         size: "large",
         shape: "rectangular",
         text: "signin_with",

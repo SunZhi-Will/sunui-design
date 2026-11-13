@@ -124,7 +124,8 @@
         "NEXT_PUBLIC_SITE_URL": "http://localhost:3112",
         "SUNUI_DEV_LICENSE_KEYS": "sunui-dev-test-key-0001",
         "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only",
-        "SUNUI_ADMIN_EMAILS": "owner@example.com"
+        "SUNUI_ADMIN_EMAILS": "owner@example.com",
+        "GOOGLE_CLIENT_ID": "385022749974-54lnlukhs3f0024argdkhah4t046cice.apps.googleusercontent.com"
       }
     }
   ]
