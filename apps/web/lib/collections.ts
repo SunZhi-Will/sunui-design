@@ -82,6 +82,44 @@ export const collections = [
       "campaign-landing",
     ],
   },
+  // 以下三組不是電商情境（2026-11-13 定位調整）：同樣只重組現有區塊。
+  {
+    slug: "saas-landing",
+    agentTitle: "a SaaS product landing page",
+    blocks: [
+      "capsule-nav",
+      "depth-hero",
+      "scripted-demo",
+      "step-demo",
+      "scroll-story",
+      "compare-slider",
+      "testimonial-marquee",
+      "faq-accordion",
+    ],
+  },
+  {
+    slug: "pricing-billing",
+    agentTitle: "a pricing page and billing flow",
+    blocks: ["pricing-cards", "plan-comparison", "faq-accordion", "upgrade-modal", "quota-meter", "payment-status-banner"],
+  },
+  {
+    slug: "app-ui",
+    agentTitle: "the interface of a web app",
+    blocks: [
+      "app-shell",
+      "sliding-tabs",
+      "side-panel",
+      "dialog-sheet",
+      "theme-picker",
+      "confirm-button",
+      "status-dot",
+      "jobs-tray",
+      "toast-stack",
+      "skeleton-set",
+      "empty-state",
+      "error-state",
+    ],
+  },
 ] as const;
 
 export type CollectionSlug = (typeof collections)[number]["slug"];

@@ -154,6 +154,9 @@ const en = {
     "launch": { title: "Product launch", intro: "A stage hero, the drop countdown and a scroll story, ending in a signup for the release." },
     "loyalty": { title: "Loyalty and rewards", intro: "Check-in streaks, stamps, tiers and prize games that bring members back." },
     "seasonal": { title: "Seasonal campaign", intro: "Festival banners, gift reveals and weekend sale heroes for Double 11, Black Friday and Lunar New Year." },
+    "saas-landing": { title: "SaaS landing page", intro: "A header that shrinks to a pill, a layered hero, a product demo that plays itself and a scroll story, closed by reviews and an FAQ." },
+    "pricing-billing": { title: "Pricing and billing", intro: "Plan cards, a comparison sheet and an upgrade dialog, with the quota meter and payment result a subscriber sees afterwards." },
+    "app-ui": { title: "App interface", intro: "The frame of a web app: sidebar shell, tabs, panels, dialogs and theme switch, plus the empty, loading, error and background job states." },
   } as Record<CollectionSlug, { title: string; intro: string }>,
   block: {
     metaTitle: (title: string) => `${title}, React Component`,
@@ -668,6 +671,9 @@ const zhTW: Messages = {
     "launch": { title: "新品發表", intro: "舞台式主視覺、開賣倒數與滾動敘事，最後接上開賣通知訂閱。" },
     "loyalty": { title: "會員集點", intro: "簽到連續天數、集點卡、會員等級與抽獎遊戲，讓會員一再回來。" },
     "seasonal": { title: "節慶檔期", intro: "節慶橫幅、禮物揭曉與週末特賣主視覺，雙 11、黑五、農曆新年都能用。" },
+    "saas-landing": { title: "SaaS 產品首頁", intro: "會縮成膠囊的頁首、分層主視覺、自己播放的產品示範與滾動敘事，最後用評價與常見問題收尾。" },
+    "pricing-billing": { title: "方案與帳單", intro: "方案卡、比較表與升級對話框，加上訂閱後會看到的用量表與付款結果。" },
+    "app-ui": { title: "應用程式介面", intro: "一個 web app 的骨架：側欄外框、分頁、面板、對話框與主題切換，以及空白、載入、錯誤與背景工作等狀態。" },
   },
   block: {
     metaTitle: (title) => `${title}，React 元件`,
@@ -1159,6 +1165,9 @@ const zhCN: Messages = {
     "launch": { title: "新品发布", intro: "舞台式主视觉、开售倒计时与滚动叙事，最后接上开售通知订阅。" },
     "loyalty": { title: "会员积分", intro: "签到连续天数、集点卡、会员等级与抽奖游戏，让会员一再回来。" },
     "seasonal": { title: "节庆档期", intro: "节庆横幅、礼物揭晓与周末特卖主视觉，双 11、黑五、春节都能用。" },
+    "saas-landing": { title: "SaaS 产品首页", intro: "会缩成胶囊的页头、分层主视觉、自动播放的产品演示与滚动叙事，最后用评价与常见问题收尾。" },
+    "pricing-billing": { title: "方案与账单", intro: "方案卡、对比表与升级对话框，加上订阅后会看到的用量表与支付结果。" },
+    "app-ui": { title: "应用界面", intro: "一个 web app 的骨架：侧栏外框、标签页、面板、对话框与主题切换，以及空白、加载、错误与后台任务等状态。" },
   },
   block: {
     metaTitle: (title) => `${title}，React 组件`,
@@ -1643,6 +1652,9 @@ const ja: Messages = {
     "launch": { title: "新製品ローンチ", intro: "ステージ型ヒーロー、発売カウントダウン、スクロールストーリー、最後に発売通知の登録。" },
     "loyalty": { title: "会員とポイント", intro: "連続チェックイン、スタンプ、会員ランク、抽選ゲームで会員の再訪を促します。" },
     "seasonal": { title: "季節キャンペーン", intro: "祭りのバナー、ギフト開封、週末セールのヒーロー。独身の日、ブラックフライデー、旧正月に。" },
+    "saas-landing": { title: "SaaS ランディングページ", intro: "ピル型に縮むヘッダー、奥行きのあるヒーロー、自動再生のプロダクトデモ、スクロールストーリー。最後はレビューと FAQ で締めます。" },
+    "pricing-billing": { title: "料金プランと請求", intro: "プランカード、比較表、アップグレードダイアログに、契約後に目にする利用量メーターと決済結果を添えて。" },
+    "app-ui": { title: "アプリ画面", intro: "Web アプリの骨組み。サイドバー付きシェル、タブ、パネル、ダイアログ、テーマ切り替えに、空、読み込み中、エラー、バックグラウンドジョブの各状態。" },
   },
   block: {
     metaTitle: (title) => `${title}、React コンポーネント`,
