@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 import { Icon } from "../icons";
-import { loginWithToken, requestLoginLink, type LoginState } from "./actions";
+import { requestLoginLink, type LoginState } from "./actions";
 import { GoogleButton } from "./google-button";
 
 const INPUT =
@@ -13,11 +13,9 @@ const PRIMARY =
 const SECONDARY =
   "inline-flex h-10 w-full items-center justify-center rounded-md border border-line px-4 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50";
 
-/** 主要是 Google；email 登入連結是第二選項；權杖登入收成卡片底部一行小字，寄信服務故障時才用。 */
+/** 主要是 Google；email 登入連結是第二選項。 */
 export function LoginForm({ googleClientId }: { googleClientId?: string }) {
   const [linkState, requestLink, sending] = useActionState<LoginState, FormData>(requestLoginLink, {});
-  const [tokenState, submitToken, checking] = useActionState<LoginState, FormData>(loginWithToken, {});
-  const [showToken, setShowToken] = useState(false);
 
   if (linkState.sent) {
     return (
@@ -55,40 +53,6 @@ export function LoginForm({ googleClientId }: { googleClientId?: string }) {
           {sending ? "寄送中…" : "寄登入連結"}
         </button>
       </form>
-
-      <div className="mt-5 border-t border-line pt-4">
-        {showToken ? (
-          <form action={submitToken} className="space-y-2.5">
-            <input
-              name="token"
-              type="password"
-              autoComplete="current-password"
-              required
-              autoFocus
-              aria-label="SUNUI_ADMIN_TOKEN"
-              placeholder="SUNUI_ADMIN_TOKEN"
-              className={INPUT}
-            />
-            {tokenState.error && (
-              <p role="alert" className="text-sm text-destructive">
-                {tokenState.error}
-              </p>
-            )}
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setShowToken(false)} className={SECONDARY}>
-                取消
-              </button>
-              <button type="submit" disabled={checking} className={PRIMARY}>
-                {checking ? "登入中…" : "登入"}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <button type="button" onClick={() => setShowToken(true)} className="text-xs text-subtle hover:text-fg">
-            改用權杖登入
-          </button>
-        )}
-      </div>
     </div>
   );
 }

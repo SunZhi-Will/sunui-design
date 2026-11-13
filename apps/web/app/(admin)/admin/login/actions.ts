@@ -13,7 +13,6 @@ import {
   LOGIN_LINK_TTL_SECONDS,
   LOGIN_NONCE_COOKIE,
   SESSION_TTL_SECONDS,
-  tokenMatches,
 } from "@/lib/admin-session";
 import { googleClientId, verifyGoogleCredential } from "@/lib/google-auth";
 import { pipeline, sha256 } from "@/lib/redis";
@@ -23,7 +22,7 @@ const WINDOW_SECONDS = 15 * 60;
 const MAX_ATTEMPTS = 10;
 const memoryAttempts = new Map<string, number[]>();
 
-/** 同一個 IP 15 分鐘內最多試 10 次（email 與權杖合計）。Redis 可用時跨 instance 計算，否則用記憶體。 */
+/** 同一個 IP 15 分鐘內最多試 10 次（email 與 Google 合計）。Redis 可用時跨 instance 計算，否則用記憶體。 */
 async function tooManyAttempts(ip: string) {
   const now = Date.now();
   try {
@@ -109,16 +108,6 @@ export async function loginWithGoogle(credential: string): Promise<LoginState> {
   if (!profile || !emailAllowed(profile.email, process.env.SUNUI_ADMIN_EMAILS)) {
     return { error: "這個 Google 帳號沒有後台權限。" };
   }
-  await startSession();
-  redirect("/admin");
-}
-
-/** 備用：直接輸入 SUNUI_ADMIN_TOKEN 登入（寄信服務故障時用）。 */
-export async function loginWithToken(_prev: LoginState, formData: FormData): Promise<LoginState> {
-  const token = adminToken();
-  if (!token) return { error: "後台尚未設定。" };
-  if (await tooManyAttempts(await clientIp())) return { error: "嘗試次數太多，請 15 分鐘後再試。" };
-  if (!(await tokenMatches(String(formData.get("token") ?? ""), token))) return { error: "權杖不正確。" };
   await startSession();
   redirect("/admin");
 }

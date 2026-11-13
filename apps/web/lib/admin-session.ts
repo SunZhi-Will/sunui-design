@@ -50,13 +50,6 @@ export async function verifySession(value: string | undefined, token: string | u
   return safeEqual(signature, await sign(expires, token));
 }
 
-/** 比對登入輸入的 token：先各自雜湊成等長字串再做固定時間比較，不洩漏長度。 */
-export async function tokenMatches(input: string, token: string) {
-  const hash = async (text: string) =>
-    toBase64Url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)));
-  return safeEqual(await hash(input), await hash(token));
-}
-
 /** 白名單：SUNUI_ADMIN_EMAILS，逗號分隔，不分大小寫。 */
 export function emailAllowed(email: string, allowList: string | undefined) {
   const target = email.trim().toLowerCase();

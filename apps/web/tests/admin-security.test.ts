@@ -9,7 +9,6 @@ import {
   emailAllowed,
   LOGIN_LINK_TTL_SECONDS,
   SESSION_TTL_SECONDS,
-  tokenMatches,
   verifyLoginLink,
   verifySession,
 } from "../lib/admin-session.ts";
@@ -34,12 +33,6 @@ test("admin session rejects tampering and junk", async () => {
   assert.equal(await verifySession("abc.def", TOKEN, now), false);
   assert.equal(await verifySession(undefined, TOKEN, now), false);
   assert.equal(await verifySession(`${expires}.${sig}`, undefined, now), false);
-});
-
-test("token comparison", async () => {
-  assert.equal(await tokenMatches(TOKEN, TOKEN), true);
-  assert.equal(await tokenMatches(`${TOKEN}x`, TOKEN), false);
-  assert.equal(await tokenMatches("", TOKEN), false);
 });
 
 test("email allow list is case-insensitive and exact", () => {
