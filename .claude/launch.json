@@ -123,7 +123,8 @@
         "NEXT_DIST_DIR": ".next-admin",
         "NEXT_PUBLIC_SITE_URL": "http://localhost:3112",
         "SUNUI_DEV_LICENSE_KEYS": "sunui-dev-test-key-0001",
-        "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only"
+        "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only",
+        "SUNUI_ADMIN_EMAILS": "owner@example.com"
       }
     }
   ]

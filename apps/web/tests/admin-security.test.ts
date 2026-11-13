@@ -2,7 +2,17 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createSession, SESSION_TTL_SECONDS, tokenMatches, verifySession } from "../lib/admin-session.ts";
+import {
+  createLoginLink,
+  createNonce,
+  createSession,
+  emailAllowed,
+  LOGIN_LINK_TTL_SECONDS,
+  SESSION_TTL_SECONDS,
+  tokenMatches,
+  verifyLoginLink,
+  verifySession,
+} from "../lib/admin-session.ts";
 import { signWebhook, verifyWebhook } from "../lib/webhook-signature.ts";
 
 const TOKEN = "a-long-enough-admin-token";
@@ -29,6 +39,33 @@ test("token comparison", async () => {
   assert.equal(await tokenMatches(TOKEN, TOKEN), true);
   assert.equal(await tokenMatches(`${TOKEN}x`, TOKEN), false);
   assert.equal(await tokenMatches("", TOKEN), false);
+});
+
+test("email allow list is case-insensitive and exact", () => {
+  const list = " Owner@Example.com , second@example.org";
+  assert.equal(emailAllowed("owner@example.com", list), true);
+  assert.equal(emailAllowed("OWNER@EXAMPLE.COM ", list), true);
+  assert.equal(emailAllowed("second@example.org", list), true);
+  assert.equal(emailAllowed("owner@example.co", list), false);
+  assert.equal(emailAllowed("", list), false);
+  assert.equal(emailAllowed("owner@example.com", undefined), false);
+});
+
+test("login link works once per browser nonce and expires", async () => {
+  const now = 1_800_000_000;
+  const nonce = createNonce();
+  const link = await createLoginLink("Owner@Example.com", nonce, TOKEN, now);
+  assert.equal(await verifyLoginLink(link, nonce, TOKEN, now + 60), "owner@example.com");
+  // 別的瀏覽器（沒有同一個 nonce）、別的 token、過期、竄改 email 都不行
+  assert.equal(await verifyLoginLink(link, createNonce(), TOKEN, now + 60), null);
+  assert.equal(await verifyLoginLink(link, undefined, TOKEN, now + 60), null);
+  assert.equal(await verifyLoginLink(link, nonce, "another-token-entirely", now + 60), null);
+  assert.equal(await verifyLoginLink(link, nonce, TOKEN, now + LOGIN_LINK_TTL_SECONDS + 1), null);
+  const [, expires, sig] = link.split(".");
+  const forged = `${btoa("attacker@example.com").replace(/=+$/, "")}.${expires}.${sig}`;
+  assert.equal(await verifyLoginLink(forged, nonce, TOKEN, now + 60), null);
+  // 登入連結的簽章不能拿來當 session cookie
+  assert.equal(await verifySession(`${expires}.${sig}`, TOKEN, now + 60), false);
 });
 
 const body = JSON.stringify({ type: "benefit_grant.revoked", data: { properties: { license_key_id: "lk_1" } } });
