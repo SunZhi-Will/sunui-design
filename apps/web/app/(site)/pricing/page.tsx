@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SavingsCalculator } from "@/components/savings-calculator";
+import { ViewBeacon } from "@/components/view-beacon";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
@@ -50,19 +51,20 @@ export default async function PricingPage() {
       note: t.pro.note,
       highlight: true,
       features: t.pro.features,
-      cta: checkoutUrls.pro ? { label: t.pro.cta, href: checkoutUrls.pro } : waitlistCta,
+      cta: checkoutUrls.pro ? { label: t.pro.cta, href: "/go/checkout/pro" } : waitlistCta,
     },
     {
       name: t.team.name,
       price: `$${prices.team}`,
       note: t.team.note,
       features: t.team.features,
-      cta: checkoutUrls.team ? { label: t.team.cta, href: checkoutUrls.team } : waitlistCta,
+      cta: checkoutUrls.team ? { label: t.team.cta, href: "/go/checkout/team" } : waitlistCta,
     },
   ];
 
   return (
     <div className="py-16 sm:py-20">
+      <ViewBeacon event="pricing_view" />
       <header className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">{t.title}</h1>
         <p className="mt-4 text-lg text-pretty text-subtle">{t.lead}</p>
@@ -89,7 +91,7 @@ export default async function PricingPage() {
           <div className="mt-5 max-w-md">
             {state === "open" && checkoutUrls.founding ? (
               <a
-                href={checkoutUrls.founding}
+                href="/go/checkout/founding"
                 className="inline-flex rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg hover:opacity-90"
               >
                 {t.foundingCta}
@@ -125,15 +127,22 @@ export default async function PricingPage() {
                 </li>
               ))}
             </ul>
-            <Link
-              href={plan.cta.href}
-              className={cn(
+            {/* 結帳走 /go/checkout 計數後轉到 Polar：用一般連結，Link 的預先載入會把瀏覽也算成點擊 */}
+            {(() => {
+              const className = cn(
                 "mt-8 rounded-md px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90",
                 plan.highlight ? "bg-fg text-bg" : "border border-line",
-              )}
-            >
-              {plan.cta.label}
-            </Link>
+              );
+              return plan.cta.href.startsWith("/go/") ? (
+                <a href={plan.cta.href} className={className}>
+                  {plan.cta.label}
+                </a>
+              ) : (
+                <Link href={plan.cta.href} className={className}>
+                  {plan.cta.label}
+                </Link>
+              );
+            })()}
           </div>
         ))}
       </section>

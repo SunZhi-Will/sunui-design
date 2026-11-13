@@ -2,6 +2,9 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { after } from "next/server";
+
+import { recordProDenied, recordProInstall } from "@/lib/events";
 import { checkLicense, clientIp, readBearer } from "@/lib/license";
 import { getProIconItem, type ProIconItem } from "@/lib/pro-icons";
 import { buildRegistryItem, getItem, withBanner } from "@/lib/registry";
@@ -30,7 +33,9 @@ export async function GET(
   }
 
   const key = readBearer(request);
+  // 統計（/admin）在回應送出後才寫，不拖慢安裝
   if (!key) {
+    after(() => recordProDenied(item.name, 401));
     return deny(
       401,
       [
@@ -44,11 +49,14 @@ export async function GET(
 
   const license = await checkLicense(key, clientIp(request));
   if (!license.ok) {
+    after(() => recordProDenied(item.name, license.status));
     return Response.json(
       { error: "License error", message: license.message },
       { status: license.status, headers: license.status === 429 ? { "Retry-After": "900" } : undefined },
     );
   }
+
+  after(() => recordProInstall(item.name, license.licenseId));
 
   const banner = [
     "/**",

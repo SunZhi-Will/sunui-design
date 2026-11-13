@@ -109,6 +109,22 @@
       "env": {
         "NEXT_DIST_DIR": ".next-perf"
       }
+    },
+    {
+      "name": "web-admin",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "npm run dev -w @sunui-design/web -- -p ${PORT:-3112}"
+      ],
+      "port": 3112,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-admin",
+        "NEXT_PUBLIC_SITE_URL": "http://localhost:3112",
+        "SUNUI_DEV_LICENSE_KEYS": "sunui-dev-test-key-0001",
+        "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only"
+      }
     }
   ]
 }

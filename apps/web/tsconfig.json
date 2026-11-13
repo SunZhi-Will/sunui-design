@@ -32,6 +32,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-admin/types/**/*.ts",
     ".next-alt/types/**/*.ts",
     ".next-deploycheck/types/**/*.ts",
     ".next-motion/types/**/*.ts",
