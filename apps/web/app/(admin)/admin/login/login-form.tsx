@@ -7,11 +7,11 @@ import { requestLoginLink, type LoginState } from "./actions";
 import { GoogleButton } from "./google-button";
 
 const INPUT =
-  "h-10 w-full rounded-md border border-line bg-bg px-3 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-subtle/60 focus:border-fg focus:shadow-[0_0_0_3px_var(--muted)]";
+  "h-11 w-full rounded-lg border border-line bg-bg px-3.5 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-subtle/60 focus:border-fg focus:shadow-[0_0_0_3px_var(--muted)]";
 const PRIMARY =
-  "inline-flex h-10 w-full items-center justify-center rounded-md bg-fg px-4 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-50";
+  "inline-flex h-11 w-full items-center justify-center rounded-lg bg-fg px-4 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-50";
 const SECONDARY =
-  "inline-flex h-10 w-full items-center justify-center rounded-md border border-line px-4 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50";
+  "inline-flex h-11 w-full items-center justify-center rounded-lg border border-line bg-card px-4 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50";
 
 /** 主要是 Google；email 登入連結是第二選項。 */
 export function LoginForm({ googleClientId }: { googleClientId?: string }) {
@@ -36,21 +36,21 @@ export function LoginForm({ googleClientId }: { googleClientId?: string }) {
       {googleClientId && (
         <>
           <GoogleButton clientId={googleClientId} />
-          <div className="my-5 flex items-center gap-3 text-xs text-subtle">
-            <span className="h-px flex-1 bg-line" />或<span className="h-px flex-1 bg-line" />
+          <div className="my-6 flex items-center gap-3 text-xs text-subtle">
+            <span className="h-px flex-1 bg-line" />或用 email<span className="h-px flex-1 bg-line" />
           </div>
         </>
       )}
 
-      <form action={requestLink} className="space-y-2.5">
-        <input name="email" type="email" autoComplete="email" required aria-label="Email" placeholder="輸入 email 收登入連結" className={INPUT} />
+      <form action={requestLink} className="space-y-3">
+        <input name="email" type="email" autoComplete="email" required aria-label="Email" placeholder="you@example.com" className={INPUT} />
         {linkState.error && (
           <p role="alert" className="text-sm text-destructive">
             {linkState.error}
           </p>
         )}
         <button type="submit" disabled={sending} className={googleClientId ? SECONDARY : PRIMARY}>
-          {sending ? "寄送中…" : "寄登入連結"}
+          {sending ? "寄送中…" : "寄送登入連結"}
         </button>
       </form>
     </div>
