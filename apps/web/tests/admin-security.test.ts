@@ -13,6 +13,7 @@ import {
   verifyLoginLink,
   verifySession,
 } from "../lib/admin-session.ts";
+import { checkTokenInfo } from "../lib/google-auth.ts";
 import { signWebhook, verifyWebhook } from "../lib/webhook-signature.ts";
 
 const TOKEN = "a-long-enough-admin-token";
@@ -96,4 +97,18 @@ test("webhook rejects a changed body, wrong secret, old timestamp or missing hea
   assert.equal(await verifyWebhook(body, headers, secret, now + 10 * 60), false);
   assert.equal(await verifyWebhook(body, { ...headers, id: null }, secret, now), false);
   assert.equal(await verifyWebhook(body, { ...headers, signature: "v2,abc" }, secret, now), false);
+});
+
+test("google tokeninfo must be ours, from Google, verified and fresh", () => {
+  const client = "123-abc.apps.googleusercontent.com";
+  const now = 1_800_000_000_000;
+  const good = { aud: client, iss: "https://accounts.google.com", exp: now / 1000 + 600, email: "Owner@Example.com", email_verified: "true", name: "Owner", picture: "https://lh3.googleusercontent.com/a" };
+  assert.deepEqual(checkTokenInfo(good, client, now), { email: "owner@example.com", name: "Owner", picture: "https://lh3.googleusercontent.com/a" });
+  assert.equal(checkTokenInfo({ ...good, iss: "accounts.google.com" }, client, now)?.email, "owner@example.com");
+  assert.equal(checkTokenInfo({ ...good, aud: "someone-else" }, client, now), null);
+  assert.equal(checkTokenInfo({ ...good, iss: "https://evil.example" }, client, now), null);
+  assert.equal(checkTokenInfo({ ...good, email_verified: "false" }, client, now), null);
+  assert.equal(checkTokenInfo({ ...good, exp: now / 1000 - 1 }, client, now), null);
+  assert.equal(checkTokenInfo({ ...good, email: undefined }, client, now), null);
+  assert.equal(checkTokenInfo({ ...good, picture: "javascript:alert(1)" }, client, now)?.picture, "");
 });

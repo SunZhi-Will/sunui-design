@@ -78,7 +78,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </main>
           </div>
         ) : (
-          <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+          // 未登入只會看到登入頁（自帶全版面版型）或 404
+          children
         )}
       </body>
     </html>

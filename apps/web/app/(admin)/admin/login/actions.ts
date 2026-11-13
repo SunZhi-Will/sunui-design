@@ -15,6 +15,7 @@ import {
   SESSION_TTL_SECONDS,
   tokenMatches,
 } from "@/lib/admin-session";
+import { googleClientId, verifyGoogleCredential } from "@/lib/google-auth";
 import { pipeline, sha256 } from "@/lib/redis";
 import { siteUrl } from "@/lib/site";
 
@@ -97,6 +98,19 @@ export async function requestLoginLink(_prev: LoginState, formData: FormData): P
     return { error: "登入信寄送失敗，請稍後再試。" };
   }
   return SENT_MESSAGE;
+}
+
+/** Google 登入：驗證 Google 按鈕給的 ID token，email 在白名單才發 session。任何失敗都回同一個訊息。 */
+export async function loginWithGoogle(credential: string): Promise<LoginState> {
+  const clientId = googleClientId();
+  if (!adminToken() || !clientId) return { error: "Google 登入尚未設定。" };
+  if (await tooManyAttempts(await clientIp())) return { error: "嘗試次數太多，請 15 分鐘後再試。" };
+  const profile = await verifyGoogleCredential(credential, clientId);
+  if (!profile || !emailAllowed(profile.email, process.env.SUNUI_ADMIN_EMAILS)) {
+    return { error: "這個 Google 帳號沒有後台權限。" };
+  }
+  await startSession();
+  redirect("/admin");
 }
 
 /** 備用：直接輸入 SUNUI_ADMIN_TOKEN 登入（寄信服務故障時用）。 */
