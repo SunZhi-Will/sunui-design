@@ -1,6 +1,6 @@
 # SunUI: instructions for AI agents working in this repo
 
-SunUI is a shadcn registry of animated React + Tailwind blocks for commerce and campaign pages. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
+SunUI is a shadcn registry of paper-feel animated React + Tailwind blocks. Positioning (changed 2026-11-13): the headline is the paper feel and the motion, not an industry. Stores and campaign pages are the flagship collection and the Pro focus, not the limit of the catalog. Reasoning: `reports/SunUI 定位是否跳出電商.md`. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
 
 ## Where things are
 

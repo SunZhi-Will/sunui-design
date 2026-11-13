@@ -13,12 +13,12 @@ export function skillMarkdown() {
   const base = siteUrl();
   return `---
 name: ${skillName}
-description: Build commerce and campaign UI with SunUI blocks (paper-feel React + Tailwind, installed through the shadcn CLI). Use when the user mentions SunUI or @sunui-pro, or asks for shop, checkout, cart, coupon, voucher, receipt, loyalty stamp card, countdown, flash sale, pricing or campaign landing UI in a React, Next.js or shadcn project. Covers picking the right block, installing it, Pro license setup and keeping the SunUI design rules when editing.
+description: Build animated, paper-feel UI with SunUI blocks (React + Tailwind, installed through the shadcn CLI). Use when the user mentions SunUI or @sunui-pro, or asks for shop, checkout, cart, coupon, voucher, receipt, loyalty stamp card, countdown, flash sale, pricing or campaign landing UI, or for an animated hero, navigation, chart, theme switch or motion effect, in a React, Next.js or shadcn project. Covers picking the right block, installing it, Pro license setup and keeping the SunUI design rules when editing.
 ---
 
 # SunUI
 
-SunUI is a shadcn registry of production-ready animated blocks for commerce and campaign pages. Blocks are copied into the project as source; after install they belong to the user.
+SunUI is a shadcn registry of production-ready, paper-feel animated blocks. The deepest set is for stores and campaign pages; the rest (heroes, navigation, charts, theme switches, motion effects) fits any product page. Blocks are copied into the project as source; after install they belong to the user.
 
 ## Tools, in order of preference
 

@@ -7,7 +7,7 @@ import { getItems } from "@/lib/registry";
 // 整站（首頁）的分享圖。要放在 (site) 底下：app/ 根目錄的 opengraph-image 不會套到 (site) 這個 root layout。
 // 左邊主標，右邊拼四張型錄最前面的 block 畫面（scripts/capture-og.mjs 截的）。
 // 一張截圖都沒有時只顯示文字。
-export const alt = "SunUI: paper-feel commerce blocks for React";
+export const alt = "SunUI: paper-feel animated blocks for React";
 export const size = ogSize;
 export const contentType = ogContentType;
 // 建置時產生：讀 public/og 的截圖在執行期的 serverless 函式裡拿不到
@@ -52,7 +52,7 @@ export default async function OpengraphImage() {
               Coupons, receipts and stamps your shoppers can feel.
             </div>
             <div style={{ display: "flex", fontSize: mosaic ? 24 : 32, lineHeight: 1.35, color: "#6b6b6b" }}>
-              {`${items.length} paper-feel commerce blocks · shadcn registry · accessible by default`}
+              {`${items.length} paper-feel animated blocks · shadcn registry · accessible by default`}
             </div>
           </div>
           <div style={{ display: "flex", fontSize: 22, color: "#a3a3a3" }}>{siteHost()}</div>

@@ -239,7 +239,7 @@ const handler = createMcpHandler(
       "build_page",
       {
         title: "Build a page with SunUI",
-        description: "Plan and build a commerce or campaign page from SunUI blocks.",
+        description: "Plan and build a page from SunUI blocks: store, campaign, launch or product page.",
         argsSchema: z.object({ brief: z.string().describe("What the page is for, e.g. 'Double 11 sale landing page'.") }),
       },
       ({ brief }) => ({
@@ -265,7 +265,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: "sunui", version: "1.0.0" },
-    instructions: `SunUI: ${getItems().length} paper-feel React + Tailwind blocks for commerce and campaign pages, installed with the shadcn CLI. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
+    instructions: `SunUI: ${getItems().length} paper-feel animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
   },
 );
 

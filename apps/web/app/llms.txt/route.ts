@@ -13,7 +13,7 @@ export function GET() {
 
   const body = `# SunUI
 
-> Paper-feel React + Tailwind blocks for commerce and campaign pages (coupons, receipts, loyalty stamps, countdowns, carts, checkout, pricing). Design language: paper surfaces, ink text, one vermilion accent, stamps for results, motion only on user action. Distributed as a shadcn registry: blocks are copied into the project with the shadcn CLI. Every block respects prefers-reduced-motion and supports keyboard and screen readers. Only dependency: framer-motion.
+> Paper-feel animated React + Tailwind blocks. The deepest set covers stores and campaign pages (coupons, receipts, loyalty stamps, countdowns, carts, checkout, pricing); the rest covers heroes, navigation, charts, theme switches and motion effects for any product page. Paper series design language: paper surfaces, ink text, one brand spot colour taken from the theme, results as one quiet line of ink, motion only on user action. Distributed as a shadcn registry: blocks are copied into the project with the shadcn CLI. Every block respects prefers-reduced-motion and supports keyboard and screen readers. Only dependency: framer-motion.
 
 ## Docs
 
