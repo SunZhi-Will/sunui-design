@@ -150,7 +150,7 @@
       "name": "animated-number",
       "type": "registry:block",
       "title": "Animated Number",
-      "description": "Mechanical odometer for prices and counts: each digit wheel turns in the direction the value moved, with Intl currency formatting and an optional small ink trend arrow. Screen readers get the formatted value.",
+      "description": "Mechanical odometer for changing numbers such as counts, stats and prices: each digit wheel turns in the direction the value moved, with Intl currency formatting and an optional small ink trend arrow. Screen readers get the formatted value.",
       "dependencies": [
         "framer-motion"
       ],
@@ -291,7 +291,7 @@
       "name": "avatar-stack",
       "type": "registry:block",
       "title": "Avatar Stack",
-      "description": "Recent buyers social proof: initials on paper discs with an ink outline, a +N count and hover or focus tooltips. Use near add-to-cart to show real purchase activity.",
+      "description": "Social proof avatar stack: initials on paper discs with an ink outline, a +N count and hover or focus tooltips. Use it for team members, recent sign-ups or recent buyers, next to the action they vouch for.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1618,7 +1618,7 @@
       "name": "favorite-button",
       "type": "registry:block",
       "title": "Favorite Button",
-      "description": "Wishlist heart in ink that fills solid ink with a short press when saved. aria-pressed toggle with optional count.",
+      "description": "Favorite heart in ink that fills solid ink with a short press when saved, for bookmarks, likes or a wishlist. aria-pressed toggle with optional count.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1811,7 +1811,7 @@
       "name": "hotspots",
       "type": "registry:block",
       "title": "Hotspots",
-      "description": "Numbered pins on a product picture that open a paper note about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a price or add to cart.",
+      "description": "Numbered pins on a picture (a product shot, screenshot, map or diagram) that open a paper note about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a link, a price or add to cart.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1902,7 +1902,7 @@
       "name": "hover-motion",
       "type": "registry:block",
       "title": "Hover Motion",
-      "description": "Four small hover pieces for store navigation and campaign pages: Magnetic pulls a button gently toward the cursor and springs back, InkUnderline draws a line in from the left and out to the right, TextRoll rolls each letter up while the same word rolls in from below, and HoverPreviewList shows a row's picture beside the cursor. All switch off on touch screens and with reduced motion.",
+      "description": "Four small hover pieces for navigation and landing pages: Magnetic pulls a button gently toward the cursor and springs back, InkUnderline draws a line in from the left and out to the right, TextRoll rolls each letter up while the same word rolls in from below, and HoverPreviewList shows a row's picture beside the cursor. All switch off on touch screens and with reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2104,7 +2104,7 @@
       "name": "lightbox",
       "type": "registry:block",
       "title": "Lightbox",
-      "description": "Product gallery whose thumbnail grows into the full view and shrinks back on close; switching images sends the old one back to its thumbnail while the next grows from its own. Arrow keys and swipe change images, Escape, the scrim or a downward drag closes, focus returns to the thumbnail, and you can control the index or render custom thumbnails.",
+      "description": "Image gallery whose thumbnail grows into the full view and shrinks back on close; switching images sends the old one back to its thumbnail while the next grows from its own. Arrow keys and swipe change images, Escape, the scrim or a downward drag closes, focus returns to the thumbnail, and you can control the index or render custom thumbnails.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2546,7 +2546,6 @@
         "utils"
       ],
       "categories": [
-        "commerce",
         "navigation",
         "listing"
       ],
@@ -3045,7 +3044,7 @@
       "name": "range-slider",
       "type": "registry:block",
       "title": "Range Slider",
-      "description": "Price and rating slider that takes a number for one thumb or a [low, high] pair for a range: step snapping, minimum gap, ticks, a value bubble while dragging or focused, custom formatting and hidden inputs for forms. Click the track to jump the nearest thumb, use arrows, Page keys, Home and End, and get onValueCommit once when the drag ends.",
+      "description": "Slider for any numeric value or range (price, rating, volume, quota) that takes a number for one thumb or a [low, high] pair for a range: step snapping, minimum gap, ticks, a value bubble while dragging or focused, custom formatting and hidden inputs for forms. Click the track to jump the nearest thumb, use arrows, Page keys, Home and End, and get onValueCommit once when the drag ends.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3709,7 +3708,7 @@
       "name": "skeleton-set",
       "type": "registry:block",
       "title": "Skeleton Set",
-      "description": "Paper placeholders for product cards, lists, text and generic full-width rows with a slow opacity pulse while loading that stops under reduced motion, crossfading to real content. Sets aria-busy, announces a custom loading label through a status region and announces when loaded.",
+      "description": "Paper placeholders for cards, lists, text and generic full-width rows with a slow opacity pulse while loading that stops under reduced motion, crossfading to real content. Sets aria-busy, announces a custom loading label through a status region and announces when loaded.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3912,7 +3911,7 @@
       "name": "stamp",
       "type": "registry:ui",
       "title": "Result mark",
-      "description": "SunUI's result mark: an upright line of ink where the result happened, with a check for positive results and faded ink for ended, sold out or no prize. The shape picks what extra detail it carries (date adds a printed date, seal adds a second line) rather than how it looks. No tilt, no texture, no colour; it fades in over 150ms and appears instantly under reduced motion. Kept under the name stamp so existing installs keep working.",
+      "description": "SunUI's result mark: an upright line of ink where the result happened, with a check for positive results and faded ink for negative ones such as ended, expired or sold out. The shape picks what extra detail it carries (date adds a printed date, seal adds a second line) rather than how it looks. No tilt, no texture, no colour; it fades in over 150ms and appears instantly under reduced motion. Kept under the name stamp so existing installs keep working.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4448,8 +4447,7 @@
       "categories": [
         "chart",
         "diagram",
-        "data-display",
-        "commerce"
+        "data-display"
       ],
       "meta": {
         "tier": "free",
@@ -4506,7 +4504,7 @@
       "name": "toast-stack",
       "type": "registry:block",
       "title": "Toast Stack",
-      "description": "Paper slip notifications that stack, fan out on hover or focus and dismiss by swipe, Escape or Delete, with optional product thumbnail and undo action; timers pause while the tab is hidden. Includes useToasts and useUndoable, which applies a removal at once and shows an Undo slip that stays until used or closed, no confirm dialog.",
+      "description": "Paper slip notifications that stack, fan out on hover or focus and dismiss by swipe, Escape or Delete, with optional thumbnail and undo action; timers pause while the tab is hidden. Includes useToasts and useUndoable, which applies a removal at once and shows an Undo slip that stays until used or closed, no confirm dialog.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5098,7 +5096,6 @@
         "@sunui/sunui-motion"
       ],
       "categories": [
-        "commerce",
         "overlay",
         "menu"
       ],

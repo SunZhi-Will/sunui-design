@@ -1,7 +1,7 @@
 {
   "zh-TW": {
     "title": "滑入動效",
-    "description": "四個給商店導覽與活動頁用的小元件：Magnetic 讓按鈕被游標輕輕吸過去再彈回，InkUnderline 底線從左畫入、往右收走，TextRoll 讓每個字往上滾出、同一個字從下方滾入，HoverPreviewList 在游標旁顯示該列的圖。觸控螢幕與減少動態時全部自動關閉。",
+    "description": "四個給導覽與行銷頁用的小元件：Magnetic 讓按鈕被游標輕輕吸過去再彈回，InkUnderline 底線從左畫入、往右收走，TextRoll 讓每個字往上滾出、同一個字從下方滾入，HoverPreviewList 在游標旁顯示該列的圖。觸控螢幕與減少動態時全部自動關閉。",
     "whenToUse": [
       "header 選單與 footer 連結",
       "活動頁上唯一的主要按鈕",
@@ -14,7 +14,7 @@
   },
   "zh-CN": {
     "title": "悬停动效",
-    "description": "四个用于商店导航和活动页的小组件：Magnetic 让按钮被光标轻轻吸过去再弹回，InkUnderline 下划线从左画入、向右收走，TextRoll 让每个字向上滚出、同一个字从下方滚入，HoverPreviewList 在光标旁显示该行的图片。触屏和减少动态时全部自动关闭。",
+    "description": "四个用于导航和营销页的小组件：Magnetic 让按钮被光标轻轻吸过去再弹回，InkUnderline 下划线从左画入、向右收走，TextRoll 让每个字向上滚出、同一个字从下方滚入，HoverPreviewList 在光标旁显示该行的图片。触屏和减少动态时全部自动关闭。",
     "whenToUse": [
       "header 菜单与 footer 链接",
       "活动页上唯一的主按钮",
@@ -27,7 +27,7 @@
   },
   "ja": {
     "title": "ホバーモーション",
-    "description": "ストアのナビゲーションやキャンペーンページ向けの小さな四つの部品：Magnetic はボタンがカーソルにそっと引き寄せられて戻り、InkUnderline は下線が左から引かれて右へ消え、TextRoll は文字が一字ずつ上へ転がり同じ語が下から入り、HoverPreviewList はカーソルの横にその行の写真を出します。タッチ画面と視差効果を減らす設定ではすべて無効になります。",
+    "description": "ナビゲーションやランディングページ向けの小さな四つの部品：Magnetic はボタンがカーソルにそっと引き寄せられて戻り、InkUnderline は下線が左から引かれて右へ消え、TextRoll は文字が一字ずつ上へ転がり同じ語が下から入り、HoverPreviewList はカーソルの横にその行の写真を出します。タッチ画面と視差効果を減らす設定ではすべて無効になります。",
     "whenToUse": [
       "ヘッダーメニューやフッターのリンク",
       "キャンペーンページの主要ボタンひとつ",
