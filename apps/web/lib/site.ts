@@ -35,6 +35,16 @@ export const pricesTwd = { founding: 2490, pro: 4090, team: 10990 } as const;
 
 export type Plan = keyof typeof pricesTwd;
 
+/**
+ * 方案價格的兩種幣別。實際以新台幣收款，美金是參考價。
+ * 繁中介面以台幣為主、美金為輔，其他語系反過來。
+ */
+export function planPrice(plan: Plan, locale: string) {
+  const usd = `US$${plan === "founding" ? prices.founding : prices[plan]}`;
+  const twd = `NT$${pricesTwd[plan].toLocaleString("en-US")}`;
+  return locale === "zh-TW" ? { primary: twd, secondary: usd, usd, twd } : { primary: usd, secondary: twd, usd, twd };
+}
+
 export function isPlan(value: string): value is Plan {
   return value === "founding" || value === "pro" || value === "team";
 }

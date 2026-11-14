@@ -8,7 +8,8 @@ import { getI18n } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
-import { checkoutReady, foundingState, foundingWindow, prices } from "@/lib/site";
+import { checkoutCopy } from "@/lib/checkout-copy";
+import { checkoutReady, foundingState, foundingWindow, planPrice, prices } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,17 +40,25 @@ export default async function PricingPage() {
       ? { label: t.opensCta(dateFormat.format(foundingWindow.opensAt)), href: "#waitlist" }
       : { label: t.joinWaitlist, href: "#waitlist" };
 
+  // 以台幣收款：每個付費方案同時列台幣與美金，繁中以台幣為主
+  const proPrice = planPrice("pro", locale);
+  const teamPrice = planPrice("team", locale);
+  const foundingPrice = planPrice("founding", locale);
+  const billedInTwd = checkoutCopy(locale).billedInTwd;
+
   const plans = [
     {
       name: t.free.name,
-      price: "$0",
+      price: locale === "zh-TW" ? "NT$0" : "$0",
+      secondary: undefined as string | undefined,
       note: t.free.note,
       features: t.free.features(freeCount, motionCount),
       cta: { label: m.common.browseBlocks, href: "/" },
     },
     {
       name: t.pro.name,
-      price: `$${prices.pro}`,
+      price: proPrice.primary,
+      secondary: proPrice.secondary,
       note: t.pro.note,
       highlight: true,
       features: t.pro.features,
@@ -57,7 +66,8 @@ export default async function PricingPage() {
     },
     {
       name: t.team.name,
-      price: `$${prices.team}`,
+      price: teamPrice.primary,
+      secondary: teamPrice.secondary,
       note: t.team.note,
       features: t.team.features,
       cta: canBuy ? { label: t.team.cta, href: "/go/checkout/team" } : waitlistCta,
@@ -82,6 +92,9 @@ export default async function PricingPage() {
           <h2 id="founding-title" className="mt-1 text-2xl font-semibold tracking-tight">
             {t.foundingTitle(foundingWindow.seats)}
           </h2>
+          <p className="mt-1 text-sm text-subtle tabular-nums">
+            ≈ {foundingPrice.secondary}
+          </p>
           <p className="mt-2 text-sm text-subtle">
             {state === "upcoming"
               ? t.foundingUpcoming(
@@ -119,6 +132,7 @@ export default async function PricingPage() {
               <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
               <span className="text-sm text-subtle">{plan.note}</span>
             </p>
+            {plan.secondary && <p className="mt-1 text-sm text-subtle tabular-nums">≈ {plan.secondary}</p>}
             <ul className="mt-6 grid flex-1 content-start gap-2.5 text-sm">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex gap-2">
@@ -152,6 +166,7 @@ export default async function PricingPage() {
       <p className="mt-6 text-center text-sm text-subtle">
         {t.footnote(proCount)}
       </p>
+      <p className="mt-1.5 text-center text-xs text-subtle">{billedInTwd}</p>
 
       <SavingsCalculator price={prices.pro} locale={locale} t={t.calculator} />
 

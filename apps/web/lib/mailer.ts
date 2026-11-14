@@ -16,6 +16,8 @@ async function send(to: string[], subject: string, text: string) {
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from: process.env.RESEND_FROM ?? process.env.RESEND_ADMIN_FROM ?? "SunUI <onboarding@resend.dev>",
+        // 買家按「回覆」時寄到這裡（synvize.com 的收信地址，由 Cloudflare Email Routing 轉到作者信箱）
+        ...(process.env.RESEND_REPLY_TO ? { reply_to: process.env.RESEND_REPLY_TO } : {}),
         to,
         subject,
         text,
@@ -34,6 +36,7 @@ export function sendLicenseEmail(order: Order, key: string) {
     `Your SunUI ${PLAN_NAME[order.plan]} license`,
     [
       `Thanks for buying SunUI ${PLAN_NAME[order.plan]}.`,
+      `Paid: NT$${order.amountTwd.toLocaleString("en-US")} (about US$${order.plan === "founding" ? prices.founding : prices[order.plan]}).`,
       "",
       `License key: ${key}`,
       "",

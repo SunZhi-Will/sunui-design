@@ -365,7 +365,7 @@ const en = {
     joinWaitlist: "Join the waitlist",
     opensCta: (date: string) => `Opens ${date}, get notified`,
     footnote: (n: number) =>
-      `${n} Pro ${n === 1 ? "block" : "blocks"} today, new ones every week. Prices in USD, taxes handled at checkout.`,
+      `${n} Pro ${n === 1 ? "block" : "blocks"} today, new ones every week.`,
     bar: {
       upcoming: "Founding member: lifetime Pro for $79, {seats} seats, opens {opens}.",
       open: "Founding member: lifetime Pro for $79, {seats} seats, on sale until {closes}.",
@@ -633,7 +633,7 @@ const zhTW: Messages = {
     },
     proEyebrow: "SunUI Pro",
     proTitle: "所有 Pro 場景，一次付費，永久擁有。",
-    proBody: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。創始會員只要 $79 即可終身使用。`,
+    proBody: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。創始會員只要 NT$2,490 即可終身使用。`,
   },
   catalog: {
     sectionLabel: "區塊",
@@ -842,7 +842,7 @@ const zhTW: Messages = {
     title: "付一次，用到永遠。",
     lead: "免費區塊永遠免費。Pro 解鎖可直接上線的商店、檔期活動與產品頁場景，日後新增的區塊也全部包含。",
     foundingEyebrow: "創始會員",
-    foundingTitle: (seats) => `$79 終身使用 Pro，限量 ${seats} 位`,
+    foundingTitle: (seats) => `NT$2,490 終身使用 Pro，限量 ${seats} 位`,
     foundingUpcoming: (opens, closes) =>
       `${opens} 開賣，${closes} 截止，席位售完即提前結束。加入候補名單，搶先取得購買資格。`,
     foundingOpen: (closes) => `販售至 ${closes}，席位售完即提前結束。內容與 Pro 相同，以創始價格購買。`,
@@ -872,10 +872,10 @@ const zhTW: Messages = {
     },
     joinWaitlist: "加入候補名單",
     opensCta: (date) => `${date} 開賣，通知我`,
-    footnote: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。價格以美元計，稅金於結帳時處理。`,
+    footnote: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。`,
     bar: {
-      upcoming: "創始會員：$79 終身使用 Pro，限量 {seats} 位，{opens}開賣。",
-      open: "創始會員：$79 終身使用 Pro，限量 {seats} 位，販售至{closes}。",
+      upcoming: "創始會員：NT$2,490 終身使用 Pro，限量 {seats} 位，{opens}開賣。",
+      open: "創始會員：NT$2,490 終身使用 Pro，限量 {seats} 位，販售至{closes}。",
       upcomingCta: "開賣時通知我",
       openCta: "搶一個席位",
       dismiss: "關閉",
@@ -1359,7 +1359,7 @@ const zhCN: Messages = {
     },
     joinWaitlist: "加入候补名单",
     opensCta: (date) => `${date} 开卖，通知我`,
-    footnote: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。价格以美元计，税费在结算时处理。`,
+    footnote: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。`,
     bar: {
       upcoming: "创始会员：$79 终身使用 Pro，限量 {seats} 名，{opens}开售。",
       open: "创始会员：$79 终身使用 Pro，限量 {seats} 名，销售至{closes}。",
@@ -1854,7 +1854,7 @@ const ja: Messages = {
     },
     joinWaitlist: "ウェイトリストに登録",
     opensCta: (date) => `${date} 発売、通知を受け取る`,
-    footnote: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。価格は米ドル、税金はチェックアウト時に計算されます。`,
+    footnote: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。`,
     bar: {
       upcoming: "創設メンバー：$79 で Pro を永久に。先着 {seats} 名、{opens}発売。",
       open: "創設メンバー：$79 で Pro を永久に。先着 {seats} 名、{closes}まで販売中。",

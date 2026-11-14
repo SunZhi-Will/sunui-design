@@ -8,6 +8,8 @@ type Copy = {
   planName: Record<"founding" | "pro" | "team", string>;
   planNote: Record<"founding" | "pro" | "team", string>;
   chargedInTwd: (twd: string, usd: number) => string;
+  /** 定價頁方案卡下方：說明以台幣收款、美金只是參考 */
+  billedInTwd: string;
   emailLabel: string;
   emailHint: string;
   pay: string;
@@ -47,6 +49,7 @@ const en: Copy = {
     team: "One-time payment for 5 people. All Pro blocks and future updates.",
   },
   chargedInTwd: (twd, usd) => `Charged in New Taiwan dollars: NT$${twd} (about US$${usd}). Your bank converts the amount.`,
+  billedInTwd: "Paid in New Taiwan dollars. US$ prices are approximate; your bank converts the amount.",
   emailLabel: "Email",
   emailHint: "Your license key is sent here and shown on the next page.",
   pay: "Continue to payment",
@@ -92,6 +95,7 @@ const zhTW: Copy = {
     team: "一次付清，5 人使用，含全部 Pro 區塊與之後的更新。",
   },
   chargedInTwd: (twd) => `以新台幣結帳：NT$${twd}。`,
+  billedInTwd: "以新台幣結帳，美金價格僅供參考。",
   emailLabel: "Email",
   emailHint: "授權碼會寄到這裡，下一頁也會直接顯示。",
   pay: "前往付款",
@@ -138,6 +142,7 @@ const zhCN: Copy = {
     team: "一次付清，5 人使用，含全部 Pro 区块与之后的更新。",
   },
   chargedInTwd: (twd, usd) => `以新台币结账：NT$${twd}（约 US$${usd}），由你的银行换算。`,
+  billedInTwd: "以新台币结账，美元价格仅供参考，由你的银行换算。",
   emailHint: "授权码会寄到这里，下一页也会直接显示。",
   pay: "前往付款",
   paying: "正在打开付款页…",
@@ -182,6 +187,7 @@ const ja: Copy = {
     team: "5 人分の買い切り。すべての Pro ブロックと今後のアップデート。",
   },
   chargedInTwd: (twd, usd) => `新台湾ドルで決済されます：NT$${twd}（約 US$${usd}）。換算はカード会社が行います。`,
+  billedInTwd: "お支払いは新台湾ドルです。米ドル表示は目安で、換算はカード会社が行います。",
   emailLabel: "メールアドレス",
   emailHint: "ライセンスキーはここに届き、次のページにも表示されます。",
   pay: "支払いへ進む",
