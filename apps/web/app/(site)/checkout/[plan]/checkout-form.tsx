@@ -6,15 +6,18 @@ import { startCheckout, type CheckoutState } from "../actions";
 
 export function CheckoutForm({
   plan,
+  currency,
   t,
 }: {
   plan: string;
+  currency: "twd" | "usd";
   t: { emailLabel: string; emailHint: string; pay: string; paying: string };
 }) {
   const [state, action, pending] = useActionState<CheckoutState, FormData>(startCheckout, {});
   return (
     <form action={action} className="space-y-3">
       <input type="hidden" name="plan" value={plan} />
+      <input type="hidden" name="currency" value={currency} />
       <label className="block space-y-1.5">
         <span className="text-sm font-medium">{t.emailLabel}</span>
         <input

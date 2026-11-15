@@ -80,7 +80,25 @@ Vercel 要設 `CRON_SECRET`，否則提醒信不會寄出。退款一期訂閱�
 - 商家 ID 與 API key 和其他產品相同，填進 `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`。
 - 先用 `SHOPLINE_ENV=sandbox` 走一次測試卡付款，拿完成頁的授權碼實際跑 `npx shadcn add @sunui-pro/coupon-claim-card`，再退款一次確認授權被撤銷。
 - 寄授權碼信給買家需要在 Resend 驗證 synvize.com，並設定 `RESEND_FROM`；沒設定前買家只能從完成頁拿授權碼。
-- 海外營收變大後再評估加一個代收代付平台（Polar 或 Dodo Payments）處理各國消費稅。
+- 海外客戶改用 Polar 收美金（2026-11-15 定案），見下一節。
+
+**11/27 前買 Pro 的退差價（2026-11-15 定案）**：創始會員開賣前，定價頁與 Pro 結帳頁都寫著「開賣後可申請退差價」。
+有人來信要求時，到 SHOPLINE 後台對那筆訂單做部分退款 NT$1,600（4,090 − 2,490），Polar 訂單退 US$50。
+部分退款不會撤銷授權（後台訂單會留一筆「需人工確認」的退款紀錄），客戶繼續用原本的授權碼。
+
+**疑似分享**：同一把授權碼一天內超過 10 個 IP 安裝時，會寄信給 `SUNUI_ADMIN_EMAILS` 並在後台「授權使用」標記；超過 20 個自動擋下。
+確定外流時按「重發」換掉那一把。
+
+### 4b. Polar（海外美金收款）
+
+繁中介面預設走 SHOPLINE 新台幣，其他語系預設走 Polar 美金，結帳頁可以切換。Polar 是 merchant of record，各國消費稅由它處理；官方文件列出台灣可以出款（Stripe Connect Express）。
+
+- 在 polar.sh 建立組織並完成出款設定（Stripe Connect Express，台灣在支援名單內）。
+- 建立五個「一次性付款」商品，價格照美金定價：Founding US$79、Pro US$129、Team US$349、月訂 US$19、年訂 US$99。月訂與年訂也建成一次性付款，到期日由 SunUI 管理，不用 Polar 的自動續扣。
+- Settings → Developers 產生 Organization Access Token（`checkouts:write`），填進 `POLAR_ACCESS_TOKEN`。
+- Settings → Webhooks 新增 `https://sunui.synvize.com/api/polar/webhook`，格式選 Raw，勾 `order.paid` 與 `order.refunded`，拿到的 `whsec_…` 填進 `POLAR_WEBHOOK_SECRET`。
+- 五個商品 id 以 JSON 填進 `POLAR_PRODUCT_IDS`，`POLAR_ENV` 先填 `sandbox`，測完改 `live`。四項都設好，結帳頁才會出現美金選項；沒設好時一切照舊。
+- Sandbox 測一次：英文介面買月訂，完成頁拿到授權碼，再到 Polar 退款，確認到期日往回扣一個月。
 
 ### 5. Resend（waitlist）
 

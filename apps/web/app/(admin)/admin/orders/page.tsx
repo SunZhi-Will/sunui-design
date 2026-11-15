@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { formatDate, maskEmail, requireAdmin } from "@/lib/admin";
-import { listOrders, webhookLog, type Order } from "@/lib/orders";
+import { listOrders, orderAmountLabel, sumByCurrency, webhookLog, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 import { salesOpen, shoplineConfigured, type Plan } from "@/lib/site";
 
@@ -33,11 +33,13 @@ const RESULT_TONE: Record<string, "ok" | "warn" | "bad" | "idle"> = {
   store_failed: "bad",
 };
 
-const twd = (n: number) => `NT$${n.toLocaleString("en-US")}`;
+// 新台幣（SHOPLINE）與美金（Polar）分開列，不換算
+const money = (n: { twd: number; usd: number }) =>
+  [`NT$${n.twd.toLocaleString("en-US")}`, ...(n.usd ? [`US$${n.usd.toLocaleString("en-US")}`] : [])].join(" + ");
 
 export default async function AdminOrders() {
   await requireAdmin();
-  const header = <PageHeader title="訂單" description="SHOPLINE Payments 收款，訂單與授權存在 Upstash Redis。金額為新台幣。退款請到 SHOPLINE 後台操作，付款通知會自動撤銷授權。" />;
+  const header = <PageHeader title="訂單" description="新台幣走 SHOPLINE Payments，美金走 Polar；訂單與授權存在 Upstash Redis。退款請到對應的金流後台操作，付款通知會自動處理授權。" />;
 
   if (!redisEnabled()) {
     return (
@@ -64,27 +66,22 @@ export default async function AdminOrders() {
   const paid = real.filter((o) => o.status === "paid");
   const refunded = real.filter((o) => o.status === "refunded");
   const finished = real.filter((o) => o.status !== "pending");
-  const sales = paid.reduce((s, o) => s + o.amountTwd, 0);
+  const sales = sumByCurrency(paid);
   const attention = real.filter((o) => o.status === "amount_mismatch" || o.status === "disputed");
 
-  const byPlan = new Map<Plan, { count: number; amount: number }>();
-  for (const o of paid) {
-    const row = byPlan.get(o.plan) ?? { count: 0, amount: 0 };
-    row.count += 1;
-    row.amount += o.amountTwd;
-    byPlan.set(o.plan, row);
-  }
+  const byPlan = new Map<Plan, Order[]>();
+  for (const o of paid) byPlan.set(o.plan, [...(byPlan.get(o.plan) ?? []), o]);
 
   return (
     <>
       {header}
       {attention.length > 0 && (
-        <Notice tone="bad">有 {attention.length} 筆訂單需要處理（金額不符或爭議中），請到 SHOPLINE 後台確認。</Notice>
+        <Notice tone="bad">有 {attention.length} 筆訂單需要處理（金額不符或爭議中），請到對應的金流後台確認。</Notice>
       )}
 
       <KpiStrip cols={4}>
         <StatTile icon="orders" label="有效訂單" value={paid.length} hint={`另有 ${real.length - finished.length} 筆未完成付款`} />
-        <StatTile icon="dollar" label="銷售額" value={twd(sales)} hint="已扣退款，未扣金流手續費" />
+        <StatTile icon="dollar" label="銷售額" value={money(sales)} hint="已扣退款，未扣金流手續費；美金未換算" />
         <StatTile
           icon="check"
           label="付款完成率"
@@ -100,11 +97,11 @@ export default async function AdminOrders() {
         />
       </KpiStrip>
 
-      <Section title="方案組合" description="已付款訂單，依金額排序">
+      <Section title="方案組合" description="已付款訂單，依筆數排序">
         <BarList
           items={[...byPlan.entries()]
-            .sort((a, b) => b[1].amount - a[1].amount)
-            .map(([plan, row]) => ({ label: PLAN_LABEL[plan], value: row.count, extra: twd(row.amount) }))}
+            .sort((a, b) => b[1].length - a[1].length)
+            .map(([plan, list]) => ({ label: PLAN_LABEL[plan], value: list.length, extra: money(sumByCurrency(list)) }))}
           empty={{ title: "還沒有付款完成的訂單", icon: "orders" }}
         />
       </Section>
@@ -131,7 +128,10 @@ export default async function AdminOrders() {
               {o.test && <span className="ml-1.5 rounded border border-line px-1 text-[10px] text-subtle">測試</span>}
             </span>,
             maskEmail(o.email),
-            twd(o.amountTwd),
+            <span key="a" className="whitespace-nowrap tabular-nums">
+              {orderAmountLabel(o)}
+              {o.provider === "polar" && <span className="ml-1.5 text-xs text-subtle">Polar</span>}
+            </span>,
             <StatusDot key="s" tone={STATUS[o.status].tone}>
               {STATUS[o.status].label}
             </StatusDot>,

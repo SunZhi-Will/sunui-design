@@ -8,9 +8,11 @@ import { getLocale } from "@/lib/i18n-server";
 import { clientIp } from "@/lib/license";
 import { notifyOwner, sendLicenseEmail } from "@/lib/mailer";
 import { attachSession, createOrder, foundingSold, fulfillOrder, ORDER_COOKIE } from "@/lib/orders";
+import { paymentOptions, providerFor } from "@/lib/payments";
+import { createPolarCheckout, devPolar } from "@/lib/polar";
 import { pipeline, sha256 } from "@/lib/redis";
 import { createCheckoutSession, devCheckout } from "@/lib/shopline";
-import { checkoutReady, foundingState, foundingWindow, isPlan } from "@/lib/site";
+import { foundingState, foundingWindow, isPlan } from "@/lib/site";
 
 export type CheckoutState = { error?: string };
 
@@ -30,8 +32,11 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
   const t = checkoutCopy(locale).errors;
   const plan = String(formData.get("plan") ?? "");
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const currency = formData.get("currency") === "usd" ? "usd" : "twd";
 
-  if (!isPlan(plan) || !checkoutReady()) return { error: t.closed };
+  // 選的幣別要真的可以用（SHOPLINE 收新台幣、Polar 收美金）
+  if (!isPlan(plan) || !paymentOptions()[currency]) return { error: t.closed };
+  const provider = providerFor(currency);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return { error: t.email };
   if (plan === "founding") {
     if (foundingState() !== "open") return { error: t.closed };
@@ -42,7 +47,7 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
 
   let order;
   try {
-    order = await createOrder(plan, email);
+    order = await createOrder(plan, email, { provider });
   } catch {
     return { error: t.upstream };
   }
@@ -54,14 +59,21 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
     maxAge: 30 * 24 * 60 * 60,
   });
 
-  // 本機開發模式：不經過 SHOPLINE，直接入帳，方便測完整流程
-  if (devCheckout()) {
+  // 本機開發模式：不經過 SHOPLINE / Polar，直接入帳，方便測完整流程
+  if (provider === "shopline" ? devCheckout() : devPolar()) {
     const issued = await fulfillOrder(order, "", process.env.SUNUI_ADMIN_TOKEN ?? "dev-secret");
     if (issued) {
       await sendLicenseEmail(order, issued);
       await notifyOwner(order, issued);
     }
     redirect(`/checkout/done?o=${order.id}`);
+  }
+
+  if (provider === "polar") {
+    const polar = await createPolarCheckout(order);
+    if (!polar.ok) return { error: t.upstream };
+    if (polar.checkoutId) await attachSession(order.id, polar.checkoutId).catch(() => {});
+    redirect(polar.url);
   }
 
   const session = await createCheckoutSession(order, ip, locale === "zh-TW" || locale === "zh-CN" ? "zh-TW" : "en");

@@ -2,7 +2,7 @@ import { requireAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
 import { installStats } from "@/lib/installs";
-import { listOrders, type Order } from "@/lib/orders";
+import { listOrders, sumByCurrency, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 import { foundingState, foundingWindow, shoplineConfigured } from "@/lib/site";
 
@@ -64,13 +64,15 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
   const orders: Order[] = (orderList ?? []).filter((o) => !o.test);
   const counted = orders.filter((o) => o.status === "paid");
   const founding = counted.filter((o) => o.plan === "founding").length;
-  const sales = counted.reduce((sum, o) => sum + o.amountTwd, 0);
+  const sales = sumByCurrency(counted);
   // 本期建立的結帳與成功付款（SunUI 自己的訂單，結帳頁送出 email 才會建立）
   const since = Date.now() - days * 86_400_000;
   const periodOrders = orders.filter((o) => Date.parse(o.createdAt) >= since);
   const periodPaid = counted.filter((o) => o.paidAt && Date.parse(o.paidAt) >= since);
-  const periodSales = periodPaid.reduce((sum, o) => sum + o.amountTwd, 0);
-  const twd = (n: number) => `NT$${n.toLocaleString("en-US")}`;
+  const periodSales = sumByCurrency(periodPaid);
+  // 新台幣（SHOPLINE）與美金（Polar）分開列，不換算
+  const twd = (n: { twd: number; usd: number }) =>
+    [`NT$${n.twd.toLocaleString("en-US")}`, ...(n.usd ? [`US$${n.usd.toLocaleString("en-US")}`] : [])].join(" + ");
 
   const free = installs ? split(installs.perDay.map((d) => ({ day: d.day, value: d.installs })), days) : null;
   const pro = events ? split(events.pro.perDay, days) : null;

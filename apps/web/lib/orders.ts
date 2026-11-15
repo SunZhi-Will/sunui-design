@@ -2,9 +2,10 @@
 //
 // order:{id}          hash：plan、amountTwd、email、status、createdAt、paidAt、sessionId、tradeId、licenseId、keyEnc、viewToken、refundedTwd、
 //                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）、
-//                     licenseIds、seatKeysEnc（Team：5 個席位各一把授權碼，逗號分隔的 id 與加密的 JSON 陣列）
+//                     licenseIds、seatKeysEnc（Team：5 個席位各一把授權碼，逗號分隔的 id 與加密的 JSON 陣列）、
+//                     provider（shopline / polar，沒有這欄的舊訂單是 shopline）、amountUsd（polar 訂單的美金金額，此時 amountTwd 為 0）
 // orders              zset：createdAt → 訂單編號（後台列表）
-// ordersession:{sid}  string：SHOPLINE sessionId → 訂單編號
+// ordersession:{sid}  string：SHOPLINE sessionId 或 Polar checkout id → 訂單編號
 // ordertrade:{tid}    string：SHOPLINE tradeOrderId → 訂單編號（退款、爭議的通知只帶這個）
 // order:{id}:fulfill  string：入帳鎖（SET NX），重複的付款通知不會發兩把授權碼
 // license:{hash}      hash：id、orderId、plan、status（active / revoked）、email、createdAt、display、
@@ -52,7 +53,31 @@ export type Order = {
   licenseIds?: string[];
   /** Team：所有席位授權碼的加密 JSON 陣列 */
   seatKeysEnc?: string;
+  /** 收款方：SHOPLINE（新台幣）或 Polar（美金） */
+  provider: Provider;
+  /** Polar 訂單的美金金額（整數美元）；SHOPLINE 訂單沒有 */
+  amountUsd?: number;
 };
+
+export type Provider = "shopline" | "polar";
+
+/** 訂單應收金額，用該幣別的最小單位（新台幣 × 100、美分），付款與退款通知都用這個比對。 */
+export function expectedMinor(order: Pick<Order, "provider" | "amountTwd" | "amountUsd">) {
+  return order.provider === "polar" ? (order.amountUsd ?? 0) * 100 : order.amountTwd * 100;
+}
+
+/** 後台與信件顯示用：NT$4,090 或 US$129。 */
+export function orderAmountLabel(order: Pick<Order, "provider" | "amountTwd" | "amountUsd">) {
+  return order.provider === "polar" ? `US$${(order.amountUsd ?? 0).toLocaleString("en-US")}` : `NT$${order.amountTwd.toLocaleString("en-US")}`;
+}
+
+/** 分幣別加總（後台銷售額）。 */
+export function sumByCurrency(orders: Pick<Order, "provider" | "amountTwd" | "amountUsd">[]) {
+  return orders.reduce(
+    (sum, o) => (o.provider === "polar" ? { ...sum, usd: sum.usd + (o.amountUsd ?? 0) } : { ...sum, twd: sum.twd + o.amountTwd }),
+    { twd: 0, usd: 0 },
+  );
+}
 
 export type License = {
   id: string;
@@ -67,6 +92,9 @@ export type License = {
   remindedFor?: string;
   /** Team 的席位編號（1 起算） */
   seat?: number;
+  /** 疑似分享：最近一次一天內超過 10 個 IP 的日期與 IP 數 */
+  shareAlertDay?: string;
+  shareIps?: number;
 };
 
 /** 一筆訂單發出的所有授權 id（Team 有多把）。 */
@@ -113,6 +141,8 @@ function toOrder(raw: Record<string, string>): Order | null {
     periodEnd: raw.periodEnd || undefined,
     licenseIds: raw.licenseIds ? raw.licenseIds.split(",").filter(Boolean) : undefined,
     seatKeysEnc: raw.seatKeysEnc || undefined,
+    provider: raw.provider === "polar" ? "polar" : "shopline",
+    amountUsd: raw.amountUsd ? Number(raw.amountUsd) : undefined,
   };
 }
 
@@ -129,14 +159,20 @@ function toLicense(raw: Record<string, string>): License | null {
     expiresAt: raw.expiresAt || undefined,
     remindedFor: raw.remindedFor || undefined,
     seat: raw.seat ? Number(raw.seat) : undefined,
+    shareAlertDay: raw.shareAlertDay || undefined,
+    shareIps: raw.shareIps ? Number(raw.shareIps) : undefined,
   };
 }
 
-export async function createOrder(plan: Plan, email: string, options: { test?: boolean } = {}) {
+export async function createOrder(plan: Plan, email: string, options: { test?: boolean; provider?: Provider } = {}) {
+  const provider = options.provider ?? "shopline";
   const order: Order = {
     id: `SU${randomHex(11)}`,
     plan,
-    amountTwd: pricesTwd[plan],
+    provider,
+    // Polar 收美金：台幣金額記 0，銷售額才不會重複計算
+    amountTwd: provider === "polar" ? 0 : pricesTwd[plan],
+    ...(provider === "polar" ? { amountUsd: prices[plan] } : {}),
     email: email.trim().toLowerCase(),
     status: "pending",
     createdAt: new Date().toISOString(),
@@ -363,7 +399,7 @@ async function setLicenseStatus(licenseId: string | undefined, status: License["
 export async function refundOrder(order: Order, refunded: number | null) {
   if (order.status === "refunded") return "duplicate";
   if (refunded !== null) await run([["HSET", `order:${order.id}`, "refundedTwd", Math.round(refunded / 100)]]);
-  if (order.status !== "paid" || refunded !== order.amountTwd * 100) return "refund_review";
+  if (order.status !== "paid" || refunded === null || refunded < expectedMinor(order)) return "refund_review";
   await run([
     ["HSET", `order:${order.id}`, "status", "refunded"],
     ...(order.plan === "founding" ? [["DECR", "seats:founding"] as RedisCommand] : []),
@@ -403,6 +439,21 @@ export async function disputeOrder(order: Order) {
 
 export async function markAmountMismatch(order: Order, tradeId: string) {
   await run([["HSET", `order:${order.id}`, "status", "amount_mismatch", ...(tradeId ? ["tradeId", tradeId] : [])]]);
+}
+
+/**
+ * 標記疑似分享：同一把授權碼今天的 IP 數過了通知門檻。每把每天只標記一次（SET NX），
+ * 第一次標記時回傳授權（給呼叫端寄通知），重複的回 null。
+ */
+export async function flagSharing(key: string, ips: number, day: string) {
+  const hash = await hashLicenseKey(key);
+  const [lock] = await run([["SET", `sharealert:${hash.slice(0, 32)}:${day}`, "1", "NX", "EX", 2 * 24 * 60 * 60]]);
+  if (lock.result !== "OK") return null;
+  const [, r] = await run([
+    ["HSET", `license:${hash}`, "shareAlertDay", day, "shareIps", ips],
+    ["HGETALL", `license:${hash}`],
+  ]);
+  return toLicense(hashToStrings(r.result));
 }
 
 export async function lookupLicense(key: string) {

@@ -26,6 +26,14 @@ type Copy = {
   };
   /** 結帳頁條款連結的文字 */
   termsLink: string;
+  /** 幣別選擇：新台幣走 SHOPLINE，美金走 Polar */
+  payWith: { label: string; twd: string; twdHint: string; usd: string; usdHint: string };
+  /** 選美金時，價格下方的說明 */
+  chargedInUsd: string;
+  /** 定價頁：兩種幣別都能付時的說明 */
+  billedBoth: string;
+  /** Pro 買斷在創始會員開賣前：保證可退差價 */
+  priceGuard: (date: string, founding: string) => string;
   chargedInTwd: (twd: string, usd: number) => string;
   /** 定價頁方案卡下方：說明以台幣收款、美金只是參考 */
   billedInTwd: string;
@@ -35,6 +43,7 @@ type Copy = {
   paying: string;
   terms: string;
   secure: string;
+  secureUsd: string;
   errors: { email: string; closed: string; soldOut: string; upstream: string; rate: string };
   done: {
     title: string;
@@ -90,6 +99,16 @@ const en: Copy = {
     orMonthly: (price) => `Or subscribe from ${price} / month`,
   },
   termsLink: "Read the license",
+  payWith: {
+    label: "Pay in",
+    twd: "NT$",
+    twdHint: "Taiwan cards",
+    usd: "US$",
+    usdHint: "International cards",
+  },
+  chargedInUsd: "Charged in US dollars through Polar, our reseller. Sales tax or VAT is added at checkout where your country requires it.",
+  billedBoth: "International cards pay in US dollars; Taiwan cards can pay in New Taiwan dollars at checkout.",
+  priceGuard: (date, founding) => `Buying before ${date}? If you would rather have the ${founding} founding price, ask for the difference back once founding opens.`,
 
   chargedInTwd: (twd, usd) => `Charged in New Taiwan dollars: NT$${twd} (about US$${usd}). Your bank converts the amount.`,
   billedInTwd: "Paid in New Taiwan dollars. US$ prices are approximate; your bank converts the amount.",
@@ -99,6 +118,7 @@ const en: Copy = {
   paying: "Opening payment…",
   terms: "By paying you agree to the SunUI license.",
   secure: "Card payment is handled by SHOPLINE Payments. SunUI never sees your card.",
+  secureUsd: "Payment is handled by Polar, our reseller and merchant of record. SunUI never sees your card.",
   errors: {
     email: "Please enter a valid email address.",
     closed: "This plan is not on sale right now.",
@@ -160,6 +180,16 @@ const zhTW: Copy = {
     orMonthly: (price) => `或訂閱：${price} / 月起`,
   },
   termsLink: "查看授權條款",
+  payWith: {
+    label: "付款幣別",
+    twd: "新台幣",
+    twdHint: "台灣發卡",
+    usd: "美金",
+    usdHint: "海外發卡",
+  },
+  chargedInUsd: "以美金結帳，由 Polar 代收。部分國家會依法在結帳時加上當地消費稅。",
+  billedBoth: "以新台幣結帳；海外發卡可在結帳頁改用美金付款。",
+  priceGuard: (date, founding) => `${date}前購買 Pro，創始會員開賣後可申請退差價（創始價 ${founding}）。`,
 
   chargedInTwd: (twd) => `以新台幣結帳：NT$${twd}。`,
   billedInTwd: "以新台幣結帳，美金價格僅供參考。",
@@ -169,6 +199,7 @@ const zhTW: Copy = {
   paying: "開啟付款頁中…",
   terms: "付款即表示同意 SunUI 授權條款。",
   secure: "信用卡付款由 SHOPLINE Payments 處理，SunUI 不會看到你的卡號。",
+  secureUsd: "美金付款由 Polar 處理（代收並開立收據），SunUI 不會看到你的卡號。",
   errors: {
     email: "請輸入正確的 email。",
     closed: "這個方案目前沒有開放購買。",
@@ -231,6 +262,16 @@ const zhCN: Copy = {
     orMonthly: (price) => `或订阅：${price} / 月起`,
   },
   termsLink: "查看授权条款",
+  payWith: {
+    label: "付款币种",
+    twd: "新台币",
+    twdHint: "台湾发卡",
+    usd: "美元",
+    usdHint: "海外发卡",
+  },
+  chargedInUsd: "以美元结账，由 Polar 代收。部分国家会依法在结账时加上当地消费税。",
+  billedBoth: "海外发卡以美元结账；台湾发卡可在结账页改用新台币付款。",
+  priceGuard: (date, founding) => `${date}前购买 Pro，创始会员开售后可申请退差价（创始价 ${founding}）。`,
 
   chargedInTwd: (twd, usd) => `以新台币结账：NT$${twd}（约 US$${usd}），由你的银行换算。`,
   billedInTwd: "以新台币结账，美元价格仅供参考，由你的银行换算。",
@@ -239,6 +280,7 @@ const zhCN: Copy = {
   paying: "正在打开付款页…",
   terms: "付款即表示同意 SunUI 授权条款。",
   secure: "信用卡付款由 SHOPLINE Payments 处理，SunUI 不会看到你的卡号。",
+  secureUsd: "美元付款由 Polar 处理（代收并开具收据），SunUI 不会看到你的卡号。",
   errors: {
     email: "请输入正确的 email。",
     closed: "这个方案目前没有开放购买。",
@@ -300,6 +342,16 @@ const ja: Copy = {
     orMonthly: (price) => `月額 ${price} からのプランもあります`,
   },
   termsLink: "ライセンスを読む",
+  payWith: {
+    label: "支払い通貨",
+    twd: "新台湾ドル",
+    twdHint: "台湾発行のカード",
+    usd: "米ドル",
+    usdHint: "海外発行のカード",
+  },
+  chargedInUsd: "米ドルで決済され、販売代理の Polar が受け付けます。国によっては決済時に消費税や VAT が加算されます。",
+  billedBoth: "海外発行のカードは米ドルで決済されます。台湾発行のカードは決済ページで新台湾ドルを選べます。",
+  priceGuard: (date, founding) => `${date}より前に Pro を購入した方は、創設メンバーの販売開始後に差額の返金を申請できます（創設価格 ${founding}）。`,
 
   chargedInTwd: (twd, usd) => `新台湾ドルで決済されます：NT$${twd}（約 US$${usd}）。換算はカード会社が行います。`,
   billedInTwd: "お支払いは新台湾ドルです。米ドル表示は目安で、換算はカード会社が行います。",
@@ -309,6 +361,7 @@ const ja: Copy = {
   paying: "支払いページを開いています…",
   terms: "お支払いにより SunUI ライセンスに同意したものとみなされます。",
   secure: "カード決済は SHOPLINE Payments が処理します。SunUI がカード番号を見ることはありません。",
+  secureUsd: "米ドルの決済は販売代理の Polar が処理し、領収書も発行します。SunUI がカード番号を見ることはありません。",
   errors: {
     email: "正しいメールアドレスを入力してください。",
     closed: "このプランは現在販売していません。",

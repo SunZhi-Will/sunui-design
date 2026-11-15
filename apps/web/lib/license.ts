@@ -3,7 +3,8 @@
 // Redis 裡只存 key 的 SHA-256 與加鹽雜湊後的 IP，不存原文。
 
 import { LICENSE_KEY_PATTERN } from "./license-key";
-import { licenseExpired, lookupLicense } from "./orders";
+import { notifyOwnerSharing } from "./mailer";
+import { flagSharing, licenseExpired, lookupLicense } from "./orders";
 import { dayKey, pipeline, redisEnabled, sha256 } from "./redis";
 import { prices, siteUrl } from "./site";
 
@@ -17,8 +18,10 @@ type CacheEntry = { result: LicenseResult; expiresAt: number };
 const CACHE_TTL_MS = 60 * 1000;
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMIT = 100;
-// 同一把 key 在一天內出現的不同 IP 超過這個數，視為 key 被分享
+// 同一把 key 在一天內出現的不同 IP 超過這個數，視為 key 被分享，直接擋
 const MAX_IPS_PER_DAY = 20;
+// 超過這個數先通知作者、在後台標記「疑似分享」，還不擋（換網路、出差、VPN 都會多幾個 IP）
+const ALERT_IPS_PER_DAY = 10;
 
 const cache = new Map<string, CacheEntry>();
 const hits = new Map<string, number[]>();
@@ -41,7 +44,7 @@ export async function checkLicense(key: string, ip: string): Promise<LicenseResu
   const now = Date.now();
 
   const shared = await sharedLimits(key, ip, now);
-  const limited = shared ?? memoryLimits(key, ip, now);
+  const limited = shared ? shared.blocked : memoryLimits(key, ip, now);
   if (limited) return limited;
 
   const cached = cache.get(key);
@@ -51,6 +54,15 @@ export async function checkLicense(key: string, ip: string): Promise<LicenseResu
   } else {
     result = await validateKey(key);
     if (!result.ok && result.status === 401) cache.set(key, { result, expiresAt: now + CACHE_TTL_MS });
+  }
+  // 疑似分享：每把 key 每天只通知一次，失敗不影響安裝
+  if (result.ok && result.licenseId !== "dev" && shared && shared.ips > ALERT_IPS_PER_DAY) {
+    try {
+      const flagged = await flagSharing(key, shared.ips, dayKey(new Date(now)));
+      if (flagged) await notifyOwnerSharing(flagged, shared.ips);
+    } catch {
+      // 忽略
+    }
   }
   return result;
 }
@@ -66,8 +78,11 @@ const tooManyIps: LicenseResult = {
   message: "This license key is being used from too many locations. Contact support if this is a mistake.",
 };
 
-/** Redis 版限流與 IP 計數。回傳 null 代表沒有 Redis 或 Redis 失敗，改用記憶體版；回傳 false 代表通過。 */
-async function sharedLimits(key: string, ip: string, now: number): Promise<LicenseResult | false | null> {
+/**
+ * Redis 版限流與 IP 計數。回傳 null 代表沒有 Redis 或 Redis 失敗，改用記憶體版；
+ * blocked 為 false 代表通過，ips 是這把 key 今天出現過的不同 IP 數（估計值）。
+ */
+async function sharedLimits(key: string, ip: string, now: number): Promise<{ blocked: LicenseResult | false; ips: number } | null> {
   if (!redisEnabled()) return null;
   try {
     const day = dayKey(new Date(now));
@@ -83,9 +98,10 @@ async function sharedLimits(key: string, ip: string, now: number): Promise<Licen
       ["EXPIRE", ipKey, 2 * 24 * 60 * 60],
     ]);
     if (!replies) return null;
-    if (Number(replies[0]?.result) > RATE_LIMIT) return rateLimited;
-    if (Number(replies[3]?.result) > MAX_IPS_PER_DAY) return tooManyIps;
-    return false;
+    const ips = Number(replies[3]?.result) || 0;
+    if (Number(replies[0]?.result) > RATE_LIMIT) return { blocked: rateLimited, ips };
+    if (ips > MAX_IPS_PER_DAY) return { blocked: tooManyIps, ips };
+    return { blocked: false, ips };
   } catch {
     return null;
   }

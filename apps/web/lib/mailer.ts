@@ -2,8 +2,8 @@
 // 寄件人 RESEND_FROM；沒驗證網域時預設 onboarding@resend.dev，那個地址只能寄給 Resend 帳號本人，
 // 所以在 synvize.com 驗證完成前，買家收不到授權碼信，只有作者收得到通知。
 
-import type { Fulfilled, License, Order } from "./orders";
-import { planUsd, prices, pricesTwd, siteUrl } from "./site";
+import { orderAmountLabel, type Fulfilled, type License, type Order } from "./orders";
+import { planUsd, prices, siteUrl } from "./site";
 
 const PLAN_NAME: Record<Order["plan"], string> = {
   founding: "Founding member",
@@ -39,7 +39,8 @@ async function send(to: string[], subject: string, text: string) {
 }
 
 export function sendLicenseEmail(order: Order, issued: Fulfilled) {
-  const paid = `Paid: NT$${order.amountTwd.toLocaleString("en-US")} (about US$${planUsd(order.plan)}).`;
+  const paid =
+    order.provider === "polar" ? `Paid: ${orderAmountLabel(order)}.` : `Paid: ${orderAmountLabel(order)} (about US$${planUsd(order.plan)}).`;
   if (issued.renewal) {
     return send(
       [order.email],
@@ -112,8 +113,25 @@ export function notifyOwner(order: Order, issued?: Fulfilled) {
   const until = issued?.expiresAt ? `\n到期 ${day(issued.expiresAt)}` : "";
   return send(
     owners,
-    `${kind}：SunUI ${PLAN_NAME[order.plan]} NT$${pricesTwd[order.plan].toLocaleString("en-US")}`,
-    `訂單 ${order.id}\n方案 ${PLAN_NAME[order.plan]}（約 US$${planUsd(order.plan)}）${until}\n後台：${siteUrl()}/admin/orders`,
+    `${kind}：SunUI ${PLAN_NAME[order.plan]} ${orderAmountLabel(order)}`,
+    `訂單 ${order.id}\n方案 ${PLAN_NAME[order.plan]}，${order.provider === "polar" ? "Polar 美金" : "SHOPLINE 新台幣"}${until}\n後台：${siteUrl()}/admin/orders`,
+  );
+}
+
+/** 疑似分享：同一把授權碼一天內從超過 10 個 IP 安裝。只通知作者，由作者決定要不要在後台重發。 */
+export function notifyOwnerSharing(license: License, ips: number) {
+  const owners = (process.env.SUNUI_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
+  const seat = license.seat ? `（Team 席位 ${license.seat}）` : "";
+  return send(
+    owners,
+    `疑似分享：授權碼 ${license.display} 今天從 ${ips} 個 IP 安裝`,
+    [
+      `授權碼 ${license.display}${seat}，方案 ${PLAN_NAME[license.plan]}，訂單 ${license.orderId}。`,
+      `今天從大約 ${ips} 個不同 IP 安裝 Pro block。超過 20 個會自動擋下。`,
+      "",
+      "換網路、出差、VPN 也會多幾個 IP，不一定是分享。如果確定外流，到後台「授權使用」按「重發」換掉這一把：",
+      `${siteUrl()}/admin/licenses`,
+    ].join("\n"),
   );
 }
 

@@ -9,7 +9,8 @@ import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { checkoutCopy } from "@/lib/checkout-copy";
-import { checkoutReady, foundingState, foundingWindow, planPrice, prices, pricesTwd } from "@/lib/site";
+import { anyCheckoutReady, paymentOptions } from "@/lib/payments";
+import { foundingState, foundingWindow, planPrice, prices, pricesTwd } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,7 +27,8 @@ export default async function PricingPage() {
   const dateFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
   const state = foundingState();
   // SHOPLINE 設定好才開放結帳；否則按鈕導到 waitlist
-  const canBuy = checkoutReady();
+  const canBuy = anyCheckoutReady();
+  const pay = paymentOptions();
   const proCount = getItems("pro").length;
   const freeItems = getItems("free");
   // 動效庫一組含十幾種效果，和一般 block 分開列（見 reports/免費與付費切分規劃-2026-11-05.md）
@@ -44,7 +46,9 @@ export default async function PricingPage() {
   const proPrice = planPrice("pro", locale);
   const teamPrice = planPrice("team", locale);
   const foundingPrice = planPrice("founding", locale);
-  const { billedInTwd, subscribe: sub, planName } = checkoutCopy(locale);
+  const { billedInTwd, billedBoth, chargedInUsd, priceGuard, subscribe: sub, planName } = checkoutCopy(locale);
+  // 收款說明：兩種幣別都開時講清楚海外卡付美金；只有 Polar 時講美金；否則維持新台幣
+  const billingNote = pay.twd && pay.usd ? billedBoth : pay.usd ? chargedInUsd : billedInTwd;
 
   // 訂閱（預付期間制，不自動續扣）。年訂省多少依介面主要幣別計算，和畫面上的數字對得起來
   const yearlySave =
@@ -89,6 +93,11 @@ export default async function PricingPage() {
       highlight: true,
       // 主方案卡也要看得到訂閱入口，不然想先試用的人要滑很久才找到
       subscribeLink: sub.orMonthly(planPrice("monthly", locale).primary),
+      // 創始會員開賣前賣 Pro 買斷：保證開賣後可退差價，買的人不會覺得被坑
+      guard:
+        canBuy && state === "upcoming"
+          ? priceGuard(dateFormat.format(foundingWindow.opensAt), planPrice("founding", locale).primary)
+          : undefined,
       features: t.pro.features,
       cta: canBuy ? { label: t.pro.cta, href: "/go/checkout/pro" } : waitlistCta,
     },
@@ -163,6 +172,7 @@ export default async function PricingPage() {
               {plan.secondary && <>≈ {plan.secondary} · </>}
               {plan.note}
             </p>
+            {"guard" in plan && plan.guard && <p className="mt-2 text-xs text-pretty text-subtle">{plan.guard}</p>}
             {"subscribeLink" in plan && plan.subscribeLink && (
               <a href="#subscribe" className="mt-1 self-start text-sm text-subtle underline decoration-line underline-offset-4 hover:text-fg">
                 {plan.subscribeLink}
@@ -245,7 +255,7 @@ export default async function PricingPage() {
       <p className="mt-10 text-center text-sm text-subtle">
         {t.footnote(proCount)}
       </p>
-      <p className="mt-1.5 text-center text-xs text-subtle">{billedInTwd}</p>
+      <p className="mt-1.5 text-center text-xs text-subtle">{billingNote}</p>
 
       <SavingsCalculator price={prices.pro} locale={locale} t={t.calculator} />
 

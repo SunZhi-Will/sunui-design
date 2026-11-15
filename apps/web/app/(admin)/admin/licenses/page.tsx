@@ -115,6 +115,14 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
             <span key="k" className="whitespace-nowrap">
               <code className="font-mono text-xs">{k.display}</code>
               {k.seat && <span className="ml-1.5 text-xs text-subtle">Team 席位 {k.seat}</span>}
+              {k.shareAlertDay && (
+                <span
+                  className="ml-1.5 rounded border border-amber-500/40 px-1 text-[10px] text-amber-700 dark:text-amber-400"
+                  title={`${k.shareAlertDay} 從約 ${k.shareIps} 個 IP 安裝`}
+                >
+                  疑似分享 {k.shareAlertDay.slice(5)}
+                </span>
+              )}
             </span>,
             maskEmail(k.email),
             <span key="s" className="whitespace-nowrap">
