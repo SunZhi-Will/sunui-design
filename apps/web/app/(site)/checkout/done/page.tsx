@@ -6,7 +6,7 @@ import { checkoutCopy } from "@/lib/checkout-copy";
 import { getLocale } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { decryptLicenseKey } from "@/lib/license-key";
-import { getOrder, ORDER_COOKIE } from "@/lib/orders";
+import { decryptSeatKeys, getOrder, ORDER_COOKIE } from "@/lib/orders";
 import { siteUrl } from "@/lib/site";
 
 import { CopyButton, WaitForPayment } from "./client";
@@ -92,6 +92,8 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
     );
   }
 
+  // Team：顯示 5 個席位各自的授權碼
+  const seatKeys = owner ? await decryptSeatKeys(order, process.env.SUNUI_ADMIN_TOKEN ?? "dev-secret") : null;
   const registry = `"registries": {\n  "@sunui-pro": {\n    "url": "${siteUrl()}/r/pro/{name}.json",\n    "headers": { "Authorization": "Bearer \${SUNUI_LICENSE_KEY}" }\n  }\n}`;
   return (
     <Shell>
@@ -99,15 +101,32 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
       <p className="mt-2 text-sm text-subtle">{t.paidBody}</p>
       {order.periodEnd && <p className="mt-1 text-sm text-subtle">{t.subscriptionUntil(formatDay(order.periodEnd))}</p>}
 
-      <p className="mt-6 text-sm font-medium">{t.keyLabel}</p>
-      <Code copy={t.copied} label={t.copy}>{key}</Code>
+      {seatKeys ? (
+        <>
+          <h2 className="mt-6 text-sm font-medium">{t.seatsTitle}</h2>
+          <p className="mt-1 text-xs text-subtle">{t.seatsBody}</p>
+          <ul className="mt-3 space-y-3">
+            {seatKeys.map((seatKey, i) => (
+              <li key={seatKey}>
+                <p className="text-xs text-subtle">{t.seatLabel(i + 1)}</p>
+                <Code copy={t.copied} label={t.copy}>{seatKey}</Code>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <>
+          <p className="mt-6 text-sm font-medium">{t.keyLabel}</p>
+          <Code copy={t.copied} label={t.copy}>{key}</Code>
+        </>
+      )}
       <p className="mt-2 text-xs text-subtle">{t.keyPrivate}</p>
 
       <h2 className="mt-8 text-sm font-medium">{t.steps}</h2>
       <ol className="mt-3 space-y-5 text-sm">
         <li>
           1. {t.step1}
-          <Code copy={t.copied} label={t.copy}>{`SUNUI_LICENSE_KEY=${key}`}</Code>
+          <Code copy={t.copied} label={t.copy}>{`SUNUI_LICENSE_KEY=${seatKeys ? "<your seat key>" : key}`}</Code>
         </li>
         <li>
           2. {t.step2}

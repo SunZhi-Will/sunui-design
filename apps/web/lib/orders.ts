@@ -1,13 +1,14 @@
 // 訂單與授權碼，存在 Upstash Redis（SHOPLINE 只負責收款，沒有訂單後台與授權碼）。
 //
 // order:{id}          hash：plan、amountTwd、email、status、createdAt、paidAt、sessionId、tradeId、licenseId、keyEnc、viewToken、refundedTwd、
-//                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）
+//                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）、
+//                     licenseIds、seatKeysEnc（Team：5 個席位各一把授權碼，逗號分隔的 id 與加密的 JSON 陣列）
 // orders              zset：createdAt → 訂單編號（後台列表）
 // ordersession:{sid}  string：SHOPLINE sessionId → 訂單編號
 // ordertrade:{tid}    string：SHOPLINE tradeOrderId → 訂單編號（退款、爭議的通知只帶這個）
 // order:{id}:fulfill  string：入帳鎖（SET NX），重複的付款通知不會發兩把授權碼
 // license:{hash}      hash：id、orderId、plan、status（active / revoked）、email、createdAt、display、
-//                     expiresAt（只有訂閱有）、remindedFor（已寄過到期提醒的 expiresAt）
+//                     expiresAt（只有訂閱有）、remindedFor（已寄過到期提醒的 expiresAt）、seat（Team 的席位編號）
 // licid:{id}          string：授權 id → 授權碼雜湊
 // licenses            zset：createdAt → 授權 id
 // licsub:{emailHash}  string：email → 這個人的訂閱授權 id。再買一期就延長這把，授權碼不變
@@ -20,7 +21,7 @@ import { decryptLicenseKey, displayKey, encryptLicenseKey, generateLicenseKey, h
 import { hashToStrings, pipeline, randomHex, sha256, type RedisCommand } from "./redis";
 import type { WebhookIds } from "./shopline-core";
 import { ORDER_PATTERN } from "./shopline-core";
-import { addTerm, isSubscription, pricesTwd, type Plan } from "./site";
+import { addTerm, isSubscription, prices, pricesTwd, type Plan } from "./site";
 
 /** 完成頁只對「發起結帳的那個瀏覽器」顯示授權碼：cookie 存訂單編號與 viewToken。 */
 export const ORDER_COOKIE = "sunui_order";
@@ -47,6 +48,10 @@ export type Order = {
   renewal?: boolean;
   /** 訂閱：這筆付款之後授權的到期時間 */
   periodEnd?: string;
+  /** Team：每個席位一把授權碼，依席位順序（licenseId / keyEnc 是第 1 席，向下相容） */
+  licenseIds?: string[];
+  /** Team：所有席位授權碼的加密 JSON 陣列 */
+  seatKeysEnc?: string;
 };
 
 export type License = {
@@ -60,7 +65,15 @@ export type License = {
   /** 訂閱的到期時間；買斷沒有 */
   expiresAt?: string;
   remindedFor?: string;
+  /** Team 的席位編號（1 起算） */
+  seat?: number;
 };
+
+/** 一筆訂單發出的所有授權 id（Team 有多把）。 */
+export function orderLicenseIds(order: Pick<Order, "licenseId" | "licenseIds">) {
+  if (order.licenseIds?.length) return order.licenseIds;
+  return order.licenseId ? [order.licenseId] : [];
+}
 
 /** 訂閱過了到期時間。買斷永遠回 false。 */
 export function licenseExpired(license: Pick<License, "expiresAt">, now = new Date()) {
@@ -98,6 +111,8 @@ function toOrder(raw: Record<string, string>): Order | null {
     test: raw.test === "1",
     renewal: raw.renewal === "1",
     periodEnd: raw.periodEnd || undefined,
+    licenseIds: raw.licenseIds ? raw.licenseIds.split(",").filter(Boolean) : undefined,
+    seatKeysEnc: raw.seatKeysEnc || undefined,
   };
 }
 
@@ -113,6 +128,7 @@ function toLicense(raw: Record<string, string>): License | null {
     display: raw.display,
     expiresAt: raw.expiresAt || undefined,
     remindedFor: raw.remindedFor || undefined,
+    seat: raw.seat ? Number(raw.seat) : undefined,
   };
 }
 
@@ -175,7 +191,34 @@ export type Fulfilled = {
   licenseId: string;
   renewal: boolean;
   expiresAt?: string;
+  /** Team：所有席位的授權碼（第 1 把同 key） */
+  seatKeys?: string[];
 };
+
+/** 解開 Team 訂單的所有席位授權碼；不是 Team 或解不開時回 null。 */
+export async function decryptSeatKeys(order: Pick<Order, "seatKeysEnc">, secret: string) {
+  if (!order.seatKeysEnc) return null;
+  const plain = await decryptLicenseKey(order.seatKeysEnc, secret);
+  try {
+    const keys = plain ? (JSON.parse(plain) as unknown) : null;
+    return Array.isArray(keys) && keys.every((k) => typeof k === "string") ? (keys as string[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 產生一把授權並回傳寫入 Redis 的指令（還沒執行）。 */
+async function newLicense(fields: Omit<License, "id" | "display" | "status" | "createdAt">, now: string) {
+  const key = generateLicenseKey();
+  const hash = await hashLicenseKey(key);
+  const license: License = { id: `lic_${randomHex(8)}`, status: "active", createdAt: now, display: displayKey(key), ...fields };
+  const commands: RedisCommand[] = [
+    ["HSET", `license:${hash}`, ...Object.entries(license).flatMap(([k, v]) => (v === undefined ? [] : [k, String(v)]))],
+    ["SET", `licid:${license.id}`, hash],
+    ["ZADD", "licenses", Date.now(), license.id],
+  ];
+  return { key, license, commands };
+}
 
 /** 依授權 id 取授權（連同雜湊，續約要寫回去）。 */
 async function licenseById(licenseId: string) {
@@ -225,31 +268,85 @@ export async function fulfillOrder(order: Order, tradeId: string, secret: string
     }
   }
 
-  const key = generateLicenseKey();
-  const hash = await hashLicenseKey(key);
-  const licenseId = `lic_${randomHex(8)}`;
+  // Team：每個席位一把授權碼，各自計算用量、可以單獨撤銷重發
+  if (order.plan === "team") {
+    const seats = await Promise.all(
+      Array.from({ length: prices.teamSeats }, (_, i) =>
+        newLicense({ orderId: order.id, plan: order.plan, email: order.email, seat: i + 1 }, now),
+      ),
+    );
+    const keys = seats.map((s) => s.key);
+    const ids = seats.map((s) => s.license.id);
+    await run([
+      ...seats.flatMap((s) => s.commands),
+      [
+        "HSET",
+        `order:${order.id}`,
+        ...paidFields,
+        "licenseId", ids[0],
+        "keyEnc", await encryptLicenseKey(keys[0], secret),
+        "licenseIds", ids.join(","),
+        "seatKeysEnc", await encryptLicenseKey(JSON.stringify(keys), secret),
+      ],
+      ...tradeIndex,
+    ]);
+    return { key: keys[0], licenseId: ids[0], renewal: false, seatKeys: keys };
+  }
+
   const expiresAt = isSubscription(order.plan) ? addTerm(order.plan, nowDate).toISOString() : undefined;
-  const license: License = {
-    id: licenseId,
-    orderId: order.id,
-    plan: order.plan,
-    status: "active",
-    email: order.email,
-    createdAt: now,
-    display: displayKey(key),
-    ...(expiresAt ? { expiresAt } : {}),
-  };
-  const commands: RedisCommand[] = [
-    ["HSET", `license:${hash}`, ...Object.entries(license).flatMap(([k, v]) => [k, String(v)])],
-    ["SET", `licid:${licenseId}`, hash],
-    ["ZADD", "licenses", Date.now(), licenseId],
+  const { key, license, commands } = await newLicense({ orderId: order.id, plan: order.plan, email: order.email, expiresAt }, now);
+  const licenseId = license.id;
+  commands.push(
     ["HSET", `order:${order.id}`, ...paidFields, "licenseId", licenseId, "keyEnc", await encryptLicenseKey(key, secret), ...(expiresAt ? ["periodEnd", expiresAt] : [])],
     ...tradeIndex,
-  ];
+  );
   if (expiresAt) commands.push(["SET", await subscriptionKey(order.email), licenseId]);
   if (order.plan === "founding") commands.push(["INCR", "seats:founding"]);
   await run(commands);
   return { key, licenseId, renewal: false, expiresAt };
+}
+
+/**
+ * 撤銷一把授權並發一把新的取代它（同訂單、同方案、同到期日、同席位）。
+ * 用在 Team 成員離職，或發現授權碼外流。訂單裡的加密授權碼一起換掉，完成頁會顯示新的。
+ */
+export async function reissueLicense(licenseId: string, secret: string) {
+  const found = await licenseById(licenseId);
+  if (!found || found.license.status !== "active") return null;
+  const old = found.license;
+  const order = await getOrder(old.orderId);
+  if (!order) return null;
+
+  const now = new Date().toISOString();
+  const { key, license, commands } = await newLicense(
+    { orderId: old.orderId, plan: old.plan, email: old.email, expiresAt: old.expiresAt, seat: old.seat },
+    now,
+  );
+  commands.push(["HSET", `license:${found.hash}`, "status", "revoked"]);
+
+  const orderFields: (string | number)[] = [];
+  const ids = orderLicenseIds(order);
+  const index = ids.indexOf(old.id);
+  if (order.licenseIds?.length && index >= 0) {
+    const nextIds = [...ids];
+    nextIds[index] = license.id;
+    orderFields.push("licenseIds", nextIds.join(","));
+    const keys = await decryptSeatKeys(order, secret);
+    if (keys && keys.length === ids.length) {
+      keys[index] = key;
+      orderFields.push("seatKeysEnc", await encryptLicenseKey(JSON.stringify(keys), secret));
+    }
+  }
+  if (order.licenseId === old.id) orderFields.push("licenseId", license.id, "keyEnc", await encryptLicenseKey(key, secret));
+  if (orderFields.length) commands.push(["HSET", `order:${order.id}`, ...orderFields]);
+  // 訂閱：續約要找到新的這一把
+  if (old.expiresAt) {
+    const subKey = await subscriptionKey(old.email);
+    const [current] = await run([["GET", subKey]]);
+    if (current.result === old.id) commands.push(["SET", subKey, license.id]);
+  }
+  await run(commands);
+  return { key, license, old, order };
 }
 
 async function setLicenseStatus(licenseId: string | undefined, status: License["status"]) {
@@ -279,7 +376,7 @@ export async function refundOrder(order: Order, refunded: number | null) {
     }
     return "refunded";
   }
-  await setLicenseStatus(order.licenseId, "revoked");
+  for (const id of orderLicenseIds(order)) await setLicenseStatus(id, "revoked");
   return "refunded";
 }
 
@@ -301,7 +398,7 @@ export async function markReminded(license: License) {
 /** 拒付（chargeback）：持卡人已經在要回這筆錢，授權先撤銷，訂單標成爭議中。 */
 export async function disputeOrder(order: Order) {
   await run([["HSET", `order:${order.id}`, "status", "disputed"]]);
-  await setLicenseStatus(order.licenseId, "revoked");
+  for (const id of orderLicenseIds(order)) await setLicenseStatus(id, "revoked");
 }
 
 export async function markAmountMismatch(order: Order, tradeId: string) {

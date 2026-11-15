@@ -359,7 +359,7 @@ const en = {
     team: {
       name: "Team",
       note: "one-time, up to 5 developers",
-      features: ["Everything in Pro", "5 seats on one license", "Priority email support"],
+      features: ["Everything in Pro", "5 license keys, one per developer", "Replace a single key when someone leaves", "Priority email support"],
       cta: "Get Team",
     },
     joinWaitlist: "Join the waitlist",
@@ -867,7 +867,7 @@ const zhTW: Messages = {
     team: {
       name: "團隊",
       note: "一次付清，最多 5 位開發者",
-      features: ["包含 Pro 的所有內容", "一份授權 5 個席位", "優先電子郵件支援"],
+      features: ["包含 Pro 的所有內容", "5 把授權碼，每位開發者一把", "成員離職時可以只換掉那一把", "優先電子郵件支援"],
       cta: "購買團隊方案",
     },
     joinWaitlist: "加入候補名單",
@@ -1354,7 +1354,7 @@ const zhCN: Messages = {
     team: {
       name: "团队",
       note: "一次付清，最多 5 位开发者",
-      features: ["包含 Pro 的全部内容", "一份许可 5 个席位", "优先邮件支持"],
+      features: ["包含 Pro 的全部内容", "5 把授权码，每位开发者一把", "成员离职时可以只换掉那一把", "优先邮件支持"],
       cta: "购买团队版",
     },
     joinWaitlist: "加入候补名单",
@@ -1849,7 +1849,7 @@ const ja: Messages = {
     team: {
       name: "チーム",
       note: "買い切り、開発者 5 名まで",
-      features: ["Pro のすべて", "1 ライセンスで 5 シート", "優先メールサポート"],
+      features: ["Pro のすべて", "ライセンスキー 5 本、開発者 1 名につき 1 本", "退職者が出たらその 1 本だけ差し替え", "優先メールサポート"],
       cta: "チームプランを購入",
     },
     joinWaitlist: "ウェイトリストに登録",

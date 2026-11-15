@@ -66,7 +66,15 @@ export function sendLicenseEmail(order: Order, issued: Fulfilled) {
         ? [`Your subscription runs until ${day(issued.expiresAt)}. It does not renew by itself: we email you a week before it ends, and buying again with this email extends the same key.`]
         : []),
       "",
-      `License key: ${key}`,
+      ...(issued.seatKeys
+        ? [
+            `Your Team license has ${issued.seatKeys.length} keys, one per developer. Give each person their own key; we can replace a single key later (for example when someone leaves) without touching the others.`,
+            "",
+            ...issued.seatKeys.map((k, i) => `Seat ${i + 1}: ${k}`),
+            "",
+            "Each developer sets up their own key:",
+          ]
+        : [`License key: ${key}`]),
       "",
       "1. Add it to .env.local:",
       `   SUNUI_LICENSE_KEY=${key}`,
@@ -77,6 +85,23 @@ export function sendLicenseEmail(order: Order, issued: Fulfilled) {
       "",
       `Order ${order.id}. License terms: ${siteUrl()}/license`,
       "Keep this key private. Reply to this email if you need help.",
+    ].join("\n"),
+  );
+}
+
+/** 後台重發授權碼後，把新的那一把寄給買家（Team 寄給購買人，由他轉交給成員）。 */
+export function sendReissuedKey(license: License, key: string) {
+  const seat = license.seat ? ` (Team seat ${license.seat})` : "";
+  return send(
+    [license.email],
+    `Your new SunUI license key${seat}`,
+    [
+      `We replaced a SunUI license key${seat} at your request. The old key (${license.display}) no longer works for new installs.`,
+      "",
+      `New key: ${key}`,
+      "",
+      "Update SUNUI_LICENSE_KEY in .env.local with the new key. Blocks already installed keep working.",
+      "Reply to this email if you did not ask for this.",
     ].join("\n"),
   );
 }

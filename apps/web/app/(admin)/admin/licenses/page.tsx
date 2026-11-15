@@ -6,6 +6,7 @@ import { eventStats } from "@/lib/events";
 import { licenseExpired } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 
+import { ReissueButton } from "./reissue-button";
 import { DataTable, KpiStrip, Notice, PageHeader, parseRange, pct, RangeTabs, Section, StatTile, StatusDot } from "../ui";
 
 export const dynamic = "force-dynamic";
@@ -108,11 +109,13 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
             { label: "最後使用", hideOnMobile: true },
             { label: "安裝", num: true },
             { label: "裝過的 block", hideOnMobile: true },
+            { label: "" },
           ]}
           rows={(ok?.rows ?? []).map((k) => [
-            <code key="k" className="font-mono text-xs">
-              {k.display}
-            </code>,
+            <span key="k" className="whitespace-nowrap">
+              <code className="font-mono text-xs">{k.display}</code>
+              {k.seat && <span className="ml-1.5 text-xs text-subtle">Team 席位 {k.seat}</span>}
+            </span>,
             maskEmail(k.email),
             <span key="s" className="whitespace-nowrap">
               {k.status !== "active" ? (
@@ -145,6 +148,7 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
             <span key="b" className="text-xs text-subtle">
               {k.usage.blocks.join("、")}
             </span>,
+            k.status === "active" ? <ReissueButton key="r" licenseId={k.id} label={k.display} /> : "",
           ])}
           empty={{ title: "還沒有授權", description: "有人付款完成後，SunUI 發出的授權碼會列在這裡。", icon: "license" }}
         />

@@ -35,6 +35,9 @@ type Copy = {
   done: {
     title: string;
     renewedTitle: string;
+    seatsTitle: string;
+    seatsBody: string;
+    seatLabel: (n: number) => string;
     renewedBody: (date: string) => string;
     subscriptionUntil: (date: string) => string;
     pendingTitle: string;
@@ -64,7 +67,7 @@ const en: Copy = {
   planNote: {
     founding: "Lifetime Pro at the founding price. Limited seats.",
     pro: "One-time payment. All Pro blocks and future updates.",
-    team: "One-time payment for 5 people. All Pro blocks and future updates.",
+    team: "One-time payment, 5 license keys (one per developer). All Pro blocks and future updates.",
     monthly: "One month of Pro for 1 developer. Does not renew by itself.",
     yearly: "One year of Pro for 1 developer. Does not renew by itself.",
   },
@@ -99,6 +102,9 @@ const en: Copy = {
   done: {
     title: "You are in",
     renewedTitle: "Subscription renewed",
+    seatsTitle: "5 license keys, one per developer",
+    seatsBody: "Give each person their own key. If someone leaves, contact us and we replace just that key.",
+    seatLabel: (n) => `Seat ${n}`,
     renewedBody: (date) => `Your license now runs until ${date}. The key stays the same, so there is nothing to change in your project.`,
     subscriptionUntil: (date) => `Active until ${date}. It does not renew by itself; we email you a week before it ends.`,
     pendingTitle: "Confirming your payment",
@@ -128,7 +134,7 @@ const zhTW: Copy = {
   planNote: {
     founding: "以創始價取得終身 Pro，名額有限。",
     pro: "一次付清，含全部 Pro 區塊與之後的更新。",
-    team: "一次付清，5 人使用，含全部 Pro 區塊與之後的更新。",
+    team: "一次付清，5 把授權碼，每位開發者一把，含全部 Pro 區塊與之後的更新。",
     monthly: "一個月的 Pro，1 位開發者。不會自動續扣。",
     yearly: "一年的 Pro，1 位開發者。不會自動續扣。",
   },
@@ -163,6 +169,9 @@ const zhTW: Copy = {
   done: {
     title: "購買完成",
     renewedTitle: "續訂完成",
+    seatsTitle: "5 把授權碼，每位開發者一把",
+    seatsBody: "請分給每位成員各自一把。有人離職時聯絡我們，只換掉那一把，其他人不受影響。",
+    seatLabel: (n) => `席位 ${n}`,
     renewedBody: (date) => `授權已延長到 ${date}。授權碼不變，專案裡不用改任何設定。`,
     subscriptionUntil: (date) => `有效期限到 ${date}。不會自動續扣，到期前一週會寄信提醒。`,
     pendingTitle: "正在確認付款",
@@ -193,7 +202,7 @@ const zhCN: Copy = {
   planNote: {
     founding: "以创始价获得终身 Pro，名额有限。",
     pro: "一次付清，含全部 Pro 区块与之后的更新。",
-    team: "一次付清，5 人使用，含全部 Pro 区块与之后的更新。",
+    team: "一次付清，5 把授权码，每位开发者一把，含全部 Pro 区块与之后的更新。",
     monthly: "一个月的 Pro，1 位开发者。不会自动续费。",
     yearly: "一年的 Pro，1 位开发者。不会自动续费。",
   },
@@ -227,6 +236,9 @@ const zhCN: Copy = {
   done: {
     title: "购买完成",
     renewedTitle: "续订完成",
+    seatsTitle: "5 把授权码，每位开发者一把",
+    seatsBody: "请分给每位成员各自一把。有人离职时联系我们，只换掉那一把，其他人不受影响。",
+    seatLabel: (n) => `席位 ${n}`,
     renewedBody: (date) => `授权已延长到 ${date}。授权码不变，项目里不用改任何设置。`,
     subscriptionUntil: (date) => `有效期至 ${date}。不会自动续费，到期前一周会发邮件提醒。`,
     pendingTitle: "正在确认付款",
@@ -256,7 +268,7 @@ const ja: Copy = {
   planNote: {
     founding: "創設価格で生涯 Pro。席数限定。",
     pro: "買い切り。すべての Pro ブロックと今後のアップデート。",
-    team: "5 人分の買い切り。すべての Pro ブロックと今後のアップデート。",
+    team: "買い切り、ライセンスキー 5 本（開発者 1 名につき 1 本）。すべての Pro ブロックと今後のアップデート。",
     monthly: "開発者 1 名、1 か月分の Pro。自動更新はありません。",
     yearly: "開発者 1 名、1 年分の Pro。自動更新はありません。",
   },
@@ -291,6 +303,9 @@ const ja: Copy = {
   done: {
     title: "購入が完了しました",
     renewedTitle: "更新が完了しました",
+    seatsTitle: "ライセンスキー 5 本、開発者 1 名につき 1 本",
+    seatsBody: "メンバーごとに 1 本ずつ渡してください。退職者が出たらご連絡ください。その 1 本だけを差し替え、他の人には影響しません。",
+    seatLabel: (n) => `シート ${n}`,
     renewedBody: (date) => `ライセンスは ${date} まで延長されました。キーは変わらないので、プロジェクト側の変更は不要です。`,
     subscriptionUntil: (date) => `${date} まで有効です。自動更新はなく、終了の 1 週間前にメールでお知らせします。`,
     pendingTitle: "お支払いを確認しています",
