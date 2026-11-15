@@ -21,7 +21,11 @@ type Copy = {
     yearlySave: (pct: number) => string;
     features: string[];
     cta: string;
+    /** Pro 卡上連到訂閱區的一行 */
+    orMonthly: (price: string) => string;
   };
+  /** 結帳頁條款連結的文字 */
+  termsLink: string;
   chargedInTwd: (twd: string, usd: number) => string;
   /** 定價頁方案卡下方：說明以台幣收款、美金只是參考 */
   billedInTwd: string;
@@ -38,6 +42,7 @@ type Copy = {
     seatsTitle: string;
     seatsBody: string;
     seatLabel: (n: number) => string;
+    seatPlaceholder: string;
     renewedBody: (date: string) => string;
     subscriptionUntil: (date: string) => string;
     pendingTitle: string;
@@ -68,8 +73,8 @@ const en: Copy = {
     founding: "Lifetime Pro at the founding price. Limited seats.",
     pro: "One-time payment. All Pro blocks and future updates.",
     team: "One-time payment, 5 license keys (one per developer). All Pro blocks and future updates.",
-    monthly: "One month of Pro for 1 developer. Does not renew by itself.",
-    yearly: "One year of Pro for 1 developer. Does not renew by itself.",
+    monthly: "One month of Pro for 1 developer.",
+    yearly: "One year of Pro for 1 developer.",
   },
   renewHint: "Already subscribed? Use the same email and your current key is extended. Nothing to change in your project.",
   subscribe: {
@@ -82,7 +87,9 @@ const en: Copy = {
     yearlySave: (pct) => `Save ${pct}% over monthly`,
     features: ["Every Pro block while active", "Installed blocks keep working after it ends", "Renew with the same email, same key"],
     cta: "Subscribe",
+    orMonthly: (price) => `Or subscribe from ${price} / month`,
   },
+  termsLink: "Read the license",
 
   chargedInTwd: (twd, usd) => `Charged in New Taiwan dollars: NT$${twd} (about US$${usd}). Your bank converts the amount.`,
   billedInTwd: "Paid in New Taiwan dollars. US$ prices are approximate; your bank converts the amount.",
@@ -105,6 +112,7 @@ const en: Copy = {
     seatsTitle: "5 license keys, one per developer",
     seatsBody: "Give each person their own key. If someone leaves, contact us and we replace just that key.",
     seatLabel: (n) => `Seat ${n}`,
+    seatPlaceholder: "<your seat key>",
     renewedBody: (date) => `Your license now runs until ${date}. The key stays the same, so there is nothing to change in your project.`,
     subscriptionUntil: (date) => `Active until ${date}. It does not renew by itself; we email you a week before it ends.`,
     pendingTitle: "Confirming your payment",
@@ -135,8 +143,8 @@ const zhTW: Copy = {
     founding: "以創始價取得終身 Pro，名額有限。",
     pro: "一次付清，含全部 Pro 區塊與之後的更新。",
     team: "一次付清，5 把授權碼，每位開發者一把，含全部 Pro 區塊與之後的更新。",
-    monthly: "一個月的 Pro，1 位開發者。不會自動續扣。",
-    yearly: "一年的 Pro，1 位開發者。不會自動續扣。",
+    monthly: "一個月的 Pro，1 位開發者。",
+    yearly: "一年的 Pro，1 位開發者。",
   },
   renewHint: "已經訂閱了嗎？用同一個 email 購買，會直接延長你現在的授權碼，專案裡不用改任何設定。",
   subscribe: {
@@ -149,7 +157,9 @@ const zhTW: Copy = {
     yearlySave: (pct) => `比月訂省 ${pct}%`,
     features: ["訂閱期間可用所有 Pro 區塊", "到期後已安裝的區塊照常可用", "用同一個 email 續訂，授權碼不變"],
     cta: "訂閱",
+    orMonthly: (price) => `或訂閱：${price} / 月起`,
   },
+  termsLink: "查看授權條款",
 
   chargedInTwd: (twd) => `以新台幣結帳：NT$${twd}。`,
   billedInTwd: "以新台幣結帳，美金價格僅供參考。",
@@ -172,6 +182,7 @@ const zhTW: Copy = {
     seatsTitle: "5 把授權碼，每位開發者一把",
     seatsBody: "請分給每位成員各自一把。有人離職時聯絡我們，只換掉那一把，其他人不受影響。",
     seatLabel: (n) => `席位 ${n}`,
+    seatPlaceholder: "<你的席位授權碼>",
     renewedBody: (date) => `授權已延長到 ${date}。授權碼不變，專案裡不用改任何設定。`,
     subscriptionUntil: (date) => `有效期限到 ${date}。不會自動續扣，到期前一週會寄信提醒。`,
     pendingTitle: "正在確認付款",
@@ -203,8 +214,8 @@ const zhCN: Copy = {
     founding: "以创始价获得终身 Pro，名额有限。",
     pro: "一次付清，含全部 Pro 区块与之后的更新。",
     team: "一次付清，5 把授权码，每位开发者一把，含全部 Pro 区块与之后的更新。",
-    monthly: "一个月的 Pro，1 位开发者。不会自动续费。",
-    yearly: "一年的 Pro，1 位开发者。不会自动续费。",
+    monthly: "一个月的 Pro，1 位开发者。",
+    yearly: "一年的 Pro，1 位开发者。",
   },
   renewHint: "已经订阅了？用同一个 email 购买，会直接延长你现在的授权码，项目里不用改任何设置。",
   subscribe: {
@@ -217,7 +228,9 @@ const zhCN: Copy = {
     yearlySave: (pct) => `比月付省 ${pct}%`,
     features: ["订阅期间可用所有 Pro 区块", "到期后已安装的区块照常可用", "用同一个 email 续订，授权码不变"],
     cta: "订阅",
+    orMonthly: (price) => `或订阅：${price} / 月起`,
   },
+  termsLink: "查看授权条款",
 
   chargedInTwd: (twd, usd) => `以新台币结账：NT$${twd}（约 US$${usd}），由你的银行换算。`,
   billedInTwd: "以新台币结账，美元价格仅供参考，由你的银行换算。",
@@ -239,6 +252,7 @@ const zhCN: Copy = {
     seatsTitle: "5 把授权码，每位开发者一把",
     seatsBody: "请分给每位成员各自一把。有人离职时联系我们，只换掉那一把，其他人不受影响。",
     seatLabel: (n) => `席位 ${n}`,
+    seatPlaceholder: "<你的席位授权码>",
     renewedBody: (date) => `授权已延长到 ${date}。授权码不变，项目里不用改任何设置。`,
     subscriptionUntil: (date) => `有效期至 ${date}。不会自动续费，到期前一周会发邮件提醒。`,
     pendingTitle: "正在确认付款",
@@ -269,8 +283,8 @@ const ja: Copy = {
     founding: "創設価格で生涯 Pro。席数限定。",
     pro: "買い切り。すべての Pro ブロックと今後のアップデート。",
     team: "買い切り、ライセンスキー 5 本（開発者 1 名につき 1 本）。すべての Pro ブロックと今後のアップデート。",
-    monthly: "開発者 1 名、1 か月分の Pro。自動更新はありません。",
-    yearly: "開発者 1 名、1 年分の Pro。自動更新はありません。",
+    monthly: "開発者 1 名、1 か月分の Pro。",
+    yearly: "開発者 1 名、1 年分の Pro。",
   },
   renewHint: "すでにご利用中ですか？同じメールアドレスで購入すると、今のキーの期限が延長されます。プロジェクト側の変更は不要です。",
   subscribe: {
@@ -283,7 +297,9 @@ const ja: Copy = {
     yearlySave: (pct) => `月額より ${pct}% お得`,
     features: ["期間中はすべての Pro ブロック", "終了後もインストール済みのブロックは使える", "同じメールで更新、キーはそのまま"],
     cta: "申し込む",
+    orMonthly: (price) => `月額 ${price} からのプランもあります`,
   },
+  termsLink: "ライセンスを読む",
 
   chargedInTwd: (twd, usd) => `新台湾ドルで決済されます：NT$${twd}（約 US$${usd}）。換算はカード会社が行います。`,
   billedInTwd: "お支払いは新台湾ドルです。米ドル表示は目安で、換算はカード会社が行います。",
@@ -306,6 +322,7 @@ const ja: Copy = {
     seatsTitle: "ライセンスキー 5 本、開発者 1 名につき 1 本",
     seatsBody: "メンバーごとに 1 本ずつ渡してください。退職者が出たらご連絡ください。その 1 本だけを差し替え、他の人には影響しません。",
     seatLabel: (n) => `シート ${n}`,
+    seatPlaceholder: "<あなたのシートのキー>",
     renewedBody: (date) => `ライセンスは ${date} まで延長されました。キーは変わらないので、プロジェクト側の変更は不要です。`,
     subscriptionUntil: (date) => `${date} まで有効です。自動更新はなく、終了の 1 週間前にメールでお知らせします。`,
     pendingTitle: "お支払いを確認しています",

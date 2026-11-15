@@ -5,7 +5,8 @@ import { notFound, redirect } from "next/navigation";
 import { checkoutCopy } from "@/lib/checkout-copy";
 import { getLocale } from "@/lib/i18n-server";
 import { foundingSold } from "@/lib/orders";
-import { checkoutReady, foundingState, foundingWindow, isPlan, isSubscription, planPrice, planUsd, pricesTwd } from "@/lib/site";
+import { intlLocale } from "@/lib/messages";
+import { addTerm, checkoutReady, foundingState, foundingWindow, isPlan, isSubscription, planPrice, planUsd, pricesTwd } from "@/lib/site";
 
 import { CheckoutForm } from "./checkout-form";
 
@@ -30,6 +31,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ plan:
   const usd = planUsd(plan);
   const twd = pricesTwd[plan].toLocaleString("en-US");
   const price = planPrice(plan, locale);
+  const formatDay = (date: Date) =>
+    new Intl.DateTimeFormat(intlLocale(locale), { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Taipei" }).format(date);
 
   return (
     <div className="mx-auto max-w-md py-16 sm:py-20">
@@ -44,15 +47,22 @@ export default async function CheckoutPage({ params }: { params: Promise<{ plan:
           <span className="text-4xl font-semibold tracking-tight">{price.primary}</span>
           <span className="text-sm text-subtle tabular-nums">≈ {price.secondary}</span>
         </p>
-        <p className="mt-2 text-sm text-subtle">{t.chargedInTwd(twd, usd)}</p>
-        {isSubscription(plan) && <p className="mt-4 rounded-md border border-line bg-bg p-3 text-xs text-subtle">{t.renewHint}</p>}
+        {/* 繁中的主價格本來就是台幣，不必再講一次 */}
+        {locale !== "zh-TW" && <p className="mt-2 text-sm text-subtle">{t.chargedInTwd(twd, usd)}</p>}
+        {isSubscription(plan) && (
+          <>
+            {/* 付款前就看得到這一期到哪天 */}
+            <p className="mt-2 text-sm text-subtle">{t.done.subscriptionUntil(formatDay(addTerm(plan, new Date())))}</p>
+            <p className="mt-4 rounded-md border border-line bg-bg p-3 text-xs text-subtle">{t.renewHint}</p>
+          </>
+        )}
         <div className="mt-6 border-t border-line pt-6">
           <CheckoutForm plan={plan} t={{ emailLabel: t.emailLabel, emailHint: t.emailHint, pay: t.pay, paying: t.paying }} />
         </div>
         <p className="mt-4 text-xs text-subtle">
           {t.terms}{" "}
           <Link href="/license" className="underline underline-offset-2 hover:text-fg">
-            /license
+            {t.termsLink}
           </Link>
         </p>
       </div>

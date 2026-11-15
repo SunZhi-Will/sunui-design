@@ -126,7 +126,7 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
       <ol className="mt-3 space-y-5 text-sm">
         <li>
           1. {t.step1}
-          <Code copy={t.copied} label={t.copy}>{`SUNUI_LICENSE_KEY=${seatKeys ? "<your seat key>" : key}`}</Code>
+          <Code copy={t.copied} label={t.copy}>{`SUNUI_LICENSE_KEY=${seatKeys ? t.seatPlaceholder : key}`}</Code>
         </li>
         <li>
           2. {t.step2}

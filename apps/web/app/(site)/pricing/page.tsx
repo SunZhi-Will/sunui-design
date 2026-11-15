@@ -87,6 +87,8 @@ export default async function PricingPage() {
       secondary: proPrice.secondary,
       note: t.pro.note,
       highlight: true,
+      // 主方案卡也要看得到訂閱入口，不然想先試用的人要滑很久才找到
+      subscribeLink: sub.orMonthly(planPrice("monthly", locale).primary),
       features: t.pro.features,
       cta: canBuy ? { label: t.pro.cta, href: "/go/checkout/pro" } : waitlistCta,
     },
@@ -150,15 +152,22 @@ export default async function PricingPage() {
             key={plan.name}
             className={cn(
               "flex flex-col rounded-lg border bg-card p-6",
-              plan.highlight ? "border-fg" : "border-line",
+              // 手機上單欄堆疊時 Pro 排第一，付費的人不用先滑過免費方案
+              plan.highlight ? "border-fg max-md:order-first" : "border-line",
             )}
           >
             <h2 className="font-medium">{plan.name}</h2>
-            <p className="mt-4 flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
-              <span className="text-sm text-subtle">{plan.note}</span>
+            {/* 價格獨立一行：說明放在旁邊時，三欄的寬度會把它擠成一欄兩個字的直排 */}
+            <p className="mt-4 text-4xl font-semibold tracking-tight tabular-nums">{plan.price}</p>
+            <p className="mt-1.5 text-sm text-pretty text-subtle tabular-nums">
+              {plan.secondary && <>≈ {plan.secondary} · </>}
+              {plan.note}
             </p>
-            {plan.secondary && <p className="mt-1 text-sm text-subtle tabular-nums">≈ {plan.secondary}</p>}
+            {"subscribeLink" in plan && plan.subscribeLink && (
+              <a href="#subscribe" className="mt-1 self-start text-sm text-subtle underline decoration-line underline-offset-4 hover:text-fg">
+                {plan.subscribeLink}
+              </a>
+            )}
             <ul className="mt-6 grid flex-1 content-start gap-2.5 text-sm">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex gap-2">
