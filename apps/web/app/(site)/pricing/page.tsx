@@ -9,7 +9,7 @@ import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { checkoutCopy } from "@/lib/checkout-copy";
-import { checkoutReady, foundingState, foundingWindow, planPrice, prices } from "@/lib/site";
+import { checkoutReady, foundingState, foundingWindow, planPrice, prices, pricesTwd } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,7 +44,33 @@ export default async function PricingPage() {
   const proPrice = planPrice("pro", locale);
   const teamPrice = planPrice("team", locale);
   const foundingPrice = planPrice("founding", locale);
-  const billedInTwd = checkoutCopy(locale).billedInTwd;
+  const { billedInTwd, subscribe: sub, planName } = checkoutCopy(locale);
+
+  // 訂閱（預付期間制，不自動續扣）。年訂省多少依介面主要幣別計算，和畫面上的數字對得起來
+  const yearlySave =
+    locale === "zh-TW"
+      ? Math.round((1 - pricesTwd.yearly / (pricesTwd.monthly * 12)) * 100)
+      : Math.round((1 - prices.yearly / (prices.monthly * 12)) * 100);
+  const subscriptionPlans = [
+    {
+      key: "monthly" as const,
+      name: planName.monthly,
+      price: planPrice("monthly", locale),
+      per: sub.perMonth,
+      note: sub.monthlyNote,
+      badge: undefined as string | undefined,
+      cta: canBuy ? { label: sub.cta, href: "/go/checkout/monthly" } : waitlistCta,
+    },
+    {
+      key: "yearly" as const,
+      name: planName.yearly,
+      price: planPrice("yearly", locale),
+      per: sub.perYear,
+      note: sub.yearlyNote,
+      badge: sub.yearlySave(yearlySave),
+      cta: canBuy ? { label: sub.cta, href: "/go/checkout/yearly" } : waitlistCta,
+    },
+  ];
 
   const plans = [
     {
@@ -163,7 +189,51 @@ export default async function PricingPage() {
         ))}
       </section>
 
-      <p className="mt-6 text-center text-sm text-subtle">
+      <section id="subscribe" aria-labelledby="subscribe-title" className="mx-auto mt-14 max-w-3xl scroll-mt-24">
+        <div className="text-center">
+          <h2 id="subscribe-title" className="text-xl font-semibold tracking-tight">
+            {sub.title}
+          </h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-pretty text-subtle">{sub.lead}</p>
+        </div>
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          {subscriptionPlans.map((plan) => (
+            <div key={plan.key} className="flex flex-col rounded-lg border border-line bg-card p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-medium">{plan.name}</h3>
+                {plan.badge && (
+                  <span className="rounded-full border border-accent/40 px-2 py-0.5 text-xs font-medium text-accent">{plan.badge}</span>
+                )}
+              </div>
+              <p className="mt-4 flex items-baseline gap-1.5">
+                <span className="text-3xl font-semibold tracking-tight tabular-nums">{plan.price.primary}</span>
+                <span className="text-sm text-subtle">{plan.per}</span>
+              </p>
+              <p className="mt-1 text-sm text-subtle tabular-nums">
+                ≈ {plan.price.secondary} · {plan.note}
+              </p>
+              <a
+                href={plan.cta.href}
+                className="mt-6 rounded-md border border-line px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90"
+              >
+                {plan.cta.label}
+              </a>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-subtle">
+          {sub.features.map((feature) => (
+            <li key={feature} className="flex gap-2">
+              <span aria-hidden="true" className="text-accent">
+                ✓
+              </span>
+              {feature}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="mt-10 text-center text-sm text-subtle">
         {t.footnote(proCount)}
       </p>
       <p className="mt-1.5 text-center text-xs text-subtle">{billedInTwd}</p>

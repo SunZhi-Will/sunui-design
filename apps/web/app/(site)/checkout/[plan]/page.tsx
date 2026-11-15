@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { checkoutCopy } from "@/lib/checkout-copy";
 import { getLocale } from "@/lib/i18n-server";
 import { foundingSold } from "@/lib/orders";
-import { checkoutReady, foundingState, foundingWindow, isPlan, planPrice, prices, pricesTwd } from "@/lib/site";
+import { checkoutReady, foundingState, foundingWindow, isPlan, isSubscription, planPrice, planUsd, pricesTwd } from "@/lib/site";
 
 import { CheckoutForm } from "./checkout-form";
 
@@ -27,7 +27,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ plan:
 
   const locale = await getLocale();
   const t = checkoutCopy(locale);
-  const usd = plan === "founding" ? prices.founding : prices[plan];
+  const usd = planUsd(plan);
   const twd = pricesTwd[plan].toLocaleString("en-US");
   const price = planPrice(plan, locale);
 
@@ -45,6 +45,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ plan:
           <span className="text-sm text-subtle tabular-nums">≈ {price.secondary}</span>
         </p>
         <p className="mt-2 text-sm text-subtle">{t.chargedInTwd(twd, usd)}</p>
+        {isSubscription(plan) && <p className="mt-4 rounded-md border border-line bg-bg p-3 text-xs text-subtle">{t.renewHint}</p>}
         <div className="mt-6 border-t border-line pt-6">
           <CheckoutForm plan={plan} t={{ emailLabel: t.emailLabel, emailHint: t.emailHint, pay: t.pay, paying: t.paying }} />
         </div>

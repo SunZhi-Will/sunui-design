@@ -19,34 +19,55 @@ export function foundingState(now = new Date()): FoundingState {
   return "open";
 }
 
-/** 定價（美元，一次買斷）。pricing 頁、401 訊息與 agent 說明都從這裡取。 */
-export const prices = { pro: 129, team: 349, founding: 79, teamSeats: 5 };
+/**
+ * 定價（美元）。pricing 頁、401 訊息與 agent 說明都從這裡取。
+ * founding / pro / team 是買斷；monthly / yearly 是預付期間制訂閱：不綁卡、不自動扣款，
+ * 到期前寄信提醒，續約就是用同一個 email 再買一期，同一把授權碼往後延。
+ */
+export const prices = { pro: 129, team: 349, founding: 79, monthly: 19, yearly: 99, teamSeats: 5 };
 
 /** 給終端機與 agent 看的一句話方案說明（英文）。 */
 export function licenseSummary(now = new Date()) {
-  const base = `Pro is a one-time $${prices.pro} (Team: $${prices.team} for ${prices.teamSeats} people), no subscription, and covers unlimited personal and client projects.`;
+  const base = `Pro is a one-time $${prices.pro} (Team: $${prices.team} for ${prices.teamSeats} people), or $${prices.monthly}/month or $${prices.yearly}/year with no auto-renewal, and covers unlimited personal and client projects.`;
   return foundingState(now) === "open"
     ? `${base} Founding members pay $${prices.founding} for lifetime Pro until the seats run out.`
     : base;
 }
 
 /** 實際結帳金額（新台幣，SHOPLINE Payments 只收台幣）。約等於上面的美金價，網站仍以美金標價並註明以台幣結帳。 */
-export const pricesTwd = { founding: 2490, pro: 4090, team: 10990 } as const;
+export const pricesTwd = { founding: 2490, pro: 4090, team: 10990, monthly: 590, yearly: 3190 } as const;
 
 export type Plan = keyof typeof pricesTwd;
+export type SubscriptionPlan = "monthly" | "yearly";
+
+export function isSubscription(plan: Plan): plan is SubscriptionPlan {
+  return plan === "monthly" || plan === "yearly";
+}
+
+/** 從 from 往後加一期（月或年）。月底遇到短月份時落在下個月初，和多數帳單一致。 */
+export function addTerm(plan: SubscriptionPlan, from: Date, periods = 1) {
+  const next = new Date(from);
+  if (plan === "monthly") next.setUTCMonth(next.getUTCMonth() + periods);
+  else next.setUTCFullYear(next.getUTCFullYear() + periods);
+  return next;
+}
+
+export function planUsd(plan: Plan) {
+  return prices[plan];
+}
 
 /**
  * 方案價格的兩種幣別。實際以新台幣收款，美金是參考價。
  * 繁中介面以台幣為主、美金為輔，其他語系反過來。
  */
 export function planPrice(plan: Plan, locale: string) {
-  const usd = `US$${plan === "founding" ? prices.founding : prices[plan]}`;
+  const usd = `US$${planUsd(plan)}`;
   const twd = `NT$${pricesTwd[plan].toLocaleString("en-US")}`;
   return locale === "zh-TW" ? { primary: twd, secondary: usd, usd, twd } : { primary: usd, secondary: twd, usd, twd };
 }
 
 export function isPlan(value: string): value is Plan {
-  return value === "founding" || value === "pro" || value === "team";
+  return Object.prototype.hasOwnProperty.call(pricesTwd, value);
 }
 
 function devShopline() {

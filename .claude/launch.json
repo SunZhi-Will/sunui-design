@@ -127,6 +127,25 @@
         "SUNUI_ADMIN_EMAILS": "owner@example.com",
         "GOOGLE_CLIENT_ID": "385022749974-54lnlukhs3f0024argdkhah4t046cice.apps.googleusercontent.com"
       }
+    },
+    {
+      "name": "web-checkout",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "npm run dev -w @sunui-design/web -- -p ${PORT:-3114}"
+      ],
+      "port": 3114,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-checkout",
+        "NEXT_PUBLIC_SITE_URL": "http://localhost:3114",
+        "SHOPLINE_ENV": "dev",
+        "KV_REST_API_URL": "http://localhost:8799",
+        "KV_REST_API_TOKEN": "local",
+        "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only",
+        "CRON_SECRET": "local-cron"
+      }
     }
   ]
 }

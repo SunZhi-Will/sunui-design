@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { daysBetween, formatDate, maskEmail, requireAdmin } from "@/lib/admin";
 import { DORMANT_DAYS, licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
+import { licenseExpired } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 
 import { DataTable, KpiStrip, Notice, PageHeader, parseRange, pct, RangeTabs, Section, StatTile, StatusDot } from "../ui";
@@ -113,9 +114,20 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
               {k.display}
             </code>,
             maskEmail(k.email),
-            <StatusDot key="s" tone={k.status === "active" ? (k.usage.count > 0 ? "ok" : "warn") : "idle"}>
-              {k.status === "active" ? (k.usage.count > 0 ? "使用中" : "未安裝") : "已撤銷"}
-            </StatusDot>,
+            <span key="s" className="whitespace-nowrap">
+              {k.status !== "active" ? (
+                <StatusDot tone="idle">已撤銷</StatusDot>
+              ) : licenseExpired(k) ? (
+                <StatusDot tone="idle">已到期</StatusDot>
+              ) : (
+                <StatusDot tone={k.usage.count > 0 ? "ok" : "warn"}>{k.usage.count > 0 ? "使用中" : "未安裝"}</StatusDot>
+              )}
+              {k.expiresAt && (
+                <span className="ml-1.5 text-xs text-subtle tabular-nums">
+                  {k.plan === "monthly" ? "月訂" : "年訂"} 至 {k.expiresAt.slice(0, 10)}
+                </span>
+              )}
+            </span>,
             <span key="c" className="whitespace-nowrap text-subtle tabular-nums">
               {formatDate(k.createdAt)}
             </span>,

@@ -2,10 +2,18 @@
 // 寄件人 RESEND_FROM；沒驗證網域時預設 onboarding@resend.dev，那個地址只能寄給 Resend 帳號本人，
 // 所以在 synvize.com 驗證完成前，買家收不到授權碼信，只有作者收得到通知。
 
-import type { Order } from "./orders";
-import { prices, pricesTwd, siteUrl } from "./site";
+import type { Fulfilled, License, Order } from "./orders";
+import { planUsd, prices, pricesTwd, siteUrl } from "./site";
 
-const PLAN_NAME: Record<Order["plan"], string> = { founding: "Founding member", pro: "Pro", team: "Team (5 seats)" };
+const PLAN_NAME: Record<Order["plan"], string> = {
+  founding: "Founding member",
+  pro: "Pro",
+  team: "Team (5 seats)",
+  monthly: "Pro monthly",
+  yearly: "Pro yearly",
+};
+
+const day = (iso: string) => iso.slice(0, 10);
 
 async function send(to: string[], subject: string, text: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -30,13 +38,33 @@ async function send(to: string[], subject: string, text: string) {
   }
 }
 
-export function sendLicenseEmail(order: Order, key: string) {
+export function sendLicenseEmail(order: Order, issued: Fulfilled) {
+  const paid = `Paid: NT$${order.amountTwd.toLocaleString("en-US")} (about US$${planUsd(order.plan)}).`;
+  if (issued.renewal) {
+    return send(
+      [order.email],
+      `Your SunUI Pro subscription is renewed`,
+      [
+        `Thanks for renewing SunUI ${PLAN_NAME[order.plan]}.`,
+        paid,
+        "",
+        `Your license now runs until ${day(issued.expiresAt ?? "")}. The key stays the same${issued.key ? `: ${issued.key}` : ""}, so there is nothing to change in your project.`,
+        "",
+        `Order ${order.id}. License terms: ${siteUrl()}/license`,
+        "Reply to this email if you need help.",
+      ].join("\n"),
+    );
+  }
+  const key = issued.key ?? "";
   return send(
     [order.email],
     `Your SunUI ${PLAN_NAME[order.plan]} license`,
     [
       `Thanks for buying SunUI ${PLAN_NAME[order.plan]}.`,
-      `Paid: NT$${order.amountTwd.toLocaleString("en-US")} (about US$${order.plan === "founding" ? prices.founding : prices[order.plan]}).`,
+      paid,
+      ...(issued.expiresAt
+        ? [`Your subscription runs until ${day(issued.expiresAt)}. It does not renew by itself: we email you a week before it ends, and buying again with this email extends the same key.`]
+        : []),
       "",
       `License key: ${key}`,
       "",
@@ -53,12 +81,33 @@ export function sendLicenseEmail(order: Order, key: string) {
   );
 }
 
-export function notifyOwner(order: Order) {
+export function notifyOwner(order: Order, issued?: Fulfilled) {
   const owners = (process.env.SUNUI_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
-  const usd = order.plan === "founding" ? prices.founding : prices[order.plan];
+  const kind = issued?.renewal ? "續約" : "新訂單";
+  const until = issued?.expiresAt ? `\n到期 ${day(issued.expiresAt)}` : "";
   return send(
     owners,
-    `新訂單：SunUI ${PLAN_NAME[order.plan]} NT$${pricesTwd[order.plan].toLocaleString("en-US")}`,
-    `訂單 ${order.id}\n方案 ${PLAN_NAME[order.plan]}（約 US$${usd}）\n後台：${siteUrl()}/admin/orders`,
+    `${kind}：SunUI ${PLAN_NAME[order.plan]} NT$${pricesTwd[order.plan].toLocaleString("en-US")}`,
+    `訂單 ${order.id}\n方案 ${PLAN_NAME[order.plan]}（約 US$${planUsd(order.plan)}）${until}\n後台：${siteUrl()}/admin/orders`,
+  );
+}
+
+/** 訂閱到期前的提醒信。續約就是用同一個 email 再買一期。 */
+export function sendRenewalReminder(license: License) {
+  const ends = day(license.expiresAt ?? "");
+  return send(
+    [license.email],
+    `Your SunUI Pro subscription ends on ${ends}`,
+    [
+      `Your SunUI Pro subscription (${license.display}) ends on ${ends}. It does not renew by itself.`,
+      "",
+      "Blocks you already installed keep working after that. You just cannot install new Pro blocks or get updates.",
+      "",
+      `To keep going, buy another month (US$${prices.monthly}) or year (US$${prices.yearly}) with this same email. The key stays the same:`,
+      `${siteUrl()}/pricing#subscribe`,
+      "",
+      `Or switch to lifetime Pro for US$${prices.pro} and never think about it again.`,
+      "Reply to this email if you need help.",
+    ].join("\n"),
   );
 }

@@ -16,6 +16,8 @@ const PRODUCT_NAME: Record<Order["plan"], string> = {
   founding: `${PRODUCT_PREFIX} Pro Founding member (lifetime)`,
   pro: `${PRODUCT_PREFIX} Pro (lifetime)`,
   team: `${PRODUCT_PREFIX} Pro Team, 5 seats (lifetime)`,
+  monthly: `${PRODUCT_PREFIX} Pro, 1 month`,
+  yearly: `${PRODUCT_PREFIX} Pro, 1 year`,
 };
 
 export function devCheckout() {

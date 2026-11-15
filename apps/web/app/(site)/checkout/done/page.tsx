@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { checkoutCopy } from "@/lib/checkout-copy";
 import { getLocale } from "@/lib/i18n-server";
+import { intlLocale } from "@/lib/messages";
 import { decryptLicenseKey } from "@/lib/license-key";
 import { getOrder, ORDER_COOKIE } from "@/lib/orders";
 import { siteUrl } from "@/lib/site";
@@ -29,7 +30,10 @@ function Code({ children, copy, label }: { children: string; copy: string; label
 }
 
 export default async function CheckoutDonePage({ searchParams }: { searchParams: Promise<{ o?: string }> }) {
-  const t = checkoutCopy(await getLocale()).done;
+  const locale = await getLocale();
+  const t = checkoutCopy(locale).done;
+  const formatDay = (iso: string) =>
+    new Intl.DateTimeFormat(intlLocale(locale), { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Taipei" }).format(new Date(iso));
   const id = (await searchParams).o ?? "";
   const order = await getOrder(id).catch(() => null);
   const [cookieId, viewToken] = ((await cookies()).get(ORDER_COOKIE)?.value ?? "").split(".");
@@ -57,6 +61,27 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
   }
 
   const key = owner && order.keyEnc ? await decryptLicenseKey(order.keyEnc, process.env.SUNUI_ADMIN_TOKEN ?? "dev-secret") : null;
+
+  // 訂閱續約：授權碼沒變，只顯示新的到期日（付款的瀏覽器才附上授權碼）
+  if (order.renewal) {
+    return (
+      <Shell>
+        <h1 className="text-2xl font-semibold tracking-tight">{t.renewedTitle}</h1>
+        <p className="mt-2 text-sm text-subtle">{t.renewedBody(order.periodEnd ? formatDay(order.periodEnd) : "")}</p>
+        {key && (
+          <>
+            <p className="mt-6 text-sm font-medium">{t.keyLabel}</p>
+            <Code copy={t.copied} label={t.copy}>{key}</Code>
+          </>
+        )}
+        <p className="mt-4 font-mono text-xs text-subtle">{order.id}</p>
+        <Link href="/" className="mt-6 inline-flex rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
+          {t.browse}
+        </Link>
+      </Shell>
+    );
+  }
+
   if (!key) {
     return (
       <Shell>
@@ -72,6 +97,7 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
     <Shell>
       <h1 className="text-2xl font-semibold tracking-tight">{t.title}</h1>
       <p className="mt-2 text-sm text-subtle">{t.paidBody}</p>
+      {order.periodEnd && <p className="mt-1 text-sm text-subtle">{t.subscriptionUntil(formatDay(order.periodEnd))}</p>}
 
       <p className="mt-6 text-sm font-medium">{t.keyLabel}</p>
       <Code copy={t.copied} label={t.copy}>{key}</Code>

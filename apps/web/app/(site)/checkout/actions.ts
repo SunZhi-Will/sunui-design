@@ -58,8 +58,8 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
   if (devCheckout()) {
     const issued = await fulfillOrder(order, "", process.env.SUNUI_ADMIN_TOKEN ?? "dev-secret");
     if (issued) {
-      await sendLicenseEmail(order, issued.key);
-      await notifyOwner(order);
+      await sendLicenseEmail(order, issued);
+      await notifyOwner(order, issued);
     }
     redirect(`/checkout/done?o=${order.id}`);
   }

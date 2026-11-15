@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       return ok();
     }
 
-    // 其他事件（失敗、過期、取消）回 200 讓對方不要重送；買斷沒有續扣，不需要處理
+    // 其他事件（失敗、過期、取消）回 200 讓對方不要重送；訂閱是預付期間制、沒有續扣，不需要處理
     if (type !== "trade.succeeded") {
       record(null, "ignored");
       return ok({ ignored: true });
@@ -93,8 +93,8 @@ export async function POST(request: Request) {
     }
     // 只有第一次入帳會走到這裡，重送的通知不會多寄
     after(async () => {
-      await sendLicenseEmail(order, issued.key);
-      await notifyOwner(order);
+      await sendLicenseEmail(order, issued);
+      await notifyOwner(order, issued);
     });
     record(order.id, "paid");
     return ok();

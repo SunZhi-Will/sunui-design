@@ -14,6 +14,6 @@ export default function OpengraphImage() {
     eyebrow: "Pricing",
     title: m.pricing.title,
     description: m.pricing.metaDescription,
-    chips: [`Pro $${prices.pro}`, `Team $${prices.team}`, "One-time, no subscription"],
+    chips: [`Pro $${prices.pro}`, `Team $${prices.team}`, `Or $${prices.monthly}/mo`],
   });
 }

@@ -3,8 +3,9 @@
 // Redis 裡只存 key 的 SHA-256 與加鹽雜湊後的 IP，不存原文。
 
 import { LICENSE_KEY_PATTERN } from "./license-key";
-import { lookupLicense } from "./orders";
+import { licenseExpired, lookupLicense } from "./orders";
 import { dayKey, pipeline, redisEnabled, sha256 } from "./redis";
+import { prices, siteUrl } from "./site";
 
 export type LicenseResult =
   | { ok: true; licenseId: string; displayKey: string }
@@ -118,6 +119,14 @@ async function validateKey(key: string): Promise<LicenseResult> {
     if (!license) return { ok: false, status: 401, message: invalidKeyMessage() };
     if (license.status !== "active") {
       return { ok: false, status: 403, message: "This license key has been disabled or revoked." };
+    }
+    // 訂閱到期：已經裝進專案的 block 照常可用，只是不能再裝新的或拿更新
+    if (licenseExpired(license)) {
+      return {
+        ok: false,
+        status: 403,
+        message: `This SunUI Pro subscription ended on ${license.expiresAt!.slice(0, 10)}. Blocks you already installed keep working. Renew with the same email at ${siteUrl()}/pricing (the key stays the same), or buy lifetime Pro for $${prices.pro}.`,
+      };
     }
     return { ok: true, licenseId: license.id, displayKey: license.display };
   } catch {

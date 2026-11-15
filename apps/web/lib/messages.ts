@@ -178,7 +178,7 @@ const en = {
     proTitle: "This is a Pro block",
     proBody: "One license unlocks every Pro block, now and in the future.",
     proTerms: (price: number) =>
-      `One-time $${price}, no subscription. Use it in unlimited personal and client projects.`,
+      `One-time $${price}, or by the month or year with no auto-renewal. Use it in unlimited personal and client projects.`,
     proInstallTitle: "Install with your license",
     proStep1: "1. Add the SunUI Pro registry to `components.json`.",
     proStep2: "2. Put your license key in `.env.local`.",
@@ -350,7 +350,7 @@ const en = {
       note: "one-time, 1 developer",
       features: [
         "Every Pro block and template",
-        "All future blocks, no subscription",
+        "All future blocks, pay once",
         "Private @sunui-pro registry for the CLI and AI agents",
         "Unlimited personal and client projects",
       ],
@@ -391,7 +391,7 @@ const en = {
     faqs: [
       {
         q: "Is this a subscription?",
-        a: "No. You pay once and keep access to every current and future Pro block.",
+        a: "Your choice. Lifetime Pro is a single payment for every current and future Pro block. Or buy a month or a year: it never renews by itself, and blocks you installed keep working after it ends.",
       },
       {
         q: "How do I install Pro blocks?",
@@ -416,7 +416,7 @@ const en = {
     freeBody: "Free blocks are released under the MIT license. Use, modify and distribute them however you like.",
     proTitle: "Pro blocks, in plain words",
     proBody:
-      "A Pro license is for one developer. A Team license covers up to five developers at the same company. The license never expires.",
+      "A Pro license is for one developer. A Team license covers up to five developers at the same company. Lifetime licenses never expire. A monthly or yearly license lets you install Pro blocks and get updates while it is active; blocks already in your projects stay licensed after it ends.",
     canTitle: "You can",
     can: [
       "Use Pro blocks in unlimited projects, for yourself or for clients.",
@@ -694,7 +694,7 @@ const zhTW: Messages = {
     manualStep2: "2. 如果還沒有，在 `lib/utils.ts` 加上 `cn` 輔助函式，再複製元件程式碼。",
     proTitle: "這是 Pro 區塊",
     proBody: "一份授權即可解鎖所有 Pro 區塊，包含日後新增的。",
-    proTerms: (price) => `一次付費 $${price}，不是訂閱。自己的專案與客戶案子都能用，數量不限。`,
+    proTerms: (price) => `一次付費 $${price} 買斷，也可以月訂或年訂（不自動續扣）。自己的專案與客戶案子都能用，數量不限。`,
     proInstallTitle: "用你的授權安裝",
     proStep1: "1. 把 SunUI Pro registry 加到 `components.json`。",
     proStep2: "2. 把授權金鑰放進 `.env.local`。",
@@ -858,7 +858,7 @@ const zhTW: Messages = {
       note: "一次付清，1 位開發者",
       features: [
         "所有 Pro 區塊與範本",
-        "日後所有新區塊，免訂閱",
+        "日後所有新區塊，付一次就好",
         "供 CLI 與 AI 代理使用的私有 @sunui-pro registry",
         "個人與客戶專案數量不限",
       ],
@@ -896,7 +896,7 @@ const zhTW: Messages = {
     waitlistBody: "Pro 開賣時寄一封信給你，不會有垃圾郵件。",
     faqTitle: "常見問題",
     faqs: [
-      { q: "這是訂閱制嗎？", a: "不是。付費一次，就能持續使用現有與日後推出的所有 Pro 區塊。" },
+      { q: "這是訂閱制嗎？", a: "由你選。買斷 Pro 付一次，就能使用現有與日後推出的所有 Pro 區塊。也可以只買一個月或一年：不會自動續扣，到期後已安裝的區塊照常可用。" },
       {
         q: "如何安裝 Pro 區塊？",
         a: "把 @sunui-pro registry 加到 components.json，把授權金鑰放進 .env.local，再執行 npx shadcn@latest add @sunui-pro/<block>。透過 shadcn CLI 或 MCP 伺服器的 AI 代理也能用同樣方式安裝。",
@@ -916,7 +916,7 @@ const zhTW: Messages = {
     freeTitle: "免費區塊",
     freeBody: "免費區塊以 MIT 授權釋出，可以自由使用、修改與散布。",
     proTitle: "Pro 區塊，用白話說明",
-    proBody: "Pro 授權供一位開發者使用。團隊授權涵蓋同一間公司最多五位開發者。授權永不過期。",
+    proBody: "Pro 授權供一位開發者使用。團隊授權涵蓋同一間公司最多五位開發者。買斷授權永不過期。月訂或年訂授權在有效期間內可以安裝 Pro 區塊與取得更新，到期後已經放進專案的區塊仍然可以繼續使用。",
     canTitle: "你可以",
     can: [
       "在不限數量的專案中使用 Pro 區塊，無論是自己的還是客戶的。",
@@ -1188,7 +1188,7 @@ const zhCN: Messages = {
     manualStep2: "2. 如果还没有，在 `lib/utils.ts` 添加 `cn` 辅助函数，然后复制组件代码。",
     proTitle: "这是 Pro 区块",
     proBody: "一份许可即可解锁所有 Pro 区块，包括以后新增的。",
-    proTerms: (price) => `一次付费 $${price}，不是订阅。自己的项目和客户项目都能用，数量不限。`,
+    proTerms: (price) => `一次付费 $${price} 买断，也可以按月或按年订阅（不自动续费）。自己的项目和客户项目都能用，数量不限。`,
     proInstallTitle: "使用你的许可安装",
     proStep1: "1. 把 SunUI Pro registry 添加到 `components.json`。",
     proStep2: "2. 把许可密钥写入 `.env.local`。",
@@ -1348,7 +1348,7 @@ const zhCN: Messages = {
     pro: {
       name: "Pro",
       note: "一次付清，1 位开发者",
-      features: ["所有 Pro 区块与模板", "以后所有新区块，无需订阅", "供 CLI 与 AI 智能体使用的私有 @sunui-pro registry", "个人与客户项目数量不限"],
+      features: ["所有 Pro 区块与模板", "以后所有新区块，付一次就好", "供 CLI 与 AI 智能体使用的私有 @sunui-pro registry", "个人与客户项目数量不限"],
       cta: "购买 Pro",
     },
     team: {
@@ -1383,7 +1383,7 @@ const zhCN: Messages = {
     waitlistBody: "Pro 开售时发一封邮件给你，绝不发垃圾邮件。",
     faqTitle: "常见问题",
     faqs: [
-      { q: "这是订阅制吗？", a: "不是。付费一次，即可持续使用现有及以后推出的所有 Pro 区块。" },
+      { q: "这是订阅制吗？", a: "由你选择。买断 Pro 付一次，即可使用现有及以后推出的所有 Pro 区块。也可以只买一个月或一年：不会自动续费，到期后已安装的区块照常可用。" },
       {
         q: "如何安装 Pro 区块？",
         a: "把 @sunui-pro registry 添加到 components.json，把许可密钥写入 .env.local，然后运行 npx shadcn@latest add @sunui-pro/<block>。通过 shadcn CLI 或 MCP 服务器工作的 AI 智能体也能用同样方式安装。",
@@ -1403,7 +1403,7 @@ const zhCN: Messages = {
     freeTitle: "免费区块",
     freeBody: "免费区块以 MIT 许可发布，可以自由使用、修改与分发。",
     proTitle: "Pro 区块，用大白话说明",
-    proBody: "Pro 许可供一位开发者使用。团队许可覆盖同一家公司最多五位开发者。许可永不过期。",
+    proBody: "Pro 许可供一位开发者使用。团队许可覆盖同一家公司最多五位开发者。买断许可永不过期。月付或年付许可在有效期内可以安装 Pro 区块并获得更新，到期后已经放进项目的区块仍然可以继续使用。",
     canTitle: "你可以",
     can: [
       "在不限数量的项目中使用 Pro 区块，无论是自己的还是客户的。",
@@ -1675,7 +1675,7 @@ const ja: Messages = {
     manualStep2: "2. `cn` ヘルパーがなければ `lib/utils.ts` に追加し、コンポーネントをコピーします。",
     proTitle: "これは Pro ブロックです",
     proBody: "ひとつのライセンスで、今後追加されるものも含めてすべての Pro ブロックが使えます。",
-    proTerms: (price) => `$${price} の買い切りで、サブスクリプションではありません。自分の案件にもクライアント案件にも、数の制限なく使えます。`,
+    proTerms: (price) => `$${price} の買い切り、または自動更新なしの月額・年額プラン。自分の案件にもクライアント案件にも、数の制限なく使えます。`,
     proInstallTitle: "ライセンスでインストール",
     proStep1: "1. SunUI Pro registry を `components.json` に追加します。",
     proStep2: "2. ライセンスキーを `.env.local` に記述します。",
@@ -1840,7 +1840,7 @@ const ja: Messages = {
       note: "買い切り、開発者 1 名",
       features: [
         "すべての Pro ブロックとテンプレート",
-        "今後のブロックもすべて、サブスクなし",
+        "今後のブロックもすべて、支払いは一度だけ",
         "CLI と AI エージェント用の非公開 @sunui-pro registry",
         "個人・クライアント案件の数は無制限",
       ],
@@ -1878,7 +1878,7 @@ const ja: Messages = {
     waitlistBody: "Pro の販売開始時にメールを 1 通お送りします。迷惑メールは送りません。",
     faqTitle: "よくある質問",
     faqs: [
-      { q: "サブスクリプションですか？", a: "いいえ。一度の支払いで、現在と今後のすべての Pro ブロックを使い続けられます。" },
+      { q: "サブスクリプションですか？", a: "お好みで選べます。買い切りの Pro は一度の支払いで、現在と今後のすべての Pro ブロックが使えます。1 か月または 1 年のプランもあり、自動更新はなく、終了後もインストール済みのブロックはそのまま使えます。" },
       {
         q: "Pro ブロックはどうやってインストールしますか？",
         a: "@sunui-pro registry を components.json に追加し、ライセンスキーを .env.local に記述してから npx shadcn@latest add @sunui-pro/<block> を実行します。shadcn CLI や MCP サーバーを使う AI エージェントからも同じように使えます。",
@@ -1901,7 +1901,7 @@ const ja: Messages = {
     freeTitle: "無料ブロック",
     freeBody: "無料ブロックは MIT ライセンスで公開しています。自由に使用、改変、配布できます。",
     proTitle: "Pro ブロックをわかりやすく",
-    proBody: "Pro ライセンスは開発者 1 名用です。Team ライセンスは同じ会社の開発者 5 名までをカバーします。ライセンスに有効期限はありません。",
+    proBody: "Pro ライセンスは開発者 1 名用です。Team ライセンスは同じ会社の開発者 5 名までをカバーします。買い切りライセンスに有効期限はありません。月額・年額ライセンスは有効期間中に Pro ブロックのインストールとアップデートができ、終了後もプロジェクトに入っているブロックはそのまま使えます。",
     canTitle: "できること",
     can: [
       "自分用でもクライアント用でも、プロジェクト数の制限なく Pro ブロックを使えます。",

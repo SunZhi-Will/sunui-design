@@ -69,8 +69,12 @@ curl -s https://<網域>/r/pro/coupon-claim-card.json
 ### 4. SHOPLINE Payments（2026-11-14 從 Polar 改過來）
 
 改用作者其他產品（萬寶箱、PostVault、課程平台）已在用的 SHOPLINE 商家帳號，不用再開戶與 KYC。
-新台幣收款（Founding NT$2,490、Pro NT$4,090、Team NT$10,990，約等於網站上的美金價，見 `lib/site.ts` 的 `pricesTwd`），
+新台幣收款（買斷：Founding NT$2,490、Pro NT$4,090、Team NT$10,990；訂閱：月 NT$590、年 NT$3,190，約等於網站上的美金價，見 `lib/site.ts` 的 `pricesTwd`），
 授權碼由 SunUI 自己發（`lib/orders.ts`，存在 Upstash Redis）。
+
+訂閱是預付期間制（2026-11-15 定案）：不綁卡、不自動扣款。授權碼帶到期日，到期後 `/r/pro/*` 回 403，已經裝進專案的 block 照常可用。
+到期前 7 天 `/api/cron/renewals` 寄提醒信，續約就是用同一個 email 再買一期，同一把授權碼往後延。
+Vercel 要設 `CRON_SECRET`，否則提醒信不會寄出。退款一期訂閱只會把到期日往回扣一期，不會撤銷整把授權。
 
 - SHOPLINE 後台，設定、開發者管理、Webhook 管理，新增 `https://sunui.synvize.com/api/shopline/webhook`，勾選 `trade.succeeded`、`trade.failed`、`trade.expired`、`trade.refund.succeeded` 與 `dispute.*`。這一列的 Sign Key 填進 `SHOPLINE_SIGN_KEY`。
 - 商家 ID 與 API key 和其他產品相同，填進 `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`。

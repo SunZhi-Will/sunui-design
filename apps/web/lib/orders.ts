@@ -1,23 +1,26 @@
 // 訂單與授權碼，存在 Upstash Redis（SHOPLINE 只負責收款，沒有訂單後台與授權碼）。
 //
-// order:{id}          hash：plan、amountTwd、email、status、createdAt、paidAt、sessionId、tradeId、licenseId、keyEnc、viewToken、refundedTwd
+// order:{id}          hash：plan、amountTwd、email、status、createdAt、paidAt、sessionId、tradeId、licenseId、keyEnc、viewToken、refundedTwd、
+//                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）
 // orders              zset：createdAt → 訂單編號（後台列表）
 // ordersession:{sid}  string：SHOPLINE sessionId → 訂單編號
 // ordertrade:{tid}    string：SHOPLINE tradeOrderId → 訂單編號（退款、爭議的通知只帶這個）
 // order:{id}:fulfill  string：入帳鎖（SET NX），重複的付款通知不會發兩把授權碼
-// license:{hash}      hash：id、orderId、plan、status（active / revoked）、email、createdAt、display
+// license:{hash}      hash：id、orderId、plan、status（active / revoked）、email、createdAt、display、
+//                     expiresAt（只有訂閱有）、remindedFor（已寄過到期提醒的 expiresAt）
 // licid:{id}          string：授權 id → 授權碼雜湊
 // licenses            zset：createdAt → 授權 id
+// licsub:{emailHash}  string：email → 這個人的訂閱授權 id。再買一期就延長這把，授權碼不變
 // seats:founding      counter：已付款的 Founding 筆數（退款會扣回）
 // webhook:log         list：最近 200 則付款通知的處理結果（不含個資）
 //
-// 訂單與授權不設過期：這是帳務資料。
+// 訂單與授權不設過期：這是帳務資料。訂閱的「到期」是授權上的 expiresAt，不是 Redis TTL。
 
-import { displayKey, encryptLicenseKey, generateLicenseKey, hashLicenseKey } from "./license-key";
-import { hashToStrings, pipeline, randomHex, type RedisCommand } from "./redis";
+import { decryptLicenseKey, displayKey, encryptLicenseKey, generateLicenseKey, hashLicenseKey } from "./license-key";
+import { hashToStrings, pipeline, randomHex, sha256, type RedisCommand } from "./redis";
 import type { WebhookIds } from "./shopline-core";
 import { ORDER_PATTERN } from "./shopline-core";
-import { pricesTwd, type Plan } from "./site";
+import { addTerm, isSubscription, pricesTwd, type Plan } from "./site";
 
 /** 完成頁只對「發起結帳的那個瀏覽器」顯示授權碼：cookie 存訂單編號與 viewToken。 */
 export const ORDER_COOKIE = "sunui_order";
@@ -40,6 +43,10 @@ export type Order = {
   refundedTwd?: number;
   /** 後台「測試 SHOPLINE 連線」建立的訂單，不算進統計 */
   test?: boolean;
+  /** 訂閱續約：延長了既有授權，沒有發新的授權碼 */
+  renewal?: boolean;
+  /** 訂閱：這筆付款之後授權的到期時間 */
+  periodEnd?: string;
 };
 
 export type License = {
@@ -50,7 +57,19 @@ export type License = {
   email: string;
   createdAt: string;
   display: string;
+  /** 訂閱的到期時間；買斷沒有 */
+  expiresAt?: string;
+  remindedFor?: string;
 };
+
+/** 訂閱過了到期時間。買斷永遠回 false。 */
+export function licenseExpired(license: Pick<License, "expiresAt">, now = new Date()) {
+  return Boolean(license.expiresAt) && new Date(license.expiresAt!).getTime() <= now.getTime();
+}
+
+async function subscriptionKey(email: string) {
+  return `licsub:${(await sha256(`licsub:${email.trim().toLowerCase()}`)).slice(0, 32)}`;
+}
 
 async function run(commands: RedisCommand[]) {
   const replies = await pipeline(commands);
@@ -77,6 +96,8 @@ function toOrder(raw: Record<string, string>): Order | null {
     viewToken: raw.viewToken ?? "",
     refundedTwd: raw.refundedTwd ? Number(raw.refundedTwd) : undefined,
     test: raw.test === "1",
+    renewal: raw.renewal === "1",
+    periodEnd: raw.periodEnd || undefined,
   };
 }
 
@@ -90,6 +111,8 @@ function toLicense(raw: Record<string, string>): License | null {
     email: raw.email ?? "",
     createdAt: raw.createdAt,
     display: raw.display,
+    expiresAt: raw.expiresAt || undefined,
+    remindedFor: raw.remindedFor || undefined,
   };
 }
 
@@ -146,14 +169,66 @@ export async function findOrder(ids: WebhookIds) {
  * 入帳：發一把授權碼、訂單標成已付款。用 SET NX 上鎖，重複的通知回 null（不會發第二把）。
  * secret 用來加密一份授權碼存在訂單裡，讓完成頁可以再顯示。
  */
-export async function fulfillOrder(order: Order, tradeId: string, secret: string) {
+export type Fulfilled = {
+  /** 授權碼原文。續約時從原訂單解密取得，解不開（換過 SUNUI_ADMIN_TOKEN）時是 null */
+  key: string | null;
+  licenseId: string;
+  renewal: boolean;
+  expiresAt?: string;
+};
+
+/** 依授權 id 取授權（連同雜湊，續約要寫回去）。 */
+async function licenseById(licenseId: string) {
+  const [h] = await run([["GET", `licid:${licenseId}`]]);
+  if (typeof h.result !== "string") return null;
+  const [r] = await run([["HGETALL", `license:${h.result}`]]);
+  const license = toLicense(hashToStrings(r.result));
+  return license ? { license, hash: h.result } : null;
+}
+
+/**
+ * 入帳：訂單標成已付款，並發授權。用 SET NX 上鎖，重複的通知回 null（不會發第二把）。
+ * 訂閱方案：同一個 email 已經有沒被撤銷的訂閱授權時，延長那一把（從目前到期日或現在，取較晚的往後加一期），
+ * 授權碼不變，客戶不用改 .env.local。
+ * secret 用來加密一份授權碼存在訂單裡，讓完成頁可以再顯示。
+ */
+export async function fulfillOrder(order: Order, tradeId: string, secret: string): Promise<Fulfilled | null> {
   const [lock] = await run([["SET", `order:${order.id}:fulfill`, "1", "NX"]]);
   if (lock.result !== "OK") return null;
+
+  const nowDate = new Date();
+  const now = nowDate.toISOString();
+  const paidFields = ["status", "paid", "paidAt", now, ...(tradeId ? ["tradeId", tradeId] : [])];
+  const tradeIndex: RedisCommand[] = tradeId ? [["SET", `ordertrade:${tradeId}`, order.id]] : [];
+
+  if (isSubscription(order.plan)) {
+    const subKey = await subscriptionKey(order.email);
+    const [existingId] = await run([["GET", subKey]]);
+    const existing = typeof existingId.result === "string" ? await licenseById(existingId.result) : null;
+    if (existing && existing.license.status === "active") {
+      const current = existing.license.expiresAt ? new Date(existing.license.expiresAt) : nowDate;
+      const expiresAt = addTerm(order.plan, current > nowDate ? current : nowDate).toISOString();
+      const original = await getOrder(existing.license.orderId);
+      const keyEnc = original?.keyEnc ?? "";
+      await run([
+        // 方案跟著最新一期走（月訂改年訂時後台顯示年訂）
+        ["HSET", `license:${existing.hash}`, "expiresAt", expiresAt, "plan", order.plan],
+        ["HSET", `order:${order.id}`, ...paidFields, "licenseId", existing.license.id, "renewal", "1", "periodEnd", expiresAt, ...(keyEnc ? ["keyEnc", keyEnc] : [])],
+        ...tradeIndex,
+      ]);
+      return {
+        key: keyEnc ? await decryptLicenseKey(keyEnc, secret) : null,
+        licenseId: existing.license.id,
+        renewal: true,
+        expiresAt,
+      };
+    }
+  }
 
   const key = generateLicenseKey();
   const hash = await hashLicenseKey(key);
   const licenseId = `lic_${randomHex(8)}`;
-  const now = new Date().toISOString();
+  const expiresAt = isSubscription(order.plan) ? addTerm(order.plan, nowDate).toISOString() : undefined;
   const license: License = {
     id: licenseId,
     orderId: order.id,
@@ -162,17 +237,19 @@ export async function fulfillOrder(order: Order, tradeId: string, secret: string
     email: order.email,
     createdAt: now,
     display: displayKey(key),
+    ...(expiresAt ? { expiresAt } : {}),
   };
   const commands: RedisCommand[] = [
     ["HSET", `license:${hash}`, ...Object.entries(license).flatMap(([k, v]) => [k, String(v)])],
     ["SET", `licid:${licenseId}`, hash],
     ["ZADD", "licenses", Date.now(), licenseId],
-    ["HSET", `order:${order.id}`, "status", "paid", "paidAt", now, "licenseId", licenseId, "keyEnc", await encryptLicenseKey(key, secret), ...(tradeId ? ["tradeId", tradeId] : [])],
+    ["HSET", `order:${order.id}`, ...paidFields, "licenseId", licenseId, "keyEnc", await encryptLicenseKey(key, secret), ...(expiresAt ? ["periodEnd", expiresAt] : [])],
+    ...tradeIndex,
   ];
-  if (tradeId) commands.push(["SET", `ordertrade:${tradeId}`, order.id]);
+  if (expiresAt) commands.push(["SET", await subscriptionKey(order.email), licenseId]);
   if (order.plan === "founding") commands.push(["INCR", "seats:founding"]);
   await run(commands);
-  return { key, licenseId };
+  return { key, licenseId, renewal: false, expiresAt };
 }
 
 async function setLicenseStatus(licenseId: string | undefined, status: License["status"]) {
@@ -181,7 +258,11 @@ async function setLicenseStatus(licenseId: string | undefined, status: License["
   if (typeof r.result === "string") await run([["HSET", `license:${r.result}`, "status", status]]);
 }
 
-/** 全額退款：訂單標成已退款、授權撤銷、Founding 名額扣回。部分退款或金額不明時只記下來，留給人看。 */
+/**
+ * 全額退款：訂單標成已退款、Founding 名額扣回。部分退款或金額不明時只記下來，留給人看。
+ * 買斷：授權撤銷。訂閱：到期日往回扣一期（退的是續約那一期時，前面已付的期間照常有效；
+ * 退的是唯一一期時，扣完就等於已到期）。
+ */
 export async function refundOrder(order: Order, refunded: number | null) {
   if (order.status === "refunded") return "duplicate";
   if (refunded !== null) await run([["HSET", `order:${order.id}`, "refundedTwd", Math.round(refunded / 100)]]);
@@ -190,8 +271,31 @@ export async function refundOrder(order: Order, refunded: number | null) {
     ["HSET", `order:${order.id}`, "status", "refunded"],
     ...(order.plan === "founding" ? [["DECR", "seats:founding"] as RedisCommand] : []),
   ]);
+  if (isSubscription(order.plan) && order.licenseId) {
+    const found = await licenseById(order.licenseId);
+    if (found?.license.expiresAt) {
+      const shortened = addTerm(order.plan, new Date(found.license.expiresAt), -1).toISOString();
+      await run([["HSET", `license:${found.hash}`, "expiresAt", shortened]]);
+    }
+    return "refunded";
+  }
   await setLicenseStatus(order.licenseId, "revoked");
   return "refunded";
+}
+
+/** 到期提醒：expiresAt 落在 [now, now + withinMs) 而且這個到期日還沒提醒過的訂閱授權。 */
+export async function licensesToRemind(withinMs: number, now = new Date()) {
+  const all = await listLicenses(5000);
+  return all.filter((l) => {
+    if (l.status !== "active" || !l.expiresAt || l.remindedFor === l.expiresAt) return false;
+    const left = new Date(l.expiresAt).getTime() - now.getTime();
+    return left > 0 && left < withinMs;
+  });
+}
+
+export async function markReminded(license: License) {
+  const found = await licenseById(license.id);
+  if (found && license.expiresAt) await run([["HSET", `license:${found.hash}`, "remindedFor", license.expiresAt]]);
 }
 
 /** 拒付（chargeback）：持卡人已經在要回這筆錢，授權先撤銷，訂單標成爭議中。 */

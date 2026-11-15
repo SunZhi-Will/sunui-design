@@ -2,7 +2,7 @@
 
 import { daysBetween } from "./admin";
 import { licenseUsage, type LicenseUsage } from "./events";
-import { listLicenses, type License } from "./orders";
+import { licenseExpired, listLicenses, type License } from "./orders";
 import { redisEnabled } from "./redis";
 
 /** 買超過這麼多天仍然 0 安裝，列入沉睡名單。 */
@@ -21,7 +21,7 @@ export async function licenseOverview(now = new Date()) {
   const usage = licenses.length ? await licenseUsage(licenses.map((l) => l.id)).catch(() => null) : null;
   const rows: LicenseRow[] = licenses.map((l) => ({ ...l, usage: usage?.get(l.id) ?? { count: 0, blocks: [] } }));
   const iso = now.toISOString();
-  const granted = rows.filter((r) => r.status === "active");
+  const granted = rows.filter((r) => r.status === "active" && !licenseExpired(r));
   const activated = granted.filter((r) => r.usage.count > 0);
   const dormant = granted.filter((r) => r.usage.count === 0 && daysBetween(r.createdAt, iso) >= DORMANT_DAYS);
   const firstInstallDays = activated.flatMap((r) => (r.usage.first ? [daysBetween(r.createdAt, r.usage.first)] : []));

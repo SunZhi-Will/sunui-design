@@ -11,7 +11,7 @@ import { BarList, DataTable, EmptyState, KpiStrip, Notice, PageHeader, pct, Sect
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "訂單" };
 
-const PLAN_LABEL: Record<Plan, string> = { founding: "Founding", pro: "Pro", team: "Team" };
+const PLAN_LABEL: Record<Plan, string> = { founding: "Founding", pro: "Pro", team: "Team", monthly: "月訂", yearly: "年訂" };
 const STATUS: Record<Order["status"], { label: string; tone: "ok" | "warn" | "bad" | "idle" }> = {
   paid: { label: "已付款", tone: "ok" },
   pending: { label: "未完成", tone: "idle" },
