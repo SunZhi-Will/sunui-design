@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { checkoutCopy } from "@/lib/checkout-copy";
+import { googleClientId } from "@/lib/google-auth";
 import { getLocale } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { foundingSold } from "@/lib/orders";
@@ -118,7 +119,9 @@ export default async function CheckoutPage({
           <CheckoutForm
             plan={plan}
             currency={currency}
-            t={{ emailLabel: t.emailLabel, emailHint: t.emailHint, pay: t.pay, paying: t.paying }}
+            googleClientId={googleClientId()}
+            locale={locale}
+            t={{ emailLabel: t.emailLabel, emailHint: t.emailHint, pay: t.pay, paying: t.paying, google: t.google }}
           />
         </div>
         <p className="mt-4 text-xs text-subtle">

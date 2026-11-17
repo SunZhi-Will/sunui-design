@@ -3,8 +3,9 @@
 import { useActionState } from "react";
 
 import { Icon } from "../icons";
-import { requestLoginLink, type LoginState } from "./actions";
-import { GoogleButton } from "./google-button";
+import { GoogleButton } from "@/components/google-button";
+
+import { loginWithGoogle, requestLoginLink, type LoginState } from "./actions";
 
 const INPUT =
   "h-11 w-full rounded-lg border border-line bg-bg px-3.5 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-subtle/60 focus:border-fg focus:shadow-[0_0_0_3px_var(--muted)]";
@@ -35,7 +36,11 @@ export function LoginForm({ googleClientId }: { googleClientId?: string }) {
     <div>
       {googleClientId && (
         <>
-          <GoogleButton clientId={googleClientId} />
+          <GoogleButton
+            clientId={googleClientId}
+            onCredential={async (credential) => (await loginWithGoogle(credential))?.error}
+            labels={{ idle: "使用 Google 帳號登入", pending: "驗證 Google 帳號中…", loadError: "無法載入 Google 登入，請改用 email。" }}
+          />
           <div className="my-6 flex items-center gap-3 text-xs text-subtle">
             <span className="h-px flex-1 bg-line" />或用 email<span className="h-px flex-1 bg-line" />
           </div>

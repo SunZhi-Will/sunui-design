@@ -41,6 +41,16 @@ type Copy = {
   emailHint: string;
   pay: string;
   paying: string;
+  /** 結帳頁「用 Google 繼續」：帶入 Google 驗證過的 email */
+  google: {
+    button: string;
+    pending: string;
+    loadError: string;
+    failed: string;
+    divider: string;
+    filled: string;
+    change: string;
+  };
   terms: string;
   secure: string;
   secureUsd: string;
@@ -116,6 +126,15 @@ const en: Copy = {
   emailHint: "Your license key is sent here and shown on the next page.",
   pay: "Continue to payment",
   paying: "Opening payment…",
+  google: {
+    button: "Continue with Google",
+    pending: "Checking your Google account…",
+    loadError: "Google sign-in could not load. Type your email below instead.",
+    failed: "Could not read your Google email. Type it below instead.",
+    divider: "or type your email",
+    filled: "Verified by Google",
+    change: "Use another email",
+  },
   terms: "By paying you agree to the SunUI license.",
   secure: "Card payment is handled by SHOPLINE Payments. SunUI never sees your card.",
   secureUsd: "Payment is handled by Polar, our reseller and merchant of record. SunUI never sees your card.",
@@ -197,6 +216,15 @@ const zhTW: Copy = {
   emailHint: "授權碼會寄到這裡，下一頁也會直接顯示。",
   pay: "前往付款",
   paying: "開啟付款頁中…",
+  google: {
+    button: "使用 Google 帳號繼續",
+    pending: "確認 Google 帳號中…",
+    loadError: "無法載入 Google 登入，請直接在下方輸入 email。",
+    failed: "讀不到 Google 帳號的 email，請直接在下方輸入。",
+    divider: "或輸入 email",
+    filled: "已由 Google 驗證",
+    change: "改用其他 email",
+  },
   terms: "付款即表示同意 SunUI 授權條款。",
   secure: "信用卡付款由 SHOPLINE Payments 處理，SunUI 不會看到你的卡號。",
   secureUsd: "美金付款由 Polar 處理（代收並開立收據），SunUI 不會看到你的卡號。",
@@ -278,6 +306,15 @@ const zhCN: Copy = {
   emailHint: "授权码会寄到这里，下一页也会直接显示。",
   pay: "前往付款",
   paying: "正在打开付款页…",
+  google: {
+    button: "使用 Google 账号继续",
+    pending: "正在确认 Google 账号…",
+    loadError: "无法加载 Google 登录，请直接在下方输入邮箱。",
+    failed: "读取不到 Google 账号的邮箱，请直接在下方输入。",
+    divider: "或输入邮箱",
+    filled: "已由 Google 验证",
+    change: "改用其他邮箱",
+  },
   terms: "付款即表示同意 SunUI 授权条款。",
   secure: "信用卡付款由 SHOPLINE Payments 处理，SunUI 不会看到你的卡号。",
   secureUsd: "美元付款由 Polar 处理（代收并开具收据），SunUI 不会看到你的卡号。",
@@ -359,6 +396,15 @@ const ja: Copy = {
   emailHint: "ライセンスキーはここに届き、次のページにも表示されます。",
   pay: "支払いへ進む",
   paying: "支払いページを開いています…",
+  google: {
+    button: "Google で続ける",
+    pending: "Google アカウントを確認しています…",
+    loadError: "Google ログインを読み込めませんでした。下にメールアドレスを入力してください。",
+    failed: "Google アカウントのメールアドレスを取得できませんでした。下に入力してください。",
+    divider: "またはメールアドレスを入力",
+    filled: "Google で確認済み",
+    change: "別のメールアドレスにする",
+  },
   terms: "お支払いにより SunUI ライセンスに同意したものとみなされます。",
   secure: "カード決済は SHOPLINE Payments が処理します。SunUI がカード番号を見ることはありません。",
   secureUsd: "米ドルの決済は販売代理の Polar が処理し、領収書も発行します。SunUI がカード番号を見ることはありません。",

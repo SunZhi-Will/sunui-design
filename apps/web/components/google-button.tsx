@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 
-import { loginWithGoogle } from "./actions";
+import { cn } from "@/lib/utils";
 
 type GoogleId = {
   initialize: (options: { client_id: string; callback: (response: { credential: string }) => void; ux_mode?: string }) => void;
@@ -26,15 +26,33 @@ function GoogleMark() {
   );
 }
 
+export type GoogleButtonLabels = { idle: string; pending: string; loadError: string };
+
 /**
- * Google 登入（Google Identity Services）。
+ * Google 登入按鈕（Google Identity Services），後台登入與結帳共用。
  * 看得到的是自己畫的按鈕，跟著主題和其他輸入框同樣的圓角、高度；
  * Google 官方按鈕（iframe）透明疊在上面，實際點到的是它，所以仍然走官方的 ID token 流程。
- * 拿到 ID token 後交給 server action 驗證，白名單內的帳號才會登入。
+ * 拿到 ID token 後交給 onCredential（呼叫 server action 驗證），回傳字串代表錯誤訊息。
  */
-export function GoogleButton({ clientId }: { clientId: string }) {
+export function GoogleButton({
+  clientId,
+  onCredential,
+  labels,
+  locale = "zh-TW",
+  className,
+}: {
+  clientId: string;
+  onCredential: (credential: string) => Promise<string | undefined>;
+  labels: GoogleButtonLabels;
+  /** 官方按鈕的語系（看不到，但影響無障礙名稱） */
+  locale?: string;
+  /** 看得到的按鈕外觀（底色、邊框）；預設是深色主按鈕 */
+  className?: string;
+}) {
   const frame = useRef<HTMLDivElement>(null);
   const target = useRef<HTMLDivElement>(null);
+  const handler = useRef(onCredential);
+  handler.current = onCredential;
   const [error, setError] = useState<string>();
   const [ready, setReady] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -58,9 +76,9 @@ export function GoogleButton({ clientId }: { clientId: string }) {
         theme: "outline",
         size: "large",
         shape: "rectangular",
-        text: "signin_with",
+        text: "continue_with",
         width: String(next),
-        locale: "zh-TW",
+        locale,
       });
       setReady(true);
     };
@@ -73,8 +91,8 @@ export function GoogleButton({ clientId }: { clientId: string }) {
         callback: ({ credential }) => {
           setError(undefined);
           startTransition(async () => {
-            const result = await loginWithGoogle(credential);
-            if (result?.error) setError(result.error);
+            const message = await handler.current(credential);
+            if (message) setError(message);
           });
         },
       });
@@ -90,14 +108,16 @@ export function GoogleButton({ clientId }: { clientId: string }) {
       script.src = "https://accounts.google.com/gsi/client";
       script.async = true;
       script.onload = start;
-      script.onerror = () => setError("無法載入 Google 登入，請改用 email。");
+      script.onerror = () => setError(labels.loadError);
       document.head.append(script);
     }
     return () => {
       observer?.disconnect();
       script?.remove();
     };
-  }, [clientId]);
+    // labels.loadError 只在載入失敗時讀一次，不需要因為它重跑
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId, locale]);
 
   const busy = !ready || pending;
 
@@ -105,24 +125,26 @@ export function GoogleButton({ clientId }: { clientId: string }) {
     <div>
       <div
         ref={frame}
-        className="group relative h-11 w-full overflow-hidden rounded-lg bg-fg text-bg transition-opacity hover:opacity-90"
+        className={cn(
+          "group relative h-11 w-full overflow-hidden rounded-lg transition-opacity hover:opacity-90",
+          className ?? "bg-fg text-bg",
+        )}
       >
         {/* 看得到的按鈕 */}
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 flex items-center justify-center gap-2.5 text-sm font-medium transition-opacity ${busy ? "opacity-50" : ""}`}
-        >
-          {pending ? (
-            <span className="size-4 animate-spin rounded-full border-2 border-bg/30 border-t-bg" />
-          ) : (
-            <GoogleMark />
+          className={cn(
+            "pointer-events-none absolute inset-0 flex items-center justify-center gap-2.5 text-sm font-medium transition-opacity",
+            busy && "opacity-50",
           )}
-          {pending ? "驗證 Google 帳號中…" : "使用 Google 帳號登入"}
+        >
+          {pending ? <span className="size-4 animate-spin rounded-full border-2 border-current/30 border-t-current" /> : <GoogleMark />}
+          {pending ? labels.pending : labels.idle}
         </div>
         {/* 官方按鈕：透明、置中蓋在上面，負責真正的點擊 */}
         <div
           ref={target}
-          className={`absolute inset-0 flex items-center justify-center opacity-[0.01] [&_iframe]:!m-0 ${pending ? "pointer-events-none" : ""}`}
+          className={cn("absolute inset-0 flex items-center justify-center opacity-[0.01] [&_iframe]:!m-0", pending && "pointer-events-none")}
         />
       </div>
       {error && (

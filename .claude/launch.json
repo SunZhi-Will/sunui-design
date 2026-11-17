@@ -147,7 +147,8 @@
         "KV_REST_API_URL": "http://localhost:8799",
         "KV_REST_API_TOKEN": "local",
         "SUNUI_ADMIN_TOKEN": "local-dev-admin-token-only",
-        "CRON_SECRET": "local-cron"
+        "CRON_SECRET": "local-cron",
+        "GOOGLE_CLIENT_ID": "385022749974-54lnlukhs3f0024argdkhah4t046cice.apps.googleusercontent.com"
       }
     }
   ]
