@@ -209,7 +209,7 @@ export function AdminSidebar({
                     <span className={s.ok ? "text-fg" : undefined}>{s.label}</span>
                     {!s.ok && <span>未設定</span>}
                   </span>
-                  {s.ok && s.detail && <span className="block truncate pl-3 text-[11px]">{s.detail}</span>}
+                  {s.ok && s.detail && <span className="block pl-3 text-[11px] leading-snug whitespace-normal">{s.detail}</span>}
                 </li>
               ))}
             </ul>

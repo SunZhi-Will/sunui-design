@@ -6,6 +6,7 @@ import { formatDate, isAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { RAIL_COOKIE } from "@/lib/admin-session";
 import { webhookLast } from "@/lib/events";
+import { polarConfigured } from "@/lib/polar";
 import { redisEnabled } from "@/lib/redis";
 import { foundingState, foundingWindow, salesOpen, shoplineConfigured } from "@/lib/site";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
@@ -35,14 +36,26 @@ function countdown(now = new Date()) {
 async function sources(): Promise<SourceStatus[]> {
   const redis = redisEnabled();
   const last = redis ? await webhookLast().catch(() => null) : null;
-  const latest = last ? Object.values(last).sort().at(-1) : undefined;
+  // webhook:last 的欄位：Polar 寫 `polar:<事件>`（驗簽失敗是 `polar`），其餘是 SHOPLINE
+  const latest = (polar: boolean) =>
+    Object.entries(last ?? {})
+      .filter(([type]) => type.startsWith("polar") === polar)
+      .map(([, at]) => at)
+      .sort()
+      .at(-1);
+  const notice = (at: string | undefined) => (at ? `最後通知 ${formatDate(at)}` : "尚未收到通知");
+  const open = salesOpen() ? "已開賣" : "未開賣";
   return [
-    { label: "Upstash Redis", ok: redis, detail: "安裝、Pro 使用、漏斗" },
-    { label: "SHOPLINE", ok: shoplineConfigured(), detail: `${process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境"}，${salesOpen() ? "已開賣" : "未開賣"}` },
+    { label: "Upstash Redis", ok: redis, detail: "訂單、授權、安裝、漏斗" },
     {
-      label: "付款通知",
-      ok: Boolean(process.env.SHOPLINE_SIGN_KEY),
-      detail: latest ? `最後收到 ${formatDate(latest)}` : "尚未收到事件",
+      label: "SHOPLINE（新台幣）",
+      ok: shoplineConfigured(),
+      detail: `${process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境"}，${open}；${notice(latest(false))}`,
+    },
+    {
+      label: "Polar（美金）",
+      ok: polarConfigured(),
+      detail: `${process.env.POLAR_ENV === "live" ? "正式環境" : process.env.POLAR_ENV === "dev" ? "本機直接入帳" : "sandbox"}，${open}；${notice(latest(true))}`,
     },
   ];
 }

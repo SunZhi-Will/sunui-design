@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { formatDate, maskEmail, requireAdmin } from "@/lib/admin";
-import { listOrders, orderAmountLabel, sumByCurrency, webhookLog, type Order } from "@/lib/orders";
+import { listAllOrders, orderAmountLabel, sumByCurrency, webhookLog, type Order } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 import { salesOpen, shoplineConfigured, type Plan } from "@/lib/site";
 
@@ -33,6 +33,13 @@ const RESULT_TONE: Record<string, "ok" | "warn" | "bad" | "idle"> = {
   store_failed: "bad",
 };
 
+const TABLE_LIMIT = 500;
+
+/** 付款通知來源：Polar 的事件寫成 `polar:<type>`（驗簽失敗是 `polar`），其餘是 SHOPLINE。 */
+function webhookProvider(type: string) {
+  return type.startsWith("polar") ? "Polar" : "SHOPLINE";
+}
+
 // 新台幣（SHOPLINE）與美金（Polar）分開列，不換算
 const money = (n: { twd: number; usd: number }) =>
   [`NT$${n.twd.toLocaleString("en-US")}`, ...(n.usd ? [`US$${n.usd.toLocaleString("en-US")}`] : [])].join(" + ");
@@ -52,7 +59,7 @@ export default async function AdminOrders() {
     );
   }
 
-  const [orders, log] = await Promise.all([listOrders().catch(() => null), webhookLog(30).catch(() => [])]);
+  const [orders, log] = await Promise.all([listAllOrders().catch(() => null), webhookLog(30).catch(() => [])]);
   if (!orders) {
     return (
       <>
@@ -68,6 +75,9 @@ export default async function AdminOrders() {
   const finished = real.filter((o) => o.status !== "pending");
   const sales = sumByCurrency(paid);
   const attention = real.filter((o) => o.status === "amount_mismatch" || o.status === "disputed");
+
+  // 統計用全部訂單，明細只列最新的 TABLE_LIMIT 筆
+  const recent = orders.slice(0, TABLE_LIMIT);
 
   const byPlan = new Map<Plan, Order[]>();
   for (const o of paid) byPlan.set(o.plan, [...(byPlan.get(o.plan) ?? []), o]);
@@ -106,7 +116,11 @@ export default async function AdminOrders() {
         />
       </Section>
 
-      <Section title="訂單明細" description={`最近 ${orders.length} 筆（最多 500 筆），時間為台北時間`} flush>
+      <Section title="訂單明細" description={
+          orders.length > TABLE_LIMIT
+            ? `共 ${orders.length} 筆，列出最新 ${TABLE_LIMIT} 筆；上方統計含全部訂單。時間為台北時間`
+            : `共 ${orders.length} 筆，時間為台北時間`
+        } flush>
         <DataTable
           columns={[
             { label: "時間" },
@@ -116,7 +130,7 @@ export default async function AdminOrders() {
             { label: "金額", num: true },
             { label: "狀態" },
           ]}
-          rows={orders.map((o) => [
+          rows={recent.map((o) => [
             <span key="t" className="whitespace-nowrap text-subtle tabular-nums">
               {formatDate(o.createdAt)}
             </span>,
@@ -149,15 +163,18 @@ export default async function AdminOrders() {
         </Section>
       )}
 
-      <Section title="付款通知紀錄" description="SHOPLINE 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
+      <Section title="付款通知紀錄" description="SHOPLINE 與 Polar 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
         <DataTable
-          columns={[{ label: "時間" }, { label: "事件" }, { label: "訂單", hideOnMobile: true }, { label: "結果" }]}
+          columns={[{ label: "時間" }, { label: "來源" }, { label: "事件" }, { label: "訂單", hideOnMobile: true }, { label: "結果" }]}
           rows={log.map((e) => [
             <span key="t" className="whitespace-nowrap text-subtle tabular-nums">
               {formatDate(e.at)}
             </span>,
+            <span key="p" className="whitespace-nowrap text-xs">
+              {webhookProvider(e.type)}
+            </span>,
             <code key="e" className="font-mono text-xs">
-              {e.type || "（無）"}
+              {e.type.replace(/^polar:?/, "") || "（無）"}
             </code>,
             <code key="o" className="font-mono text-xs text-subtle">
               {e.order ?? ""}

@@ -2,7 +2,8 @@ import { requireAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
 import { installStats } from "@/lib/installs";
-import { listOrders, sumByCurrency, type Order } from "@/lib/orders";
+import { foundingSold, listAllOrders, sumByCurrency, type Order } from "@/lib/orders";
+import { polarConfigured } from "@/lib/polar";
 import { redisEnabled } from "@/lib/redis";
 import { foundingState, foundingWindow, shoplineConfigured } from "@/lib/site";
 
@@ -54,16 +55,18 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
   await requireAdmin();
   const days = parseRange((await searchParams).days);
 
-  const [installs, events, orderList, licenses] = await Promise.all([
+  const [installs, events, orderList, licenses, foundingCount] = await Promise.all([
     installStats(days * 2).catch(() => null),
     eventStats(days * 2).catch(() => null),
-    redisEnabled() ? listOrders().catch(() => null) : Promise.resolve(null),
+    redisEnabled() ? listAllOrders().catch(() => null) : Promise.resolve(null),
     licenseOverview(),
+    redisEnabled() ? foundingSold().catch(() => null) : Promise.resolve(null),
   ]);
 
   const orders: Order[] = (orderList ?? []).filter((o) => !o.test);
   const counted = orders.filter((o) => o.status === "paid");
-  const founding = counted.filter((o) => o.plan === "founding").length;
+  // Founding 筆數以 seats:founding 計數器為準（付款加一、退款扣回，也是賣完判斷用的同一個數字）
+  const founding = foundingCount ?? counted.filter((o) => o.plan === "founding").length;
   const sales = sumByCurrency(counted);
   // 本期建立的結帳與成功付款（SunUI 自己的訂單，結帳頁送出 email 才會建立）
   const since = Date.now() - days * 86_400_000;
@@ -106,7 +109,8 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
 
   const missing = [
     !redisEnabled() && "Upstash Redis（訂單、授權、安裝與漏斗計數）",
-    !shoplineConfigured() && "SHOPLINE（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
+    !shoplineConfigured() && "SHOPLINE 新台幣收款（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
+    !polarConfigured() && "Polar 美金收款（POLAR_ACCESS_TOKEN、POLAR_WEBHOOK_SECRET、POLAR_PRODUCT_IDS）",
   ].filter(Boolean) as string[];
   const errors = redisEnabled() && (!orderList || !licenses.ok) ? ["讀不到 Redis 的訂單或授權資料"] : [];
 
@@ -114,7 +118,7 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
     <>
       <PageHeader
         title="總覽"
-        description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC，金額為新台幣。`}
+        description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC；新台幣與美金分開列，不換算。`}
         actions={<RangeTabs value={days} basePath="/admin" />}
       />
 
@@ -209,7 +213,7 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
               { label: "定價頁瀏覽", value: funnel?.pricing_view ?? (funnel ? 0 : undefined), source: "本站" },
               { label: "點結帳", value: checkoutClicks, source: "本站" },
               { label: "填完 email 前往付款", value: orderList ? periodOrders.length : undefined, source: "結帳頁" },
-              { label: "付款成功", value: orderList ? periodPaid.length : undefined, source: "SHOPLINE 通知" },
+              { label: "付款成功", value: orderList ? periodPaid.length : undefined, source: "SHOPLINE、Polar 通知" },
             ]}
           />
         </Section>

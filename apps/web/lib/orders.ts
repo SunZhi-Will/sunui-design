@@ -466,6 +466,32 @@ export async function foundingSold() {
   return Math.max(0, Number(r.result) || 0);
 }
 
+/** 訂單總數（含未付款與測試）。 */
+export async function countOrders() {
+  const [r] = await run([["ZCARD", "orders"]]);
+  return Number(r.result) || 0;
+}
+
+/**
+ * 全部訂單（新的在前），每批 500 筆分次讀。後台的累計數字用這個：
+ * 每次結帳頁送出 email 都會建立一筆訂單（含放棄付款的），只看最近 500 筆會讓舊的已付款訂單掉出統計。
+ */
+export async function listAllOrders(batch = 500) {
+  const all: Order[] = [];
+  for (let start = 0; ; start += batch) {
+    const [ids] = await run([["ZREVRANGE", "orders", start, start + batch - 1]]);
+    const list = Array.isArray(ids.result) ? ids.result.map(String) : [];
+    if (list.length === 0) break;
+    const replies = await run(list.map((id) => ["HGETALL", `order:${id}`]));
+    for (const r of replies) {
+      const order = toOrder(hashToStrings(r.result));
+      if (order) all.push(order);
+    }
+    if (list.length < batch) break;
+  }
+  return all;
+}
+
 /** 最新的訂單（新的在前）。 */
 export async function listOrders(limit = 500) {
   const [ids] = await run([["ZREVRANGE", "orders", 0, limit - 1]]);
