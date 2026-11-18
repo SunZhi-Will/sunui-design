@@ -221,7 +221,7 @@ function RelatedBlocks({ item, m, locale }: { item: Item; m: Messages; locale: L
     .filter((other) => other.name !== item.name)
     .map((other) => ({
       other,
-      // 同系列優先，避免紙感頁面推薦遊戲介面
+      // 同系列優先，避免核心元件頁推薦遊戲介面
       score:
         (seriesOf(other) === seriesOf(item) ? 4 : 0) +
         (other.meta.interaction === item.meta.interaction ? 2 : 0) +

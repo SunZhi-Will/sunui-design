@@ -1,8 +1,9 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState, type CSSProperties } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import type { Messages } from "@/lib/messages";
 import { spotKeys, spotSwatches, type SpotKey } from "@/lib/spot";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,7 @@ import { cn } from "@/lib/utils";
 type CompareMessages = Messages["home"]["compare"];
 
 /**
- * 首頁主視覺：同一張優惠券，左邊是 AI 工具最常產出的樣子，右邊是 SunUI 的紙感版本。
+ * 首頁主視覺：同一張優惠券，左邊是 AI 工具最常產出的樣子，右邊是 SunUI 的質感版本。
  * 拖動中線比較。用原生 range input 當控制項，鍵盤、觸控、讀屏都直接可用。
  * 只在使用者拖動時改變，不自動播放（DESIGN.md：不做常駐循環）。
  * 下方的色票把右邊的券換成買家的品牌色：SunUI 不替你選顏色，顏色是你的（reports/網站灰階單調診斷-2026-11-08.md）。
@@ -26,7 +27,7 @@ export function HeroCompare({ m }: { m: CompareMessages }) {
   return (
     <figure className="w-full">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-line bg-stage select-none sm:aspect-[5/4]">
-        {/* 右邊（After）：SunUI 紙感，墊在底層 */}
+        {/* 右邊（After）：SunUI 質感版，墊在底層 */}
         <div
           style={spotStyle}
           className={cn(
@@ -34,7 +35,7 @@ export function HeroCompare({ m }: { m: CompareMessages }) {
             spotStyle && "dark:[--sunui-spot-foreground:#0a0a0a] dark:[--sunui-spot:var(--spot-dark)]",
           )}
         >
-          <PaperCoupon m={m} />
+          <CraftCoupon m={m} />
         </div>
 
         {/* 左邊（Before）：常見 AI 樣貌，依滑桿位置裁切 */}
@@ -130,39 +131,62 @@ function SlopCoupon({ m }: { m: CompareMessages }) {
   );
 }
 
-/** SunUI 的做法：中性灰紙、墨色、打孔線、結果用 Stamp 放在按鈕原位 */
-function PaperCoupon({ m }: { m: CompareMessages }) {
+/**
+ * SunUI 的做法：有厚度的表面（hairline 加極淡多層陰影，深色用頂邊高光），同心圓角，
+ * 按鈕有內高光與按下的重量，領取後結果用 Result 在按鈕原位落定，外框不換。
+ */
+function CraftCoupon({ m }: { m: CompareMessages }) {
   const [claimed, setClaimed] = useState(false);
+  const reduce = useReducedMotion();
   return (
-    <div className="relative flex w-full max-w-[320px] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
-      <div className="min-w-0 flex-1 p-5">
-        <p className="text-xs text-[#737373]">{m.paper.eyebrow}</p>
-        <p className="mt-1 flex items-baseline gap-1.5">
-          <span className="text-4xl font-semibold tracking-tight text-[color:var(--sunui-spot,var(--primary))] tabular-nums">{m.paper.amount}</span>
-          <span className="text-sm">{m.paper.unit}</span>
+    <div
+      className={cn(
+        "relative flex w-full max-w-[340px] rounded-xl bg-card p-1 text-foreground",
+        "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04),0_8px_16px_-8px_rgb(0_0_0/0.10),0_24px_40px_-16px_rgb(0_0_0/0.12)]",
+        "dark:bg-[#1f1f1f] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_0_0_1px_rgb(255_255_255/0.09),0_24px_40px_-16px_rgb(0_0_0/0.6)]",
+      )}
+    >
+      <div className="min-w-0 flex-1 px-4 py-4">
+        <p className="text-xs font-medium text-muted-foreground">{m.coupon.eyebrow}</p>
+        <p className="mt-1.5 flex items-baseline gap-1.5">
+          <span className="text-[40px] leading-none font-semibold tracking-[-0.03em] text-[color:var(--sunui-spot,var(--primary))] tabular-nums">
+            {m.coupon.amount}
+          </span>
+          <span className="text-sm font-medium">{m.coupon.unit}</span>
         </p>
-        <p className="mt-1 text-sm text-[#737373]">{m.paper.condition}</p>
-        <p className="mt-3 font-mono text-xs tracking-[0.12em]">{m.paper.code}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{m.coupon.condition}</p>
       </div>
-      {/* 打孔線：虛線加上下半圓缺口 */}
-      <div className="relative w-0 border-l border-dashed border-[#d4d4d4] dark:border-[#3a3a3a]" aria-hidden="true">
-        <span className="absolute -top-px left-0 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e2e2e2] bg-stage dark:border-[#333333]" />
-        <span className="absolute -bottom-px left-0 size-3 -translate-x-1/2 translate-y-1/2 rounded-full border border-[#e2e2e2] bg-stage dark:border-[#333333]" />
-      </div>
-      <div className="flex w-24 shrink-0 items-center justify-center p-3">
-        {claimed ? (
-          <Stamp shape="tick" tone="vermilion" size="sm">{m.paper.claimed}</Stamp>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setClaimed(true)}
-            className="rounded-md bg-[color:var(--sunui-spot,var(--primary))] px-3 py-1.5 text-sm font-medium text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]"
-          >
-            {m.paper.cta}
-          </button>
-        )}
-        {/* Stamp 是 aria-hidden，結果另外用 status 告訴讀屏 */}
-        <span role="status" className="sr-only">{claimed ? m.paper.claimed : ""}</span>
+      {/* 右側是凹面：比表面低一階，放代碼與動作；同心圓角 12 − 4 = 8 */}
+      <div className="flex w-[118px] shrink-0 flex-col items-center justify-center gap-2.5 rounded-lg bg-muted/70 px-2 py-3 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:bg-white/[0.04] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]">
+        <p className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground">{m.coupon.code}</p>
+        <div className="grid h-8 place-items-center">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {claimed ? (
+              <motion.span key="done" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: 0.06 }}>
+                <Result shape="tick" size="sm">{m.coupon.claimed}</Result>
+              </motion.span>
+            ) : (
+              <motion.button
+                key="claim"
+                type="button"
+                onClick={() => setClaimed(true)}
+                whileTap={reduce ? undefined : { scale: 0.97 }}
+                exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.1 } }}
+                transition={{ type: "spring", stiffness: 520, damping: 34 }}
+                className={cn(
+                  "h-8 rounded-md px-4 text-sm font-medium",
+                  "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]",
+                  "shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_rgb(0_0_0/0.16),0_0_0_1px_rgb(0_0_0/0.08)]",
+                  "transition-[filter] duration-150 hover:brightness-110 hover:duration-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sunui-spot,var(--primary))]",
+                )}
+              >
+                {m.coupon.cta}
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* Result 是 aria-hidden，結果另外用 status 告訴讀屏 */}
+        <span role="status" className="sr-only">{claimed ? m.coupon.claimed : ""}</span>
       </div>
     </div>
   );

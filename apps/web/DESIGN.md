@@ -12,12 +12,12 @@
 
 ## 1. 顏色與材質
 
-block 不寫死色碼，全部讀主題 token 或下面這組 SunUI 變數。變數一律寫回退值，買家沒設也成立。
+block 不寫死色碼，全部讀買家的 shadcn 主題 token，裝進任何主題都成立。
 
 | 角色 | 寫法 | 回退 | 用途 |
 |---|---|---|---|
-| 表面 | `bg-[var(--sunui-surface,var(--card))]` | `--card` | 卡片、券面、面板 |
-| 凹面 | `bg-[var(--sunui-inset,var(--muted))]` | `--muted` | 輸入框、軌道、未選取格、分段控制底 |
+| 表面 | `bg-card` | `--card` | 卡片、券面、面板 |
+| 凹面 | `bg-muted` | `--muted` | 輸入框、軌道、未選取格、分段控制底 |
 | 邊線 | `border-foreground/10` | 跟主題前景色 | 所有 hairline。用透明度，放在任何底色、圖片上都乾淨 |
 | 文字 | `text-foreground`、`text-muted-foreground` | shadcn | 主文與次要文字 |
 | 主要動作 | `bg-primary text-primary-foreground` | shadcn | 主按鈕 |
@@ -26,7 +26,7 @@ block 不寫死色碼，全部讀主題 token 或下面這組 SunUI 變數。變
 - 灰是**純中性**，不用米白、暖灰、stone 色階（米白配赤陶橘、米白配鼠尾草綠都是公認的 AI 樣貌，見 `reports/黑白灰視覺去AI感分析-2026-11-06.md`）。
 - 不再使用紙感時期的寫死色碼 `#f7f7f7`、`#1c1c1c`、`#e2e2e2`、`#333333`、`#171717`、`#ededed`、`#a3a3a3`、`#737373`。既有 block 依報告 P2 批次改掉，新程式不准再出現。
 - **品牌專色**（2026-11-08 起）：SunUI 自己不選顏色。出廠跟著主題的 `--primary`，買家在 `:root` 與 `.dark` 設 `--sunui-spot`（和 `--sunui-spot-foreground`）就換成自己的品牌色。只用在「拿掉會遺失資訊」的地方：選中狀態、折扣面額、目前進度、主要按鈕、正面結果。一般文字、標題、邊線不用。
-- **整頁模板的例外**（`categories` 含 `template`）：可以有**一段**整塊反白（`bg-foreground text-background`，字與線用 `currentColor`）製造明暗節奏，通常放在主視覺。不要把品牌專色鋪成整面。
+- **整頁模板的例外**（`categories` 含 `template`）：可以有**一段**固定深色的段落（`bg-[#111111] text-[#ededed]`，深淺模式都是深色，字與線用 `currentColor`）製造明暗節奏，通常放在主視覺。不要把品牌專色鋪成整面。
 - 折扣面額、促銷強調、目前步驟靠字重、尺寸、對比區分；「其他」項目用 `text-muted-foreground`。
 - 成功、錯誤這類狀態色只在小面積文字或圖示上用，不鋪滿底色。不准每個 block 自己挑強調色。
 
@@ -129,7 +129,7 @@ const springs = {
 
 ## 檢查表
 
-- [ ] 沒有寫死的紙感色碼；顏色全部來自主題 token 或帶回退的 `--sunui-*` 變數
+- [ ] 沒有寫死的紙感色碼；顏色全部來自主題 token（品牌專色 `--sunui-spot` 帶回退）
 - [ ] 沒有裝飾性漸層、漸層字、光暈、彩色陰影、粒子；模擬光的漸層明度差不超過 3%、同色相
 - [ ] 高度只用 e0 到 e3，陰影有邊線，深色模式用頂邊高光而不是投影
 - [ ] 毛玻璃只在浮在內容上的功能層

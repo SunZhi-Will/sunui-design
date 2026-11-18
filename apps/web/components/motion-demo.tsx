@@ -5,12 +5,15 @@ import { useEffect, useRef, useState } from "react";
 
 import type { DemoKey } from "@/content/motion-dictionary";
 import { cn } from "@/lib/utils";
-import { listItem, panel, press, roll, scrim, springs, stamp, useShake } from "@/registry/lib/sunui-motion/motion";
+import { Result } from "@/components/ui/stamp";
+import { listItem, panel, press, roll, scrim, springs, useShake } from "@/registry/lib/sunui-motion/motion";
 
 // 動效辭典的小示範：只有使用者按「播放」或直接操作時才動，符合 DESIGN.md 第 4 節。
 // 全部用 sunui-motion 本身實作，順便驗證這個 lib。
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c] border-[#e2e2e2] dark:border-[#333333] text-[#171717] dark:text-[#ededed]";
+// 質感表面（DESIGN.md 第 2 節的 e1）：hairline 加極淡陰影，深色用頂邊高光
+const surface =
+  "bg-card text-foreground border-transparent shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:bg-[#1f1f1f] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
 export function MotionDemo({ demo, playLabel }: { demo: DemoKey; playLabel: string }) {
   const [run, setRun] = useState(0);
@@ -51,24 +54,15 @@ function PressDemo() {
 function StampDemo({ run }: DemoProps) {
   const reduce = useReducedMotion();
   return (
-    <div className={cn("relative w-full max-w-60 rounded-md border px-3 py-2.5", paper)}>
-      <p className="text-[11px] tracking-[0.12em] uppercase opacity-60">Coupon</p>
+    <div className={cn("relative w-full max-w-60 rounded-xl border px-3 py-2.5", surface)}>
+      <p className="text-xs font-medium text-muted-foreground">Coupon</p>
       <p className="text-lg font-semibold tracking-tight tabular-nums">NT$150 off</p>
       <AnimatePresence>
         {run > 0 && (
-          <motion.span
-            key={run}
-            aria-hidden="true"
-            variants={stamp}
-            initial={reduce ? false : "lifted"}
-            animate="pressed"
-            exit="gone"
-            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium"
-          >
-            <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12.5l4.5 4.5L19 7.5" />
-            </svg>
-            Claimed
+          <motion.span key={run} className="mt-1.5 block" exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12 } }}>
+            <Result shape="tick" size="sm">
+              Claimed
+            </Result>
           </motion.span>
         )}
       </AnimatePresence>
@@ -136,7 +130,7 @@ function PanelDemo({ run }: DemoProps) {
               initial="closed"
               animate="open"
               exit="closed"
-              className={cn("absolute inset-y-0 right-0 w-1/2 border-l p-2.5 text-xs", paper)}
+              className={cn("absolute inset-y-0 right-0 w-1/2 border-l p-2.5 text-xs", surface)}
             >
               Cart · 2
             </motion.div>

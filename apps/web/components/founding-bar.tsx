@@ -8,7 +8,7 @@ import { foundingState, foundingWindow } from "@/lib/site";
 
 /**
  * Founding member 期間的常駐公告條（reports/Planes 參考分析-2026-11-08.md 第 9 節 F1）。
- * 開賣前寫開賣日，開賣中寫截止日，結束後不出現。下緣是虛線，像一張可撕的紙條。
+ * 開賣前寫開賣日，開賣中寫截止日，結束後不出現。下緣是一條 hairline。
  * 關閉後記在 localStorage；key 帶著狀態，所以關掉「即將開賣」後，開賣當天還會再出現一次。
  * 先在第一次繪製前用內嵌腳本藏起來，已關閉的人不會看到它閃一下。
  */
@@ -25,7 +25,7 @@ export async function FoundingBar() {
   const storageKey = `sunui-founding-bar-${state}`;
 
   return (
-    <div className="founding-bar border-b border-dashed border-line bg-card text-sm [[data-founding-bar=hidden]_&]:hidden">
+    <div className="founding-bar border-b border-line bg-card text-sm [[data-founding-bar=hidden]_&]:hidden">
       <script
         dangerouslySetInnerHTML={{
           __html: `try{if(localStorage.getItem(${JSON.stringify(storageKey)}))document.documentElement.dataset.foundingBar="hidden"}catch(e){}`,

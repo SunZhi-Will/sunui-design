@@ -7,8 +7,8 @@ export type IconGroup = { id: string; title: string; note: string; icons: IconNa
 export const iconGroups: IconGroup[] = [
   {
     id: "paper",
-    title: "Paper",
-    note: "SunUI signatures: notched coupons, zigzag receipts, tilted stamps.",
+    title: "Coupons & tickets",
+    note: "Coupons, receipts, tickets and stamp cards for store pages.",
     icons: ["coupon", "receipt", "ticket", "stamp", "stamp-check", "stamp-tool", "punch-card", "scissors", "envelope"],
   },
   {
@@ -66,8 +66,8 @@ export const pixelIconGroups: PixelIconGroup[] = [
   },
   {
     id: "pixel-paper",
-    title: "Paper",
-    note: "The coupon, receipt and stamp signatures, in pixels.",
+    title: "Coupons & tickets",
+    note: "Coupons, receipts and stamp cards, in pixels.",
     icons: ["coupon", "receipt", "stamp", "stamp-check", "punch-card", "envelope", "scissors"],
   },
   {

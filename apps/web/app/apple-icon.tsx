@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// 主畫面圖示：紙色底加朱紅太陽，與 app/icon.svg 同一個標誌
+// 主畫面圖示：白底黑色太陽，與 app/icon.svg 同一個標誌
 export default function AppleIcon() {
   return new ImageResponse(
     (

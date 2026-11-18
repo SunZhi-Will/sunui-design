@@ -23,7 +23,7 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
 
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center bg-bg px-4 py-12">
-      {/* 很淡的紙張點格，往邊緣漸隱，只是質感 */}
+      {/* 很淡的點格，往邊緣漸隱，只是背景層次 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-70 [background-image:radial-gradient(var(--line)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_60%_55%_at_center,black,transparent)]"

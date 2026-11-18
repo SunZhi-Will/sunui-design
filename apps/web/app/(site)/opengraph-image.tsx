@@ -49,7 +49,7 @@ export default async function OpengraphImage() {
           <Brand size={mosaic ? 34 : 40} />
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ display: "flex", fontSize: mosaic ? 50 : 76, fontWeight: 700, lineHeight: 1.05, letterSpacing: -2 }}>
-              Coupons, receipts and stamps your shoppers can feel.
+              Refined animated blocks, with a press you can feel.
             </div>
             <div style={{ display: "flex", fontSize: mosaic ? 24 : 32, lineHeight: 1.35, color: "#6b6b6b" }}>
               {`${items.length} refined animated blocks · shadcn registry · accessible by default`}
