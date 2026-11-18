@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 
 import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
@@ -98,13 +98,8 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 票根寬度與打孔缺口半徑 */
+/** 左側面額凹面的寬度 */
 const STUB = 76;
-const NOTCH = 8;
-const notches: CSSProperties = (() => {
-  const mask = `radial-gradient(circle ${NOTCH}px at ${STUB}px 0, #0000 97%, #000), radial-gradient(circle ${NOTCH}px at ${STUB}px 100%, #0000 97%, #000)`;
-  return { maskImage: mask, WebkitMaskImage: mask, maskComposite: "intersect", WebkitMaskComposite: "source-in" };
-})();
 
 export function CouponWallet({ coupons, value, defaultValue = null, onChange, locale = "en", labels, className }: CouponWalletProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
@@ -213,19 +208,21 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
               animate={target}
               transition={reduce ? { duration: 0 } : springs.gentle}
               style={{ zIndex: lifted ? n + 1 : open ? i : n - r, transformOrigin: "50% 120%" }}
-              className="absolute inset-x-0 top-5 mx-auto block h-[6.5rem] w-[13.5rem] rounded-md text-left focus-visible:outline-none [&:focus-visible>span]:ring-2 [&:focus-visible>span]:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
+              className="absolute inset-x-0 top-5 mx-auto block h-[6.5rem] w-[13.5rem] rounded-xl text-left focus-visible:outline-none [&:focus-visible>span]:ring-2 [&:focus-visible>span]:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
             >
               <span
-                style={notches}
                 className={cn(
-                  "relative flex h-full overflow-hidden rounded-xl border shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
+                  "relative flex h-full gap-1 overflow-hidden rounded-xl border p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
                   surface,
                   isOn ? spotBorder : edge,
                 )}
               >
-                {/* 不可用時只淡化內容，紙面保持不透明，扇形展開時後面的券才不會透出來 */}
+                {/* 面額放在凹面裡（同心圓角 12 − 4 = 8）。不可用時只淡化內容，表面保持不透明，扇形展開時後面的券才不會透出來 */}
                 <span
-                  className={cn("flex shrink-0 flex-col items-center justify-center border-r", edge, c.unavailableReason && "opacity-55")}
+                  className={cn(
+                    "flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted/70 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:bg-foreground/[0.04] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]",
+                    c.unavailableReason && "opacity-55",
+                  )}
                   style={{ width: STUB }}
                 >
                   <span className={cn("text-2xl leading-none font-semibold tracking-tight tabular-nums", spot)}>{c.amount}</span>

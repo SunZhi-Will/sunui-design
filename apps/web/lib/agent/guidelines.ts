@@ -49,7 +49,7 @@ const craft = `## Series: craft (default when meta.series is missing)
 
 ${seriesSummary.craft}
 
-SunUI dropped its old "paper" look on 2026-11-19: no paper or ink hex colours, no perforations, notches or zigzag tears as a signature, no flat shadowless cards. If an older block still has \`#f7f7f7\`, \`#e2e2e2\` or \`#171717\` classes, that is legacy; new code uses the tokens below.
+SunUI dropped its old "paper" look on 2026-11-19: no paper or ink hex colours, no perforations, notches or zigzag tears (not even on coupons or pickup tickets; reveal a code with a raised lid that lifts away from an inset well, or a bar that slides away), no flat shadowless cards. If an older block still has \`#f7f7f7\`, \`#e2e2e2\` or \`#171717\` classes, that is legacy; new code uses the tokens below.
 
 | Role | Tailwind | Fallback |
 |---|---|---|
