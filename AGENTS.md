@@ -6,6 +6,8 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 
 | Path | What |
 |---|---|
+| `apps/web/app/(site)/page.tsx`, `apps/web/components/home/` | Home page (remade 2026-11-19): a narrative page, not the catalog. Hero specimens are site components, not registry blocks. Rules: `apps/web/SITE-MOTION.md` section 6 |
+| `apps/web/app/(site)/blocks/page.tsx` | Full catalog with search and filters (moved off the home page 2026-11-19) |
 | `apps/web/registry/free/<name>/` | Free block source (`<name>.tsx`) and `demo.tsx` |
 | `apps/web/registry/pro/` | Pro blocks. A separate private git repo, gitignored here. May be missing; the build must still work |
 | `apps/web/registry.json` | Free registry manifest (shadcn format + `meta`: tier, series, interaction, usage) |

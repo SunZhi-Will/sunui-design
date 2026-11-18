@@ -9,7 +9,7 @@ type Item = { href: string; label: string; match: (path: string) => boolean; cla
 export function SiteNavLinks({ labels }: { labels: { blocks: string; icons: string; docs: string; pricing: string } }) {
   const pathname = usePathname() ?? "/";
   const items: Item[] = [
-    { href: "/", label: labels.blocks, match: (p) => p === "/" || p.startsWith("/blocks") },
+    { href: "/blocks", label: labels.blocks, match: (p) => p.startsWith("/blocks") },
     { href: "/icons", label: labels.icons, match: (p) => p.startsWith("/icons"), className: "hidden min-[400px]:inline-flex" },
     { href: "/docs", label: labels.docs, match: (p) => p.startsWith("/docs") },
     { href: "/pricing", label: labels.pricing, match: (p) => p.startsWith("/pricing") },

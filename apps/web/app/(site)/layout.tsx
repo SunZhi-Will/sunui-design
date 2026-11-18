@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { getLocale } from "@/lib/i18n-server";
 import { getMessages } from "@/lib/messages";
 import { siteUrl } from "@/lib/site";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { defaultDarkScript, THEME_STORAGE_KEY } from "@/lib/theme";
 import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
 import "../globals.css";
@@ -38,9 +38,10 @@ export default async function SiteLayout({ children, modal }: { children: React.
     <html lang={locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript(THEME_STORAGE_KEY) }} />
+        <script dangerouslySetInnerHTML={{ __html: defaultDarkScript() }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh overflow-x-clip`}>
-        <HideOnPaths prefixes={["/pricing", "/checkout"]}>
+        <HideOnPaths prefixes={["/", "/pricing", "/checkout"]}>
           <FoundingBar />
         </HideOnPaths>
         <SiteHeader />

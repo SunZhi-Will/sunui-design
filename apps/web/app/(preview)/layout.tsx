@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { siteUrl } from "@/lib/site";
 import { spotCss, spotKeys } from "@/lib/spot";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { defaultDarkScript, THEME_STORAGE_KEY } from "@/lib/theme";
 import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
 import "../globals.css";
@@ -30,6 +30,7 @@ export default function PreviewLayout({ children }: { children: React.ReactNode 
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript(THEME_STORAGE_KEY) }} />
+        <script dangerouslySetInnerHTML={{ __html: defaultDarkScript() }} />
         <script dangerouslySetInnerHTML={{ __html: spotScript }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh`}>{children}</body>

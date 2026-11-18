@@ -36,6 +36,9 @@ export async function SiteHeader() {
             </a>
             <LocaleSwitcher locale={locale} label={m.nav.language} />
             <ThemeMenu labels={m.nav} />
+            <Link href="/pricing" className="ml-1 hidden h-8 items-center rounded-md px-3 text-[13px] font-semibold btn-primary sm:inline-flex">
+              {m.home.hero.getPro}
+            </Link>
           </div>
         </div>
       </div>

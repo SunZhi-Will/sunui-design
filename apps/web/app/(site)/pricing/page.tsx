@@ -83,7 +83,7 @@ export default async function PricingPage() {
       secondary: undefined as string | undefined,
       note: t.free.note,
       features: t.free.features(freeCount, motionCount),
-      cta: { label: m.common.browseBlocks, href: "/" },
+      cta: { label: m.common.browseBlocks, href: "/blocks" },
     },
     {
       name: t.pro.name,

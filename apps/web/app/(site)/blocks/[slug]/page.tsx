@@ -65,7 +65,7 @@ export default async function BlockPage({ params }: Props) {
   return (
     <article className="py-10">
       <nav aria-label={m.block.breadcrumb} className="mb-6 text-sm text-subtle">
-        <Link href="/" className="hover:text-fg">
+        <Link href="/blocks" className="hover:text-fg">
           {m.nav.blocks}
         </Link>
         <span className="mx-2">/</span>
@@ -77,7 +77,7 @@ export default async function BlockPage({ params }: Props) {
           <TierBadge tier={item.meta.tier} />
           {seriesOf(item) !== "craft" && (
             <Link
-              href={`/?series=${seriesOf(item)}#blocks`}
+              href={`/blocks?series=${seriesOf(item)}`}
               className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:border-fg hover:text-fg"
             >
               {m.series.labels[seriesOf(item)]}
@@ -202,7 +202,7 @@ function UsageGuide({ item, t }: { item: Item; t: Messages["block"] }) {
             {aliases.map((alias) => (
               <li key={alias}>
                 <Link
-                  href={`/?q=${encodeURIComponent(alias)}`}
+                  href={`/blocks?q=${encodeURIComponent(alias)}`}
                   className="inline-block rounded-sm border border-line px-2.5 py-1 text-xs text-subtle transition-colors hover:border-fg hover:text-fg"
                 >
                   {alias}
