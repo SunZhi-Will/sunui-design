@@ -75,13 +75,13 @@ export interface InkUnderlineProps {
   href?: string;
   /** 目前所在頁面：底線常駐 */
   active?: boolean;
-  /** 底線顏色：ink 墨色、accent 朱紅 */
+  /** 底線顏色：ink 文字色、accent 朱紅 */
   tone?: "ink" | "accent";
   className?: string;
   [key: string]: unknown;
 }
 
-/** 墨線底線：滑入時從左畫出，滑出時往右收走。 */
+/** 細線底線：滑入時從左畫出，滑出時往右收走。 */
 export function InkUnderline({ children, as: Tag = "a", active = false, tone = "ink", className, ...rest }: InkUnderlineProps) {
   return (
     <Tag
@@ -92,7 +92,7 @@ export function InkUnderline({ children, as: Tag = "a", active = false, tone = "
         "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none",
         "hover:after:origin-left hover:after:scale-x-100 focus-visible:after:origin-left focus-visible:after:scale-x-100",
         active && "after:scale-x-100",
-        // 目前頁的底線用品牌專色，其餘維持墨色
+        // 目前頁的底線用品牌專色，其餘維持文字色
         active ? "after:bg-[color:var(--sunui-spot,var(--primary))]" : tone === "ink" ? "after:bg-foreground" : "after:bg-foreground",
         className,
       )}

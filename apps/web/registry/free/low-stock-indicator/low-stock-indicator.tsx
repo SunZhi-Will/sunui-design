@@ -124,7 +124,7 @@ const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙邊、墨、品牌專色
+// 設計語言（DESIGN.md）：邊線、墨、品牌專色
 const edge = "border-foreground/10";
 const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */

@@ -97,7 +97,7 @@ function AddButton({ disabled, children }: { disabled: boolean; children: string
   );
 }
 
-/** 兩張商品卡並排：毛衣用紙面尺寸格、摘要行與到貨通知，外套用滑動外框的文字膠囊（另有獨立的版型選項） */
+/** 兩張商品卡並排：毛衣用表面尺寸格、摘要行與到貨通知，外套用滑動外框的文字膠囊（另有獨立的版型選項） */
 export default function VariantPickerDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

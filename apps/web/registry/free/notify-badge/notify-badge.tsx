@@ -19,7 +19,7 @@ export interface NotifyBadgeProps {
   /** 只顯示小圓點，不顯示數字 */
   dot?: boolean;
   showZero?: boolean;
-  /** accent：朱紅；ink：墨色；primary：主題主色 */
+  /** accent：朱紅；ink：文字色；primary：主題主色 */
   tone?: "accent" | "ink" | "primary";
   /** 徽章位置 */
   placement?: "top-right" | "top-left" | "bottom-right";

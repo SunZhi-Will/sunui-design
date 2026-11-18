@@ -287,7 +287,7 @@ export function FloatingField({
           {required && <span aria-hidden="true"> *</span>}
         </motion.label>
 
-        {/* 字數：打字是高頻動作，數字不滾動；剩一成時轉為墨色 */}
+        {/* 字數：打字是高頻動作，數字不滾動；剩一成時轉為文字色 */}
         {count !== null && floated && (
           <span
             aria-hidden="true"

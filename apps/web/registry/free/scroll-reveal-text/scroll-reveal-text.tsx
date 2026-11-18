@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils";
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
 export interface ScrollRevealTextProps {
-  /** 段落文字；中文、日文逐字由淡墨轉為實墨，英文逐詞 */
+  /** 段落文字；中文、日文逐字由淡色字轉為實色，英文逐詞 */
   text: string;
   /** 捲動容器；省略時追蹤 window。容器需為定位元素（relative），位置才量得準 */
   container?: RefObject<HTMLElement | null>;
   as?: ElementType;
   /** 強制切分方式；auto 依文字自動判斷 */
   splitBy?: "auto" | "word" | "char";
-  /** 尚未讀到時的墨色濃度（0 到 1） */
+  /** 尚未讀到時的文字色濃度（0 到 1） */
   dimOpacity?: number;
   /** 需要強調的字詞（可多字），讀到時以朱紅印出 */
   accentWords?: string[];
@@ -126,7 +126,7 @@ function Token({
   className?: string;
   children: string;
 }) {
-  // 墨色由淡轉濃：只調濃度，不掃色、不模糊
+  // 文字色由淡轉濃：只調濃度，不掃色、不模糊
   const opacity = useTransform(progress, range, [dim, 1]);
   return (
     <motion.span className={className} style={{ opacity }}>

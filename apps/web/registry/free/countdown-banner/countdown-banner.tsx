@@ -161,7 +161,7 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const surfaceUnder = "bg-muted dark:bg-foreground/10";
 const edge = "border-foreground/10";
@@ -352,7 +352,7 @@ export function CountdownBanner({
   );
 }
 
-/** 印在紙上的翻頁數字：只有值改變時，上半張沿中線翻下 */
+/** 翻頁數字：只有值改變時，上半張沿中線翻下 */
 function FlipCard({ value, reduceMotion }: { value: string; reduceMotion: boolean }) {
   const [state, setState] = useState({ prev: value, cur: value });
   if (state.cur !== value) setState({ prev: state.cur, cur: value });

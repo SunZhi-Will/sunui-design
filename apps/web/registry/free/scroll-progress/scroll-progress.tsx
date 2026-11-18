@@ -18,9 +18,9 @@ export interface ScrollProgressProps {
   sections?: ScrollSection[];
   /** fixed 固定在視窗頂端；sticky 黏在容器頂端；static 由父層排版。fixed 時刻度不印文字 */
   position?: "fixed" | "sticky" | "static";
-  /** 墨線粗細（px） */
+  /** 細線粗細（px） */
   thickness?: number;
-  /** 墨線顏色 class */
+  /** 細線顏色 class */
   barClassName?: string;
   /** 在尺規右上方印出百分比 */
   showPercent?: boolean;
@@ -55,7 +55,7 @@ const MESSAGES: Record<SunLocale, ScrollProgressLabels> = {
   ja: { progress: "読書の進捗", jumpTo: (label) => `「${label}」へ移動` },
 };
 
-// 設計語言（DESIGN.md）：紙邊作底線，品牌專色作進度
+// 設計語言（DESIGN.md）：邊線作底線，品牌專色作進度
 const edgeLine = "bg-foreground/10";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";

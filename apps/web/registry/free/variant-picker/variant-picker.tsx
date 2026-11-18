@@ -66,7 +66,7 @@ export interface VariantPickerProps {
   showSummary?: boolean;
   /** 庫存小於等於此數字時顯示「剩 N 件」 */
   lowStockAt?: number;
-  /** 尺寸列樣式：stamp 是紙面格子加售完小字；chips 是文字膠囊，一個墨色外框滑動、售完劃線 */
+  /** 尺寸列樣式：stamp 是表面格子加售完小字；chips 是文字膠囊，一個文字色外框滑動、售完劃線 */
   sizeStyle?: "stamp" | "chips";
   /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
   locale?: string;
@@ -137,7 +137,7 @@ const MESSAGES: Record<SunLocale, Required<VariantPickerLabels> & OptionChipsLab
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨，全部是中性灰
+// 設計語言（DESIGN.md，質感）：表面、hairline、文字色，全部是中性灰
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -276,7 +276,7 @@ export function VariantPicker({
                   >
                     {labelOf(id)}
                   </span>
-                  {/* 售完：淡墨小字放在尺寸下方，不蓋住尺寸名稱；一直在版面裡，只淡入淡出 */}
+                  {/* 售完：淡色字小字放在尺寸下方，不蓋住尺寸名稱；一直在版面裡，只淡入淡出 */}
                   <span
                     aria-hidden="true"
                     className={cn("absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] leading-[10px] whitespace-nowrap", inkMuted, fade, !off && "opacity-0")}
@@ -545,7 +545,7 @@ function RadioRow({ items, selected, onSelect, onPressDisabled, onPeek, render, 
   );
 }
 
-/* ───────── OptionChips（原 segmented-control）：文字膠囊，一個墨色外框在選項間滑動 ───────── */
+/* ───────── OptionChips（原 segmented-control）：文字膠囊，一個文字色外框在選項間滑動 ───────── */
 
 export interface OptionChip<T extends string = string> {
   value: T;

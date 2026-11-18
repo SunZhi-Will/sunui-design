@@ -143,7 +143,7 @@ const MESSAGES: Record<SunLocale, ToastStackLabels> = {
   ja: { region: "通知", dismiss: "通知を閉じる", undo: "元に戻す" },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨
+// 設計語言（DESIGN.md，質感）：表面、hairline、文字色
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -328,7 +328,7 @@ export function ToastStack({
                 }}
               >
                 <ToastBody item={t} dismissLabel={text.dismiss} onDismiss={() => onDismiss(t.id)} onMeasure={(h) => measure(t.id, h)} inert={hidden} />
-                {/* 剩餘時間：底部一條墨線慢慢縮短 */}
+                {/* 剩餘時間：底部一條細線慢慢縮短 */}
                 {!reduceMotion && Number.isFinite(d) && d > 0 && (
                   <span
                     aria-hidden="true"

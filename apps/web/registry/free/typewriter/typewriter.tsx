@@ -21,7 +21,7 @@ export interface TypewriterProps {
   cjkFactor?: number;
   /** 打完最後一句後回到第一句重來；預設關閉 */
   loop?: boolean;
-  /** 墨色細游標；停在最後一句時自動收起 */
+  /** 文字色細游標；停在最後一句時自動收起 */
   caret?: boolean;
   /** 進入畫面才開始打字 */
   startOnView?: boolean;

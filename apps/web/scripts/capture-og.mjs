@@ -8,6 +8,8 @@
 //   node apps/web/scripts/capture-og.mjs [--only a,b] [--missing] [--jobs 4] [--base http://localhost:3100]
 //
 // --only 只截這些 block；--missing 只截還沒有圖的；--jobs 同時開幾個瀏覽器。
+// --theme light|dark 指定預覽主題（寫進 localStorage 的 sunui-theme）；省略時照網站預設。
+// 型錄縮圖要整批同一個主題，只重截一部分時記得指定，免得和舊圖混色。
 // Pro block 也截（registry/pro 存在時）：分享圖只有畫面，沒有原始碼。
 // 裁切：取 block 內容的外框，四周留白，再補成 OG 右側畫框的比例（640 : 550）；太高的 block 取上半部。
 // macOS 另用 sips 縮到 1000 寬，其他系統保留原尺寸。
@@ -34,6 +36,8 @@ const base = opt("--base", process.env.SUNUI_BASE || "http://localhost:3100").re
 const only = opt("--only", "").split(",").map((s) => s.trim()).filter(Boolean);
 const missingOnly = args.includes("--missing");
 const jobs = Math.max(1, Number(opt("--jobs", 4)) || 4);
+const theme = opt("--theme", "");
+if (theme && theme !== "light" && theme !== "dark") fail("--theme 只能是 light 或 dark");
 const out = path.join(root, "public", "og", "blocks");
 
 const VIEWPORT = { width: 1280, height: 900 };
@@ -156,6 +160,11 @@ async function openBrowser(slot) {
 
   await page("Page.enable");
   await page("Emulation.setDeviceMetricsOverride", { ...VIEWPORT, deviceScaleFactor: 2, mobile: false });
+  // 在頁面任何腳本之前寫入主題，layout 的主題腳本就會照它
+  if (theme) {
+    await page("Page.addScriptToEvaluateOnNewDocument", { source: `try{localStorage.setItem("sunui-theme",${JSON.stringify(theme)})}catch(e){}` });
+    await page("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: theme }] });
+  }
   return {
     page,
     waitEvent,

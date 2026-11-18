@@ -12,7 +12,7 @@ export interface AnimatedNumberProps {
   currency?: string;
   /** 額外的 Intl.NumberFormat 選項，會覆蓋預設 */
   formatOptions?: Intl.NumberFormatOptions;
-  /** 數值變動後在右側短暫顯示一個墨色小箭頭 */
+  /** 數值變動後在右側短暫顯示一個文字色小箭頭 */
   trendArrow?: boolean;
   /** 箭頭維持多久（ms） */
   trendHold?: number;

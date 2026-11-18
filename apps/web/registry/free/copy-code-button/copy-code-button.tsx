@@ -76,9 +76,9 @@ const MESSAGES: Record<SunLocale, CopyCodeButtonLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
-// 虛線用淡墨色，紙邊色在紙面上幾乎看不見
+// 虛線用淡色字色，邊線色在表面上幾乎看不見
 const edge = "border-foreground/25";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";

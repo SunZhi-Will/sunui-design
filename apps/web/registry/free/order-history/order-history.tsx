@@ -121,7 +121,7 @@ const MESSAGES: Record<SunLocale, OrderHistoryMessages> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -132,7 +132,7 @@ const springs = {
   stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
-/** 朱紅只留給「待付款」這個需要買家行動的狀態；取消用淡墨 */
+/** 朱紅只留給「待付款」這個需要買家行動的狀態；取消用淡色字 */
 
 export function OrderHistory({
   orders,

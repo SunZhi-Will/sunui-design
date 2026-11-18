@@ -103,7 +103,7 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：墨線星星，不用金色
+// 設計語言（DESIGN.md）：細線星星，不用金色
 const ink = "text-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
@@ -118,7 +118,7 @@ const labelSize: Record<StarRatingSize, string> = { sm: "text-xs", md: "text-sm"
 
 const STAR = "M12 3.2l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6-4.4-4.2 6-.8z";
 
-/** 一顆星：底層墨線外框，上層依 fill 比例裁出實心；可點的選分器裡，實心部分用品牌專色 */
+/** 一顆星：底層細線外框，上層依 fill 比例裁出實心；可點的選分器裡，實心部分用品牌專色 */
 function Star({ fill, className, fillClassName }: { fill: number; className?: string; fillClassName?: string }) {
   return (
     <span aria-hidden="true" className={cn("relative block", className)}>

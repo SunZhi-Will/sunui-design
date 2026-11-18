@@ -5,7 +5,7 @@ import { createContext, useContext, type CSSProperties, type ReactNode } from "r
 
 import { cn } from "@/lib/utils";
 
-/** pulse：緩慢的透明度呼吸（只在載入中）；none：靜止的紙面色塊 */
+/** pulse：緩慢的透明度呼吸（只在載入中）；none：靜止的表面色塊 */
 export type ShimmerStyle = "pulse" | "none";
 
 const ShimmerContext = createContext<ShimmerStyle>("pulse");
@@ -123,7 +123,7 @@ export function SkeletonList({ rows = 4, className }: { rows?: number; className
   );
 }
 
-/** 通用的整列版位：不知道內容長怎樣時，用幾條等寬的紙面色塊代表「這裡有幾筆資料」 */
+/** 通用的整列版位：不知道內容長怎樣時，用幾條等寬的表面色塊代表「這裡有幾筆資料」 */
 export function SkeletonRows({ rows = 4, className }: { rows?: number; className?: string }) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>

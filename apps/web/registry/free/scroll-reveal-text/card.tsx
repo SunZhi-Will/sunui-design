@@ -34,7 +34,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：在框內往下捲，段落文字逐字由淡墨轉為實墨，強調詞以朱紅印出。 */
+/** 型錄卡片：在框內往下捲，段落文字逐字由淡色字轉為實色，強調詞以朱紅印出。 */
 export default function ScrollRevealTextCard() {
   const scroller = useRef<HTMLDivElement>(null);
   const locale = useDemoLocale();
