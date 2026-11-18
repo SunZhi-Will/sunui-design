@@ -50,34 +50,28 @@ export function SpecimenTable({ copy, links }: { copy: Copy; links: Partial<Reco
   return (
     <TableActive.Provider value={active}>
       <div ref={ref} role="group" aria-label={copy.label} className="specimens grid grid-cols-6 gap-3">
-        <Cell i={0} className="col-span-6 h-40 sm:col-span-4" caption={copy.cart.caption} href={links.cart}>
+        <Cell className="col-span-6 h-40 sm:col-span-4" caption={copy.cart.caption} href={links.cart}>
           {(auto) => <CartSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={1} className="col-span-3 h-40 sm:col-span-2" caption={copy.toggle.caption} href={links.toggle}>
+        <Cell className="col-span-3 h-40 sm:col-span-2" caption={copy.toggle.caption} href={links.toggle}>
           {(auto) => <ToggleSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={2} className="col-span-3 h-40 sm:col-span-2" caption={copy.stepper.caption} href={links.stepper}>
+        <Cell className="col-span-3 h-40 sm:col-span-2" caption={copy.stepper.caption} href={links.stepper}>
           {(auto) => <StepperSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={3} className="col-span-6 h-40 sm:col-span-4" caption={copy.dimmer.caption} href={links.dimmer}>
+        <Cell className="col-span-6 h-40 sm:col-span-4" caption={copy.dimmer.caption} href={links.dimmer}>
           {(auto) => <DimmerSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={4} className="col-span-6 h-36 sm:col-span-3" caption={copy.price.caption} href={links.price}>
+        <Cell className="col-span-6 h-36 sm:col-span-3" caption={copy.price.caption} href={links.price}>
           {(auto) => <PriceSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={5} className="col-span-6 h-36 sm:col-span-3" caption={copy.island.caption} href={links.island}>
+        <Cell className="col-span-6 h-36 sm:col-span-3" caption={copy.island.caption} href={links.island}>
           {(auto) => <IslandSpecimen auto={auto} copy={copy} />}
         </Cell>
-        <Cell i={6} className="col-span-6 h-28" caption={copy.steps.caption} href={links.steps}>
+        <Cell className="col-span-6 h-28" caption={copy.steps.caption} href={links.steps}>
           {(auto) => <StepsSpecimen auto={auto} copy={copy} />}
         </Cell>
       </div>
-      <style>{`
-        @keyframes specimen-in { from { opacity: 0; translate: 0 16px } }
-        @media (prefers-reduced-motion: no-preference) {
-          .specimens > * { animation: specimen-in 0.6s cubic-bezier(0.23, 1, 0.32, 1) both; }
-        }
-      `}</style>
     </TableActive.Provider>
   );
 }
@@ -86,13 +80,11 @@ export type SpecimenKey = "cart" | "toggle" | "stepper" | "dimmer" | "price" | "
 
 /** 一格：材質、左上角的名稱、滑鼠接手的邏輯 */
 function Cell({
-  i,
   className,
   caption,
   href,
   children,
 }: {
-  i: number;
   className: string;
   caption: string;
   href?: string;
@@ -119,7 +111,6 @@ function Cell({
       onPointerLeave={release}
       onFocus={hold}
       onBlur={release}
-      style={{ animationDelay: `${0.15 + i * 0.06}s` }}
       className={cn("relative flex flex-col overflow-hidden rounded-xl bg-card p-4 shadow-e1 transition-shadow duration-200 hover:shadow-e2", className)}
     >
       <p className="text-[12px] font-medium text-subtle">
@@ -245,7 +236,7 @@ function ToggleSpecimen({ auto, copy }: { auto: boolean; copy: Copy }) {
     <div className="flex w-full flex-col gap-3.5">
       {[copy.toggle.a, copy.toggle.b].map((label, i) => (
         <label key={i} className="flex cursor-pointer items-center justify-between gap-2">
-          <span className="min-w-0 truncate text-[13px]">{label}</span>
+          <span className="min-w-0 text-[13px] leading-tight text-pretty">{label}</span>
           <motion.button
             type="button"
             role="switch"

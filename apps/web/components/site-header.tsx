@@ -16,7 +16,8 @@ export async function SiteHeader() {
           className="-ml-1 flex shrink-0 items-center gap-2 rounded-md px-1 py-1 font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-accent"
         >
           <SunMark />
-          SunUI
+          {/* 日文的導覽字最長，手機寬度放不下：窄螢幕只留標誌，導覽字才不會斷成兩行 */}
+          <span className="[:lang(ja)_&]:max-[439px]:sr-only">SunUI</span>
         </Link>
         <div className="flex items-center gap-1 text-sm sm:gap-2">
           <nav>

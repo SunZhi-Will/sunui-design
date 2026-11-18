@@ -24,7 +24,7 @@ export function SiteNavLinks({ labels }: { labels: { blocks: string; icons: stri
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex h-8 items-center rounded-md px-2 transition-colors focus-visible:outline-2 focus-visible:outline-accent sm:px-3 ${
+              className={`inline-flex h-8 items-center rounded-md px-1.5 text-[13px] whitespace-nowrap transition-colors min-[400px]:px-2 min-[400px]:text-sm focus-visible:outline-2 focus-visible:outline-accent sm:px-3 ${
                 active ? "bg-accent-soft font-medium text-fg" : "text-subtle hover:bg-accent-soft/60 hover:text-fg"
               }`}
             >

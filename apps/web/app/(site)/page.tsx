@@ -233,7 +233,7 @@ function SectionHead({ id, eyebrow, title, body, center }: { id?: string; eyebro
   return (
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       <p className="text-sm font-medium text-subtle">{eyebrow}</p>
-      <h2 id={id} className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-balance sm:text-[40px] sm:leading-[1.1]">
+      <h2 id={id} className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-balance [word-break:auto-phrase] sm:text-[40px] sm:leading-[1.1]">
         {title}
       </h2>
       {body && <p className="mt-4 text-lg leading-relaxed text-pretty text-subtle">{body}</p>}

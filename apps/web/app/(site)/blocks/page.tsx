@@ -20,7 +20,7 @@ export default async function BlocksPage() {
     <div className="pt-12 sm:pt-16">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-subtle">{t.eyebrow}</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl">{t.title}</h1>
+        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.03em] text-balance [word-break:auto-phrase] sm:text-5xl">{t.title}</h1>
         <p className="mt-4 text-lg leading-relaxed text-pretty text-subtle">{t.body}</p>
       </div>
       <div className="mt-10">
