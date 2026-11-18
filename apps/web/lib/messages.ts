@@ -7,9 +7,9 @@ import type { Interaction, Series } from "@/lib/registry";
 
 const en = {
   meta: {
-    siteTitle: "SunUI: paper-feel animated blocks for React",
+    siteTitle: "SunUI: refined animated blocks for React",
     siteDescription:
-      "Paper, ink and calm motion for React and Tailwind: tear-off coupons, printed receipts, heroes, charts, menus and theme switches. Accessible, installed with the shadcn CLI.",
+      "Refined details and calm motion for React and Tailwind: coupons, carts, heroes, charts, menus and theme switches. Accessible, installed with the shadcn CLI.",
   },
   nav: {
     blocks: "Blocks",
@@ -48,14 +48,14 @@ const en = {
   } as Record<Interaction, string>,
   series: {
     labels: {
-      paper: "Paper",
+      paper: "Tickets",
       product: "Product UI",
       story: "Story",
       showcase: "Showcase",
       motion: "Motion",
     } as Record<Series, string>,
     descriptions: {
-      paper: "Paper and ink for storefronts and campaigns: coupons, receipts and loyalty cards.",
+      paper: "Coupons, receipts, tickets and loyalty cards for storefronts and campaigns.",
       product: "Quiet tool UI: neutral surfaces, one accent, status on dots.",
       story: "Signature pieces in ink and lantern light: a readable 3D book and a WebGL cloth curtain for launch reveals.",
       showcase: "Landing-page signature visuals in a quiet editorial dark: tilts, carousels, marquees and recap slides.",
@@ -63,10 +63,10 @@ const en = {
     } as Record<Series, string>,
   },
   home: {
-    metaTitle: "SunUI: paper-feel animated blocks for React",
-    eyebrow: "Paper-feel animated blocks for React",
+    metaTitle: "SunUI: refined animated blocks for React",
+    eyebrow: "Refined animated blocks for React",
     title: "Less glow, more craft.",
-    lead: "Paper, ink and motion you can feel. Coupons, carts and checkout for stores and campaigns, plus heroes, navigation, charts and theme switches for any product page. No gradients, no glow. Install with one command or hand it to your coding agent, and the source is yours.",
+    lead: "Precise details and motion you can feel. Coupons, carts and checkout for stores and campaigns, plus heroes, navigation, charts and theme switches for any product page. No gradients, no glow. Install with one command or hand it to your coding agent, and the source is yours.",
     stats: {
       label: "What sets SunUI apart",
       items: [
@@ -79,7 +79,7 @@ const en = {
       label: "Drag to compare the generic AI coupon with the SunUI coupon",
       before: "Typical AI output",
       after: "SunUI",
-      caption: "Same coupon, same $15 off. Left is what AI tools ship by default: gradients, glow, emoji. Right is SunUI: paper, ink and one spot of your brand color. Drag the line.",
+      caption: "Same coupon, same $15 off. Left is what AI tools ship by default: gradients, glow, emoji. Right is SunUI: precise type, quiet depth and one spot of your brand color. Drag the line.",
       spotLabel: "Your brand color:",
       spotColors: { ink: "Ink (default)", wine: "Wine", forest: "Forest", navy: "Navy", magenta: "Magenta" },
       slop: { eyebrow: "Mega deal", amount: "$15 OFF", body: "Unlock exclusive savings today! 🔥", cta: "Claim now 🚀" },
@@ -88,8 +88,8 @@ const en = {
     whyTitle: "Why SunUI",
     reasons: [
       {
-        title: "A stance, not a texture",
-        body: "Paper and ink, because a page should be easy to read, not dazzling. Conditions sit on the coupon, receipts print, and a result is one quiet line of ink where the button was. No gradients, no glow, no confetti.",
+        title: "Craft, not decoration",
+        body: "Precise type, quiet depth and restrained color, because a page should be easy to read, not dazzling. Conditions sit on the coupon, receipts print, and a result is one quiet line of text where the button was. No gradients, no glow, no confetti.",
       },
       {
         title: "Deepest where pages have to sell",
@@ -97,7 +97,7 @@ const en = {
       },
       {
         title: "Calm where people act",
-        body: "Paper blocks have no glows, no confetti and no loops: they move only when someone acts. The free Motion libraries are louder on purpose, with backgrounds, text, cursors and loaders to set the stage. Both respect reduced motion, and Chinese typesetting is first-class.",
+        body: "SunUI blocks have no glows, no confetti and no loops: they move only when someone acts. The free Motion libraries are louder on purpose, with backgrounds, text, cursors and loaders to set the stage. Both respect reduced motion, and Chinese typesetting is first-class.",
       },
     ],
     agent: {
@@ -238,7 +238,7 @@ const en = {
     metaDescription: "What SunUI is and how it works.",
     title: "Introduction",
     p1: (total: number, free: number, pro: number) =>
-      `SunUI is a collection of paper-feel animated React blocks. The deepest set covers stores and campaign pages (countdowns, coupons, carts, checkout, pricing and loyalty), and the rest covers heroes, navigation, charts and motion effects for any product page. There are ${total} blocks today, ${free} free under MIT and ${pro} in Pro.`,
+      `SunUI is a collection of refined animated React blocks. The deepest set covers stores and campaign pages (countdowns, coupons, carts, checkout, pricing and loyalty), and the rest covers heroes, navigation, charts and motion effects for any product page. There are ${total} blocks today, ${free} free under MIT and ${pro} in Pro.`,
     p2: "SunUI is not a package you import. Each block is copied into your project with the shadcn CLI, so you can read, change and own every line.",
     principlesTitle: "Principles",
     principles: [
@@ -495,14 +495,14 @@ const en = {
       loop: "Loops only while active, for loading and live status.",
     },
     groups: {
-      paper: { title: "Paper", note: "SunUI signatures: notched coupons, zigzag receipts, tilted stamps." },
+      paper: { title: "Tickets", note: "SunUI signatures: notched coupons, zigzag receipts, tilted stamps." },
       commerce: { title: "Commerce", note: "Carts, tags, shipping and payment." },
       interface: { title: "Interface", note: "The everyday controls every block needs." },
       product: { title: "Product UI", note: "Quiet tool UI: status, jobs, quotas." },
       story: { title: "Story", note: "Ink and lantern signature pieces for launch reveals." },
       toggles: { title: "State toggles", note: "Icons that exist only as a pair of states." },
       "pixel-interface": { title: "Interface", note: "Controls on a 16px grid, 2px strokes for glyphs." },
-      "pixel-paper": { title: "Paper", note: "The coupon, receipt and stamp signatures, in pixels." },
+      "pixel-paper": { title: "Tickets", note: "The coupon, receipt and stamp signatures, in pixels." },
       "pixel-commerce": { title: "Commerce", note: "Carts, tags, shipping and payment." },
       "pixel-gear": { title: "Gear", note: "Weapons, armor and trinkets for an inventory screen." },
       "pixel-game": { title: "Items", note: "Loot, food and consumables." },
@@ -541,9 +541,9 @@ export type Messages = typeof en;
 
 const zhTW: Messages = {
   meta: {
-    siteTitle: "SunUI：有紙感的 React 動態區塊",
+    siteTitle: "SunUI：有質感的 React 動態區塊",
     siteDescription:
-      "紙、墨與克制的動態，適用 React 與 Tailwind：撕得開的優惠券、印出來的收據，還有首屏、圖表、選單與主題切換。無障礙，用 shadcn CLI 一行安裝。",
+      "精緻的細節與克制的動態，適用 React 與 Tailwind：優惠券、購物車，還有首屏、圖表、選單與主題切換。無障礙，用 shadcn CLI 一行安裝。",
   },
   nav: { blocks: "區塊", icons: "圖示", docs: "文件", pricing: "價格", github: "GitHub", language: "語言", theme: "主題", themeSystem: "跟隨系統", themeLight: "淺色", themeDark: "深色", themeHint: "區塊預覽也會一起切換。" },
   footer: { tagline: "SunUI，由 Sun 製作。免費區塊採 MIT 授權。", changelog: "更新紀錄", license: "授權條款" },
@@ -566,14 +566,14 @@ const zhTW: Messages = {
   },
   series: {
     labels: {
-      paper: "紙感",
+      paper: "票券",
       product: "產品介面",
       story: "故事",
       showcase: "展示",
       motion: "動效",
     },
     descriptions: {
-      paper: "紙張與墨色，為商店與檔期活動而做：優惠券、收據、集點卡。",
+      paper: "給商店與檔期活動的優惠券、收據、票根與集點卡。",
       product: "安靜的工具介面：中性底色、單一強調色，用圓點表示狀態。",
       story: "墨色與燈籠風格的招牌作品：可以翻閱的 3D 書、用於新品揭幕的 WebGL 布簾。",
       showcase: "形象頁的招牌視覺：3D 傾斜、輪播、跑馬燈與回顧投影片。",
@@ -581,10 +581,10 @@ const zhTW: Messages = {
     },
   },
   home: {
-    metaTitle: "SunUI：有紙感的 React 動態區塊",
-    eyebrow: "有紙感的 React 動態區塊",
+    metaTitle: "SunUI：有質感的 React 動態區塊",
+    eyebrow: "有質感的 React 動態區塊",
     title: "少一點閃爍，多一點手感。",
-    lead: "紙、墨，加上摸得到的動態。有給商店與檔期活動的優惠券、購物車與結帳，也有任何產品頁都用得上的首屏、導覽、圖表與主題切換。不靠漸層和光暈。一行指令裝進專案，或交給你的 coding agent，原始碼歸你。",
+    lead: "精準的細節，加上摸得到的動態。有給商店與檔期活動的優惠券、購物車與結帳，也有任何產品頁都用得上的首屏、導覽、圖表與主題切換。不靠漸層和光暈。一行指令裝進專案，或交給你的 coding agent，原始碼歸你。",
     stats: {
       label: "SunUI 的不同",
       items: [
@@ -597,7 +597,7 @@ const zhTW: Messages = {
       label: "拖動比較常見 AI 優惠券與 SunUI 優惠券",
       before: "常見 AI 樣貌",
       after: "SunUI",
-      caption: "同一張券，同樣折 $15。左邊是 AI 工具的預設長相：漸層、光暈、emoji；右邊是 SunUI：紙、墨，加上一處你的品牌色。拖動中線看差別。",
+      caption: "同一張券，同樣折 $15。左邊是 AI 工具的預設長相：漸層、光暈、emoji；右邊是 SunUI：精準的字、安靜的層次，加上一處你的品牌色。拖動中線看差別。",
       spotLabel: "換成你的品牌色：",
       spotColors: { ink: "墨色（預設）", wine: "酒紅", forest: "森林綠", navy: "海軍藍", magenta: "洋紅" },
       slop: { eyebrow: "超殺優惠", amount: "$15 OFF", body: "立即解鎖你的專屬好康！🔥", cta: "馬上搶 🚀" },
@@ -606,8 +606,8 @@ const zhTW: Messages = {
     whyTitle: "為什麼選 SunUI",
     reasons: [
       {
-        title: "是一種立場，不只是質感",
-        body: "只有紙和墨，因為頁面該讓人看清楚，而不是看花眼。優惠條件寫在券面上，收據一張張印出，結果就在按鈕原本的位置，安靜地寫成一行字。沒有漸層、光暈，也沒有彩帶。",
+        title: "質感來自細節，不靠裝飾",
+        body: "精準的字、安靜的層次、克制的顏色，因為頁面該讓人看清楚，而不是看花眼。優惠條件寫在券面上，收據一張張印出，結果就在按鈕原本的位置，安靜地寫成一行字。沒有漸層、光暈，也沒有彩帶。",
       },
       {
         title: "最深的一組，給要成交的頁面",
@@ -615,7 +615,7 @@ const zhTW: Messages = {
       },
       {
         title: "使用者動手的地方保持沉穩",
-        body: "紙感區塊沒有光暈、沒有彩帶、沒有無限循環，只在使用者動手時才動。免費的動效庫則刻意更搶眼，用背景、文字、游標與載入效果佈置舞台。兩者都尊重減少動態設定，中文排版是一等公民。",
+        body: "SunUI 的區塊沒有光暈、沒有彩帶、沒有無限循環，只在使用者動手時才動。免費的動效庫則刻意更搶眼，用背景、文字、游標與載入效果佈置舞台。兩者都尊重減少動態設定，中文排版是一等公民。",
       },
     ],
     agent: {
@@ -754,7 +754,7 @@ const zhTW: Messages = {
     metaDescription: "SunUI 是什麼，以及它如何運作。",
     title: "簡介",
     p1: (total, free, pro) =>
-      `SunUI 是一套有紙感的 React 動態區塊。最完整的一組給商店與活動頁使用（倒數計時、優惠券、購物車、結帳、價格方案與集點），其餘則是任何產品頁都用得上的首屏、導覽、圖表與動效。目前共有 ${total} 個區塊，其中 ${free} 個以 MIT 授權免費提供，${pro} 個屬於 Pro。`,
+      `SunUI 是一套有質感的 React 動態區塊。最完整的一組給商店與活動頁使用（倒數計時、優惠券、購物車、結帳、價格方案與集點），其餘則是任何產品頁都用得上的首屏、導覽、圖表與動效。目前共有 ${total} 個區塊，其中 ${free} 個以 MIT 授權免費提供，${pro} 個屬於 Pro。`,
     p2: "SunUI 不是要你 import 的套件。每個區塊都透過 shadcn CLI 複製進你的專案，你可以閱讀、修改並擁有每一行程式碼。",
     principlesTitle: "設計原則",
     principles: [
@@ -991,14 +991,14 @@ const zhTW: Messages = {
       loop: "只在 active 時循環，用於載入與即時狀態。",
     },
     groups: {
-      paper: { title: "紙感", note: "SunUI 的招牌：有缺口的優惠券、鋸齒收據、微斜的印章。" },
+      paper: { title: "票券", note: "SunUI 的招牌：有缺口的優惠券、鋸齒收據、微斜的印章。" },
       commerce: { title: "電商", note: "購物車、標籤、運送與付款。" },
       interface: { title: "介面", note: "每個區塊都用得到的日常控制項。" },
       product: { title: "產品介面", note: "安靜的工具介面：狀態、工作、用量。" },
       story: { title: "故事", note: "墨色與燈籠風格的招牌揭幕作品。" },
       toggles: { title: "狀態切換", note: "只以一對狀態存在的圖示。" },
       "pixel-interface": { title: "介面", note: "16px 點陣的控制項，符號用 2 格粗線。" },
-      "pixel-paper": { title: "紙感", note: "優惠券、收據、印章這些招牌，換成像素。" },
+      "pixel-paper": { title: "票券", note: "優惠券、收據、印章這些招牌，換成像素。" },
       "pixel-commerce": { title: "電商", note: "購物車、標籤、運送與付款。" },
       "pixel-gear": { title: "裝備", note: "武器、防具與飾品，放進背包畫面剛好。" },
       "pixel-game": { title: "道具", note: "寶物、食物與消耗品。" },
@@ -1035,9 +1035,9 @@ const zhTW: Messages = {
 
 const zhCN: Messages = {
   meta: {
-    siteTitle: "SunUI：有纸感的 React 动效区块",
+    siteTitle: "SunUI：有质感的 React 动效区块",
     siteDescription:
-      "纸、墨与克制的动效，适用于 React 与 Tailwind：撕得开的优惠券、打印出来的小票，还有首屏、图表、菜单与主题切换。无障碍，用 shadcn CLI 一行安装。",
+      "精致的细节与克制的动效，适用于 React 与 Tailwind：优惠券、购物车，还有首屏、图表、菜单与主题切换。无障碍，用 shadcn CLI 一行安装。",
   },
   nav: { blocks: "区块", icons: "图标", docs: "文档", pricing: "价格", github: "GitHub", language: "语言", theme: "主题", themeSystem: "跟随系统", themeLight: "浅色", themeDark: "深色", themeHint: "区块预览也会一起切换。" },
   footer: { tagline: "SunUI，由 Sun 制作。免费区块采用 MIT 许可。", changelog: "更新日志", license: "许可协议" },
@@ -1060,14 +1060,14 @@ const zhCN: Messages = {
   },
   series: {
     labels: {
-      paper: "纸感",
+      paper: "票券",
       product: "产品界面",
       story: "故事",
       showcase: "展示",
       motion: "动效",
     },
     descriptions: {
-      paper: "纸张与墨色，为店铺与大促活动而做：优惠券、小票、集点卡。",
+      paper: "给店铺与大促活动的优惠券、小票、票根与集点卡。",
       product: "安静的工具界面：中性底色、单一强调色，用圆点表示状态。",
       story: "墨色与灯笼风格的招牌作品：可以翻阅的 3D 书、用于新品揭幕的 WebGL 布帘。",
       showcase: "落地页的招牌视觉：3D 倾斜、轮播、跑马灯与回顾幻灯片。",
@@ -1075,10 +1075,10 @@ const zhCN: Messages = {
     },
   },
   home: {
-    metaTitle: "SunUI：有纸感的 React 动效区块",
-    eyebrow: "有纸感的 React 动效区块",
+    metaTitle: "SunUI：有质感的 React 动效区块",
+    eyebrow: "有质感的 React 动效区块",
     title: "少一点闪烁，多一点手感。",
-    lead: "纸、墨，加上摸得到的动效。有给商店与大促活动的优惠券、购物车与结算，也有任何产品页都用得上的首屏、导航、图表与主题切换。不靠渐变和光晕。一行命令装进项目，或交给你的 coding agent，源码归你。",
+    lead: "精准的细节，加上摸得到的动效。有给商店与大促活动的优惠券、购物车与结算，也有任何产品页都用得上的首屏、导航、图表与主题切换。不靠渐变和光晕。一行命令装进项目，或交给你的 coding agent，源码归你。",
     stats: {
       label: "SunUI 的不同",
       items: [
@@ -1091,7 +1091,7 @@ const zhCN: Messages = {
       label: "拖动比较常见 AI 优惠券与 SunUI 优惠券",
       before: "常见 AI 样貌",
       after: "SunUI",
-      caption: "同一张券，同样减 $15。左边是 AI 工具的默认样子：渐变、光晕、emoji；右边是 SunUI：纸、墨，加上一处你的品牌色。拖动中线看区别。",
+      caption: "同一张券，同样减 $15。左边是 AI 工具的默认样子：渐变、光晕、emoji；右边是 SunUI：精准的字、安静的层次，加上一处你的品牌色。拖动中线看区别。",
       spotLabel: "换成你的品牌色：",
       spotColors: { ink: "墨色（默认）", wine: "酒红", forest: "森林绿", navy: "海军蓝", magenta: "洋红" },
       slop: { eyebrow: "超值优惠", amount: "$15 OFF", body: "立即解锁你的专属福利！🔥", cta: "马上抢 🚀" },
@@ -1100,8 +1100,8 @@ const zhCN: Messages = {
     whyTitle: "为什么选 SunUI",
     reasons: [
       {
-        title: "是一种立场，不只是质感",
-        body: "只有纸和墨，因为页面该让人看清楚，而不是看花眼。优惠条件写在券面上，小票一张张打印出来，结果就在按钮原来的位置，安静地写成一行字。没有渐变、光晕，也没有彩带。",
+        title: "质感来自细节，不靠装饰",
+        body: "精准的字、安静的层次、克制的颜色，因为页面该让人看清楚，而不是看花眼。优惠条件写在券面上，小票一张张打印出来，结果就在按钮原来的位置，安静地写成一行字。没有渐变、光晕，也没有彩带。",
       },
       {
         title: "最深的一组，给要成交的页面",
@@ -1109,7 +1109,7 @@ const zhCN: Messages = {
       },
       {
         title: "用户操作的地方保持沉稳",
-        body: "纸感区块没有光晕、没有彩带、没有无限循环，只在用户操作时才动。免费的动效库则刻意更抢眼，用背景、文字、光标与加载效果布置舞台。两者都尊重减弱动态效果设置，中文排版是一等公民。",
+        body: "SunUI 的区块没有光晕、没有彩带、没有无限循环，只在用户操作时才动。免费的动效库则刻意更抢眼，用背景、文字、光标与加载效果布置舞台。两者都尊重减弱动态效果设置，中文排版是一等公民。",
       },
     ],
     agent: {
@@ -1248,7 +1248,7 @@ const zhCN: Messages = {
     metaDescription: "SunUI 是什么，以及它如何工作。",
     title: "简介",
     p1: (total, free, pro) =>
-      `SunUI 是一套有纸感的 React 动效区块。最完整的一组用于商店与活动页面（倒计时、优惠券、购物车、结算、价格方案与集点），其余则是任何产品页都用得上的首屏、导航、图表与动效。目前共有 ${total} 个区块，其中 ${free} 个以 MIT 许可免费提供，${pro} 个属于 Pro。`,
+      `SunUI 是一套有质感的 React 动效区块。最完整的一组用于商店与活动页面（倒计时、优惠券、购物车、结算、价格方案与集点），其余则是任何产品页都用得上的首屏、导航、图表与动效。目前共有 ${total} 个区块，其中 ${free} 个以 MIT 许可免费提供，${pro} 个属于 Pro。`,
     p2: "SunUI 不是需要 import 的依赖包。每个区块都通过 shadcn CLI 复制到你的项目中，你可以阅读、修改并拥有每一行代码。",
     principlesTitle: "设计原则",
     principles: [
@@ -1478,14 +1478,14 @@ const zhCN: Messages = {
       loop: "只在 active 时循环，用于加载与实时状态。",
     },
     groups: {
-      paper: { title: "纸感", note: "SunUI 的招牌：带缺口的优惠券、锯齿小票、微斜的印章。" },
+      paper: { title: "票券", note: "SunUI 的招牌：带缺口的优惠券、锯齿小票、微斜的印章。" },
       commerce: { title: "电商", note: "购物车、标签、配送与支付。" },
       interface: { title: "界面", note: "每个区块都用得上的日常控件。" },
       product: { title: "产品界面", note: "安静的工具界面：状态、任务、配额。" },
       story: { title: "故事", note: "墨色与灯笼风格的招牌揭幕作品。" },
       toggles: { title: "状态切换", note: "只以一对状态存在的图标。" },
       "pixel-interface": { title: "界面", note: "16px 点阵的控件，符号用 2 格粗线。" },
-      "pixel-paper": { title: "纸感", note: "优惠券、收据、印章这些招牌，换成像素。" },
+      "pixel-paper": { title: "票券", note: "优惠券、收据、印章这些招牌，换成像素。" },
       "pixel-commerce": { title: "电商", note: "购物车、标签、配送与付款。" },
       "pixel-gear": { title: "装备", note: "武器、防具与饰品，放进背包画面刚好。" },
       "pixel-game": { title: "道具", note: "宝物、食物与消耗品。" },
@@ -1522,9 +1522,9 @@ const zhCN: Messages = {
 
 const ja: Messages = {
   meta: {
-    siteTitle: "SunUI：紙の手ざわりを持つ React アニメーションブロック",
+    siteTitle: "SunUI：質感のある React アニメーションブロック",
     siteDescription:
-      "紙とインク、控えめなモーションを React と Tailwind で。切り取れるクーポン、印字されるレシートから、ヒーロー、チャート、メニュー、テーマ切り替えまで。アクセシブルで、shadcn CLI でインストール。",
+      "精緻なディテールと控えめなモーションを React と Tailwind で。クーポン、カートから、ヒーロー、チャート、メニュー、テーマ切り替えまで。アクセシブルで、shadcn CLI でインストール。",
   },
   nav: { blocks: "ブロック", icons: "アイコン", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語", theme: "テーマ", themeSystem: "システム", themeLight: "ライト", themeDark: "ダーク", themeHint: "ブロックのプレビューも一緒に切り替わります。" },
   footer: { tagline: "SunUI by Sun。無料ブロックは MIT ライセンスです。", changelog: "更新履歴", license: "ライセンス" },
@@ -1547,14 +1547,14 @@ const ja: Messages = {
   },
   series: {
     labels: {
-      paper: "ペーパー",
+      paper: "チケット",
       product: "プロダクト UI",
       story: "ストーリー",
       showcase: "ショーケース",
       motion: "モーション",
     },
     descriptions: {
-      paper: "紙とインク。ストアやキャンペーンのための、クーポン、レシート、スタンプカード。",
+      paper: "ストアやキャンペーンのための、クーポン、レシート、チケット、スタンプカード。",
       product: "静かなツール UI。ニュートラルな面、アクセントは一色、状態はドットで。",
       story: "墨と灯籠の看板作品。めくれる 3D の本と、新商品のお披露目に使える WebGL のカーテン。",
       showcase: "LP の見せ場になるビジュアル。3D チルト、カルーセル、マーキー、振り返りスライド。",
@@ -1562,10 +1562,10 @@ const ja: Messages = {
     },
   },
   home: {
-    metaTitle: "SunUI：紙の手ざわりを持つ React アニメーションブロック",
-    eyebrow: "紙の手ざわりを持つ React アニメーションブロック",
+    metaTitle: "SunUI：質感のある React アニメーションブロック",
+    eyebrow: "質感のある React アニメーションブロック",
     title: "きらめきは控えめに、手ざわりはもっと。",
-    lead: "紙とインク、そして手ざわりのあるモーション。ストアやキャンペーン向けのクーポン、カート、購入手続きに加えて、どんな製品ページにも使えるヒーロー、ナビゲーション、チャート、テーマ切り替えがあります。グラデーションやグローには頼りません。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。ソースはあなたのものです。",
+    lead: "精緻なディテールと、手ざわりのあるモーション。ストアやキャンペーン向けのクーポン、カート、購入手続きに加えて、どんな製品ページにも使えるヒーロー、ナビゲーション、チャート、テーマ切り替えがあります。グラデーションやグローには頼りません。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。ソースはあなたのものです。",
     stats: {
       label: "SunUI の違い",
       items: [
@@ -1578,7 +1578,7 @@ const ja: Messages = {
       label: "よくある AI 製クーポンと SunUI のクーポンをドラッグして比較",
       before: "よくある AI 製",
       after: "SunUI",
-      caption: "同じクーポン、同じ $15 引き。左は AI ツールが標準で出す見た目（グラデーション、グロー、絵文字）。右は SunUI、紙とインクに、あなたのブランドカラーを一か所だけ。線をドラッグして比べてください。",
+      caption: "同じクーポン、同じ $15 引き。左は AI ツールが標準で出す見た目（グラデーション、グロー、絵文字）。右は SunUI、精緻な文字と静かな奥行きに、あなたのブランドカラーを一か所だけ。線をドラッグして比べてください。",
       spotLabel: "ブランドカラーに変える：",
       spotColors: { ink: "墨（デフォルト）", wine: "ワインレッド", forest: "フォレストグリーン", navy: "ネイビー", magenta: "マゼンタ" },
       slop: { eyebrow: "超お得", amount: "$15 OFF", body: "今だけの特典をアンロック！🔥", cta: "今すぐゲット 🚀" },
@@ -1587,8 +1587,8 @@ const ja: Messages = {
     whyTitle: "SunUI を選ぶ理由",
     reasons: [
       {
-        title: "質感ではなく、姿勢",
-        body: "紙とインクだけ。ページは目を奪うより、読みやすくあるべきだからです。条件はクーポンの券面に書き、レシートは印字され、結果はボタンのあった場所に一行のインクで静かに表示されます。グラデーションも光も紙吹雪もありません。",
+        title: "質感は装飾ではなく、ディテールから",
+        body: "精緻な文字、静かな奥行き、控えめな色。ページは目を奪うより、読みやすくあるべきだからです。条件はクーポンの券面に書き、レシートは印字され、結果はボタンのあった場所に一行の文字で静かに表示されます。グラデーションも光も紙吹雪もありません。",
       },
       {
         title: "いちばん厚いのは、売るためのページ",
@@ -1596,7 +1596,7 @@ const ja: Messages = {
       },
       {
         title: "操作する場所は、落ち着いて",
-        body: "紙のブロックにはグローも紙吹雪もループもなく、ユーザーが操作したときだけ動きます。無料のモーションライブラリはあえて華やかに、背景、文字、カーソル、ローディングで舞台をつくります。どちらも視差効果を減らす設定を尊重し、日本語と中国語の組版にも標準で対応しています。",
+        body: "SunUI のブロックにはグローも紙吹雪もループもなく、ユーザーが操作したときだけ動きます。無料のモーションライブラリはあえて華やかに、背景、文字、カーソル、ローディングで舞台をつくります。どちらも視差効果を減らす設定を尊重し、日本語と中国語の組版にも標準で対応しています。",
       },
     ],
     agent: {
@@ -1735,7 +1735,7 @@ const ja: Messages = {
     metaDescription: "SunUI とは何か、どう動くのか。",
     title: "はじめに",
     p1: (total, free, pro) =>
-      `SunUI は、紙の手ざわりを持つアニメーション付き React ブロック集です。いちばん充実しているのはストアやキャンペーンページ向け（カウントダウン、クーポン、カート、チェックアウト、料金表、ポイント）で、ほかにどんな製品ページにも使えるヒーロー、ナビゲーション、チャート、モーションエフェクトがあります。現在 ${total} 個のブロックがあり、${free} 個は MIT ライセンスで無料、${pro} 個が Pro です。`,
+      `SunUI は、質感のあるアニメーション付き React ブロック集です。いちばん充実しているのはストアやキャンペーンページ向け（カウントダウン、クーポン、カート、チェックアウト、料金表、ポイント）で、ほかにどんな製品ページにも使えるヒーロー、ナビゲーション、チャート、モーションエフェクトがあります。現在 ${total} 個のブロックがあり、${free} 個は MIT ライセンスで無料、${pro} 個が Pro です。`,
     p2: "SunUI は import して使うパッケージではありません。各ブロックは shadcn CLI でプロジェクトにコピーされるので、すべての行を読み、変更し、所有できます。",
     principlesTitle: "原則",
     principles: [
@@ -1980,14 +1980,14 @@ const ja: Messages = {
       loop: "active の間だけループします。読み込みやライブ状態に。",
     },
     groups: {
-      paper: { title: "ペーパー", note: "SunUI の代名詞。切り欠きクーポン、ギザギザのレシート、傾いたスタンプ。" },
+      paper: { title: "チケット", note: "SunUI の代名詞。切り欠きクーポン、ギザギザのレシート、傾いたスタンプ。" },
       commerce: { title: "コマース", note: "カート、タグ、配送、支払い。" },
       interface: { title: "インターフェース", note: "どのブロックにも必要な日常的なコントロール。" },
       product: { title: "プロダクト UI", note: "静かなツール UI。ステータス、ジョブ、使用量。" },
       story: { title: "ストーリー", note: "お披露目に使う墨と灯籠の看板作品。" },
       toggles: { title: "状態の切り替え", note: "2 つの状態のペアとしてだけ存在するアイコン。" },
       "pixel-interface": { title: "インターフェース", note: "16px 格子の操作アイコン。記号は 2 ドットの太線。" },
-      "pixel-paper": { title: "ペーパー", note: "クーポン、レシート、スタンプの看板アイコンをドットで。" },
+      "pixel-paper": { title: "チケット", note: "クーポン、レシート、スタンプの看板アイコンをドットで。" },
       "pixel-commerce": { title: "コマース", note: "カート、タグ、配送と支払い。" },
       "pixel-gear": { title: "装備", note: "武器、防具、アクセサリー。インベントリ画面向け。" },
       "pixel-game": { title: "アイテム", note: "お宝、食べ物、消耗品。" },

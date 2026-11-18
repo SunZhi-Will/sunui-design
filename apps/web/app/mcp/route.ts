@@ -265,7 +265,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: "sunui", version: "1.0.0" },
-    instructions: `SunUI: ${getItems().length} paper-feel animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
+    instructions: `SunUI: ${getItems().length} refined animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
   },
 );
 

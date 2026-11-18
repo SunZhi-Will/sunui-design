@@ -1,6 +1,6 @@
 # SunUI: instructions for AI agents working in this repo
 
-SunUI is a shadcn registry of paper-feel animated React + Tailwind blocks. Positioning (changed 2026-11-13): the headline is the paper feel and the motion, not an industry. Stores and campaign pages are the flagship collection and the Pro focus, not the limit of the catalog. Reasoning: `reports/SunUI 定位是否跳出電商.md`. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
+SunUI is a shadcn registry of refined animated React + Tailwind blocks. Positioning (changed 2026-11-13, headline updated 2026-11-18): the headline is craft quality (質感) and the motion, not paper and not an industry. Paper is one block series (coupons, receipts), not the brand. Shell craft rules: `apps/web/SITE-MOTION.md` section 5. Stores and campaign pages are the flagship collection and the Pro focus, not the limit of the catalog. Reasoning: `reports/SunUI 定位是否跳出電商.md`. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
 
 ## Where things are
 

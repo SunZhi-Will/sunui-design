@@ -98,6 +98,9 @@ export function HeroOpening({ tiles, featured, children }: { tiles: string[]; fe
         aria-hidden="true"
         className="absolute inset-0 [perspective:1600px] [mask-composite:intersect] [mask-image:linear-gradient(to_bottom,transparent,#000_8%,#000_42%,transparent_74%),linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]"
       >
+        {/* 淺色底：白紙放在白頁面上分不出來（圖片載入前更是一片空白）。牆後鋪一層淺灰，跟著同一個遮罩淡出，
+            卡片就是灰底上的白色物件。深色模式本來就有對比，不鋪 */}
+        <div className="absolute inset-0 bg-[#e9e9e9] dark:hidden" />
         <motion.div
           style={{ rotateX, rotateZ, width: COLS * TILE_W + (COLS - 1) * GAP, height: H, x: "-50%", y: "-50%" }}
           className="hero-wall absolute top-[42%] left-1/2 flex gap-5 [transform-style:preserve-3d]"
@@ -124,7 +127,7 @@ export function HeroOpening({ tiles, featured, children }: { tiles: string[]; fe
                         key={i}
                         href={`/blocks/${name}`}
                         tabIndex={-1}
-                        className={`relative block shrink-0 overflow-hidden rounded-lg border border-line bg-[#f7f7f7] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_10px_24px_-10px_rgb(0_0_0/0.14)] transition-transform dark:shadow-none duration-200 hover:[transform:translateZ(36px)] ${isFeatured ? "" : "hero-tile"}`}
+                        className={`relative block shrink-0 overflow-hidden rounded-lg border border-black/[0.08] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_28px_-12px_rgb(0_0_0/0.2)] transition-transform duration-200 dark:border-line dark:bg-[#f7f7f7] dark:shadow-none hover:[transform:translateZ(36px)] ${isFeatured ? "" : "hero-tile"}`}
                         style={{ width: TILE_W, height: TILE_H, animationDelay: `${Math.min(dist, 6) * 0.05}s` }}
                       >
                         <Image
