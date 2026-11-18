@@ -65,6 +65,7 @@ const en = {
   home: {
     metaTitle: "SunUI: refined animated blocks for React",
     eyebrow: "Refined animated blocks for React",
+    stage: { label: "Featured blocks, running live", live: "Live", open: "Open" },
     title: "Less glow, more craft.",
     lead: "Precise details and motion you can feel. Coupons, carts and checkout for stores and campaigns, plus heroes, navigation, charts and theme switches for any product page. No gradients, no glow. Install with one command or hand it to your coding agent, and the source is yours.",
     stats: {
@@ -583,6 +584,7 @@ const zhTW: Messages = {
   home: {
     metaTitle: "SunUI：有質感的 React 動態區塊",
     eyebrow: "有質感的 React 動態區塊",
+    stage: { label: "精選區塊，即時執行", live: "即時", open: "打開" },
     title: "少一點閃爍，多一點手感。",
     lead: "精準的細節，加上摸得到的動態。有給商店與檔期活動的優惠券、購物車與結帳，也有任何產品頁都用得上的首屏、導覽、圖表與主題切換。不靠漸層和光暈。一行指令裝進專案，或交給你的 coding agent，原始碼歸你。",
     stats: {
@@ -1077,6 +1079,7 @@ const zhCN: Messages = {
   home: {
     metaTitle: "SunUI：有质感的 React 动效区块",
     eyebrow: "有质感的 React 动效区块",
+    stage: { label: "精选区块，实时运行", live: "实时", open: "打开" },
     title: "少一点闪烁，多一点手感。",
     lead: "精准的细节，加上摸得到的动效。有给商店与大促活动的优惠券、购物车与结算，也有任何产品页都用得上的首屏、导航、图表与主题切换。不靠渐变和光晕。一行命令装进项目，或交给你的 coding agent，源码归你。",
     stats: {
@@ -1564,6 +1567,7 @@ const ja: Messages = {
   home: {
     metaTitle: "SunUI：質感のある React アニメーションブロック",
     eyebrow: "質感のある React アニメーションブロック",
+    stage: { label: "注目のブロック、ライブで動作中", live: "ライブ", open: "開く" },
     title: "きらめきは控えめに、手ざわりはもっと。",
     lead: "精緻なディテールと、手ざわりのあるモーション。ストアやキャンペーン向けのクーポン、カート、購入手続きに加えて、どんな製品ページにも使えるヒーロー、ナビゲーション、チャート、テーマ切り替えがあります。グラデーションやグローには頼りません。コマンドひとつで導入でき、コーディングエージェントに任せることもできます。ソースはあなたのものです。",
     stats: {

@@ -23,6 +23,7 @@ export function LivePreview({
   poster,
   title,
   locale,
+  mode = "card",
   onExpand,
 }: {
   name: string;
@@ -33,6 +34,8 @@ export function LivePreview({
   poster?: string;
   title: string;
   locale: Locale;
+  /** sheet：完整 demo、底色滿版（首頁展示台這種大框用）；預設是型錄卡片 */
+  mode?: "card" | "sheet";
   onExpand?: () => void;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
@@ -99,7 +102,7 @@ export function LivePreview({
         <iframe
           key={locale}
           ref={iframeRef}
-          src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/card`, locale) + (spot ? `&spot=${spot}` : "")}
+          src={previewUrl(variant ? `/preview/${name}/v/${encodeURIComponent(variant)}` : `/preview/${name}/${mode}`, locale) + (spot ? `&spot=${spot}` : "")}
           title={title}
           onLoad={() => setLoadedLocale(locale)}
           className={cn("relative size-full border-0 transition-opacity duration-300 motion-reduce:duration-0", loaded ? "opacity-100" : "opacity-0")}

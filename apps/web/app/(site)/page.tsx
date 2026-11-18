@@ -8,25 +8,17 @@ import { AgentSteps } from "@/components/agent-steps";
 import { Catalog } from "@/components/catalog";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
-import { HeroOpening } from "@/components/hero-opening";
+import { HeroStage } from "@/components/hero-stage";
 import { PhraseText } from "@/components/phrase-text";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { getI18n } from "@/lib/i18n-server";
 import { orderCatalog } from "@/lib/catalog-order";
-import { getItems, installCommand, usesSpot } from "@/lib/registry";
+import { getItem, getItems, installCommand, usesSpot } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { variantIds } from "@/registry/__generated__/variants";
 
-const HERO_TILES = [
-  "day-night-hero", "glass-cube-hero", "flash-sale-hero", "launch-stage-hero", "drop-release-hero", "curve-rail-hero",
-  "depth-hero", "gift-box-reveal", "order-island", "receipt-printer", "coupon-wallet", "peel-sticker-coupon",
-  "scratch-card", "prize-wheel", "stamp-card", "physics-cart-jar", "pixel-boss-sale", "pixel-gacha", "festival-banner",
-  "black-friday-weekend", "countdown-banner", "cart-drawer", "checkout-steps", "product-gallery", "flash-sale-product-card",
-  "coupon-claim-card", "free-shipping-progress", "gift-card-designer", "fold-invite-card", "launch-countdown-wall",
-  "book-3d", "orbit-gallery", "spine-shelf", "photo-looks", "vote-terrain", "showcase-mosaic", "self-building-page",
-  "shader-campaign-banner", "price-history", "order-tracker", "variant-picker", "plan-comparison", "testimonial-wall",
-  "hotspots", "cloth-curtain", "plush-portrait", "point-cloud", "theme-picker", "loop-shader-hero",
-];
+// 開場展示台的精選區塊：第一個是預設。都要有分享圖（載入前的底圖）；Pro 資料夾不在時自動略過
+const HERO_STAGE = ["day-night-hero", "add-to-cart-button", "orbit-gallery", "checkout-steps", "depth-hero"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
@@ -68,13 +60,20 @@ export default async function HomePage() {
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
   const firstFree = all.find((item) => item.meta.tier === "free");
-  // 開場紙牆：挑畫面最有份量的區塊，只放有分享圖的
-  const heroTiles = HERO_TILES.filter((name) => existsSync(path.join(process.cwd(), "public/og/blocks", `${name}.jpg`)));
+  const stageBlocks = HERO_STAGE.flatMap((name) => {
+    const item = getItem(name);
+    if (!item || !existsSync(path.join(process.cwd(), "public/og/blocks", `${name}.jpg`))) return [];
+    return [{ name, title: localizeItem(item, locale).title, tier: item.meta.tier }];
+  });
 
   return (
     <>
-      {/* 開場：真實區塊鋪成的 3D 紙牆佔滿主視覺，上面只留一句話和安裝指令 */}
-      <HeroOpening tiles={heroTiles} featured="day-night-hero">
+      {/* 開場：一句話和安裝指令，下面是真的區塊在跑的展示台 */}
+      <HeroStage
+        blocks={stageBlocks}
+        locale={locale}
+        labels={{ ...m.home.stage, livePreview: m.catalog.livePreview, pro: m.tier.pro }}
+      >
         {/* 一行小字先說這是什麼，標題才有上下文；不加按鈕列，維持開場只有一句話的份量 */}
         <p className="mb-3 text-center text-sm font-medium text-subtle">{m.home.eyebrow}</p>
         <h1 className="text-center text-4xl font-semibold tracking-tight text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] sm:text-6xl">
@@ -94,7 +93,7 @@ export default async function HomePage() {
             </svg>
           </a>
         </p>
-      </HeroOpening>
+      </HeroStage>
 
       <Catalog
         items={items}
