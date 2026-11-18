@@ -41,7 +41,7 @@ const copy = {
   },
 };
 
-const tones = ["bg-[#e2e2e2]", "bg-[#cdcdcd]", "bg-[#bfbfbf]"];
+const tones = ["bg-foreground/10", "bg-[#cdcdcd]", "bg-[#bfbfbf]"];
 
 /** 型錄卡片：選單滑過時文字上捲、底線墨水般畫出；滑過商品列，預覽圖跟著游標浮出來。 */
 export default function HoverMotionCard() {
@@ -69,7 +69,7 @@ export default function HoverMotionCard() {
           items={t.rows.map((row, i) => ({
             ...row,
             preview: (
-              <div className={`flex h-full items-end p-2 text-[11px] text-[#171717]/70 ${tones[i]}`}>
+              <div className={`flex h-full items-end p-2 text-[11px] text-muted-foreground ${tones[i]}`}>
                 <span>{row.meta}</span>
               </div>
             ),

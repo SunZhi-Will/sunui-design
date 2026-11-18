@@ -8,10 +8,10 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { ScrollProgress } from "./scroll-progress";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/65 dark:text-[#ededed]/65";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 type Chapter = { id: string; label: string; title: string; body: string[] };
 
@@ -209,7 +209,7 @@ export default function ScrollProgressDemo() {
   const scroller = useRef<HTMLDivElement>(null);
 
   return (
-    <article className={cn("w-full max-w-2xl overflow-hidden rounded-md border", paper, edge, ink)}>
+    <article className={cn("w-full max-w-2xl overflow-hidden rounded-md border", surface, edge, ink)}>
       <header className={cn("border-b px-6 pt-5 pb-3 sm:px-8", edge)}>
         <p className={cn("text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">{t.heading}</h2>

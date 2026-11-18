@@ -93,7 +93,7 @@ export function InkUnderline({ children, as: Tag = "a", active = false, tone = "
         "hover:after:origin-left hover:after:scale-x-100 focus-visible:after:origin-left focus-visible:after:scale-x-100",
         active && "after:scale-x-100",
         // 目前頁的底線用品牌專色，其餘維持墨色
-        active ? "after:bg-[color:var(--sunui-spot,var(--primary))]" : tone === "ink" ? "after:bg-[#171717] dark:after:bg-[#ededed]" : "after:bg-[#171717] dark:after:bg-[#ededed]",
+        active ? "after:bg-[color:var(--sunui-spot,var(--primary))]" : tone === "ink" ? "after:bg-foreground" : "after:bg-foreground",
         className,
       )}
     >
@@ -190,7 +190,7 @@ export function HoverPreviewList({ items, previewSize = { width: 200, height: 25
       {items.map((item) => {
         const Row = item.href ? "a" : "div";
         return (
-          <li key={item.id} className="border-b border-[#e2e2e2] first:border-t dark:border-[#333333]">
+          <li key={item.id} className="border-b border-foreground/10 first:border-t">
             <Row
               href={item.href}
               tabIndex={item.href ? undefined : 0}
@@ -199,7 +199,7 @@ export function HoverPreviewList({ items, previewSize = { width: 200, height: 25
               onBlur={() => setHover(null)}
               className={cn(
                 "flex items-baseline justify-between gap-4 py-4 outline-offset-2 transition-colors focus-visible:outline-2",
-                hover && hover !== item.id ? "text-[#171717]/35 dark:text-[#ededed]/35" : "text-[#171717] dark:text-[#ededed]",
+                hover && hover !== item.id ? "text-foreground/35" : "text-foreground",
               )}
             >
               <span className="text-lg font-medium tracking-tight sm:text-2xl">{item.title}</span>
@@ -214,7 +214,7 @@ export function HoverPreviewList({ items, previewSize = { width: 200, height: 25
             {current && (
               <motion.div
                 key={current.id}
-                className="absolute inset-0 overflow-hidden rounded-md border border-[#e2e2e2] bg-[#f7f7f7] dark:border-[#333333] dark:bg-[#1c1c1c]"
+                className="absolute inset-0 overflow-hidden rounded-md border border-foreground/10 bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
                 initial={{ opacity: 0, scale: reduce ? 1 : 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}

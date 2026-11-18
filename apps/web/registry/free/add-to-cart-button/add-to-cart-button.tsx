@@ -101,9 +101,9 @@ const MESSAGES: Record<SunLocale, AddToCartLabels> = {
 };
 
 // 設計語言（DESIGN.md）：飛出去的是一張紙吊牌
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -294,7 +294,7 @@ function FlyingTag({
       aria-hidden="true"
       className={cn(
         "pointer-events-none fixed top-0 left-0 z-[100] flex origin-top flex-col items-center gap-1 rounded-[3px] border px-1 pt-3.5 pb-1 font-mono text-[9px] leading-none font-semibold tracking-tight tabular-nums shadow-[0_1px_0_rgb(0_0_0/0.04)]",
-        paper,
+        surface,
         edge,
         ink,
       )}

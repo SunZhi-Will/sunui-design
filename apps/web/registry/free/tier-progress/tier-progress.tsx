@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface MembershipTier {
@@ -104,10 +104,10 @@ const MESSAGES: Record<SunLocale, Required<TierProgressLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
@@ -137,7 +137,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
   const move = reduce ? { duration: 0 } : springs.gentle;
 
   return (
-    <div className={cn("relative w-full max-w-xs rounded-md border p-5 font-sans", paper, edge, ink, className)}>
+    <div className={cn("relative w-full max-w-xs rounded-md border p-5 font-sans", surface, edge, ink, className)}>
       <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
 
       <div className="relative mx-auto mt-3 w-full max-w-[15rem]">
@@ -181,7 +181,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
         {isTop ? t.topTier : t.toNext(fmt(next.min - points), next.name)}
       </p>
 
-      <ol className={cn("mt-4 flex border-t border-dashed pt-3", edge)}>
+      <ol className={cn("mt-4 flex border-t pt-3", edge)}>
         {tiers.map((tier, i) => {
           const reached = i <= currentIndex;
           return (
@@ -201,7 +201,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
       </ol>
 
       {next?.perks && next.perks.length > 0 && (
-        <div className={cn("mt-3 border-t border-dashed pt-3", edge)}>
+        <div className={cn("mt-3 border-t pt-3", edge)}>
           <p className={cn("text-xs", inkMuted)}>{t.unlocks(next.name)}</p>
           <ul className="mt-1.5 space-y-1 text-sm">
             {next.perks.map((perk) => (
@@ -218,9 +218,9 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
 
       <AnimatePresence initial={false}>
         {isTop && (
-          <Stamp key="stamp" shape="seal" size="sm" seed="tier-top" className="absolute top-4 right-4">
+          <Result key="stamp" shape="seal" size="sm" seed="tier-top" className="absolute top-4 right-4">
             {t.topStamp}
-          </Stamp>
+          </Result>
         )}
       </AnimatePresence>
     </div>

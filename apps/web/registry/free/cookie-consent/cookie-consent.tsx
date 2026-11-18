@@ -1,9 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useId, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface CookieCategory {
@@ -104,10 +104,10 @@ const MESSAGES: Record<SunLocale, Required<CookieConsentLabels>> = {
   },
 };
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/65 dark:text-[#ededed]/65";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotTrack = "border-[color:var(--sunui-spot,var(--primary))] bg-[color:var(--sunui-spot,var(--primary))]";
 const spotThumb = "bg-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -117,11 +117,6 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 紙條頂端的打孔線兩端各挖一個半圓缺口 */
-const notches: CSSProperties = (() => {
-  const mask = "radial-gradient(circle 7px at 0 28px, #0000 97%, #000), radial-gradient(circle 7px at 100% 28px, #0000 97%, #000)";
-  return { maskImage: mask, WebkitMaskImage: mask, maskComposite: "intersect", WebkitMaskComposite: "source-in" };
-})();
 
 /** 蓋完章停留多久再收起 */
 const STAMP_HOLD = 700;
@@ -166,7 +161,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
   const choiceButton = cn(
     "min-h-10 rounded-md border px-4 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60",
     edge,
-    "bg-white hover:bg-[#efefef] dark:bg-[#0a0a0a] dark:hover:bg-[#262626]",
+    "bg-white hover:bg-muted dark:bg-card dark:hover:bg-foreground/10",
   );
 
   return (
@@ -181,8 +176,8 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
           transition={springs.gentle}
           className={cn(position === "fixed" ? "fixed" : "absolute", "inset-x-3 bottom-3 z-50 mx-auto max-w-xl font-sans sm:inset-x-6", ink, className)}
         >
-          <div style={notches} className={cn("relative overflow-hidden rounded-md border", paper, edge)}>
-            <div className={cn("flex h-14 items-center gap-2 border-b border-dashed px-5", edge)}>
+          <div className={cn("relative overflow-hidden rounded-xl border", surface, edge)}>
+            <div className={cn("flex h-14 items-center gap-2 border-b px-5", edge)}>
               <span className={cn("text-[11px] font-semibold tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</span>
             </div>
 
@@ -208,7 +203,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
                     animate={{ height: "auto", opacity: 1 }}
                     exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { height: 0, opacity: 0 }}
                     transition={springs.gentle}
-                    className={cn("divide-y divide-dashed overflow-hidden border-y border-dashed", edge, "divide-[#e2e2e2] dark:divide-[#333333]")}
+                    className={cn("divide-y overflow-hidden border-y", edge, "divide-foreground/10")}
                   >
                     {categories.map((c) => (
                       <li key={c.id} className="flex items-start justify-between gap-4 py-3">
@@ -255,9 +250,9 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
 
             <AnimatePresence>
               {saved && (
-                <Stamp key="saved" shape="tick" seed="consent" className="absolute top-5 right-5">
+                <Result key="saved" shape="tick" seed="consent" className="absolute top-5 right-5">
                   {t.stamp}
-                </Stamp>
+                </Result>
               )}
             </AnimatePresence>
             <span role="status" className="sr-only">

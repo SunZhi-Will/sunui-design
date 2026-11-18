@@ -50,7 +50,7 @@ export function ScrollRevealText({
   splitBy = "auto",
   dimOpacity = 0.2,
   accentWords = NO_WORDS,
-  accentClassName = "text-[#171717] dark:text-[#ededed]",
+  accentClassName = "text-foreground",
   offset = ["start 0.85", "end 0.45"],
   lang,
   locale,
@@ -88,7 +88,7 @@ export function ScrollRevealText({
     <Tag
       ref={ref}
       lang={lang ?? locale}
-      className={cn("text-2xl leading-relaxed font-semibold text-[#171717] sm:text-3xl dark:text-[#ededed]", className)}
+      className={cn("text-2xl leading-relaxed font-semibold text-foreground sm:text-3xl", className)}
     >
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">

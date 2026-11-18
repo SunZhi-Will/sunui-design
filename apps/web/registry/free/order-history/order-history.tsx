@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId, useState, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
@@ -122,10 +122,10 @@ const MESSAGES: Record<SunLocale, OrderHistoryMessages> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -159,8 +159,8 @@ export function OrderHistory({
   const count = (o: HistoryOrder) => o.lines.reduce((s, l) => s + l.qty, 0);
 
   return (
-    <section className={cn("w-full max-w-md rounded-md border font-sans", paper, edge, ink, className)}>
-      {title && <h3 className={cn("border-b border-dashed px-4 py-3 text-sm font-semibold tracking-tight", edge)}>{title}</h3>}
+    <section className={cn("w-full max-w-md rounded-md border font-sans", surface, edge, ink, className)}>
+      {title && <h3 className={cn("border-b px-4 py-3 text-sm font-semibold tracking-tight", edge)}>{title}</h3>}
 
       {orders.length === 0 ? (
         <div className="px-6 py-10 text-center">
@@ -175,7 +175,7 @@ export function OrderHistory({
           {emptyAction && <div className="mt-4">{emptyAction}</div>}
         </div>
       ) : (
-        <ul className="divide-y divide-dashed divide-[#e2e2e2] dark:divide-[#333333]">
+        <ul className="divide-y divide-foreground/10">
           {orders.map((o) => {
             const expanded = open === o.id;
             const panelId = `${baseId}-${o.id}`;
@@ -194,9 +194,9 @@ export function OrderHistory({
                       <span className="font-mono text-xs tracking-[0.12em]">#{o.number}</span>
                       <span className="relative inline-flex">
                         <AnimatePresence initial={false} mode="popLayout">
-                          <Stamp key={o.status} size="sm" seed={o.id} tone={o.status === "pending" ? "vermilion" : "ink"} void={o.status === "cancelled"}>
+                          <Result key={o.status} size="sm" seed={o.id} tone={o.status === "pending" ? "positive" : "muted"} void={o.status === "cancelled"}>
                             {t.status[o.status]}
-                          </Stamp>
+                          </Result>
                         </AnimatePresence>
                       </span>
                     </span>
@@ -235,7 +235,7 @@ export function OrderHistory({
                       transition={springs.gentle}
                       className="overflow-hidden"
                     >
-                      <div className={cn("mx-4 mb-4 border-t border-dashed pt-3 text-sm", edge)}>
+                      <div className={cn("mx-4 mb-4 border-t pt-3 text-sm", edge)}>
                         <ul className="space-y-2">
                           {o.lines.map((l, i) => (
                             <li key={`${l.name}-${i}`} className="flex items-baseline gap-2">
@@ -251,7 +251,7 @@ export function OrderHistory({
                             </li>
                           ))}
                         </ul>
-                        <dl className={cn("mt-3 space-y-1 border-t border-dashed pt-2 text-xs tabular-nums", edge, inkMuted)}>
+                        <dl className={cn("mt-3 space-y-1 border-t pt-2 text-xs tabular-nums", edge, inkMuted)}>
                           <div className="flex justify-between">
                             <dt>{t.shipping}</dt>
                             <dd>{o.shipping ? money(o.shipping) : t.free}</dd>

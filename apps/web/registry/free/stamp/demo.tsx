@@ -2,7 +2,7 @@
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { Stamp } from "./stamp";
+import { Result } from "./stamp";
 
 const copy = {
   en: {
@@ -83,29 +83,29 @@ export default function StampDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   const samples = [
-    <Stamp key="tick" shape="tick">{t.tick}</Stamp>,
+    <Result key="tick" shape="tick">{t.tick}</Result>,
     <span key="box" className="flex flex-wrap items-center gap-3">
-      <Stamp seed="claim-1">{t.claimed}</Stamp>
-      <Stamp seed="sold-1" tone="ink">{t.soldOut}</Stamp>
+      <Result seed="claim-1">{t.claimed}</Result>
+      <Result seed="sold-1" tone="muted">{t.soldOut}</Result>
     </span>,
     <span key="seal" className="flex flex-wrap items-center gap-3">
-      <Stamp shape="seal" seed="win-1">{t.winner}</Stamp>
-      <Stamp shape="seal" seed="tier-1" sub={t.tier}>{t.topTier}</Stamp>
+      <Result shape="seal" seed="win-1">{t.winner}</Result>
+      <Result shape="seal" seed="tier-1" sub={t.tier}>{t.topTier}</Result>
     </span>,
-    <Stamp key="date" shape="date" seed="order-20418" date="2026-11-05T09:30:00">{t.paid}</Stamp>,
+    <Result key="date" shape="date" seed="order-20418" date="2026-11-05T09:30:00">{t.paid}</Result>,
     <span key="chop" className="flex flex-wrap items-center gap-3">
-      <Stamp shape="chop" seed="invite-1">{t.chop}</Stamp>
-      <Stamp shape="chop" seed="member-1" filled>{t.chopFilled}</Stamp>
+      <Result shape="chop" seed="invite-1">{t.chop}</Result>
+      <Result shape="chop" seed="member-1" filled>{t.chopFilled}</Result>
     </span>,
   ];
 
   return (
-    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-dashed divide-[#e2e2e2] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:divide-[#333333] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-foreground/10 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       {t.rows.map(([title, examples], i) => (
         <div key={title} className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[1fr_auto]">
           <div>
             <p className="text-sm font-medium">{title}</p>
-            <p className="text-xs text-[#171717]/60 dark:text-[#ededed]/60">{examples}</p>
+            <p className="text-xs text-muted-foreground">{examples}</p>
           </div>
           <div className="flex min-h-12 items-center sm:justify-end">{samples[i]}</div>
         </div>

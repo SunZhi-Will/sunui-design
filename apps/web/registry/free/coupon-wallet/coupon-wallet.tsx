@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface WalletCoupon {
@@ -86,10 +86,10 @@ const MESSAGES: Record<SunLocale, Required<CouponWalletLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
@@ -219,13 +219,13 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                 style={notches}
                 className={cn(
                   "relative flex h-full overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)]",
-                  paper,
+                  surface,
                   isOn ? spotBorder : edge,
                 )}
               >
                 {/* 不可用時只淡化內容，紙面保持不透明，扇形展開時後面的券才不會透出來 */}
                 <span
-                  className={cn("flex shrink-0 flex-col items-center justify-center border-r border-dashed", edge, c.unavailableReason && "opacity-55")}
+                  className={cn("flex shrink-0 flex-col items-center justify-center border-r", edge, c.unavailableReason && "opacity-55")}
                   style={{ width: STUB }}
                 >
                   <span className={cn("text-2xl leading-none font-semibold tracking-tight tabular-nums", spot)}>{c.amount}</span>
@@ -238,9 +238,9 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                 </span>
                 <AnimatePresence initial={false}>
                   {isOn && (
-                    <Stamp key="stamp" size="sm" seed={c.id} className="absolute right-2 bottom-2">
+                    <Result key="stamp" size="sm" seed={c.id} className="absolute right-2 bottom-2">
                       {t.applied}
-                    </Stamp>
+                    </Result>
                   )}
                 </AnimatePresence>
               </span>

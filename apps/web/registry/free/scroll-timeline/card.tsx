@@ -67,7 +67,7 @@ export default function ScrollTimelineCard() {
   const current = Math.min(tick, t.tracking.length - 1);
 
   return (
-    <div className="mx-auto w-80 rounded-lg border border-[#e2e2e2] bg-[#f7f7f7] p-4 text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+    <div className="mx-auto w-80 rounded-lg border border-foreground/10 bg-card p-4 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       <p className="font-mono text-[11px] tracking-[0.12em] opacity-60">{t.order}</p>
       <p className="mt-0.5 mb-3 text-base font-semibold tracking-tight">{t.eta}</p>
       <ScrollTimeline mode="progress" current={current} items={t.tracking} className="space-y-2 text-sm" />

@@ -78,9 +78,9 @@ const jacketStock: Record<string, number> = {
 /** 現有的商品照只有一種顏色：選到別的顏色時，誠實標出照片是哪一色 */
 function Photo({ src, note }: { src: string; note: string | null }) {
   return (
-    <div className="relative aspect-[5/6] overflow-hidden rounded-md border border-[#e2e2e2] bg-[#c4bdb4] dark:border-[#333333]">
+    <div className="relative aspect-[5/6] overflow-hidden rounded-md border border-foreground/10 bg-[#c4bdb4]">
       <img src={src} alt="" decoding="async" className="size-full object-cover" />
-      {note && <span className="absolute bottom-2 left-2 rounded-sm bg-[#f7f7f7]/90 px-1.5 py-0.5 text-[11px] text-[#171717]">{note}</span>}
+      {note && <span className="absolute bottom-2 left-2 rounded-sm bg-card/90 px-1.5 py-0.5 text-[11px] text-foreground">{note}</span>}
     </div>
   );
 }
@@ -167,7 +167,7 @@ export default function VariantPickerDemo() {
           <p className="mt-0.5 text-lg font-semibold tracking-tight tabular-nums">$128.00</p>
         </div>
         <div className="space-y-2.5">
-          <p className="text-sm text-[#171717]/60 dark:text-[#ededed]/60">{t.fit}</p>
+          <p className="text-sm text-muted-foreground">{t.fit}</p>
           <OptionChips<Fit>
             locale={locale}
             aria-label={t.fit}

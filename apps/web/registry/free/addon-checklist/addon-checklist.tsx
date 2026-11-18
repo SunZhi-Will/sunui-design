@@ -90,10 +90,10 @@ const MESSAGES: Record<SunLocale, Required<AddonChecklistLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
@@ -150,8 +150,8 @@ export function AddonChecklist({
   }, [total, reduceMotion, mv]);
 
   return (
-    <div className={cn("w-full max-w-sm min-w-[17rem] rounded-md border px-5 pt-4 pb-3 font-sans", paper, edge, ink, className)}>
-      <p className={cn("border-b border-dashed pb-3 text-sm font-semibold tracking-tight", edge)}>{title}</p>
+    <div className={cn("w-full max-w-sm min-w-[17rem] rounded-md border px-5 pt-4 pb-3 font-sans", surface, edge, ink, className)}>
+      <p className={cn("border-b pb-3 text-sm font-semibold tracking-tight", edge)}>{title}</p>
 
       <ul className="py-2" aria-label={typeof title === "string" ? title : undefined}>
         {basePrice !== undefined && (
@@ -210,7 +210,7 @@ export function AddonChecklist({
         })}
       </ul>
 
-      <div className={cn("flex items-baseline justify-between gap-3 border-t border-dashed pt-3", edge)}>
+      <div className={cn("flex items-baseline justify-between gap-3 border-t pt-3", edge)}>
         <span className={cn("text-xs tracking-[0.14em] uppercase", inkMuted)}>{t.subtotal}</span>
         <motion.span className="text-lg font-semibold tracking-tight tabular-nums" aria-hidden="true">
           {shown}

@@ -81,9 +81,9 @@ const MESSAGES: Record<SunLocale, AvatarStackLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、墨
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkOutline = "border-[#171717]/70 dark:border-[#ededed]/70";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const ink = "text-foreground";
+const inkOutline = "border-foreground/70";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
@@ -116,7 +116,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
   const extraText = `+${compact(extra, locale)}`;
   const hiddenNames = hidden.map((h) => h.name).join(t.separator);
   const extraLabel = t.more(String(extra), hiddenNames);
-  const disc = cn("flex items-center justify-center rounded-full border font-medium tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", paper, ink, inkOutline, s.text);
+  const disc = cn("flex items-center justify-center rounded-full border font-medium tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", surface, ink, inkOutline, s.text);
 
   return (
     <ul aria-label={`${t.label} (${count})`} className={cn("flex items-center", className)}>
@@ -142,7 +142,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
           <motion.li key="overflow" className="relative" style={{ marginLeft: s.overlap, zIndex: 1 }}>
             <Lift title={hiddenNames || t.more(compact(extra, locale), "")} reduce={reduce}>
               {onOverflowClick ? (
-                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-[#efefef] dark:hover:bg-[#262626]")} style={{ minWidth: s.box, height: s.box }}>
+                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-muted dark:hover:bg-foreground/10")} style={{ minWidth: s.box, height: s.box }}>
                   {extraText}
                 </button>
               ) : (
@@ -176,7 +176,7 @@ function Lift({ title, note, reduce, children }: { title: string; note?: string;
       {active && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-52 -translate-x-1/2 rounded-[3px] bg-[#171717] px-2 py-1 text-xs text-[#f7f7f7] dark:bg-[#ededed] dark:text-[#171717]"
+          className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-52 -translate-x-1/2 rounded-[3px] bg-foreground px-2 py-1 text-xs text-background"
         >
           <span className="block truncate font-medium">{title}</span>
           {note && <span className="block truncate opacity-70">{note}</span>}

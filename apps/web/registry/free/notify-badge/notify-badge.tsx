@@ -33,7 +33,7 @@ const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--
 
 const tones = {
   accent: spotFill,
-  ink: "bg-[#171717] text-[#f7f7f7] dark:bg-[#ededed] dark:text-[#1c1c1c]",
+  ink: "bg-foreground text-background",
   primary: "bg-primary text-primary-foreground",
 };
 

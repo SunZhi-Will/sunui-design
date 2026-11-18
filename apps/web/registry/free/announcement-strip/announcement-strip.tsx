@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -86,23 +86,17 @@ const MESSAGES: Record<SunLocale, Required<AnnouncementStripLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
+const vermilion = "text-foreground";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 紙條左右兩端各挖一個半圓缺口，像撕下來的票根 */
-const NOTCH = 7;
-const notches: CSSProperties = (() => {
-  const mask = `radial-gradient(circle ${NOTCH}px at 0 50%, #0000 97%, #000), radial-gradient(circle ${NOTCH}px at 100% 50%, #0000 97%, #000)`;
-  return { maskImage: mask, WebkitMaskImage: mask, maskComposite: "intersect", WebkitMaskComposite: "source-in" };
-})();
 
 function readDismissed(key: string) {
   try {
@@ -159,9 +153,9 @@ export function AnnouncementStrip({ messages, storageKey, dismissible = true, on
           transition={springs.gentle}
           className={cn("w-full overflow-hidden font-sans", ink, className)}
         >
-          <div style={notches} className={cn("flex min-h-11 items-center gap-2 border-y px-3 py-1.5 text-sm sm:px-5", paper, edge)}>
+          <div className={cn("flex min-h-11 items-center gap-2 border-y px-3 py-1.5 text-sm sm:px-5", surface, edge)}>
             <span className={cn("hidden shrink-0 text-[11px] font-semibold tracking-[0.14em] uppercase sm:inline", vermilion)}>{t.eyebrow}</span>
-            <span aria-hidden="true" className={cn("hidden h-4 shrink-0 border-l border-dashed sm:block", edge)} />
+            <span aria-hidden="true" className={cn("hidden h-4 shrink-0 border-l sm:block", edge)} />
 
             {total > 1 && (
               <motion.button type="button" aria-label={t.previous} onClick={() => go(-1)} whileTap={reduce ? undefined : { x: -2 }} transition={springs.snappy} className={iconButton}>

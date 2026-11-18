@@ -65,10 +65,10 @@ const sideClass: Record<SidePanelSide, string> = {
 };
 
 // 設計語言（DESIGN.md）：一張紙從邊緣滑進來，紙面、紙邊、墨色
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 
 const offscreen: Record<SidePanelSide, { x?: string; y?: string }> = {
@@ -181,7 +181,7 @@ export function SidePanel({
         <div className={cn(portal ? "fixed" : "absolute", "inset-0 z-50")} onKeyDown={onKeyDown}>
           <motion.div
             aria-hidden="true"
-            className="absolute inset-0 bg-[#171717]/30 dark:bg-black/55"
+            className="absolute inset-0 bg-foreground/30 dark:bg-black/55"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -202,7 +202,7 @@ export function SidePanel({
             exit="hidden"
             className={cn(
               "absolute flex flex-col shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none",
-              paper,
+              surface,
               edge,
               ink,
               sideClass[side],
@@ -226,7 +226,7 @@ export function SidePanel({
                 onClick={() => onOpenChange(false)}
                 aria-label={closeLabel}
                 className={cn(
-                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-[#171717] focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-[#ededed]",
+                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
                   inkMuted,
                 )}
               >

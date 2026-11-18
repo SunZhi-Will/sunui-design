@@ -201,7 +201,7 @@ export function FloatingField({
   };
 
   const fieldClass = cn(
-    "peer w-full bg-transparent px-3 text-sm text-[#171717] outline-none dark:text-[#ededed]",
+    "peer w-full bg-transparent px-3 text-sm text-foreground outline-none",
     multiline ? "min-h-24 resize-y pb-2 pt-6" : "h-14 pb-2 pt-6",
     (trailing || valid) && "pr-10",
     morph && "text-transparent dark:text-transparent",
@@ -237,8 +237,8 @@ export function FloatingField({
       <div
         ref={scope}
         className={cn(
-          "relative rounded-md border bg-[#f7f7f7] transition-colors dark:bg-[#1c1c1c]",
-          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? spotBorder : "border-[#e2e2e2] dark:border-[#333333]",
+          "relative rounded-md border bg-card transition-colors shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
+          error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? spotBorder : "border-foreground/10",
         )}
       >
         {multiline ? <textarea rows={rows} {...common} /> : <input {...common} />}
@@ -247,7 +247,7 @@ export function FloatingField({
         {!multiline && (ghost || morph) && (
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-3 top-6 flex h-6 items-center overflow-hidden text-sm whitespace-pre">
             {morph ? (
-              <span className="text-[#171717] dark:text-[#ededed]">
+              <span className="text-foreground">
                 {morph[0]}
                 {morph[1].split("").map((c, i) => (
                   <motion.span
@@ -265,7 +265,7 @@ export function FloatingField({
             ) : (
               <>
                 <span className="text-transparent">{value}</span>
-                <span className="text-[#171717]/30 dark:text-[#ededed]/30">{ghost}</span>
+                <span className="text-foreground/30">{ghost}</span>
               </>
             )}
           </div>
@@ -280,7 +280,7 @@ export function FloatingField({
           className={cn(
             "pointer-events-none absolute left-3 text-sm",
             multiline ? "top-4" : "top-[1.05rem]",
-            error ? "text-destructive" : floated ? "text-[#171717]/70 dark:text-[#ededed]/70" : "text-[#171717]/50 dark:text-[#ededed]/50",
+            error ? "text-destructive" : floated ? "text-muted-foreground" : "text-muted-foreground",
           )}
         >
           {label}
@@ -293,7 +293,7 @@ export function FloatingField({
             aria-hidden="true"
             className={cn(
               "pointer-events-none absolute top-1.5 right-3 text-[11px] tabular-nums",
-              count >= maxLength! * 0.9 ? "text-[#171717] dark:text-[#ededed]" : "text-[#171717]/45 dark:text-[#ededed]/45",
+              count >= maxLength! * 0.9 ? "text-foreground" : "text-foreground/45",
             )}
           >
             {count}/{maxLength}
@@ -336,7 +336,7 @@ export function FloatingField({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: reduce ? 0 : 0.14 }}
-              className={cn("text-xs", error ? "text-destructive" : valid && successMessage && !offer ? "text-emerald-700 dark:text-emerald-400" : offer ? "text-[#171717] dark:text-[#ededed]" : "text-muted-foreground")}
+              className={cn("text-xs", error ? "text-destructive" : valid && successMessage && !offer ? "text-emerald-700 dark:text-emerald-400" : offer ? "text-foreground" : "text-muted-foreground")}
             >
               {error ??
                 (offer

@@ -96,8 +96,8 @@ export function SlidingTabs(props: SlidingTabsProps) {
           aria-label={props["aria-label"]}
           className={cn(
             "relative flex max-w-full",
-            variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-[#e2e2e2] dark:border-[#333333]",
-            variant === "segment" && cn("rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-1 dark:border-[#333333] dark:bg-[#1c1c1c]", fullWidth ? "w-full" : "w-fit"),
+            variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-foreground/10",
+            variant === "segment" && cn("rounded-md border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
           )}
         >
@@ -123,8 +123,8 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
                   variant === "chips" ? "rounded-full border" : "rounded-md",
-                  variant === "chips" && (on ? spotBorder : "border-[#e2e2e2] hover:border-[#171717]/40 dark:border-[#333333]"),
-                  on ? (variant === "chips" ? spotOn : "text-[#171717] dark:text-[#ededed]") : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
+                  variant === "chips" && (on ? spotBorder : "border-foreground/10 hover:border-foreground/40"),
+                  on ? (variant === "chips" ? spotOn : "text-foreground") : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {on && variant === "underline" && (
@@ -134,7 +134,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   <motion.span
                     layoutId="ind"
                     transition={t}
-                    className="absolute inset-0 rounded-[5px] border border-[#e2e2e2] bg-background shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#333333]"
+                    className="absolute inset-0 rounded-[5px] border border-foreground/10 bg-background shadow-[0_1px_0_rgb(0_0_0/0.04)]"
                   />
                 )}
                 {variant === "chips" && (

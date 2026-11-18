@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface CopyCodeButtonProps {
@@ -77,11 +77,11 @@ const MESSAGES: Record<SunLocale, CopyCodeButtonLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 // 虛線用淡墨色，紙邊色在紙面上幾乎看不見
-const edge = "border-[#171717]/25 dark:border-[#ededed]/25";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const edge = "border-foreground/25";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
@@ -148,8 +148,8 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
   return (
     <div
       className={cn(
-        "relative inline-flex max-w-full items-stretch rounded-md border border-dashed font-sans",
-        paper,
+        "relative inline-flex max-w-full items-stretch rounded-md border font-sans",
+        surface,
         edge,
         ink,
         s.root,
@@ -159,7 +159,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
       {caption && (
         <span
           className={cn(
-            "flex min-w-0 items-center border-r border-dashed font-medium tracking-[0.14em] whitespace-nowrap uppercase",
+            "flex min-w-0 items-center border-r font-medium tracking-[0.14em] whitespace-nowrap uppercase",
             edge,
             inkMuted,
             s.caption,
@@ -183,9 +183,9 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         <AnimatePresence>
           {copied && (
             <motion.span key={stampKey} exit={{ opacity: 0, transition: { duration: 0.15 } }} className="pointer-events-none absolute inset-0 grid place-items-center font-sans">
-              <Stamp shape="tick" seed={code} size={size}>
+              <Result shape="tick" seed={code} size={size}>
                 {t.stamp}
-              </Stamp>
+              </Result>
             </motion.span>
           )}
         </AnimatePresence>
@@ -198,7 +198,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
         whileTap={reduceMotion ? undefined : { scale: 0.94 }}
         transition={springs.snappy}
         className={cn(
-          "flex shrink-0 items-center gap-1.5 rounded-r-[5px] border-l border-dashed font-medium transition-colors",
+          "flex shrink-0 items-center gap-1.5 rounded-r-[5px] border-l font-medium transition-colors",
           "hover:bg-[#171717]/[0.04] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset dark:hover:bg-[#ededed]/[0.06]",
           edge,
           copied ? ink : inkMuted,

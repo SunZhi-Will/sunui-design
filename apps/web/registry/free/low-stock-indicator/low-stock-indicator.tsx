@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type StockLevel = "in-stock" | "low" | "critical" | "sold-out";
@@ -125,8 +125,8 @@ const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙邊、墨、品牌專色
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const edge = "border-foreground/10";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
@@ -188,9 +188,9 @@ export function LowStockIndicator({
           <p id={labelId} role="status" aria-live="polite" className="flex items-center">
             {level === "sold-out" ? (
               <>
-                <Stamp tone="ink" seed="sold-out" appear={stampLive}>
+                <Result tone="muted" seed="sold-out" appear={stampLive}>
                   {t.soldOut}
-                </Stamp>
+                </Result>
                 <span className="sr-only">{t.soldOut}</span>
               </>
             ) : (

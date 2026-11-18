@@ -3,7 +3,7 @@
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, type ChangeEvent, type CSSProperties, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { instant, springs, useShake } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
@@ -766,9 +766,9 @@ export function RedeemKeyInput({
           <p className="text-[11px] text-[var(--rk-muted)]">{name}</p>
         </div>
         {result && (
-          <Stamp shape="tick" size="sm" appear={fresh} delay={0.06} className="text-[color:var(--rk-text)] dark:text-[color:var(--rk-text)]">
+          <Result shape="tick" size="sm" appear={fresh} delay={0.06} className="text-[color:var(--rk-text)] dark:text-[color:var(--rk-text)]">
             {result}
-          </Stamp>
+          </Result>
         )}
       </motion.div>
     </motion.div>

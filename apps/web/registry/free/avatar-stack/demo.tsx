@@ -86,7 +86,7 @@ export default function AvatarStackDemo() {
           <h2 className="text-lg font-semibold tracking-tight">{productNames.bottle}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{t.blurb}</p>
           <p className="mt-3 text-xl font-semibold tracking-tight tabular-nums">$32</p>
-          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-dashed border-border pt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border pt-4">
             <AvatarStack people={buyers} total={1284} max={4} locale={locale} />
             <p className="min-w-[9rem] flex-1 text-xs leading-snug text-muted-foreground">
               <span className="font-medium text-foreground tabular-nums">{new Intl.NumberFormat(locale).format(1284)}</span> {t.bought}

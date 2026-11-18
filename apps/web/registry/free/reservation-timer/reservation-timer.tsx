@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion, type Transition, type Variants } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 /**
@@ -273,9 +273,9 @@ export function ReservationTimer({
           <AnimatePresence mode="wait" initial={false}>
             {expired ? (
               <motion.span key="released" exit={{ opacity: 0, transition: fade(100) }}>
-                <Stamp tone="ink" void size="sm">
+                <Result tone="muted" void size="sm">
                   {t.released}
-                </Stamp>
+                </Result>
               </motion.span>
             ) : labels?.deadline ? null : (
               <motion.span key="left" role="timer" exit={{ opacity: 0, transition: fade(100) }} className="text-foreground tabular-nums">

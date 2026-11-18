@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const surfaceUnder = "bg-muted dark:bg-foreground/10";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
 const sizes = ["S", "M", "L", "XL"];
 
 const copy = {
@@ -29,7 +29,7 @@ export default function SidePanelCard() {
   const toggle = (v: string) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
 
   return (
-    <div className={cn("relative mx-auto h-[220px] w-72 overflow-hidden rounded-md border", paper, edge, ink)}>
+    <div className={cn("relative mx-auto h-[220px] w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
       <header className={cn("flex items-center justify-between border-b px-3 py-2", edge)}>
         <button
           type="button"
@@ -42,7 +42,7 @@ export default function SidePanelCard() {
       </header>
       <div className="grid grid-cols-2 gap-3 p-3">
         {[0, 1].map((i) => (
-          <div key={i} aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", paperUnder)} />
+          <div key={i} aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", surfaceUnder)} />
         ))}
       </div>
 

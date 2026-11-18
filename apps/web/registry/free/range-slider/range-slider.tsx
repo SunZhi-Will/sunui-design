@@ -164,7 +164,7 @@ export function RangeSlider<V extends RangeValue>({
         onPointerUp={onTrackUp}
         onPointerCancel={onTrackUp}
       >
-        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#e2e2e2] dark:bg-[#333333]" />
+        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-foreground/10" />
         <motion.div
           className={cn("absolute top-1/2 h-1 -translate-y-1/2 rounded-full", spotBg)}
           initial={false}
@@ -175,7 +175,7 @@ export function RangeSlider<V extends RangeValue>({
           <span
             key={tick}
             aria-hidden="true"
-            className={cn("absolute top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full", pct(tick) >= lo && pct(tick) <= hi ? "bg-[#f7f7f7] dark:bg-[#1c1c1c]" : "bg-[#171717]/30 dark:bg-[#ededed]/30")}
+            className={cn("absolute top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full", pct(tick) >= lo && pct(tick) <= hi ? "bg-card" : "bg-foreground/30")}
             style={{ left: `${pct(tick)}%` }}
           />
         ))}
@@ -194,14 +194,14 @@ export function RangeSlider<V extends RangeValue>({
             onKeyDown={(e) => onKeyDown(e, i)}
             onFocus={() => setFocused(i)}
             onBlur={() => setFocused(null)}
-            className={cn("absolute top-1/2 z-10 -ml-2.5 -mt-2.5 size-5 rounded-full border-[1.5px] bg-[#f7f7f7] outline-offset-2 focus-visible:outline-2 dark:bg-[#1c1c1c]", spotBorder)}
+            className={cn("absolute top-1/2 z-10 -ml-2.5 -mt-2.5 size-5 rounded-full border-[1.5px] bg-card outline-offset-2 focus-visible:outline-2", spotBorder)}
             initial={false}
             animate={{ left: `${pct(v)}%`, scale: dragging === i && !reduce ? 1.15 : 1 }}
             transition={t}
             style={{ zIndex: dragging === i || focused === i ? 20 : 10 }}
           >
             {showTooltip && (dragging === i || focused === i) && (
-              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-[#e2e2e2] bg-[#f7f7f7] px-1.5 py-0.5 text-xs tabular-nums text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-foreground/10 bg-card px-1.5 py-0.5 text-xs tabular-nums text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
                 {format(v)}
               </span>
             )}

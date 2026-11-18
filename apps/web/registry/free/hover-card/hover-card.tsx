@@ -69,10 +69,10 @@ const MESSAGES: Record<SunLocale, Required<HoverCardLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、品牌專色
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -223,7 +223,7 @@ export function HoverCard({
             transition={reduce ? { duration: 0 } : springs.gentle}
             className={cn(
               "absolute z-50 block w-64 max-w-[calc(100vw-2rem)] rounded-md border p-3 text-left font-normal shadow-[0_1px_0_rgb(0_0_0/0.04)]",
-              paper,
+              surface,
               edge,
               ink,
               place.above ? "bottom-full mb-2" : "top-full mt-2",
@@ -235,7 +235,7 @@ export function HoverCard({
             )}
             <span className="block text-sm leading-snug font-medium">{product.name}</span>
             {product.meta && <span className={cn("mt-0.5 block text-xs", inkMuted)}>{product.meta}</span>}
-            <span className={cn("mt-3 flex items-baseline gap-2 border-t border-dashed pt-3 tabular-nums", edge)}>
+            <span className={cn("mt-3 flex items-baseline gap-2 border-t pt-3 tabular-nums", edge)}>
               <span className="text-base font-semibold tracking-tight">{fmt.format(product.price)}</span>
               {product.compareAt && (
                 <>

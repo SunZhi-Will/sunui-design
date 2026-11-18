@@ -104,7 +104,7 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
 };
 
 // 設計語言（DESIGN.md）：墨線星星，不用金色
-const ink = "text-[#171717] dark:text-[#ededed]";
+const ink = "text-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
@@ -358,7 +358,7 @@ export function StarRating({
                                 "rounded-md border px-2.5 py-1 text-xs leading-tight transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
                                 on
                                   ? cn(spotBorder, spotFill)
-                                  : "border-[#e2e2e2] text-current/80 hover:border-[#a3a3a3] dark:border-[#333333] dark:hover:border-[#737373]",
+                                  : "border-foreground/10 text-current/80 hover:border-muted-foreground/70",
                               )}
                             >
                               {r}

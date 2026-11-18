@@ -22,9 +22,9 @@ export type TinyScene = TinyProp | { prop: TinyProp; person?: boolean };
 type Tone = "paper" | "card" | "ink";
 /** 同一張紙的三階明度：頂面最亮、正面次之、側面最暗 */
 const FILL: Record<Tone, { top: string; front: string; side: string }> = {
-  paper: { top: "fill-[#f7f7f7] dark:fill-[#1c1c1c]", front: "fill-[#e8e8e8] dark:fill-[#272727]", side: "fill-[#dbdbdb] dark:fill-[#131313]" },
-  card: { top: "fill-[#e3e3e3] dark:fill-[#333333]", front: "fill-[#d4d4d4] dark:fill-[#282828]", side: "fill-[#c2c2c2] dark:fill-[#1a1a1a]" },
-  ink: { top: "fill-[#525252] dark:fill-[#a3a3a3]", front: "fill-[#404040] dark:fill-[#8a8a8a]", side: "fill-[#262626] dark:fill-[#666666]" },
+  paper: { top: "fill-card", front: "fill-[#e8e8e8] dark:fill-[#272727]", side: "fill-[#dbdbdb] dark:fill-[#131313]" },
+  card: { top: "fill-[#e3e3e3] dark:fill-foreground/10", front: "fill-foreground/15 dark:fill-[#282828]", side: "fill-[#c2c2c2] dark:fill-[#1a1a1a]" },
+  ink: { top: "fill-muted-foreground", front: "fill-[#404040] dark:fill-[#8a8a8a]", side: "fill-[#262626] dark:fill-[#666666]" },
 };
 
 export type ScenePart =
@@ -201,11 +201,11 @@ export function placeScene(scene: TinyScene, blockX: number, blockY: number, blo
 
 export type PersonTone = "card" | "ink" | "red";
 
-const INK_LINE = "stroke-[#171717] dark:stroke-[#ededed]";
+const INK_LINE = "stroke-foreground";
 const SHIRT: Record<PersonTone, string> = {
   card: FILL.card.front,
   ink: FILL.ink.front,
-  red: "fill-[#171717] dark:fill-[#ededed]",
+  red: "fill-foreground",
 };
 
 /** 一個小人：腳底在 (0, 0)，身高約 35；red 是正在走流程的那個人 */
@@ -215,7 +215,7 @@ export function Figure({ tone = "card" }: { tone?: PersonTone }) {
       <path d="M-2.6 0 V-9 M2.6 0 V-9" strokeWidth="2.4" strokeLinecap="round" className={INK_LINE} />
       <rect x="-5.5" y="-22" width="11" height="14" rx="4.5" strokeWidth="1.2" className={cn(SHIRT[tone], INK_LINE)} />
       <circle cy="-27" r="4.6" strokeWidth="1.2" className={cn(FILL.paper.top, INK_LINE)} />
-      <path d="M-4.6 -27.6 a4.6 4.6 0 0 1 9.2 0 q-4.6 -1.6 -9.2 0 z" className="fill-[#171717] dark:fill-[#ededed]" />
+      <path d="M-4.6 -27.6 a4.6 4.6 0 0 1 9.2 0 q-4.6 -1.6 -9.2 0 z" className="fill-foreground" />
     </g>
   );
 }

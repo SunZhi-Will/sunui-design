@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -59,10 +59,10 @@ const MESSAGES: Record<SunLocale, ShippingOptionsLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
@@ -71,12 +71,8 @@ const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
 } as const;
 
-/** 票根寬度與打孔線上下的半圓缺口 */
+/** 左欄（配送方式與選取圈）寬度 */
 const STUB = "5.75rem";
-const notch: CSSProperties = (() => {
-  const mask = `radial-gradient(circle at ${STUB} 0, #0000 7px, #000 7.5px) top / 100% 51% no-repeat, radial-gradient(circle at ${STUB} 100%, #0000 7px, #000 7.5px) bottom / 100% 51% no-repeat`;
-  return { maskImage: mask, WebkitMaskImage: mask };
-})();
 
 export function ShippingOptions({
   options,
@@ -148,28 +144,27 @@ export function ShippingOptions({
             whileTap={reduceMotion || o.disabled ? undefined : { scale: 0.98 }}
             transition={springs.snappy}
             className={cn(
-              "group relative isolate flex min-h-[5.5rem] items-stretch rounded-md text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
+              "group relative isolate flex min-h-[5.5rem] items-stretch rounded-xl text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
               o.disabled && "cursor-not-allowed opacity-50",
             )}
           >
-            {/* 紙面另成一層再打缺口，焦點框才不會被 mask 裁掉 */}
+            {/* 表面另成一層，選取時只換邊線顏色，焦點框不受影響 */}
             <span
               aria-hidden="true"
-              style={notch}
               className={cn(
-                "absolute inset-0 -z-10 rounded-md border",
-                paper,
+                "absolute inset-0 -z-10 rounded-xl border",
+                surface,
                 on ? spotBorder : edge,
-                !on && !o.disabled && "group-hover:border-[#171717]/30 dark:group-hover:border-[#ededed]/30",
+                !on && !o.disabled && "group-hover:border-foreground/30",
               )}
             />
-            {/* 票根：配送方式與選取圈 */}
+            {/* 左欄：配送方式與選取圈 */}
             <span className="flex shrink-0 flex-col justify-between gap-2 px-3 py-3" style={{ width: STUB }}>
               <Dot on={on} reduceMotion={!!reduceMotion} />
               <span className="text-sm leading-tight font-semibold tracking-tight">{o.name}</span>
             </span>
-            <span aria-hidden="true" className={cn("my-2 border-l border-dashed", on ? "border-current/40" : edge)} />
-            {/* 票身：到貨日與運費 */}
+            <span aria-hidden="true" className={cn("my-2 border-l", on ? "border-current/40" : edge)} />
+            {/* 右欄：到貨日與運費 */}
             <span className="flex min-w-0 flex-1 items-start justify-between gap-3 px-3.5 py-3">
               <span className="min-w-0">
                 <span className={cn("block text-[11px] tracking-[0.14em] uppercase", inkMuted)}>{etaLabel}</span>

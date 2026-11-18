@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { Fragment, useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { shakeKeyframes, shakeTransition } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
@@ -85,11 +85,11 @@ const MESSAGES: Record<SunLocale, OtpInputLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
+const vermilion = "text-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
@@ -238,10 +238,10 @@ export function OtpInput({
                     onBlur={() => setFocused((f) => (f === i ? -1 : f))}
                     className={cn(
                       "block h-14 w-10 rounded-[3px] border text-center font-mono text-2xl font-medium tabular-nums caret-transparent outline-none transition-colors sm:w-12",
-                      paper,
+                      surface,
                       edge,
-                      "focus:border-[#171717]/45 dark:focus:border-[#ededed]/45 selection:bg-transparent",
-                      status === "error" && "border-[#171717]/50 dark:border-[#ededed]/50",
+                      "focus:border-foreground/45 selection:bg-transparent",
+                      status === "error" && "border-foreground/50",
                       disabled && "cursor-not-allowed opacity-50",
                     )}
                   />
@@ -257,9 +257,9 @@ export function OtpInput({
 
         <AnimatePresence initial={false}>
           {status === "success" && (
-            <Stamp key="stamp" shape="tick" seed={groupId} className="absolute top-full right-1 mt-2">
+            <Result key="stamp" shape="tick" seed={groupId} className="absolute top-full right-1 mt-2">
               {text.stamp}
-            </Stamp>
+            </Result>
           )}
         </AnimatePresence>
       </div>

@@ -56,7 +56,7 @@ export function addCjkSpacing(text: string) {
 
 // 設計語言（DESIGN.md）：朱紅只用在印章關鍵字
 const seal =
-  "whitespace-nowrap rounded-[2px] bg-[#171717] [margin-inline:0.04em] [padding-inline:0.14em] text-[#f7f7f7] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] dark:bg-[#ededed] dark:text-[#1c1c1c]";
+  "whitespace-nowrap rounded-[2px] bg-foreground [margin-inline:0.04em] [padding-inline:0.14em] text-background [box-decoration-break:clone] [-webkit-box-decoration-break:clone]";
 
 const NO_WORDS: string[] = [];
 
@@ -136,7 +136,7 @@ export function CjkHeading({
       data-compress={compress}
       data-vertical={vertical || undefined}
       className={cn(
-        "sunui-cjk-heading text-[length:clamp(2rem,1.2rem+3vw,3rem)] font-bold tracking-[0.04em] text-[#171717] dark:text-[#ededed]",
+        "sunui-cjk-heading text-[length:clamp(2rem,1.2rem+3vw,3rem)] font-bold tracking-[0.04em] text-foreground",
         vertical ? "leading-[1.5] [writing-mode:vertical-rl]" : "leading-[1.3] [text-wrap:balance]",
         className,
       )}

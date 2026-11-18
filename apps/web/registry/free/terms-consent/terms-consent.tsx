@@ -93,11 +93,11 @@ const MESSAGES: Record<SunLocale, Required<TermsConsentLabels>> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
-const vermilion = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
+const vermilion = "text-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -139,15 +139,15 @@ export function TermsConsent({
   }
 
   return (
-    <section className={cn("w-full max-w-md rounded-md border", paper, edge, ink, className)}>
-      <header className={cn("flex items-baseline justify-between gap-3 border-b border-dashed px-4 py-3", edge)}>
+    <section className={cn("w-full max-w-md rounded-md border", surface, edge, ink, className)}>
+      <header className={cn("flex items-baseline justify-between gap-3 border-b px-4 py-3", edge)}>
         <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
         <p className="text-xs font-medium tabular-nums" aria-hidden="true">
           {t.counter(done, required.length)}
         </p>
       </header>
 
-      <ul className="divide-y divide-dashed divide-[#e2e2e2] dark:divide-[#333333]">
+      <ul className="divide-y divide-foreground/10">
         {items.map((item) => {
           const on = checked.includes(item.id);
           const inputId = `${uid}-${item.id}`;
@@ -167,7 +167,7 @@ export function TermsConsent({
                   className={cn(
                     "mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-[4px] border transition-colors",
                     "peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
-                    on ? cn(spotBorder, spotFill) : "border-[#171717]/30 dark:border-[#ededed]/30",
+                    on ? cn(spotBorder, spotFill) : "border-foreground/30",
                   )}
                 >
                   <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -205,7 +205,7 @@ export function TermsConsent({
         })}
       </ul>
 
-      <footer className={cn("space-y-2 border-t border-dashed px-4 py-3", edge)}>
+      <footer className={cn("space-y-2 border-t px-4 py-3", edge)}>
         <button
           type="button"
           aria-disabled={!ready}

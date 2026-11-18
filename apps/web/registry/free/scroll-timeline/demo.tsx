@@ -90,7 +90,7 @@ export default function ScrollTimelineDemo() {
   const scroller = useRef<HTMLDivElement>(null);
   return (
     <div className="grid w-full max-w-3xl gap-4 md:grid-cols-[1fr_1.3fr]">
-      <div className="rounded-lg border border-[#e2e2e2] bg-[#f7f7f7] p-5 text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+      <div className="rounded-lg border border-foreground/10 bg-card p-5 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
         <p className="font-mono text-xs tracking-[0.12em] opacity-60">{t.order}</p>
         <p className="mb-5 mt-1 text-lg font-semibold tracking-tight">{t.eta}</p>
         <ScrollTimeline mode="progress" current={2} items={t.tracking} className="space-y-5" />

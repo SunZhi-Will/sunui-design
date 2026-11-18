@@ -117,7 +117,7 @@ export function LoadingButton({
         "relative inline-flex h-10 items-center justify-center overflow-hidden whitespace-nowrap text-sm font-medium outline-offset-2 focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-50",
         shrunk ? "w-10 px-0" : "px-4",
         variant === "primary" && state !== "error" && spotFill,
-        variant === "paper" && "border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]",
+        variant === "paper" && "border border-foreground/10 bg-card text-foreground",
         state === "error" && "bg-destructive text-white",
         className,
       )}

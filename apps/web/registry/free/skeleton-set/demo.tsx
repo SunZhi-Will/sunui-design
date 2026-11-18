@@ -46,7 +46,7 @@ export function ProductPick({ kind, price }: { kind: ProductKind; price: string 
   const t = useDemoText(copy);
   const names = useProductNames();
   return (
-    <article className="overflow-hidden rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+    <article className="overflow-hidden rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       <ProductArt kind={kind} />
       <div className="p-4">
         <p className="truncate text-sm font-medium">{names[kind]}</p>
@@ -69,7 +69,7 @@ export function OrderList() {
   const t = useDemoText(copy);
   const { date } = useDate();
   return (
-    <ul className="divide-y divide-dashed divide-[#e2e2e2] rounded-md border border-[#e2e2e2] bg-[#f7f7f7] text-[#171717] dark:divide-[#333333] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
+    <ul className="divide-y divide-foreground/10 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       {orders.map((o) => (
         <li key={o.no} className="flex items-center gap-3 px-4 py-3.5">
           <ProductArt kind={o.kind} className="size-10 shrink-0 rounded-[3px]" />
@@ -94,7 +94,7 @@ export function TrackingList() {
       {t.events.map((e, i) => (
         <li
           key={e}
-          className="flex h-11 items-center justify-between gap-3 rounded-md border border-[#e2e2e2] bg-[#f7f7f7] px-4 text-sm text-[#171717] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]"
+          className="flex h-11 items-center justify-between gap-3 rounded-md border border-foreground/10 bg-card px-4 text-sm text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
         >
           <span className={i === 0 ? "truncate font-medium" : "truncate text-current/70"}>{e}</span>
           <span className="shrink-0 text-xs text-current/60 tabular-nums">

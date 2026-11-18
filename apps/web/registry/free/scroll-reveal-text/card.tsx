@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 
 import { ScrollRevealText } from "./scroll-reveal-text";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
 
 const copy = {
   en: {
@@ -41,7 +41,7 @@ export default function ScrollRevealTextCard() {
   const t = useDemoText(copy);
 
   return (
-    <article lang={t.lang} className={cn("mx-auto w-72 overflow-hidden rounded-md border", paper, edge, ink)}>
+    <article lang={t.lang} className={cn("mx-auto w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
       <div ref={scroller} className="relative h-[210px] overflow-y-auto px-5">
         <div className="h-20" />
         <ScrollRevealText

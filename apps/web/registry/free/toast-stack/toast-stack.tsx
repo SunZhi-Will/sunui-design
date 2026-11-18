@@ -144,10 +144,10 @@ const MESSAGES: Record<SunLocale, ToastStackLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
@@ -160,7 +160,7 @@ const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
   success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-emerald-700 dark:text-emerald-400" />,
   error: (
-    <g className="text-[#171717] dark:text-[#ededed]">
+    <g className="text-foreground">
       <path d="M10.3 4.6L3.4 17a2 2 0 0 0 1.7 3h13.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z" />
       <path d="M12 9.5v4" />
       <circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none" />
@@ -295,7 +295,7 @@ export function ToastStack({
                 key={t.id}
                 className={cn(
                   "absolute inset-x-0 overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  paper,
+                  surface,
                   edge,
                   ink,
                   placement === "bottom" ? "bottom-0 origin-bottom" : "top-0 origin-top",
@@ -409,7 +409,7 @@ function ToastBody({
         type="button"
         onClick={onDismiss}
         aria-label={dismissLabel}
-        className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-colors hover:text-[#171717] dark:hover:text-[#ededed] focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
+        className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
       >
         <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
           <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />

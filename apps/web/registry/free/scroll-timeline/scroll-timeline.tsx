@@ -40,9 +40,9 @@ const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 function Dot({ reached, current, reduce }: { reached: boolean; current: boolean; reduce: boolean | null }) {
   return (
     <span className="absolute left-0 top-1 grid size-4 -translate-x-1/2 place-items-center">
-      <span className="absolute inset-0 rounded-full border-[1.5px] border-[#171717]/25 bg-[#f7f7f7] dark:border-[#ededed]/25 dark:bg-[#1c1c1c]" />
+      <span className="absolute inset-0 rounded-full border-[1.5px] border-foreground/25 bg-card" />
       <motion.span
-        className={cn("absolute inset-0 rounded-full", current ? spotBg : "bg-[#a3a3a3] dark:bg-[#737373]")}
+        className={cn("absolute inset-0 rounded-full", current ? spotBg : "bg-muted-foreground/70")}
         initial={false}
         animate={{ scale: reached ? 1 : 0 }}
         transition={reduce ? { duration: 0 } : springs.stamp}
@@ -91,7 +91,7 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
 
   return (
     <ol ref={listRef} className={cn("relative ml-2 space-y-8 pl-8", className)}>
-      <span aria-hidden="true" className="absolute bottom-2 left-0 top-2 w-px bg-[#e2e2e2] dark:bg-[#333333]" />
+      <span aria-hidden="true" className="absolute bottom-2 left-0 top-2 w-px bg-foreground/10" />
       {mode === "scroll" ? (
         <motion.span aria-hidden="true" className={cn("absolute bottom-2 left-0 top-2 w-px origin-top", spotBg)} style={{ scaleY: smooth }} />
       ) : (
@@ -123,8 +123,8 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
               animate={{ opacity: reached || mode === "progress" ? 1 : 0.45 }}
               transition={{ duration: reduce ? 0 : 0.2 }}
             >
-              {item.time && <p className="text-xs tabular-nums text-[#171717]/60 dark:text-[#ededed]/60">{item.time}</p>}
-              <p className={cn("mt-0.5 font-medium tracking-tight", mode === "progress" && !reached && "text-[#171717]/45 dark:text-[#ededed]/45")}>{item.title}</p>
+              {item.time && <p className="text-xs tabular-nums text-muted-foreground">{item.time}</p>}
+              <p className={cn("mt-0.5 font-medium tracking-tight", mode === "progress" && !reached && "text-foreground/45")}>{item.title}</p>
               {item.description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.description}</p>}
             </motion.div>
           </li>

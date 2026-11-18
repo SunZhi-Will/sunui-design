@@ -98,11 +98,11 @@ const MESSAGES: Record<SunLocale, ExpandingSearchLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const surfaceUnder = "bg-muted dark:bg-foreground/10";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -281,7 +281,7 @@ export function ExpandingSearch({
         transition={reduce ? { duration: 0 } : springs.gentle}
         className={cn(
           "relative flex h-10 max-w-full items-center overflow-hidden rounded-md border transition-colors",
-          open ? cn(paper, edge, "focus-within:border-[#171717]/40 dark:focus-within:border-[#ededed]/40") : "border-transparent",
+          open ? cn(surface, edge, "focus-within:border-foreground/40") : "border-transparent",
         )}
       >
         {open ? (
@@ -350,7 +350,7 @@ export function ExpandingSearch({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }}
             transition={{ duration: 0.12 }}
-            className={cn("absolute top-full right-0 left-0 z-20 mt-1.5 max-h-80 overflow-y-auto rounded-md border p-1 shadow-[0_1px_0_rgb(0_0_0/0.04)]", paper, edge)}
+            className={cn("absolute top-full right-0 left-0 z-20 mt-1.5 max-h-80 overflow-y-auto rounded-md border p-1 shadow-[0_1px_0_rgb(0_0_0/0.04)]", surface, edge)}
           >
             {filtered.map((s, i) => (
               <li
@@ -361,7 +361,7 @@ export function ExpandingSearch({
                 onMouseDown={(e) => e.preventDefault()}
                 onPointerMove={() => i !== active && setActive(i)}
                 onClick={() => choose(s)}
-                className={cn("flex cursor-pointer items-center gap-3 rounded-[3px] px-2 py-1.5 text-sm", i === active && paperUnder)}
+                className={cn("flex cursor-pointer items-center gap-3 rounded-[3px] px-2 py-1.5 text-sm", i === active && surfaceUnder)}
               >
                 {s.thumbnail && (
                   <span aria-hidden="true" className={cn("size-10 shrink-0 overflow-hidden rounded-[3px] border", edge)}>

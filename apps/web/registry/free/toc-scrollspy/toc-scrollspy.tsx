@@ -103,7 +103,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
   return (
     <nav aria-label={typeof title === "string" ? title : "Table of contents"} className={cn("text-sm", className)}>
       {title && <p className="mb-3 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{title}</p>}
-      <ul className="relative border-l border-[#e2e2e2] dark:border-[#333333]">
+      <ul className="relative border-l border-foreground/10">
         {items.map((item) => {
           const on = item.id === active;
           return (
@@ -125,7 +125,7 @@ export function TocScrollspy({ items, title, container, offset = 96, smooth = tr
                 className={cn(
                   "block py-1.5 pr-2 outline-offset-2 transition-colors focus-visible:outline-2",
                   item.level === 2 ? "pl-7" : "pl-4",
-                  on ? "font-medium text-[#171717] dark:text-[#ededed]" : "text-[#171717]/55 hover:text-[#171717] dark:text-[#ededed]/55 dark:hover:text-[#ededed]",
+                  on ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {item.label}

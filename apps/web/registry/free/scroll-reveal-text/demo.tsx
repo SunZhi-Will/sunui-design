@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 
 import { ScrollRevealText } from "./scroll-reveal-text";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 const copy = {
   en: {
@@ -61,7 +61,7 @@ export default function ScrollRevealTextDemo() {
   const t = useDemoText(copy);
 
   return (
-    <article lang={t.lang} className={cn("w-full max-w-2xl overflow-hidden rounded-md border", paper, edge, ink)}>
+    <article lang={t.lang} className={cn("w-full max-w-2xl overflow-hidden rounded-md border", surface, edge, ink)}>
       <div ref={scroller} className="relative h-[440px] overflow-y-auto px-6 sm:px-12">
         <header className="pt-10 pb-24 sm:pt-14">
           <p className={cn("text-xs font-medium tracking-[0.2em]", inkMuted)}>{t.eyebrow}</p>

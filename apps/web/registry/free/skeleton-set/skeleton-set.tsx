@@ -10,9 +10,9 @@ export type ShimmerStyle = "pulse" | "none";
 
 const ShimmerContext = createContext<ShimmerStyle>("pulse");
 
-// 設計語言（DESIGN.md）：紙、紙邊。色塊比紙面深一階，像還沒印上去的版位
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
+// 設計語言（DESIGN.md）：表面與 hairline。色塊比表面深一階，表示還沒載入的版位
+const sheet = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
 const block = "bg-[#e7e7e7] dark:bg-[#292929]";
 
 export interface SkeletonProps {
@@ -65,7 +65,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
 /** 排版稿上的圖片版位：細線打叉的方框 */
 export function SkeletonImage({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={cn("relative w-full bg-[#f1f1f1] text-[#e2e2e2] dark:bg-[#232323] dark:text-[#333333]", className)}>
+    <div aria-hidden="true" className={cn("relative w-full bg-muted text-foreground/10", className)}>
       <svg className="absolute inset-0 size-full" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
         <path d="M0 0 100 100M100 0 0 100" vectorEffect="non-scaling-stroke" />
       </svg>
@@ -73,7 +73,7 @@ export function SkeletonImage({ className }: { className?: string }) {
   );
 }
 
-const surface = cn("rounded-md border", paper, edge);
+const surface = cn("rounded-xl border", sheet, edge);
 
 export function SkeletonCard({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
@@ -108,7 +108,7 @@ export function SkeletonProductCard({ className }: { className?: string }) {
 
 export function SkeletonList({ rows = 4, className }: { rows?: number; className?: string }) {
   return (
-    <ul className={cn(surface, "divide-y divide-dashed divide-[#e2e2e2] dark:divide-[#333333]", className)}>
+    <ul className={cn(surface, "divide-y divide-foreground/10", className)}>
       {Array.from({ length: rows }, (_, i) => (
         <li key={i} className="flex items-center gap-3 px-4 py-3.5">
           <Skeleton className="size-10 shrink-0" />

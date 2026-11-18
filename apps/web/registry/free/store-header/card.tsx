@@ -46,7 +46,7 @@ export default function StoreHeaderCard() {
                 <button
                   type="button"
                   onClick={() => setCount((c) => c + 1)}
-                  className="shrink-0 rounded-md border px-2 py-0.5 hover:bg-[#171717]/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-[#ededed]/10"
+                  className="shrink-0 rounded-md border px-2 py-0.5 hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-foreground/10"
                 >
                   {t.add}
                 </button>

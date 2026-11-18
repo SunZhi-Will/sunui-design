@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const surfaceUnder = "bg-muted dark:bg-foreground/10";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 const prices = [128, 96, 84, 42];
 const bagPrices = [128, 84];
@@ -124,7 +124,7 @@ export default function SidePanelDemo() {
   const toggle = (v: string) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
 
   return (
-    <div className={cn("relative h-[30rem] w-full max-w-3xl overflow-hidden rounded-md border", paper, edge, ink)}>
+    <div className={cn("relative h-[30rem] w-full max-w-3xl overflow-hidden rounded-md border", surface, edge, ink)}>
       <header className={cn("flex items-center justify-between gap-3 border-b px-4 py-2.5 sm:px-5", edge)}>
         <button type="button" onClick={() => setPanel("filters")} className={trigger}>
           <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
@@ -142,7 +142,7 @@ export default function SidePanelDemo() {
       <ul className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4 sm:p-5">
         {t.products.map((name, i) => (
           <li key={i} className="text-sm">
-            <div aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", paperUnder)} />
+            <div aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", surfaceUnder)} />
             <p className="mt-2 font-medium">{name}</p>
             <p className={cn("tabular-nums", inkMuted)}>
               {t.productColors[i]}
@@ -189,7 +189,7 @@ export default function SidePanelDemo() {
           <div className="space-y-2 text-sm">
             {colorIds.map((id, i) => (
               <label key={id} className="flex cursor-pointer items-center gap-2.5">
-                <input type="checkbox" checked={picked.includes(id)} onChange={() => toggle(id)} className="size-4 accent-[#171717] dark:accent-[#ededed]" />
+                <input type="checkbox" checked={picked.includes(id)} onChange={() => toggle(id)} className="size-4 accent-foreground" />
                 {t.colors[i]}
               </label>
             ))}
@@ -218,10 +218,10 @@ export default function SidePanelDemo() {
           </div>
         }
       >
-        <ul className={cn("divide-y", "divide-[#e2e2e2] dark:divide-[#333333]")}>
+        <ul className={cn("divide-y", "divide-foreground/10")}>
           {t.bag.map((b, i) => (
             <li key={i} className="flex gap-3 py-3 first:pt-0">
-              <div aria-hidden="true" className={cn("h-16 w-13 shrink-0 rounded-[3px]", paperUnder)} />
+              <div aria-hidden="true" className={cn("h-16 w-13 shrink-0 rounded-[3px]", surfaceUnder)} />
               <div className="min-w-0 flex-1 text-sm">
                 <p className="font-medium">{b.name}</p>
                 <p className={inkMuted}>{b.detail}</p>

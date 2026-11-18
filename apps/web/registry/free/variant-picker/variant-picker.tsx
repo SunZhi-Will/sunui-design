@@ -3,7 +3,7 @@
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { instant, roll, springs } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
@@ -138,10 +138,10 @@ const MESSAGES: Record<SunLocale, Required<VariantPickerLabels> & OptionChipsLab
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨，全部是中性灰
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 // 預覽庫存時只動不透明度與刪除線顏色，不換版面
@@ -261,7 +261,7 @@ export function VariantPicker({
               label: sizeName(id, off),
               className: cn(
                 "relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums",
-                paper,
+                surface,
                 // 選中但這個顏色售完：外框改虛線，選擇還在
                 on ? cn(spotBorder, off && "border-dashed") : edge,
               ),
@@ -392,7 +392,7 @@ interface SoldOutNoteProps {
 /** 售完提示：哪個顏色還有這個尺寸（一鍵切過去），以及到貨通知；結果放在原本按鈕的位置 */
 function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: SoldOutNoteProps) {
   return (
-    <div className={cn("mt-3 space-y-2 rounded-md border p-3 text-sm", paper, edge)}>
+    <div className={cn("mt-3 space-y-2 rounded-md border p-3 text-sm", surface, edge)}>
       <p className="font-medium">{text.line}</p>
       {alternatives.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -418,7 +418,7 @@ function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: Sold
         <div className="flex min-h-9 items-center">
           {done ? (
             <span role="status">
-              <Stamp shape="tick" size="sm">{text.done}</Stamp>
+              <Result shape="tick" size="sm">{text.done}</Result>
               <span className="sr-only">{text.done}</span>
             </span>
           ) : (

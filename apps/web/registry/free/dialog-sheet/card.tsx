@@ -12,7 +12,7 @@ const copy = {
 };
 
 const buttonClass =
-  "rounded-md border border-[#e2e2e2] bg-[#f7f7f7] px-3 py-1.5 text-sm font-medium text-[#171717] transition-colors hover:bg-[#e2e2e2]/60 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]";
+  "rounded-md border border-foreground/10 bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-[#e2e2e2]/60 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 
 /** 型錄卡片：手機寬的商品頁，點「尺寸表」從底部拉起一張面板，往下拖或點遮罩關閉。 */
 export default function DialogSheetCard() {
@@ -35,14 +35,14 @@ export default function DialogSheetCard() {
             >
               <table className="w-full text-left tabular-nums">
                 <thead>
-                  <tr className="border-b border-dashed border-[#e2e2e2] text-xs text-[#171717]/60 dark:border-[#333333] dark:text-[#ededed]/60">
+                  <tr className="border-b border-foreground/10 text-xs text-muted-foreground">
                     <th className="py-1.5 font-medium" />
                     <th className="py-1.5 font-medium">{t.chest}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {t.rows.map(([size, chest]) => (
-                    <tr key={size} className="border-b border-dashed border-[#e2e2e2] last:border-0 dark:border-[#333333]">
+                    <tr key={size} className="border-b border-foreground/10 last:border-0">
                       <td className="py-1.5 font-medium">{size}</td>
                       <td className="py-1.5">{chest}</td>
                     </tr>

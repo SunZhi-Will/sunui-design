@@ -96,7 +96,7 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
               "absolute z-10 -ml-3.5 -mt-3.5 grid size-7 place-items-center rounded-full border-[1.5px] text-xs font-semibold tabular-nums outline-offset-2 transition-colors focus-visible:outline-2",
               on
                 ? cn(spotBorder, spotFill)
-                : "border-[#171717] bg-[#f7f7f7] text-[#171717] hover:bg-[#e2e2e2] dark:border-[#ededed] dark:bg-[#1c1c1c] dark:text-[#ededed]",
+                : "border-foreground bg-card text-foreground hover:bg-foreground/10",
             )}
             style={{ left: `${s.x}%`, top: `${s.y}%` }}
           >
@@ -129,7 +129,7 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
               id={`${uid}-card`}
               role="region"
               aria-label={typeof open.title === "string" ? open.title : undefined}
-              className="pointer-events-auto rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-3.5 text-[#171717] shadow-[0_1px_0_rgb(0_0_0/0.04)] dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]"
+              className="pointer-events-auto rounded-md border border-foreground/10 bg-card p-3.5 text-foreground shadow-[0_1px_0_rgb(0_0_0/0.04)]"
               style={{ originX: place(open).side === "left" ? 1 : 0, originY: place(open).vertical === "up" ? 1 : 0 }}
               initial={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -137,8 +137,8 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
               transition={reduce ? { duration: 0 } : springs.gentle}
             >
               <p className="text-sm font-semibold tracking-tight">{open.title}</p>
-              {open.description && <p className="mt-1 text-xs leading-relaxed text-[#171717]/70 dark:text-[#ededed]/70">{open.description}</p>}
-              {open.action && <div className="mt-3 border-t border-dashed border-[#e2e2e2] pt-3 dark:border-[#333333]">{open.action}</div>}
+              {open.description && <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{open.description}</p>}
+              {open.action && <div className="mt-3 border-t border-foreground/10 pt-3">{open.action}</div>}
             </motion.div>
           </div>
         )}

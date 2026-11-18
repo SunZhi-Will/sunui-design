@@ -55,7 +55,7 @@ const MESSAGES: Record<SunLocale, Required<StoreHeaderLabels>> = {
   ja: { nav: "メイン", menu: "メニュー", cart: (n) => `カート、${n}点` },
 };
 
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const edge = "border-foreground/10";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -105,7 +105,7 @@ export function StoreHeader({
   const navLink =
     "rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
   const iconButton =
-    "relative grid size-9 place-items-center rounded-md text-foreground hover:bg-[#171717]/5 dark:hover:bg-[#ededed]/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+    "relative grid size-9 place-items-center rounded-md text-foreground hover:bg-foreground/5 dark:hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 
   return (
     <motion.header
@@ -186,7 +186,7 @@ export function StoreHeader({
             exit={{ opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.2 }}
             onClick={() => setMenuOpen(false)}
-            className="absolute inset-x-0 top-full h-dvh bg-[#171717]/30 dark:bg-black/50 md:hidden"
+            className="absolute inset-x-0 top-full h-dvh bg-foreground/30 dark:bg-black/50 md:hidden"
           />
         )}
         {menuOpen && (

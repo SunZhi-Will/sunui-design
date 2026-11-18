@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import { Stamp } from "@/components/ui/stamp";
+import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export type LanguageType = "zh" | "en";
@@ -162,11 +162,11 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
 };
 
 // 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const paperUnder = "bg-[#efefef] dark:bg-[#262626]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/60 dark:text-[#ededed]/60";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const surfaceUnder = "bg-muted dark:bg-foreground/10";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -275,7 +275,7 @@ export function CountdownBanner({
   return (
     <section
       style={style}
-      className={cn("@container w-full rounded-md border font-sans shadow-[0_1px_0_rgb(0_0_0/0.04)]", paper, edge, ink, className)}
+      className={cn("@container w-full rounded-md border font-sans shadow-[0_1px_0_rgb(0_0_0/0.04)]", surface, edge, ink, className)}
     >
       <div className="grid gap-5 p-5 @3xl:grid-cols-[1fr_auto_auto] @3xl:items-center @3xl:gap-0 @3xl:p-0">
         <div className="min-w-0 @3xl:px-6 @3xl:py-5">
@@ -283,7 +283,7 @@ export function CountdownBanner({
           {subtitle && <p className={cn("mt-1 text-sm text-pretty", inkMuted)}>{subtitle}</p>}
         </div>
 
-        <div className={cn("relative border-t border-dashed pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
+        <div className={cn("relative border-t pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
           <p className={cn("text-4xl leading-none font-black tracking-tight tabular-nums transition-opacity", ended ? cn(inkMuted, "opacity-40") : spot)}>{discount}</p>
           {(discountedPrice || originalPrice) && (
             <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm tabular-nums">
@@ -299,15 +299,15 @@ export function CountdownBanner({
           <AnimatePresence initial={false}>
             {ended && (
               <motion.span key="ended" exit={{ opacity: 0, transition: { duration: 0.15 } }} className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[40%]">
-                <Stamp tone="ink" seed="sale-ended" appear={wasRunning}>
+                <Result tone="muted" seed="sale-ended" appear={wasRunning}>
                   {t.ended}
-                </Stamp>
+                </Result>
               </motion.span>
             )}
           </AnimatePresence>
         </div>
 
-        <div className={cn("flex flex-wrap items-end gap-x-6 gap-y-4 border-t border-dashed pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
+        <div className={cn("flex flex-wrap items-end gap-x-6 gap-y-4 border-t pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
           <div>
             {/* 進行中只在狀態改變時播報一次，不逐秒朗讀 */}
             <span className="sr-only" role="status">
@@ -367,7 +367,7 @@ function FlipCard({ value, reduceMotion }: { value: string; reduceMotion: boolea
     <span className="relative block h-9 w-[1.6rem] [perspective:300px]">
       <Half top value={state.cur} />
       <Half value={flipping ? state.prev : state.cur} />
-      <span className="absolute inset-x-0 top-1/2 z-10 h-px bg-[#171717]/15 dark:bg-black/50" />
+      <span className="absolute inset-x-0 top-1/2 z-10 h-px bg-foreground/15 dark:bg-black/50" />
       {flipping && (
         <>
           {[true, false].map((top) => (
@@ -392,7 +392,7 @@ function Half({ top, flap, value }: { top?: boolean; flap?: boolean; value: stri
     <span
       className={cn(
         "block overflow-hidden border",
-        paperUnder,
+        surfaceUnder,
         edge,
         flap ? "relative size-full" : cn("absolute inset-x-0 h-1/2", top ? "top-0" : "bottom-0"),
         top ? "rounded-t-[3px] border-b-0" : "rounded-b-[3px]",

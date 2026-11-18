@@ -8,10 +8,10 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { ScrollProgress } from "./scroll-progress";
 
-const paper = "bg-[#f7f7f7] dark:bg-[#1c1c1c]";
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
-const ink = "text-[#171717] dark:text-[#ededed]";
-const inkMuted = "text-[#171717]/65 dark:text-[#ededed]/65";
+const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+const edge = "border-foreground/10";
+const ink = "text-foreground";
+const inkMuted = "text-muted-foreground";
 
 const copy = {
   en: [
@@ -43,7 +43,7 @@ export default function ScrollProgressCard() {
   const scroller = useRef<HTMLDivElement>(null);
 
   return (
-    <article className={cn("mx-auto w-72 overflow-hidden rounded-md border", paper, edge, ink)}>
+    <article className={cn("mx-auto w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
       <header className={cn("border-b px-4 pt-6 pb-2", edge)}>
         <ScrollProgress container={scroller} sections={chapters} position="static" showPercent locale={locale} />
       </header>

@@ -51,7 +51,7 @@ const MESSAGES: Record<SunLocale, Required<ProductMediaLabels>> = {
   ja: { region: "商品画像", zoomIn: "拡大", zoomOut: "縮小", show: (n, total) => `${total}枚中${n}枚目を表示` },
 };
 
-const edge = "border-[#e2e2e2] dark:border-[#333333]";
+const edge = "border-foreground/10";
 /** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 

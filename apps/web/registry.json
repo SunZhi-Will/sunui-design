@@ -7,7 +7,7 @@
       "name": "add-to-cart-button",
       "type": "registry:block",
       "title": "Add To Cart Button",
-      "description": "Add-to-cart button that sends a small paper price tag along an arc into the cart; the cart badge gives a small bump. Use on product cards and detail pages. Reduced motion skips the flight.",
+      "description": "Add-to-cart button that sends a small price tag along an arc into the cart; the cart badge gives a small bump. Use on product cards and detail pages. Reduced motion skips the flight.",
       "dependencies": [
         "framer-motion"
       ],
@@ -53,7 +53,7 @@
       "name": "addon-checklist",
       "type": "registry:block",
       "title": "Add-on Checklist",
-      "description": "A paper receipt of optional extras with dotted leaders between each item and its price, where every row is a checkbox and the subtotal rolls to its new value as you tick. Rows use role=checkbox with keyboard toggling, the subtotal is announced via aria-live, and the number jumps instantly under reduced motion.",
+      "description": "A card of optional extras with dotted leaders between each item and its price, where every row is a checkbox and the subtotal rolls to its new value as you tick. Rows use role=checkbox with keyboard toggling, the subtotal is announced via aria-live, and the number jumps instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -150,7 +150,7 @@
       "name": "animated-number",
       "type": "registry:block",
       "title": "Animated Number",
-      "description": "Mechanical odometer for changing numbers such as counts, stats and prices: each digit wheel turns in the direction the value moved, with Intl currency formatting and an optional small ink trend arrow. Screen readers get the formatted value.",
+      "description": "Mechanical odometer for changing numbers such as counts, stats and prices: each digit wheel turns in the direction the value moved, with Intl currency formatting and an optional small trend arrow. Screen readers get the formatted value.",
       "dependencies": [
         "framer-motion"
       ],
@@ -197,7 +197,7 @@
       "name": "announcement-strip",
       "type": "registry:block",
       "title": "Announcement Strip",
-      "description": "A paper strip notice bar for the top of the store with notched ends, manual previous and next for several messages, and a dismiss that collapses its height and is remembered under a storageKey. Messages sit in a labelled region with a polite live area, controls have ARIA labels, and the collapse is instant under reduced motion.",
+      "description": "A notice bar for the top of the store, a theme surface between two hairlines, with manual previous and next for several messages and a dismiss that collapses its height and is remembered under a storageKey. Messages sit in a labelled region with a polite live area, controls have ARIA labels, and the collapse is instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -291,7 +291,7 @@
       "name": "avatar-stack",
       "type": "registry:block",
       "title": "Avatar Stack",
-      "description": "Social proof avatar stack: initials on paper discs with an ink outline, a +N count and hover or focus tooltips. Use it for team members, recent sign-ups or recent buyers, next to the action they vouch for.",
+      "description": "Social proof avatar stack: overlapping initial discs, a +N count and hover or focus tooltips. Use it for team members, recent sign-ups or recent buyers, next to the action they vouch for.",
       "dependencies": [
         "framer-motion"
       ],
@@ -336,7 +336,7 @@
       "name": "back-to-top",
       "type": "registry:block",
       "title": "Back To Top",
-      "description": "Round paper button that appears after you scroll past a threshold and takes you back to the top, with an ink ring around it that fills as you read. Works on the window or a scroll container, scrolls smoothly unless reduced motion is on, and can sit fixed to the viewport or inside a relative container.",
+      "description": "Round button that appears after you scroll past a threshold and takes you back to the top, with a ring in the brand spot colour around it that fills as you read. Works on the window or a scroll container, scrolls smoothly unless reduced motion is on, and can sit fixed to the viewport or inside a relative container.",
       "dependencies": [
         "framer-motion"
       ],
@@ -868,7 +868,7 @@
       "name": "cjk-heading",
       "type": "registry:block",
       "title": "CJK Heading",
-      "description": "Typeset Traditional Chinese and Japanese campaign headlines: punctuation compression, CJK and Latin spacing, optional vertical writing and a solid ink highlight for one key word. No motion.",
+      "description": "Typeset Traditional Chinese and Japanese campaign headlines: punctuation compression, CJK and Latin spacing, optional vertical writing and a solid highlight in the text colour for one key word. No motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1096,7 +1096,7 @@
       "name": "cookie-consent",
       "type": "registry:block",
       "title": "Cookie Consent",
-      "description": "A paper slip cookie banner that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice draws a small Saved check before the slip slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
+      "description": "A cookie banner on a raised surface that slides up only until a choice is made. Reject all and Accept all have equal weight, Customize opens per-category switches with necessary ones always on, and a choice shows a small Saved check that settles once before the banner slides away. onChange hands you the consent map and storageKey remembers it. Switches use role switch and the banner is a labelled region.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1143,7 +1143,7 @@
       "name": "copy-code-button",
       "type": "registry:block",
       "title": "Copy Code Button",
-      "description": "Printed promo code slip with a dashed outline; copying fades the code and draws an ink check with Copied over it, then announces the result. Falls back when the clipboard API is unavailable.",
+      "description": "Promo code chip with the code set in mono beside a Copy button; copying fades the code and shows a check with Copied over it that settles once, then announces the result. Falls back when the clipboard API is unavailable.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1190,7 +1190,7 @@
       "name": "countdown-banner",
       "type": "registry:block",
       "title": "Countdown Banner",
-      "description": "Paper sale banner with discount, prices and a printed flip-card countdown to a real end date, or to the start of a live event followed by a Live now state; shows a quiet Ended line when time is up. Hydration safe (the server prints only the date text), pauses while the tab is hidden and resyncs on return, in English, Chinese and Japanese.",
+      "description": "Sale banner on a raised surface with discount, prices and a flip-card countdown to a real end date, or to the start of a live event followed by a Live now state; shows a quiet Ended line when time is up. Hydration safe (the server prints only the date text), pauses while the tab is hidden and resyncs on return, in English, Chinese and Japanese.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1443,7 +1443,7 @@
       "name": "dialog-sheet",
       "type": "registry:block",
       "title": "Dialog Sheet",
-      "description": "One dialog for both screens: a centred paper card on desktop that becomes a bottom sheet under 640px, with a handle you can drag down to close. Focus trap, Escape and scrim close, focus returns to the trigger, controlled or uncontrolled, and contained mode for previews. Ships useExitIntent to open it when the cursor leaves through the top of the page.",
+      "description": "One dialog for both screens: a centred card on desktop that becomes a bottom sheet under 640px, with a handle you can drag down to close. Focus trap, Escape and scrim close, focus returns to the trigger, controlled or uncontrolled, and contained mode for previews. Ships useExitIntent to open it when the cursor leaves through the top of the page.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1573,7 +1573,7 @@
       "name": "expanding-search",
       "type": "registry:block",
       "title": "Expanding Search",
-      "description": "Store search field that expands into a paper slip of product suggestions with thumbnails, prices and keyboard navigation (combobox pattern, / shortcut).",
+      "description": "Store search field that expands into a panel of product suggestions with thumbnails, prices and keyboard navigation (combobox pattern, / shortcut).",
       "dependencies": [
         "framer-motion"
       ],
@@ -1618,7 +1618,7 @@
       "name": "favorite-button",
       "type": "registry:block",
       "title": "Favorite Button",
-      "description": "Favorite heart in ink that fills solid ink with a short press when saved, for bookmarks, likes or a wishlist. aria-pressed toggle with optional count.",
+      "description": "Favorite heart outline that fills with the brand spot colour on a short press when saved, for bookmarks, likes or a wishlist. aria-pressed toggle with optional count.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1664,7 +1664,7 @@
       "name": "floating-field",
       "type": "registry:block",
       "title": "Floating Field",
-      "description": "A paper text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in faint ink and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
+      "description": "A text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in muted text and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1738,7 +1738,7 @@
             "Picking a background style quickly: switch preset and palette instead of exporting a new image"
           ],
           "watchOut": [
-            "It is a motion series piece. Paper and product series pages stay flat, without gradients",
+            "It is a motion series piece. Core and product series pages stay restrained, without decorative gradients",
             "Check text contrast on top: light palettes (pastel, meadow) need dark text, the rest need light text",
             "colors[0] is the base color; the rest are accents, so put the background color first",
             "Keep one animated backdrop per screen; for many small cards set animate={false}"
@@ -1811,7 +1811,7 @@
       "name": "hotspots",
       "type": "registry:block",
       "title": "Hotspots",
-      "description": "Numbered pins on a picture (a product shot, screenshot, map or diagram) that open a paper note about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a link, a price or add to cart.",
+      "description": "Numbered pins on a picture (a product shot, screenshot, map or diagram) that open a note card about that part: positions in percent, the open pin turns into an x, notes open to the side away from the nearest edge, and Escape or a click outside closes. Controlled or uncontrolled, numbers or plain dots, and an action slot for a link, a price or add to cart.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1857,7 +1857,7 @@
       "name": "hover-card",
       "type": "registry:block",
       "title": "Hover Card",
-      "description": "A product quick-view card that opens after a short hover delay and stays open while the pointer moves into it, with price, discount and an add to cart button on paper. Keyboard focus opens it, Escape closes it and returns focus, touch opens it on first tap, it flips above the trigger near the viewport edge, and reduced motion removes the slide.",
+      "description": "A product quick-view card that opens after a short hover delay and stays open while the pointer moves into it, with price, discount and an add to cart button. Keyboard focus opens it, Escape closes it and returns focus, touch opens it on first tap, it flips above the trigger near the viewport edge, and reduced motion removes the slide.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2248,7 +2248,7 @@
       "name": "low-stock-indicator",
       "type": "registry:block",
       "title": "Low Stock Indicator",
-      "description": "Honest printed stock tag: one slip per unit when stock is small, otherwise a thin ink line; heavier ink at the critical level and a plain Sold out line when it runs out. Never counts down on its own.",
+      "description": "Honest stock meter: one segment per unit when stock is small, otherwise a thin bar; the brand spot colour at the critical level and a plain muted Sold out line when it runs out. Never counts down on its own.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2345,7 +2345,7 @@
       "name": "notify-badge",
       "type": "registry:block",
       "title": "Notify Badge",
-      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It gives a small bump when the count rises and stays still when it falls, sits in one of three corners, and offers ink or theme primary tones with a screen reader label you phrase yourself.",
+      "description": "Count badge for any icon: wraps a bell, bag or chat icon and shows a number, a max+ cap or a plain dot. It gives a small bump when the count rises and stays still when it falls, sits in one of three corners, and offers the brand spot colour (accent), the text colour (ink) or theme primary tones with a screen reader label you phrase yourself.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2415,7 +2415,7 @@
             "Brand or event pages where a 3D moment helps more than a long grid"
           ],
           "watchOut": [
-            "It is a motion series piece; keep it out of checkout, cart and other paper or product blocks",
+            "It is a motion series piece; keep it out of checkout, cart and other core or product blocks",
             "With fewer images than count, images repeat; pass at least 8 distinct images so repeats are not obvious",
             "Vertical drags on touch screens scroll the page; the sphere turns sideways on touch and in both directions with a mouse or keys",
             "Tiles are small: do not rely on text inside the images"
@@ -2445,7 +2445,7 @@
       "name": "order-history",
       "type": "registry:block",
       "title": "Order History",
-      "description": "A receipt-style list of past orders with small upright status labels, expandable line items with dotted leaders and totals, an actions slot for buy again or track, and an empty state. Each row is a disclosure button with aria-expanded and aria-controls, and the expand and collapse are instant under reduced motion.",
+      "description": "A list of past orders on a card with small status marks, expandable line items with dotted leaders and totals, an actions slot for buy again or track, and an empty state. Each row is a disclosure button with aria-expanded and aria-controls, and the expand and collapse are instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2491,7 +2491,7 @@
       "name": "otp-input",
       "type": "registry:block",
       "title": "OTP Input",
-      "description": "One-time code entry styled like boxes on a printed form: auto-advance, paste to fill, keyboard navigation, a short error shake and an ink check with Verified on success.",
+      "description": "One-time code entry with one bordered box per digit: auto-advance, paste to fill, keyboard navigation, a short error shake and a check with Verified on success that settles once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2742,7 +2742,7 @@
             "A screen-to-screen transition in a pixel or retro styled game UI"
           ],
           "watchOut": [
-            "It is a celebration language for game UI. Paper-series commerce pages confirm with a quiet status line, not particles",
+            "It is a celebration language for game UI. Core-series commerce pages confirm with the Result mark, not particles",
             "Play it in response to a user action, never on a loop or on page load",
             "Content under pixelReveal is visible to the DOM; mark it inert and aria-hidden until onDone, as the demo does",
             "Effects are drawn in art pixels: a very large box at pixelSize 1 costs more per frame, keep pixelSize at 2 or more"
@@ -2956,7 +2956,7 @@
       "name": "quantity-stepper",
       "type": "registry:block",
       "title": "Quantity Stepper",
-      "description": "Receipt-style quantity stepper with tabular count, long-press repeat, typed input, min and max limits and a remove action at the minimum.",
+      "description": "Quantity stepper with tabular count, long-press repeat, typed input, min and max limits and a remove action at the minimum.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3265,7 +3265,7 @@
             "Replacing a flat slider when the section is a visual moment, not a list to compare"
           ],
           "watchOut": [
-            "It is a motion series piece; keep it out of paper and product blocks such as cart or checkout",
+            "It is a motion series piece; keep it out of core and product blocks such as cart or checkout",
             "Use loop={false} when there are fewer than about 2 x visible + 1 cards, or the ends will meet",
             "Autoplay is off by default; turn it on only where people do not need to read",
             "Images are decorative cards here; put prices and buttons outside the ribbon or in your own caption via onChange"
@@ -3391,7 +3391,7 @@
       "name": "scroll-progress",
       "type": "registry:block",
       "title": "Scroll Progress",
-      "description": "Hairline ink reading progress rule for the window or a scroll container, with optional section ticks you can jump to.",
+      "description": "Hairline reading progress bar in the brand spot colour for the window or a scroll container, with optional section ticks you can jump to.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3436,7 +3436,7 @@
       "name": "scroll-reveal-text",
       "type": "registry:block",
       "title": "Scroll Reveal Text",
-      "description": "Paragraph whose characters (CJK) or words (Latin) darken from faint to full ink as the reader scrolls. Accent phrases can print in heavier ink.",
+      "description": "Paragraph whose characters (CJK) or words (Latin) darken from faint to the full text colour as the reader scrolls. Accent phrases can take their own class to stand out.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3571,7 +3571,7 @@
       "name": "scroll-timeline",
       "type": "registry:block",
       "title": "Scroll Timeline",
-      "description": "Vertical timeline in two modes: scroll mode draws an ink line down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in full ink and earlier ones in muted ink. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
+      "description": "Vertical timeline in two modes: scroll mode draws a line in the brand spot colour down as the page scrolls and fills each dot it reaches, progress mode takes a current step and works as order tracking with the current dot in the spot colour and earlier ones muted. Times, titles and descriptions per item, a window or container scroll source and an adjustable line anchor.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3617,7 +3617,7 @@
       "name": "shipping-options",
       "type": "registry:block",
       "title": "Shipping Options",
-      "description": "Ticket-stub radio cards for delivery methods: a perforated stub holds the method name and radio dot, the body shows the arrival date, note and fee, and free shipping is printed in bold ink. Works as a radiogroup with arrow keys and roving focus, skips disabled methods, wraps to a single column on narrow screens, and the dot switches instantly under reduced motion.",
+      "description": "Two-part radio cards for delivery methods: a left column holds the method name and radio dot, a hairline divider separates the body with the arrival date, note and fee, and free shipping shows in the brand spot colour. Works as a radiogroup with arrow keys and roving focus, skips disabled methods, wraps to a single column on narrow screens, and the dot switches instantly under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3662,7 +3662,7 @@
       "name": "side-panel",
       "type": "registry:block",
       "title": "Side Panel",
-      "description": "Paper sheet drawer from the left, right or bottom over a flat ink scrim, with focus trap, Escape to close, scroll lock and focus return.",
+      "description": "Drawer on a raised surface from the left, right or bottom over a dimmed scrim, with focus trap, Escape to close, scroll lock and focus return.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3708,7 +3708,7 @@
       "name": "skeleton-set",
       "type": "registry:block",
       "title": "Skeleton Set",
-      "description": "Paper placeholders for cards, lists, text and generic full-width rows with a slow opacity pulse while loading that stops under reduced motion, crossfading to real content. Sets aria-busy, announces a custom loading label through a status region and announces when loaded.",
+      "description": "Placeholders for cards, lists, text and generic full-width rows with a slow opacity pulse while loading that stops under reduced motion, crossfading to real content. Sets aria-busy, announces a custom loading label through a status region and announces when loaded.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3880,7 +3880,7 @@
             "Rigging your own SVG: write a rig that maps the pointer to channel goals and a draw function that turns channel values into paths"
           ],
           "watchOut": [
-            "It is a motion series piece; keep it out of paper and product blocks such as checkout or cart",
+            "It is a motion series piece; keep it out of core and product blocks such as checkout or cart",
             "Autoplay is a loop: use it for one hero drawing, not a whole grid, and leave it off where people need to read",
             "Define custom rigs outside components so the springs are not reset on every render",
             "Drawings use currentColor and fill-background; place them on the page background or a card so the overlaps read correctly"
@@ -3960,7 +3960,7 @@
       "name": "star-rating",
       "type": "registry:block",
       "title": "Star Rating",
-      "description": "Ink star rating that asks why: after a score is chosen, the same frame grows reason chips (what went wrong at or below the threshold, what they liked above it) that swap in place when the score crosses it, plus an optional \"same as N% of buyers\" line from a distribution; the level label rolls in the direction of change. Half stars, keyboard roving focus, optional clear, hidden form input, and a read-only mode for review summaries. Reduced motion switches instantly.",
+      "description": "Star rating in the brand spot colour that asks why: after a score is chosen, the same frame grows reason chips (what went wrong at or below the threshold, what they liked above it) that swap in place when the score crosses it, plus an optional \"same as N% of buyers\" line from a distribution; the level label rolls in the direction of change. Half stars, keyboard roving focus, optional clear, hidden form input, and a read-only mode for review summaries. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4103,7 +4103,7 @@
       "name": "store-header",
       "type": "registry:block",
       "title": "Store Header",
-      "description": "A sticky store header that tucks away when you scroll down past a threshold and slides back the moment you scroll up, shrinking from 64 to 52 px with a paper hairline once it leaves the top. The cart button takes a cartRef so add-to-cart-button can fly into it, an announcement slot rides along, and a mobile menu collapses by height. It never hides while keyboard focus is inside or the menu is open, and under reduced motion it only shrinks.",
+      "description": "A sticky store header that tucks away when you scroll down past a threshold and slides back the moment you scroll up, shrinking from 64 to 52 px with a hairline once it leaves the top. The cart button takes a cartRef so add-to-cart-button can fly into it, an announcement slot rides along, and a mobile menu collapses by height. It never hides while keyboard focus is inside or the menu is open, and under reduced motion it only shrinks.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4250,7 +4250,7 @@
       "name": "terms-consent",
       "type": "registry:block",
       "title": "Terms Consent",
-      "description": "A paper slip of checkout consents where required items show an n / m counter and gate the pay button, while optional opt-ins like marketing email default to off. The button stays focusable with aria-disabled and explains why it is blocked through aria-describedby and a polite live region; with reduced motion the check marks switch instantly.",
+      "description": "A card of checkout consents where required items show an n / m counter and gate the pay button, while optional opt-ins like marketing email default to off. The button stays focusable with aria-disabled and explains why it is blocked through aria-describedby and a polite live region; with reduced motion the check marks switch instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4437,7 +4437,7 @@
       "name": "tiny-chart",
       "type": "registry:block",
       "title": "Tiny Chart",
-      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks on an isometric floor, each with an optional code-drawn scene such as a desk, counter, shelf, warehouse, truck, house or post box, and a character who hops onto the current step), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is inked in full ink while the rest stays muted, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the ink and the marker jump to the new step at once.",
+      "description": "A small explainer chart you can play, with a real state machine behind it: every button follows the rules of the process it shows, and a button that cannot fire yet answers with one sentence saying why. One machine, four layouts: isometric (steps as blocks on an isometric floor, each with an optional code-drawn scene such as a desk, counter, shelf, warehouse, truck, house or post box, and a character who hops onto the current step), flow (steps and branches), timeline (each step to scale) and cycle (a loop and its exit). Play all, Next step and a choice button for each branch; the path walked is drawn in the brand spot colour while the rest stays muted, and a logic panel checks the machine for unreachable steps, dead ends and ambiguous buttons. Exports a headless useStatechart hook for your own drawings. Under reduced motion the line and the marker jump to the new step at once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4504,7 +4504,7 @@
       "name": "toast-stack",
       "type": "registry:block",
       "title": "Toast Stack",
-      "description": "Paper slip notifications that stack, fan out on hover or focus and dismiss by swipe, Escape or Delete, with optional thumbnail and undo action; timers pause while the tab is hidden. Includes useToasts and useUndoable, which applies a removal at once and shows an Undo slip that stays until used or closed, no confirm dialog.",
+      "description": "Notifications on a raised surface that stack, fan out on hover or focus and dismiss by swipe, Escape or Delete, with optional thumbnail and undo action; timers pause while the tab is hidden. Includes useToasts and useUndoable, which applies a removal at once and shows an Undo toast that stays until used or closed, no confirm dialog.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4548,7 +4548,7 @@
       "name": "toc-scrollspy",
       "type": "registry:block",
       "title": "TOC Scrollspy",
-      "description": "Table of contents that highlights the section being read, with an ink bar that slides between entries. It counts a section as read once its top passes an offset, lights the last entry at the bottom of the page, jumps smoothly on click and moves focus to the heading. Works on the window or a scroll container, with nested entries and a useScrollSpy hook for your own layout.",
+      "description": "Table of contents that highlights the section being read, with a bar in the brand spot colour that slides between entries. It counts a section as read once its top passes an offset, lights the last entry at the bottom of the page, jumps smoothly on click and moves focus to the heading. Works on the window or a scroll container, with nested entries and a useScrollSpy hook for your own layout.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4592,7 +4592,7 @@
       "name": "typewriter",
       "type": "registry:block",
       "title": "Typewriter",
-      "description": "Types phrases once with grapheme-correct CJK timing and rests on the last one (loop optional). Thin ink caret; screen readers get the full text once.",
+      "description": "Types phrases once with grapheme-correct CJK timing and rests on the last one (loop optional). Thin caret in the text colour; screen readers get the full text once.",
       "dependencies": [
         "framer-motion"
       ],
@@ -4636,7 +4636,7 @@
       "name": "variant-picker",
       "type": "registry:block",
       "title": "Variant Picker",
-      "description": "Product colour swatches and size options driven by per-combination stock. Hovering or focusing a colour previews its stock on the size row in place, and switching to a colour where the chosen size is sold out keeps the size and opens an inline note listing the colours that still have it. With onNotify, sold-out sizes open an Email me when it is back action in place, and showSummary adds a line such as Fog grey · M · Only 2 left where only the changed part rolls. Sizes are paper chips or, with sizeStyle=\"chips\", typographic chips with one sliding ink outline; OptionChips exports that row on its own. Every row is a labelled radiogroup whose arrow, Home and End keys skip sold-out options, stock changes are announced politely, and all motion is instant under reduced motion.",
+      "description": "Product colour swatches and size options driven by per-combination stock. Hovering or focusing a colour previews its stock on the size row in place, and switching to a colour where the chosen size is sold out keeps the size and opens an inline note listing the colours that still have it. With onNotify, sold-out sizes open an Email me when it is back action in place, and showSummary adds a line such as Fog grey · M · Only 2 left where only the changed part rolls. Sizes are bordered boxes or, with sizeStyle=\"chips\", typographic chips with one sliding outline; OptionChips exports that row on its own. Every row is a labelled radiogroup whose arrow, Home and End keys skip sold-out options, stock changes are announced politely, and all motion is instant under reduced motion.",
       "dependencies": [
         "framer-motion"
       ],
