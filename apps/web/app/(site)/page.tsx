@@ -1,26 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { permanentRedirect } from "next/navigation";
 
-import { AgentSteps } from "@/components/agent-steps";
 import { BlockCard } from "@/components/block-card";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
-import { CountUp } from "@/components/home/count-up";
 import { HomeHero } from "@/components/home/home-hero";
 import { SpecimenTable, type SpecimenKey } from "@/components/home/specimen-table";
 import { WaitlistForm } from "@/components/waitlist-form";
-import { iconGroups } from "@/lib/icon-groups";
 import { buildCatalogItems } from "@/lib/catalog-items";
 import { getI18n } from "@/lib/i18n-server";
 import { format } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
 import { getItem, getItems, installCommand } from "@/lib/registry";
 import { foundingState, foundingWindow } from "@/lib/site";
-import { variantIds } from "@/registry/__generated__/variants";
 
 
-const COMPAT = ["shadcn CLI", "Next.js", "Vite", "Tailwind CSS v4", "Motion", "Claude Code", "Cursor", "Codex"];
+// 「交給 agent」那一段展示的成果：一句話之後裝好的三個區塊
+const AGENT_RESULT = ["countdown-banner", "coupon-claim-card", "free-shipping-progress"];
 // 首頁展示的 Pro 場景：挑一個動作就有大變化、畫面最完整的。Pro 資料夾不在時整段不出現
 const SHOWCASE = ["kelvin-switch", "lamp-dimmer-scene", "theme-reveal", "glass-cube-hero", "launch-stage-hero", "curve-rail-hero"];
 // 首頁的九張精選：都是免費區塊，一按就有反應的
@@ -61,12 +59,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     Object.entries(SPECIMEN_BLOCKS).flatMap(([key, name]) => (getItem(name) ? [[key, `/blocks/${name}`]] : [])),
   ) as Partial<Record<SpecimenKey, string>>;
   const t = m.home.sections;
-  const styleCount = Object.values(variantIds).reduce((n, ids) => n + ids.length, 0);
-  const iconCount = iconGroups.reduce((n, group) => n + group.icons.length, 0);
-  // 「裡面有什麼」四張卡：數字與連結，順序對應 messages 的 sections.inside.items
-  const insideCounts = [all.length, styleCount, iconCount, proCount];
-  const insideLinks = ["/blocks", "/docs/motion", "/icons", "/pricing"];
   const picks = PICKS.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
+  const agentBlocks = AGENT_RESULT.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
+  const cardLabels = { livePreview: m.catalog.livePreview, expand: m.catalog.expand, pro: m.tier.pro };
+  const browseLabel = format(m.home.hero.browse, { n: all.length });
   const showcase = SHOWCASE.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
   const founding = foundingState();
   const day = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
@@ -87,89 +83,113 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
               }
         }
         title={m.home.title}
-        sub={format(m.home.hero.sub, { n: all.length })}
-        primary={{ label: m.common.browseBlocks, href: "/blocks" }}
+        sub={m.home.hero.sub}
+        primary={{ label: browseLabel, href: "/blocks" }}
         secondary={{ label: m.home.hero.proCta, href: "/pricing" }}
         command={firstFree && <Command value={installCommand(firstFree)} />}
         table={<SpecimenTable copy={m.home.hero.specimens} links={specimenLinks} />}
       />
 
-      {/* 相容性：只有文字，不放商標圖 */}
-      <section aria-label={t.compat} className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 border-y border-line py-5 text-sm text-subtle lg:mt-0">
-        <span className="font-medium text-fg">{t.compat}</span>
-        {COMPAT.map((name) => (
-          <span key={name} className="font-mono text-[13px]">
-            {name}
-          </span>
-        ))}
-      </section>
-
-      {/* 裡面有什麼：四個數字，不加說明 */}
-      <section aria-labelledby="inside-title" className="mt-28 sm:mt-36">
-        <SectionHead id="inside-title" eyebrow={t.inside.eyebrow} title={t.inside.title} />
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {t.inside.items.map((label, i) => (
-            <Link
-              key={label}
-              href={insideLinks[i]}
-              className="group flex flex-col rounded-xl bg-card p-6 shadow-e1 transition-shadow duration-200 hover:shadow-e2"
-            >
-              <CountUp value={insideCounts[i]} className="text-5xl font-semibold tracking-[-0.04em] tabular-nums" />
-              <span className="mt-4 flex items-center gap-1.5 font-medium">
-                {label}
-                <Arrow className="size-3.5 text-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-fg" />
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Pro 場景：旗艦，即時預覽 */}
-      {showcase.length > 0 && (
-        <section aria-labelledby="showcase-title" className="mt-28 sm:mt-36">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHead id="showcase-title" eyebrow={t.showcase.eyebrow} title={t.showcase.title} />
-            <Link href="/pricing" className="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold btn-primary">
-              {t.showcase.cta}
-              <Arrow className="size-4" />
-            </Link>
-          </div>
-          <ul className="mt-10 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-            {showcase.map((item) => (
+      {/* 免費區塊：開場正下方就是可以按的東西 */}
+      <section aria-labelledby="free-title" className="mt-10 sm:mt-16">
+        <SectionHead id="free-title" title={t.free}>
+          <Link href="/blocks" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
+            {format(t.catalog.cta, { n: all.length })}
+            <Arrow className="size-3.5" />
+          </Link>
+        </SectionHead>
+        <ul className="mt-8 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          {picks.map((item) => (
               <BlockCard
                 key={item.name}
                 name={item.name}
                 title={item.title}
-                tier="pro"
+                tier={item.meta.tier}
                 spot={item.spot ? "ink" : undefined}
                 poster={item.poster}
                 locale={locale}
-                labels={{ livePreview: m.catalog.livePreview, expand: m.catalog.expand, pro: m.tier.pro }}
+                labels={cardLabels}
               />
+          ))}
+        </ul>
+      </section>
+
+      {/* Pro 場景 */}
+      {showcase.length > 0 && (
+        <section aria-labelledby="pro-scenes-title" className="mt-24 sm:mt-32">
+          <SectionHead id="pro-scenes-title" title={t.pro}>
+            <Link href="/pricing" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold btn-primary">
+              {t.proCta}
+              <Arrow className="size-3.5" />
+            </Link>
+          </SectionHead>
+          <ul className="mt-8 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            {showcase.map((item) => (
+                <BlockCard
+                  key={item.name}
+                  name={item.name}
+                  title={item.title}
+                  tier={item.meta.tier}
+                  spot={item.spot ? "ink" : undefined}
+                  poster={item.poster}
+                  locale={locale}
+                  labels={cardLabels}
+                />
             ))}
           </ul>
         </section>
       )}
 
-      {/* 比較示範：只留示範本身，不加說明 */}
-      <section aria-labelledby="compare-title" className="mt-28 sm:mt-36">
-        <SectionHead id="compare-title" eyebrow={t.compare.eyebrow} title={t.compare.title} center />
-        <div aria-label={m.home.compare.label} className="mx-auto mt-10 max-w-xl">
+      {/* 比較示範：只留示範本身 */}
+      <section aria-labelledby="compare-title" className="mt-24 sm:mt-32">
+        <SectionHead id="compare-title" title={t.compare} />
+        <div aria-label={m.home.compare.label} className="mx-auto mt-8 max-w-xl">
           <HeroCompare m={{ ...m.home.compare, caption: "" }} />
         </div>
       </section>
 
-      {/* 首頁只留標題與步驟名稱，細節在文件頁 */}
-      <AgentSteps m={{ ...m.home.agent, lead: "", steps: m.home.agent.steps.map((step) => ({ ...step, body: "" })) }} />
+      {/* 交給 agent：一句話進去，裝好的區塊出來 */}
+      {agentBlocks.length > 0 && (
+        <section aria-labelledby="agent-title" className="mt-24 sm:mt-32">
+          <SectionHead id="agent-title" title={t.agent.title}>
+            <Link href="/docs/ai-agents" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
+              {m.home.agent.docs}
+              <Arrow className="size-3.5" />
+            </Link>
+          </SectionHead>
+          <div className="mt-8 flex flex-col items-start gap-3">
+            <p className="max-w-full rounded-2xl rounded-bl-md bg-fg px-4 py-2.5 text-[15px] font-medium text-bg">{t.agent.prompt}</p>
+            <p className="flex items-center gap-2 font-mono text-[13px] text-subtle">
+              <svg viewBox="0 0 24 24" className="size-4 text-fg" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              </svg>
+              {format(t.agent.result, { n: agentBlocks.length })}
+            </p>
+          </div>
+          <ul className="mt-6 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            {agentBlocks.map((item) => (
+                <BlockCard
+                  key={item.name}
+                  name={item.name}
+                  title={item.title}
+                  tier={item.meta.tier}
+                  spot={item.spot ? "ink" : undefined}
+                  poster={item.poster}
+                  locale={locale}
+                  labels={cardLabels}
+                />
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* 價格與創始會員 */}
       <section
         aria-labelledby="pro-title"
-        className="mt-28 grid gap-10 rounded-2xl bg-card p-8 shadow-e2 sm:mt-36 sm:p-12 md:grid-cols-[1.2fr_1fr] md:items-center"
+        className="mt-24 grid gap-10 rounded-2xl bg-card p-8 shadow-e2 sm:mt-32 sm:p-12 md:grid-cols-[1.2fr_1fr] md:items-center"
       >
         <div>
-          <p className="text-sm font-medium text-subtle">{m.home.proEyebrow}</p>
-          <h2 id="pro-title" className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          <h2 id="pro-title" className="text-3xl font-semibold tracking-tight text-balance [word-break:auto-phrase] sm:text-4xl">
             {m.home.proTitle}
           </h2>
           <p className="mt-4 text-pretty text-subtle">{m.home.proBody(proCount)}</p>
@@ -184,39 +204,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </div>
       </section>
 
-      {/* 九張精選：完整型錄在 /blocks */}
-      <section aria-labelledby="picks-title" className="mt-28 sm:mt-36">
-        <SectionHead id="picks-title" eyebrow={t.catalog.eyebrow} title={t.catalog.picksTitle} />
-        <ul className="mt-10 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-          {picks.map((item) => (
-            <BlockCard
-              key={item.name}
-              name={item.name}
-              title={item.title}
-              tier={item.meta.tier}
-              spot={item.spot ? "ink" : undefined}
-              poster={item.poster}
-              locale={locale}
-              labels={{ livePreview: m.catalog.livePreview, expand: m.catalog.expand, pro: m.tier.pro }}
-            />
-          ))}
-        </ul>
-        <div className="mt-12 flex justify-center">
-          <Link href="/blocks" className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-medium btn-secondary">
-            {format(t.catalog.cta, { n: all.length })}
-            <Arrow className="size-4" />
-          </Link>
-        </div>
-      </section>
-
       {/* 收尾 */}
-      <section aria-labelledby="closing-title" className="mt-28 text-center sm:mt-36">
-        <h2 id="closing-title" className="text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl">
+      <section aria-labelledby="closing-title" className="mt-24 text-center sm:mt-32">
+        <h2 id="closing-title" className="text-4xl font-semibold tracking-[-0.03em] text-balance [word-break:auto-phrase] sm:text-5xl">
           {t.closing.title}
         </h2>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/blocks" className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-semibold btn-primary">
-            {m.common.browseBlocks}
+            {browseLabel}
             <Arrow className="size-4" />
           </Link>
           <Link href="/pricing" className="inline-flex h-11 items-center rounded-lg px-5 text-[15px] font-medium btn-secondary">
@@ -229,14 +224,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 }
 
 
-function SectionHead({ id, eyebrow, title, body, center }: { id?: string; eyebrow: string; title: string; body?: string; center?: boolean }) {
+/** 段落開頭只有一層：兩到四個字的標題，右邊可以放一個動作。不加小標、不加說明 */
+function SectionHead({ id, title, children }: { id: string; title: string; children?: ReactNode }) {
   return (
-    <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
-      <p className="text-sm font-medium text-subtle">{eyebrow}</p>
-      <h2 id={id} className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-balance [word-break:auto-phrase] sm:text-[40px] sm:leading-[1.1]">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <h2 id={id} className="text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
         {title}
       </h2>
-      {body && <p className="mt-4 text-lg leading-relaxed text-pretty text-subtle">{body}</p>}
+      {children}
     </div>
   );
 }
