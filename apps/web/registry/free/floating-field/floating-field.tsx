@@ -237,7 +237,7 @@ export function FloatingField({
       <div
         ref={scope}
         className={cn(
-          "relative rounded-md border bg-card transition-colors shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
+          "relative rounded-xl border bg-card transition-colors shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
           error ? "border-destructive" : valid ? "border-emerald-700/60 dark:border-emerald-400/60" : focused ? spotBorder : "border-foreground/10",
         )}
       >
@@ -344,7 +344,7 @@ export function FloatingField({
                       <button
                         type="button"
                         onClick={() => accept(offer)}
-                        className="rounded-sm font-medium underline underline-offset-4 outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring"
+                        className="rounded-sm font-medium underline underline-offset-4 outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
                       >
                         {offer}
                       </button>,

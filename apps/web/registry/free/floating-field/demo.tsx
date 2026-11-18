@@ -68,7 +68,7 @@ export default function FloatingFieldDemo() {
             autoComplete="new-password"
             validate={(v) => (v.length >= 8 ? true : t.pwBad)}
             trailing={
-              <button type="button" onClick={() => setShowPw((s) => !s)} className="rounded px-1.5 text-xs text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setShowPw((s) => !s)} className="rounded px-1.5 text-xs text-muted-foreground hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
                 {showPw ? t.hide : t.show}
               </button>
             }

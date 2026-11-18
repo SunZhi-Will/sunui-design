@@ -139,7 +139,7 @@ export function TermsConsent({
   }
 
   return (
-    <section className={cn("w-full max-w-md rounded-md border", surface, edge, ink, className)}>
+    <section className={cn("w-full max-w-md rounded-xl border", surface, edge, ink, className)}>
       <header className={cn("flex items-baseline justify-between gap-3 border-b px-4 py-3", edge)}>
         <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
         <p className="text-xs font-medium tabular-nums" aria-hidden="true">
@@ -213,7 +213,7 @@ export function TermsConsent({
           onClick={() => ready && onSubmit?.(checked)}
           className={cn(
             spotFill,
-            "inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-medium transition-opacity outline-none",
+            "inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-medium transition-[opacity,scale] outline-none motion-safe:active:scale-[0.97]",
             "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             !ready && "cursor-not-allowed opacity-45",
           )}

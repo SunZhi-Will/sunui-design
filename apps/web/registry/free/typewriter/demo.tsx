@@ -57,7 +57,7 @@ export default function TypewriterDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   return (
-    <section className={cn("w-full max-w-2xl rounded-md border p-6 sm:p-10", surface, edge, ink)}>
+    <section className={cn("w-full max-w-2xl rounded-xl border p-6 sm:p-10", surface, edge, ink)}>
       <p className={cn("text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
       <Typewriter
         key={locale}

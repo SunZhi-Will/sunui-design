@@ -61,7 +61,7 @@ export default function AnimatedNumberDemo() {
   const total = (189 + finish.extra + (withCase ? 29 : 0)) * qty;
 
   return (
-    <div className="grid w-full max-w-2xl gap-6 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[14rem_1fr] sm:p-5">
+    <div className="grid w-full max-w-2xl gap-6 rounded-xl border border-border bg-card p-4 text-card-foreground sm:grid-cols-[14rem_1fr] sm:p-5">
       <ProductArt kind="headphones" className="aspect-[3/2] rounded-md sm:aspect-square" />
 
       <div className="flex min-w-0 flex-col gap-4">
@@ -101,7 +101,7 @@ export default function AnimatedNumberDemo() {
               type="button"
               aria-label={t.dec}
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
             >
               <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <path d="M3 8h10" strokeLinecap="round" />
@@ -112,7 +112,7 @@ export default function AnimatedNumberDemo() {
               type="button"
               aria-label={t.inc}
               onClick={() => setQty((q) => Math.min(9, q + 1))}
-              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+              className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
             >
               <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                 <path d="M8 3v10M3 8h10" strokeLinecap="round" />

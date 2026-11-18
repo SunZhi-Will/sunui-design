@@ -214,7 +214,7 @@ export function HoverPreviewList({ items, previewSize = { width: 200, height: 25
             {current && (
               <motion.div
                 key={current.id}
-                className="absolute inset-0 overflow-hidden rounded-md border border-foreground/10 bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
+                className="absolute inset-0 overflow-hidden rounded-xl border border-foreground/10 bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
                 initial={{ opacity: 0, scale: reduce ? 1 : 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}

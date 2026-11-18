@@ -146,7 +146,7 @@ export default function ToastStackDemo() {
                     <button
                       type="button"
                       onClick={() => push({ title: t.emailTitle, description: t.emailBody(names[p.kind]), tone: "success" })}
-                      className="min-w-[4.5rem] shrink-0 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:w-28"
+                      className="min-w-[4.5rem] shrink-0 rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-[color,background-color,border-color,opacity,scale] hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:w-28 motion-safe:active:scale-[0.97]"
                     >
                       {t.notify[0]}
                       <span className="hidden sm:inline">{t.notify[1]}</span>
@@ -155,7 +155,7 @@ export default function ToastStackDemo() {
                     <button
                       type="button"
                       onClick={() => add(p.kind, variant)}
-                      className="min-w-[4.5rem] shrink-0 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-28"
+                      className="min-w-[4.5rem] shrink-0 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-[opacity,scale] hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-28 motion-safe:active:scale-[0.97]"
                     >
                       {t.add[0]}
                       <span className="hidden sm:inline">{t.add[1]}</span>

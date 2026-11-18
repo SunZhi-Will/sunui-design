@@ -97,7 +97,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
           className={cn(
             "relative flex max-w-full",
             variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-foreground/10",
-            variant === "segment" && cn("rounded-md border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", fullWidth ? "w-full" : "w-fit"),
+            variant === "segment" && cn("rounded-xl border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
           )}
         >
@@ -119,7 +119,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                 onClick={() => choose(item.value)}
                 onKeyDown={(e) => onKeyDown(e, index)}
                 className={cn(
-                  "relative inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap font-medium outline-offset-2 transition-colors focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-40",
+                  "relative inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap font-medium outline-offset-2 transition-[color,background-color,border-color,opacity,scale] focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-40 motion-safe:active:scale-[0.97]",
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
                   variant === "chips" ? "rounded-full border" : "rounded-md",
@@ -134,7 +134,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   <motion.span
                     layoutId="ind"
                     transition={t}
-                    className="absolute inset-0 rounded-[5px] border border-foreground/10 bg-background shadow-[0_1px_0_rgb(0_0_0/0.04)]"
+                    className="absolute inset-0 rounded-[5px] border border-foreground/10 bg-background shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
                   />
                 )}
                 {variant === "chips" && (

@@ -150,7 +150,7 @@ export function AddonChecklist({
   }, [total, reduceMotion, mv]);
 
   return (
-    <div className={cn("w-full max-w-sm min-w-[17rem] rounded-md border px-5 pt-4 pb-3 font-sans", surface, edge, ink, className)}>
+    <div className={cn("w-full max-w-sm min-w-[17rem] rounded-xl border px-5 pt-4 pb-3 font-sans", surface, edge, ink, className)}>
       <p className={cn("border-b pb-3 text-sm font-semibold tracking-tight", edge)}>{title}</p>
 
       <ul className="py-2" aria-label={typeof title === "string" ? title : undefined}>
@@ -172,7 +172,7 @@ export function AddonChecklist({
                 aria-disabled={item.required || undefined}
                 onClick={() => toggle(item)}
                 className={cn(
-                  "-mx-2 flex w-[calc(100%+1rem)] items-start gap-2.5 rounded-md px-2 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                  "-mx-2 flex w-[calc(100%+1rem)] items-start gap-2.5 rounded-md px-2 py-1.5 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]",
                   item.required ? "cursor-default" : "hover:bg-current/5",
                 )}
               >

@@ -18,7 +18,7 @@ export default function CopyCodeButtonCard() {
   const t = useDemoText(copy);
   const names = useProductNames();
   return (
-    <div className="mx-auto flex w-64 flex-col gap-3 rounded-md border border-border bg-card p-3 text-card-foreground">
+    <div className="mx-auto flex w-64 flex-col gap-3 rounded-xl border border-border bg-card p-3 text-card-foreground">
       <div className="flex items-center gap-3">
         <ProductArt kind="tote" className="size-16 shrink-0 rounded-md" />
         <div className="min-w-0">

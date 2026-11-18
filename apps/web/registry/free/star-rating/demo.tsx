@@ -91,7 +91,7 @@ export default function StarRatingDemo() {
   });
 
   return (
-    <section ref={ref} aria-labelledby="reviews-heading" className="relative w-full max-w-2xl rounded-md border border-border bg-card p-4 text-card-foreground sm:p-6">
+    <section ref={ref} aria-labelledby="reviews-heading" className="relative w-full max-w-2xl rounded-xl border border-border bg-card p-4 text-card-foreground sm:p-6">
       <div className="flex items-center gap-3">
         <img src="/blocks/upsell-drawer/tote.webp" alt="" decoding="async" className="size-12 shrink-0 rounded-md border border-border object-cover" />
         <div className="min-w-0">

@@ -41,7 +41,7 @@ export default function ScrollRevealTextCard() {
   const t = useDemoText(copy);
 
   return (
-    <article lang={t.lang} className={cn("mx-auto w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
+    <article lang={t.lang} className={cn("mx-auto w-72 overflow-hidden rounded-xl border", surface, edge, ink)}>
       <div ref={scroller} className="relative h-[210px] overflow-y-auto px-5">
         <div className="h-20" />
         <ScrollRevealText

@@ -71,7 +71,7 @@ export default function QuantityStepperDemo() {
   const count = lines.reduce((sum, l) => sum + l.qty, 0);
 
   return (
-    <section aria-labelledby="bag-heading" className="w-full max-w-xl rounded-md border border-border bg-card text-card-foreground">
+    <section aria-labelledby="bag-heading" className="w-full max-w-xl rounded-xl border border-border bg-card text-card-foreground">
       <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
         <h2 id="bag-heading" className="font-semibold tracking-tight">
           {t.heading}

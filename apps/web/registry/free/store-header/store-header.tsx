@@ -137,7 +137,7 @@ export function StoreHeader({
             aria-label={t.menu}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((o) => !o)}
-            className={cn(iconButton, "-ml-2 md:hidden")}
+            className={cn(iconButton, "-ml-2 md:hidden motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")}
           >
             <MenuIcon open={menuOpen} />
           </button>

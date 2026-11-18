@@ -222,7 +222,7 @@ export function HoverCard({
             exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: place.above ? 4 : -4 }}
             transition={reduce ? { duration: 0 } : springs.gentle}
             className={cn(
-              "absolute z-50 block w-64 max-w-[calc(100vw-2rem)] rounded-md border p-3 text-left font-normal shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+              "absolute z-50 block w-64 max-w-[calc(100vw-2rem)] rounded-md border p-3 text-left font-normal shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
               surface,
               edge,
               ink,
@@ -248,7 +248,7 @@ export function HoverCard({
               <button
                 type="button"
                 onClick={onAddToCart}
-                className={cn("mt-3 inline-flex h-9 w-full items-center justify-center rounded-md px-3 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", spotFill)}
+                className={cn("mt-3 inline-flex h-9 w-full items-center justify-center rounded-md px-3 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]", spotFill)}
               >
                 {t.addToCart}
               </button>

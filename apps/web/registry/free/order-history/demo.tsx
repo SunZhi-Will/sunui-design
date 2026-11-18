@@ -60,7 +60,7 @@ export default function OrderHistoryDemo() {
           defaultExpandedId="o2"
           renderActions={(o) =>
             o.status === "pending" ? (
-              <a href="#pay" className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+              <a href="#pay" className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
                 {t.pay}
               </a>
             ) : (

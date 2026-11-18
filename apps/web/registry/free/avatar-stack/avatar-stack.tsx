@@ -142,7 +142,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
           <motion.li key="overflow" className="relative" style={{ marginLeft: s.overlap, zIndex: 1 }}>
             <Lift title={hiddenNames || t.more(compact(extra, locale), "")} reduce={reduce}>
               {onOverflowClick ? (
-                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-muted dark:hover:bg-foreground/10")} style={{ minWidth: s.box, height: s.box }}>
+                <button type="button" onClick={onOverflowClick} aria-label={t.showMore(String(extra), hiddenNames)} className={cn(disc, "px-1.5 hover:bg-muted dark:hover:bg-foreground/10 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")} style={{ minWidth: s.box, height: s.box }}>
                   {extraText}
                 </button>
               ) : (

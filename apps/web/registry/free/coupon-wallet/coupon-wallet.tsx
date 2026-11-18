@@ -213,12 +213,12 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
               animate={target}
               transition={reduce ? { duration: 0 } : springs.gentle}
               style={{ zIndex: lifted ? n + 1 : open ? i : n - r, transformOrigin: "50% 120%" }}
-              className="absolute inset-x-0 top-5 mx-auto block h-[6.5rem] w-[13.5rem] rounded-md text-left focus-visible:outline-none [&:focus-visible>span]:ring-2 [&:focus-visible>span]:ring-ring"
+              className="absolute inset-x-0 top-5 mx-auto block h-[6.5rem] w-[13.5rem] rounded-md text-left focus-visible:outline-none [&:focus-visible>span]:ring-2 [&:focus-visible>span]:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
             >
               <span
                 style={notches}
                 className={cn(
-                  "relative flex h-full overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+                  "relative flex h-full overflow-hidden rounded-xl border shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
                   surface,
                   isOn ? spotBorder : edge,
                 )}

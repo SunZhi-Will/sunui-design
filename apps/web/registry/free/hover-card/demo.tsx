@@ -45,7 +45,7 @@ export default function HoverCardDemo() {
   const price = (n: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(n);
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border bg-card p-4 text-sm text-card-foreground sm:p-5">
+    <div className="w-full max-w-md rounded-xl border border-border bg-card p-4 text-sm text-card-foreground sm:p-5">
       <p className="text-sm font-semibold tracking-tight">{t.heading}</p>
       <ul className="mt-3 divide-y divide-border">
         <li className="flex items-baseline justify-between gap-3 py-2.5">

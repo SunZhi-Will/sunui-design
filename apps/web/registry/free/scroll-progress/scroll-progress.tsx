@@ -188,7 +188,7 @@ export function ScrollProgress({
                     aria-label={text.jumpTo(m.label)}
                     title={printLabels ? undefined : m.label}
                     className={cn(
-                      "group flex max-w-full items-start gap-1.5 rounded-[2px] outline-none transition-colors focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current",
+                      "group flex max-w-full items-start gap-1.5 rounded-[2px] outline-none transition-[color,background-color,border-color,opacity,scale] focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current motion-safe:active:scale-[0.97]",
                       flip(i) ? "flex-row-reverse pl-2 text-right" : "pr-2 text-left",
                       passed ? ink : inkMuted,
                     )}

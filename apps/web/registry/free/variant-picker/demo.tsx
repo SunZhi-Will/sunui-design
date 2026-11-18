@@ -90,7 +90,7 @@ function AddButton({ disabled, children }: { disabled: boolean; children: string
     <button
       type="button"
       disabled={disabled}
-      className="h-11 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground disabled:opacity-50"
+      className="h-11 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground disabled:opacity-50 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
     >
       {children}
     </button>

@@ -124,7 +124,7 @@ export default function SidePanelDemo() {
   const toggle = (v: string) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
 
   return (
-    <div className={cn("relative h-[30rem] w-full max-w-3xl overflow-hidden rounded-md border", surface, edge, ink)}>
+    <div className={cn("relative h-[30rem] w-full max-w-3xl overflow-hidden rounded-xl border", surface, edge, ink)}>
       <header className={cn("flex items-center justify-between gap-3 border-b px-4 py-2.5 sm:px-5", edge)}>
         <button type="button" onClick={() => setPanel("filters")} className={trigger}>
           <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
@@ -164,7 +164,7 @@ export default function SidePanelDemo() {
         description={t.filtersDesc}
         footer={
           <div className="flex items-center justify-between gap-2">
-            <button type="button" onClick={() => setPicked([])} className={cn(trigger, "px-0")}>
+            <button type="button" onClick={() => setPicked([])} className={cn(trigger, "px-0 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")}>
               {t.clear}
             </button>
             <button type="button" onClick={() => setPanel(null)} className={primary}>
@@ -212,7 +212,7 @@ export default function SidePanelDemo() {
               <span className={inkMuted}>{t.subtotal}</span>
               <span className="font-semibold tabular-nums">{money(bagPrices.reduce((n, p) => n + p, 0))}</span>
             </div>
-            <button type="button" className={cn(primary, "w-full")}>
+            <button type="button" className={cn(primary, "w-full motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")}>
               {t.checkout}
             </button>
           </div>

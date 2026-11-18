@@ -172,7 +172,7 @@ export function ProductMedia({
                 aria-label={t.show(i + 1, total)}
                 aria-current={i === index ? "true" : undefined}
                 onClick={() => go(i)}
-                className="grid size-6 place-items-center rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="grid size-6 place-items-center rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
               >
                 <span className={cn("block h-1 rounded-full transition-all duration-200", i === index ? cn("w-4", spotBg) : "w-1.5 bg-muted-foreground/40")} />
               </button>

@@ -293,7 +293,7 @@ function FlyingTag({
     <motion.span
       aria-hidden="true"
       className={cn(
-        "pointer-events-none fixed top-0 left-0 z-[100] flex origin-top flex-col items-center gap-1 rounded-[3px] border px-1 pt-3.5 pb-1 font-mono text-[9px] leading-none font-semibold tracking-tight tabular-nums shadow-[0_1px_0_rgb(0_0_0/0.04)]",
+        "pointer-events-none fixed top-0 left-0 z-[100] flex origin-top flex-col items-center gap-1 rounded-[3px] border px-1 pt-3.5 pb-1 font-mono text-[9px] leading-none font-semibold tracking-tight tabular-nums shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
         surface,
         edge,
         ink,
@@ -348,7 +348,7 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, 
       onClick={onClick}
       aria-label={`${label ?? t.cart}, ${t.items(count)}`}
       className={cn(
-        "relative grid size-10 place-items-center rounded-md border border-border text-foreground transition-colors hover:border-foreground",
+        "relative grid size-10 place-items-center rounded-md border border-border text-foreground transition-[color,background-color,border-color,opacity,scale] hover:border-foreground motion-safe:active:scale-[0.97]",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         className,
       )}

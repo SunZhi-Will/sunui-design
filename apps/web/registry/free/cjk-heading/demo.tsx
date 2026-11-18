@@ -72,7 +72,7 @@ export default function CjkHeadingDemo() {
   return (
     <section lang={t.lang} className={cn("grid w-full max-w-4xl gap-4 md:grid-cols-[1fr_auto]", ink)}>
       {/* 橫排：活動頁主視覺 */}
-      <div className={cn("flex flex-col justify-between gap-8 rounded-md border p-6 sm:p-9", surface, edge)}>
+      <div className={cn("flex flex-col justify-between gap-8 rounded-xl border p-6 sm:p-9", surface, edge)}>
         <div className="space-y-5">
           <p className={cn("text-xs font-medium tracking-[0.2em]", inkMuted)}>{t.eyebrow}</p>
           <CjkHeading
@@ -106,7 +106,7 @@ export default function CjkHeadingDemo() {
       </div>
 
       {/* 直排：櫥窗直式海報 */}
-      <div className={cn("flex flex-row-reverse justify-center gap-5 rounded-md border px-8 py-8", surface, edge)}>
+      <div className={cn("flex flex-row-reverse justify-center gap-5 rounded-xl border px-8 py-8", surface, edge)}>
         <CjkHeading
           as="h3"
           vertical

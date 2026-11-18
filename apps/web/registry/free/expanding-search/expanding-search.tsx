@@ -316,7 +316,7 @@ export function ExpandingSearch({
                   setValue("");
                   inputRef.current?.focus();
                 }}
-                className={cn("absolute right-2 flex size-6 items-center justify-center rounded-[3px] outline-none hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
+                className={cn("absolute right-2 flex size-6 items-center justify-center rounded-[3px] outline-none hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]", inkMuted)}
               >
                 <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
                   <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
@@ -332,7 +332,7 @@ export function ExpandingSearch({
             aria-expanded={false}
             aria-keyshortcuts={slashShortcut ? "/" : undefined}
             onClick={() => setOpen(true)}
-            className="flex size-10 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex size-10 shrink-0 items-center justify-center rounded-md outline-none transition-[color,background-color,border-color,opacity,scale] hover:bg-current/5 focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]"
           >
             <SearchIcon className="size-[18px]" />
           </button>
@@ -350,7 +350,7 @@ export function ExpandingSearch({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }}
             transition={{ duration: 0.12 }}
-            className={cn("absolute top-full right-0 left-0 z-20 mt-1.5 max-h-80 overflow-y-auto rounded-md border p-1 shadow-[0_1px_0_rgb(0_0_0/0.04)]", surface, edge)}
+            className={cn("absolute top-full right-0 left-0 z-20 mt-1.5 max-h-80 overflow-y-auto rounded-md border p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", surface, edge)}
           >
             {filtered.map((s, i) => (
               <li

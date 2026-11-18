@@ -209,7 +209,7 @@ export default function ScrollProgressDemo() {
   const scroller = useRef<HTMLDivElement>(null);
 
   return (
-    <article className={cn("w-full max-w-2xl overflow-hidden rounded-md border", surface, edge, ink)}>
+    <article className={cn("w-full max-w-2xl overflow-hidden rounded-xl border", surface, edge, ink)}>
       <header className={cn("border-b px-6 pt-5 pb-3 sm:px-8", edge)}>
         <p className={cn("text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">{t.heading}</h2>

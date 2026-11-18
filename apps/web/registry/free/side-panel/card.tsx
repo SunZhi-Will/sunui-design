@@ -29,12 +29,12 @@ export default function SidePanelCard() {
   const toggle = (v: string) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
 
   return (
-    <div className={cn("relative mx-auto h-[220px] w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
+    <div className={cn("relative mx-auto h-[220px] w-72 overflow-hidden rounded-xl border", surface, edge, ink)}>
       <header className={cn("flex items-center justify-between border-b px-3 py-2", edge)}>
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-md px-2 py-1 text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-md px-2 py-1 text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
         >
           {t.filters} <span className="tabular-nums opacity-60">({picked.length})</span>
         </button>

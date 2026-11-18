@@ -89,7 +89,7 @@ export default function HoverMotionDemo() {
         />
         <div className="mt-8 flex justify-center">
           <Magnetic>
-            <button type="button" className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground">
+            <button type="button" className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
               <TextRoll>{t.cta}</TextRoll>
             </button>
           </Magnetic>

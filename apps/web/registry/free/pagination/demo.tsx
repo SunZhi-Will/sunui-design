@@ -26,7 +26,7 @@ export default function PaginationDemo() {
 
   return (
     <div className="w-full max-w-2xl space-y-4">
-      <section className="rounded-md border border-border bg-card p-4 text-card-foreground sm:p-5">
+      <section className="rounded-xl border border-border bg-card p-4 text-card-foreground sm:p-5">
         <div className="mb-4 flex items-baseline justify-between gap-3">
           <p className="text-sm font-semibold tracking-tight">{t.home}</p>
           <p className="text-xs text-muted-foreground tabular-nums">
@@ -37,11 +37,11 @@ export default function PaginationDemo() {
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <section className="rounded-md border border-border bg-card p-4 text-card-foreground">
+        <section className="rounded-xl border border-border bg-card p-4 text-card-foreground">
           <p className="mb-3 text-sm font-semibold tracking-tight">{t.orders}</p>
           <Pagination locale={locale} total={4} defaultPage={1} getHref={(n) => `#orders-page-${n}`} />
         </section>
-        <section className="rounded-md border border-border bg-card p-4 text-card-foreground">
+        <section className="rounded-xl border border-border bg-card p-4 text-card-foreground">
           <p className="mb-3 text-sm font-semibold tracking-tight">{t.reviews}</p>
           <Pagination locale={locale} total={38} defaultPage={3} compact />
         </section>

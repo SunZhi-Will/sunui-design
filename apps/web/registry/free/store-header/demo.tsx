@@ -107,7 +107,7 @@ export default function StoreHeaderDemo() {
                 <button
                   type="button"
                   onClick={() => setCount((c) => c + 1)}
-                  className="shrink-0 rounded-md border px-2.5 py-1 text-xs hover:bg-foreground/5 dark:hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  className="shrink-0 rounded-md border px-2.5 py-1 text-xs hover:bg-foreground/5 dark:hover:bg-foreground/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
                 >
                   {t.add}
                 </button>

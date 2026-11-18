@@ -61,7 +61,7 @@ export default function ScrollRevealTextDemo() {
   const t = useDemoText(copy);
 
   return (
-    <article lang={t.lang} className={cn("w-full max-w-2xl overflow-hidden rounded-md border", surface, edge, ink)}>
+    <article lang={t.lang} className={cn("w-full max-w-2xl overflow-hidden rounded-xl border", surface, edge, ink)}>
       <div ref={scroller} className="relative h-[440px] overflow-y-auto px-6 sm:px-12">
         <header className="pt-10 pb-24 sm:pt-14">
           <p className={cn("text-xs font-medium tracking-[0.2em]", inkMuted)}>{t.eyebrow}</p>

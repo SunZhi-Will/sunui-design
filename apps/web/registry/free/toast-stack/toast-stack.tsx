@@ -294,7 +294,7 @@ export function ToastStack({
               <motion.li
                 key={t.id}
                 className={cn(
-                  "absolute inset-x-0 overflow-hidden rounded-md border shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "absolute inset-x-0 overflow-hidden rounded-xl border shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   surface,
                   edge,
                   ink,
@@ -400,7 +400,7 @@ function ToastBody({
             item.action?.onClick();
             onDismiss();
           }}
-          className={cn("mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring", spot)}
+          className={cn("mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]", spot)}
         >
           {item.action.label}
         </button>
@@ -409,7 +409,7 @@ function ToastBody({
         type="button"
         onClick={onDismiss}
         aria-label={dismissLabel}
-        className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring", inkMuted)}
+        className={cn("shrink-0 rounded-[3px] p-1 outline-none transition-[color,background-color,border-color,opacity,scale] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]", inkMuted)}
       >
         <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
           <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />

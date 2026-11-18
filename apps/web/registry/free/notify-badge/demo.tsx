@@ -67,10 +67,10 @@ export default function NotifyBadgeDemo() {
       </header>
       <div className="flex flex-wrap items-center gap-3 p-5">
         <div aria-hidden="true" className="size-16 rounded-md bg-muted" />
-        <button type="button" onClick={() => setCart((c) => c + 1)} className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+        <button type="button" onClick={() => setCart((c) => c + 1)} className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
           {t.add}
         </button>
-        <button type="button" onClick={() => setNotes(0)} className="h-10 rounded-md border px-4 text-sm">
+        <button type="button" onClick={() => setNotes(0)} className="h-10 rounded-md border px-4 text-sm motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
           {t.clear}
         </button>
       </div>

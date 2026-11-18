@@ -40,7 +40,7 @@ export default function TierProgressCard() {
       <button
         type="button"
         onClick={() => setStep((s) => (s + 1) % steps.length)}
-        className="absolute top-3 left-3 rounded-md border border-border px-2 py-0.5 text-xs font-medium tabular-nums outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute top-3 left-3 rounded-md border border-border px-2 py-0.5 text-xs font-medium tabular-nums outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
       >
         {t.add}
       </button>

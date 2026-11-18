@@ -241,7 +241,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
                   disabled={saved}
                   aria-expanded={customizing}
                   onClick={() => (customizing ? commit(choice) : setCustomizing(true))}
-                  className="min-h-10 rounded-md px-3 text-sm font-medium underline decoration-1 underline-offset-4 hover:decoration-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60 max-sm:col-span-2 sm:ml-auto"
+                  className="min-h-10 rounded-md px-3 text-sm font-medium underline decoration-1 underline-offset-4 hover:decoration-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60 max-sm:col-span-2 sm:ml-auto motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
                 >
                   {customizing ? t.save : t.customize}
                 </button>
@@ -274,7 +274,7 @@ function Switch({ on, labelledBy, reduce, onToggle }: { on: boolean; labelledBy:
       aria-labelledby={labelledBy}
       onClick={onToggle}
       className={cn(
-        "relative flex h-6 w-10 shrink-0 items-center rounded-full border px-0.5 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+        "relative flex h-6 w-10 shrink-0 items-center rounded-full border px-0.5 transition-[color,background-color,border-color,opacity,scale] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97]",
         on ? cn("justify-end", spotTrack) : cn("justify-start bg-background", edge),
       )}
     >

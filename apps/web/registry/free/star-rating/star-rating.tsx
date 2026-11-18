@@ -355,7 +355,7 @@ export function StarRating({
                               onClick={() => toggle(r)}
                               {...rise(0.06 * Math.min(i + 1, 5))}
                               className={cn(
-                                "rounded-md border px-2.5 py-1 text-xs leading-tight transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                "rounded-md border px-2.5 py-1 text-xs leading-tight transition-[color,background-color,border-color,opacity,scale] outline-none focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]",
                                 on
                                   ? cn(spotBorder, spotFill)
                                   : "border-foreground/10 text-current/80 hover:border-muted-foreground/70",

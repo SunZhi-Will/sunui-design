@@ -39,11 +39,11 @@ export default function LowStockIndicatorCard() {
           type="button"
           onClick={() => setStock((s) => Math.max(0, s - 1))}
           disabled={stock === 0}
-          className="h-9 flex-1 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          className="h-9 flex-1 rounded-md bg-primary text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
         >
           {t.buy}
         </button>
-        <button type="button" onClick={() => setStock(9)} className="h-9 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted">
+        <button type="button" onClick={() => setStock(9)} className="h-9 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
           {t.restock}
         </button>
       </div>

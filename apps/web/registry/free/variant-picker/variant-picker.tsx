@@ -392,7 +392,7 @@ interface SoldOutNoteProps {
 /** 售完提示：哪個顏色還有這個尺寸（一鍵切過去），以及到貨通知；結果放在原本按鈕的位置 */
 function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: SoldOutNoteProps) {
   return (
-    <div className={cn("mt-3 space-y-2 rounded-md border p-3 text-sm", surface, edge)}>
+    <div className={cn("mt-3 space-y-2 rounded-xl border p-3 text-sm", surface, edge)}>
       <p className="font-medium">{text.line}</p>
       {alternatives.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -403,7 +403,7 @@ function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: Sold
               type="button"
               onClick={() => onAlternative(c.id)}
               className={cn(
-                "inline-flex h-7 items-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium outline-none hover:border-current/40",
+                "inline-flex h-7 items-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium outline-none hover:border-current/40 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
                 edge,
               )}
@@ -426,7 +426,7 @@ function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: Sold
               type="button"
               onClick={onNotify}
               className={cn(
-                "inline-flex h-9 items-center gap-2 rounded-md border border-current/25 px-3 text-sm font-medium outline-none hover:border-current/60",
+                "inline-flex h-9 items-center gap-2 rounded-md border border-current/25 px-3 text-sm font-medium outline-none hover:border-current/60 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
               )}
             >

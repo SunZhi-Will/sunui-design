@@ -43,7 +43,7 @@ export default function ScrollProgressCard() {
   const scroller = useRef<HTMLDivElement>(null);
 
   return (
-    <article className={cn("mx-auto w-72 overflow-hidden rounded-md border", surface, edge, ink)}>
+    <article className={cn("mx-auto w-72 overflow-hidden rounded-xl border", surface, edge, ink)}>
       <header className={cn("border-b px-4 pt-6 pb-2", edge)}>
         <ScrollProgress container={scroller} sections={chapters} position="static" showPercent locale={locale} />
       </header>

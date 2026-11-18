@@ -63,7 +63,7 @@ export default function OtpInputDemo() {
 
   return (
     <div className="grid w-full max-w-3xl grid-cols-[minmax(0,1fr)] items-start gap-5 md:grid-cols-[1fr_15rem]">
-      <section aria-labelledby="otp-heading" className="rounded-md border border-border bg-card p-5 text-card-foreground sm:p-7">
+      <section aria-labelledby="otp-heading" className="rounded-xl border border-border bg-card p-5 text-card-foreground sm:p-7">
         <h2 id="otp-heading" className="text-lg font-semibold tracking-tight">
           {t.heading}
         </h2>
@@ -86,7 +86,7 @@ export default function OtpInputDemo() {
         />
         <p className={status === "success" ? "invisible mt-2 text-sm" : "mt-2 text-sm text-muted-foreground"}>
           {t.noCode}{" "}
-          <button type="button" className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none">
+          <button type="button" className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
             {t.resend}
           </button>
         </p>
@@ -95,7 +95,7 @@ export default function OtpInputDemo() {
       {/* 收件匣裡的那封信，買家照著輸入 */}
       <aside
         aria-label={t.preview}
-        className="rounded-md border border-foreground/10 bg-card p-4 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
+        className="rounded-xl border border-foreground/10 bg-card p-4 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
       >
         <p className="text-[11px] font-medium tracking-[0.14em] text-current/60 uppercase">{t.inbox}</p>
         <p className="mt-2 text-sm font-medium">{t.subject}</p>

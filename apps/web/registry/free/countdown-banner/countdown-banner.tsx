@@ -275,7 +275,7 @@ export function CountdownBanner({
   return (
     <section
       style={style}
-      className={cn("@container w-full rounded-md border font-sans shadow-[0_1px_0_rgb(0_0_0/0.04)]", surface, edge, ink, className)}
+      className={cn("@container w-full rounded-xl border font-sans shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", surface, edge, ink, className)}
     >
       <div className="grid gap-5 p-5 @3xl:grid-cols-[1fr_auto_auto] @3xl:items-center @3xl:gap-0 @3xl:p-0">
         <div className="min-w-0 @3xl:px-6 @3xl:py-5">

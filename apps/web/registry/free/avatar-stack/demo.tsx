@@ -80,7 +80,7 @@ export default function AvatarStackDemo() {
 
   return (
     <div className="grid w-full max-w-3xl gap-6 text-foreground md:grid-cols-[1.4fr_1fr]">
-      <article className="grid gap-5 rounded-md border border-border bg-card p-4 sm:grid-cols-[9rem_1fr] sm:p-5">
+      <article className="grid gap-5 rounded-xl border border-border bg-card p-4 sm:grid-cols-[9rem_1fr] sm:p-5">
         <ProductArt kind="bottle" className="rounded-[3px] max-sm:aspect-[16/9]" />
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold tracking-tight">{productNames.bottle}</h2>
@@ -94,7 +94,7 @@ export default function AvatarStackDemo() {
           </div>
           <button
             type="button"
-            className="mt-5 h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-fit"
+            className="mt-5 h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:w-fit motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
           >
             {t.addToCart}
           </button>
@@ -107,7 +107,7 @@ export default function AvatarStackDemo() {
         </h3>
         <ul className="space-y-3">
           {related.map((r) => (
-            <li key={r.kind} className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+            <li key={r.kind} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
               <ProductArt kind={r.kind} className="size-14 shrink-0 rounded-[3px]" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{productNames[r.kind]}</p>

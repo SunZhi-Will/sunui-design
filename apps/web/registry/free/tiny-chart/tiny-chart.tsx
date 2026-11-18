@@ -711,7 +711,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const arrow = (tone: "ink" | "red") => `url(#${uid}-${tone})`;
 
   return (
-    <figure className={cn("min-w-0 rounded-md border border-foreground/10 bg-card p-4 text-foreground sm:p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", className)}>
+    <figure className={cn("min-w-0 rounded-xl border border-foreground/10 bg-card p-4 text-foreground sm:p-5 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <figcaption className="text-lg font-semibold leading-tight tracking-tight">{title}</figcaption>
@@ -943,7 +943,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
           </button>
         ))}
         {showLogic && (
-          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls={`${uid}-logic`} className="ml-auto inline-flex h-8 items-center px-1 text-sm text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground">
+          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls={`${uid}-logic`} className="ml-auto inline-flex h-8 items-center px-1 text-sm text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
             {copy.logic}
           </button>
         )}

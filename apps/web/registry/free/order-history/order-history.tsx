@@ -159,7 +159,7 @@ export function OrderHistory({
   const count = (o: HistoryOrder) => o.lines.reduce((s, l) => s + l.qty, 0);
 
   return (
-    <section className={cn("w-full max-w-md rounded-md border font-sans", surface, edge, ink, className)}>
+    <section className={cn("w-full max-w-md rounded-xl border font-sans", surface, edge, ink, className)}>
       {title && <h3 className={cn("border-b px-4 py-3 text-sm font-semibold tracking-tight", edge)}>{title}</h3>}
 
       {orders.length === 0 ? (
@@ -187,7 +187,7 @@ export function OrderHistory({
                   aria-controls={panelId}
                   aria-label={`${t.toggle(o.number)}, ${o.date}, ${t.status[o.status]}, ${money(total(o))}`}
                   onClick={() => setOpen(expanded ? null : o.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-current/[0.03] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-current/[0.03] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">

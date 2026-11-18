@@ -201,7 +201,7 @@ export function SidePanel({
             animate="visible"
             exit="hidden"
             className={cn(
-              "absolute flex flex-col shadow-[0_1px_0_rgb(0_0_0/0.04)] outline-none",
+              "absolute flex flex-col shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] outline-none",
               surface,
               edge,
               ink,
@@ -226,7 +226,7 @@ export function SidePanel({
                 onClick={() => onOpenChange(false)}
                 aria-label={closeLabel}
                 className={cn(
-                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
+                  "-mt-1 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-md outline-none transition-[color,background-color,border-color,opacity,scale] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97]",
                   inkMuted,
                 )}
               >

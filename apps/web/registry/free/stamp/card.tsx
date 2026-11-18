@@ -20,7 +20,7 @@ export default function StampCard() {
   const [claimed, setClaimed] = useState<number[]>([0]);
 
   return (
-    <div lang={locale} className="mx-auto w-72 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+    <div lang={locale} className="mx-auto w-72 rounded-xl border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       <p className="border-b border-foreground/10 px-4 py-2.5 text-sm font-semibold tracking-tight">{t.title}</p>
       <ul className="divide-y divide-foreground/10">
         {t.rows.map(([name, note], i) => (
@@ -37,7 +37,7 @@ export default function StampCard() {
               <button
                 type="button"
                 onClick={() => setClaimed((c) => [...c, i])}
-                className="shrink-0 rounded-md border border-foreground bg-foreground px-3 py-1 text-xs font-medium text-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="shrink-0 rounded-md border border-foreground bg-foreground px-3 py-1 text-xs font-medium text-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
               >
                 {t.claim}
               </button>

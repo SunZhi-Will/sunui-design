@@ -100,7 +100,7 @@ export default function StampDemo() {
   ];
 
   return (
-    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-foreground/10 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+    <div lang={locale} className="w-full max-w-[40rem] divide-y divide-foreground/10 rounded-xl border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       {t.rows.map(([title, examples], i) => (
         <div key={title} className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[1fr_auto]">
           <div>

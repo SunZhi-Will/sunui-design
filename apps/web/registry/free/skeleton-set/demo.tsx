@@ -46,7 +46,7 @@ export function ProductPick({ kind, price }: { kind: ProductKind; price: string 
   const t = useDemoText(copy);
   const names = useProductNames();
   return (
-    <article className="overflow-hidden rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+    <article className="overflow-hidden rounded-xl border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       <ProductArt kind={kind} />
       <div className="p-4">
         <p className="truncate text-sm font-medium">{names[kind]}</p>
@@ -55,7 +55,7 @@ export function ProductPick({ kind, price }: { kind: ProductKind; price: string 
           <span className="font-semibold tracking-tight tabular-nums">{price}</span>
           <button
             type="button"
-            className="h-8 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="h-8 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
           >
             {t.add}
           </button>
@@ -69,7 +69,7 @@ export function OrderList() {
   const t = useDemoText(copy);
   const { date } = useDate();
   return (
-    <ul className="divide-y divide-foreground/10 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+    <ul className="divide-y divide-foreground/10 rounded-xl border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
       {orders.map((o) => (
         <li key={o.no} className="flex items-center gap-3 px-4 py-3.5">
           <ProductArt kind={o.kind} className="size-10 shrink-0 rounded-[3px]" />

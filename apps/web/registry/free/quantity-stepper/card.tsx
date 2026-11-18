@@ -25,14 +25,14 @@ export default function QuantityStepperCard() {
 
   if (removed) {
     return (
-      <button type="button" onClick={() => setRemoved(false)} className="mx-auto block text-sm text-muted-foreground underline underline-offset-4">
+      <button type="button" onClick={() => setRemoved(false)} className="mx-auto block text-sm text-muted-foreground underline underline-offset-4 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
         {t.undo}
       </button>
     );
   }
 
   return (
-    <div className="mx-auto w-72 rounded-md border border-border bg-card text-card-foreground">
+    <div className="mx-auto w-72 rounded-xl border border-border bg-card text-card-foreground">
       <div className="flex items-center gap-3 p-3">
         <ProductArt kind="mug" className="size-12 shrink-0 rounded-md" />
         <div className="min-w-0 flex-1">

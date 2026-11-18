@@ -36,7 +36,7 @@ export default function SkeletonSetCard() {
   return (
     <div className="mx-auto w-72 space-y-2.5">
       <SkeletonSet loaded={loaded} skeleton="list" count={2} locale={locale}>
-        <ul className="divide-y divide-foreground/10 rounded-md border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+        <ul className="divide-y divide-foreground/10 rounded-xl border border-foreground/10 bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           {orders.map((o) => (
             <li key={o.no} className="flex items-center gap-3 px-4 py-3.5">
               <ProductArt kind={o.kind} className="size-10 shrink-0 rounded-[3px]" />
@@ -52,7 +52,7 @@ export default function SkeletonSetCard() {
       <button
         type="button"
         onClick={() => setRun((r) => r + 1)}
-        className="mx-auto block rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className="mx-auto block rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
       >
         {t.replay}
       </button>

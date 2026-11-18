@@ -198,7 +198,7 @@ export function QuantityStepper({
           aria-label={t.remove}
           disabled={disabled}
           onClick={() => onRemove?.()}
-          className={cn(buttonClass, "hover:text-foreground focus-visible:text-foreground")}
+          className={cn(buttonClass, "hover:text-foreground focus-visible:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4.5 7h15M9.5 7V5.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7" />

@@ -196,7 +196,7 @@ export function AnnouncementStrip({ messages, storageKey, dismissible = true, on
             )}
 
             {dismissible && (
-              <button type="button" aria-label={t.dismiss} onClick={dismiss} className={cn(iconButton, "-mr-1")}>
+              <button type="button" aria-label={t.dismiss} onClick={dismiss} className={cn(iconButton, "-mr-1 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]")}>
                 <CloseIcon />
               </button>
             )}

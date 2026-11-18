@@ -129,7 +129,7 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
               id={`${uid}-card`}
               role="region"
               aria-label={typeof open.title === "string" ? open.title : undefined}
-              className="pointer-events-auto rounded-md border border-foreground/10 bg-card p-3.5 text-foreground shadow-[0_1px_0_rgb(0_0_0/0.04)]"
+              className="pointer-events-auto rounded-xl border border-foreground/10 bg-card p-3.5 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
               style={{ originX: place(open).side === "left" ? 1 : 0, originY: place(open).vertical === "up" ? 1 : 0 }}
               initial={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
               animate={{ opacity: 1, scale: 1 }}

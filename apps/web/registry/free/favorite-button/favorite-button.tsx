@@ -90,7 +90,7 @@ export function FavoriteButton({
       aria-pressed={pressed}
       aria-label={pressed ? t.remove : t.add}
       className={cn(
-        "group inline-flex items-center gap-1.5 rounded-full",
+        "group inline-flex items-center gap-1.5 rounded-full motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
         ink,
         count !== undefined && "pr-2",

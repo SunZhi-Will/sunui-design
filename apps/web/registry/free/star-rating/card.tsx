@@ -39,7 +39,7 @@ export default function StarRatingCard() {
   const t = useDemoText(copy);
   const [mine, setMine] = useState(4);
   return (
-    <div className="mx-auto w-64 rounded-md border border-border bg-card p-4 text-card-foreground">
+    <div className="mx-auto w-64 rounded-xl border border-border bg-card p-4 text-card-foreground">
       <div className="flex items-center gap-2">
         <span className="text-2xl font-semibold tracking-tight tabular-nums">4.4</span>
         <StarRating readOnly value={4.4} size="sm" locale={locale} />

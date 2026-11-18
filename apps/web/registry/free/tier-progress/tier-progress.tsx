@@ -137,7 +137,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
   const move = reduce ? { duration: 0 } : springs.gentle;
 
   return (
-    <div className={cn("relative w-full max-w-xs rounded-md border p-5 font-sans", surface, edge, ink, className)}>
+    <div className={cn("relative w-full max-w-xs rounded-xl border p-5 font-sans", surface, edge, ink, className)}>
       <p className={cn("text-[11px] font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.eyebrow}</p>
 
       <div className="relative mx-auto mt-3 w-full max-w-[15rem]">

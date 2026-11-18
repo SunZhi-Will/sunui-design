@@ -135,7 +135,7 @@ export function Lightbox({
             <span className="px-2 text-xs tabular-nums opacity-70">
               {index + 1} / {images.length}
             </span>
-            <button ref={closeRef} type="button" aria-label={L.close} onClick={() => set(null)} className="grid size-10 place-items-center rounded-md outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
+            <button ref={closeRef} type="button" aria-label={L.close} onClick={() => set(null)} className="grid size-10 place-items-center rounded-md outline-offset-2 hover:bg-white/10 focus-visible:outline-2 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
               <Icon d="M6 6l12 12M18 6L6 18" />
             </button>
           </div>
@@ -158,10 +158,10 @@ export function Lightbox({
             </AnimatePresence>
             {images.length > 1 && (
               <>
-                <button type="button" aria-label={L.previous} onClick={() => step(-1)} className="pointer-events-auto absolute left-2 grid size-10 place-items-center rounded-full text-background outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
+                <button type="button" aria-label={L.previous} onClick={() => step(-1)} className="pointer-events-auto absolute left-2 grid size-10 place-items-center rounded-full text-background outline-offset-2 hover:bg-white/10 focus-visible:outline-2 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
                   <Icon d="M15 6l-6 6 6 6" />
                 </button>
-                <button type="button" aria-label={L.next} onClick={() => step(1)} className="pointer-events-auto absolute right-2 grid size-10 place-items-center rounded-full text-background outline-offset-2 hover:bg-white/10 focus-visible:outline-2">
+                <button type="button" aria-label={L.next} onClick={() => step(1)} className="pointer-events-auto absolute right-2 grid size-10 place-items-center rounded-full text-background outline-offset-2 hover:bg-white/10 focus-visible:outline-2 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]">
                   <Icon d="M9 6l6 6-6 6" />
                 </button>
               </>
@@ -185,7 +185,7 @@ export function Lightbox({
               type="button"
               aria-label={L.open(image.alt)}
               onClick={() => set(i)}
-              className="block w-full overflow-hidden rounded-md outline-offset-2 focus-visible:outline-2"
+              className="block w-full overflow-hidden rounded-md outline-offset-2 focus-visible:outline-2 motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
               style={{ aspectRatio: aspect }}
             >
               {renderThumb ? (

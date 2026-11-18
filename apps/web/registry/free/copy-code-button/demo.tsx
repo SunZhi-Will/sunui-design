@@ -37,7 +37,7 @@ export default function CopyCodeButtonDemo() {
   const t = useDemoText(copy);
   const names = useProductNames();
   return (
-    <div className="grid w-full max-w-2xl gap-5 rounded-md border border-border bg-card p-4 text-card-foreground sm:grid-cols-[13rem_1fr] sm:p-5">
+    <div className="grid w-full max-w-2xl gap-5 rounded-xl border border-border bg-card p-4 text-card-foreground sm:grid-cols-[13rem_1fr] sm:p-5">
       <ProductArt kind="tote" className="aspect-[3/2] rounded-md sm:aspect-square" />
 
       <div className="flex min-w-0 flex-col gap-4">

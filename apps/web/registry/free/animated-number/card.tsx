@@ -21,7 +21,7 @@ export default function AnimatedNumberCard() {
   const total = 189 * qty;
 
   return (
-    <div className="mx-auto flex w-64 flex-col gap-4 rounded-md border border-border bg-card p-4 text-card-foreground">
+    <div className="mx-auto flex w-64 flex-col gap-4 rounded-xl border border-border bg-card p-4 text-card-foreground">
       <div>
         <p className="text-xs text-muted-foreground">{t.total}</p>
         <AnimatedNumber locale={locale} value={total} currency="USD" trendArrow announce className="text-3xl font-semibold tracking-tight" />
@@ -33,7 +33,7 @@ export default function AnimatedNumberCard() {
             type="button"
             aria-label={t.dec}
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+            className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
           >
             <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <path d="M3 8h10" strokeLinecap="round" />
@@ -44,7 +44,7 @@ export default function AnimatedNumberCard() {
             type="button"
             aria-label={t.inc}
             onClick={() => setQty((q) => Math.min(9, q + 1))}
-            className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground"
+            className="grid h-full w-9 place-items-center text-muted-foreground hover:text-foreground motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
           >
             <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
               <path d="M8 3v10M3 8h10" strokeLinecap="round" />
