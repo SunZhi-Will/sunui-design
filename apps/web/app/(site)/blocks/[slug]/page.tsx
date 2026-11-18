@@ -91,7 +91,7 @@ export default async function BlockPage({ params }: Props) {
         <p className="mt-3 text-lg text-pretty text-fg/85">{lede}</p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           {isPro && (
-            <Link href="/pricing" className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90">
+            <Link href="/pricing" className="rounded-md px-4 py-2 text-sm font-medium btn-primary">
               {m.common.seePricing}
             </Link>
           )}
@@ -99,8 +99,8 @@ export default async function BlockPage({ params }: Props) {
             href="#install"
             className={
               isPro
-                ? "rounded-md border border-line px-4 py-2 text-sm font-medium text-fg transition-colors hover:border-fg"
-                : "rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
+                ? "rounded-md px-4 py-2 text-sm font-medium btn-secondary"
+                : "rounded-md px-4 py-2 text-sm font-medium btn-primary"
             }
           >
             {isPro ? m.block.proInstallTitle : m.block.cliTitle}
@@ -299,7 +299,7 @@ function ProInstall({ item, t, seePricing }: { item: Item; t: Messages["block"];
         </div>
         <Link
           href="/pricing"
-          className="rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90"
+          className="rounded-md px-4 py-2.5 text-sm font-medium btn-primary"
         >
           {seePricing}
         </Link>

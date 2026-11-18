@@ -45,6 +45,24 @@ CSS 在 `app/globals.css` 的 `@theme`（`ease-site` 曲線，並把預設 trans
 - 佔位不閃：骨架的脈動要慢（≥ 2s 一輪）且對比低；載入很快時（< 150ms）不顯示骨架。
 - 同一列的卡片不要各自決定什麼時候出現：進入畫面的那一刻一起開始載入，淡入時長一致。
 
+## 5. 外殼材質（2026-11-18 起）
+
+網站外殼從「平面的紙」改成「精密的物件」：仍是黑白灰、仍不准漸層、光暈、彩色陰影、毛玻璃內容層，但物件有厚度。這一節只管網站外殼，block 照 `DESIGN.md`。分析見 `reports/網站質感升級深度分析-2026-11-18.md`。
+
+- **邊線**：外殼用 `border-line`（透明度 9% / 深色 10%），比較強的用 `line-strong`。block 用的 `--border` 維持實色，型錄外觀不變。
+- **高度**：只用 `globals.css` 的四個陰影，每一層都已含 1px hairline，不要再疊 `border`。
+  - `shadow-hair`：只有邊線。
+  - `shadow-e1`：卡片、預覽框、次按鈕、指令列、分段控制的選中格。
+  - `shadow-e2`：hover 的卡片、強調的定價卡。
+  - `shadow-e3`：面板、對話框。
+  - 深色模式不靠投影，改成頂邊 1px 白色高光加邊線，tokens 已經處理好。
+- **按鈕**：主按鈕 `btn-primary`、次按鈕 `btn-secondary`（含 hover、按下 0.97、內高光）。不要再手寫 `bg-fg text-bg hover:opacity-90`。
+- **分段控制**：軌道 `bg-accent-soft p-0.5 rounded-md`，選中格 `bg-card shadow-e1 rounded-[4px]`（同心：6 − 2 = 4），不用整塊黑底。
+- **圓角**：控制項 6px（`rounded-md`），卡片與預覽框 12px（`rounded-xl`），面板 16px（`rounded-2xl`）。巢狀時內圓角 = 外圓角 − 內距。
+- **字重**：`font-medium` 是 510、`font-semibold` 是 590（Geist 可變字重）。
+- **字體**：`body` 直接讀 `--font-geist-sans`。`@theme inline` 不會在 `:root` 產生 `--font-sans`，不要改回 `var(--font-sans)`。
+- **焦點環**：全站 `outline-offset: 2px`，和元件之間留間隙。
+
 ## 檢查表
 
 - [ ] 時長來自上表，曲線是同一條
@@ -52,3 +70,4 @@ CSS 在 `app/globals.css` 的 `@theme`（`ease-site` 曲線，並把預設 trans
 - [ ] 第一幀就能讀到主要文字
 - [ ] reduced motion 下沒有位移與循環
 - [ ] hover、focus-visible、active 三種狀態都有
+- [ ] 外殼高度只用 `shadow-hair` / `e1` / `e2` / `e3`，按鈕用 `btn-primary` / `btn-secondary`

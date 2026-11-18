@@ -42,7 +42,7 @@ export function ThemeMenu({ labels }: { labels: Labels }) {
     <button
       type="button"
       onClick={toggle}
-      className="group relative grid size-8 place-items-center overflow-hidden rounded-md border border-line text-subtle transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-accent active:scale-95"
+      className="group relative grid size-8 place-items-center overflow-hidden rounded-md bg-card text-subtle shadow-e1 transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-accent active:scale-95"
     >
       {/* 名稱跟著實際主題走，同樣用 CSS 切換，免去讀狀態 */}
       <span className="sr-only dark:hidden">{`${labels.theme}: ${labels.themeDark}`}</span>

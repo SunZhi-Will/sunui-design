@@ -121,19 +121,19 @@ export function BlockSheet({
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0, transition: { duration: DURATION.panelIn, ease: EASE_SITE } }}
             exit={reduce ? { opacity: 0, transition: { duration: DURATION.panelOut } } : { opacity: 0, y: 8, transition: { duration: DURATION.panelOut, ease: "easeIn" } }}
-            className="relative rounded-xl flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden bg-card shadow-2xl ring-1 ring-line outline-none"
+            className="relative flex h-full max-h-[860px] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-card shadow-e3 outline-none"
           >
             <header className="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-5">
               <div className="min-w-0 flex-1">
                 <h2 id="block-sheet-title" className="flex items-center gap-2 font-medium tracking-tight">
                   <span className="truncate">{item.title}</span>
                   {item.tier === "pro" && (
-                    <span className="rounded-sm bg-fg px-2 py-0.5 text-[11px] font-medium text-bg">Pro</span>
+                    <span className="rounded-md bg-fg px-2 py-0.5 text-[11px] font-medium text-bg shadow-btn">Pro</span>
                   )}
                 </h2>
               </div>
               {/* 面板夠寬時才有意義：sm 以下整個面板就是手機寬，不顯示 */}
-              <div role="radiogroup" aria-label={viewportLabels.viewport} className="hidden rounded-md border border-line p-0.5 sm:flex">
+              <div role="radiogroup" aria-label={viewportLabels.viewport} className="hidden rounded-md bg-accent-soft p-0.5 sm:flex">
                 {viewports.map((v) => (
                   <button
                     key={v.key}
@@ -144,8 +144,8 @@ export function BlockSheet({
                     title={`${viewportLabels[v.key]}${v.key === "desktop" ? "" : ` · ${v.width}`}`}
                     onClick={() => setViewport(v.key)}
                     className={cn(
-                      "grid h-7 w-8 place-items-center rounded-[5px] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                      viewport === v.key ? "bg-fg text-bg" : "text-subtle hover:text-fg",
+                      "grid h-7 w-8 place-items-center rounded-[4px] transition-[color,background-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                      viewport === v.key ? "bg-card text-fg shadow-e1" : "text-subtle hover:text-fg",
                     )}
                   >
                     <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -196,14 +196,14 @@ export function BlockSheet({
                 {labels.docs}
               </a>
               {item.install ? (
-                <div className="flex min-w-0 items-center gap-2 rounded-md border border-line bg-bg py-1.5 pr-1.5 pl-3 sm:max-w-md">
+                <div className="flex min-w-0 items-center gap-2 rounded-lg bg-bg py-1.5 pr-1.5 pl-3 shadow-e1 sm:max-w-md">
                   <code className="min-w-0 flex-1 overflow-x-auto font-mono text-xs whitespace-nowrap">{item.install}</code>
                   <CopyButton value={item.install} />
                 </div>
               ) : (
                 <Link
                   href="/pricing"
-                  className="shrink-0 rounded-sm bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+                  className="shrink-0 rounded-md px-4 py-2 text-sm font-medium btn-primary"
                 >
                   {labels.getPro}
                 </Link>

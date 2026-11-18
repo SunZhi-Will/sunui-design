@@ -137,7 +137,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/pricing"
-            className="mt-6 inline-flex rounded-md bg-fg px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90"
+            className="mt-6 inline-flex rounded-md px-5 py-2.5 text-sm font-medium btn-primary"
           >
             {m.common.seePricing}
           </Link>

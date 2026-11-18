@@ -102,7 +102,7 @@ export function AgentSteps({ m }: { m: AgentMessages }) {
           <p className="text-sm text-pretty text-subtle">{m.lead}</p>
           <Link
             href="/docs/ai-agents"
-            className="mt-4 inline-flex rounded-md bg-fg px-4 py-2 text-sm font-medium text-bg hover:opacity-90"
+            className="mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium btn-primary"
           >
             {m.docs} →
           </Link>

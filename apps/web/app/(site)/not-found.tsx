@@ -25,12 +25,12 @@ export default async function NotFound() {
       <p className="mt-3 text-subtle">{m.notFound.body}</p>
       <NotFoundSuggestions items={items} labels={{ tried: m.notFound.tried, suggest: m.notFound.suggest, tier: m.tier }} />
       <div className="mt-10 flex flex-wrap justify-center gap-3">
-        <Link href="/" className="inline-flex rounded-md bg-fg px-5 py-2.5 text-sm font-medium text-bg hover:opacity-90">
+        <Link href="/" className="inline-flex rounded-md px-5 py-2.5 text-sm font-medium btn-primary">
           {m.notFound.cta}
         </Link>
         <Link
           href="/docs"
-          className="inline-flex rounded-md border border-line px-5 py-2.5 text-sm font-medium text-fg hover:bg-stage"
+          className="inline-flex rounded-md px-5 py-2.5 text-sm font-medium btn-secondary"
         >
           {m.notFound.docs}
         </Link>

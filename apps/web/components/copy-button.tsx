@@ -26,7 +26,7 @@ export function CopyButton({
       type="button"
       onClick={copy}
       className={cn(
-        "shrink-0 rounded-md border whitespace-nowrap border-line bg-card px-2.5 py-1 text-xs font-medium text-subtle transition-colors hover:text-fg",
+        "shrink-0 rounded-[5px] whitespace-nowrap bg-card px-2.5 py-1 text-xs font-medium text-subtle shadow-e1 transition-[color,background-color,scale] hover:bg-surface-hover hover:text-fg active:scale-[0.97]",
         className,
       )}
     >

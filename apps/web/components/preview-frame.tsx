@@ -124,10 +124,10 @@ export function PreviewFrame({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-card">
+    <div className="overflow-hidden rounded-xl bg-card shadow-e1">
       <div className="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
         <div className="flex items-center gap-3">
-          <div role="radiogroup" aria-label={labels.viewport} className="flex rounded-md border border-line p-0.5">
+          <div role="radiogroup" aria-label={labels.viewport} className="flex rounded-md bg-accent-soft p-0.5">
             {viewports.map((v) => {
               const active = custom === null && viewport === v.key;
               return (
@@ -143,8 +143,8 @@ export function PreviewFrame({
                     setCustom(null);
                   }}
                   className={cn(
-                    "grid h-7 w-8 place-items-center rounded-[5px] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                    active ? "bg-fg text-bg" : "text-subtle hover:text-fg",
+                    "grid h-7 w-8 place-items-center rounded-[4px] transition-[color,background-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-accent",
+                    active ? "bg-card text-fg shadow-e1" : "text-subtle hover:text-fg",
                   )}
                 >
                   <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -195,7 +195,7 @@ export function PreviewFrame({
             rel="noreferrer"
             aria-label={labels.openTab}
             title={labels.openTab}
-            className="grid size-7 place-items-center rounded-md text-subtle transition-colors outline-none hover:bg-stage hover:text-fg focus-visible:ring-2 focus-visible:ring-accent"
+            className="grid size-7 place-items-center rounded-md text-subtle transition-colors outline-none hover:bg-surface-hover hover:text-fg focus-visible:ring-2 focus-visible:ring-accent"
           >
             <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
@@ -259,7 +259,7 @@ function ToolButton({ label, onClick, children }: { label: string; onClick: () =
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid size-7 place-items-center rounded-md text-subtle transition-colors outline-none hover:bg-stage hover:text-fg focus-visible:ring-2 focus-visible:ring-accent"
+      className="grid size-7 place-items-center rounded-md text-subtle transition-colors outline-none hover:bg-surface-hover hover:text-fg focus-visible:ring-2 focus-visible:ring-accent"
     >
       <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         {children}

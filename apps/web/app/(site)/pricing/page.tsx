@@ -123,7 +123,7 @@ export default async function PricingPage() {
         <section
           id={foundingHasForm ? "waitlist" : undefined}
           aria-labelledby="founding-title"
-          className="mx-auto mt-12 max-w-3xl scroll-mt-24 rounded-lg border border-fg/80 bg-card p-6 sm:p-8"
+          className="mx-auto mt-12 max-w-3xl scroll-mt-24 rounded-xl bg-card p-6 shadow-e2 ring-1 ring-fg sm:p-8"
         >
           <p className="text-sm font-medium text-accent">{t.foundingEyebrow}</p>
           <h2 id="founding-title" className="mt-1 text-2xl font-semibold tracking-tight">
@@ -144,7 +144,7 @@ export default async function PricingPage() {
             {state === "open" && canBuy ? (
               <a
                 href="/go/checkout/founding"
-                className="inline-flex rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-fg hover:opacity-90"
+                className="inline-flex rounded-md px-5 py-2.5 text-sm font-medium btn-primary"
               >
                 {t.foundingCta}
               </a>
@@ -160,9 +160,9 @@ export default async function PricingPage() {
           <div
             key={plan.name}
             className={cn(
-              "flex flex-col rounded-lg border bg-card p-6",
+              "flex flex-col rounded-xl bg-card p-6",
               // 手機上單欄堆疊時 Pro 排第一，付費的人不用先滑過免費方案
-              plan.highlight ? "border-fg max-md:order-first" : "border-line",
+              plan.highlight ? "shadow-e2 ring-1 ring-fg max-md:order-first" : "shadow-e1",
             )}
           >
             <h2 className="font-medium">{plan.name}</h2>
@@ -191,8 +191,8 @@ export default async function PricingPage() {
             {/* 結帳走 /go/checkout 計數後轉到結帳頁：用一般連結，Link 的預先載入會把瀏覽也算成點擊 */}
             {(() => {
               const className = cn(
-                "mt-8 rounded-md px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90",
-                plan.highlight ? "bg-fg text-bg" : "border border-line",
+                "mt-8 rounded-md px-4 py-2.5 text-center text-sm font-medium",
+                plan.highlight ? "btn-primary" : "btn-secondary",
               );
               return plan.cta.href.startsWith("/go/") ? (
                 <a href={plan.cta.href} className={className}>
@@ -217,7 +217,7 @@ export default async function PricingPage() {
         </div>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           {subscriptionPlans.map((plan) => (
-            <div key={plan.key} className="flex flex-col rounded-lg border border-line bg-card p-6">
+            <div key={plan.key} className="flex flex-col rounded-xl bg-card p-6 shadow-e1">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-medium">{plan.name}</h3>
                 {plan.badge && (
@@ -233,7 +233,7 @@ export default async function PricingPage() {
               </p>
               <a
                 href={plan.cta.href}
-                className="mt-6 rounded-md border border-line px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90"
+                className="mt-6 rounded-md px-4 py-2.5 text-center text-sm font-medium btn-secondary"
               >
                 {plan.cta.label}
               </a>

@@ -92,7 +92,7 @@ export function CheckoutForm({
         <button
           type="submit"
           disabled={pending}
-          className="h-11 w-full rounded-md bg-accent px-4 text-sm font-medium text-accent-fg transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="h-11 w-full rounded-md px-4 text-sm font-medium disabled:opacity-50 btn-primary"
         >
           {pending ? t.paying : t.pay}
         </button>

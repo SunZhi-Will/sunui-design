@@ -9,7 +9,7 @@ import { githubUrl } from "@/lib/site";
 export async function SiteHeader() {
   const { locale, m } = await getI18n();
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/75 backdrop-blur-md backdrop-saturate-150">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
         <Link
           href="/"
@@ -30,7 +30,7 @@ export async function SiteHeader() {
               rel="noreferrer"
               aria-label={m.nav.github}
               title={m.nav.github}
-              className="hidden size-8 place-items-center rounded-md border border-line text-subtle transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-accent sm:grid"
+              className="hidden size-8 place-items-center rounded-md bg-card text-subtle shadow-e1 transition-colors hover:bg-surface-hover hover:text-fg focus-visible:outline-2 focus-visible:outline-accent sm:grid"
             >
               <GitHubMark />
             </a>

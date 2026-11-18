@@ -124,7 +124,7 @@ export function HeroOpening({ tiles, featured, children }: { tiles: string[]; fe
                         key={i}
                         href={`/blocks/${name}`}
                         tabIndex={-1}
-                        className={`relative block shrink-0 overflow-hidden rounded-lg border border-line bg-[#f7f7f7] transition-transform duration-200 hover:[transform:translateZ(36px)] ${isFeatured ? "" : "hero-tile"}`}
+                        className={`relative block shrink-0 overflow-hidden rounded-lg border border-line bg-[#f7f7f7] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_10px_24px_-10px_rgb(0_0_0/0.14)] transition-transform dark:shadow-none duration-200 hover:[transform:translateZ(36px)] ${isFeatured ? "" : "hero-tile"}`}
                         style={{ width: TILE_W, height: TILE_H, animationDelay: `${Math.min(dist, 6) * 0.05}s` }}
                       >
                         <Image

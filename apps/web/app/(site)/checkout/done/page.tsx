@@ -75,7 +75,7 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
           </>
         )}
         <p className="mt-4 font-mono text-xs text-subtle">{order.id}</p>
-        <Link href="/" className="mt-6 inline-flex rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
+        <Link href="/" className="mt-6 inline-flex rounded-md px-4 py-2 text-sm font-medium btn-primary">
           {t.browse}
         </Link>
       </Shell>
@@ -138,7 +138,7 @@ export default async function CheckoutDonePage({ searchParams }: { searchParams:
         </li>
       </ol>
       <p className="mt-6 text-xs text-subtle">{t.emailNote(order.email)}</p>
-      <Link href="/" className="mt-6 inline-flex rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg hover:opacity-90">
+      <Link href="/" className="mt-6 inline-flex rounded-md px-4 py-2 text-sm font-medium btn-primary">
         {t.browse}
       </Link>
     </Shell>

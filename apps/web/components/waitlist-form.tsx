@@ -79,7 +79,7 @@ export function WaitlistForm({
         <button
           type="submit"
           disabled={status === "sending"}
-          className="shrink-0 rounded-md bg-fg px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="shrink-0 rounded-md px-4 py-2.5 text-sm font-medium disabled:opacity-60 btn-primary"
         >
           {status === "sending" ? t.joining : t.join}
         </button>

@@ -21,7 +21,14 @@
   --bg: #ffffff;
   --fg: #0a0a0a;
   --subtle: #6b6b6b;
-  --line: #e4e4e4;
+  --line: rgb(0 0 0 / 0.09); /* 邊線用透明度：放在紙、舞台、圖片上都一樣乾淨（2026-11-18，原為 #e4e4e4） */
+  --line-strong: rgb(0 0 0 / 0.16);
+  --surface-hover: #f5f5f5;
+  /* 高度：極淡的多層陰影，永遠帶 1px hairline，光源在正上方。見 reports/網站質感升級深度分析-2026-11-18.md */
+  --sh-1: 0 0 0 1px var(--line), 0 1px 2px rgb(0 0 0 / 0.04);
+  --sh-2: 0 0 0 1px var(--line), 0 1px 1px rgb(0 0 0 / 0.02), 0 4px 8px -4px rgb(0 0 0 / 0.06), 0 12px 24px -8px rgb(0 0 0 / 0.08);
+  --sh-3: 0 0 0 1px var(--line), 0 2px 4px rgb(0 0 0 / 0.03), 0 16px 32px -8px rgb(0 0 0 / 0.1), 0 32px 64px -16px rgb(0 0 0 / 0.1);
+  --sh-btn: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(0 0 0 / 0.16), 0 0 0 1px var(--fg);
   --card: #ffffff;
   --stage: #ececec; /* 比紙 #f7f7f7 深一階，block 放上舞台才分得出邊（2026-11-08） */
   /* 站台不設彩色強調：accent 就是墨色，accent-soft 是最淺的灰 */
@@ -38,7 +45,7 @@
   --muted-foreground: #6b6b6b;
   --primary: #0a0a0a;
   --primary-foreground: #ffffff;
-  --border: var(--line);
+  --border: #e4e4e4; /* block 用實色，維持型錄原樣；網站外殼用 --line */
   --ring: #0a0a0a;
   --destructive: #b42318;
 }
@@ -48,7 +55,14 @@
     --bg: #0a0a0a;
     --fg: #ededed;
     --subtle: #8f8f8f;
-    --line: #262626;
+    --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.18);
+  --surface-hover: #1a1a1a;
+  /* 深色不靠投影：頂邊 1px 高光加邊線，浮層再補一層深陰影 */
+  --sh-1: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px var(--line);
+  --sh-2: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 0 0 1px var(--line-strong), 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --sh-3: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px var(--line-strong), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  --sh-btn: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 -1px 0 rgb(0 0 0 / 0.1), 0 0 0 1px var(--fg);
     --card: #111111;
     --stage: #171717;
     --accent: #ededed;
@@ -61,6 +75,7 @@
     --primary-foreground: #0a0a0a;
     --ring: #ededed;
     --destructive: #f97066;
+    --border: #262626;
   }
 }
 
@@ -69,7 +84,14 @@
   --bg: #0a0a0a;
   --fg: #ededed;
   --subtle: #8f8f8f;
-  --line: #262626;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.18);
+  --surface-hover: #1a1a1a;
+  /* 深色不靠投影：頂邊 1px 高光加邊線，浮層再補一層深陰影 */
+  --sh-1: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px var(--line);
+  --sh-2: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 0 0 1px var(--line-strong), 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --sh-3: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px var(--line-strong), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  --sh-btn: inset 0 1px 0 rgb(255 255 255 / 0.7), inset 0 -1px 0 rgb(0 0 0 / 0.1), 0 0 0 1px var(--fg);
   --card: #111111;
   --stage: #171717;
   --accent: #ededed;
@@ -85,13 +107,20 @@
   --background: var(--bg);
   --foreground: var(--fg);
   --card-foreground: var(--fg);
-  --border: var(--line);
+  --border: #262626;
 }
 .light {
   --bg: #ffffff;
   --fg: #0a0a0a;
   --subtle: #6b6b6b;
-  --line: #e4e4e4;
+  --line: rgb(0 0 0 / 0.09); /* 邊線用透明度：放在紙、舞台、圖片上都一樣乾淨（2026-11-18，原為 #e4e4e4） */
+  --line-strong: rgb(0 0 0 / 0.16);
+  --surface-hover: #f5f5f5;
+  /* 高度：極淡的多層陰影，永遠帶 1px hairline，光源在正上方。見 reports/網站質感升級深度分析-2026-11-18.md */
+  --sh-1: 0 0 0 1px var(--line), 0 1px 2px rgb(0 0 0 / 0.04);
+  --sh-2: 0 0 0 1px var(--line), 0 1px 1px rgb(0 0 0 / 0.02), 0 4px 8px -4px rgb(0 0 0 / 0.06), 0 12px 24px -8px rgb(0 0 0 / 0.08);
+  --sh-3: 0 0 0 1px var(--line), 0 2px 4px rgb(0 0 0 / 0.03), 0 16px 32px -8px rgb(0 0 0 / 0.1), 0 32px 64px -16px rgb(0 0 0 / 0.1);
+  --sh-btn: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(0 0 0 / 0.16), 0 0 0 1px var(--fg);
   --card: #ffffff;
   --stage: #ececec;
   --accent: #0a0a0a;
@@ -107,7 +136,7 @@
   --background: var(--bg);
   --foreground: var(--fg);
   --card-foreground: var(--fg);
-  --border: var(--line);
+  --border: #e4e4e4;
 }
 
 /* 網站動效 tokens，規範見 SITE-MOTION.md；JS 端同一組數字在 lib/motion.ts。
@@ -116,6 +145,10 @@
   --ease-site: cubic-bezier(0.23, 1, 0.32, 1);
   --default-transition-duration: 150ms;
   --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Geist 是可變字重：比 500 / 600 略重一點，不顯粗（Linear 用 510 / 590） */
+  --font-weight-medium: 510;
+  --font-weight-semibold: 590;
 }
 
 @theme inline {
@@ -123,6 +156,13 @@
   --color-fg: var(--fg);
   --color-subtle: var(--subtle);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-surface-hover: var(--surface-hover);
+  --shadow-hair: 0 0 0 1px var(--line);
+  --shadow-e1: var(--sh-1);
+  --shadow-e2: var(--sh-2);
+  --shadow-e3: var(--sh-3);
+  --shadow-btn: var(--sh-btn);
   --color-card: var(--card);
   --color-stage: var(--stage);
   --color-accent: var(--accent);
@@ -178,11 +218,52 @@ html:not(:has([data-fit-stage])) {
   background-color: var(--subtle);
 }
 
+/* 字體：@theme inline 會把 --font-sans 內嵌進工具類別，:root 上不存在這個變數，
+   所以這裡直接讀 next/font 掛在 <body> 的 --font-geist-sans（2026-11-18 前全站其實在用系統字體） */
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-sans);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 網站外殼的按鈕（不是 block）：主按鈕有 1px 內高光與極淡投影，次按鈕是浮起的白面。按下縮到 0.97 */
+@utility btn-primary {
+  background-color: var(--fg);
+  color: var(--bg);
+  box-shadow: var(--sh-btn);
+  transition-property: opacity, scale;
+  transition-duration: 150ms;
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+  &:active:not(:disabled) {
+    scale: 0.97;
+    transition-duration: 100ms;
+  }
+}
+@utility btn-secondary {
+  background-color: var(--card);
+  color: var(--fg);
+  box-shadow: var(--sh-1);
+  transition-property: background-color, scale;
+  transition-duration: 150ms;
+  &:hover:not(:disabled) {
+    background-color: var(--surface-hover);
+  }
+  &:active:not(:disabled) {
+    scale: 0.97;
+    transition-duration: 100ms;
+  }
+}
+
+/* 焦點：和元件之間留 2px 間隙，不貼邊（放在 base layer，元件自己的 outline-offset 工具類別仍然優先） */
+@layer base {
+  :focus-visible {
+    outline-offset: 2px;
+  }
 }
 
 /* shiki 雙主題：依系統深淺色切換 */
