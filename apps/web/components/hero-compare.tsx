@@ -107,7 +107,8 @@ export function HeroCompare({ m }: { m: CompareMessages }) {
           ))}
         </div>
       </div>
-      <figcaption className="mt-2 text-sm text-pretty text-subtle">{m.caption}</figcaption>
+      {/* 首頁不放說明文字時傳空字串 */}
+      {m.caption && <figcaption className="mt-2 text-sm text-pretty text-subtle">{m.caption}</figcaption>}
     </figure>
   );
 }

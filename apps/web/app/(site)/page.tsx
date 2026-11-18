@@ -61,7 +61,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     Object.entries(SPECIMEN_BLOCKS).flatMap(([key, name]) => (getItem(name) ? [[key, `/blocks/${name}`]] : [])),
   ) as Partial<Record<SpecimenKey, string>>;
   const t = m.home.sections;
-  const motionLibs = all.filter((item) => item.meta.series === "motion").length;
   const styleCount = Object.values(variantIds).reduce((n, ids) => n + ids.length, 0);
   const iconCount = iconGroups.reduce((n, group) => n + group.icons.length, 0);
   // 「裡面有什麼」四張卡：數字與連結，順序對應 messages 的 sections.inside.items
@@ -105,22 +104,21 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         ))}
       </section>
 
-      {/* 裡面有什麼：四個數字 */}
+      {/* 裡面有什麼：四個數字，不加說明 */}
       <section aria-labelledby="inside-title" className="mt-28 sm:mt-36">
         <SectionHead id="inside-title" eyebrow={t.inside.eyebrow} title={t.inside.title} />
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {t.inside.items.map((item, i) => (
+          {t.inside.items.map((label, i) => (
             <Link
-              key={item.label}
+              key={label}
               href={insideLinks[i]}
               className="group flex flex-col rounded-xl bg-card p-6 shadow-e1 transition-shadow duration-200 hover:shadow-e2"
             >
               <CountUp value={insideCounts[i]} className="text-5xl font-semibold tracking-[-0.04em] tabular-nums" />
               <span className="mt-4 flex items-center gap-1.5 font-medium">
-                {item.label}
+                {label}
                 <Arrow className="size-3.5 text-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-fg" />
               </span>
-              <span className="mt-1.5 text-sm text-pretty text-subtle">{format(item.body, { n: motionLibs })}</span>
             </Link>
           ))}
         </div>
@@ -130,7 +128,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       {showcase.length > 0 && (
         <section aria-labelledby="showcase-title" className="mt-28 sm:mt-36">
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <SectionHead id="showcase-title" eyebrow={t.showcase.eyebrow} title={t.showcase.title} body={t.showcase.body} />
+            <SectionHead id="showcase-title" eyebrow={t.showcase.eyebrow} title={t.showcase.title} />
             <Link href="/pricing" className="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold btn-primary">
               {t.showcase.cta}
               <Arrow className="size-4" />
@@ -153,23 +151,16 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </section>
       )}
 
-      {/* 比較示範加三個理由 */}
+      {/* 比較示範：只留示範本身，不加說明 */}
       <section aria-labelledby="compare-title" className="mt-28 sm:mt-36">
         <SectionHead id="compare-title" eyebrow={t.compare.eyebrow} title={t.compare.title} center />
         <div aria-label={m.home.compare.label} className="mx-auto mt-10 max-w-xl">
-          <HeroCompare m={m.home.compare} />
+          <HeroCompare m={{ ...m.home.compare, caption: "" }} />
         </div>
-        <dl className="mt-14 grid gap-x-10 gap-y-8 border-t border-line pt-10 md:grid-cols-3">
-          {m.home.reasons.map((reason) => (
-            <div key={reason.title}>
-              <dt className="font-medium">{reason.title}</dt>
-              <dd className="mt-2 text-sm leading-relaxed text-pretty text-subtle">{reason.body}</dd>
-            </div>
-          ))}
-        </dl>
       </section>
 
-      <AgentSteps m={m.home.agent} />
+      {/* 首頁只留標題與步驟名稱，細節在文件頁 */}
+      <AgentSteps m={{ ...m.home.agent, lead: "", steps: m.home.agent.steps.map((step) => ({ ...step, body: "" })) }} />
 
       {/* 價格與創始會員 */}
       <section
@@ -195,7 +186,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
       {/* 九張精選：完整型錄在 /blocks */}
       <section aria-labelledby="picks-title" className="mt-28 sm:mt-36">
-        <SectionHead id="picks-title" eyebrow={t.catalog.eyebrow} title={t.catalog.picksTitle} body={t.catalog.picksBody} />
+        <SectionHead id="picks-title" eyebrow={t.catalog.eyebrow} title={t.catalog.picksTitle} />
         <ul className="mt-10 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {picks.map((item) => (
             <BlockCard
@@ -223,7 +214,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <h2 id="closing-title" className="text-4xl font-semibold tracking-[-0.03em] text-balance sm:text-5xl">
           {t.closing.title}
         </h2>
-        <p className="mx-auto mt-4 max-w-md text-lg text-pretty text-subtle">{t.closing.body}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/blocks" className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-semibold btn-primary">
             {m.common.browseBlocks}

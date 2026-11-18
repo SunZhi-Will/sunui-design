@@ -99,7 +99,7 @@ export function AgentSteps({ m }: { m: AgentMessages }) {
           </h2>
         </div>
         <div>
-          <p className="text-sm text-pretty text-subtle">{m.lead}</p>
+          {m.lead && <p className="text-sm text-pretty text-subtle">{m.lead}</p>}
           <Link
             href="/docs/ai-agents"
             className="mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium btn-primary"
@@ -122,7 +122,7 @@ export function AgentSteps({ m }: { m: AgentMessages }) {
               </div>
               <p className="mt-5 font-mono text-xs text-subtle">{String(i + 1).padStart(2, "0")}</p>
               <h3 className="mt-2 font-medium">{step.title}</h3>
-              <p className="mt-1.5 text-sm text-pretty text-subtle">{step.body}</p>
+              {step.body && <p className="mt-1.5 text-sm text-pretty text-subtle">{step.body}</p>}
             </li>
           ))}
         </ol>
