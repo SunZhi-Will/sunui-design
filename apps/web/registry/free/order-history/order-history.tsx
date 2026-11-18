@@ -187,14 +187,14 @@ export function OrderHistory({
                   aria-controls={panelId}
                   aria-label={`${t.toggle(o.number)}, ${o.date}, ${t.status[o.status]}, ${money(total(o))}`}
                   onClick={() => setOpen(expanded ? null : o.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-current/[0.03] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]"
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-current/[0.03] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset motion-safe:active:scale-[0.99] transition-[color,background-color,border-color,opacity,scale]"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                       <span className="font-mono text-xs tracking-[0.12em]">#{o.number}</span>
                       <span className="relative inline-flex">
                         <AnimatePresence initial={false} mode="popLayout">
-                          <Result key={o.status} size="sm" seed={o.id} tone={o.status === "pending" ? "positive" : "muted"} void={o.status === "cancelled"}>
+                          <Result key={o.status} size="sm" seed={o.id} tone="muted" void={o.status === "cancelled"} className={o.status === "pending" ? "text-foreground" : undefined}>
                             {t.status[o.status]}
                           </Result>
                         </AnimatePresence>
