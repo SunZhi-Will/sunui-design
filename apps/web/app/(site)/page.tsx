@@ -7,13 +7,13 @@ import { BlockCard } from "@/components/block-card";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
 import { HomeHero } from "@/components/home/home-hero";
-import { SpecimenTable, type SpecimenKey } from "@/components/home/specimen-table";
+import { LiveWall } from "@/components/home/live-wall";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { buildCatalogItems } from "@/lib/catalog-items";
 import { getI18n } from "@/lib/i18n-server";
 import { format } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
-import { getItem, getItems, installCommand } from "@/lib/registry";
+import { getItems, installCommand } from "@/lib/registry";
 import { foundingState, foundingWindow } from "@/lib/site";
 
 
@@ -23,16 +23,6 @@ const AGENT_RESULT = ["countdown-banner", "coupon-claim-card", "free-shipping-pr
 const SHOWCASE = ["kelvin-switch", "lamp-dimmer-scene", "theme-reveal", "glass-cube-hero", "launch-stage-hero", "curve-rail-hero"];
 // 首頁的九張精選：都是免費區塊，一按就有反應的
 const PICKS = ["add-to-cart-button", "depth-hero", "orbit-gallery", "checkout-steps", "animated-number", "theme-picker", "quantity-stepper", "hotspots", "compare-slider"];
-const SPECIMEN_BLOCKS: Record<SpecimenKey, string> = {
-  cart: "add-to-cart-button",
-  toggle: "theme-picker",
-  stepper: "quantity-stepper",
-  dimmer: "lamp-dimmer-scene",
-  price: "animated-number",
-  island: "order-island",
-  steps: "checkout-steps",
-};
-
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
   return { title: { absolute: m.home.metaTitle }, description: m.meta.siteDescription };
@@ -54,10 +44,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
   const firstFree = all.find((item) => item.meta.tier === "free");
-  // 標本桌每一格左上角的名稱連到對應的正式區塊；區塊不存在（例如 Pro 資料夾不在）就不連
-  const specimenLinks = Object.fromEntries(
-    Object.entries(SPECIMEN_BLOCKS).flatMap(([key, name]) => (getItem(name) ? [[key, `/blocks/${name}`]] : [])),
-  ) as Partial<Record<SpecimenKey, string>>;
   const t = m.home.sections;
   const picks = PICKS.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
   const agentBlocks = AGENT_RESULT.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
@@ -69,7 +55,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      {/* 開場：左邊文字與兩個按鈕，右邊是標本桌 */}
+      {/* 開場：置中的標題與兩顆按鈕，下面是鋪滿螢幕寬度的即時元件牆 */}
       <HomeHero
         chip={
           founding === "closed"
@@ -86,12 +72,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         sub={m.home.hero.sub}
         primary={{ label: browseLabel, href: "/blocks" }}
         secondary={{ label: m.home.hero.proCta, href: "/pricing" }}
-        command={firstFree && <Command value={installCommand(firstFree)} />}
-        table={<SpecimenTable copy={m.home.hero.specimens} links={specimenLinks} />}
+        wall={<LiveWall copy={m.home.hero.wall} command={firstFree && <Command value={installCommand(firstFree)} />} />}
       />
 
       {/* 免費區塊：開場正下方就是可以按的東西 */}
-      <section aria-labelledby="free-title" className="mt-10 sm:mt-16">
+      <section aria-labelledby="free-title" className="mt-16 sm:mt-24">
         <SectionHead id="free-title" title={t.free}>
           <Link href="/blocks" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
             {format(t.catalog.cta, { n: all.length })}

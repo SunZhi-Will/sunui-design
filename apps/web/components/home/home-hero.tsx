@@ -2,9 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /**
- * 首頁開場（規劃見 reports/首頁全面重製完整規劃-2026-11-19.md）。
- * 左邊：開賣小標籤、兩行標題、一句說明、兩個按鈕，安裝指令放第三層。
- * 右邊：標本桌（specimen-table.tsx），七個會自己動、也可以自己玩的小元件。
+ * 首頁開場：上面是置中的標題、一句話、兩顆按鈕；下面是鋪滿螢幕寬度的即時元件牆（live-wall.tsx）。
+ * 規則見 SITE-MOTION.md §6，視覺比較見 reports/元件庫首頁設計深度分析-2026-11-19.md。
  */
 export function HomeHero({
   chip,
@@ -12,21 +11,18 @@ export function HomeHero({
   sub,
   primary,
   secondary,
-  command,
-  table,
+  wall,
 }: {
   chip?: { text: string; href: string };
   title: string;
   sub: string;
   primary: { label: string; href: string };
   secondary: { label: string; href: string };
-  command?: ReactNode;
-  /** 右邊的標本桌（components/home/specimen-table.tsx） */
-  table: ReactNode;
+  wall: ReactNode;
 }) {
   return (
-    <section className="grid items-center gap-12 pt-12 pb-8 sm:pt-16 lg:min-h-[640px] lg:grid-cols-12 lg:gap-10 lg:py-20">
-      <div className="lg:col-span-5">
+    <section className="pt-14 sm:pt-20">
+      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         {chip && (
           <Link
             href={chip.href}
@@ -37,11 +33,11 @@ export function HomeHero({
             <Arrow className="size-3 transition-transform group-hover:translate-x-0.5" />
           </Link>
         )}
-        <h1 className="text-[44px] leading-[1.06] font-semibold tracking-[-0.035em] text-balance [word-break:auto-phrase] sm:text-6xl lg:text-[64px]">
+        <h1 className="text-[44px] leading-[1.06] font-semibold tracking-[-0.035em] text-balance [word-break:auto-phrase] sm:text-6xl lg:text-[72px]">
           <Title text={title} />
         </h1>
-        <p className="mt-5 max-w-md text-lg leading-relaxed text-pretty text-subtle">{sub}</p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <p className="mt-5 max-w-xl text-lg leading-relaxed text-pretty text-subtle">{sub}</p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href={primary.href} className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-semibold btn-primary">
             {primary.label}
             <Arrow className="size-4" />
@@ -50,10 +46,8 @@ export function HomeHero({
             {secondary.label}
           </Link>
         </div>
-        {command && <div className="mt-8 max-w-md">{command}</div>}
       </div>
-
-      <div className="lg:col-span-7">{table}</div>
+      <div className="mt-14 sm:mt-16">{wall}</div>
     </section>
   );
 }
