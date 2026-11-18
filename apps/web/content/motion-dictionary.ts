@@ -67,10 +67,10 @@ export const motionGroups: MotionGroup[] = [
         names: n("彈跳入場", "弹跳入场", "バウンスイン"),
         verdict: "avoid",
         how: {
-          en: "Popping and scaling have no physical meaning on paper. Dialogs settle with the gentle spring from 98%, without overshoot.",
-          "zh-TW": "彈出與縮放在紙上沒有物理意義。對話框用 gentle 彈簧從 98% 落定，不回彈。",
-          "zh-CN": "弹出与缩放在纸上没有物理意义。对话框用 gentle 弹簧从 98% 落定，不回弹。",
-          ja: "ポップや拡大は紙として意味がありません。ダイアログは gentle スプリングで 98% から静かに収まります。",
+          en: "A bounce from zero has no mass behind it. Dialogs and popovers settle in from 96% with a fade in under 200ms, without overshoot.",
+          "zh-TW": "從零彈出的縮放沒有質量感。對話框與彈出層從 96% 加淡入落定，200ms 內，不回彈。",
+          "zh-CN": "从零弹出的缩放没有质量感。对话框与弹出层从 96% 加淡入落定，200ms 内，不回弹。",
+          ja: "ゼロから弾む拡大には重さがありません。ダイアログとポップオーバーは 96% からフェードとともに 200ms 以内で収まり、オーバーシュートしません。",
         },
         blocks: ["upgrade-modal"],
       },
@@ -217,10 +217,10 @@ export const motionGroups: MotionGroup[] = [
         names: n("固定頁首縮小", "固定页首缩小", "縮むヘッダー"),
         verdict: "allow",
         how: {
-          en: "Once the page leaves the top, the header gets shorter and gains a 1 px paper edge. No frosted glass.",
-          "zh-TW": "離開頁面頂端後頁首變矮，加上 1px 紙邊。不用毛玻璃。",
-          "zh-CN": "离开页面顶端后页首变矮，加上 1px 纸边。不用毛玻璃。",
-          ja: "ページ上端を離れるとヘッダーが低くなり、1px の紙の縁が付きます。すりガラスは使いません。",
+          en: "Once the page leaves the top, the header gets shorter and gains a hairline edge. Frosted glass is fine here because the header floats over content; keep it at least 80% opaque.",
+          "zh-TW": "離開頁面頂端後頁首變矮，加上一條 hairline 邊線。頁首浮在內容上，可以用毛玻璃，底色至少 80% 不透明。",
+          "zh-CN": "离开页面顶端后页首变矮，加上一条 hairline 边线。页首浮在内容上，可以用毛玻璃，底色至少 80% 不透明。",
+          ja: "ページ上端を離れるとヘッダーが低くなり、細い境界線が付きます。ヘッダーはコンテンツの上に浮くので、80% 以上の不透明度ならすりガラスを使えます。",
         },
         blocks: ["capsule-nav"],
         planned: "store-header",
@@ -450,10 +450,10 @@ export const motionGroups: MotionGroup[] = [
         names: n("3D 傾斜與炫光卡片", "3D 倾斜与炫光卡片", "3D チルト・グレアカード"),
         verdict: "avoid",
         how: {
-          en: "Pretty but says nothing, and it does not work on touch. Paper lies flat.",
-          "zh-TW": "好看但不傳達資訊，觸控裝置也沒效果。紙是平放的。",
-          "zh-CN": "好看但不传达信息，触控设备也没效果。纸是平放的。",
-          ja: "見た目だけで情報がなく、タッチでは機能しません。紙は平らに置かれています。",
+          en: "Pretty but says nothing, and it does not work on touch. Depth comes from light and elevation, not from tilting the object at the cursor.",
+          "zh-TW": "好看但不傳達資訊，觸控裝置也沒效果。厚度靠光與高度表現，不靠跟著游標傾斜物件。",
+          "zh-CN": "好看但不传达信息，触控设备也没效果。厚度靠光与高度表现，不靠跟着光标倾斜物件。",
+          ja: "見た目だけで情報がなく、タッチでは機能しません。厚みは光と高さで表し、カーソルに合わせて傾けることでは表しません。",
         },
       },
       {
@@ -765,10 +765,10 @@ export const motionGroups: MotionGroup[] = [
         names: n("粒子、極光、動態漸層", "粒子、极光、动态渐变", "パーティクル・オーロラ・動くグラデーション"),
         verdict: "avoid",
         how: {
-          en: "Every item here breaks the color rules and adds an idle loop. A SunUI page gets its character from paper, type and ink.",
-          "zh-TW": "這一類每一個都違反顏色規則，還多一個常駐循環。SunUI 的頁面靠紙、字和墨色出性格。",
-          "zh-CN": "这一类每一个都违反颜色规则，还多一个常驻循环。SunUI 的页面靠纸、字和墨色出性格。",
-          ja: "どれも色のルールに反し、常駐ループを増やします。SunUI のページは紙、文字、インクで個性を出します。",
+          en: "Every item here breaks the color rules and adds an idle loop. A SunUI page gets its character from material, light, type and the feel of each press.",
+          "zh-TW": "這一類每一個都違反顏色規則，還多一個常駐循環。SunUI 的頁面靠材質、光、字和每一下按壓的手感出性格。",
+          "zh-CN": "这一类每一个都违反颜色规则，还多一个常驻循环。SunUI 的页面靠材质、光、字和每一下按压的手感出性格。",
+          ja: "どれも色のルールに反し、常駐ループを増やします。SunUI のページは素材、光、文字、押したときの手応えで個性を出します。",
         },
       },
       {
@@ -843,7 +843,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "Installs to `lib/sunui-motion.ts`. Import `springs`, `press`, `stamp`, `useShake`, `panel`, `listItem` or `roll`.",
     sourcesTitle: "Further reading",
     sourcesBody: "Two public collections are good for learning motion names and seeing them play. Most of their effects fall under Avoided here; use them as a vocabulary, not a shopping list.",
-    seriesNote: "These verdicts apply to the paper and product blocks. For landing pages and marketing sections that want the full range (gradients, entrances, loops, cursor and background effects), use the [Motion series](/?series=motion#blocks).",
+    seriesNote: "These verdicts apply to the core (craft) and product blocks. For landing pages and marketing sections that want the full range (gradients, entrances, loops, cursor and background effects), use the [Motion series](/?series=motion#blocks).",
   },
   "zh-TW": {
     title: "動效辭典",
@@ -875,7 +875,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "安裝到 `lib/sunui-motion.ts`。可匯入 `springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll`。",
     sourcesTitle: "延伸閱讀",
     sourcesBody: "這兩個公開收藏適合用來認識動效名稱、看實際效果。它們大部分的效果在這裡屬於「不用」；請當成詞彙表，不是採購清單。",
-    seriesNote: "這些立場適用於紙感與產品介面系列的 block。形象頁與行銷區塊若需要完整的動效（漸層、進場、循環、游標與背景特效），請用[動效系列](/?series=motion#blocks)。",
+    seriesNote: "這些立場適用於核心元件與產品介面系列的 block。形象頁與行銷區塊若需要完整的動效（漸層、進場、循環、游標與背景特效），請用[動效系列](/?series=motion#blocks)。",
   },
   "zh-CN": {
     title: "动效辞典",
@@ -907,7 +907,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "安装到 `lib/sunui-motion.ts`。可导入 `springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll`。",
     sourcesTitle: "延伸阅读",
     sourcesBody: "这两个公开收藏适合用来认识动效名称、看实际效果。它们大部分的效果在这里属于“不用”；请当成词汇表，不是采购清单。",
-    seriesNote: "这些立场适用于纸感与产品界面系列的 block。落地页与营销区块若需要完整的动效（渐变、进场、循环、光标与背景特效），请用[动效系列](/?series=motion#blocks)。",
+    seriesNote: "这些立场适用于核心组件与产品界面系列的 block。落地页与营销区块若需要完整的动效（渐变、进场、循环、光标与背景特效），请用[动效系列](/?series=motion#blocks)。",
   },
   ja: {
     title: "モーション辞典",
@@ -939,7 +939,7 @@ export const motionPageCopy: Record<Locale, MotionPageCopy> = {
     libUsage: "`lib/sunui-motion.ts` に入ります。`springs`、`press`、`stamp`、`useShake`、`panel`、`listItem`、`roll` を import できます。",
     sourcesTitle: "参考資料",
     sourcesBody: "次の 2 つの公開コレクションは、モーションの名前を覚えたり動きを見たりするのに便利です。効果の多くはここでは「使わない」に当たります。買い物リストではなく語彙集として使ってください。",
-    seriesNote: "この判定は紙とプロダクト UI シリーズのブロックに適用されます。LP やマーケティング用のセクションで、グラデーション、登場、ループ、カーソルや背景の演出まで使いたい場合は[モーションシリーズ](/?series=motion#blocks)を使ってください。",
+    seriesNote: "この判定はコアとプロダクト UI シリーズのブロックに適用されます。LP やマーケティング用のセクションで、グラデーション、登場、ループ、カーソルや背景の演出まで使いたい場合は[モーションシリーズ](/?series=motion#blocks)を使ってください。",
   },
 };
 

@@ -48,14 +48,14 @@ const en = {
   } as Record<Interaction, string>,
   series: {
     labels: {
-      paper: "Tickets",
+      craft: "Core",
       product: "Product UI",
       story: "Story",
       showcase: "Showcase",
       motion: "Motion",
     } as Record<Series, string>,
     descriptions: {
-      paper: "Coupons, receipts, tickets and loyalty cards for storefronts and campaigns.",
+      craft: "Everyday pieces for stores and product pages, with depth, light and a press you can feel: carts, coupons, inputs, toasts.",
       product: "Quiet tool UI: neutral surfaces, one accent, status on dots.",
       story: "Signature pieces in ink and lantern light: a readable 3D book and a WebGL cloth curtain for launch reveals.",
       showcase: "Landing-page signature visuals in a quiet editorial dark: tilts, carousels, marquees and recap slides.",
@@ -566,14 +566,14 @@ const zhTW: Messages = {
   },
   series: {
     labels: {
-      paper: "票券",
+      craft: "核心元件",
       product: "產品介面",
       story: "故事",
       showcase: "展示",
       motion: "動效",
     },
     descriptions: {
-      paper: "給商店與檔期活動的優惠券、收據、票根與集點卡。",
+      craft: "給商店與產品頁的日常元件，有厚度、有光、按下去有手感：購物車、優惠券、輸入框、通知。",
       product: "安靜的工具介面：中性底色、單一強調色，用圓點表示狀態。",
       story: "墨色與燈籠風格的招牌作品：可以翻閱的 3D 書、用於新品揭幕的 WebGL 布簾。",
       showcase: "形象頁的招牌視覺：3D 傾斜、輪播、跑馬燈與回顧投影片。",
@@ -1060,14 +1060,14 @@ const zhCN: Messages = {
   },
   series: {
     labels: {
-      paper: "票券",
+      craft: "核心组件",
       product: "产品界面",
       story: "故事",
       showcase: "展示",
       motion: "动效",
     },
     descriptions: {
-      paper: "给店铺与大促活动的优惠券、小票、票根与集点卡。",
+      craft: "给店铺与产品页的日常组件，有厚度、有光、按下去有手感：购物车、优惠券、输入框、通知。",
       product: "安静的工具界面：中性底色、单一强调色，用圆点表示状态。",
       story: "墨色与灯笼风格的招牌作品：可以翻阅的 3D 书、用于新品揭幕的 WebGL 布帘。",
       showcase: "落地页的招牌视觉：3D 倾斜、轮播、跑马灯与回顾幻灯片。",
@@ -1547,14 +1547,14 @@ const ja: Messages = {
   },
   series: {
     labels: {
-      paper: "チケット",
+      craft: "コア",
       product: "プロダクト UI",
       story: "ストーリー",
       showcase: "ショーケース",
       motion: "モーション",
     },
     descriptions: {
-      paper: "ストアやキャンペーンのための、クーポン、レシート、チケット、スタンプカード。",
+      craft: "ストアやプロダクトページの日常パーツ。厚みと光があり、押した手応えがある。カート、クーポン、入力欄、通知。",
       product: "静かなツール UI。ニュートラルな面、アクセントは一色、状態はドットで。",
       story: "墨と灯籠の看板作品。めくれる 3D の本と、新商品のお披露目に使える WebGL のカーテン。",
       showcase: "LP の見せ場になるビジュアル。3D チルト、カルーセル、マーキー、振り返りスライド。",

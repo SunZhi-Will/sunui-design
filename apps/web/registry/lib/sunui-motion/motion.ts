@@ -15,7 +15,9 @@ export const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   /** 狀態切換、展開收合 */
   gentle: { type: "spring", stiffness: 240, damping: 30 },
-  /** 蓋章、落下這類有重量的瞬間 */
+  /** 小元件落定一次的回彈：結果圓片、徽章數字 */
+  pop: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
+  /** 舊名，等於 pop */
   stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const satisfies Record<string, Transition>;
 
@@ -31,7 +33,7 @@ export function press(reduce?: boolean | null) {
 }
 
 /**
- * 結果出現：150ms 淡入，不縮放、不旋轉。block 裡顯示結果請直接用 `Stamp`（registry/free/stamp）；
+ * 結果出現：150ms 淡入，不縮放、不旋轉。block 裡顯示結果請直接用 `Result`（registry/free/stamp，舊名 Stamp）；
  * 這組 variants 只留給需要自訂結果樣式的特殊情況。名稱沿用 stamp 以相容舊程式。
  * 用法：<motion.span variants={stamp} initial={reduce ? false : "lifted"} animate="pressed" exit="gone" />
  */
@@ -41,7 +43,7 @@ export const stamp: Variants = {
   gone: { opacity: 0, transition: { duration: 0.12 } },
 };
 
-/** 錯誤輕搖的關鍵影格，像紙被推回來 */
+/** 錯誤輕搖的關鍵影格：有質量的物件被推回來 */
 export const shakeKeyframes = { x: [0, -6, 5, -3, 2, 0] };
 export const shakeTransition: Transition = { duration: 0.32, ease: "easeOut" };
 

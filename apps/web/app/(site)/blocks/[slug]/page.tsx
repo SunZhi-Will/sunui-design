@@ -75,7 +75,7 @@ export default async function BlockPage({ params }: Props) {
       <header className="mb-8 max-w-3xl">
         <div className="flex flex-wrap items-center gap-2">
           <TierBadge tier={item.meta.tier} />
-          {seriesOf(item) !== "paper" && (
+          {seriesOf(item) !== "craft" && (
             <Link
               href={`/?series=${seriesOf(item)}#blocks`}
               className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle transition-colors hover:border-fg hover:text-fg"

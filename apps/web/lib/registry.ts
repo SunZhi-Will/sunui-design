@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import freeRegistry from "@/registry.json";
+import { parseSeries } from "@/lib/series";
 import { siteUrl } from "@/lib/site";
 
 export type Tier = "free" | "pro";
@@ -16,8 +17,11 @@ export type Interaction =
   | "scroll"
   | "section";
 
-/** 設計語言系列：paper 見 DESIGN.md，product 與 story 見各自的 DESIGN 文件；product、story、showcase 依 PORTING.md 從原始專案移植 */
-export type Series = "paper" | "product" | "story" | "showcase" | "motion";
+/**
+ * 設計語言系列：craft 見 DESIGN.md（預設），product 與 story 見各自的 DESIGN 文件；product、story、showcase 依 PORTING.md 從原始專案移植。
+ * 2026-11-19 起 paper 改名 craft（紙感是誤讀，見 reports/拋棄紙感全面改質感深度分析-2026-11-18.md）；舊值 paper 一律讀成 craft。
+ */
+export type Series = "craft" | "product" | "story" | "showcase" | "motion";
 
 export type RegistryFile = {
   path: string;
@@ -42,7 +46,7 @@ export type RegistryItem = {
   meta: {
     tier: Tier;
     interaction: Interaction;
-    /** 省略時視為 paper */
+    /** 省略時視為 craft */
     series?: Series;
     addedAt: string;
     /** 區塊頁的使用指引；aliases 也會被目錄搜尋 */
@@ -58,7 +62,13 @@ const proManifestPath = path.join(process.cwd(), "registry", "pro", "registry.js
 
 function loadProManifest(): Manifest | null {
   if (!existsSync(proManifestPath)) return null;
-  return JSON.parse(readFileSync(proManifestPath, "utf8")) as Manifest;
+  const manifest = JSON.parse(readFileSync(proManifestPath, "utf8")) as Manifest;
+  // Pro 清單在私有 repo，可能還寫著舊名 paper
+  for (const item of manifest.items) {
+    const raw = item.meta.series as string | undefined;
+    if (raw !== undefined) item.meta.series = parseSeries(raw);
+  }
+  return manifest;
 }
 
 export const freeManifest = freeRegistry as Manifest;

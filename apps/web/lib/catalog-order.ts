@@ -121,7 +121,7 @@ const freeLead = [
   "scroll-tilt-stage",
 ];
 
-const seriesRank = { paper: 0, story: 1, showcase: 2, product: 3, motion: 4 } as const;
+const seriesRank = { craft: 0, story: 1, showcase: 2, product: 3, motion: 4 } as const;
 
 function rankBy(order: string[]) {
   const index = new Map(order.map((name, i) => [name, i]));

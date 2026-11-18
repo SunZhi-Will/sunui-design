@@ -9,12 +9,12 @@ import { format, type Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
 import type { Interaction, RegistryItem, Series, Tier } from "@/lib/registry";
 import { useSaved } from "@/lib/saved";
-import { seriesOf } from "@/lib/series";
+import { parseSeries, seriesIds, seriesOf } from "@/lib/series";
 import { cn } from "@/lib/utils";
 import { spotKeys, type SpotKey } from "@/lib/spot";
 import { variantFeatured } from "@/registry/__generated__/variants";
 
-const seriesKeys: Series[] = ["paper", "product", "story", "showcase", "motion"];
+const seriesKeys: Series[] = seriesIds;
 const interactionKeys: Interaction[] = ["press", "hover", "drag", "type", "loading", "scroll", "section"];
 
 /** title、description 已換成目前語言；search 保留英文標題與描述，讓英文關鍵字也搜得到。 */
@@ -112,7 +112,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     const q = params.get("q");
     if (q) setQuery(q);
     const s = params.get("series");
-    if (s && (seriesKeys as string[]).includes(s)) setSeries(s as Series);
+    const parsedSeries = parseSeries(s);
+    if (parsedSeries) setSeries(parsedSeries);
     // 首頁數量條以 ?tier= 帶入方案篩選
     const tierParam = params.get("tier");
     if (tierParam === "free" || tierParam === "pro") setTier(tierParam);

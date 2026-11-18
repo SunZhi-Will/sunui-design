@@ -46,9 +46,10 @@ SunUI is a shadcn registry of production-ready, refined animated blocks. The dee
 
 ## Do not
 
-- Add gradients, glows, blur, colored shadows, particles or confetti next to a block. There is no celebration: a result is one quiet line of ink where the action happened.
-- Add entrance animations or idle loops to the page around a block.
-- Pick a new accent color per block. Paper blocks use ink only; product blocks use the theme primary.
+- Add decorative gradients, gradient text, glows, coloured shadows, particles or confetti next to a block. There is no celebration: a result is the shared \`Result\` mark settling once where the action happened.
+- Add decorative entrance animations or idle loops to the page around a block.
+- Pick a new accent color per block. Craft blocks use the brand spot colour (\`--sunui-spot\`, default theme primary) only on selection, discounts, progress and results; product blocks use the theme primary.
+- Reintroduce the old paper look (hard-coded \`#f7f7f7\` / \`#171717\` paper and ink, perforated tear lines, flat shadowless cards). SunUI dropped it on 2026-11-19.
 - Remove \`useReducedMotion\` branches or \`aria-live\` regions while editing.
 - Invent block names. If a name is not in search results, it does not exist.
 - Draw a new SVG icon before checking \`search_icons\`. SunUI icons share one grid and stroke; a hand-drawn one breaks the set.

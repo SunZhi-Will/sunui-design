@@ -1,6 +1,6 @@
 # SunUI: instructions for AI agents working in this repo
 
-SunUI is a shadcn registry of refined animated React + Tailwind blocks. Positioning (changed 2026-11-13, headline updated 2026-11-18): the headline is craft quality (質感) and the motion, not paper and not an industry. Paper is one block series (coupons, receipts), not the brand. Shell craft rules: `apps/web/SITE-MOTION.md` section 5. Stores and campaign pages are the flagship collection and the Pro focus, not the limit of the catalog. Reasoning: `reports/SunUI 定位是否跳出電商.md`. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
+SunUI is a shadcn registry of refined animated React + Tailwind blocks. Positioning (changed 2026-11-13, headline updated 2026-11-18): the headline is craft quality (質感) and the motion, not paper and not an industry. On 2026-11-19 paper was dropped as a design language too: it was a misreading of 質感. The default series is `craft` (`apps/web/DESIGN.md`); the old id `paper` is read as `craft`. Do not reintroduce paper and ink hex colours, perforations or stamps. Plan for redoing existing blocks: `reports/拋棄紙感全面改質感深度分析-2026-11-18.md`. Shell values: `apps/web/SITE-MOTION.md` section 5. Stores and campaign pages are the flagship collection and the Pro focus, not the limit of the catalog. Reasoning: `reports/SunUI 定位是否跳出電商.md`. The live product is `apps/web` (catalog site + registry endpoints). Read this file first, then the file named for your task.
 
 ## Where things are
 
@@ -20,7 +20,7 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 ## Rules by task
 
 - **Free catalog is frozen (decided 2026-11-06, until the 2027-01-12 Product Hunt launch)**: do not add new free blocks or motion effect libraries (now 75 free blocks + 28 motion libraries; theme-picker was added 2026-11-07 as an atom of the Pro day-night-hero). A new free item is allowed only if it is an atom pulled out of a Pro scene. Put the time into Pro scenes and launch work. Reasoning: `reports/商業模式深度分析-2026-11-06.md`.
-- **Adding or editing a block**: follow `apps/web/README.md` (steps) and the design doc for its series: `apps/web/DESIGN.md` (paper, default), `DESIGN-product.md`, `DESIGN-story.md`. Ported blocks follow `apps/web/PORTING.md`. Add `meta.usage` (`whenToUse`, `watchOut`, `aliases`): agents search on it.
+- **Adding or editing a block**: follow `apps/web/README.md` (steps) and the design doc for its series: `apps/web/DESIGN.md` (craft, default), `DESIGN-product.md`, `DESIGN-story.md`. Ported blocks follow `apps/web/PORTING.md`. Add `meta.usage` (`whenToUse`, `watchOut`, `aliases`): agents search on it.
 - **Site chrome motion** (header, catalog, panels, home hero, docs pages, not blocks): follow `apps/web/SITE-MOTION.md`. Durations and the easing curve come from `lib/motion.ts` and the `@theme` block in `app/globals.css`.
 - **Changing a design doc**: update `apps/web/lib/agent/guidelines.ts` too. It is the English copy that the MCP server, the skill and `llms-full.txt` serve.
 - **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check.

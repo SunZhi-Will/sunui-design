@@ -3911,7 +3911,7 @@
       "name": "stamp",
       "type": "registry:ui",
       "title": "Result mark",
-      "description": "SunUI's result mark: an upright line of ink where the result happened, with a check for positive results and faded ink for negative ones such as ended, expired or sold out. The shape picks what extra detail it carries (date adds a printed date, seal adds a second line) rather than how it looks. No tilt, no texture, no colour; it fades in over 150ms and appears instantly under reduced motion. Kept under the name stamp so existing installs keep working.",
+      "description": "SunUI's result mark (exported as Result; Stamp is the old name of the same component): placed where the result happened, a small disc in the brand spot colour with a top highlight and a check that draws in and settles once on a spring, or muted text for negative results such as ended, expired or sold out. The shape picks what extra detail it carries (date adds a date, seal adds a second line) rather than how it looks. Appears instantly under reduced motion. The registry name stays stamp so existing installs keep working.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3930,7 +3930,7 @@
         "usage": {
           "whenToUse": [
             "Showing the result of a shopper action: claimed, paid, won, sold out, ended",
-            "Building your own block that needs a SunUI style result line without copying code"
+            "Building your own block that needs a SunUI style result mark without copying code"
           ],
           "watchOut": [
             "Place it in the layout where the action was (for example where the button stood), never on top of other content",
@@ -4451,7 +4451,7 @@
       ],
       "meta": {
         "tier": "free",
-        "series": "paper",
+        "series": "craft",
         "interaction": "section",
         "addedAt": "2026-11-05",
         "usage": {

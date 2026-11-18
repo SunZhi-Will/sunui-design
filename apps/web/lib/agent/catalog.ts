@@ -6,7 +6,7 @@ import { licenseSummary, siteUrl } from "@/lib/site";
 // 給 MCP、llms-full.txt 與 SKILL.md 共用的型錄查詢。只讀 metadata，永遠不碰 Pro 原始碼。
 
 export function seriesOf(item: RegistryItem): Series {
-  return item.meta.series ?? "paper";
+  return item.meta.series ?? "craft";
 }
 
 type Field = { text: string; weight: number };
@@ -210,7 +210,7 @@ export function catalogMarkdown() {
     const series = seriesOf(item);
     groups.set(series, [...(groups.get(series) ?? []), item]);
   }
-  const order: Series[] = ["paper", "product", "story", "showcase", "motion"];
+  const order: Series[] = ["craft", "product", "story", "showcase", "motion"];
   return [
     "# SunUI block catalog",
     `Generated from the live registry. ${getItems().length} blocks. Tier is free (MIT) or pro (license).`,

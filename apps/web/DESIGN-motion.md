@@ -1,6 +1,6 @@
 # SunUI 動效系列（motion）
 
-> `meta.series: "motion"` 的 block 遵守這份文件，不套用 DESIGN.md 的紙感限制（漸層、光暈、進場動畫、常駐循環在這個系列都允許）。
+> `meta.series: "motion"` 的 block 遵守這份文件，不套用 DESIGN.md 的克制限制（裝飾性漸層、光暈、進場動畫、常駐循環在這個系列都允許）。
 > 概念參考：Motion Library（kittenjam-motion-library.vercel.app）與 ShowMotion（showmotion.bohehub.com）。兩站沒有開放授權，所以**只參考效果名稱與概念，程式碼、CSS、提示詞、文案全部自己寫**，不得開對方原始碼照抄。
 
 ## 一句話

@@ -6,6 +6,7 @@ import { designRules } from "@/lib/agent/guidelines";
 import { findIcon, iconLibraryUsage, iconSetsSummary, proIconUsage, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
 import { skillMarkdown } from "@/lib/agent/skill";
 import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
+import { parseSeries } from "@/lib/series";
 import { siteUrl } from "@/lib/site";
 
 // SunUI 的遠端 MCP 伺服器（Streamable HTTP，無狀態）。全部唯讀、不需授權；
@@ -14,7 +15,8 @@ import { siteUrl } from "@/lib/site";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const series = z.enum(["paper", "product", "story", "showcase", "motion"]);
+// paper 是 craft 的舊名，舊的 agent 設定仍可能傳 paper
+const series = z.enum(["craft", "paper", "product", "story", "showcase", "motion"]).transform((value) => parseSeries(value)!);
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }] });
@@ -30,7 +32,7 @@ const handler = createMcpHandler(
         inputSchema: z.object({
           query: z.string().optional().describe("What the UI should do or be called. Omit to list blocks."),
           tier: z.enum(["free", "pro"]).optional().describe("Only free (MIT) or only Pro blocks."),
-          series: series.optional().describe("Design series: paper (commerce), product (tool UI), story (narrative game UI), showcase (landing visuals)."),
+          series: series.optional().describe("Design series: craft (default: stores, campaigns and everyday UI), product (tool UI), story (narrative game UI), showcase (landing visuals), motion (effect libraries)."),
           category: z.string().optional().describe("Registry category, e.g. checkout, coupon, cart, marketing, feedback."),
           limit: z.number().int().min(1).max(30).default(8),
         }),
@@ -50,7 +52,7 @@ const handler = createMcpHandler(
               name: item.name,
               title: item.title,
               tier: item.meta.tier,
-              series: item.meta.series ?? "paper",
+              series: item.meta.series ?? "craft",
               description: item.description,
             })),
           },

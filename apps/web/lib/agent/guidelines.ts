@@ -3,11 +3,11 @@ import { motionLibName } from "@/lib/motion-lib";
 import type { Series } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
 
-// 給 AI 代理看的設計規則（英文精簡版）。來源是 DESIGN.md、DESIGN-product.md、DESIGN-story.md；
+// 給 AI 代理看的設計規則（英文精簡版）。來源是 DESIGN.md（質感，craft 系列）、DESIGN-product.md、DESIGN-story.md；
 // 改了那幾份文件，這裡要一起改。MCP、SKILL.md、llms-full.txt 都從這裡取，保持單一來源。
 
 export const seriesSummary: Record<Series, string> = {
-  paper: "Paper commerce: coupons, receipts, stamp cards and tickets on neutral gray paper with ink text; the only colour is the store brand spot colour, taken from the theme.",
+  craft: "Craft: precise objects with material, light and a tactile press. Neutral theme surfaces with real depth (hairline plus near-invisible layered shadow, top highlight in dark mode), concentric radii, and one brand spot colour taken from the theme. Covers stores and campaigns (coupons, carts, checkout, loyalty) and everyday UI.",
   product: "Quiet tool UI: neutral shadcn tokens, one accent color, status shown only as small dots, the reason written on screen.",
   story: "Ink and lamp: near-black panels, warm white serif text, one gold accent, all colors through --story-* CSS variables.",
   showcase: "Landing-page signature visuals in a quiet editorial dark, ported from real launch pages.",
@@ -20,8 +20,8 @@ const shared = `## Rules for every block
 - Each block is one file that depends only on \`framer-motion\` and \`cn\` (\`@/lib/utils\`). Icons are inline SVG at stroke width 1.5 using \`currentColor\`. Take icon shapes from SunUI icons (\`search_icons\`, \`get_icon\`). Icons marked Pro belong to seasonal packs that install with a Pro license; Pro scenes depend on them, free blocks never do.
 - Every block supports \`prefers-reduced-motion\` (\`useReducedMotion()\`): motion becomes an instant switch and no information is lost. Keep that when you edit.
 - Numbers, prices and timers use \`tabular-nums\`. Codes and order numbers use \`font-mono\`.
-- Never add gradients, glows, blur, colored shadows, particles or confetti around a block.
-- Motion only answers a user action or a data change. No fade-up on page load, no idle loops (countdowns and loading states are the exception).
+- Never add decorative gradients, gradient text, glows, coloured shadows, particles or confetti around a block. Content layers never get frosted glass.
+- Motion only answers a user action or a data change. No decorative fade-up on page load, no idle loops (countdowns and loading states are the exception). Popovers, menus, drawers and panels may settle in from \`scale(0.96)\` with a fade, under 200ms.
   - Exception for full-page templates (registry \`categories\` include \`template\`): the hero's signature element may run one idle loop, such as campaign-landing's discount figure cycling through sale product photos that drift inside the numerals. One per page, plays only while on screen and the tab is visible, holds the first frame under reduced motion, and the loop must show real content (products), never decorative breathing, flicker or glow.
 - Continuity: when state changes, reshape the same container instead of swapping it, and keep one anchor (thumbnail, icon, amount) in place across states. Old content leaves fast (about 100ms), new content arrives with the main line first and the secondary line slightly later. Plain crossfades and hard cuts are not enough. For dropdowns, drawers and accordions, also check what the rest of the page does while they move: content below should slide, not jump. When switching views or encodings, keep the same geometry through every state (a dot stays a dot that grows or lies flat; do not swap it for a different shape). Run multi-step transitions in sequence, one property at a time (for example drop the height, then turn the view, then add labels), each step under 400ms, instead of changing everything at once.
 - Density by layer: overview surfaces (lists, card grids, dashboards) stay flat, dense and easy to compare. Heavier treatments (3D, large charts, detailed motion) belong only in the drill-down layer the user opens on purpose (drawer, side panel, detail page). Carry the title, numbers and colours from the overview into the drill-down so it reads as the same data in more depth, and keep an exact way to read it there (a flat view toggle, exact values on hover).
@@ -45,27 +45,36 @@ Limited (only in this situation):
 ${entries.filter((e) => e.verdict === "limit").map(line).join("\n")}`;
 }
 
-const paper = `## Series: paper (default when meta.series is missing)
+const craft = `## Series: craft (default when meta.series is missing)
 
-${seriesSummary.paper}
+${seriesSummary.craft}
 
-| Role | Light | Dark | Tailwind |
-|---|---|---|---|
-| UI neutrals | shadcn tokens | shadcn tokens | \`bg-card\` \`text-muted-foreground\` \`border-border\` |
-| Primary action | theme primary | theme primary | \`bg-primary text-primary-foreground\` |
-| Paper | #f7f7f7 | #1c1c1c | \`bg-[#f7f7f7] dark:bg-[#1c1c1c]\` |
-| Paper edge | #e2e2e2 | #333333 | \`border-[#e2e2e2] dark:border-[#333333]\` |
-| Ink | #171717 | #ededed | \`text-[#171717] dark:text-[#ededed]\` |
-| Muted ink | #a3a3a3 | #737373 | \`text-[#a3a3a3] dark:text-[#737373]\` |
+SunUI dropped its old "paper" look on 2026-11-19: no paper or ink hex colours, no perforations, notches or zigzag tears as a signature, no flat shadowless cards. If an older block still has \`#f7f7f7\`, \`#e2e2e2\` or \`#171717\` classes, that is legacy; new code uses the tokens below.
 
-- Paper and ink are neutral grays with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
-- Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress and the main button read \`var(--sunui-spot, var(--primary))\` (text: \`text-[color:var(--sunui-spot,var(--primary))]\`; on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Out of the box this is the theme primary; set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and paper edges stay ink. Blocks with no selection, discount or progress state (pure text effects, frames, layouts) stay ink.
-- Full-page templates (registry \`categories\` include \`template\`) may have one fully inverted section (ink \`#111111\` background, white text, rules in \`currentColor\`) to give the page a light and dark rhythm, usually the hero. Do not fill sections with the brand spot colour: a spot colour hero plus a spot ribbon plus a black section was tried and rejected as too many colour blocks competing with the product photos. The spot colour stays on discounts, savings, the current selection and low stock. Everything else still applies: no gradients, glows, blur or coloured shadows.
-- Discount values, promo emphasis and the current step are also set apart by weight, size and contrast; when "current" must differ from "others", draw the others in muted ink. Do not pick an accent color per block; tell coupons apart with copy and layout.
-- Paper is flat: 1px paper edge, no shadow or at most \`shadow-[0_1px_0_rgb(0_0_0/0.04)]\`, radius \`rounded-md\` or less.
-- Results are shown with the shared \`Stamp\` component (install \`stamp\` from the SunUI registry, import from \`@/components/ui/stamp\`). Despite the name it is not a rubber stamp: it is one upright line of ink with a check for positive results and faded ink for negative ones. Place it where the action happened (for example where the button was), never absolutely positioned over other content. \`shape\` only adds detail: \`date\` adds a printed date, \`seal\` adds a second line; the look is the same.
-- Use the default tone for positive results and \`tone="ink"\` for expired, sold out, ended or no prize; \`void\` adds a strikethrough. Never tilt it, add ink texture, mix-blend, double borders, wide uppercase tracking or colour. There is no celebration: results fade in over 150ms. Labels that are not results (Recommended, Popular) must not use it.
-- Springs: snappy \`{ stiffness: 520, damping: 34 }\`, gentle \`{ stiffness: 240, damping: 30 }\`, stamp \`{ stiffness: 620, damping: 20, mass: 0.8 }\`. Single animations stay under 400ms.`;
+| Role | Tailwind | Fallback |
+|---|---|---|
+| Surface | \`bg-[var(--sunui-surface,var(--card))]\` | theme card |
+| Inset | \`bg-[var(--sunui-inset,var(--muted))]\` | theme muted (inputs, tracks, unselected cells) |
+| Hairline | \`border-foreground/10\` | theme foreground at 10% |
+| Text | \`text-foreground\`, \`text-muted-foreground\` | theme |
+| Primary action | \`bg-primary text-primary-foreground\` | theme |
+| Brand spot | \`text-[color:var(--sunui-spot,var(--primary))]\` | theme primary |
+
+- Grays are neutral with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
+- Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress, the main button and positive results read \`var(--sunui-spot, var(--primary))\` (on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and hairlines never use it. Do not pick an accent colour per block.
+- Full-page templates (registry \`categories\` include \`template\`) may have one fully inverted section (\`bg-foreground text-background\`), usually the hero. Do not fill sections with the spot colour.
+- Light comes from straight above, one source per page. Elevation levels, each already including the hairline (do not add a border on top):
+  - e1 (cards, coupons, inputs, secondary buttons): \`shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)]\`
+  - e2 (hovered cards, dropdowns, featured plan): \`shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)]\`
+  - e3 (panels, dialogs, drawers): \`shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)]\`
+  - Dark mode does not rely on drop shadows: lift the surface one step and use \`dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]\`.
+- Raised objects (primary button, selected segment, result disc) get a 1px inner top highlight such as \`shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]\`. Inset controls (inputs, switch and progress tracks) use the inset colour with \`shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]\`.
+- Gradients only to model light: a same-hue surface shading of at most 3% lightness, or edge fade masks. Never multi-hue gradients, gradient text or coloured backgrounds. Frosted glass only on functional layers floating over content (sticky bars, floating toolbars, popovers) with at least 80% opacity.
+- Concentric radii: controls 6px (\`rounded-md\`), cards and coupons 12px (\`rounded-xl\`), panels and dialogs 16px (\`rounded-2xl\`); inner radius = outer radius minus padding. Separators are solid hairlines (\`divide-foreground/10\`), not dashed tear lines.
+- Discount values, promo emphasis and the current step are set apart by weight, size and contrast; "others" use \`text-muted-foreground\`.
+- Every pressable element has hover, focus-visible and pressed states: \`whileTap={{ scale: 0.97 }}\` with the snappy spring; hover appears instantly and fades out over about 150ms. This shared press weight is a SunUI signature.
+- Results use the shared \`Result\` component (install \`stamp\` from the SunUI registry, \`import { Result } from "@/components/ui/stamp"\`; \`Stamp\` is its old name). Positive results show a small spot-colour disc with a check that draws in and settles once on the pop spring; expired, sold out, ended or no prize use \`tone="muted"\`; \`void\` adds a strikethrough. Place it where the action happened (for example where the button was), never absolutely positioned over other content. \`shape\` only adds detail: \`date\` adds a date, \`seal\` adds a second line. No confetti, no whole-card bounce. Labels that are not results (Recommended, Popular) must not use it.
+- Springs: snappy \`{ stiffness: 520, damping: 34 }\`, gentle \`{ stiffness: 240, damping: 30 }\`, pop \`{ stiffness: 620, damping: 20, mass: 0.8 }\` (old name: stamp). Single animations stay under 400ms. Do not animate box-shadow; cross-fade two layers instead.`;
 
 const product = `## Series: product
 
@@ -99,12 +108,12 @@ const motion = `## Series: motion
 
 ${seriesSummary.motion}
 
-- The paper rules do not apply: gradients, glows, entrance animations and loops are allowed here. Colors still come from theme tokens, \`currentColor\` or a \`colors\` prop, never hard-coded purple or pink.
+- The craft restraint rules do not apply: decorative gradients, glows, entrance animations and loops are allowed here. Colors still come from theme tokens, \`currentColor\` or a \`colors\` prop, never hard-coded purple or pink.
 - Pick the effect with the \`effect\` (or \`preset\`) prop and the timing with \`trigger\`: mount, inView, hover, click or loop.
 - Reduced motion shows the final state, stops loops and keeps every word readable. Loops pause off screen and on hidden tabs.
-- Do not put motion blocks inside paper or product blocks; use them on landing pages, heroes and marketing sections.`;
+- Do not put motion blocks inside craft or product blocks; use them on landing pages, heroes and marketing sections.`;
 
-const bySeries: Record<Series, string> = { paper, product, story, showcase, motion };
+const bySeries: Record<Series, string> = { craft, product, story, showcase, motion };
 
 /** 共用規則加上一個系列的規則，不含動效名稱對照表。給區塊頁的「複製給 agent」prompt 用，保持短。 */
 export function seriesRules(series: Series) {
@@ -113,6 +122,6 @@ export function seriesRules(series: Series) {
 
 /** 單一系列或全部系列的設計規則（Markdown）。 */
 export function designRules(series?: Series) {
-  const sections = series ? [bySeries[series]] : [paper, product, story, showcase, motion];
+  const sections = series ? [bySeries[series]] : [craft, product, story, showcase, motion];
   return [`# SunUI design rules`, shared, motionRequests(), ...sections].join("\n\n");
 }
