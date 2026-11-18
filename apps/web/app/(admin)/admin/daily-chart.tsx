@@ -77,14 +77,23 @@ export function DailyChart({ series }: { series: Series[] }) {
       ) : (
         <div
           className="relative mt-3 h-40 outline-none"
+          // 這是一個用方向鍵逐日移動的讀數游標，語意上是滑桿：有焦點、有鍵盤操作、有目前值。
+          // 用 slider 角色讓螢幕閱讀器直接唸出選到的那一天（原本的 group 不是互動角色，不該有 tabIndex 和鍵盤事件）
           tabIndex={0}
-          role="group"
+          role="slider"
           aria-label={`${current.label}，每日，共 ${values.length} 天`}
+          aria-orientation="horizontal"
+          aria-valuemin={0}
+          aria-valuemax={Math.max(0, values.length - 1)}
+          aria-valuenow={hover ?? Math.max(0, values.length - 1)}
+          aria-valuetext={focus ? `${focus.day}：${focus.value}` : `期間合計：${total}`}
           onMouseLeave={() => setHover(null)}
           onBlur={() => setHover(null)}
           onKeyDown={(e) => {
             if (e.key === "ArrowRight") setHover((h) => Math.min(values.length - 1, (h ?? -1) + 1));
             else if (e.key === "ArrowLeft") setHover((h) => Math.max(0, (h ?? values.length) - 1));
+            else if (e.key === "Home") setHover(0);
+            else if (e.key === "End") setHover(values.length - 1);
             else if (e.key === "Escape") setHover(null);
             else return;
             e.preventDefault();
