@@ -66,7 +66,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      {/* 開場：置中的標題與兩顆按鈕，下面是鋪滿螢幕寬度的即時元件牆 */}
+      {/* 開場：一個畫面高的舞台，大標題加可以拖的太陽；下面是鋪滿螢幕寬度的即時元件牆 */}
       <HomeHero
         chip={
           founding === "closed"
@@ -83,6 +83,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         sub={m.home.hero.sub}
         primary={{ label: browseLabel, href: "/blocks" }}
         secondary={{ label: m.home.hero.proCta, href: "/pricing" }}
+        sun={m.home.hero.sun}
         wall={<LiveWall copy={m.home.hero.wall} command={firstFree && <Command value={installCommand(firstFree)} />} />}
       />
 

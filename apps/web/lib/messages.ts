@@ -70,6 +70,7 @@ const en = {
       browse: "Browse {n} blocks",
       proCta: "See Pro scenes",
       getPro: "Get Pro",
+      sun: { label: "Sun dimmer: drag up or press to switch between dark and light", toDay: "Drag up to bring the day", toNight: "Drag up to bring the night" },
       chipUpcoming: "Founding members open {opens}",
       chipOpen: "Founding price until {closes}",
       wall: {
@@ -628,6 +629,7 @@ const zhTW: Messages = {
       browse: "瀏覽 {n} 個區塊",
       proCta: "看 Pro 場景",
       getPro: "取得 Pro",
+      sun: { label: "太陽調光：往上拖或按一下，切換深色與淺色", toDay: "往上拖，天就亮了", toNight: "往上拖，天就黑了" },
       chipUpcoming: "創始會員 {opens}開賣",
       chipOpen: "創始會員價到{closes}",
       wall: {
@@ -1162,6 +1164,7 @@ const zhCN: Messages = {
       browse: "浏览 {n} 个区块",
       proCta: "看 Pro 场景",
       getPro: "获取 Pro",
+      sun: { label: "太阳调光：往上拖或按一下，切换深色与浅色", toDay: "往上拖，天就亮了", toNight: "往上拖，天就黑了" },
       chipUpcoming: "创始会员 {opens}开售",
       chipOpen: "创始会员价到{closes}",
       wall: {
@@ -1689,6 +1692,7 @@ const ja: Messages = {
       browse: "{n} 個のブロックを見る",
       proCta: "Pro のシーンを見る",
       getPro: "Pro を入手",
+      sun: { label: "太陽の調光：上にドラッグするか押すと、ダークとライトが切り替わります", toDay: "上にドラッグすると夜が明けます", toNight: "上にドラッグすると夜になります" },
       chipUpcoming: "創設メンバー {opens}販売開始",
       chipOpen: "創設メンバー価格は{closes}まで",
       wall: {
