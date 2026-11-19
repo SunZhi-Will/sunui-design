@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
-import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/product-art";
+import { cn } from "@/lib/utils";
+import { useProductNames, type ProductKind } from "@/registry/_demo/product-art";
 
 import { AddToCartButton, CartIcon } from "./add-to-cart-button";
 
@@ -12,6 +13,8 @@ const products: { kind: ProductKind; price: string }[] = [
   { kind: "tote", price: "$38" },
   { kind: "lamp", price: "$124" },
 ];
+
+const photo = (kind: ProductKind) => `/blocks/add-to-cart-button/${kind}.webp`;
 
 export default function AddToCartButtonDemo() {
   const locale = useDemoLocale();
@@ -22,24 +25,22 @@ export default function AddToCartButtonDemo() {
 
   return (
     <div className="w-full max-w-3xl space-y-6">
-      <header className="flex items-center justify-between border-b border-border pb-3">
+      <header className="flex items-center justify-between border-b border-foreground/10 pb-3">
         <span className="text-sm font-semibold tracking-tight">{shop}</span>
         <CartIcon ref={cartRef} count={count} locale={locale} />
       </header>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3">
         {products.map((p) => (
-          <div key={p.kind} className="flex flex-col gap-3">
-            <div className="overflow-hidden rounded-md border border-foreground/10">
-              <ProductArt kind={p.kind} />
-            </div>
+          <div key={p.kind} className="group/item flex flex-col gap-3">
+            <ProductPhoto src={photo(p.kind)} alt={productNames[p.kind]} />
             <div className="flex items-baseline justify-between gap-2 text-sm">
               <span className="min-w-0 font-medium">{productNames[p.kind]}</span>
               <span className="text-muted-foreground tabular-nums">{p.price}</span>
             </div>
             <AddToCartButton
               cartRef={cartRef}
-              thumbnail={<ProductArt kind={p.kind} />}
+              thumbnail={<img src={photo(p.kind)} alt="" />}
               tag={p.price}
               locale={locale}
               onAdd={() => new Promise((r) => setTimeout(r, 250))}
@@ -49,6 +50,21 @@ export default function AddToCartButtonDemo() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/** 商品照：12px 圓角，hairline 疊在照片上面才不會被吃掉；懸停時照片慢慢推近一點 */
+function ProductPhoto({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className={cn("relative aspect-square overflow-hidden rounded-xl bg-muted", className)}>
+      <img
+        src={src}
+        alt={alt}
+        decoding="async"
+        className="size-full object-cover transition-[scale] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/item:scale-[1.03] motion-reduce:transition-none"
+      />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-foreground/10 ring-inset" />
     </div>
   );
 }

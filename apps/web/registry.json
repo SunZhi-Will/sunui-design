@@ -7,7 +7,7 @@
       "name": "add-to-cart-button",
       "type": "registry:block",
       "title": "Add To Cart Button",
-      "description": "Add-to-cart button that sends a small price tag along an arc into the cart; the cart badge gives a small bump. Use on product cards and detail pages. Reduced motion skips the flight.",
+      "description": "Raised add-to-cart button whose label rolls through adding and added while a small product card lifts off and arcs into the cart, tilting with its speed; the cart dips as it catches it and the badge settles. Use on product cards and detail pages. Reduced motion skips the flight.",
       "dependencies": [
         "framer-motion"
       ],
