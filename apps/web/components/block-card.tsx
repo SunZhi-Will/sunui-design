@@ -28,6 +28,7 @@ export function BlockCard({
   tier,
   locale,
   labels,
+  className,
 }: {
   name: string;
   /** 效果庫拆開後的單一樣式：卡片只跑這一種，展開時面板也帶著它 */
@@ -44,13 +45,15 @@ export function BlockCard({
   tier: Tier;
   locale: Locale;
   labels: BlockCardLabels;
+  /** 加在最外層 <li> 上，例如依欄數隱藏多出來的卡 */
+  className?: string;
 }) {
   const router = useRouter();
   const path = `/blocks/${name}`;
   const href = variant ? `${path}?style=${encodeURIComponent(variant)}` : path;
 
   return (
-    <li className="group">
+    <li className={cn("group", className)}>
       <div className="relative aspect-[5/4] overflow-hidden rounded-xl bg-card shadow-e1 transition-shadow duration-200 group-hover:shadow-e2">
         <LivePreview
           name={name}

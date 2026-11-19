@@ -18,11 +18,22 @@ import { foundingState, foundingWindow } from "@/lib/site";
 
 
 // 「交給 agent」那一段展示的成果：一句話之後裝好的三個區塊
+// 開場以下的展示段落和元件牆一樣鋪滿寬度；內層上限和牆相同
+const WIDE_INNER = "mx-auto max-w-[2400px]";
+// 第五欄的斷點寫成 rem（106.25rem = 1700px）：用 px 的話和內建的 rem 斷點比不出先後，會被 xl 的四欄蓋掉。
+// 展示格線一列的欄數是 1、2、3、4、5；傳 10 張卡，各欄數下顯示 6、8、9、8、10 張，每一列都排滿
+function showAt(i: number) {
+  if (i < 6) return undefined;
+  if (i < 8) return "hidden sm:block";
+  if (i === 8) return "hidden lg:block xl:hidden min-[106.25rem]:block";
+  return "hidden min-[106.25rem]:block";
+}
+
 const AGENT_RESULT = ["countdown-banner", "coupon-claim-card", "free-shipping-progress"];
 // 首頁展示的 Pro 場景：挑一個動作就有大變化、畫面最完整的。Pro 資料夾不在時整段不出現
-const SHOWCASE = ["kelvin-switch", "lamp-dimmer-scene", "theme-reveal", "glass-cube-hero", "launch-stage-hero", "curve-rail-hero"];
-// 首頁的九張精選：都是免費區塊，一按就有反應的
-const PICKS = ["add-to-cart-button", "depth-hero", "orbit-gallery", "checkout-steps", "animated-number", "theme-picker", "quantity-stepper", "hotspots", "compare-slider"];
+const SHOWCASE = ["kelvin-switch", "lamp-dimmer-scene", "theme-reveal", "glass-cube-hero", "launch-stage-hero", "curve-rail-hero", "checkout-flow", "cart-drawer", "order-island", "day-night-hero"];
+// 首頁的免費精選：一按就有反應的。張數與 showAt 配合，各欄數下都排滿
+const PICKS = ["add-to-cart-button", "depth-hero", "orbit-gallery", "checkout-steps", "animated-number", "theme-picker", "quantity-stepper", "hotspots", "compare-slider", "expanding-search"];
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
   return { title: { absolute: m.home.metaTitle }, description: m.meta.siteDescription };
@@ -76,15 +87,16 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       />
 
       {/* 免費區塊：開場正下方就是可以按的東西 */}
-      <section aria-labelledby="free-title" className="mt-16 sm:mt-24">
+      <section aria-labelledby="free-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-16 sm:mt-24">
+        <div className={WIDE_INNER}>
         <SectionHead id="free-title" title={t.free}>
           <Link href="/blocks" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
             {format(t.catalog.cta, { n: all.length })}
             <Arrow className="size-3.5" />
           </Link>
         </SectionHead>
-        <ul className="mt-8 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-          {picks.map((item) => (
+        <ul className="mt-8 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[106.25rem]:grid-cols-5">
+          {picks.map((item, i) => (
               <BlockCard
                 key={item.name}
                 name={item.name}
@@ -94,22 +106,25 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                 poster={item.poster}
                 locale={locale}
                 labels={cardLabels}
+                className={showAt(i)}
               />
           ))}
         </ul>
+        </div>
       </section>
 
       {/* Pro 場景 */}
       {showcase.length > 0 && (
-        <section aria-labelledby="pro-scenes-title" className="mt-24 sm:mt-32">
+        <section aria-labelledby="pro-scenes-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-24 sm:mt-32">
+          <div className={WIDE_INNER}>
           <SectionHead id="pro-scenes-title" title={t.pro}>
             <Link href="/pricing" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold btn-primary">
               {t.proCta}
               <Arrow className="size-3.5" />
             </Link>
           </SectionHead>
-          <ul className="mt-8 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-            {showcase.map((item) => (
+          <ul className="mt-8 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[106.25rem]:grid-cols-5">
+            {showcase.map((item, i) => (
                 <BlockCard
                   key={item.name}
                   name={item.name}
@@ -119,40 +134,46 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                   poster={item.poster}
                   locale={locale}
                   labels={cardLabels}
+                  className={showAt(i)}
                 />
             ))}
           </ul>
+          </div>
         </section>
       )}
 
       {/* 比較示範：只留示範本身 */}
       <section aria-labelledby="compare-title" className="mt-24 sm:mt-32">
-        <SectionHead id="compare-title" title={t.compare} />
-        <div aria-label={m.home.compare.label} className="mx-auto mt-8 max-w-xl">
+        <h2 id="compare-title" className="text-center text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
+          {t.compare}
+        </h2>
+        <div aria-label={m.home.compare.label} className="mx-auto mt-8 max-w-2xl">
           <HeroCompare m={{ ...m.home.compare, caption: "" }} />
         </div>
       </section>
 
       {/* 交給 agent：一句話進去，裝好的區塊出來 */}
       {agentBlocks.length > 0 && (
-        <section aria-labelledby="agent-title" className="mt-24 sm:mt-32">
+        <section aria-labelledby="agent-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-24 sm:mt-32">
+          <div className={WIDE_INNER}>
           <SectionHead id="agent-title" title={t.agent.title}>
             <Link href="/docs/ai-agents" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
               {m.home.agent.docs}
               <Arrow className="size-3.5" />
             </Link>
           </SectionHead>
-          <div className="mt-8 flex flex-col items-start gap-3">
-            <p className="max-w-full rounded-2xl rounded-bl-md bg-fg px-4 py-2.5 text-[15px] font-medium text-bg">{t.agent.prompt}</p>
-            <p className="flex items-center gap-2 font-mono text-[13px] text-subtle">
-              <svg viewBox="0 0 24 24" className="size-4 text-fg" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12.5l4.5 4.5L19 7.5" />
-              </svg>
-              {format(t.agent.result, { n: agentBlocks.length })}
-            </p>
-          </div>
-          <ul className="mt-6 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-            {agentBlocks.map((item) => (
+          <ul className="mt-8 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[106.25rem]:grid-cols-5">
+            {/* 第一格是那一句話，後面是它裝好的區塊；最寬的版面這一格佔兩欄 */}
+            <li className="flex aspect-[5/4] flex-col justify-between rounded-xl bg-card p-6 shadow-e1 sm:col-span-2 sm:aspect-auto lg:col-span-3 xl:col-span-1 min-[106.25rem]:col-span-2 dark:bg-[#151515]">
+              <p className="max-w-full self-start rounded-2xl rounded-bl-md bg-fg px-4 py-2.5 text-lg font-medium text-bg">{t.agent.prompt}</p>
+              <p className="mt-6 flex items-center gap-2 font-mono text-[13px] text-subtle">
+                <svg viewBox="0 0 24 24" className="size-4 text-fg" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+                {format(t.agent.result, { n: agentBlocks.length })}
+              </p>
+            </li>
+            {agentBlocks.map((item, i) => (
                 <BlockCard
                   key={item.name}
                   name={item.name}
@@ -162,16 +183,18 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                   poster={item.poster}
                   locale={locale}
                   labels={cardLabels}
+                  className={i === agentBlocks.length - 1 ? "sm:max-lg:col-span-2" : undefined}
                 />
             ))}
           </ul>
+          </div>
         </section>
       )}
 
       {/* 價格與創始會員 */}
       <section
         aria-labelledby="pro-title"
-        className="mt-24 grid gap-10 rounded-2xl bg-card p-8 shadow-e2 sm:mt-32 sm:p-12 md:grid-cols-[1.2fr_1fr] md:items-center"
+        className="mx-auto mt-24 grid max-w-5xl gap-10 rounded-2xl bg-card p-8 shadow-e2 sm:mt-32 sm:p-12 md:grid-cols-[1.2fr_1fr] md:items-center dark:bg-[#151515]"
       >
         <div>
           <h2 id="pro-title" className="text-3xl font-semibold tracking-tight text-balance [word-break:auto-phrase] sm:text-4xl">

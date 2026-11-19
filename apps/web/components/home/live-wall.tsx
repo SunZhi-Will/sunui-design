@@ -57,7 +57,7 @@ export function LiveWall({ copy, command }: { copy: Copy; command?: ReactNode })
         aria-label={copy.label}
         className="relative mx-[calc(50%-50vw)] max-h-[1280px] overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,#000_72%,transparent)] sm:max-h-[900px] sm:px-5"
       >
-        <div className="mx-auto max-w-[2400px] columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 min-[1700px]:columns-5">
+        <div className="mx-auto max-w-[2400px] columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 min-[106.25rem]:columns-5">
           <Card>{(auto) => <ProductCard auto={auto} copy={copy} money={money} />}</Card>
           <Card title={copy.steps.join(" · ")} hideTitle>
             {(auto) => <StepsCard auto={auto} items={copy.steps} />}
