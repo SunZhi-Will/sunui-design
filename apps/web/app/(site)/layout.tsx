@@ -45,7 +45,11 @@ export default async function SiteLayout({ children, modal }: { children: React.
           <FoundingBar />
         </HideOnPaths>
         <SiteHeader />
-        <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-6">{children}</main>
+        {/* 首頁的滿寬段落用 50vw 往外推，vw 含捲軸寬度，會比內容區多出幾 px。
+            body 的 clip 會傳到視窗上變成 hidden，程式仍能橫向捲過去，所以在這一層裁掉 */}
+        <div className="overflow-x-clip">
+          <main className="mx-auto w-full max-w-6xl px-4 pb-24 sm:px-6">{children}</main>
+        </div>
         <SiteFooter />
         {/* 型錄卡片展開的面板（攔截路由 @modal/(.)blocks/[slug]） */}
         {modal}

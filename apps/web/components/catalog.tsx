@@ -40,10 +40,6 @@ export type CatalogMessages = Pick<Messages, "catalog" | "collections" | "intera
 /** 型錄上方的「從一整頁開始」：一個合輯，或這個瀏覽器收藏的區塊 */
 type BlockSet = CollectionSlug | "saved";
 
-const chipRow =
-  // 手機上每一排篩選改成橫向捲動的一列，不再折成好幾行把第一張卡推到第二個畫面；sm 以上照常換行
-  "-mx-4 flex items-center gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden";
-
 export function Catalog({ items, locale, messages }: { items: CatalogItem[]; locale: Locale; messages: CatalogMessages }) {
   const { catalog: t, collections: collectionText, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
@@ -205,30 +201,6 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
   return (
     <section id="blocks" aria-label={t.sectionLabel} className="scroll-mt-24">
-      <div role="group" aria-label={t.setsLabel} className={cn(chipRow, "mb-6")}>
-        <span className="mr-1 shrink-0 text-sm whitespace-nowrap text-subtle">{t.setsLabel}</span>
-        {collections.map((c) => (
-          <FilterChip
-            key={c.slug}
-            active={blockSet === c.slug}
-            onClick={() => chooseSet(blockSet === c.slug ? null : c.slug)}
-            label={collectionText[c.slug].title}
-            count={setNames.get(c.slug)?.length ?? 0}
-          />
-        ))}
-        <FilterChip
-          active={blockSet === "saved"}
-          onClick={() => chooseSet(blockSet === "saved" ? null : "saved")}
-          label={t.saved}
-          count={setNames.get("saved")?.length ?? 0}
-          icon={
-            <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden="true">
-              <path d="M6 3.5h12v17l-6-4.25-6 4.25z" />
-            </svg>
-          }
-        />
-      </div>
-
       {blockSet && (
         <SetPanel
           title={blockSet === "saved" ? t.savedTitle : collectionText[blockSet].title}
@@ -241,9 +213,10 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
         />
       )}
 
-      <div className="mb-6 grid gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="relative min-w-0 flex-1 sm:max-w-xs">
+      {/* 篩選收成一列：搜尋、三個下拉（整頁合輯、系列、互動）、方案、收藏。原本四排共二十幾顆 chip，佔掉第一個畫面 */}
+      <div className="mb-6 grid gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="relative min-w-0 basis-full sm:basis-64 sm:grow lg:max-w-xs">
             <span className="sr-only">{t.searchLabel}</span>
             <svg
               viewBox="0 0 24 24"
@@ -272,6 +245,50 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
               /
             </kbd>
           </label>
+
+          <FilterSelect
+            label={t.setsLabel}
+            active={blockSet !== null && blockSet !== "saved"}
+            value={blockSet && blockSet !== "saved" ? blockSet : ""}
+            onChange={(value) => chooseSet(value ? (value as CollectionSlug) : null)}
+          >
+            <option value="">{t.setsLabel}</option>
+            {collections.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {collectionText[c.slug].title} ({setNames.get(c.slug)?.length ?? 0})
+              </option>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            label={t.filterSeries}
+            active={series !== "all"}
+            value={series}
+            onChange={(value) => setSeries(value as Series | "all")}
+          >
+            <option value="all">{t.allSeries}</option>
+            {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
+            {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
+              <option key={key} value={key}>
+                {seriesText.labels[key]} ({seriesCounts.get(key) ?? 0})
+              </option>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            label={t.filterInteraction}
+            active={interaction !== "all"}
+            value={interaction}
+            onChange={(value) => setInteraction(value as Interaction | "all")}
+          >
+            <option value="all">{t.allInteractions}</option>
+            {interactionKeys.map((key) => (
+              <option key={key} value={key} disabled={(counts.get(key) ?? 0) === 0 && interaction !== key}>
+                {interactionLabels[key]} ({counts.get(key) ?? 0})
+              </option>
+            ))}
+          </FilterSelect>
+
           <div role="group" aria-label={t.filterPlan} className="flex rounded-sm border border-line p-0.5 text-sm">
             {(["all", "free", "pro"] as const).map((value) => (
               <button
@@ -288,35 +305,24 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
               </button>
             ))}
           </div>
-        </div>
 
-        <div role="group" aria-label={t.filterSeries} className={chipRow}>
-          <FilterChip active={series === "all"} onClick={() => setSeries("all")} label={t.allSeries} count={collapsed.length} />
-          {/* 數量為 0 的系列不顯示，避免看起來像沒做完；若網址直接帶入該系列則保留 */}
-          {seriesKeys.filter((key) => (seriesCounts.get(key) ?? 0) > 0 || series === key).map((key) => (
-            <FilterChip
-              key={key}
-              active={series === key}
-              onClick={() => setSeries(key)}
-              label={seriesText.labels[key]}
-              count={seriesCounts.get(key) ?? 0}
-            />
-          ))}
+          <button
+            type="button"
+            aria-pressed={blockSet === "saved"}
+            onClick={() => chooseSet(blockSet === "saved" ? null : "saved")}
+            className={cn(
+              "flex shrink-0 items-center gap-1.5 rounded-sm border px-3 py-2 text-sm whitespace-nowrap transition-colors sm:ml-auto",
+              blockSet === "saved" ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
+            )}
+          >
+            <svg viewBox="0 0 24 24" className="size-3.5" fill="currentColor" aria-hidden="true">
+              <path d="M6 3.5h12v17l-6-4.25-6 4.25z" />
+            </svg>
+            {t.saved}
+            <span className="text-xs tabular-nums opacity-70">{setNames.get("saved")?.length ?? 0}</span>
+          </button>
         </div>
-        {series !== "all" && <p className="-mt-1 text-sm text-pretty text-subtle">{seriesText.descriptions[series]}</p>}
-
-        <div role="group" aria-label={t.filterInteraction} className={chipRow}>
-          <FilterChip active={interaction === "all"} onClick={() => setInteraction("all")} label={t.allInteractions} count={scoped.length} />
-          {interactionKeys.map((key) => (
-            <FilterChip
-              key={key}
-              active={interaction === key}
-              onClick={() => setInteraction(key)}
-              label={interactionLabels[key]}
-              count={counts.get(key) ?? 0}
-            />
-          ))}
-        </div>
+        {series !== "all" && <p className="text-sm text-pretty text-subtle">{seriesText.descriptions[series]}</p>}
       </div>
 
       <div className="mb-4 flex items-center gap-3 text-sm text-subtle">
@@ -420,33 +426,44 @@ function SetPanel({
   );
 }
 
-function FilterChip({
-  active,
-  onClick,
+function FilterSelect({
   label,
-  count,
-  icon,
+  active,
+  value,
+  onChange,
+  children,
 }: {
-  active: boolean;
-  onClick: () => void;
   label: string;
-  count: number;
-  icon?: ReactNode;
+  /** 選了預設以外的值：邊框與文字轉成墨色，一眼看得出哪個篩選開著 */
+  active: boolean;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
 }) {
   return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "flex shrink-0 items-center gap-1.5 rounded-sm border px-3 py-1 text-sm whitespace-nowrap transition-colors",
-        active ? "border-fg bg-fg text-bg" : "border-line text-subtle hover:text-fg",
-      )}
-    >
-      {icon}
-      {label}
-      <span className={cn("text-xs tabular-nums", active ? "opacity-70" : "opacity-60")}>{count}</span>
-    </button>
+    <label className="relative shrink-0">
+      <span className="sr-only">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={cn(
+          "max-w-44 cursor-pointer appearance-none truncate rounded-sm border bg-card py-2 pr-8 pl-3 text-sm outline-none transition-colors focus-visible:border-fg",
+          active ? "border-fg text-fg" : "border-line text-subtle hover:text-fg",
+        )}
+      >
+        {children}
+      </select>
+      <svg
+        viewBox="0 0 24 24"
+        className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-subtle"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        aria-hidden="true"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </label>
   );
 }
 

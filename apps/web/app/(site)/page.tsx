@@ -4,16 +4,15 @@ import type { ReactNode } from "react";
 import { permanentRedirect } from "next/navigation";
 
 import { BlockCard } from "@/components/block-card";
-import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
-import { HomeHero } from "@/components/home/home-hero";
-import { LiveWall } from "@/components/home/live-wall";
+import { FullScenes } from "@/components/home/full-scenes";
+import { SceneOpening } from "@/components/home/scene-opening";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { buildCatalogItems } from "@/lib/catalog-items";
 import { getI18n } from "@/lib/i18n-server";
 import { format } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
-import { getItems, installCommand } from "@/lib/registry";
+import { getItems } from "@/lib/registry";
 import { foundingState, foundingWindow } from "@/lib/site";
 
 
@@ -30,8 +29,10 @@ function showAt(i: number) {
 }
 
 const AGENT_RESULT = ["countdown-banner", "coupon-claim-card", "free-shipping-progress"];
-// 首頁展示的 Pro 場景：挑一個動作就有大變化、畫面最完整的。Pro 資料夾不在時整段不出現
-const SHOWCASE = ["kelvin-switch", "lamp-dimmer-scene", "theme-reveal", "glass-cube-hero", "launch-stage-hero", "curve-rail-hero", "checkout-flow", "cart-drawer", "order-island", "day-night-hero"];
+// 首頁的完整場景：整個畫面做好、原尺寸就站得住的。一個一個鋪滿寬度往下排，不縮成小卡
+const SHOWCASE = ["launch-stage-hero", "glass-cube-hero", "day-night-hero", "curve-rail-hero", "checkout-flow"];
+// Pro 資料夾不在時（公開 repo）改放這幾個免費的完整區塊
+const FREE_SCENES = ["depth-hero", "orbit-gallery", "checkout-steps"];
 // 首頁的免費精選：一按就有反應的。張數與 showAt 配合，各欄數下都排滿
 const PICKS = ["add-to-cart-button", "depth-hero", "orbit-gallery", "checkout-steps", "animated-number", "theme-picker", "quantity-stepper", "hotspots", "compare-slider", "expanding-search"];
 export async function generateMetadata(): Promise<Metadata> {
@@ -54,20 +55,24 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const items = buildCatalogItems(all, locale);
   const freeCount = all.filter((item) => item.meta.tier === "free").length;
   const proCount = all.length - freeCount;
-  const firstFree = all.find((item) => item.meta.tier === "free");
   const t = m.home.sections;
   const picks = PICKS.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
   const agentBlocks = AGENT_RESULT.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
   const cardLabels = { livePreview: m.catalog.livePreview, expand: m.catalog.expand, pro: m.tier.pro };
   const browseLabel = format(m.home.hero.browse, { n: all.length });
   const showcase = SHOWCASE.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
+  const freeScenes = FREE_SCENES.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
+  const scenes = showcase.length > 0 ? showcase : freeScenes;
+  // 第一個場景就是開場，其餘接在下面
+  const [opening, ...rest] = scenes;
   const founding = foundingState();
   const day = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
 
   return (
     <>
-      {/* 開場：一個畫面高的舞台，大標題加可以拖的太陽；下面是鋪滿螢幕寬度的即時元件牆 */}
-      <HomeHero
+      {/* 開場：一個完整的區塊原尺寸跑在第一個畫面裡（Pro 資料夾不在時是第一個免費場景），上面一條窄的介紹列 */}
+      {opening && (
+      <SceneOpening
         chip={
           founding === "closed"
             ? undefined
@@ -83,12 +88,34 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         sub={m.home.hero.sub}
         primary={{ label: browseLabel, href: "/blocks" }}
         secondary={{ label: m.home.hero.proCta, href: "/pricing" }}
-        sun={m.home.hero.sun}
-        wall={<LiveWall copy={m.home.hero.wall} command={firstFree && <Command value={installCommand(firstFree)} />} />}
+        scene={{ name: opening.name, title: opening.title, href: `/blocks/${opening.name}`, previewLabel: format(m.catalog.livePreview, { title: opening.title }) }}
+        locale={locale}
       />
+      )}
 
-      {/* 免費區塊：開場正下方就是可以按的東西 */}
-      <section aria-labelledby="free-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-16 sm:mt-24">
+      {/* 完整場景：做好的整個畫面，原尺寸鋪滿寬度，一個接一個。Pro 資料夾不在時換成免費的首屏 */}
+      {rest.length > 0 && (
+        <section aria-labelledby="scenes-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-16 sm:mt-24">
+          <div className={WIDE_INNER}>
+            <SectionHead id="scenes-title" title={t.pro}>
+              {showcase.length > 0 && (
+                <Link href="/pricing" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold btn-primary">
+                  {t.proCta}
+                  <Arrow className="size-3.5" />
+                </Link>
+              )}
+            </SectionHead>
+            <FullScenes
+              scenes={rest.map((item) => ({ name: item.name, title: item.title, tier: item.meta.tier }))}
+              locale={locale}
+              labels={{ livePreview: m.catalog.livePreview, pro: m.tier.pro, open: t.open }}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* 免費區塊 */}
+      <section aria-labelledby="free-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-24 sm:mt-32">
         <div className={WIDE_INNER}>
         <SectionHead id="free-title" title={t.free}>
           <Link href="/blocks" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium btn-secondary">
@@ -113,35 +140,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </ul>
         </div>
       </section>
-
-      {/* Pro 場景 */}
-      {showcase.length > 0 && (
-        <section aria-labelledby="pro-scenes-title" className="mx-[calc(50%-50vw)] px-4 sm:px-5 mt-24 sm:mt-32">
-          <div className={WIDE_INNER}>
-          <SectionHead id="pro-scenes-title" title={t.pro}>
-            <Link href="/pricing" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold btn-primary">
-              {t.proCta}
-              <Arrow className="size-3.5" />
-            </Link>
-          </SectionHead>
-          <ul className="mt-8 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[106.25rem]:grid-cols-5">
-            {showcase.map((item, i) => (
-                <BlockCard
-                  key={item.name}
-                  name={item.name}
-                  title={item.title}
-                  tier={item.meta.tier}
-                  spot={item.spot ? "ink" : undefined}
-                  poster={item.poster}
-                  locale={locale}
-                  labels={cardLabels}
-                  className={showAt(i)}
-                />
-            ))}
-          </ul>
-          </div>
-        </section>
-      )}
 
       {/* 比較示範：只留示範本身 */}
       <section aria-labelledby="compare-title" className="mt-24 sm:mt-32">

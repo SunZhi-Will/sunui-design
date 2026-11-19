@@ -8,7 +8,7 @@ import type { Messages } from "@/lib/messages";
 import { EASE_SITE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-type Copy = Messages["home"]["hero"]["wall"];
+export type Copy = Messages["home"]["hero"]["wall"];
 
 /**
  * 首頁開場的即時元件牆：鋪滿螢幕寬度的一整面小場景，像一家真的店正在運作。
@@ -20,10 +20,10 @@ type Copy = Messages["home"]["hero"]["wall"];
 const SPRING = { type: "spring", stiffness: 520, damping: 34, mass: 0.8 } as const;
 const RESUME_MS = 2600;
 
-const WallActive = createContext(false);
+export const WallActive = createContext(false);
 
-export function LiveWall({ copy, command }: { copy: Copy; command?: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
+/** 元素在畫面上而且分頁在前景時才是 true：自動播放只在這時候跑 */
+export function useOnScreen(ref: React.RefObject<HTMLElement | null>) {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,14 @@ export function LiveWall({ copy, command }: { copy: Copy; command?: ReactNode })
       observer.disconnect();
       document.removeEventListener("visibilitychange", sync);
     };
-  }, []);
+  }, [ref]);
+  return active;
+}
+
+/** staged：開場的場景（hero-scene.tsx）已經用掉七張卡，牆只放剩下的 */
+export function LiveWall({ copy, command, staged }: { copy: Copy; command?: ReactNode; staged?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const active = useOnScreen(ref);
 
   const money = (n: number) => `${copy.currency}${n.toLocaleString("en-US")}`;
 
@@ -58,23 +65,37 @@ export function LiveWall({ copy, command }: { copy: Copy; command?: ReactNode })
         className="relative mx-[calc(50%-50vw)] max-h-[1280px] overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,#000_72%,transparent)] sm:max-h-[900px] sm:px-5"
       >
         <div className="mx-auto max-w-[2400px] columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 min-[106.25rem]:columns-5">
-          <Card>{(auto) => <ProductCard auto={auto} copy={copy} money={money} />}</Card>
+          {!staged && (
+            <Card>{(auto) => <ProductCard auto={auto} copy={copy} money={money} />}</Card>
+          )}
           <Card title={copy.steps.join(" · ")} hideTitle>
             {(auto) => <StepsCard auto={auto} items={copy.steps} />}
           </Card>
-          <Card title={copy.coupon.label}>{(auto) => <CouponCard auto={auto} copy={copy} money={money} />}</Card>
-          <Card title={copy.cart.title}>{(auto) => <CartCard auto={auto} copy={copy} money={money} />}</Card>
+          {!staged && (
+            <Card title={copy.coupon.label}>{(auto) => <CouponCard auto={auto} copy={copy} money={money} />}</Card>
+          )}
+          {!staged && (
+            <Card title={copy.cart.title}>{(auto) => <CartCard auto={auto} copy={copy} money={money} />}</Card>
+          )}
           <Card>{(auto) => <ReviewCard auto={auto} copy={copy} />}</Card>
-          <Card title={copy.price.caption}>{(auto) => <PriceCard auto={auto} copy={copy} />}</Card>
-          <Card title={copy.order.title} note={copy.order.eta}>
-            {(auto) => <OrderCard auto={auto} steps={copy.order.steps} />}
-          </Card>
+          {!staged && (
+            <Card title={copy.price.caption}>{(auto) => <PriceCard auto={auto} copy={copy} />}</Card>
+          )}
+          {!staged && (
+            <Card title={copy.order.title} note={copy.order.eta}>
+              {(auto) => <OrderCard auto={auto} steps={copy.order.steps} />}
+            </Card>
+          )}
           <Card title={copy.size}>{(auto) => <SizeCard auto={auto} />}</Card>
-          <Card title={copy.chart.title}>{(auto) => <ChartCard auto={auto} copy={copy} money={money} />}</Card>
+          {!staged && (
+            <Card title={copy.chart.title}>{(auto) => <ChartCard auto={auto} copy={copy} money={money} />}</Card>
+          )}
           <Card title={copy.notify.title}>{(auto) => <NotifyCard auto={auto} items={copy.notify.items} />}</Card>
           <Card className="grid min-h-28 place-items-center">{(auto) => <IslandCard auto={auto} copy={copy} />}</Card>
           {command && <Card title={copy.install}>{() => command}</Card>}
-          <Card title={copy.stock.ends}>{(auto) => <StockCard auto={auto} copy={copy} />}</Card>
+          {!staged && (
+            <Card title={copy.stock.ends}>{(auto) => <StockCard auto={auto} copy={copy} />}</Card>
+          )}
           <Card title={copy.dimmer.caption}>{(auto) => <DimmerCard auto={auto} copy={copy} />}</Card>
           <Card title={copy.ship.title}>{(auto) => <ShipCard auto={auto} copy={copy} money={money} />}</Card>
           <Card>{(auto) => <FavCard auto={auto} copy={copy} money={money} />}</Card>
@@ -88,7 +109,7 @@ export function LiveWall({ copy, command }: { copy: Copy; command?: ReactNode })
 }
 
 /** 一張卡：比頁面底色亮一階的表面、可選的小標題、滑鼠接手的邏輯 */
-function Card({
+export function Card({
   title,
   note,
   hideTitle,
@@ -171,7 +192,7 @@ function Check({ className, draw }: { className?: string; draw?: boolean }) {
 const solidButton = "bg-fg text-bg shadow-btn";
 
 // ---- 商品卡：選顏色、加入購物車 ----
-function ProductCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
+export function ProductCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
   const [added, setAdded] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [tone, setTone] = useState(0);
@@ -258,7 +279,7 @@ function ProductCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: 
 }
 
 // ---- 購物車：數量加減、小計、免運進度 ----
-function CartCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
+export function CartCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
   const [qty, setQty] = useState([1, 1]);
   const [dir, setDir] = useState(1);
   const beat = useRef(0);
@@ -354,7 +375,7 @@ function CartCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n:
 }
 
 // ---- 限時價：每一位數各自滾到新數字 ----
-function PriceCard({ auto, copy }: { auto: boolean; copy: Copy }) {
+export function PriceCard({ auto, copy }: { auto: boolean; copy: Copy }) {
   const [sale, setSale] = useState(true);
   useBeat(auto, 3000, 1500, () => setSale((s) => !s));
   const digits = String(sale ? 1180 : 1680).split("");
@@ -404,7 +425,7 @@ function PriceCard({ auto, copy }: { auto: boolean; copy: Copy }) {
 }
 
 // ---- 訂單追蹤：直式時間軸，依序點亮 ----
-function OrderCard({ auto, steps }: { auto: boolean; steps: string[] }) {
+export function OrderCard({ auto, steps }: { auto: boolean; steps: string[] }) {
   const [done, setDone] = useState(2);
   useBeat(auto, 1700, 1000, () => setDone((d) => (d >= steps.length ? 1 : d + 1)));
 
@@ -474,7 +495,7 @@ function StepsCard({ auto, items }: { auto: boolean; items: string[] }) {
 }
 
 // ---- 優惠碼：自己打字、套用、顯示折抵 ----
-function CouponCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
+export function CouponCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
   const CODE = "DOUBLE11";
   const [typed, setTyped] = useState(CODE.length);
   const [applied, setApplied] = useState(false);
@@ -625,7 +646,7 @@ function SizeCard({ auto }: { auto: boolean }) {
 }
 
 // ---- 本週銷售：長條換一組數字時各自長高變矮 ----
-function ChartCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
+export function ChartCard({ auto, copy, money }: { auto: boolean; copy: Copy; money: (n: number) => string }) {
   const weeks = [
     [42, 58, 49, 71, 64, 92, 80],
     [55, 44, 68, 60, 88, 73, 96],
@@ -713,7 +734,7 @@ function IslandCard({ auto, copy }: { auto: boolean; copy: Copy }) {
 }
 
 // ---- 限時庫存：倒數每秒跳一次，剩餘數量慢慢減少 ----
-function StockCard({ auto, copy }: { auto: boolean; copy: Copy }) {
+export function StockCard({ auto, copy }: { auto: boolean; copy: Copy }) {
   const [seconds, setSeconds] = useState(2 * 3600 + 14 * 60 + 36);
   const [left, setLeft] = useState(7);
   useBeat(auto, 1000, 0, () => setSeconds((s) => (s <= 1 ? 2 * 3600 + 14 * 60 + 36 : s - 1)));
