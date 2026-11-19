@@ -149,6 +149,13 @@
   /* Geist 是可變字重：比 500 / 600 略重一點，不顯粗（Linear 用 510 / 590） */
   --font-weight-medium: 510;
   --font-weight-semibold: 590;
+  /* 首頁的區塊跑馬燈（components/home/scene-marquee.tsx）：兩份一樣的清單各往左走一個自己的寬度，接起來沒有縫 */
+  --animate-marquee: marquee 90s linear infinite;
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 @theme inline {

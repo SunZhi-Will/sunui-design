@@ -12,7 +12,7 @@ export function isSiteDark() {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-/** 立即換成指定主題並記住。換色那一幀暫停全站 transition。首頁的太陽調光（home/sun-dimmer.tsx）也用這個 */
+/** 立即換成指定主題並記住。換色那一幀暫停全站 transition */
 export function commitSiteTheme(next: "light" | "dark") {
   const freeze = document.createElement("style");
   freeze.textContent = "*:not([data-theme-icon]),*::before,*::after{transition:none!important}";
