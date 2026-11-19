@@ -85,13 +85,21 @@ CSS 在 `app/globals.css` 的 `@theme`（`ease-site` 曲線，並把預設 trans
    - 文字後面有一塊 radial 的暗區，點雲在標題四周，不壓在字上。文字那一層 `pointer-events-none`，只有連結和按鈕接事件，這樣點雲拖得到。
    - 置中的小標籤、標題、一句話、兩顆按鈕、安裝指令。最下面一顆小膠囊說明這是哪個區塊並連過去。
    - 由來：只放靜態預覽圖的版本被否決（「一張圖無法給我震撼感」）。第一個畫面一定要有一樣大的、持續在動的東西，而且要是 SunUI 自己的區塊。
-2. **區塊跑馬燈**（`components/home/scene-marquee.tsx`）：兩排區塊預覽圖（`/og/blocks/<name>.jpg`），等大（手機 280px、sm 以上 380px 寬，5:4）、間距 16px，往相反方向走，150 秒一圈（約每秒 26px；60 秒一圈被否決，太快），兩側用 mask 淡出。滑鼠移上去或焦點進來就停。每張連到區塊頁。reduced motion 時不動，改成可以橫向捲。動畫是 `globals.css` 裡的 `@keyframes marquee` 加 `animate-[marquee_150s_linear_infinite]`（寫在 `@theme` 的 `--animate-marquee` 不會產生 class，第一版因此完全沒動）。改動後一定要量位移確認真的在走。
-3. **數字**：一排四個（區塊、動效庫、Pro 場景、語言），上下各一條線。
-4. **在這裡直接試**：六欄格線，上排一大（四欄）一小（兩欄），下排三張各兩欄。每一格是 `LivePreview` 加下面一行名稱（`page.tsx` 的 `Tile`）。
-5. **Pro 場景**：第一個用 `mode="sheet"` 放在整排寬的大框裡，下面三張。Pro 資料夾不在時整段不出現。
+2. **數字**：一排四個（區塊、動效庫、Pro 場景、語言），上下各一條線。捲進畫面時用 `animated-number` 從 0 滾上來（`motion-bento.tsx` 的 `CountUp`）。
+3. **動效庫**（`components/home/motion-bento.tsx`）：六欄格線，上排一大（四欄）一小（兩欄），下排三張。每一格是一套免費動效庫正在跑，**直接引入區塊的元件**，不是截圖也不是 iframe：背景效果每 4.6 秒換一種、文字效果、圖表、按鈕、SVG 軌道。
+   - 外殼只有黑白灰，所以每個效果都傳 `MONO`（由前景色混出來的三階灰），不用它們預設的主題色。
+   - `svg-effects` 的軌道位置在伺服器和瀏覽器算出來的小數位數不同，那一格等掛載後才畫，否則會有 hydration 不一致。
+   - 動效庫在型錄資料裡是一種樣式一張卡，要整套的名稱得讀 `libraryTitle`。
+4. **在這裡直接試**：六欄格線，上排一大一小，下排三張各兩欄。每一格是 `LivePreview` 加下面一行名稱（`page.tsx` 的 `Tile`）。
+5. **Pro 場景**：每個場景佔一整排（`mode="sheet"`，高 `min(72svh, 660px)`），外層 `sticky`，`top` 依序多 3.25rem。往下捲時下一張疊在上一張上面，露出前面每一張的標題列。Pro 資料夾不在時整段不出現。
 6. **差在哪裡**：左邊標題、一句話、三行重點，右邊 `HeroCompare`。
 7. **交給 agent**：`components/agent-steps.tsx`，自己帶標題。
-8. **價格與創始會員**、**收尾**。
+8. **型錄裡還有更多**（`components/home/scene-marquee.tsx`）：兩排區塊預覽圖（`/og/blocks/<name>.jpg`），等大（手機 280px、sm 以上 380px 寬，5:4）、間距 16px，往相反方向走，150 秒一圈（約每秒 26px；60 秒一圈被否決，太快），兩側用 mask 淡出。滑鼠移上去或焦點進來就停。每張連到區塊頁。reduced motion 時不動，改成可以橫向捲。動畫是 `globals.css` 裡的 `@keyframes marquee` 加 `animate-[marquee_150s_linear_infinite]`（寫在 `@theme` 的 `--animate-marquee` 不會產生 class，第一版因此完全沒動）。改動後一定要量位移確認真的在走。
+   - 這一段原本在開場正下方，被否決（只是圖片在平移，普通）。現在放在後段，當型錄的預告。
+9. **價格與創始會員**。
+10. **收尾**：上面一團點雲拼出 SunUI（`ClosingCloud`，`point-cloud` 的 text 形狀），和開場呼應，接一句話和兩顆按鈕。
+
+**每一段都要有一樣東西在動或可以碰，而且用的是 SunUI 自己的元件。** 首頁上一版除了開場以外幾乎都是靜的，被說「下面的段落還是很普通」：一個賣動效的元件庫，首頁自己不動。
 
 試過而且被否決的，不要再做：
 

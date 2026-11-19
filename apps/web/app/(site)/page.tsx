@@ -7,6 +7,7 @@ import { AgentSteps } from "@/components/agent-steps";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
 import { HeroCloud } from "@/components/home/hero-cloud";
+import { ClosingCloud, CountUp, MotionBento } from "@/components/home/motion-bento";
 import { SceneMarquee, type MarqueeItem } from "@/components/home/scene-marquee";
 import { LivePreview } from "@/components/live-preview";
 import { WaitlistForm } from "@/components/waitlist-form";
@@ -29,7 +30,9 @@ const MARQUEE_A = ["depth-hero", "day-night-hero", "compare-slider", "campaign-l
 const MARQUEE_B = ["lookbook-expand-hero", "kelvin-switch", "image-effects", "catalog-flipbook", "loop-shader-hero", "collection-accordion", "book-3d", "gradient-backdrop", "photo-looks", "product-media", "spine-shelf", "curve-rail-hero", "sticker-board", "theme-reveal"];
 // 「在這裡直接試」：第一張佔兩格寬，其餘四張等寬
 const PLAY = ["depth-hero", "orbit-gallery", "compare-slider", "book-3d", "hotspots"];
-// Pro 場景：第一個放大框，其餘三張。Pro 資料夾不在時整段不出現
+// 動效庫格子用到的五套免費動效庫
+const MOTION = ["background-effects", "text-effects", "chart-effects", "button-effects", "svg-effects"];
+// Pro 場景：每個佔一整排，捲動時一張疊一張。Pro 資料夾不在時整段不出現
 const PRO = ["launch-stage-hero", "day-night-hero", "glass-cube-hero", "lookbook-expand-hero"];
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,6 +65,13 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const motionCount = all.filter((item) => item.meta.series === "motion").length;
   const firstFree = all.find((item) => item.meta.tier === "free");
   const play = pick(PLAY);
+  // 動效庫在型錄裡是一種樣式一張卡，這裡要的是整套的名稱
+  const motionLibs = Object.fromEntries(
+    MOTION.flatMap((name) => {
+      const item = items.find((entry) => entry.name === name);
+      return item ? [[name, { name, title: String("libraryTitle" in item ? item.libraryTitle : item.title) }]] : [];
+    }),
+  );
   const [proLead, ...proRest] = pick(PRO);
   const stats = [all.length, motionCount, proCount, 4];
   const t = m.home.sections;
@@ -129,22 +139,33 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </Link>
       </section>
 
-      {/* 區塊跑馬燈：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊 */}
-      <section aria-label={s.marquee} className="mx-[calc(50%-50vw)] mt-10 space-y-6 sm:mt-14">
-        <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
-        <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
-      </section>
-
       {/* 數字：一排四個 */}
-      <section aria-label={m.home.stats.label} className="mt-20 sm:mt-28">
+      <section aria-label={m.home.stats.label} className="mt-6 sm:mt-10">
         <dl className="grid grid-cols-2 gap-y-10 border-y border-line py-10 md:grid-cols-4 md:divide-x md:divide-line md:py-12">
           {stats.map((value, i) => (
             <div key={i} className="flex flex-col items-center gap-2 px-4 text-center">
               <dt className="order-2 text-sm text-subtle">{s.stats[i]}</dt>
-              <dd className="order-1 text-4xl font-semibold tracking-[-0.03em] tabular-nums sm:text-5xl">{value}</dd>
+              <dd className="order-1 text-4xl font-semibold tracking-[-0.03em] tabular-nums sm:text-5xl">
+                <CountUp value={value} />
+              </dd>
             </div>
           ))}
         </dl>
+      </section>
+
+      {/* 動效庫：每一格是一套免費動效庫正在跑，直接引入元件 */}
+      <section aria-labelledby="motion-title" className={SECTION}>
+        <SectionHead id="motion-title" title={s.motionTitle} sub={s.motionSub}>
+          <Link href="/blocks?series=motion" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
+            {format(s.motionCta, { n: motionCount })}
+            <Arrow className="size-3.5" />
+          </Link>
+        </SectionHead>
+        <MotionBento
+          libs={motionLibs}
+          note={m.tier.free}
+          copy={{ prefix: s.motionPrefix, words: s.motionWords, buttons: s.motionButtons, chart: m.home.hero.wall.chart.title, days: m.home.hero.wall.chart.days }}
+        />
       </section>
 
       {/* 在這裡直接試：真的區塊在跑。上排一大一小，下排三張 */}
@@ -183,30 +204,28 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
               <Arrow className="size-3.5" />
             </Link>
           </SectionHead>
-          <ul className="mt-10 grid gap-x-4 gap-y-8 md:grid-cols-3">
-            <Tile
-              name={proLead.name}
-              title={proLead.title}
-              note={m.tier.pro}
-              locale={locale}
-              previewLabel={previewLabel(proLead.title)}
-              className="md:col-span-3"
-              frame="h-[520px] md:h-[640px]"
-              mode="sheet"
-            />
-            {proRest.map((item) => (
-              <Tile
-                key={item.name}
-                name={item.name}
-                title={item.title}
-                note={m.tier.pro}
-                poster={item.poster}
-                locale={locale}
-                previewLabel={previewLabel(item.title)}
-                frame="h-[340px]"
-              />
+          {/* 每個場景佔一整排，sticky 在頁首下面，下一張往上捲時疊在它上面，露出上一張的標題列 */}
+          <ol className="mt-10 space-y-6">
+            {[proLead, ...proRest].map((item, i) => (
+              <li key={item.name} className="sticky" style={{ top: `calc(4.75rem + ${i * 3.25}rem)` }}>
+                <div className="overflow-hidden rounded-2xl bg-card shadow-e2 dark:bg-[#131313]">
+                  <div className="flex h-13 items-center justify-between gap-4 border-b border-line px-5 text-sm">
+                    <span className="flex items-center gap-3 font-medium">
+                      <span className="font-mono text-xs text-subtle tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                      {item.title}
+                    </span>
+                    <Link href={`/blocks/${item.name}`} className="inline-flex items-center gap-1.5 text-subtle transition-colors hover:text-fg">
+                      {t.open}
+                      <Arrow className="size-3.5" />
+                    </Link>
+                  </div>
+                  <div className="relative h-[min(72svh,660px)]">
+                    <LivePreview name={item.name} mode="sheet" title={previewLabel(item.title)} locale={locale} />
+                  </div>
+                </div>
+              </li>
             ))}
-          </ul>
+          </ol>
         </section>
       )}
 
@@ -238,6 +257,20 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <AgentSteps m={m.home.agent} />
       </div>
 
+      {/* 型錄裡還有更多：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊 */}
+      <section aria-labelledby="catalog-title" className={SECTION}>
+        <SectionHead id="catalog-title" title={s.catalogTitle}>
+          <Link href="/blocks" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
+            {format(t.catalog.cta, { n: all.length })}
+            <Arrow className="size-3.5" />
+          </Link>
+        </SectionHead>
+      </section>
+      <section aria-label={s.marquee} className="mx-[calc(50%-50vw)] mt-10 space-y-6">
+        <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
+        <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
+      </section>
+
       {/* 價格與創始會員 */}
       <section
         aria-labelledby="pro-title"
@@ -261,7 +294,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
       {/* 收尾 */}
       <section aria-labelledby="closing-title" className={cn(SECTION, "text-center")}>
-        <h2 id="closing-title" className="text-4xl font-semibold tracking-[-0.03em] text-balance [word-break:auto-phrase] sm:text-5xl">
+        <ClosingCloud label="SunUI" />
+        <h2 id="closing-title" className="mt-2 text-4xl font-semibold tracking-[-0.03em] text-balance [word-break:auto-phrase] sm:text-5xl">
           {t.closing.title}
         </h2>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
