@@ -86,50 +86,6 @@
     ]
   },
   {
-    "name": "logo-marquee",
-    "type": "registry:block",
-    "title": "Logo Marquee",
-    "description": "An infinite, seamless logo or text marquee with direction and speed props, edge fade masks, pause on hover or focus and an optional pause button. Duplicate copies are hidden from assistive tech; with reduced motion it renders a static wrapped list.",
-    "dependencies": [
-      "framer-motion"
-    ],
-    "registryDependencies": [
-      "utils"
-    ],
-    "categories": [
-      "section",
-      "marquee",
-      "logos"
-    ],
-    "meta": {
-      "tier": "free",
-      "interaction": "scroll",
-      "addedAt": "2026-11-05",
-      "usage": {
-        "whenToUse": [
-          "Customer and partner logo rows",
-          "Ticker style news or feature lists"
-        ],
-        "watchOut": [
-          "Duplicate content is hidden from screen readers, so keep one readable copy",
-          "Pause on hover so people can read it"
-        ],
-        "aliases": [
-          "logo cloud",
-          "infinite scroll",
-          "ticker",
-          "carousel loop"
-        ]
-      }
-    },
-    "files": [
-      {
-        "path": "registry/lab/logo-marquee/logo-marquee.tsx",
-        "type": "registry:component"
-      }
-    ]
-  },
-  {
     "name": "magnetic-button",
     "type": "registry:block",
     "title": "Magnetic Button",
@@ -391,51 +347,6 @@
     ]
   },
   {
-    "name": "command-palette",
-    "type": "registry:block",
-    "title": "Command Palette",
-    "description": "A \u2318K / Ctrl+K command dialog with fuzzy search that highlights matched characters, grouped results, recent items, per-item shortcut hints, an empty state and a footer legend. Built as an ARIA combobox and listbox with arrow, Home/End, Enter and Escape keys, a focus trap, focus restore and body scroll lock; the opt-in global hotkey ignores typing in other fields, and reduced motion removes the scale and highlight animations.",
-    "dependencies": [
-      "framer-motion"
-    ],
-    "registryDependencies": [
-      "utils"
-    ],
-    "categories": [
-      "navigation",
-      "search",
-      "dialog"
-    ],
-    "meta": {
-      "tier": "free",
-      "interaction": "type",
-      "addedAt": "2026-11-05",
-      "usage": {
-        "whenToUse": [
-          "Apps with many pages or actions that power users jump between",
-          "A single keyboard entry point for navigation, actions and settings"
-        ],
-        "watchOut": [
-          "The hotkey is global; disable it when another component already owns \u2318K",
-          "Fuzzy matching runs on the client, so very large lists should be pre-filtered or virtualised"
-        ],
-        "aliases": [
-          "cmdk",
-          "spotlight search",
-          "command menu",
-          "quick switcher",
-          "omnibar"
-        ]
-      }
-    },
-    "files": [
-      {
-        "path": "registry/lab/command-palette/command-palette.tsx",
-        "type": "registry:component"
-      }
-    ]
-  },
-  {
     "name": "loader-set",
     "type": "registry:block",
     "title": "Loader Set",
@@ -476,51 +387,6 @@
     "files": [
       {
         "path": "registry/lab/loader-set/loader-set.tsx",
-        "type": "registry:component"
-      }
-    ]
-  },
-  {
-    "name": "notification-bell",
-    "type": "registry:block",
-    "title": "Notification Bell",
-    "description": "A bell button with a capped unread badge that pops on change and a shake when new items arrive, opening a popover with avatars, relative times, unread dots, mark all as read and an empty state. The panel is a labelled dialog with aria-expanded, Escape and outside click to close and focus return, and new arrivals are announced politely; reduced motion removes the shake and pop.",
-    "dependencies": [
-      "framer-motion"
-    ],
-    "registryDependencies": [
-      "utils"
-    ],
-    "categories": [
-      "feedback",
-      "notification",
-      "popover"
-    ],
-    "meta": {
-      "tier": "free",
-      "interaction": "press",
-      "addedAt": "2026-11-05",
-      "usage": {
-        "whenToUse": [
-          "App headers that surface mentions, assignments and system alerts",
-          "Inbox style feeds where users clear unread items in bulk"
-        ],
-        "watchOut": [
-          "The component is controlled, so persist read state yourself in onItemClick and onMarkAllRead",
-          "Relative times use Intl.RelativeTimeFormat; pass locale to match your UI language"
-        ],
-        "aliases": [
-          "notification center",
-          "inbox",
-          "alerts dropdown",
-          "activity feed",
-          "unread badge"
-        ]
-      }
-    },
-    "files": [
-      {
-        "path": "registry/lab/notification-bell/notification-bell.tsx",
         "type": "registry:component"
       }
     ]

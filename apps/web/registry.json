@@ -5132,6 +5132,144 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "command-palette",
+      "type": "registry:block",
+      "title": "Command Palette",
+      "description": "A ⌘K / Ctrl+K command dialog with fuzzy search that marks matched characters in the brand spot colour, grouped results, recent items, per-item shortcut hints, an empty state and a footer legend. Built as an ARIA combobox and listbox with arrow, Home/End, Enter and Escape keys, a focus trap, focus restore and body scroll lock; it settles in from scale 0.96 with a fade and the highlight slides with the pointer and arrow keys. An inline mode renders it open in place without a scrim, the opt-in global hotkey ignores typing in other fields, and reduced motion keeps every state readable.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "search",
+        "dialog"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "type",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "Apps with many pages or actions that power users jump between",
+            "A single keyboard entry point for navigation, actions and settings"
+          ],
+          "watchOut": [
+            "The hotkey is global; disable it when another component already owns ⌘K",
+            "Fuzzy matching runs on the client, so very large lists should be pre-filtered or virtualised"
+          ],
+          "aliases": [
+            "cmdk",
+            "spotlight search",
+            "command menu",
+            "quick switcher",
+            "omnibar",
+            "inline command menu"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/command-palette/command-palette.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "notification-bell",
+      "type": "registry:block",
+      "title": "Notification Bell",
+      "description": "A bell button with a capped unread badge in the brand spot colour, opening a popover with avatars, relative times, unread dots, mark all as read and an empty state. When new items arrive the bell swings once on a damped spring and the badge number pops once; marking an item read fades the same row in place, and new rows expand so the list slides instead of jumping. The panel is a labelled dialog with aria-expanded, Escape and outside click to close and focus return, and new arrivals are announced politely; reduced motion switches instantly and keeps every state.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "feedback",
+        "notification",
+        "popover"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "press",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "Store or product headers that surface shipping, replies, restocks and system alerts",
+            "Inbox style feeds where users clear unread items in bulk"
+          ],
+          "watchOut": [
+            "The component is controlled, so persist read state yourself in onItemClick and onMarkAllRead",
+            "Relative times use Intl.RelativeTimeFormat; pass locale and labels (including labels.count) to match your UI language"
+          ],
+          "aliases": [
+            "notification center",
+            "inbox",
+            "alerts dropdown",
+            "activity feed",
+            "unread badge"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/notification-bell/notification-bell.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "logo-marquee",
+      "type": "registry:block",
+      "title": "Logo Marquee",
+      "description": "A seamless loop of logos, wordmarks or short text, optionally in two rows running in opposite directions. Logos are monochrome in the muted text colour and brighten to the foreground on hover. Edges fade out, it pauses on hover or keyboard focus, and a real pause button is included. It only moves while on screen and the tab is visible, duplicate copies are hidden from assistive tech, and with reduced motion it renders a static wrapped list.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "section",
+        "marquee",
+        "logos"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "A trusted by row of customer and partner logos on a landing page",
+            "A list of wordmarks or short text that does not fit on one line, such as supported platforms or integrations"
+          ],
+          "watchOut": [
+            "Use single-colour currentColor SVG logos, not full-colour brand images",
+            "One strip per page; use testimonial-marquee for review cards and scroll-marquee for big text that moves with scroll"
+          ],
+          "aliases": [
+            "logo cloud",
+            "logo wall",
+            "trusted by",
+            "customer logos",
+            "infinite scroll",
+            "ticker",
+            "carousel loop"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/logo-marquee/logo-marquee.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

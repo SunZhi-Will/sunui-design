@@ -53,6 +53,12 @@ export interface CommandPaletteProps {
   onRecentChange?: (ids: string[]) => void;
   /** 選取後是否自動關閉 */
   closeOnSelect?: boolean;
+  /**
+   * 直接在容器裡展開，不用 portal、遮罩與捲動鎖定，一直是開著的。
+   * 適合放在頁面中（例如說明文件、空狀態、型錄預覽）。此時 open 相關 props 不作用，
+   * 快捷鍵改為聚焦輸入框，Escape 清空搜尋字。
+   */
+  inline?: boolean;
   labels?: {
     dialog?: string;
     recent?: string;
@@ -80,6 +86,17 @@ const defaultLabels = {
 };
 
 type Match = { score: number; indices: number[] };
+
+// SunUI 的彈簧（DESIGN.md 第 5 節）：浮層落定與高亮滑動都用 snappy
+const springs = {
+  snappy: { type: "spring", stiffness: 520, damping: 34 },
+} as const;
+
+// 高度 e3（對話框）與 e1（按鍵帽）；有陰影就不再加 border，深色模式改用頂邊高光
+const E3 =
+  "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.08)]";
+const E1 =
+  "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
 // 近似模糊比對：依序找出每個字元，連續命中與字首命中加分
 export function fuzzyMatch(text: string, query: string): Match | null {
@@ -140,7 +157,7 @@ function Highlight({ text, indices }: { text: string; indices: number[] }) {
     <>
       {Array.from(text).map((ch, i) =>
         set.has(i) ? (
-          <mark key={i} className="bg-transparent font-semibold text-primary">
+          <mark key={i} className="bg-transparent font-semibold text-[color:var(--sunui-spot,var(--primary))]">
             {ch}
           </mark>
         ) : (
@@ -155,7 +172,8 @@ export function Kbd({ children, className }: { children: ReactNode; className?: 
   return (
     <kbd
       className={cn(
-        "inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1 font-sans text-[11px] font-medium text-muted-foreground",
+        "inline-flex h-5 min-w-5 items-center justify-center rounded-[4px] bg-card px-1 font-sans text-[11px] font-medium text-muted-foreground tabular-nums",
+        E1,
         className,
       )}
     >
@@ -176,6 +194,7 @@ export function CommandPalette({
   defaultRecent = [],
   onRecentChange,
   closeOnSelect = true,
+  inline = false,
   labels,
   className,
 }: CommandPaletteProps) {
@@ -184,7 +203,8 @@ export function CommandPalette({
   const baseId = useId();
   const listId = `${baseId}-list`;
   const [inner, setInner] = useState(defaultOpen);
-  const open = openProp ?? inner;
+  // 內嵌模式一直是開著的
+  const open = inline || (openProp ?? inner);
   const [query, setQuery] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [recent, setRecent] = useState<string[]>(defaultRecent);
@@ -213,15 +233,16 @@ export function CommandPalette({
       const ours = e.target === inputRef.current;
       if (isTypingTarget(e.target) && !ours) return;
       e.preventDefault();
-      setOpen(!open);
+      if (inline) inputRef.current?.focus();
+      else setOpen(!open);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [hotkey, hotkeyKey, open, setOpen]);
+  }, [hotkey, hotkeyKey, inline, open, setOpen]);
 
-  // 開啟：記住焦點、鎖住捲動、聚焦輸入框；關閉：還原焦點
+  // 開啟：記住焦點、鎖住捲動、聚焦輸入框；關閉：還原焦點（內嵌模式不做這些）
   useEffect(() => {
-    if (!open) return;
+    if (!open || inline) return;
     restoreRef.current = document.activeElement as HTMLElement | null;
     setQuery("");
     const { body, documentElement } = document;
@@ -238,7 +259,7 @@ export function CommandPalette({
       const target = restoreRef.current;
       if (target && document.contains(target)) target.focus();
     };
-  }, [open]);
+  }, [open, inline]);
 
   const sections = useMemo<Section[]>(() => {
     const q = query.trim();
@@ -296,12 +317,16 @@ export function CommandPalette({
 
   const optionId = (key: string) => `${baseId}-opt-${key.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
 
-  // 高亮項目捲入可視範圍
+  // 高亮項目捲入清單可視範圍；只捲清單本身，不用 scrollIntoView，內嵌時才不會帶動整頁
   useEffect(() => {
-    if (!activeKey) return;
-    const el = document.getElementById(optionId(activeKey));
-    el?.scrollIntoView({ block: "nearest" });
-  }, [activeKey, baseId]);
+    const list = listRef.current;
+    const el = activeKey ? document.getElementById(optionId(activeKey)) : null;
+    if (!list || !el) return;
+    if (activeKey === enabled[0]?.key) list.scrollTop = 0;
+    else if (el.offsetTop < list.scrollTop) list.scrollTop = el.offsetTop - 8;
+    else if (el.offsetTop + el.offsetHeight > list.scrollTop + list.clientHeight)
+      list.scrollTop = el.offsetTop + el.offsetHeight - list.clientHeight + 8;
+  }, [activeKey, baseId, enabled]);
 
   const select = (row: Row) => {
     if (row.item.disabled) return;
@@ -310,7 +335,7 @@ export function CommandPalette({
       setRecent(next);
       onRecentChange?.(next);
     }
-    if (closeOnSelect) setOpen(false);
+    if (closeOnSelect && !inline) setOpen(false);
     row.item.onSelect?.();
   };
 
@@ -350,15 +375,22 @@ export function CommandPalette({
     }
   };
 
-  // 焦點陷阱：Tab 只在對話框內循環；Escape 關閉
+  // 焦點陷阱：Tab 只在對話框內循環；Escape 關閉（內嵌時清空搜尋字）
   const onDialogKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
+      if (inline) {
+        if (query) {
+          e.preventDefault();
+          setQuery("");
+        }
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       setOpen(false);
       return;
     }
-    if (e.key !== "Tab") return;
+    if (e.key !== "Tab" || inline) return;
     const nodes = Array.from(
       dialogRef.current?.querySelectorAll<HTMLElement>(
         'input, button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
@@ -376,8 +408,178 @@ export function CommandPalette({
     }
   };
 
-  const fade = reduce ? { duration: 0 } : { duration: 0.15 };
+  const panel = (
+    <motion.div
+      ref={dialogRef}
+      role={inline ? "search" : "dialog"}
+      aria-modal={inline ? undefined : true}
+      aria-label={text.dialog}
+      onKeyDown={onDialogKeyDown}
+      // 浮層落定：從 0.96 加淡入，200ms 內；內嵌時不進場
+      initial={inline || reduce ? false : { opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.98, transition: { duration: 0.12 } }}
+      transition={reduce ? { duration: 0 } : { ...springs.snappy, opacity: { duration: 0.15 } }}
+      className={cn(
+        "relative flex w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground",
+        inline
+          ? "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring"
+          : "max-h-[min(32rem,76vh)]",
+        E3,
+        className,
+      )}
+    >
+      <div className="flex items-center gap-3 border-b border-foreground/10 px-4">
+        <svg
+          viewBox="0 0 24 24"
+          className="size-4 shrink-0 text-muted-foreground"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          ref={inputRef}
+          type="text"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={activeKey ? optionId(activeKey) : undefined}
+          aria-label={text.dialog}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder={placeholder}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={onInputKeyDown}
+          className="h-12 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+        {!inline && <Kbd className="shrink-0">Esc</Kbd>}
+      </div>
 
+      <div
+        ref={listRef}
+        id={listId}
+        role="listbox"
+        aria-label={text.dialog}
+        className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-2"
+      >
+        {sections.map((section) => {
+          const headingId = `${baseId}-h-${section.key.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+          return (
+            <div key={section.key} role="group" aria-labelledby={headingId} className="mb-1 last:mb-0">
+              <div id={headingId} className="px-2 pt-2 pb-1 text-xs font-medium text-muted-foreground">
+                {section.heading}
+              </div>
+              {section.rows.map((row) => {
+                const active = row.key === activeKey;
+                const off = row.item.disabled;
+                return (
+                  <div
+                    key={row.key}
+                    id={optionId(row.key)}
+                    role="option"
+                    aria-selected={active}
+                    aria-disabled={off || undefined}
+                    onPointerMove={() => {
+                      if (!off && !active) setActiveKey(row.key);
+                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => select(row)}
+                    className={cn(
+                      // 列是大面積，按下用 0.99；高亮底由 layoutId 跟著指標與方向鍵滑動
+                      "relative flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-foreground transition-[scale] duration-150 select-none",
+                      off ? "cursor-not-allowed opacity-50" : "cursor-pointer motion-safe:active:scale-[0.99]",
+                    )}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId={reduce ? undefined : `${baseId}-active`}
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-lg bg-foreground/[0.06] dark:bg-foreground/[0.08]"
+                        transition={springs.snappy}
+                      />
+                    )}
+                    {row.item.icon && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "relative flex size-5 shrink-0 items-center justify-center transition-colors duration-150 [&>svg]:size-4",
+                          active ? "text-foreground duration-0" : "text-muted-foreground",
+                        )}
+                      >
+                        {row.item.icon}
+                      </span>
+                    )}
+                    <span className="relative min-w-0 flex-1 truncate">
+                      <Highlight text={row.item.label} indices={row.indices} />
+                    </span>
+                    {row.item.shortcut && (
+                      <span className="relative flex shrink-0 gap-1" aria-hidden="true">
+                        {row.item.shortcut.map((k, i) => (
+                          <Kbd key={i}>{k}</Kbd>
+                        ))}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+        {!rows.length && (
+          <div className="flex flex-col items-center gap-2 px-4 py-10 text-center text-sm text-muted-foreground">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5M8.5 11h5" />
+            </svg>
+            <p>{text.empty(query.trim())}</p>
+          </div>
+        )}
+      </div>
+
+      <div
+        className="flex items-center gap-4 border-t border-foreground/10 bg-muted/50 px-4 py-2 text-xs text-muted-foreground"
+        aria-hidden="true"
+      >
+        <span className="flex items-center gap-1.5">
+          <Kbd>↑</Kbd>
+          <Kbd>↓</Kbd>
+          {text.navigate}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Kbd>↵</Kbd>
+          {text.select}
+        </span>
+        {!inline && (
+          <span className="flex items-center gap-1.5">
+            <Kbd>Esc</Kbd>
+            {text.close}
+          </span>
+        )}
+      </div>
+
+      <span className="sr-only" role="status" aria-live="polite">
+        {query.trim() ? text.results(rows.length) : ""}
+      </span>
+    </motion.div>
+  );
+
+  if (inline) return panel;
   if (!mounted) return null;
 
   return createPortal(
@@ -389,163 +591,14 @@ export function CommandPalette({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={fade}
+          transition={{ duration: reduce ? 0 : 0.15 }}
         >
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/70 backdrop-blur-[2px]"
             onPointerDown={() => setOpen(false)}
           />
-          <motion.div
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={text.dialog}
-            onKeyDown={onDialogKeyDown}
-            initial={reduce ? false : { opacity: 0, scale: 0.97, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: -4 }}
-            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 34 }}
-            className={cn(
-              "relative flex max-h-[min(32rem,76vh)] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl",
-              className,
-            )}
-          >
-            <div className="flex items-center gap-3 border-b border-border px-4">
-              <svg
-                viewBox="0 0 24 24"
-                className="size-4 shrink-0 text-muted-foreground"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" />
-              </svg>
-              <input
-                ref={inputRef}
-                type="text"
-                role="combobox"
-                aria-expanded="true"
-                aria-controls={listId}
-                aria-autocomplete="list"
-                aria-activedescendant={activeKey ? optionId(activeKey) : undefined}
-                aria-label={text.dialog}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder={placeholder}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={onInputKeyDown}
-                className="h-12 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-              />
-              <Kbd className="shrink-0">Esc</Kbd>
-            </div>
-
-            <div ref={listRef} id={listId} role="listbox" aria-label={text.dialog} className="flex-1 overflow-y-auto p-2">
-              {sections.map((section) => {
-                const headingId = `${baseId}-h-${section.key.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
-                return (
-                  <div key={section.key} role="group" aria-labelledby={headingId} className="mb-1 last:mb-0">
-                    <div id={headingId} className="px-2 pt-2 pb-1 text-xs font-medium text-muted-foreground">
-                      {section.heading}
-                    </div>
-                    {section.rows.map((row) => {
-                      const active = row.key === activeKey;
-                      return (
-                        <div
-                          key={row.key}
-                          id={optionId(row.key)}
-                          role="option"
-                          aria-selected={active}
-                          aria-disabled={row.item.disabled || undefined}
-                          onPointerMove={() => {
-                            if (!row.item.disabled && !active) setActiveKey(row.key);
-                          }}
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => select(row)}
-                          className={cn(
-                            "relative flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm text-foreground select-none",
-                            row.item.disabled && "cursor-not-allowed opacity-50",
-                          )}
-                        >
-                          {active && (
-                            <motion.span
-                              layoutId={reduce ? undefined : `${baseId}-active`}
-                              aria-hidden="true"
-                              className="absolute inset-0 rounded-lg bg-muted"
-                              transition={{ type: "spring", stiffness: 600, damping: 40 }}
-                            />
-                          )}
-                          {row.item.icon && (
-                            <span
-                              aria-hidden="true"
-                              className="relative flex size-5 shrink-0 items-center justify-center text-muted-foreground [&>svg]:size-4"
-                            >
-                              {row.item.icon}
-                            </span>
-                          )}
-                          <span className="relative flex-1 truncate">
-                            <Highlight text={row.item.label} indices={row.indices} />
-                          </span>
-                          {row.item.shortcut && (
-                            <span className="relative flex shrink-0 gap-1" aria-hidden="true">
-                              {row.item.shortcut.map((k, i) => (
-                                <Kbd key={i}>{k}</Kbd>
-                              ))}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-              {!rows.length && (
-                <div className="flex flex-col items-center gap-2 px-4 py-10 text-center text-sm text-muted-foreground">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="m20 20-3.5-3.5M8.5 11h5" />
-                  </svg>
-                  <p>{text.empty(query.trim())}</p>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="flex items-center gap-4 border-t border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground"
-              aria-hidden="true"
-            >
-              <span className="flex items-center gap-1.5">
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
-                {text.navigate}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Kbd>↵</Kbd>
-                {text.select}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Kbd>Esc</Kbd>
-                {text.close}
-              </span>
-            </div>
-
-            <span className="sr-only" role="status" aria-live="polite">
-              {query.trim() ? text.results(rows.length) : ""}
-            </span>
-          </motion.div>
+          {panel}
         </motion.div>
       )}
     </AnimatePresence>,
