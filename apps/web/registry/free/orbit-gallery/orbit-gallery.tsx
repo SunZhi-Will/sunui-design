@@ -69,6 +69,8 @@ export function OrbitGallery({
   const root = useRef<HTMLDivElement>(null);
   const sphere = useRef<HTMLDivElement>(null);
   const tileEls = useRef<(HTMLButtonElement | null)[]>([]);
+  const shadeEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const [selected, setSelected] = useState<number | null>(null);
   const inView = useInView(root, { amount: 0.1 });
   const tiles = useMemo(() => fibonacciSphere(Math.max(count, images.length), images.length), [count, images.length]);
   const [scale, setScale] = useState(1);
@@ -125,6 +127,10 @@ export function OrbitGallery({
         const facing = z * cx - y * sx; // -1 back, 1 front
         el.style.opacity = String(Math.max(0, Math.min(1, 0.15 + facing * 1.1)));
         el.style.pointerEvents = facing > 0.15 ? "auto" : "none";
+        // 光從正上方、略朝觀者來：轉到側邊與下半球的方塊暗下去，正面最亮
+        const up = y * cx + z * sx; // 1 top, -1 bottom (screen space)
+        const shade = shadeEls.current[i];
+        if (shade) shade.style.opacity = String(Math.max(0, Math.min(0.6, (1 - facing) * 0.42 + (0.2 - up * 0.2))));
       });
     };
 
@@ -190,6 +196,7 @@ export function OrbitGallery({
     s.tween = { fx: s.rx, fy: s.ry, tx: clampLat(-tile.lat), ty, start: performance.now() };
     s.kick();
     const image = images[tile.image];
+    setSelected(i);
     setAnnounce(image.alt);
     onSelect?.(image, tile.image);
   };
@@ -262,9 +269,10 @@ export function OrbitGallery({
             <button
               type="button"
               onClick={() => onSelect?.(image, i)}
-              className="block aspect-square w-full overflow-hidden rounded-md border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="relative block aspect-square w-full overflow-hidden rounded-lg bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <img src={image.src} alt={image.alt} className="h-full w-full object-cover" />
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-foreground/10 ring-inset" />
             </button>
           </li>
         ))}
@@ -294,6 +302,12 @@ export function OrbitGallery({
       )}
     >
       <div aria-hidden className="pointer-events-none mx-auto my-3 w-full" style={{ maxWidth: box + 24, aspectRatio: `${box + 24} / ${box}` }} />
+      {/* 落在球正下方的接觸影：光從正上方來，球才有重量。只有一層黑、10% 以內 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(0_0_0/0.10),transparent)] dark:bg-[radial-gradient(closest-side,rgb(0_0_0/0.35),transparent)]"
+        style={{ width: radius * 1.5 * scale, height: radius * 0.22 * scale, marginLeft: (-radius * 1.5 * scale) / 2, bottom: 12 * scale }}
+      />
       <div
         className="absolute left-1/2 top-1/2"
         style={{ width: box, height: box, marginLeft: -box / 2, marginTop: -box / 2, transform: `scale(${scale})`, perspective: radius * 4 }}
@@ -311,16 +325,41 @@ export function OrbitGallery({
                 aria-label={image.alt}
                 onClick={() => bringToFront(i)}
                 onFocus={(e) => e.currentTarget.matches(":focus-visible") && bringToFront(i)}
-                className="absolute left-1/2 top-1/2 overflow-hidden rounded-md border border-border bg-muted outline-none [backface-visibility:hidden] focus-visible:ring-2 focus-visible:ring-ring"
+                aria-pressed={selected === i}
+                className={cn(
+                  "group/tile absolute top-1/2 left-1/2 overflow-hidden rounded-lg bg-muted outline-none [backface-visibility:hidden] focus-visible:ring-2 focus-visible:ring-ring",
+                  "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.08)]",
+                )}
                 style={{
                   width: tileSize,
-                  height: tileSize * 0.75,
+                  height: tileSize,
                   marginLeft: -tileSize / 2,
-                  marginTop: (-tileSize * 0.75) / 2,
+                  marginTop: -tileSize / 2,
                   transform: `rotateY(${tile.lon}deg) rotateX(${tile.lat}deg) translateZ(${radius}px)`,
                 }}
               >
-                <img src={image.src} alt="" draggable={false} className="pointer-events-none h-full w-full object-cover" />
+                <img
+                  src={image.src}
+                  alt=""
+                  draggable={false}
+                  className="pointer-events-none h-full w-full object-cover transition-[scale] duration-300 ease-out group-hover/tile:scale-[1.06] group-hover/tile:duration-150"
+                />
+                {/* 依朝向計算的暗面，每幀由 paint() 寫入 */}
+                <span
+                  ref={(node) => {
+                    shadeEls.current[i] = node;
+                  }}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-black opacity-0"
+                />
+                {/* 頂邊高光與 hairline 疊在照片上；選中時換成品牌專色框 */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none absolute inset-0 rounded-lg shadow-[inset_0_1px_0_rgb(255_255_255/0.25)] ring-1 ring-foreground/10 ring-inset transition-shadow",
+                    selected === i && "ring-2 ring-[color:var(--sunui-spot,var(--primary))]",
+                  )}
+                />
               </button>
             );
           })}
