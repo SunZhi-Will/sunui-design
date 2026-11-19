@@ -41,7 +41,7 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
 
   return (
     <ul className="mt-10 grid gap-x-4 gap-y-8 md:grid-cols-6">
-      <Tile lib={libs["background-effects"]} note={note} className="md:col-span-4" frame="h-[320px] md:h-[440px]">
+      <Tile lib={libs["background-effects"]} note={note} className="md:col-span-4" frame="h-[320px] md:h-[440px]" night>
         <EffectBackground key={BACKGROUNDS[bg]} effect={BACKGROUNDS[bg]} colors={MONO} className="absolute inset-0" />
         <span className="absolute bottom-4 left-4 rounded-full bg-bg/70 px-2.5 py-1 font-mono text-[11px] text-subtle shadow-e1">{BACKGROUNDS[bg]}</span>
       </Tile>
@@ -83,11 +83,12 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
   );
 }
 
-function Tile({ lib, note, className, frame, children }: { lib?: MotionLib; note: string; className?: string; frame: string; children: ReactNode }) {
+/** night：這一格不管網站主題都用深色（.dark 套在元素上，裡面的 token 跟著變） */
+function Tile({ lib, note, className, frame, night, children }: { lib?: MotionLib; note: string; className?: string; frame: string; night?: boolean; children: ReactNode }) {
   if (!lib) return null;
   return (
     <li className={className}>
-      <div className={cn("relative overflow-hidden rounded-2xl bg-card shadow-e1 dark:bg-[#131313]", frame)}>{children}</div>
+      <div className={cn("relative overflow-hidden rounded-2xl shadow-e1", night ? "dark bg-[#0d0d0d] text-fg" : "bg-[#f4f4f4] dark:bg-[#131313]", frame)}>{children}</div>
       <div className="mt-3.5 flex items-center justify-between gap-4 text-sm">
         <Link href={`/blocks/${lib.name}`} className="truncate font-medium underline-offset-4 hover:underline">
           {lib.title}

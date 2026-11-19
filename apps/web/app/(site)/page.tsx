@@ -257,19 +257,22 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <AgentSteps m={m.home.agent} />
       </div>
 
-      {/* 型錄裡還有更多：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊 */}
-      <section aria-labelledby="catalog-title" className={SECTION}>
-        <SectionHead id="catalog-title" title={s.catalogTitle}>
-          <Link href="/blocks" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
-            {format(t.catalog.cta, { n: all.length })}
-            <Arrow className="size-3.5" />
-          </Link>
-        </SectionHead>
-      </section>
-      <section aria-label={s.marquee} className="mx-[calc(50%-50vw)] mt-10 space-y-6">
-        <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
-        <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
-      </section>
+      {/* 型錄裡還有更多：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊。
+          預覽圖只有深色版，所以這一段固定深色：淺色主題時是一條滿寬的深色帶，深色主題時和頁面同色看不出邊界 */}
+      <div className={cn("dark mx-[calc(50%-50vw)] bg-bg text-fg [.light_&]:py-20 sm:[.light_&]:py-24", SECTION)}>
+        <section aria-labelledby="catalog-title" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <SectionHead id="catalog-title" title={s.catalogTitle}>
+            <Link href="/blocks" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
+              {format(t.catalog.cta, { n: all.length })}
+              <Arrow className="size-3.5" />
+            </Link>
+          </SectionHead>
+        </section>
+        <section aria-label={s.marquee} className="mt-10 space-y-6">
+          <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
+          <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
+        </section>
+      </div>
 
       {/* 價格與創始會員 */}
       <section
@@ -351,7 +354,7 @@ function Tile({
 }) {
   return (
     <li className={className}>
-      <div className={cn("relative overflow-hidden rounded-2xl bg-card shadow-e1 dark:bg-[#131313]", frame)}>
+      <div className={cn("relative overflow-hidden rounded-2xl bg-[#f4f4f4] shadow-e1 dark:bg-[#131313]", frame)}>
         <LivePreview name={name} mode={mode} poster={poster ? `/og/blocks/${name}.jpg` : undefined} title={previewLabel} locale={locale} />
       </div>
       <div className="mt-3.5 flex items-center justify-between gap-4 text-sm">
