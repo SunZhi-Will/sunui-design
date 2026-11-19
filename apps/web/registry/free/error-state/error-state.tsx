@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/* ---------- 按鈕（同 shadcn Button 的 default 與 outline） ---------- */
+/* ---------- Buttons (same as shadcn Button default and outline) ---------- */
 
 const buttonBase =
   "inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
@@ -20,7 +20,7 @@ const buttonSize = {
 interface StateButtonProps extends Omit<ComponentProps<"button">, "type"> {
   variant?: keyof typeof buttonVariant;
   size?: keyof typeof buttonSize;
-  /** 給了就輸出成連結 */
+  /** When given, renders as a link */
   href?: string;
 }
 
@@ -50,7 +50,7 @@ export interface ErrorStateLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -66,16 +66,16 @@ const MESSAGES: Record<SunLocale, ErrorStateLabels> = {
 };
 
 export interface ErrorStateProps {
-  /** 不給時用 locale 的預設標題 */
+  /** Falls back to the locale's default title when omitted */
   title?: ReactNode;
-  /** 給使用者看的友善訊息；不要傳原始例外或技術訊息 */
+  /** A friendly message for users; do not pass raw exceptions or technical messages */
   message?: ReactNode;
   onRetry?: () => void;
-  /** 換掉預設的警示三角形，跟 EmptyState 的 icon 一樣；任何 SVG 都會縮到 24px */
+  /** Replaces the default warning triangle, like the icon on EmptyState; any SVG is scaled to 24px */
   icon?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<ErrorStateLabels>;
   className?: string;
 }
@@ -102,7 +102,7 @@ export function ErrorState({ title, message, onRetry, icon, locale = "en", label
   );
 }
 
-/* ---------- 圖示（lucide 形狀，線寬 1.5） ---------- */
+/* ---------- Icons (lucide shapes, 1.5 stroke width) ---------- */
 
 const iconProps = {
   viewBox: "0 0 24 24",

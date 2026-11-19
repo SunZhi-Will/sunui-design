@@ -9,11 +9,11 @@ const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
 } as const;
 
-/** 回傳字串代表錯誤訊息；回傳 true 或 undefined 代表通過 */
+/** Returning a string means an error message; returning true or undefined means it passed */
 export type FieldValidator = (value: string) => string | true | undefined | null;
 
 export interface FloatingFieldLabels {
-  /** 建議修正的句子，s 是可點的建議值 */
+  /** Sentence for the suggested fix; s is the clickable suggested value */
   didYouMean: (s: ReactNode) => ReactNode;
 }
 
@@ -38,37 +38,37 @@ export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** 同步驗證；錯誤時回傳訊息字串 */
+  /** Synchronous validation; return a message string on error */
   validate?: FieldValidator;
-  /** change：打字時即時驗證（第一次離開欄位之後）；blur：只在離開時驗證 */
+  /** change: validate live while typing (after the first time the field is left); blur: validate only on leaving */
   validateOn?: "change" | "blur";
-  /** 通過驗證時顯示的訊息，例如「可以使用」 */
+  /** Message shown when validation passes, e.g. "Looks good" */
   successMessage?: ReactNode;
-  /** 一律顯示的說明文字，錯誤時被錯誤訊息取代 */
+  /** Helper text that is always shown; replaced by the error message on error */
   hint?: ReactNode;
-  /** 外部給的錯誤（例如伺服器回傳），優先於 validate */
+  /** Error supplied from outside (e.g. returned by a server); takes priority over validate */
   error?: ReactNode;
   multiline?: boolean;
   rows?: number;
-  /** 欄位右側的附加元素，例如顯示密碼按鈕 */
+  /** Extra element on the right of the field, e.g. a show-password button */
   trailing?: ReactNode;
-  /** 格式範本：9 是數字、A 是字母、* 是任意字，其他是自動補上的分隔符，例如 "999-9999"。剩下的格子以灰字顯示 */
+  /** Format template: 9 is a digit, A is a letter, * is any character, anything else is a separator inserted automatically, e.g. "999-9999". Remaining slots show in grey */
   mask?: string;
-  /** 離開欄位後提出修正建議（例如 suggestEmail），回傳 null 表示沒有建議 */
+  /** Offers a fix suggestion after leaving the field (e.g. suggestEmail); return null for no suggestion */
   suggest?: (value: string) => string | null | undefined;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<FloatingFieldLabels>;
 }
 
 const SLOT: Record<string, RegExp> = { "9": /\d/, A: /[a-z]/i, "*": /\S/ };
 const GHOST: Record<string, string> = { "9": "0", A: "A", "*": "_" };
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selected state, offers and current progress */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
-/** 依範本整理輸入：只留填得進格子的字，分隔符在下一格有字時自動補上 */
+/** Normalizes input by the template: keeps only characters that fit a slot, and inserts a separator once the next slot has a character */
 export function applyMask(input: string, mask: string): string {
   const chars = input.split("").filter((c) => Object.values(SLOT).some((r) => r.test(c)));
   let out = "";
@@ -88,7 +88,7 @@ export function applyMask(input: string, mask: string): string {
 
 const DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "live.com", "msn.com", "me.com", "yahoo.com.tw", "yahoo.co.jp", "qq.com", "163.com", "proton.me"];
 
-/** 允許相鄰兩字對調的編輯距離（gmial 對 gmail 只差 1） */
+/** Edit distance that allows swapping two adjacent characters (gmial vs gmail differ by only 1) */
 function distance(a: string, b: string) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)] as number[]);
   for (let j = 1; j <= b.length; j++) d[0][j] = j;
@@ -101,7 +101,7 @@ function distance(a: string, b: string) {
   return d[a.length][b.length];
 }
 
-/** 常見信箱網域的拼字建議：gmial.com → gmail.com、hotmal.con → hotmail.com */
+/** Spelling suggestions for common mail domains: gmial.com → gmail.com, hotmal.con → hotmail.com */
 export function suggestEmail(value: string, domains: string[] = DOMAINS): string | null {
   const at = value.lastIndexOf("@");
   if (at < 1) return null;
@@ -116,7 +116,7 @@ export function suggestEmail(value: string, domains: string[] = DOMAINS): string
   return best ? value.slice(0, at + 1) + best : null;
 }
 
-/** 找出新舊字串中間改到的那段，前後相同的部分不動 */
+/** Finds the middle segment that changed between the old and new strings; the unchanged prefix and suffix are left alone */
 function diff(a: string, b: string) {
   let p = 0;
   while (p < a.length && p < b.length && a[p] === b[p]) p++;
@@ -160,7 +160,7 @@ export function FloatingField({
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
   const [dismissed, setDismissed] = useState<string | null>(null);
-  // 套用建議後的短暫字母變形：[前段, 改到的字, 後段]
+  // Brief letter morph after applying a suggestion: [prefix, changed characters, suffix]
   const [morph, setMorph] = useState<readonly [string, string, string] | null>(null);
   const [scope, animate] = useAnimate<HTMLDivElement>();
   const fieldRef = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
@@ -175,7 +175,7 @@ export function FloatingField({
   const ownError = typeof result === "string" ? result : undefined;
   const showOwn = touched && (validateOn === "change" || !focused);
   const error = errorProp ?? (showOwn ? ownError : undefined);
-  // 不在欄位裡就提出建議（含預先帶入的值），正在打字時不打擾
+  // Offer a suggestion when not in the field (including pre-filled values); do not interrupt while typing
   const suggestion = !error && !focused && suggest && value ? suggest(value) : null;
   const offer = suggestion && suggestion !== value && suggestion !== dismissed ? suggestion : null;
   const valid = !error && !offer && !!validate && !!value && !ownError && (validateOn === "change" || !focused);
@@ -243,7 +243,7 @@ export function FloatingField({
       >
         {multiline ? <textarea rows={rows} {...common} /> : <input {...common} />}
 
-        {/* 疊在輸入字上的同一行：打過的字透明佔位，後面接灰色的剩餘格子；套用建議時改成顯示變形中的字 */}
+        {/* A line stacked over the input text: typed characters are transparent placeholders followed by the grey remaining slots; when a suggestion is applied it shows the morphing characters instead */}
         {!multiline && (ghost || morph) && (
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-3 top-6 flex h-6 items-center overflow-hidden text-sm whitespace-pre">
             {morph ? (
@@ -287,7 +287,7 @@ export function FloatingField({
           {required && <span aria-hidden="true"> *</span>}
         </motion.label>
 
-        {/* 字數：打字是高頻動作，數字不滾動；剩一成時轉為文字色 */}
+        {/* Character count: typing is high frequency, so the number does not scroll; turns to text colour when a tenth remains */}
         {count !== null && floated && (
           <span
             aria-hidden="true"

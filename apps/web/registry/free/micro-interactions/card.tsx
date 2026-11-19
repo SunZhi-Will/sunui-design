@@ -11,7 +11,7 @@ const copy = {
   ja: { like: "いいね", paid: "支払い済み", updates: "通知", send: "送信", sent: "送信済み" },
 };
 
-/** 型錄卡片：四個可以直接按的微互動。 */
+/** Catalog card: four micro-interactions you can press directly. */
 export default function MicroInteractionsCard() {
   const t = useDemoText(copy);
   return (

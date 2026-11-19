@@ -33,7 +33,7 @@ export type DepthHeroProps = {
   subjectClassName?: string;
 };
 
-// 每一層的深度係數：越大離觀眾越近，位移越多
+// Depth factor per layer: the larger, the closer to the viewer and the more it shifts
 const layers = { background: 0.25, headline: 0.55, subject: 1.2 } as const;
 const POINTER_PX = 22;
 const pointerSpring = { stiffness: 120, damping: 20, mass: 0.6 };

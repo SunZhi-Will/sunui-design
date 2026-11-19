@@ -48,8 +48,8 @@ const copy = {
 };
 
 /**
- * 型錄卡片：完整 demo 是 640px 高的直式舞台，塞進卡片會被寬度卡住、再縮成一小本。
- * 這裡給和卡片同為 5:4 的橫式舞台，書的比例才對；內文只留一章，翻開就讀得到。
+ * Catalog card: the full demo is a 640px-tall portrait stage, which would be limited by the width in a card and shrink into a tiny book.
+ * Here we give it a landscape stage with the same 5:4 ratio as the card, so the book's proportions are right; the body keeps only one chapter, readable as soon as it opens.
  */
 export default function Book3DCard() {
   const locale = useDemoLocale();

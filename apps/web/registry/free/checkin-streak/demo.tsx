@@ -6,7 +6,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { CheckinStreak } from "./checkin-streak";
 
-// 方案頁的福利區塊：簽到拿到的張數直接加進額度
+// Perk block on a plans page: credits earned by checking in are added straight to the quota
 function isoDaysAgo(n: number) {
   const d = new Date();
   d.setDate(d.getDate() - n);

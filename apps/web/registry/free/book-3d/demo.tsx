@@ -23,7 +23,7 @@ interface BookCopy {
   end: string;
 }
 
-// 原創短篇：一輪旅程走完後收進書裡的回憶錄
+// Original short story: a memoir tucked into the book after a journey is finished
 const copy: { en: BookCopy; "zh-TW": BookCopy; "zh-CN": BookCopy; ja: BookCopy } = {
   en: {
     title: "Homecoming",

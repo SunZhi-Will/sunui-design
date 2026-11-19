@@ -6,13 +6,13 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /*
- * 結帳步驟：步驟會記得答案。
- * - 完成的步驟收成一行答案（「7-Eleven 取貨」「Visa ·· 4242」）加小勾，給 onStepClick 就能點回去改
- * - 目前步驟展開成帶名稱的膠囊（唯一的強調色 primary）
- * - 未來步驟只剩安靜的編號刻度
- * 換步時同一條軌道變形（layout，gentle 彈簧），底下的墨線跟著推進；左端是錨點，不動。
- * 容器窄於 420px 改成「2/4 付款」加分段條，完成的答案仍可點。需要 Tailwind v4 的容器查詢。
- * 顏色全用 shadcn token，跟著網站明暗。
+ * Checkout steps: the steps remember their answers.
+ * - A completed step collapses into a one-line answer ("7-Eleven pickup", "Visa ·· 4242") with a small check; pass onStepClick to make it clickable for editing
+ * - The current step expands into a labelled pill (the only accent colour, primary)
+ * - Future steps are reduced to quiet numbered ticks
+ * On a step change the same track morphs (layout, gentle spring) and the ink line below advances with it; the left end is an anchor and does not move.
+ * When the container is narrower than 420px it switches to "2/4 Payment" plus a segmented bar; completed answers stay clickable. Requires Tailwind v4 container queries.
+ * All colours use shadcn tokens, so they follow the site's light and dark themes.
  */
 
 export type CheckoutStepsTheme = "light" | "dark" | "system";
@@ -21,26 +21,26 @@ const gentle: Transition = { type: "spring", stiffness: 240, damping: 30 };
 const instant: Transition = { duration: 0 };
 
 export interface CheckoutStepsProps {
-  /** 步驟名稱，例如 ["確認訂單", "配送", "付款", "完成"] */
+  /** Step names, for example ["Review order", "Delivery", "Payment", "Done"] */
   steps: string[];
-  /** 目前步驟的 index（從 0 起算），之前的步驟顯示為已完成 */
+  /** Index of the current step (zero-based); earlier steps show as completed */
   current: number;
-  /** 每個已完成步驟的答案，例如 ["2 件 · NT$1,280", "7-11 信義店取貨"]；沒有就顯示步驟名稱 */
+  /** Answer for each completed step, for example ["2 items · NT$1,280", "7-Eleven pickup"]; falls back to the step name when missing */
   summaries?: (ReactNode | null | undefined)[];
-  /** 給了之後，已完成的步驟變成按鈕，點了回到那一步 */
+  /** When given, completed steps become buttons that jump back to that step */
   onStepClick?: (index: number) => void;
-  /** ol 的無障礙名稱，優先於 labels.label */
+  /** Accessible name of the ol; takes precedence over labels.label */
   label?: string;
-  /** 已完成步驟附加給螢幕閱讀器的字，優先於 labels.done */
+  /** Extra text for screen readers on completed steps; takes precedence over labels.done */
   doneLabel?: string;
   /**
-   * system（預設）與 light 跟著網站的 token；dark 在外層加上 `dark` class，
-   * 讓 shadcn 的 .dark token 在元件內生效。元件本身沒有底色。
+   * system (default) and light follow the site's tokens; dark adds a `dark` class
+   * on the outer element so shadcn's .dark tokens apply inside the component. The component itself has no background.
    */
   theme?: CheckoutStepsTheme;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<CheckoutStepsLabels>;
   className?: string;
   style?: CSSProperties;
@@ -49,13 +49,13 @@ export interface CheckoutStepsProps {
 export interface CheckoutStepsLabels {
   label: string;
   done: string;
-  /** 已完成步驟按鈕的動作前綴，例如「修改」 */
+  /** Action prefix for completed-step buttons, for example "Edit" */
   edit?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -70,7 +70,7 @@ const MESSAGES: Record<SunLocale, Required<CheckoutStepsLabels>> = {
   ja: { label: "購入手続きのステップ", done: "完了", edit: "変更" },
 };
 
-// 線寬 1.5 的勾
+// Check mark with a 1.5 stroke width
 function CheckIcon() {
   return (
     <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
@@ -90,7 +90,7 @@ interface DoneProps {
   className?: string;
 }
 
-/** 已完成的步驟：小勾加答案；有 onStepClick 時是按鈕 */
+/** A completed step: a small check plus the answer; a button when onStepClick is set */
 function DoneStep({ index, name, summary, onStepClick, sep, doneLabel, editLabel, className }: DoneProps) {
   const hasSummary = summary != null && summary !== false && summary !== "";
   const body = (
@@ -137,7 +137,7 @@ function DoneStep({ index, name, summary, onStepClick, sep, doneLabel, editLabel
   );
 }
 
-/** 結帳步驟：完成的步驟留下答案，目前步驟是膠囊，未來步驟是刻度。 */
+/** Checkout steps: completed steps keep their answer, the current step is a pill, future steps are ticks. */
 export function CheckoutSteps({
   steps,
   current,
@@ -177,7 +177,7 @@ export function CheckoutSteps({
 
   return (
     <div className={cn("@container w-full min-w-0 text-[13px]", theme === "dark" && "dark", className)} style={style}>
-      {/* 寬版：一條會變形的軌道 */}
+      {/* Wide layout: one morphing track */}
       <LayoutGroup>
         <ol aria-label={label} className="relative hidden min-w-0 items-center border-b border-border @min-[420px]:flex">
           {steps.map((s, i) => {
@@ -210,7 +210,7 @@ export function CheckoutSteps({
                     </span>
                   )}
                 </motion.span>
-                {/* 墨線：完成與目前的步驟底下畫滿，從左往右推進 */}
+                {/* Ink line: filled under completed and current steps, advancing left to right */}
                 <motion.span
                   aria-hidden
                   initial={false}
@@ -224,7 +224,7 @@ export function CheckoutSteps({
         </ol>
       </LayoutGroup>
 
-      {/* 窄版：「2/4 付款」加分段條，完成的答案排在下面 */}
+      {/* Narrow layout: "2/4 Payment" plus a segmented bar, completed answers listed below */}
       <div className="@min-[420px]:hidden">
         <p aria-hidden className="flex min-w-0 items-baseline gap-2">
           <span className="text-muted-foreground tabular-nums">

@@ -63,7 +63,7 @@ const copy = {
 
 const sizes = ["XS", "S", "M", "L", "XL"].map((s) => ({ id: s, label: s }));
 
-// 依顏色與尺寸的庫存；沒列到的組合視為售完。燕麥的 M、L 售完，霧灰的 L 售完，苔綠整色售完
+// Stock by color and size; combinations not listed count as sold out. Oat M and L are sold out, Mist grey L is sold out, Moss green is sold out entirely
 const teeStock: Record<string, number> = {
   "oat:XS": 4, "oat:S": 10, "oat:XL": 3,
   "fog:XS": 3, "fog:S": 7, "fog:M": 2, "fog:XL": 4,
@@ -75,7 +75,7 @@ const jacketStock: Record<string, number> = {
   "ink:M": 7, "ink:L": 3,
 };
 
-/** 現有的商品照只有一種顏色：選到別的顏色時，誠實標出照片是哪一色 */
+/** The existing product photo shows only one color: when another color is picked, say honestly which color the photo is */
 function Photo({ src, note }: { src: string; note: string | null }) {
   return (
     <div className="relative aspect-[5/6] overflow-hidden rounded-md border border-foreground/10 bg-[#c4bdb4]">
@@ -97,7 +97,7 @@ function AddButton({ disabled, children }: { disabled: boolean; children: string
   );
 }
 
-/** 兩張商品卡並排：毛衣用表面尺寸格、摘要行與到貨通知，外套用滑動外框的文字膠囊（另有獨立的版型選項） */
+/** Two product cards side by side: the sweater uses surface size cells, a summary line and restock notice, the jacket uses text chips with a sliding outline (also a separate fit option) */
 export default function VariantPickerDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -110,8 +110,8 @@ export default function VariantPickerDemo() {
   const [fit, setFit] = useState<Fit>("regular");
   const ref = useRef<HTMLElement>(null);
 
-  // 預覽自己演：先懸停看霧灰與黑的庫存，選黑、選 M；換回燕麥時 M 售完但保留，提示哪裡還有；
-  // 最後點燕麥售完的 L，登記到貨通知
+  // The preview plays itself: hover Mist grey and black to see their stock, pick black, pick M; switch back to oat, where M is sold out but kept, and the hint says where it is still available;
+  // finally click oat's sold-out L to sign up for a restock notice
   const cursor = useDemoAutoplay(ref, async (d) => {
     const swatch = (id: keyof typeof t.names) => () => d.find(`[role=radio][aria-label="${t.names[id]}"]`);
     const size = (s: string) => () => d.find(`fieldset:nth-of-type(2) [role=radio][aria-label^="${s}"]`);

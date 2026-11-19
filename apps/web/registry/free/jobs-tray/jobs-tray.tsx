@@ -4,14 +4,14 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 
 import { cn } from "@/lib/utils";
 
-// 背景工作的一整套：共用的 Job 型別、進度與狀態文字、四語字串，加上右下角的工作匣 JobsTray。
-// 其他版面（單行 JobRow、側欄 JobPanel、網格 JobTile、狀態點 JobStatusDot）在 ./job-views。
+// Everything for background work: the shared Job type, progress and status text, four-language strings, plus the jobs tray JobsTray at the bottom right.
+// The other layouts (single row JobRow, sidebar JobPanel, grid JobTile, status dot JobStatusDot) are in ./job-views.
 
-/* ───────────── 語言 ───────────── */
+/* ───────────── Language ───────────── */
 
 export type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 export function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -19,7 +19,7 @@ export function resolveLocale(tag?: string): SunLocale {
   return "en";
 }
 
-/** 秒數轉成「1m 5s」「1分5秒」這類短格式 */
+/** Formats seconds as a short string such as "1m 5s", in the style of the target language */
 export function formatSeconds(s: number, unit: { s: string; m: string; gap: string }) {
   const v = Math.max(0, Math.round(s));
   if (v < 60) return `${v}${unit.s}`;
@@ -28,9 +28,9 @@ export function formatSeconds(s: number, unit: { s: string; m: string; gap: stri
   return r ? `${m}${unit.m}${unit.gap}${r}${unit.s}` : `${m}${unit.m}`;
 }
 
-/* ───────────── 生成工作 Job（JobPanel、JobTile、JobRow 共用） ───────────── */
+/* ───────────── Generation Job (shared by JobPanel, JobTile, JobRow) ───────────── */
 
-// 百分比不是線性的：排隊 2、理解 6、載入 14、生成 15 加 80 乘步數比例、檢查 97。
+// The percentage is not linear: queued 2, planning 6, loading 14, generating 15 plus 80 times the step ratio, checking 97.
 
 export type JobStatus =
   | "queued"
@@ -49,30 +49,30 @@ export interface Job {
   id: string;
   prompt: string;
   status: JobStatus;
-  /** 取樣或精修的目前步數與總步數 */
+  /** Current and total steps of sampling or refining */
   step?: number;
   total?: number;
-  /** 排隊位置，1 表示下一個就是你 */
+  /** Queue position, 1 means you are next */
   queuePosition?: number;
-  /** 預計剩下秒數 */
+  /** Estimated seconds remaining */
   etaSeconds?: number | null;
-  /** 完成後的耗時秒數 */
+  /** Elapsed seconds once finished */
   durationSeconds?: number | null;
-  /** 參考圖：生成中模糊當底圖，上面疊掃光 */
+  /** Reference image: blurred as the base while generating, with a sweeping shine on top */
   sourceSrc?: string;
-  /** 即時預覽圖（低解析度），有就取代掃光 */
+  /** Live preview image (low resolution); replaces the shine when present */
   previewSrc?: string;
-  /** 畫面比例，例如 "2 / 3" */
+  /** Aspect ratio, for example "2 / 3" */
   aspect?: string;
-  /** 一次生成幾張 */
+  /** How many images one generation produces */
   count?: number;
-  /** 完成後的張數；0 表示等待複查或已刪除 */
+  /** Number of images when finished; 0 means awaiting review or deleted */
   images?: number;
-  /** 等待人工複查 */
+  /** Awaiting manual review */
   held?: boolean;
   error?: string;
   hint?: string;
-  /** 側欄標題下方的資訊，例如建立時間、風格 */
+  /** Info under the sidebar title, for example creation time and style */
   meta?: string[];
 }
 
@@ -109,7 +109,7 @@ export function jobPercent(job: Job) {
   }
 }
 
-/** 細的生成狀態收斂成五種粗狀態，給工作匣與狀態點用 */
+/** Collapses the fine-grained generation statuses into five coarse ones, for the tray and the status dot */
 export function jobPhase(job: Pick<Job, "status">): BackgroundJobState {
   if (job.status === "queued") return "queued";
   if (isActive(job)) return "running";
@@ -118,9 +118,9 @@ export function jobPhase(job: Pick<Job, "status">): BackgroundJobState {
   return "failed";
 }
 
-/* ───────────── 字串 ───────────── */
+/* ───────────── Strings ───────────── */
 
-/** 狀態文字與共用字串，JobPanel 與 JobTile 都吃這一組 */
+/** Status text and shared strings, used by both JobPanel and JobTile */
 export interface JobStatusLabels {
   queued?: (ahead: number) => string;
   startingSoon?: string;
@@ -410,7 +410,7 @@ const MESSAGES: Record<SunLocale, Messages> = {
   },
 };
 
-/** 某語言的整套內建字串（status、panel、tile、row、tray 五組） */
+/** A full set of built-in strings for one language (five groups: status, panel, tile, row, tray) */
 export function jobMessages(locale?: string): Messages {
   return MESSAGES[resolveLocale(locale)];
 }
@@ -445,9 +445,9 @@ export function jobStatusLabel(job: Job, labels?: JobStatusLabels, locale = "en"
   }
 }
 
-/* ───────────── 工作匣 JobsTray ───────────── */
+/* ───────────── Jobs tray JobsTray ───────────── */
 
-/* AutoLens 的深色 token，元件自帶，不依賴網站主題 */
+/* AutoLens dark tokens, bundled with the component and independent of the site theme */
 const tokens = {
   "--al-bg-elevated": "#252525",
   "--al-border": "rgba(255, 255, 255, 0.06)",
@@ -461,28 +461,28 @@ export type BackgroundJobState = "queued" | "running" | "completed" | "failed" |
 
 export interface BackgroundJob {
   id: string;
-  /** 只用來判斷要不要顯示，例如 hash 這類內部工作只有失敗才顯示 */
+  /** Only used to decide whether to show it; for example internal jobs like hash are shown only on failure */
   type?: string;
-  /** 給使用者看的名稱，例如「Saving camera track」 */
+  /** Name shown to the user, for example "Saving camera track" */
   label: string;
   state: BackgroundJobState;
-  /** 0 到 1；未知進度時為 undefined */
+  /** 0 to 1; undefined when progress is unknown */
   progress?: number;
   errorCode?: string;
   startedAt: number;
   endedAt?: number;
-  /** 可取消的工作在面板上多一顆 ✕ */
+  /** A cancelable job gets an extra ✕ on the panel */
   onCancel?: () => void;
 }
 
-/** 跑不到這麼久就完成的工作不值得事後再跳一則「完成」出來 */
+/** A job that finishes faster than this is not worth a "done" notice afterwards */
 const QUICK_JOB_MS = 1500;
-/** 已完成的工作保留多久才從清單移除 */
+/** How long a finished job stays in the list before it is removed */
 const COMPLETED_TTL_MS = 8000;
 
 /**
- * 這個工作該不該出現在面板上：失敗與取消一律顯示；hash 只有失敗才顯示；
- * 一下子就完成的工作不補一則「完成」。
+ * Whether this job should appear on the panel: failed and canceled jobs always show; hash jobs
+ * show only on failure; a job that finishes quickly gets no "done" notice.
  */
 export function isJobWorthShowing(job: BackgroundJob): boolean {
   if (job.state === "failed" || job.state === "cancelled") return true;
@@ -491,7 +491,7 @@ export function isJobWorthShowing(job: BackgroundJob): boolean {
   return true;
 }
 
-/** 把一個生成工作 Job 轉成工作匣的一列：名稱用描述，進度用 jobPercent，耗時用 durationSeconds */
+/** Converts a generation Job into one tray row: the name is the prompt, progress comes from jobPercent, elapsed time from durationSeconds */
 export function toBackgroundJob(job: Job, opts?: { label?: string; type?: string; onCancel?: () => void }): BackgroundJob {
   const state = jobPhase(job);
   const ended = state === "running" || state === "queued" ? undefined : job.durationSeconds != null ? job.durationSeconds * 1000 : QUICK_JOB_MS;
@@ -508,7 +508,7 @@ export function toBackgroundJob(job: Job, opts?: { label?: string; type?: string
   };
 }
 
-/** 背景工作登記簿：startJob、updateJob、finishJob、dismissJob、runJob，行為同原本的 service */
+/** Background job registry: startJob, updateJob, finishJob, dismissJob, runJob, same behavior as the original service */
 export function useBackgroundJobs(options?: { completedTtl?: number }) {
   const ttl = options?.completedTtl ?? COMPLETED_TTL_MS;
   const [jobs, setJobs] = useState<BackgroundJob[]>([]);
@@ -543,7 +543,7 @@ export function useBackgroundJobs(options?: { completedTtl?: number }) {
             : j,
         ),
       );
-      // 成功的工作自動淡出；失敗的留著，讓使用者看到
+      // Successful jobs fade out on their own; failed ones stay so the user sees them
       if (result.success) {
         const timer = setTimeout(() => {
           timers.current.delete(timer);
@@ -559,7 +559,7 @@ export function useBackgroundJobs(options?: { completedTtl?: number }) {
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, state: "cancelled", endedAt: Date.now(), onCancel: undefined } : j)));
   }, []);
 
-  /** 包住一段背景工作：自動登記、成功或失敗收尾 */
+  /** Wraps a piece of background work: registers it automatically and finishes it on success or failure */
   const runJob = useCallback(
     async <T,>(type: string, label: string, fn: (report: (progress: number) => void) => Promise<T>) => {
       const id = startJob(type, label);
@@ -580,15 +580,15 @@ export function useBackgroundJobs(options?: { completedTtl?: number }) {
 
 export interface JobsTrayProps {
   jobs: BackgroundJob[];
-  /** 失敗那一列的 ✕ */
+  /** The ✕ on a failed row */
   onDismiss?: (id: string) => void;
-  /** 預設 fixed 於視窗右下；false 時改為 absolute，交給父層定位 */
+  /** Defaults to fixed at the bottom right of the viewport; false switches to absolute so the parent positions it */
   fixed?: boolean;
-  /** 進行中圓點的顏色，預設 AutoLens 金 */
+  /** Color of the in-progress dot, defaults to AutoLens gold */
   accent?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: JobsTrayLabels;
   className?: string;
 }
@@ -612,7 +612,7 @@ export function JobsTray({ jobs: allJobs, onDismiss, fixed = true, accent = "#ea
     }
   };
 
-  // 沒有工作時清單是空的，不佔畫面，但保留 live region 讓報讀器接得到下一則
+  // With no jobs the list is empty and takes no space, but the live region stays so screen readers catch the next one
   return (
     <div
       role="region"

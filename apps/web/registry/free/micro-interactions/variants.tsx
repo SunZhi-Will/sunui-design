@@ -25,10 +25,10 @@ import { copy } from "./demo";
 
 export const variants = microInteractions;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// Only this one is shown on the home page as the representative, chosen because it moves by itself, so the card needs no hover to show the effect
 export const featured = "slide-to-confirm";
 
-// 卡片下方的操作提示（demo 沒有這組文案，四語都在這裡）；滑動與長按的按鈕文字本身就是提示，不另外標
+// Operation hints below the card (the demo has no such copy, all four languages are here); the button text of swipe and long press is itself the hint, so it is not labeled separately
 const hintCopy = {
   en: { click: "Click", type: "Click and type", swipe: "Swipe a row left" },
   "zh-TW": { click: "點一下", type: "點進去輸入", swipe: "把一列往左滑" },
@@ -54,7 +54,7 @@ const hints: Record<MicroInteractionId, Hint | null> = {
   "password-reveal": "click",
 };
 
-/** 首頁型錄：一種微互動一張卡，內容跟 demo 的那一格相同。 */
+/** Home catalog: one card per micro-interaction, with the same content as that cell in the demo. */
 export default function MicroInteractionsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const h = useDemoText(hintCopy);
@@ -94,7 +94,7 @@ function Interaction({ id, t }: { id: MicroInteractionId; t: Copy }): ReactNode 
     case "floating-label":
       return <FloatingLabelInput label={t.email} type="email" autoComplete="email" className="w-60" />;
     case "slide-to-confirm":
-      // 滑軌是滿版寬，置中的舞台裡會縮成 0，給它一個固定寬度
+      // The track is full width and would shrink to 0 inside the centered stage, so give it a fixed width
       return (
         <div className="w-64">
           <SlideToConfirm label={t.slide} confirmedLabel={t.confirmed} resetAfter={2200} />
@@ -111,7 +111,7 @@ function Interaction({ id, t }: { id: MicroInteractionId; t: Copy }): ReactNode 
   }
 }
 
-/** 打勾只在掛載時播一次，放一顆重播鈕 */
+/** The checkmark plays only once on mount, so add a replay button */
 function SuccessCheckReplay({ message, replay }: { message: string; replay: string }) {
   const [run, setRun] = useState(0);
   return (

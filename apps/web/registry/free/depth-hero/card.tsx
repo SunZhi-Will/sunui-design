@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { DepthHero } from "./depth-hero";
 
-// 與 demo 相同的去背保溫瓶照片（透明 WebP）
+// Same cut-out thermos photo as the demo (transparent WebP)
 const bottle = "/blocks/depth-hero/bottle.webp";
 
 const copy = {
@@ -14,7 +14,7 @@ const copy = {
   ja: { headline: "静水", name: "スティルボトル 750", price: "¥5,280", cta: "予約する", alt: "サンドカラーのスティルボトル 750" },
 };
 
-/** 型錄卡片：大字標題壓在商品後面，滑鼠移動時背景、標題、商品三層各自位移出景深。 */
+/** Catalog card: a big headline sits behind the product, and as the mouse moves the background, headline and product shift separately to give depth. */
 export default function DepthHeroCard() {
   const t = useDemoText(copy);
   return (
@@ -30,7 +30,7 @@ export default function DepthHeroCard() {
         }
         subject={<img src={bottle} alt={t.alt} draggable={false} className="mb-3 h-[76%] w-auto" />}
       >
-        {/* 卡片很矮：抵掉一部分元件的 p-6 內距，文字貼近底邊 */}
+        {/* The card is very short: offset part of the component's p-6 padding so the text sits close to the bottom edge */}
         <div className="-m-2 flex w-full items-end justify-between gap-3">
           <div>
             <p className="text-sm font-semibold">{t.name}</p>

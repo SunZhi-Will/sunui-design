@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils";
 
 import { ScrollStory, StoryPanel, useLoop, type ScrollStoryStep } from "./scroll-story";
 
-// 排班系統首頁的功能故事：求解、最小擾動、公平，三個循環場景。
+// Feature story for a scheduling product's home page: solve, minimal disruption, fairness, three looping scenes.
 
 const PEOPLE = ["Alex", "Mia", "Jordan", "Tina", "Ken"];
-// 單一強調色的深淺，不用多色
+// Shades of a single accent colour, not multiple colours
 const COLORS = [100, 78, 58, 42, 28].map((n) => `color-mix(in oklab, var(--primary) ${n}%, var(--muted))`);
 
 const copy = {

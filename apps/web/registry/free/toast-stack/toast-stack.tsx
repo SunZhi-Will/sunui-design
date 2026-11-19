@@ -22,9 +22,9 @@ export interface ToastInput {
   title: ReactNode;
   description?: ReactNode;
   tone?: ToastTone;
-  /** 左側小圖，例如加入購物車的商品縮圖 */
+  /** Small image on the left, e.g. a product thumbnail for add-to-cart */
   media?: ReactNode;
-  /** 毫秒；Infinity 表示不自動關閉 */
+  /** Milliseconds; Infinity means never auto-dismiss */
   duration?: number;
   action?: { label: string; onClick: () => void };
 }
@@ -33,7 +33,7 @@ export interface ToastItem extends ToastInput {
   id: string;
 }
 
-/** 管理 toast 佇列；最新的排在最前面 */
+/** Manages the toast queue; the newest is first */
 export function useToasts({ max = 5 }: { max?: number } = {}) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const counter = useRef(0);
@@ -54,17 +54,17 @@ export function useToasts({ max = 5 }: { max?: number } = {}) {
 }
 
 export interface UndoableOptions<T> {
-  /** 原狀態是空的就不給復原，只跳一般的成功提示 */
+  /** If the previous state was empty there is nothing to undo, so show only a plain success notice */
   isEmpty?: (value: T) => boolean;
-  /** 不給時依 locale 用內建文字 */
+  /** When omitted, uses the built-in text for the locale */
   undoLabel?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
 }
 
 /**
- * 刪東西、換掉整份資料：變更立刻生效，不跳確認視窗，改給一張帶「復原」的通知。
- * 帶復原的通知不自動消失；按復原就把變更前的整份狀態放回去。
+ * For deleting things or replacing a whole data set: the change takes effect immediately with no confirmation dialog, and a notification with "Undo" is shown instead.
+ * A notification with undo does not dismiss itself; pressing Undo puts the entire previous state back.
  */
 export function useUndoable<T>(
   value: T,
@@ -72,7 +72,7 @@ export function useUndoable<T>(
   toasts: Pick<ReturnType<typeof useToasts>, "push">,
   { isEmpty, undoLabel, locale = "en" }: UndoableOptions<T> = {},
 ) {
-  // 同一輪 render 內連續變更時，以最新的值當作「變更前」
+  // When changes are made back to back within one render, use the latest value as the "before" state
   const latest = useRef(value);
   useLayoutEffect(() => {
     latest.current = value;
@@ -102,19 +102,19 @@ export function useUndoable<T>(
 export interface ToastStackProps {
   toasts: ToastItem[];
   onDismiss: (id: string) => void;
-  /** 預設自動關閉時間（毫秒） */
+  /** Default auto-dismiss time (milliseconds) */
   duration?: number;
-  /** 收合時可見的層數 */
+  /** Number of layers visible when collapsed */
   visibleCount?: number;
   placement?: "top" | "bottom";
-  /** 預設 fixed 於視窗右下；設 false 時改為 absolute，交給父層定位 */
+  /** Fixed to the bottom right of the window by default; when false, absolute so the parent positions it */
   fixed?: boolean;
-  /** 收合狀態下每層露出的距離 */
+  /** How far each layer peeks out when collapsed */
   peek?: number;
   gap?: number;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: Partial<ToastStackLabels>;
   className?: string;
 }
@@ -122,13 +122,13 @@ export interface ToastStackProps {
 export interface ToastStackLabels {
   region: string;
   dismiss: string;
-  /** useUndoable 的復原按鈕 */
+  /** The undo button of useUndoable */
   undo: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -143,19 +143,19 @@ const MESSAGES: Record<SunLocale, ToastStackLabels> = {
   ja: { region: "通知", dismiss: "通知を閉じる", undo: "元に戻す" },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colour
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for selected state, deals and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 狀態只用小圖示表達，不鋪底色 */
+/** Status is expressed with a small icon only, with no background fill */
 const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
   success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-emerald-700 dark:text-emerald-400" />,
@@ -196,7 +196,7 @@ export function ToastStack({
   const [heights, setHeights] = useState<Record<string, number>>({});
   const dir = placement === "bottom" ? -1 : 1;
 
-  // 分頁隱藏時暫停倒數，回來再接著算
+  // Pause the countdown while the tab is hidden and resume it on return
   const [pageHidden, setPageHidden] = useState(false);
   useEffect(() => {
     const sync = () => setPageHidden(document.hidden);
@@ -211,7 +211,7 @@ export function ToastStack({
     dismissRef.current = onDismiss;
   });
 
-  // 自動關閉計時；展開時暫停並記下剩餘時間
+  // Auto-dismiss timer; paused while expanded, and the remaining time is recorded
   const remaining = useRef(new Map<string, number>());
   useEffect(() => {
     const ids = new Set(toasts.map((t) => t.id));
@@ -320,7 +320,7 @@ export function ToastStack({
                 aria-atomic="true"
                 tabIndex={hidden ? -1 : 0}
                 onKeyDown={(e) => {
-                  // 聚焦在某張通知上時，Delete 或 Backspace 關掉那一張
+                  // While a notification has focus, Delete or Backspace dismisses that one
                   if ((e.key === "Delete" || e.key === "Backspace") && e.target === e.currentTarget) {
                     e.stopPropagation();
                     onDismiss(t.id);
@@ -328,7 +328,7 @@ export function ToastStack({
                 }}
               >
                 <ToastBody item={t} dismissLabel={text.dismiss} onDismiss={() => onDismiss(t.id)} onMeasure={(h) => measure(t.id, h)} inert={hidden} />
-                {/* 剩餘時間：底部一條細線慢慢縮短 */}
+                {/* Remaining time: a thin line at the bottom slowly shrinks */}
                 {!reduceMotion && Number.isFinite(d) && d > 0 && (
                   <span
                     aria-hidden="true"

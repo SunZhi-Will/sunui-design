@@ -54,7 +54,7 @@ export default function AddToCartButtonDemo() {
   );
 }
 
-/** 商品照：12px 圓角，hairline 疊在照片上面才不會被吃掉；懸停時照片慢慢推近一點 */
+/** Product photo: 12px radius, hairline drawn over the photo so it is not swallowed; the photo slowly zooms in a little on hover */
 function ProductPhoto({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return (
     <div className={cn("relative aspect-square overflow-hidden rounded-xl bg-muted", className)}>

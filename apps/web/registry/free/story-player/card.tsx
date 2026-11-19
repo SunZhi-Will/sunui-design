@@ -14,7 +14,7 @@ const copy = {
   ja: { year: "Threads での1年", month: "件の投稿（10月）", days: "日連続投稿", rank: "上位クリエイター", region: "あなたの2026年まとめ", replay: "もう一度見る" },
 };
 
-// 縮小版的回顧投影片：同一套暗色色票，大號襯線數字加一道強調色短線
+// Miniature recap slide: the same dark palette, a large serif number with a short accent line
 function Slide({ value, label }: { value: string; label: string }) {
   return (
     <div
@@ -30,7 +30,7 @@ function Slide({ value, label }: { value: string; label: string }) {
   );
 }
 
-/** 型錄卡片：限時動態播放器，點卡片右側或左側換頁，長按暫停。 */
+/** Catalog card: story player; tap the right or left side of the card to change pages, long press to pause. */
 export default function StoryPlayerCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

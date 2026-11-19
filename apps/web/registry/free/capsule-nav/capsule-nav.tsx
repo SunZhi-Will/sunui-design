@@ -18,9 +18,9 @@ export interface CapsuleNavItem {
   key: string;
   label: ReactNode;
   href: string;
-  /** 對應頁面上的區段 id；捲到該區段時這一項亮起 */
+  /** Id of the section on the page this item points to; the item lights up when that section is scrolled into view */
   sectionId?: string;
-  /** 目前所在頁面（aria-current="page"） */
+  /** The page you are currently on (aria-current="page") */
   current?: boolean;
 }
 
@@ -34,41 +34,41 @@ export interface CapsuleNavLabels {
   navigation?: string;
   openMenu?: string;
   closeMenu?: string;
-  /** 手機版膠囊中間的位置標籤，還沒捲到任何區段時顯示 */
+  /** Position label in the middle of the mobile capsule, shown before any section has been scrolled to */
   home?: string;
 }
 
 export interface CapsuleNavProps {
-  /** 左側品牌（logo 與名稱） */
+  /** Brand on the left (logo and name) */
   brand: ReactNode;
   brandHref?: string;
-  /** 品牌連結的無障礙名稱 */
+  /** Accessible name of the brand link */
   brandLabel?: string;
   items: CapsuleNavItem[];
   cta?: CapsuleNavCta;
-  /** 右端的頁面專屬工具（搜尋、主題切換） */
+  /** Page-specific tools at the right end (search, theme switch) */
   tools?: ReactNode;
-  /** 捲動超過多少 px 從滿版 header 變成膠囊 */
+  /** Scroll distance in px after which the full-width header turns into a capsule */
   threshold?: number;
-  /** 往下捲時收起、往上捲時出現；焦點在導覽內時不收 */
+  /** Hides when scrolling down and reappears when scrolling up; does not hide while focus is inside the nav */
   hideOnScroll?: boolean;
-  /** 膠囊狀態的最大寬度 */
+  /** Maximum width of the capsule state */
   maxWidth?: number;
-  /** true：固定在視窗頂端；false：sticky 在捲動容器頂端 */
+  /** true: fixed to the top of the viewport; false: sticky to the top of the scroll container */
   fixed?: boolean;
-  /** 捲動容器；不給時監聽 window */
+  /** Scroll container; listens to window when not given */
   scrollContainer?: RefObject<HTMLElement | null>;
   onNavigate?: (item: CapsuleNavItem) => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: CapsuleNavLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -87,7 +87,7 @@ const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const HIDE_AFTER = 160;
 const JITTER = 6;
 
-// 原站 base.css 的灰階雙主題 token
+// Greyscale two-theme tokens from the original site's base.css
 const themeVars =
   "[--cn-header:rgba(255,255,255,0.85)] [--cn-capsule:rgba(255,255,255,0.98)] [--cn-panel:#ffffff] [--cn-border:rgba(15,23,42,0.06)] [--cn-border-subtle:rgba(15,23,42,0.04)] [--cn-text:rgba(15,23,42,0.95)] [--cn-text-2:rgba(15,23,42,0.75)] [--cn-active:#eaeaea] [--cn-hover:#f4f4f5] [--cn-backdrop:rgba(255,255,255,0.6)] [--cn-panel-shadow:0_18px_60px_rgba(8,8,10,0.12)] dark:[--cn-header:rgba(0,0,0,0.85)] dark:[--cn-capsule:rgba(10,10,10,0.97)] dark:[--cn-panel:#121316] dark:[--cn-border:rgba(255,255,255,0.10)] dark:[--cn-border-subtle:rgba(255,255,255,0.06)] dark:[--cn-text:rgba(255,255,255,0.93)] dark:[--cn-text-2:rgba(255,255,255,0.58)] dark:[--cn-active:rgba(255,255,255,0.10)] dark:[--cn-hover:rgba(255,255,255,0.07)] dark:[--cn-backdrop:rgba(0,0,0,0.6)] dark:[--cn-panel-shadow:0_18px_60px_rgba(0,0,0,0.55)]";
 
@@ -158,7 +158,7 @@ export function CapsuleNav({
 
   const hidden = hideOnScroll && scrolledDown && !focused && !menuOpen;
 
-  /* ── 捲動狀態機：TOP 與 SCROLLED 只差在外框，導覽項目全程可見 ── */
+  /* ── Scroll state machine: TOP and SCROLLED differ only in the outline; nav items stay visible throughout ── */
   useEffect(() => {
     const target: HTMLElement | Window = scrollContainer?.current ?? window;
     const readY = () =>
@@ -170,7 +170,7 @@ export function CapsuleNav({
       frame = 0;
       const y = readY();
       setState(y <= threshold ? "top" : "scrolled");
-      // 小幅抖動不反應，避免導覽列閃爍
+      // Ignore small jitters, to avoid the nav bar flickering
       if (Math.abs(y - lastY) > JITTER) {
         setScrolledDown(y > lastY && y > HIDE_AFTER);
         lastY = y;
@@ -189,7 +189,7 @@ export function CapsuleNav({
     };
   }, [scrollContainer, threshold]);
 
-  /* ── 目前所在區段 ── */
+  /* ── Current section ── */
   useEffect(() => {
     const ids = items
       .map((item) => item.sectionId)
@@ -219,7 +219,7 @@ export function CapsuleNav({
     return () => observer.disconnect();
   }, [items, scrollContainer]);
 
-  /* ── 選單：焦點管理、Esc、背景鎖定 ── */
+  /* ── Menu: focus management, Esc, background lock ── */
   const closeMenu = useCallback((returnFocus = true) => {
     setMenuOpen(false);
     if (returnFocus) menuButtonRef.current?.focus();
@@ -248,7 +248,7 @@ export function CapsuleNav({
         return;
       }
       if (event.key !== "Tab" || !panel) return;
-      // 焦點在「選單鈕 + 面板」之間繞圈
+      // Focus cycles between the menu button and the panel
       const focusable = Array.from(
         panel.querySelectorAll<HTMLElement>(FOCUSABLE),
       );
@@ -280,7 +280,7 @@ export function CapsuleNav({
     items.find((item) => item.current)?.label ??
     l.home;
 
-  // 從滿版 header 變形成膠囊：用 box-shadow 畫邊線，轉場才平順、不會閃白邊
+  // Morphing from the full-width header into a capsule: the edge is drawn with box-shadow so the transition is smooth and shows no white flash
   const barStyle: CSSProperties = {
     marginTop: isScrolled ? 10 : 0,
     width: isScrolled ? "calc(100% - 24px)" : "100%",
@@ -362,7 +362,7 @@ export function CapsuleNav({
               {brand}
             </a>
 
-            {/* 手機版：中間顯示目前位置 */}
+            {/* Mobile: show the current position in the middle */}
             <p
               aria-hidden="true"
               className="mx-auto truncate font-mono text-[11px] tracking-[0.04em] text-[var(--cn-text-2)] @3xl/capsule:hidden"

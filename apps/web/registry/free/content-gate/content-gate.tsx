@@ -4,7 +4,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** anon：還沒登入；no-access：已登入但這個帳號沒有存取權 */
+/** anon: not signed in yet; no-access: signed in but this account has no access */
 export type ContentGateState = "anon" | "no-access";
 
 export interface ContentGateLabels {
@@ -15,7 +15,7 @@ export interface ContentGateLabels {
   contact?: ReactNode;
 }
 
-/** 覆蓋版（PaywallOverlay）的字串 */
+/** Strings for the overlay variant (PaywallOverlay) */
 export interface PaywallOverlayLabels {
   title?: ReactNode;
   body?: (previewCount: number) => ReactNode;
@@ -24,7 +24,7 @@ export interface PaywallOverlayLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -108,28 +108,28 @@ const MESSAGES: Record<SunLocale, Required<ContentGateLabels> & { overlay: Requi
 };
 
 interface SharedProps {
-  /** 課程名稱 */
+  /** Course name */
   title: ReactNode;
-  /** 標題上方的大寫小字 */
+  /** Small uppercase text above the title */
   subtitle: ReactNode;
   state?: ContentGateState;
-  /** 保留給相容舊版的品牌色，頁內版走中性 token，不再使用（不做光暈與漸層） */
+  /** Brand colour kept for compatibility with the old version; the in-page variant uses neutral tokens and no longer uses it (no glow or gradient) */
   accentFrom?: string;
   accentTo?: string;
-  /** 登入連結；有給就是 <a>，否則是按鈕並呼叫 onSignIn */
+  /** Sign-in link; when given it is an <a>, otherwise a button that calls onSignIn */
   signInHref?: string;
   onSignIn?: () => void;
   contactHref?: string;
   onContact?: () => void;
-  /** 登入鈕左側的服務商圖示，預設 Google */
+  /** Provider icon to the left of the sign-in button, Google by default */
   providerIcon?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: ContentGateLabels;
 }
 
-/* ───────── 圖示（形狀照 lucide） ───────── */
+/* ───────── Icons (shapes follow lucide) ───────── */
 
 function Svg({
   size,
@@ -247,17 +247,17 @@ function ActionLink({
   );
 }
 
-/* ───────── 頁內版：整頁的上鎖卡片 ───────── */
+/* ───────── In-page variant: a full-page locked card ───────── */
 
 /*
- * 跟著深淺色切換的 token（原站 base.css 的灰階雙主題）。
- * 淺色是 Notion 式純白，深色是近黑。
+ * Tokens that follow the light/dark switch (the original site's two-theme greyscale from base.css).
+ * Light is Notion-style plain white, dark is near black.
  */
 const gateVars =
   "[--cg-surface:#ffffff] [--cg-card:#ffffff] [--cg-border:rgba(15,23,42,0.06)] [--cg-text:rgba(15,23,42,0.95)] [--cg-muted:rgba(15,23,42,0.66)] [--cg-dim:rgba(15,23,42,0.55)] [--cg-p1:#1a1a1a] [--cg-bg:#ffffff] dark:[--cg-surface:#0e0e0e] dark:[--cg-card:rgba(255,255,255,0.05)] dark:[--cg-border:rgba(255,255,255,0.10)] dark:[--cg-text:rgba(255,255,255,0.93)] dark:[--cg-muted:rgba(255,255,255,0.50)] dark:[--cg-dim:rgba(255,255,255,0.45)] dark:[--cg-p1:#e5e5e5] dark:[--cg-bg:#000000]";
 
 export interface ContentGateProps extends SharedProps {
-  /** 卡片下方的區塊，例如學員見證 */
+  /** Section below the card, e.g. student testimonials */
   children?: ReactNode;
   className?: string;
 }
@@ -319,7 +319,7 @@ export function ContentGate({
           </p>
         </div>
 
-        {/* 按下後轉圈並停用，避免重複觸發登入 */}
+        {/* Spins and disables after a press, to avoid triggering sign-in twice */}
         <ActionLink
           href={signingIn ? undefined : signInHref}
           onClick={() => {
@@ -363,25 +363,25 @@ export function ContentGate({
   );
 }
 
-/* ───────── 覆蓋版：試看上限時蓋在播放器上 ───────── */
+/* ───────── Overlay variant: covers the player when the free preview limit is reached ───────── */
 
 export interface PaywallOverlayProps {
-  /** 免費試看的張數或集數 */
+  /** Number of free preview slides or episodes */
   previewCount: number;
   href?: string;
   onClick?: () => void;
-  /** 按鈕底色；不傳時跟隨主題的 primary */
+  /** Button background; follows the theme's primary when not passed */
   ctaFrom?: string;
-  /** 保留給相容舊版，按鈕不再做漸層，此值不使用 */
+  /** Kept for compatibility with the old version; the button no longer uses a gradient, so this value is unused */
   ctaTo?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: PaywallOverlayLabels;
   className?: string;
 }
 
-/** 蓋在播放器上（父層要 relative），試看到最後一張時顯示 */
+/** Covers the player (the parent must be relative); shown when the last preview slide is reached */
 export function PaywallOverlay({
   previewCount,
   href,
@@ -401,7 +401,7 @@ export function PaywallOverlay({
         className,
       )}
       style={{
-        // 遮住後面被鎖的內容：同色的不透明遮罩加輕微模糊（功能性，不是裝飾）
+        // Covers the locked content behind it: an opaque overlay of the same colour plus a slight blur (functional, not decorative)
         background:
           "linear-gradient(to top, var(--background) 60%, color-mix(in oklab, var(--background) 55%, transparent) 100%)",
         backdropFilter: "blur(4px)",
@@ -430,7 +430,7 @@ export function PaywallOverlay({
   );
 }
 
-/** 舊 preview-paywall 的名稱，與 PaywallOverlay 相同 */
+/** Name from the old preview-paywall, same as PaywallOverlay */
 export const PreviewPaywall = PaywallOverlay;
 export type PreviewPaywallProps = PaywallOverlayProps;
 export type PreviewPaywallLabels = PaywallOverlayLabels;

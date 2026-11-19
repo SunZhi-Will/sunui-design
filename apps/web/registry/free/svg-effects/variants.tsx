@@ -20,15 +20,16 @@ import {
 } from "./svg-effects";
 import { copy } from "./demo";
 
-// iconMorphs 與 liquidShapes 是 icon-morph、liquid-fill 的子選項，demo 也放在同一格，所以不拆卡
+// iconMorphs and liquidShapes are sub-options of icon-morph and liquid-fill, and the demo puts them in the same tile, so they do not get separate cards
 export const variants = svgEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative; pick one that animates by itself so the card shows its effect without a hover
 export const featured = "animated-beam";
 
 /**
- * 首頁型錄：一種 SVG 效果一張卡，內容與 demo 的同名格子一致。
- * 根元素若是 <svg>，FitStage 量不到它的寬度、只依高度放大，寬圖會超出卡片邊緣，所以一律包一層定寬的 div。
+ * Home catalog: one card per SVG effect, with the same content as the same-named tile in the demo.
+ * If the root element is an <svg>, FitStage cannot measure its width and scales by height only, so a wide
+ * graphic would overflow the card edge. Always wrap it in a fixed-width div.
  */
 export default function SvgEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);

@@ -171,7 +171,7 @@ const kinds: Partial<Record<CameraMove, Kind>> = {
 };
 const triggerOf: Record<Kind, CameraTrigger> = { loop: "loop", click: "click", hover: "hover", entrance: "inView" };
 
-// 所有圖層共用同一個 viewBox，用 slice 對齊；顏色只用主題 token，亮暗模式都看得清楚
+// All layers share one viewBox and align with slice; colours use only theme tokens so it reads well in light and dark
 const VB = "0 0 160 90";
 const svgProps = {
   viewBox: VB,
@@ -283,7 +283,7 @@ function Wall() {
   );
 }
 
-/** bullet-time：人物用片中時間跳躍，運鏡時幾乎停在空中 */
+/** bullet-time: the figure jumps in footage time and hangs almost still in mid-air during the move */
 function JumpingPerson() {
   const { footage } = useCameraStage();
   const lift = useTransform(footage, (s) => -Math.abs(Math.sin(s * 1.6)) * 9);
@@ -357,7 +357,7 @@ function ScrollTile({ label }: { label: string }) {
   );
 }
 
-/** 單一運鏡的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** Demo cell for a single move: shared by the full demo and the home catalog (variants.tsx) */
 export function CameraMoveTile({ move }: { move: CameraMove }) {
   const t = useDemoText(copy);
   const kind = kinds[move] ?? "loop";

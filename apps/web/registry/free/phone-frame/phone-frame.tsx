@@ -2,12 +2,12 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** auto 跟著深淺色切換；dark／light 固定色，給不吃主題的簡報舞台用 */
+/** auto follows light/dark; dark and light are fixed colours, for presentation stages that ignore the theme */
 export type PhoneFrameScheme = "auto" | "dark" | "light";
 
 /*
- * 色彩 token。auto 沿用部落格 tokens.css（淺色 stone、深色 zinc），
- * dark／light 沿用簡報裝置外框的固定色。
+ * Colour tokens. auto reuses the blog's tokens.css (stone in light, zinc in dark),
+ * dark and light reuse the fixed colours of the slide device frame.
  */
 const lightVars =
   "[--wf-surface:#ffffff] [--wf-raised:#f5f5f5] [--wf-sunken:#f3f1ed] [--wf-fg:#171717] [--wf-fg-body:#262626] [--wf-fg-muted:#525252] [--wf-line:rgba(28,25,23,0.1)] [--wf-line-strong:rgba(28,25,23,0.22)] [--wf-dot:rgba(28,25,23,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(217,119,6,0.7)] [--wf-shadow:0_1px_2px_rgba(28,25,23,0.05),0_4px_14px_-6px_rgba(28,25,23,0.08)]";
@@ -52,37 +52,37 @@ function LockIcon({ size }: { size: number }) {
   );
 }
 
-/* ───────── 手機 ───────── */
+/* ───────── Phone ───────── */
 
 export interface PhoneFrameProps {
   children: ReactNode;
-  /** 瀏覽器網址列；不給就沒有網址列 */
+  /** Browser address bar; omit it for no address bar */
   url?: string;
   time?: string;
-  /** 手機寬度（px），窄容器裡會縮到 100% */
+  /** Phone width (px); shrinks to 100% in a narrow container */
   width?: number;
-  /** 手機整體高度。給了就固定大小，內容在螢幕裡捲動 */
+  /** Overall phone height. When given, the size is fixed and content scrolls inside the screen */
   height?: number;
-  /** 手機上方的小標 */
+  /** Small label above the phone */
   label?: ReactNode;
   scheme?: PhoneFrameScheme;
   badge?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<PhoneFrameLabels>;
   className?: string;
 }
 
 export interface PhoneFrameLabels {
-  /** label 不是字串時 figure 的無障礙名稱 */
+  /** Accessible name of the figure when label is not a string */
   screen: string;
   url: (url: string) => string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -111,7 +111,7 @@ export function PhoneFrame({
   className,
 }: PhoneFrameProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  // 窄手機框：動態島縮小、狀態列收緊，不蓋到時間與電量
+  // Narrow phone frame: the dynamic island shrinks and the status bar tightens so it does not cover the time and battery
   const compact = width < 240;
   const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
   return (

@@ -22,12 +22,12 @@ import { Art, copy } from "./demo";
 
 export const variants = scrollEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// Only this one is shown on the home page as the representative, chosen because it moves by itself, so the card needs no hover to show the effect
 export const featured = "stacking-cards";
 
 const STAGE = "220px";
 
-/** 首頁型錄：一種捲動效果一張卡。跟型錄縮圖一樣用自動來回的進度代替捲動，靜態卡片也看得到 */
+/** Home catalog: one card per scroll effect. Like the catalog thumbnail, an auto-looping progress stands in for scrolling, so static cards show it too */
 export default function ScrollEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const effect = variant as ScrollEffectId;
@@ -35,7 +35,7 @@ export default function ScrollEffectsVariant({ variant }: { variant: string }) {
   const inView = useInView(ref);
   const reduce = useReducedMotion() ?? false;
   const progress = useMotionValue(reduce ? 1 : 0);
-  // velocity-skew 本身不位移，跟著進度往上捲一段，看起來像在捲動
+  // velocity-skew does not move on its own, so scroll it up a bit with the progress to look like scrolling
   const listY = useTransform(progress, [0, 1], [0, -90]);
 
   useEffect(() => {

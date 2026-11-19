@@ -17,7 +17,7 @@ const orders = [
   ["SU-20479", "$219.00"],
 ];
 
-/** 型錄卡片：點點底紋展示區裡的一個瀏覽器外框，網址列、分頁標題和模擬標記都在，內容是後台訂單表。 */
+/** Catalog card: a browser frame inside the dotted showcase area, with the address bar, tab title and simulated badge, and a back-office orders table as content. */
 export default function BrowserFrameCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

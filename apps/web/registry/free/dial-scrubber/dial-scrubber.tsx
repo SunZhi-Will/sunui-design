@@ -113,7 +113,7 @@ export function DialScrubber({
     anim.current = animate(pos, target, { ...settle, velocity });
   };
 
-  // 受控值從外面改變時，轉到新位置
+  // When the controlled value changes from outside, turn to the new position
   useEffect(() => {
     if (!controlled || drag.current) return;
     if (value === emitted.current) return;
@@ -152,7 +152,7 @@ export function DialScrubber({
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     let p = d.startPos - (e.clientX - d.startX) / spacing;
-    // 超出兩端時加阻力
+    // Add resistance when going past either end
     if (p < 0) p = p / 3;
     if (p > count) p = count + (p - count) / 3;
     pos.set(p);
@@ -166,7 +166,7 @@ export function DialScrubber({
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     drag.current = null;
-    const v = e.timeStamp - d.lt > 80 || reduce ? 0 : d.v; // 步數 / ms
+    const v = e.timeStamp - d.lt > 80 || reduce ? 0 : d.v; // steps / ms
     goTo(pos.get() + v * 180, v * 1000);
   };
 

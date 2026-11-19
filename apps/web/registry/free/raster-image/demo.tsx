@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RasterImage, type RasterMode } from "./raster-image";
 
-// 示範用的靜物插圖：SVG data URI，有明暗層次，給點陣化取樣用
+// Still-life illustration for the demo: an SVG data URI with light and dark tonal range, used as the sampling source for rasterization
 const svg = (body: string) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'>${body}</svg>`)}`;
 
@@ -95,7 +95,7 @@ const copy = {
 
 const images: Record<string, string> = { halftone: bottle, ascii: stillLife, dots: bottle, dither: stillLife, lines: ridge };
 
-/** 單一點陣化樣式的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** One rasterization style demo cell: shared by the full demo and the home catalog (variants.tsx) */
 export function RasterTile({ mode, animateIn = false, className }: { mode: RasterMode; animateIn?: boolean; className?: string }) {
   const t = useDemoText(copy);
   const item = t.items.find((x) => x.mode === mode)!;

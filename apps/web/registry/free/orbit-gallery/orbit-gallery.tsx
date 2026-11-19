@@ -127,7 +127,7 @@ export function OrbitGallery({
         const facing = z * cx - y * sx; // -1 back, 1 front
         el.style.opacity = String(Math.max(0, Math.min(1, 0.15 + facing * 1.1)));
         el.style.pointerEvents = facing > 0.15 ? "auto" : "none";
-        // 光從正上方、略朝觀者來：轉到側邊與下半球的方塊暗下去，正面最亮
+        // Light comes from straight above, tilted slightly toward the viewer: tiles turned to the side or onto the lower hemisphere darken, and the front is brightest
         const up = y * cx + z * sx; // 1 top, -1 bottom (screen space)
         const shade = shadeEls.current[i];
         if (shade) shade.style.opacity = String(Math.max(0, Math.min(0.6, (1 - facing) * 0.42 + (0.2 - up * 0.2))));
@@ -302,7 +302,7 @@ export function OrbitGallery({
       )}
     >
       <div aria-hidden className="pointer-events-none mx-auto my-3 w-full" style={{ maxWidth: box + 24, aspectRatio: `${box + 24} / ${box}` }} />
-      {/* 落在球正下方的接觸影：光從正上方來，球才有重量。只有一層黑、10% 以內 */}
+      {/* Contact shadow directly beneath the sphere: with light from straight above, the sphere has weight. Only one layer of black, within 10% */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(0_0_0/0.10),transparent)] dark:bg-[radial-gradient(closest-side,rgb(0_0_0/0.35),transparent)]"
@@ -344,7 +344,7 @@ export function OrbitGallery({
                   draggable={false}
                   className="pointer-events-none h-full w-full object-cover transition-[scale] duration-300 ease-out group-hover/tile:scale-[1.06] group-hover/tile:duration-150"
                 />
-                {/* 依朝向計算的暗面，每幀由 paint() 寫入 */}
+                {/* Dark face computed from orientation, written by paint() on every frame */}
                 <span
                   ref={(node) => {
                     shadeEls.current[i] = node;
@@ -352,7 +352,7 @@ export function OrbitGallery({
                   aria-hidden
                   className="pointer-events-none absolute inset-0 bg-black opacity-0"
                 />
-                {/* 頂邊高光與 hairline 疊在照片上；選中時換成品牌專色框 */}
+                {/* Top-edge highlight and hairline over the photo; swapped for a brand-accent frame when selected */}
                 <span
                   aria-hidden
                   className={cn(

@@ -5,10 +5,10 @@ import { gradientPresets, type GradientPreset } from "./gradient-backdrop";
 
 export const variants = gradientPresets;
 
-// 首頁預設只放這一種當代表：顏色流動最明顯
+// Only this one is shown on the home page as the representative: its colour flow is the most visible
 export const featured = "aurora";
 
-/** 首頁型錄：一種漸層背景一張卡。 */
+/** Home catalog: one card per gradient background. */
 export default function GradientBackdropVariant({ variant }: { variant: string }) {
   return (
     <div className="w-80">

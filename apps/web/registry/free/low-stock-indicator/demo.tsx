@@ -12,7 +12,7 @@ const items: { kind: ProductKind; price: number; stock: number; capacity?: numbe
   { kind: "lamp", price: 88, stock: 0 },
 ];
 
-// 每件商品的款式與更新時間，順序同 items
+// Style and update time of each product, in the same order as items
 const copy = {
   en: {
     variants: ["Size M, Olive", "Natural canvas", "Steel, 20 mm strap", "Matte black"],

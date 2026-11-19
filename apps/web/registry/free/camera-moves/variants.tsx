@@ -5,10 +5,10 @@ import { CameraMoveTile } from "./demo";
 
 export const variants = cameraMoves;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one move as the representative; pick one that moves by itself so the card needs no hover to show the effect
 export const featured = "orbit";
 
-/** 首頁型錄：一種運鏡一張卡。 */
+/** Home catalog: one move per card. */
 export default function CameraMovesVariant({ variant }: { variant: string }) {
   return (
     <div className="w-80">

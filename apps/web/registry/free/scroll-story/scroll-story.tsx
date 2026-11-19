@@ -1,13 +1,13 @@
 "use client";
 
-// 功能故事：桌面版左側文字逐段捲動、右側面板黏住並切換場景；手機版每段文字下方直接放動畫。
-// 每個場景只在「目前這段」時播放，離開就停，避免背景空轉。
+// Feature story: on desktop the text on the left scrolls paragraph by paragraph while the right panel sticks and switches scenes; on mobile the animation sits directly under each paragraph.
+// Each scene plays only while it is the current paragraph and stops when it leaves, to avoid idling in the background.
 
 import { useEffect, useId, useRef, useState, type ComponentType, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/* ---------- 動畫樣式（原 welcome.css 的 ww-* 規則） ---------- */
+/* ---------- Animation styles (the ww-* rules from the original welcome.css) ---------- */
 
 const CSS = `
 .ss-root{--ss-success:var(--success,#15803D);--ss-success-fg:var(--success-foreground,#FAFAFA);--ss-warning:var(--warning,#B45309)}
@@ -76,8 +76,8 @@ function useInView<T extends Element>(options?: { once?: boolean; threshold?: nu
 }
 
 /**
- * active 時依 steps（每一步的毫秒數）循環呼叫 onStep(index)。
- * 減少動態效果時直接停在最後一步（通常是完成畫面），不再循環。
+ * While active, calls onStep(index) in a loop over steps (milliseconds per step).
+ * With reduced motion it stops at the last step (usually the finished view) and does not loop.
  */
 export function useLoop(active: boolean, steps: number[], onStep: (index: number) => void) {
   const reduced = usePrefersReducedMotion();
@@ -106,7 +106,7 @@ export function useLoop(active: boolean, steps: number[], onStep: (index: number
   }, [active, stepsKey, reduced]);
 }
 
-/* ---------- 共用元件 ---------- */
+/* ---------- Shared components ---------- */
 
 function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.15 });
@@ -117,7 +117,7 @@ function Reveal({ children, className, delay = 0 }: { children: ReactNode; class
   );
 }
 
-/** 場景外框：白卡片、大圓角、柔和長陰影。 */
+/** Scene frame: white card, large radius, soft long shadow. */
 export function StoryPanel({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
@@ -131,35 +131,35 @@ export function StoryPanel({ children, className }: { children: ReactNode; class
   );
 }
 
-/* ---------- 故事本體 ---------- */
+/* ---------- Story body ---------- */
 
 export interface ScrollStoryStep {
   key: string;
-  /** 小標，也是右側面板下方的分頁文字 */
+  /** Short heading, also the tab text below the right-hand panel */
   tab: string;
   title: ReactNode;
   body?: ReactNode;
-  /** active 為 true 時才播放自己的循環動畫 */
+  /** Plays its own looping animation only when active is true */
   Visual: ComponentType<{ active: boolean }>;
 }
 
 export interface ScrollStoryProps {
   steps: ScrollStoryStep[];
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: Partial<ScrollStoryLabels>;
   className?: string;
 }
 
 export interface ScrollStoryLabels {
-  /** 右側分頁導覽的無障礙名稱 */
+  /** Accessible name of the right-hand tab navigation */
   nav: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -188,7 +188,7 @@ function StepBlock({
   const ref = useRef<HTMLDivElement | null>(null);
   const { ref: mobileRef, inView: mobileInView } = useInView<HTMLDivElement>({ once: false, threshold: 0.35 });
 
-  // 這一段跨過畫面正中線時，成為目前段落
+  // A paragraph becomes the current one when it crosses the vertical center line of the view
   useEffect(() => {
     const node = ref.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
@@ -211,7 +211,7 @@ function StepBlock({
         <h3 className="mt-3 text-2xl font-semibold tracking-tight text-balance sm:text-[2rem] sm:leading-tight">{step.title}</h3>
         {step.body ? <p className="mt-4 max-w-md text-pretty text-muted-foreground">{step.body}</p> : null}
       </Reveal>
-      {/* 手機版：動畫直接放在文字下方，進入畫面才播放 */}
+      {/* Mobile: the animation sits directly under the text, and plays once it enters the view */}
       <div ref={mobileRef} aria-hidden className="mt-8 flex min-w-0 justify-center lg:hidden">
         <Visual active={mobileInView} />
       </div>

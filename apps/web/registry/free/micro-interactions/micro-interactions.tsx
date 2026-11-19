@@ -46,7 +46,7 @@ export type MicroInteractionId = (typeof microInteractions)[number];
 const pop = { type: "spring", stiffness: 520, damping: 18 } as const;
 const gentle = { type: "spring", stiffness: 300, damping: 28 } as const;
 
-// 預設粒子色：全部從主題 token 推出，主題換了就跟著換
+// Default particle colors: all derived from theme tokens, so they follow when the theme changes
 const themeColors = [
   "var(--primary)",
   "color-mix(in oklch, var(--primary) 55%, var(--background))",
@@ -55,7 +55,7 @@ const themeColors = [
   "var(--muted-foreground)",
 ];
 
-/** 受控與非受控共用的布林狀態 */
+/** Boolean state shared by controlled and uncontrolled use */
 function useToggle(value: boolean | undefined, defaultValue: boolean, onChange?: (next: boolean) => void) {
   const [inner, setInner] = useState(defaultValue);
   const on = value ?? inner;
@@ -77,7 +77,7 @@ export interface LikeBurstProps {
   defaultLiked?: boolean;
   onChange?: (liked: boolean) => void;
   label?: string;
-  /** 粒子顏色，預設跟著 --primary */
+  /** Particle color, follows --primary by default */
   colors?: string[];
   className?: string;
 }
@@ -159,7 +159,7 @@ interface Piece {
 
 export interface ConfettiBurstProps {
   children?: ReactNode;
-  /** 每次發射的碎片數 */
+  /** Number of fragments per burst */
   count?: number;
   colors?: string[];
   onFire?: () => void;
@@ -191,7 +191,7 @@ export function ConfettiBurst({ children = "Celebrate", count = 36, colors = the
       };
     });
     setBursts((b) => [...b, { id, pieces }]);
-    // 動畫結束後清掉 DOM
+    // Clear the DOM after the animation ends
     timers.current.push(setTimeout(() => setBursts((b) => b.filter((x) => x.id !== id)), 1400));
   };
 
@@ -228,7 +228,7 @@ export function ConfettiBurst({ children = "Celebrate", count = 36, colors = the
 
 export interface SuccessCheckProps {
   message?: ReactNode;
-  /** 圖示邊長（px） */
+  /** Icon side length (px) */
   size?: number;
   delay?: number;
   className?: string;
@@ -243,7 +243,7 @@ const drawCheck: Variants = {
   shown: { pathLength: 1, transition: { delay: 0.45, duration: 0.3, ease: "easeOut" } },
 };
 
-/** 掛載時播放；要重播就換 key */
+/** Plays on mount; change the key to replay */
 export function SuccessCheck({ message = "Payment complete", size = 64, delay = 0, className }: SuccessCheckProps) {
   const reduce = useReducedMotion() ?? false;
   const initial = reduce ? "shown" : "hidden";
@@ -286,7 +286,7 @@ export interface AnimatedCheckboxProps {
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
   label: ReactNode;
-  /** 勾選後在文字上畫一條刪除線，適合待辦清單 */
+  /** Draw a strikethrough across the text when checked, good for to-do lists */
   strike?: boolean;
   className?: string;
 }
@@ -349,7 +349,7 @@ export interface ToggleSwitchProps {
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
   label: string;
-  /** 文字是否顯示在旁邊；隱藏時仍作為無障礙名稱 */
+  /** Whether the text is shown beside it; when hidden it still serves as the accessible name */
   showLabel?: boolean;
   disabled?: boolean;
   className?: string;
@@ -371,7 +371,7 @@ export function ToggleSwitch({ checked, defaultChecked = false, onChange, label,
       void animateKnob(knob.current, { x: on ? 20 : 0 }, { duration: 0 });
       return;
     }
-    // 滑動途中把旋鈕拉長，像橡皮一樣被拖過去
+    // Stretch the knob while sliding, like rubber being dragged across
     void animateKnob(
       knob.current,
       { x: on ? [0, 4, 20] : [20, 8, 0], width: [20, 28, 20] },
@@ -413,7 +413,7 @@ export interface CopyFeedbackProps {
   text: string;
   label?: string;
   copiedLabel?: string;
-  /** 「已複製」顯示多久（ms） */
+  /** How long "Copied" is shown (ms) */
   resetAfter?: number;
   onCopy?: (ok: boolean) => void;
   className?: string;
@@ -426,7 +426,7 @@ async function copyText(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    // 走下面的備援
+    // Fall back to the path below
   }
   try {
     const ta = document.createElement("textarea");
@@ -535,9 +535,9 @@ export function CopyFeedback({ text, label = "Copy", copiedLabel = "Copied", res
 
 export interface NotificationBadgeProps {
   count: number;
-  /** 超過就顯示 99+ */
+  /** Show 99+ above this */
   max?: number;
-  /** 讀屏用的說明，例如 "Notifications" */
+  /** Description for screen readers, e.g. "Notifications" */
   label?: string;
   children?: ReactNode;
   className?: string;
@@ -662,7 +662,7 @@ export interface SlideToConfirmProps {
   label?: string;
   confirmedLabel?: string;
   onConfirm?: () => void;
-  /** 確認後多久自動復原（ms），不給就停在完成狀態 */
+  /** How long after confirming to restore automatically (ms); when omitted it stays in the done state */
   resetAfter?: number;
   className?: string;
 }
@@ -775,7 +775,7 @@ export function SlideToConfirm({ label = "Slide to confirm", confirmedLabel = "C
 export interface HoldToConfirmProps {
   label?: string;
   doneLabel?: string;
-  /** 需要按住多久（秒） */
+  /** How long it must be held (seconds) */
   duration?: number;
   onConfirm?: () => void;
   resetAfter?: number;
@@ -801,7 +801,7 @@ export function HoldToConfirm({ label = "Hold to delete", doneLabel = "Deleted",
   const start = () => {
     if (done) return;
     holding.current?.stop();
-    // 進度本身就是資訊，減少動態時也保留線性填滿
+    // Progress is itself information, so keep the linear fill even under reduced motion
     holding.current = animate(progress, 1, {
       duration: duration * (1 - progress.get()),
       ease: "linear",
@@ -865,7 +865,7 @@ export interface SwipeToDeleteProps {
 
 const REVEAL = 80;
 
-/** 列表中的一列：左滑露出刪除，滑到底直接刪除並收合高度 */
+/** A row in a list: swipe left to reveal delete, swipe all the way to delete directly and collapse the height */
 export function SwipeToDelete({ children, onDelete, deleteLabel = "Delete", className }: SwipeToDeleteProps) {
   const reduce = useReducedMotion() ?? false;
   const [scope, animateRow] = useAnimate<HTMLDivElement>();
@@ -1065,7 +1065,7 @@ export function PasswordToggle({ label = "Password", showLabel = "Show password"
           className="absolute right-1 top-1 grid size-8 place-items-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
         >
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            {/* 眼睛閉上時整個眼形壓扁，瞳孔收起，再畫上一道斜線 */}
+            {/* When the eye is closed the whole eye shape flattens, the pupil retracts, and a diagonal slash is drawn */}
             <motion.g initial={false} animate={{ scaleY: visible ? 1 : 0.18 }} transition={t} style={{ originX: "50%", originY: "50%" }}>
               <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
             </motion.g>
@@ -1079,7 +1079,7 @@ export function PasswordToggle({ label = "Password", showLabel = "Show password"
 }
 
 /* ------------------------------------------------------------------ */
-/* 主元件：用 effect 切換，帶預設內容，方便快速預覽 */
+/* Main component: switches by effect, with default content for a quick preview */
 
 export interface MicroInteractionProps {
   effect: MicroInteractionId;

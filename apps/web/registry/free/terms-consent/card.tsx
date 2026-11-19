@@ -11,7 +11,7 @@ const copy = {
   ja: { terms: "販売条件", privacy: "プライバシーに関するお知らせ", pay: "$86.40 を支払う", ready: "準備完了です。", blocked: (n: number) => <>あと {n} 件チェックで続行できます。</> },
 };
 
-/** 型錄卡片：兩項必填條款，勾完計數到 2 / 2 才啟用結帳按鈕。 */
+/** Catalog card: two required terms; the checkout button is enabled only after both are ticked and the count reaches 2 / 2. */
 export default function TermsConsentCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

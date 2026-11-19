@@ -4,39 +4,39 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 
 import { cn } from "@/lib/utils";
 
-/** 每張停留多久（毫秒）。W3C／UX 研究建議 5 到 7 秒，太快讀不完標題 */
+/** How long each slide stays, in ms. W3C / UX research suggests 5 to 7 seconds; faster than that and headlines cannot be read */
 const SLIDE_MS = 6500;
-/** 拖曳超過多少 px 才算換張，太小會把「點一下」誤判成滑動 */
+/** Drag distance in px needed to count as a slide change; too small and a tap is misread as a swipe */
 const SWIPE_PX = 48;
 
 export interface HeroBillboardSlide {
   key: string;
   title: string;
-  /** 有就整張卡是連結；沒有就呼叫 onSelect */
+  /** When set, the whole card is a link; otherwise onSelect is called */
   href?: string;
-  /** 疊在封面上的小標（overlayTitle 時才顯示） */
+  /** Small label overlaid on the cover (shown only with overlayTitle) */
   subtitle?: string;
-  /** 封面圖片網址（16:9） */
+  /** Cover image URL (16:9) */
   image?: string;
   imageAlt?: string;
-  /** 沒有圖片時的封面內容，填滿 16:9 封面區 */
+  /** Cover content when there is no image, filling the 16:9 cover area */
   cover?: ReactNode;
-  /** 封面本身沒有標題字時，在封面上疊一層標題 */
+  /** Overlay a title on the cover when the cover itself has no title text */
   overlayTitle?: boolean;
   overlayColor?: string;
-  /** 下方資訊列的分類字，例：Free live session */
+  /** Category text in the info row below, e.g. Free live session */
   eyebrow?: string;
-  /** 一行時間或補充資訊 */
+  /** One line of time or extra info */
   meta?: string;
-  /** 金額或 Free */
+  /** Price or Free */
   price?: string;
-  /** 主要按鈕文字 */
+  /** Primary button text */
   cta?: string;
-  /** 狀態標籤，例：Open */
+  /** Status tag, e.g. Open */
   badge?: string;
-  /** 沒有圖片時環境光改用這個顏色（單色，模糊後鋪在卡片背後） */
+  /** Ambient light colour used when there is no image (a single colour, blurred behind the card) */
   accentFrom?: string;
-  /** 保留給舊版 API，已不使用（不再畫跨色相漸層） */
+  /** Kept for the old API, no longer used (cross-hue gradients are no longer drawn) */
   accentTo?: string;
 }
 
@@ -48,32 +48,32 @@ export interface HeroBillboardCarouselLabels {
   slide?: (index: number, total: number, title: string) => string;
   goTo?: (title: string) => string;
   dot?: (index: number, title: string) => string;
-  /** 目前這張整卡連結的無障礙名稱 */
+  /** Accessible name of the whole-card link for the current slide */
   hit?: (title: string, cta: string) => string;
 }
 
 export interface HeroBillboardCarouselProps {
   items: HeroBillboardSlide[];
-  /** 輪播上方、與中間卡片同寬的一列（標語、連結） */
+  /** A row above the carousel, as wide as the center card (tagline, links) */
   intro?: ReactNode;
-  /** 每張停留毫秒數 */
+  /** Milliseconds each slide stays */
   slideMs?: number;
-  /** 原專案預設暗色，淺色主題一起保留 */
+  /** The original project defaulted to dark; light theme is kept as well */
   theme?: "dark" | "light";
-  /** 唯一強調色（徽章、分類字、進度條、焦點框），預設暗色 #d4a24c、淺色 #a8741f */
+  /** The single accent colour (badge, category text, progress bar, focus ring); defaults to dark #d4a24c, light #a8741f */
   accent?: string;
-  /** 沒有 href 的卡片被點擊時 */
+  /** Called when a card without href is clicked */
   onSelect?: (slide: HeroBillboardSlide, index: number) => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: HeroBillboardCarouselLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -124,10 +124,10 @@ const MESSAGES: Record<SunLocale, Required<HeroBillboardCarouselLabels>> = {
   },
 };
 
-/** 第 i 張相對於目前這張的位置：0 是中間，±1 是兩側露出的那張，其餘藏起來 */
+/** Position of slide i relative to the current one: 0 is the center, ±1 are the visible side slides, the rest are hidden */
 function signedOffset(i: number, active: number, n: number, dir: 1 | -1): number {
   const d = (i - active + n) % n;
-  if (n % 2 === 0 && d === n / 2) return dir > 0 ? -d : d; // 偶數張時正對面那張：留在剛離開的那一側
+  if (n % 2 === 0 && d === n / 2) return dir > 0 ? -d : d; // with an even count, the slide directly opposite stays on the side it just left
   return d > n / 2 ? d - n : d;
 }
 
@@ -179,11 +179,11 @@ function ArrowIcon({ dir }: { dir: "left" | "right" }) {
 }
 
 /**
- * 滿版焦點輪播：中間一張大封面、左右各露出上一張與下一張（點了就切過去），
- * 有圖片時背後鋪一層低不透明度的模糊封面當環境光。卡片正下方是圓點指示器，目前這張拉長成進度條。
+ * Full-bleed focus carousel: one large cover in the middle, the previous and next slides peeking out on either side (tap to switch to them),
+ * and when there are images, a low-opacity blurred cover behind as ambient light. Dot indicators sit right below the card, and the current one stretches into a progress bar.
  *
- * 自動播放依 W3C APG 輪播模式：滑鼠移入、鍵盤焦點進入、分頁隱藏時暫停；
- * 系統開了「減少動態」時不自動播放。換張由進度條的 animationend 觸發，暫停後接著走。
+ * Autoplay follows the W3C APG carousel pattern: it pauses on mouse hover, keyboard focus inside, and a hidden tab;
+ * it does not autoplay when the system has "reduce motion" on. Slides change on the progress bar's animationend, and it resumes after a pause.
  */
 export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme = "dark", accent, onSelect, locale = "en", labels, className }: HeroBillboardCarouselProps) {
   const l = { ...MESSAGES[resolveLocale(locale)], ...labels };
@@ -194,7 +194,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
   const [hovering, setHovering] = useState(false);
   const [focusInside, setFocusInside] = useState(false);
   const [docHidden, setDocHidden] = useState(false);
-  // 上一輪每張的位置，用來偵測「繞圈從另一側跳過去」的那張
+  // Position of each slide in the previous round, used to detect the slide that wraps around and jumps from the other side
   const prevOffsets = useRef<number[]>([]);
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
@@ -255,7 +255,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
       aria-label={l.region}
       onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
       onPointerLeave={() => setHovering(false)}
-      // 只有鍵盤焦點才暫停：滑鼠點箭頭也會拿到焦點，若一律暫停，點過一次就再也不會自動換張
+      // Pause only on keyboard focus: clicking an arrow with the mouse also focuses it, and pausing on any focus would stop autoplay for good after one click
       onFocus={(e) => {
         if ((e.target as HTMLElement).matches?.(":focus-visible")) setFocusInside(true);
       }}
@@ -314,7 +314,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
             drag.current = null;
           }}
           onClickCapture={(e) => {
-            // 拖曳換張後放開滑鼠，不要順便觸發卡片連結
+            // After releasing the mouse following a drag-to-switch, do not also trigger the card link
             if (suppressClick.current) {
               suppressClick.current = false;
               e.preventDefault();
@@ -339,7 +339,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                 onPointerMove={pos === "front" ? onPointerMoveCard : undefined}
                 style={{ "--o": o, "--origin": o > 0 ? "0%" : o < 0 ? "100%" : "50%" } as CSSProperties}
               >
-                {/* 圖片、文字、按鈕同一張卡（同一個外框） */}
+                {/* Image, text and button are one card (one outer frame) */}
                 <div className="hbc-frame">
                   <div className="hbc-media">
                     <SlideMedia slide={slide} />
@@ -359,14 +359,14 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                           {slide.eyebrow}
                         </span>
                       )}
-                      {/* 時間與價格併成一段，太長時整段一起以刪節號收尾 */}
+                      {/* Time and price merge into one run; when too long the whole run ends with an ellipsis */}
                       {(slide.meta || slide.price) && <span>{[slide.meta, slide.price].filter(Boolean).join(" · ")}</span>}
                     </div>
                     <h2 className="hbc-title" title={slide.title}>
                       {slide.title}
                     </h2>
                   </div>
-                  {/* 整張卡就是連結，按鈕只是視覺提示（span），避免連結裡再包連結 */}
+                  {/* The whole card is the link; the button is only a visual hint (a span), to avoid nesting a link inside a link */}
                   <span className="hbc-cta" aria-hidden>
                     {cta} →
                   </span>
@@ -397,7 +397,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
           )}
         </div>
 
-        {/* 指示器：在中間那張正下方、不疊在圖上。目前這張拉長成進度條，跑滿換下一張 */}
+        {/* Indicators: right below the center card, not over the image. The current one stretches into a progress bar that fills up and then advances */}
         {n > 1 && (
           <div className="hbc-dots">
             {items.map((slide, i) => {
@@ -414,7 +414,7 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
                   style={{ "--dur": `${slideMs}ms`, "--play": playing ? "running" : "paused" } as CSSProperties}
                 >
                   <span
-                    // key 換張時重建，進度從 0 開始；跑滿就換下一張
+                    // Rebuilt on key change when the slide changes, so progress restarts from 0; when full, advance to the next slide
                     key={isCurrent ? `run-${active}` : "idle"}
                     className="hbc-dot-fill"
                     onAnimationEnd={isCurrent ? next : undefined}
@@ -429,8 +429,8 @@ export function HeroBillboardCarousel({ items, intro, slideMs = SLIDE_MS, theme 
   );
 }
 
-// 原本的 CSS module 照搬成 scoped class（hbc- 前綴）。視窗單位 vw 改成容器單位 cqw，
-// 放在任何寬度的容器裡都以容器寬度計算；@media 768px 改成 @container。
+// The original CSS module is ported as-is into scoped classes (hbc- prefix). Viewport units vw become container units cqw,
+// so sizes are computed from the container width wherever it sits; @media 768px becomes @container.
 const BILLBOARD_CSS = `
 .hbc-root {
   --bg: #0a0a0a;
@@ -495,9 +495,9 @@ const BILLBOARD_CSS = `
     radial-gradient(130% 80% at 50% 35%, transparent 45%, var(--scrim) 100%);
 }
 .hbc-inner {
-  /* 中間那張的寬度：最寬 1040，窄容器留左右各 32px 讓旁邊那張露出一條 */
+  /* Width of the centre card: at most 1040, narrow containers keep 32px on each side so a sliver of the neighbours shows */
   --card-w: min(1040px, calc(100cqw - 64px));
-  /* 卡片下半部文字區的固定高度：每張一樣高，換張時整疊不會跳 */
+  /* Fixed height of the text area in the lower half: every card is the same height, so the stack never jumps on change */
   --panel-h: 168px;
   position: relative;
   padding: 28px 0 28px;
@@ -532,7 +532,7 @@ const BILLBOARD_CSS = `
   border-radius: 20px;
   overflow: hidden;
   background: var(--card);
-  /* 往旁邊縮的那張以靠中間那一側為軸，內緣永遠貼在中間那張旁邊 gap 的位置 */
+  /* Side cards scale from their inner edge, which always sits one gap away from the centre card */
   transform:
     translateX(calc(var(--o) * (100% + var(--gap))))
     rotateY(calc(var(--o) * -9deg))
@@ -568,7 +568,7 @@ const BILLBOARD_CSS = `
   z-index: 1;
   pointer-events: none;
 }
-/* 繞圈時從另一側跳過去的那張：不播位移，只淡入 */
+/* The card that wraps around to the other side: no slide, only a fade in */
 .hbc-slide[data-jump="true"] {
   transition: opacity 0.5s ease, filter 0.6s ease;
   animation: hbc-jump-in 0.55s ease both;
@@ -595,7 +595,7 @@ const BILLBOARD_CSS = `
   background: var(--card);
 }
 .hbc-panel-text { min-width: 0; }
-/* Ken Burns：當前這張緩慢推近 */
+/* Ken Burns: the current card slowly zooms in */
 .hbc-slide[data-pos="front"] .hbc-media { animation: hbc-kenburns 9s ease-out both; }
 @keyframes hbc-kenburns { from { transform: scale(1); } to { transform: scale(1.055); } }
 .hbc-glare {
@@ -632,7 +632,7 @@ const BILLBOARD_CSS = `
 .hbc-hit:focus-visible { outline: 3px solid var(--accent-gold); outline-offset: -3px; }
 .hbc-arrow {
   position: absolute;
-  /* 對齊封面圖片的垂直中心，不是整張卡的中心 */
+  /* Aligned to the vertical centre of the cover image, not of the whole card */
   top: calc(var(--card-w) * 9 / 32);
   z-index: 5;
   display: none;
@@ -664,7 +664,7 @@ const BILLBOARD_CSS = `
   border-radius: 12px;
   font-weight: 600;
   font-size: 15px;
-  /* 品牌專色：買家設 --sunui-spot 就換成自己的品牌色，沒設時維持原本的配色 */
+  /* Brand accent: set --sunui-spot to use your own brand color; without it the default colors stay */
   background: var(--sunui-spot, var(--text-primary));
   color: var(--sunui-spot-foreground, var(--bg));
   transition: transform 0.2s ease;
@@ -728,7 +728,7 @@ const BILLBOARD_CSS = `
   animation: hbc-fill var(--dur) linear forwards;
   animation-play-state: var(--play);
 }
-/* 不自動播放時目前這格直接填滿，表示「你在這一張」 */
+/* Without autoplay the current segment is simply filled, meaning "you are here" */
 .hbc-dot[aria-current="true"][data-static="true"] .hbc-dot-fill { animation: none; transform: scaleX(1); }
 @keyframes hbc-fill { to { transform: scaleX(1); } }
 .hbc-dot:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 1px; }
@@ -754,7 +754,7 @@ const BILLBOARD_CSS = `
   .hbc-slide[data-pos="front"] .hbc-media,
   .hbc-slide[data-jump="true"] { animation: none; }
 }
-/* 資訊列高度固定：換張時整個 Hero 高度都不跳 */
+/* Fixed info bar height: the whole hero never changes height on change */
 .hbc-meta-row {
   display: flex;
   align-items: center;
@@ -776,7 +776,7 @@ const BILLBOARD_CSS = `
   font-size: clamp(17px, 1.75cqw, 24px);
   letter-spacing: -0.01em;
   line-height: 1.3;
-  /* 永遠保留兩行高度；一行的標題就靠上 */
+  /* Always reserve two lines; a one-line title sits at the top */
   height: 2.6em;
   margin: 0;
   display: -webkit-box;

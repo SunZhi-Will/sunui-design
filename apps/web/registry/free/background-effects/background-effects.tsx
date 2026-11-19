@@ -23,7 +23,7 @@ export const backgroundEffects = [
 
 export type BackgroundEffect = (typeof backgroundEffects)[number];
 
-/** 預設配色：跟隨主題的 primary，再與 foreground / background 混出兩個層次 */
+/** Default palette: follows the theme's primary, mixed with foreground / background for two tones */
 export const defaultBackgroundColors = [
   "var(--primary)",
   "color-mix(in oklch, var(--primary) 55%, var(--foreground))",
@@ -32,12 +32,12 @@ export const defaultBackgroundColors = [
 
 export interface EffectBackgroundProps {
   effect: BackgroundEffect;
-  /** 效果用色，可放任何 CSS 顏色（含 var() 與 color-mix()） */
+  /** Effect colour: any CSS colour (including var() and color-mix()) */
   colors?: string[];
-  /** 速度倍率，1 為預設 */
+  /** Speed multiplier, 1 is the default */
   speed?: number;
   className?: string;
-  /** 疊在效果上方的內容 */
+  /** Content layered above the effect */
   children?: ReactNode;
 }
 
@@ -60,7 +60,7 @@ const keyframes = `
 @keyframes sui-bg-ripple{0%{transform:translate(-50%,-50%) scale(.04);opacity:0}8%{opacity:.9}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
 `;
 
-/** 鋪滿最近的定位父層，效果在底，children 在上 */
+/** Fills the nearest positioned parent; the effect sits behind and children sit on top */
 export function EffectBackground({ effect, colors, speed = 1, className, children }: EffectBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion() ?? false;
@@ -123,12 +123,12 @@ function renderEffect(effect: BackgroundEffect, ctx: EffectCtx) {
   }
 }
 
-/* ---------- 共用工具 ---------- */
+/* ---------- Shared helpers ---------- */
 
 const pick = (colors: string[], i: number) => colors[i % colors.length] ?? "currentColor";
 const fade = (color: string, pct: number) => `color-mix(in oklch, ${color} ${pct}%, transparent)`;
 
-/** 固定種子的亂數，伺服器與瀏覽器算出一樣的位置，避免 hydration 不一致 */
+/** Seeded random numbers so the server and browser compute the same positions, avoiding hydration mismatch */
 function seeded(seed: number) {
   let a = seed >>> 0;
   return () => {
@@ -167,18 +167,18 @@ function useElementSize(ref: RefObject<HTMLElement | null>) {
   return size;
 }
 
-/** CSS 動畫秒數依 speed 縮放 */
+/** CSS animation duration in seconds, scaled by speed */
 const secs = (base: number, speed: number) => `${(base / speed).toFixed(2)}s`;
 
-/* ---------- Canvas 共用 ---------- */
+/* ---------- Shared canvas helpers ---------- */
 
 interface CanvasScene {
   resize?(w: number, h: number): void;
-  /** dt 為 0 時只重畫目前狀態（靜態影格） */
+  /** When dt is 0, redraw the current state only (a static frame) */
   frame(ctx: CanvasRenderingContext2D, w: number, h: number, dt: number, colors: string[]): void;
 }
 
-/** 把 var() 與 color-mix() 解析成 canvas 讀得懂的顏色 */
+/** Resolve var() and color-mix() into a colour the canvas can read */
 function resolveColors(colors: string[], host: HTMLElement) {
   const probe = document.createElement("span");
   probe.style.display = "none";
@@ -210,7 +210,7 @@ function useCanvasScene(
   if (!sceneRef.current) sceneRef.current = create();
   const colorKey = colors.join("|");
 
-  // 尺寸、devicePixelRatio、主題切換時重新解析顏色
+  // Re-resolve colours when the size, devicePixelRatio or theme changes
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -244,7 +244,7 @@ function useCanvasScene(
     };
   }, [colorKey, resolution]);
 
-  // 主迴圈：只在可見且非 reduced motion 時跑
+  // Main loop: runs only while visible and not in reduced motion
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -265,7 +265,7 @@ function useCanvasScene(
   return canvasRef;
 }
 
-/* ---------- 效果 ---------- */
+/* ---------- Effects ---------- */
 
 function Aurora({ colors, speed, reduce }: EffectCtx) {
   const bands = [
@@ -336,7 +336,7 @@ function GridPattern({ colors, speed, running, reduce, rootRef }: EffectCtx) {
     setLit(Array.from({ length: n }, () => Math.floor(rand() * total)));
   }, [total]);
 
-  // 每拍換掉幾格，讓亮格隨機遊走
+  // Swap a few cells each beat so the lit cells wander randomly
   useEffect(() => {
     if (!running || !total) return;
     const id = setInterval(() => {
@@ -535,7 +535,7 @@ function Particles(ctx: EffectCtx) {
             const dy = p.y - ptr.y;
             const d = Math.hypot(dx, dy) || 1;
             if (d < 110) {
-              // 指標附近的粒子被輕輕推開
+              // Particles near the pointer are gently pushed away
               p.x += (dx / d) * (110 - d) * dt * 2;
               p.y += (dy / d) * (110 - d) * dt * 2;
             }
@@ -735,7 +735,7 @@ function NoiseGrain(ctx: EffectCtx) {
         },
         frame(c, _w, _h, dt) {
           acc += dt;
-          // 約 24 fps 換一次顆粒；dt 為 0 時畫一張靜態顆粒
+          // Reshuffle the grain about 24 times per second; when dt is 0, draw one static grain frame
           if (dt > 0 && acc < 1 / 24) return;
           if (dt === 0 && img) {
             c.putImageData(img, 0, 0);

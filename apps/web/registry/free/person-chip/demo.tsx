@@ -28,7 +28,7 @@ const apps: Record<string, { name: string; paid?: boolean }> = {
   ledger: { name: "Ledger" },
 };
 
-// 每種語言一組範例名字，順序對應 crew
+// One set of sample names per language, in the same order as crew
 const names = {
   en: ["Mia", "Leo", "Ava", "Noah", "王大同", "Iris", "Kai", "Nora", "Theo"],
   "zh-TW": ["小美", "阿傑", "怡君", "志明", "王大同", "雅婷", "家豪", "淑芬", "冠宇"],
@@ -43,7 +43,7 @@ const copy = {
   ja: { team: "メンバー", count: (n: number) => `${n} 人`, uses: (n: string) => `${n} が利用中`, pick: "メンバーを選ぶと利用中のアプリを表示" },
 };
 
-/** 團隊面板：九位成員只顯示五位，其餘收成「+4」；選中的人下方列出正在使用的專案 */
+/** Team panel: only five of nine members are shown and the rest collapse into "+4"; below it, the selected person's active projects are listed */
 export default function PersonChipDemo() {
   const [selected, setSelected] = useState<number | string | null>(3);
   const reduce = useReducedMotion();
@@ -53,7 +53,7 @@ export default function PersonChipDemo() {
   const index = crew.findIndex((c) => c.id === selected);
   const people = crew.map((c, i) => ({ id: c.id, name: crewNames[i], locked: c.locked, highlighted: c.highlighted }));
   const ref = useRef<HTMLDivElement>(null);
-  // 預覽自己演：展開 +4、選一位剛滑出的人、再收合（選中的人仍留著）
+  // The preview plays itself: expand +4, select someone who just slid out, then collapse (the selected person stays)
   const cursor = useDemoAutoplay(ref, async (d) => {
     const toggle = () => d.find("button[aria-expanded]");
     await d.click(toggle);

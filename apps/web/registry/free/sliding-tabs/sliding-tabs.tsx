@@ -10,7 +10,7 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand color. Used only for selection, offers and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotOn = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -18,10 +18,10 @@ const spotOn = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground
 export interface SlidingTabItem {
   value: string;
   label: ReactNode;
-  /** 跟在標籤後的小數字，例如篩選結果數 */
+  /** Small number after the label, e.g. a filter result count */
   count?: number;
   disabled?: boolean;
-  /** 給了就成為分頁內容；只做選擇器時不用給 */
+  /** When given, it becomes the tab content; not needed when used only as a selector */
   content?: ReactNode;
 }
 
@@ -30,14 +30,14 @@ type Multi = { multiple: true; value?: string[]; defaultValue?: string[]; onValu
 
 export type SlidingTabsProps = (Single | Multi) & {
   items: SlidingTabItem[];
-  /** underline：分頁底線；segment：分段控制；chips：篩選籤（可配 multiple） */
+  /** underline: tab underline; segment: segmented control; chips: filter chips (can be used with multiple) */
   variant?: "underline" | "segment" | "chips";
-  /** 分段控制撐滿寬度 */
+  /** Segmented control fills the width */
   fullWidth?: boolean;
   size?: "sm" | "md";
   "aria-label"?: string;
   className?: string;
-  /** 套在內容面板上的 class */
+  /** Class applied to the content panel */
   contentClassName?: string;
 };
 

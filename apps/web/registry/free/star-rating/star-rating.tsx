@@ -11,56 +11,56 @@ export interface StarRatingProps {
   value?: number;
   defaultValue?: number;
   onValueChange?: (value: number) => void;
-  /** 星星數量 */
+  /** Number of stars */
   max?: number;
-  /** 0.5 支援半星 */
+  /** 0.5 supports half stars */
   precision?: 0.5 | 1;
-  /** 唯讀顯示模式，支援任意小數（例如 4.3） */
+  /** Read-only display mode; supports any decimal (for example 4.3) */
   readOnly?: boolean;
   disabled?: boolean;
   size?: StarRatingSize;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串；傳陣列時視為每個整數分數的文字（長度等於 max） */
+  /** Override built-in strings; an array is treated as the text for each whole score (length equals max) */
   labels?: string[] | Partial<StarRatingLabels>;
-  /** 是否在右側顯示文字標籤 */
+  /** Whether to show the text label on the right */
   showLabel?: boolean;
-  /** 再次點擊目前分數時清除為 0 */
+  /** Clicking the current score again clears it to 0 */
   allowClear?: boolean;
-  /** 搭配表單送出時的欄位名稱 */
+  /** Field name when submitted with a form */
   name?: string;
-  /** 整組的無障礙名稱 */
+  /** Accessible name of the whole group */
   "aria-label"?: string;
   className?: string;
-  /** 選定分數後在下方長出的理由標籤；分數 <= threshold 用 low，否則用 high。也可傳函式依分數回傳 */
+  /** Reason tags that grow below once a score is chosen; scores <= threshold use low, otherwise high. Can also be a function that returns tags for the score */
   reasons?: { low: string[]; high: string[] } | ((value: number) => string[]);
-  /** low 與 high 的分界，預設 3 */
+  /** Boundary between low and high, default 3 */
   threshold?: number;
   selectedReasons?: string[];
   defaultSelectedReasons?: string[];
   onReasonsChange?: (reasons: string[]) => void;
-  /** 各分數的人數，index 0 是 1 星；選定後顯示「和 N% 的買家一樣」 */
+  /** Number of people per score, index 0 is 1 star; once chosen, shows "Same as N% of buyers" */
   distribution?: number[];
 }
 
 export interface StarRatingLabels {
-  /** 每個整數分數對應的文字 */
+  /** Text for each whole score */
   levels: string[];
-  /** 整組預設的無障礙名稱 */
+  /** Default accessible name of the whole group */
   group: string;
   rated: (value: number, max: number) => string;
   stars: (value: number) => string;
-  /** 低分時的理由提問 */
+  /** Reason prompt for low scores */
   askLow: string;
-  /** 高分時的理由提問 */
+  /** Reason prompt for high scores */
   askHigh: string;
-  /** 跟你給一樣分數的人佔多少 */
+  /** Share of people who gave the same score as you */
   same: (pct: number) => ReactNode;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -103,9 +103,9 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：細線星星，不用金色
+// Design language (DESIGN.md): thin-line stars, no gold
 const ink = "text-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -118,7 +118,7 @@ const labelSize: Record<StarRatingSize, string> = { sm: "text-xs", md: "text-sm"
 
 const STAR = "M12 3.2l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6-4.4-4.2 6-.8z";
 
-/** 一顆星：底層細線外框，上層依 fill 比例裁出實心；可點的選分器裡，實心部分用品牌專色 */
+/** One star: a thin outline underneath, with a solid fill clipped on top by the fill ratio; in a clickable picker the solid part uses the brand accent */
 function Star({ fill, className, fillClassName }: { fill: number; className?: string; fillClassName?: string }) {
   return (
     <span aria-hidden="true" className={cn("relative block", className)}>
@@ -136,7 +136,7 @@ function Star({ fill, className, fillClassName }: { fill: number; className?: st
 
 const round = (n: number, precision: number) => Math.round(n / precision) * precision;
 
-// 文字標籤朝分數變動的方向滾：加分往上滾，減分往下滾
+// The text label scrolls in the direction the score moves: up when it rises, down when it falls
 const roll = {
   enter: (d: number) => ({ y: d > 0 ? "100%" : "-100%", opacity: 0 }),
   center: { y: 0, opacity: 1 },
@@ -187,13 +187,13 @@ export function StarRating({
   const fillOf = (i: number) => Math.min(1, Math.max(0, shown - i));
   const labelFor = (v: number) => (v > 0 ? (labels[Math.min(Math.ceil(v), labels.length) - 1] ?? "") : "");
 
-  // 記住上一個顯示的分數，算出滾動方向（render 期間的衍生 state）
+  // Remember the previously shown score to work out the scroll direction (state derived during render)
   const [rolled, setRolled] = useState({ v: shown, d: 1 });
   if (rolled.v !== shown) setRolled({ v: shown, d: shown > rolled.v ? 1 : -1 });
 
-  // 下方理由區的高度跟著內容走，用 gentle 彈簧變形，下方內容一起滑動
+  // The reason area below follows its content height, morphing with a gentle spring so content beneath slides along
   const bodyRef = useRef<HTMLDivElement>(null);
-  // 首次渲染用 auto，已選定的狀態直接出現，不做進場動畫
+  // First render uses auto, so an already chosen state appears directly with no entrance animation
   const [bodyH, setBodyH] = useState<number | "auto">("auto");
   const hasBody = !readOnly && (!!reasons || !!distribution);
   useEffect(() => {
@@ -227,13 +227,13 @@ export function StarRating({
     const v = Math.min(max, Math.max(0, round(next, precision)));
     if (valueProp === undefined) setInner(v);
     onValueChange?.(v);
-    // 換到另一組理由時，上一組選過的標籤一併清掉
+    // When switching to another reason group, clear the tags chosen in the previous group
     const list = reasonsFor(v);
     const kept = picked.filter((r) => list.includes(r));
     if (kept.length !== picked.length) setPicked(kept);
   };
 
-  // 所有可選分數，例如 0.5、1、1.5 …；roving tabindex 停在目前分數
+  // All selectable scores, for example 0.5, 1, 1.5 ...; roving tabindex rests on the current score
   const steps = Array.from({ length: Math.round(max / precision) }, (_, i) => round((i + 1) * precision, precision));
   const tabStop = steps.includes(value) ? value : steps[0];
 
@@ -258,7 +258,7 @@ export function StarRating({
   const pct = value > 0 && total > 0 ? Math.round(((distribution?.[Math.ceil(value) - 1] ?? 0) / total) * 100) : null;
   const toggle = (r: string) => setPicked(picked.includes(r) ? picked.filter((x) => x !== r) : [...picked, r]);
   const release = () => setPressed(null);
-  // 主文先到，標籤依序晚約 60ms 進場
+  // The main text arrives first and the tags follow in sequence about 60ms later
   const rise = (delay: number) => ({
     initial: reduce ? false : { opacity: 0, y: 4 },
     animate: { opacity: 1, y: 0 },
@@ -267,7 +267,7 @@ export function StarRating({
 
   return (
     <div className={cn("inline-flex max-w-full flex-col", ink, className)}>
-      {/* 容器太窄時文字標籤換到星星下方，不撐出父層 */}
+      {/* When the container is too narrow the text label moves below the stars so it does not push out the parent */}
       <div className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-1.5">
         <div
           role="radiogroup"
@@ -282,7 +282,7 @@ export function StarRating({
             const hits = precision === 0.5 ? [whole - 0.5, whole] : [whole];
             return (
               <span key={i} className={cn("relative block", starSize[size])}>
-                {/* 按下時輕壓一下再回來，不做蓋章回彈 */}
+                {/* On press, squash lightly and return, no stamp-style rebound */}
                 <motion.span className="absolute inset-0 block" animate={{ scale: pressed === i && !reduce ? 0.92 : 1 }} transition={snappy}>
                   <Star fill={fillOf(i)} className={starSize[size]} fillClassName={spot} />
                 </motion.span>
@@ -333,7 +333,7 @@ export function StarRating({
         )}
       </div>
       {hasBody && (
-        // 同一個外框往下長：高度用 gentle 彈簧，星星是不動的錨點
+        // The same frame grows downward: height uses a gentle spring, and the stars are a fixed anchor
         <motion.div initial={false} animate={{ height: bodyH }} transition={reduce ? instant : gentle} className="overflow-hidden">
           <div ref={bodyRef}>
             {value > 0 && (list.length > 0 || pct !== null) && (

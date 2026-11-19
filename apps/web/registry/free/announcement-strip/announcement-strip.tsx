@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export interface Announcement {
   id: string;
   content: ReactNode;
-  /** 選填連結，例如活動頁 */
+  /** Optional link, for example a campaign page */
   href?: string;
   linkLabel?: ReactNode;
 }
@@ -25,20 +25,20 @@ export interface AnnouncementStripLabels {
 
 export interface AnnouncementStripProps {
   messages: Announcement[];
-  /** 有值時把「已關閉」記在 localStorage；換內容時改 key（例如加上 -v2）就會再出現 */
+  /** When set, remembers "dismissed" in localStorage. Change the key (for example append -v2) to show the strip again with new content */
   storageKey?: string;
   dismissible?: boolean;
   onDismiss?: () => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: AnnouncementStripLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -85,7 +85,7 @@ const MESSAGES: Record<SunLocale, Required<AnnouncementStripLabels>> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colors, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -109,7 +109,7 @@ function readDismissed(key: string) {
 export function AnnouncementStrip({ messages, storageKey, dismissible = true, onDismiss, locale = "en", labels, className }: AnnouncementStripProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
-  // 有 storageKey 時，掛載後才知道是否已關閉；先不渲染，避免已關閉的人看到一閃
+  // With a storageKey, whether it was dismissed is only known after mount. Render nothing until then so dismissed visitors do not see a flash
   const [visible, setVisible] = useState(!storageKey);
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
@@ -132,7 +132,7 @@ export function AnnouncementStrip({ messages, storageKey, dismissible = true, on
       try {
         window.localStorage.setItem(storageKey, "dismissed");
       } catch {
-        // 隱私模式或停用儲存時，只在這次瀏覽關閉
+        // In private mode or with storage disabled, dismiss for this visit only
       }
     }
     onDismiss?.();

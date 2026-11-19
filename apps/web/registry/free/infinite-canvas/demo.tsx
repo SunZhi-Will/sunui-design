@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { InfiniteCanvas, type InfiniteCanvasItem } from "./infinite-canvas";
 
-// 示範用的佔位插畫：每張是一件靜物的 SVG data URI，不讀外部圖片
+// Placeholder illustrations for the demo: each is a still-life SVG data URI, no external images are loaded
 const tones = [
   ["#e9e2d4", "#6b5a45"],
   ["#dfe6e1", "#3f5b4f"],
@@ -17,17 +17,17 @@ const tones = [
 ];
 
 const shapes = [
-  // 托特包
+  // Tote bag
   "<path d='M70 110 h100 l-8 90 h-84z' /><path d='M95 110 q25 -50 50 0' fill='none' stroke-width='6'/>",
-  // 花瓶
+  // Vase
   "<path d='M105 80 h30 v20 q30 25 20 70 q-5 30 -35 30 q-30 0 -35 -30 q-10 -45 20 -70z'/>",
-  // 馬克杯
+  // Mug
   "<path d='M80 100 h70 v80 q0 15 -15 15 h-40 q-15 0 -15 -15z'/><path d='M150 120 q30 0 30 25 q0 25 -30 25' fill='none' stroke-width='8'/>",
-  // 檯燈
+  // Desk lamp
   "<path d='M90 90 l60 0 l20 50 h-100z'/><rect x='116' y='140' width='8' height='50'/><rect x='92' y='190' width='56' height='10' rx='3'/>",
-  // 帽子
+  // Hat
   "<ellipse cx='120' cy='170' rx='70' ry='16'/><path d='M80 170 q0 -70 40 -70 q40 0 40 70z'/>",
-  // 書本
+  // Books
   "<rect x='80' y='90' width='80' height='105' rx='4'/><rect x='88' y='98' width='6' height='89' fill='#fff' opacity='.5'/>",
 ];
 

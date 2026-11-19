@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RibbonCarousel, type RibbonItem } from "./ribbon-carousel";
 
-// 與 demo 相同：平面色塊上的單品線稿（SVG data URI）
+// Same as the demo: single-item line drawings on flat color blocks (SVG data URIs)
 const plates: [string, string][] = [
   ["#e8e1d5", "#3a3631"],
   ["#d9e0d4", "#2f3a2c"],
@@ -34,7 +34,7 @@ const copy = {
   ja: { label: "秋のルック", previous: "前のルック", next: "次のルック", looks: ["ウールラップコート", "プリーツミディワンピース", "リブクルーニット", "ワイドパンツ", "サンドのカーコート", "スリップドレス"] },
 };
 
-/** 型錄卡片：穿搭照片沿著弧面排開，自動輪播，拖曳或按箭頭換下一套。 */
+/** Catalog card: outfit photos arranged along a curved surface, auto-advancing, drag or press an arrow to change to the next outfit. */
 export default function RibbonCarouselCard() {
   const t = useDemoText(copy);
   const items: RibbonItem[] = t.looks.map((title, i) => ({ src: plate(i), alt: title, title }));

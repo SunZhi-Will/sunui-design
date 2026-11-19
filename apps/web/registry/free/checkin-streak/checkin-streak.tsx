@@ -5,29 +5,29 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 
 import { cn } from "@/lib/utils";
 
-// 每日簽到卡：連續天數是主角，下面一句話說清楚「今天簽到會怎樣」；
-// 最近 7 天用一條鏈串起來，連續的日子之間是實線，今天還沒簽時是一段虛線，簽了就接上。
-// 可選的里程碑（例如每 7 天加碼）給連續簽到一個目標。簽到成功後送出 window 事件，讓額度表重新讀取。
+// Daily check-in card: the streak length is the hero, with one line below saying what checking in today will do;
+// the last 7 days are linked as a chain, solid between consecutive days, a dashed segment when today is not checked in yet, joined up once it is.
+// An optional milestone (e.g. a bonus every 7 days) gives the streak a goal. After a successful check-in it fires a window event so the quota meter reloads.
 
-/** 預設的全域事件名稱，quota-meter 也聽這個 */
+/** Default global event name; quota-meter listens to it too */
 export const REWARDS_EVENT = "sunui:rewards";
 
 export interface CheckinStreakLabels {
-  /** 卡片上方的小標 */
+  /** Small heading above the card */
   title?: ReactNode;
-  /** 獎勵說明：每天多幾張 */
+  /** Reward description: extra credits per day */
   description?: (reward: number, streak: number) => ReactNode;
-  /** 大數字旁的單位，例如「天連續簽到」 */
+  /** Unit next to the big number, e.g. "day streak" */
   streakUnit?: (streak: number) => ReactNode;
-  /** 今天還沒簽、昨天有簽：簽了就接上第幾天 */
+  /** Not checked in today but checked in yesterday: which streak day checking in will reach */
   keepGoing?: (next: number) => ReactNode;
-  /** 連續天數歸零時 */
+  /** When the streak is reset to zero */
   startToday?: ReactNode;
-  /** 今天已簽 */
+  /** Already checked in today */
   doneToday?: ReactNode;
-  /** 離里程碑還有幾天 */
+  /** Days left until the milestone */
   milestoneLeft?: (left: number, every: number, bonus: number) => ReactNode;
-  /** 這次簽到剛好拿到里程碑加碼 */
+  /** This check-in just earned the milestone bonus */
   milestoneHit?: (bonus: number) => ReactNode;
   weekAria?: string;
   today?: string;
@@ -41,54 +41,54 @@ export interface CheckinStreakLabels {
 }
 
 export interface CheckinResult {
-  /** 實際拿到的張數；不傳時用 reward（遇到里程碑會自動加上 bonus） */
+  /** Credits actually received; when omitted, reward is used (a milestone automatically adds bonus) */
   reward?: number;
-  /** 伺服器算好的連續天數；不傳時自動加一 */
+  /** Streak length computed by the server; when omitted, it is incremented by one */
   streak?: number;
 }
 
 export interface CheckinMilestone {
-  /** 每連續幾天一次，例如 7 */
+  /** Every this many consecutive days, e.g. 7 */
   every: number;
-  /** 那一天額外多給幾張 */
+  /** Extra credits given on that day */
   bonus: number;
 }
 
 export interface CheckinStreakProps {
-  /** 今天，當地時間 YYYY-MM-DD */
+  /** Today, local time, YYYY-MM-DD */
   today: string;
-  /** 最近 7 天裡已簽到的日期（YYYY-MM-DD） */
+  /** Dates in the last 7 days that were checked in (YYYY-MM-DD) */
   week: string[];
-  /** 連續簽到天數 */
+  /** Consecutive check-in days */
   streak: number;
-  /** 每次簽到多幾張 */
+  /** Extra credits per check-in */
   reward: number;
-  /** 連續簽到的里程碑加碼；不傳就不顯示進度條 */
+  /** Bonus for a check-in streak milestone; when omitted, no progress bar is shown */
   milestone?: CheckinMilestone;
-  /** 今天是否已簽到 */
+  /** Whether today is already checked in */
   done?: boolean;
-  /** 簽到；拋錯會顯示錯誤提示（Error.message 優先） */
+  /** Check in; if it throws, an error toast is shown (Error.message takes priority) */
   onCheckIn?: () => void | CheckinResult | Promise<void | CheckinResult>;
-  /** 拿到獎勵後的回呼，例如重新讀取額度 */
+  /** Callback after the reward is received, e.g. to reload the quota */
   onClaimed?: (reward: number) => void;
-  /** 成功後送出的 window 事件；設為 null 不送 */
+  /** Window event fired on success; set to null to not fire one */
   refreshEvent?: string | null;
-  /** 強調色，預設跟隨主題的 primary */
+  /** Accent color, follows the theme's primary by default */
   accent?: string;
-  /** 提示固定在視窗上方；false 時放在卡片上方 */
+  /** Pin the toast to the top of the window; when false it sits above the card */
   fixed?: boolean;
-  /** 提示自動關閉毫秒數 */
+  /** Toast auto-dismiss time in milliseconds */
   toastDuration?: number;
-  /** 介面語言與星期格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and weekday format: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: CheckinStreakLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -178,7 +178,7 @@ const MESSAGES: Record<SunLocale, Required<CheckinStreakLabels>> = {
   },
 };
 
-// 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
+// Zinc palette from the original project (Yumecanvas), one set each for light and dark
 const tokens =
   "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:var(--primary,#18181B)] [--yc-brand-fg:var(--primary-foreground,#FAFAFA)] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
   "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--primary,#FAFAFA)] dark:[--yc-brand-fg:var(--primary-foreground,#09090B)] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
@@ -186,7 +186,7 @@ const tokens =
 const ease = [0.23, 1, 0.32, 1] as const;
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** 最近 7 天（含今天）的日期，格式和後端一樣是當地的 YYYY-MM-DD */
+/** Dates of the last 7 days (including today), in the same local YYYY-MM-DD format as the backend */
 function lastWeek(today: string) {
   const [y, m, d] = today.split("-").map(Number);
   return Array.from({ length: 7 }, (_, i) => {
@@ -259,13 +259,13 @@ export function CheckinStreak({
   const [toast, setToast] = useState<Toast | null>(null);
   const seq = useRef(0);
 
-  // 外部資料真的變了（例如重新讀取）才跟著換。用日期內容比對，父層每次 render 傳新陣列時不會把剛簽到的狀態洗掉
+  // Only follow external data when it really changed (e.g. a reload). Compare by date content so a new array from the parent on every render does not wash out the just-checked-in state
   const weekKey = weekProp.join(",");
   useEffect(() => {
     setState({ week: weekKey ? weekKey.split(",") : [], streak: streakProp, done: doneProp, hit: false });
   }, [weekKey, streakProp, doneProp]);
 
-  // 提示自動關閉，行為同 sonner 預設的 4 秒
+  // The toast dismisses itself, behaving like sonner's default 4 seconds
   useEffect(() => {
     if (!toast) return;
     const id = window.setTimeout(() => setToast(null), toastDuration);
@@ -276,7 +276,7 @@ export function CheckinStreak({
   const doneSet = new Set(state.week);
   const { streak, done } = state;
   const every = milestone && milestone.every > 1 ? milestone.every : 0;
-  // 進度條上已亮的格數：今天已簽時含今天；剛好走完一輪時整條亮著
+  // Number of lit cells on the progress bar: includes today when already checked in; the whole bar is lit when a round just completed
   const filled = every ? (streak % every === 0 && streak > 0 && done ? every : streak % every) : 0;
   const left = every ? every - (streak % every) : 0;
 
@@ -313,7 +313,7 @@ export function CheckinStreak({
         className,
       )}
     >
-      {/* 主角：連續天數。數字換的時候舊的往上退、新的從下面上來 */}
+      {/* Hero: the streak length. When the number changes the old one retreats upward and the new one rises from below */}
       <div>
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-[11px] font-medium tracking-[0.14em] text-[var(--yc-muted-fg)] uppercase">{t.title}</h3>
@@ -332,7 +332,7 @@ export function CheckinStreak({
         <p className="mt-1.5 min-h-5 text-sm text-[var(--yc-muted-fg)]">{line}</p>
       </div>
 
-      {/* 最近 7 天：連續的日子之間畫實線；今天還沒簽、昨天有簽時畫一段虛線，簽了就變實線 */}
+      {/* Last 7 days: solid between consecutive days; a dashed segment when today is not checked in but yesterday was, turning solid once checked in */}
       <ol className="grid grid-cols-7" aria-label={t.weekAria}>
         {days.map((d, i) => {
           const on = doneSet.has(d.iso);
@@ -375,7 +375,7 @@ export function CheckinStreak({
         })}
       </ol>
 
-      {/* 里程碑：每一格是一天，最後一格是加碼 */}
+      {/* Milestone: each cell is one day, the last cell is the bonus */}
       {every > 0 && milestone && (
         <div className="space-y-2 rounded-lg bg-[var(--yc-muted)] p-3">
           <div className="flex items-center gap-1" aria-hidden>

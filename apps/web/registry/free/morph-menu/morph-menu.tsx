@@ -9,37 +9,37 @@ import { cn } from "@/lib/utils";
 export interface MorphMenuItem {
   id: string;
   label: ReactNode;
-  /** 16px inline SVG，跟隨 currentColor */
+  /** 16px inline SVG, follows currentColor */
   icon?: ReactNode;
-  /** 右側小字，例如快捷鍵或數量 */
+  /** Small text on the right, for example a shortcut or a count */
   hint?: ReactNode;
-  /** 破壞性動作，例如移除 */
+  /** Destructive action, for example remove */
   danger?: boolean;
   disabled?: boolean;
-  /** 在這一項上方畫一條分隔線 */
+  /** Draws a divider above this item */
   separator?: boolean;
   onSelect?: () => void;
 }
 
 export interface MorphMenuProps {
   items: MorphMenuItem[];
-  /** 觸發按鈕的無障礙名稱，未提供時依 locale 用「更多動作」 */
+  /** Accessible name of the trigger button; when omitted, uses "More actions" in the current locale */
   label?: string;
-  /** 觸發按鈕裡的圖示，預設是三個點 */
+  /** Icon inside the trigger button, defaults to three dots */
   icon?: ReactNode;
   onSelect?: (id: string) => void;
   onOpenChange?: (open: boolean) => void;
-  /** 收合動畫結束、選單卸載後呼叫；放在 overflow hidden 的列裡時，用它把列的裁切還原 */
+  /** Called after the collapse animation ends and the menu unmounts; when placed in a row with overflow hidden, use it to restore the row's clipping */
   onClosed?: () => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
   className?: string;
   menuClassName?: string;
 }
 
-/** 觸發鈕落在選單的哪個角；選單從這個角長出來 */
+/** Which corner of the menu the trigger sits in; the menu grows out from that corner */
 type Corner = { x: "left" | "right"; y: "top" | "bottom" };
-/** 起點裁切：上、右、下、左的內縮與圓角半徑；終點是全部 0、圓角 RADIUS */
+/** Starting clip: top, right, bottom, left insets and corner radius; the end is all 0 with corner radius RADIUS */
 type Inset = [number, number, number, number, number];
 
 const RADIUS = 10;
@@ -51,7 +51,7 @@ function defaultLabel(tag?: string) {
   return t.startsWith("ja") ? LABELS.ja : LABELS.en;
 }
 
-/** 可見範圍：視窗與所有會裁切的祖先取交集，抽屜、捲動清單裡也能正確翻面 */
+/** Visible area: the intersection of the viewport and every clipping ancestor, so flipping works inside drawers and scrolling lists too */
 function visibleBounds(el: HTMLElement) {
   const root = document.documentElement;
   let b = { top: 0, left: 0, right: root.clientWidth, bottom: root.clientHeight };
@@ -65,7 +65,7 @@ function visibleBounds(el: HTMLElement) {
   return b;
 }
 
-/** 橫向往空間大的一側長（列尾的按鈕會往左蓋回自己那一列）；縱向預設往下，不夠才往上 */
+/** Horizontally grows toward the side with more room (a button at the end of a row covers its own row, extending left); vertically grows down by default, up only when there is not enough room */
 function pickCorner(trigger: DOMRect, h: number, b: ReturnType<typeof visibleBounds>): Corner {
   const right = b.right - trigger.left;
   const left = trigger.right - b.left;
@@ -77,14 +77,14 @@ function pickCorner(trigger: DOMRect, h: number, b: ReturnType<typeof visibleBou
   };
 }
 
-/** 起點是觸發鈕大小、落在對應角的圓；終點是整張選單 */
+/** The start is a circle the size of the trigger, at the matching corner; the end is the whole menu */
 function insetFor({ x, y }: Corner, w: number, h: number, tw: number, th: number): Inset {
   const dx = Math.max(0, w - tw);
   const dy = Math.max(0, h - th);
   return [y === "top" ? 0 : dy, x === "left" ? dx : 0, y === "top" ? dy : 0, x === "left" ? 0 : dx, th / 2];
 }
 
-/** 進度 0 是觸發鈕形狀，1 是整張選單；彈簧過衝時可略超出 0 到 1 */
+/** Progress 0 is the trigger shape, 1 is the whole menu; spring overshoot may go slightly outside 0 to 1 */
 function clipAt(start: Inset, p: number) {
   const [t, r, b, l, rad] = start.map((v, i) => v + ((i === 4 ? RADIUS : 0) - v) * p);
   return `inset(${t}px ${r}px ${b}px ${l}px round ${Math.max(0, rad)}px)`;
@@ -106,7 +106,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const geo = useRef<Inset | null>(null);
-  /** 目前的展開進度、內容與圖示的不透明度；中途反向時從這裡接續 */
+  /** Current expansion progress and the opacity of content and icon; a mid-way reversal continues from here */
   const now = useRef({ p: 0, content: 0, ghost: 1 });
   const running = useRef<{ stop: () => void }[]>([]);
   const returnFocus = useRef(false);
@@ -122,7 +122,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     onOpenChange?.(next);
   }
 
-  // 開與關都在繪製前處理：先量尺寸、定角落、設好起點裁切，第一格畫面就是觸發鈕的形狀
+  // Both opening and closing are handled before paint: measure the size, pick the corner and set the start clip, so the first frame is the trigger shape
   useLayoutEffect(() => {
     const menu = menuRef.current;
     const trigger = triggerRef.current;
@@ -131,8 +131,8 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     running.current = [];
     const content = menu.querySelector<HTMLElement>("[data-content]")!;
     const ghost = menu.querySelector<HTMLElement>("[data-ghost]")!;
-    // 只補間數字、每格自己寫 style，不交給 WAAPI：WAAPI 結束時會有一格退回 inline 的舊值，
-    // 選單每次開完、關完都會閃一下起點形狀
+    // Only tween numbers and write style each frame ourselves instead of using WAAPI: when WAAPI finishes, one frame falls back to the old inline value,
+    // so the menu would flash the start shape after every open and close
     const v = now.current;
     const paint = () => {
       if (geo.current) menu.style.clipPath = clipAt(geo.current, v.p);
@@ -154,7 +154,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
         return paint();
       }
       paint();
-      // 依序：外框先從角落長開，圖示 100ms 退場，內容晚約 60ms 進場
+      // In order: the frame grows from the corner first, the icon leaves in 100ms, and the content enters about 60ms later
       running.current = [
         tween("p", 1, springs.gentle),
         tween("ghost", 0, { duration: 0.1 }),
@@ -170,7 +170,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     if (reduce || !geo.current) return done();
     const shrink = tween("p", 0, { ...springs.snappy, restDelta: 0.005, restSpeed: 0.05 });
     running.current = [tween("content", 0, { duration: 0.08 }), tween("ghost", 1, { duration: 0.12, delay: 0.1 }), shrink];
-    // stop() 也會讓 promise 完成，被重新打開打斷時不能卸載
+    // stop() also resolves the promise, so we must not unmount when interrupted by a reopen
     void shrink.then(() => {
       if (running.current.includes(shrink)) done();
     });
@@ -254,7 +254,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
             menuClassName,
           )}
         >
-          {/* 觸發鈕的圖示留在原位，外框長開時才退場，視線有錨點 */}
+          {/* The trigger icon stays in place and only leaves once the frame has grown, giving the eye an anchor */}
           <span data-ghost aria-hidden="true" className="pointer-events-none absolute flex items-center justify-center opacity-0">
             {icon ?? <Dots />}
           </span>

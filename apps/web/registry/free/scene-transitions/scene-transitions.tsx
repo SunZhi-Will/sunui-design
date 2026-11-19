@@ -16,7 +16,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type Componen
 
 import { cn } from "@/lib/utils";
 
-/** 全部轉場名稱；demo 與文件都從這裡讀 */
+/** All transition names. The demo and the docs both read from here */
 export const sceneTransitions = [
   "cut",
   "cross-dissolve",
@@ -42,13 +42,13 @@ export const sceneTransitions = [
 ] as const;
 
 export type SceneTransitionName = (typeof sceneTransitions)[number];
-/** 新畫面移動的方向：left 代表從右邊進來、往左推 */
+/** Direction the new scene moves: left means it enters from the right and pushes left */
 export type SceneDirection = "left" | "right" | "up" | "down";
 
 interface Ctx {
   w: number;
   h: number;
-  /** 起點（%），圓形、星形、碎裂、穿越用 */
+  /** Origin (%), used by circle, star, shatter and zoom-through */
   ox: number;
   oy: number;
   vx: number;
@@ -73,18 +73,18 @@ interface DecorProps {
 }
 
 interface TransitionDef {
-  /** p：進場進度、q：離場進度，都是 0 到 1 */
+  /** p: entering progress, q: leaving progress, both from 0 to 1 */
   style: (p: number, q: number, c: Ctx) => StyleOut;
-  /** 離場畫面疊在進場畫面上面（遮罩關閉、翻頁、碎裂這類） */
+  /** The leaving scene is stacked above the entering one (mask close, page curl, shatter and the like) */
   exitOnTop?: boolean;
-  /** 轉場期間畫面後方的底色 */
+  /** Background color behind the scenes during the transition */
   backdrop?: boolean;
   duration: number;
   ease?: "linear";
   Decor?: ComponentType<DecorProps>;
-  /** 裝飾層畫在內容下面（液體先流下來，內容跟在後面） */
+  /** The decoration layer is drawn below the content (liquid flows down first, content follows) */
   decorBelow?: boolean;
-  /** 離場時用自己的方式畫內容（例如切成碎片） */
+  /** Draws the content its own way while leaving (for example cut into shards) */
   Exit?: ComponentType<DecorProps & { children: ReactNode }>;
 }
 
@@ -93,7 +93,7 @@ const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
 const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const poly = (pts: [number, number][]) => `polygon(${pts.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(",")})`;
 
-/** 可重現的亂數，碎片每次形狀一樣 */
+/** Reproducible random numbers, so the shards have the same shape every time */
 function rng(seed: number) {
   let s = seed;
   return () => {
@@ -102,7 +102,7 @@ function rng(seed: number) {
   };
 }
 
-/* ───────────── 各轉場的裝飾層 ───────────── */
+/* ───────────── decoration layer for each transition ───────────── */
 
 function Bands({ p, ctx }: DecorProps) {
   const colors = ctx.colors.length ? ctx.colors : ["currentColor"];
@@ -117,7 +117,7 @@ function Bands({ p, ctx }: DecorProps) {
 }
 
 function Band({ p, i, n, color }: { p: MotionValue<number>; i: number; n: number; color: string }) {
-  // 每條色帶錯開一點：先蓋過畫面，再往另一邊離開
+  // Each band is offset slightly: it first covers the scene, then leaves toward the other side
   const x = useTransform(p, (v) => {
     const d = (i / n) * 0.18;
     const cover = inOut(seg(v, d, 0.5));
@@ -154,7 +154,7 @@ function LiquidLayer({ p, ctx }: DecorProps) {
   return <motion.div className="pointer-events-none absolute inset-0" style={{ clipPath, opacity, background: ctx.colors[0] ?? "currentColor" }} />;
 }
 
-/** 翻頁：被折起來的那一角，是切掉區域對折線的鏡像 */
+/** Page curl: the folded corner is the mirror image of the cut-off region across the fold line */
 function curlCut(q: number, w: number, h: number) {
   const k = (w + h) * (1 - q);
   const rect: [number, number][] = [
@@ -202,7 +202,7 @@ function PixelFilter({ p, q, ctx }: DecorProps) {
   const comp = useRef<SVGFECompositeElement>(null);
   const morph = useRef<SVGFEMorphologyElement>(null);
   const apply = useCallback(() => {
-    // 離場時格子越來越粗，進場時越來越細；最粗的那一刻換畫面
+    // The cells grow coarser while leaving and finer while entering; the scene swaps at the coarsest moment
     const qv = q.get();
     const pv = p.get();
     const t = qv > 0 ? seg(qv, 0, 0.5) : 1 - seg(pv, 0.5, 1);
@@ -325,7 +325,7 @@ function Shard({ q, shard, g, children }: { q: MotionValue<number>; shard: { pts
   );
 }
 
-/* ───────────── 轉場定義 ───────────── */
+/* ───────────── transition definitions ───────────── */
 
 const circleTo = (c: Ctx) => Math.hypot(Math.max(c.ox, 100 - c.ox) * c.w / 100, Math.max(c.oy, 100 - c.oy) * c.h / 100);
 
@@ -479,7 +479,7 @@ const defs: Record<SceneTransitionName, TransitionDef> = {
   shatter: { duration: SHATTER_TIME, ease: "linear", exitOnTop: true, Exit: Shatter, style: () => ({}) },
 };
 
-/* ───────────── 單一畫面 ───────────── */
+/* ───────────── a single scene ───────────── */
 
 const EASE = [0.65, 0, 0.35, 1] as const;
 
@@ -537,23 +537,23 @@ function Scene({ def, ctx, first, duration, children }: { def: TransitionDef; ct
   );
 }
 
-/* ───────────── 對外元件 ───────────── */
+/* ───────────── public component ───────────── */
 
 export interface SceneTransitionProps {
-  /** 換這個值就觸發轉場，例如目前第幾張 */
+  /** Changing this value triggers the transition, for example the current slide index */
   activeKey: string | number;
-  /** 目前要顯示的畫面 */
+  /** The scene to show now */
   children: ReactNode;
   transition?: SceneTransitionName;
-  /** 秒；不給時用每種轉場的建議長度 */
+  /** Seconds. When omitted, each transition uses its suggested length */
   duration?: number;
-  /** 推移、擦除、方塊、百葉、快甩的方向（新畫面往哪邊移動） */
+  /** Direction for push, wipe, tiles, blinds and whip (which way the new scene moves) */
   direction?: SceneDirection;
-  /** 圓形、星形、穿越、碎裂的起點（%），例如從按鈕或太陽的位置開始 */
+  /** Origin (%) for circle, star, zoom-through and shatter, for example from a button or the sun's position */
   origin?: { x: number; y: number };
-  /** bands 的色帶顏色、liquid 的液體顏色、page-curl 紙背的顏色 */
+  /** Band color for bands, liquid color for liquid, paper-back color for page-curl */
   colors?: string[];
-  /** fade-to-black、iris 的底色 */
+  /** Background color for fade-to-black and iris */
   backdrop?: string;
   className?: string;
 }
@@ -584,7 +584,7 @@ export function SceneTransition({
     return () => ro.disconnect();
   }, []);
 
-  // 減少動態：一律直接切換，資訊不遺失
+  // Reduced motion: always switch directly, no information is lost
   const def = defs[reduce ? "cut" : transition];
   const d = reduce ? 0 : duration ?? def.duration;
   const [vx, vy] = vectors[direction];
@@ -602,15 +602,15 @@ export function SceneTransition({
   );
 }
 
-/* ───────────── 自動輪播 ───────────── */
+/* ───────────── autoplay ───────────── */
 
 export interface SceneSlideshowProps extends Omit<SceneTransitionProps, "activeKey" | "children"> {
   scenes: ReactNode[];
-  /** loop：自動輪播；inView：進入畫面才輪播；click：點一下換下一張 */
+  /** loop: autoplay. inView: autoplay only once on screen. click: click to go to the next slide */
   trigger?: "loop" | "inView" | "click";
-  /** 每張停留的毫秒數 */
+  /** Milliseconds each slide is held */
   interval?: number;
-  /** 顯示上一張、下一張與圓點 */
+  /** Show previous and next buttons and dots */
   controls?: boolean;
   labels?: { previous?: string; next?: string; goTo?: (n: number) => string };
   onIndexChange?: (index: number) => void;
@@ -688,7 +688,7 @@ export function SceneSlideshow({ scenes, trigger = "loop", interval = 3200, cont
   );
 }
 
-/** 給自訂播放器用：回傳每種轉場建議的秒數 */
+/** For custom players: returns the suggested seconds for each transition */
 export function getTransitionDuration(name: SceneTransitionName) {
   return defs[name].duration;
 }

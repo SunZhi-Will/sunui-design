@@ -51,7 +51,7 @@ const copy = {
   },
 };
 
-// 示範照片（AI 生成）：蠟布夾克平拍，4:5。熱點座標以這張照片的百分比位置為準
+// Demo photo (AI generated): a waxed-canvas jacket shot flat, 4:5. Hotspot coordinates are percentages of this photo
 function Jacket() {
   return (
     <img

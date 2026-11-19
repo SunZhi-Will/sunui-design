@@ -8,7 +8,7 @@ import { OtpInput, type OtpStatus } from "./otp-input";
 
 const SENT = "246810";
 
-/** 型錄卡片：一組六格驗證碼，輸入 246810 成功，其他號碼會搖頭報錯。 */
+/** Catalog card: a six-cell verification code; 246810 succeeds, any other number shakes and shows an error. */
 export default function OtpInputCard() {
   const locale = useDemoLocale();
   const codeLabel = useDemoText({ en: "Code:", "zh-TW": "驗證碼：", "zh-CN": "验证码：", ja: "コード：" });

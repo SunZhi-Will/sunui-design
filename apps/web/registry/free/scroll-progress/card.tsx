@@ -36,7 +36,7 @@ const copy = {
   ],
 };
 
-/** 型錄卡片：框內捲動一篇短文，上方細線跟著前進，點刻度跳到該章。 */
+/** Catalog card: scroll a short article inside a frame, the thin line on top follows along, click a tick to jump to that chapter. */
 export default function ScrollProgressCard() {
   const locale = useDemoLocale();
   const chapters = useDemoText(copy);

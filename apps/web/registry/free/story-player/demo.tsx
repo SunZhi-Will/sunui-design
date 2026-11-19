@@ -78,12 +78,12 @@ const copy = {
   },
 };
 
-// 一年貼文裡最常出現的字，依次數由多到少
+// The words that appear most often across a year of posts, from most to least frequent
 const KEYWORD_COUNTS = [64, 52, 41, 33, 24, 17, 11, 8];
 
 type Copy = (typeof copy)["en"];
 
-// 封面：跟回顧投影片共用 RecapFrame，版面一致
+// Cover: shares RecapFrame with the recap slides, so the layout is consistent
 function CoverSlide({ t }: { t: Copy }) {
   return (
     <RecapFrame title={t.coverTitle} footer={<p className="text-[15px] text-[#a3a3a3]">{t.tap}</p>}>
@@ -102,7 +102,7 @@ function CoverSlide({ t }: { t: Copy }) {
   );
 }
 
-// 結尾：三個數字的總表，最後一張會停比較久，底部出現動作列
+// Closing: a summary of three numbers; the last slide stays longer and an action bar appears at the bottom
 function OutroSlide({ t }: { t: Copy }) {
   const rows = [
     { label: t.posts, value: "312" },
@@ -148,7 +148,7 @@ export default function StoryPlayerDemo() {
       index={index}
       onIndexChange={setIndex}
       cardWidth={360}
-      // 底部留出動作列的高度，最後兩張的頁尾文字才不會被蓋住
+      // Leave room for the action bar at the bottom so the footer text on the last two slides is not covered
       className="rounded-xl pb-14"
       locale={locale}
       labels={{ region: t.region }}

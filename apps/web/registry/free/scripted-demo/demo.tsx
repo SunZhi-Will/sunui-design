@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import { DemoStatus, Pop, ScriptedDemo, SpinnerIcon, useScriptedDemo, type DemoTone, type ScriptedDemoChapter, type ScriptedDemoScene } from "./scripted-demo";
 
-// 排班系統的首頁 Demo：草稿 → 求解 → 排好。
+// Home page demo for a shift-scheduling product: draft → solve → scheduled.
 
 type Key = "input" | "solving" | "solved";
 

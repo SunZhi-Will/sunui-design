@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { OrbitGallery, type OrbitImage } from "./orbit-gallery";
 
-// 示範圖：同一組灰底棚拍商品照，放在 public/blocks/orbit-gallery/
+// Demo images: one set of studio product photos on a grey background, stored in public/blocks/orbit-gallery/
 const photos = ["mug", "tote", "lamp", "bottle", "vase", "candle", "notebook", "tea", "backpack", "watch", "wallet", "scarf"];
 const photo = (i: number) => `/blocks/orbit-gallery/${photos[i % photos.length]}.webp`;
 
@@ -15,7 +15,7 @@ const copy = {
   ja: { label: "日常のセレクト 全 6 点", items: ["陶器のマグ", "キャンバストート", "デスクランプ", "ステンレスボトル", "一輪挿し", "ソイキャンドル"] },
 };
 
-/** 型錄卡片：商品圖排成一顆會自轉的球，拖曳旋轉，點一張轉到正面。 */
+/** Catalog card: product images arranged into a self-rotating sphere; drag to rotate, tap one to bring it to the front. */
 export default function OrbitGalleryCard() {
   const t = useDemoText(copy);
   const images: OrbitImage[] = t.items.map((alt, i) => ({ src: photo(i), alt }));

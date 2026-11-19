@@ -13,7 +13,7 @@ const copy = {
 
 const picks: AnimatePreset[] = ["bounceIn", "flipInX", "clipRevealCircle", "tada"];
 
-/** 型錄卡片：四個代表性的預設持續循環。 */
+/** Catalog card: four representative presets looping continuously. */
 export default function AnimatePresetsCard() {
   const label = useDemoText(copy);
   return (

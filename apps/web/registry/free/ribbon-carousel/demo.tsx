@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RibbonCarousel, type RibbonItem } from "./ribbon-carousel";
 
-// 示範圖：平面色塊上的單品線稿（SVG data URI），不讀外部圖片
+// Demo images: single-item line drawings on flat color blocks (SVG data URIs), no external images are loaded
 const plates: [string, string][] = [
   ["#e8e1d5", "#3a3631"],
   ["#d9e0d4", "#2f3a2c"],

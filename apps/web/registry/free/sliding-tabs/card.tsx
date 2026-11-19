@@ -35,7 +35,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：商品頁的分頁，點標籤看底線滑過去、內容跟著方向換頁。 */
+/** Catalog card: tabs on a product page, click a label to see the underline slide over and the content change page in that direction. */
 export default function SlidingTabsCard() {
   const t = useDemoText(copy);
   return (

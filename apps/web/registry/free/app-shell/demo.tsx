@@ -55,7 +55,7 @@ const pageCopy = {
 };
 type PageCopy = (typeof pageCopy)["en"];
 
-// 每格排了幾個人：中性色塊，缺人的格子留白
+// How many people are scheduled per cell: neutral colour blocks, cells with nobody are left blank
 const FILL = [
   [2, 2, 2, 2, 3, 3, 2],
   [1, 1, 1, 1, 2, 2, 1],
@@ -145,7 +145,7 @@ export function PageBody({
         </ul>
       )}
 
-      {/* 撐出可捲動的高度，讓手機頂部列的標題淡入看得到 */}
+      {/* Stretch to a scrollable height so the mobile top bar's title fade-in is visible */}
       {!compact ? (
         <div className="grid gap-3 sm:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (

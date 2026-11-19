@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent color: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, the offer and current progress */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -16,29 +16,29 @@ const springs = {
 
 export interface Hotspot {
   id: string;
-  /** 水平位置，0 到 100（%） */
+  /** Horizontal position, 0 to 100 (%) */
   x: number;
-  /** 垂直位置，0 到 100（%） */
+  /** Vertical position, 0 to 100 (%) */
   y: number;
   title: ReactNode;
   description?: ReactNode;
-  /** 說明卡底部的動作，例如價格或「加入購物車」 */
+  /** Action at the bottom of the detail card, for example the price or "Add to cart" */
   action?: ReactNode;
-  /** 給螢幕閱讀器的按鈕名稱；不給時用 title */
+  /** Button name for screen readers; title is used when not given */
   label?: string;
 }
 
 export interface HotspotsProps {
-  /** 底圖，通常是一張 img；容器會依它的尺寸撐開 */
+  /** Base image, usually an img; the container is sized by its dimensions */
   children: ReactNode;
   spots: Hotspot[];
-  /** 受控：目前打開哪一個 */
+  /** Controlled: which one is currently open */
   active?: string | null;
   defaultActive?: string | null;
   onActiveChange?: (id: string | null) => void;
-  /** number：顯示編號；dot：只有圓點 */
+  /** number: shows the number; dot: just a dot */
   marker?: "number" | "dot";
-  /** 說明卡寬度（px） */
+  /** Detail card width (px) */
   cardWidth?: number;
   className?: string;
 }
@@ -71,7 +71,7 @@ export function Hotspots({ children, spots, active: activeProp, defaultActive = 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open?.id]);
 
-  // 說明卡放在點的哪一側：靠右的點往左開、靠下的點往上開
+  // Which side of the point the detail card sits on: points on the right open to the left, points near the bottom open upward
   const place = (s: Hotspot) => ({
     side: s.x > 55 ? "left" : "right",
     vertical: s.y > 60 ? "up" : "down",

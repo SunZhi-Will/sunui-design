@@ -16,7 +16,7 @@ const copy = {
   ja: { range: (a: number, b: number, n: number) => `全 ${n} 件中 ${a}〜${b} 件`, home: "ホーム & リビング", orders: "注文履歴", reviews: "カスタマーレビュー" },
 };
 
-/** 型錄卡片：一條分頁列，點頁碼或左右鍵，頁碼長度固定不跳動。 */
+/** Catalog card: a single pagination bar. Click a page number or use the arrow keys, and the bar keeps a fixed length with no jumping. */
 export default function PaginationCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -30,7 +30,7 @@ export default function PaginationCard() {
       <p className="text-center text-xs text-muted-foreground tabular-nums">
         {t.range(from, to, TOTAL_ITEMS)}
       </p>
-      {/* 卡片寬度有限，前後只留目前頁一格 */}
+      {/* The card is narrow, so only the current page is kept on each side */}
       <Pagination locale={locale} total={pages} page={page} onPageChange={setPage} siblings={0} />
     </div>
   );

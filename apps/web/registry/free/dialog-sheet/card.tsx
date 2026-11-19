@@ -14,7 +14,7 @@ const copy = {
 const buttonClass =
   "rounded-md border border-foreground/10 bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-[#e2e2e2]/60 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 
-/** 型錄卡片：手機寬的商品頁，點「尺寸表」從底部拉起一張面板，往下拖或點遮罩關閉。 */
+/** Catalog card: a phone-width product page; tap "Size guide" to pull up a panel from the bottom, drag down or tap the backdrop to close. */
 export default function DialogSheetCard() {
   const t = useDemoText(copy);
   return (

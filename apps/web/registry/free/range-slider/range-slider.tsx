@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState, type KeyboardEvent, type PointerE
 
 import { cn } from "@/lib/utils";
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for selected state, deals and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
@@ -16,28 +16,28 @@ const springs = {
 type RangeValue = number | [number, number];
 
 export interface RangeSliderProps<V extends RangeValue = RangeValue> {
-  /** 傳數字是單值；傳 [低, 高] 是區間 */
+  /** A number means a single value; [low, high] means a range */
   value?: V;
   defaultValue?: V;
-  /** 拖曳中持續呼叫 */
+  /** Called continuously while dragging */
   onValueChange?: (value: V) => void;
-  /** 放開或鍵盤操作後呼叫一次，適合拿來送出篩選 */
+  /** Called once after release or a keyboard action; good for submitting a filter */
   onValueCommit?: (value: V) => void;
   min?: number;
   max?: number;
   step?: number;
-  /** 區間模式下兩個把手至少相隔多少 */
+  /** Minimum gap between the two handles in range mode */
   minGap?: number;
-  /** 顯示數值的格式，例如 (n) => `$${n}` */
+  /** Format of the displayed value, e.g. (n) => `$${n}` */
   format?: (n: number) => ReactNode;
-  /** 刻度：數字代表等分幾格，陣列代表指定位置 */
+  /** Ticks: a number means that many equal divisions, an array gives explicit positions */
   ticks?: number | number[];
-  /** 拖曳時在把手上方顯示數值 */
+  /** Show the value above the handle while dragging */
   showTooltip?: boolean;
   label?: ReactNode;
-  /** 表單欄位名稱；區間會送出 name-min 與 name-max */
+  /** Form field name; a range submits name-min and name-max */
   name?: string;
-  /** 把手的 aria-label，區間模式依序為 [低, 高] */
+  /** aria-label of the handles; in range mode in the order [low, high] */
   thumbLabels?: [string, string] | string;
   disabled?: boolean;
   className?: string;

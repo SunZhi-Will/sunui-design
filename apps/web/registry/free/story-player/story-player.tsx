@@ -18,38 +18,38 @@ type Direction = "left" | "right";
 
 export interface StoryAction {
   key: string;
-  /** 按鈕的 title 與 aria-label */
+  /** The button's title and aria-label */
   label: string;
   icon: ReactNode;
   onClick: () => void;
-  /** 進行中：顯示轉圈並停用整排按鈕（原本的下載中狀態） */
+  /** In progress: shows a spinner and disables the whole row of buttons (originally the downloading state) */
   loading?: boolean;
   loadingLabel?: string;
-  /** 只在最後一張顯示（原本的「查看所有寵物」） */
+  /** Shown only on the last slide (originally "View all pets") */
   lastOnly?: boolean;
 }
 
 export interface StoryPlayerProps {
-  /** 每一張卡片的內容，卡片本身是 #0f0f0f 圓角深色底 */
+  /** Content of each card; the card itself is a #0f0f0f rounded dark surface */
   slides: ReactNode[];
-  /** 每張停留毫秒數，最後兩張自動乘以 5 */
+  /** Milliseconds each slide stays; the last two are automatically multiplied by 5 */
   duration?: number;
   autoPlay?: boolean;
-  /** 受控模式的目前索引 */
+  /** Current index in controlled mode */
   index?: number;
   defaultIndex?: number;
   onIndexChange?: (index: number) => void;
   onPause?: () => void;
   onResume?: () => void;
-  /** 最後兩張出現的底部動態島按鈕 */
+  /** Bottom dynamic-island buttons shown on the last two slides */
   actions?: StoryAction[];
-  /** 卡片寬度（px），原本是 480 */
+  /** Card width (px), originally 480 */
   cardWidth?: number;
-  /** true 時鋪滿整個視窗（原本的全螢幕模式） */
+  /** When true, fills the whole viewport (originally the fullscreen mode) */
   fixed?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<StoryPlayerLabels>;
   className?: string;
 }
@@ -64,7 +64,7 @@ export interface StoryPlayerLabels {
 
 export type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文（recap-slides.tsx 也共用這一份） */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English (recap-slides.tsx shares this too) */
 export function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -103,7 +103,7 @@ const MESSAGES: Record<SunLocale, StoryPlayerLabels> = {
   },
 };
 
-/** 原本動態島用的圖示（heroicons outline） */
+/** Icon originally used by the dynamic island (heroicons outline) */
 export const storyIcons = {
   download: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />,
   share: (
@@ -196,7 +196,7 @@ export function StoryPlayer({
     setIndex(currentIndex - 1);
   }, [currentIndex, setIndex]);
 
-  // 索引改變時，同步決定滑動方向並把進度歸零（在繪製前完成，避免閃爍）
+  // When the index changes, decide the slide direction and reset progress synchronously (before paint, to avoid flicker)
   useLayoutEffect(() => {
     if (prevIndexRef.current === currentIndex) return;
     directionRef.current = pendingDirectionRef.current ?? (currentIndex > prevIndexRef.current ? "left" : "right");
@@ -206,10 +206,10 @@ export function StoryPlayer({
     setProgress(0);
   }, [currentIndex]);
 
-  // 最後兩張減慢五倍
+  // The last two slides are five times slower
   const actualDuration = currentIndex >= total - 2 ? duration * 5 : duration;
 
-  // 進度條與自動前進共用同一個 rAF 迴圈
+  // The progress bar and auto-advance share one rAF loop
   const goNextRef = useRef(goNext);
   goNextRef.current = goNext;
   useEffect(() => {
@@ -232,7 +232,7 @@ export function StoryPlayer({
     return () => cancelAnimationFrame(raf);
   }, [currentIndex, isPaused, actualDuration, autoPlay, total]);
 
-  // 長按 300ms 暫停，放開繼續
+  // Long press for 300ms pauses, release resumes
   const handleLongPressStart = useCallback(() => {
     suppressClickRef.current = false;
     longPressTimerRef.current = setTimeout(() => {
@@ -262,7 +262,7 @@ export function StoryPlayer({
     [],
   );
 
-  // 點擊區在下一個 frame 才換頁，確保方向先更新
+  // The tap area changes page on the next frame, so the direction is updated first
   const tap = (dir: Direction) => () => {
     if (suppressClickRef.current) {
       suppressClickRef.current = false;
@@ -315,7 +315,7 @@ export function StoryPlayer({
     >
       <div className="relative flex h-full w-full items-center justify-center p-4 md:p-8">
         <div className="relative flex w-full flex-col items-center">
-          {/* 進度條，在卡片上方 */}
+          {/* Progress bar, above the card */}
           <div className="z-50 mb-2 px-3 md:mb-3" style={{ width: `min(${cardWidth}px, 100%)` }} aria-hidden="true">
             <div className="pointer-events-none relative flex w-full gap-[2px]">
               {slides.map((_, i) => {
@@ -332,7 +332,7 @@ export function StoryPlayer({
             </div>
           </div>
 
-          {/* 卡片與左右提示箭頭 */}
+          {/* Card with left and right hint arrows */}
           <div className="relative" style={{ width: fixed ? `min(${cardWidth}px, calc(100vw - 32px))` : `min(${cardWidth}px, 100%)` }}>
             <AnimatePresence mode="wait" initial={false} custom={dir}>
               <motion.div
@@ -354,9 +354,9 @@ export function StoryPlayer({
                 onPointerCancel={handleLongPressEnd}
                 onContextMenu={(e) => e.preventDefault()}
               >
-                {/* 左三分之一：上一張 */}
+                {/* Left third: previous slide */}
                 {currentIndex > 0 && <div aria-hidden="true" className="absolute top-0 bottom-0 left-0 z-40 w-1/3 cursor-pointer" onClick={tap("right")} />}
-                {/* 右三分之一：下一張 */}
+                {/* Right third: next slide */}
                 {currentIndex < total - 1 && (
                   <div aria-hidden="true" className="absolute top-0 right-0 bottom-0 z-40 w-1/3 cursor-pointer" onClick={tap("left")} />
                 )}
@@ -364,7 +364,7 @@ export function StoryPlayer({
               </motion.div>
             </AnimatePresence>
 
-            {/* 右側提示箭頭（窄螢幕會落在畫面外，所以只在 md 以上顯示） */}
+            {/* Right hint arrow (falls outside the screen on narrow screens, so shown only from md up) */}
             {currentIndex < total - 1 && (
               <motion.button
                 type="button"
@@ -412,7 +412,7 @@ export function StoryPlayer({
         </div>
       )}
 
-      {/* 底部動態島：最後兩張出現 */}
+      {/* Bottom dynamic island: appears on the last two slides */}
       {isEnd && visibleActions.length > 0 && (
         <div className={cn("pointer-events-auto bottom-1 left-0 right-0 z-[100] flex justify-center", fixed ? "fixed" : "absolute")}>
           <motion.div

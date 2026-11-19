@@ -7,18 +7,18 @@ import { copy, Subject } from "./demo";
 
 export const variants = [...entrancePresets, ...exitPresets, ...emphasisPresets] as const;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative, picking one that moves on its own so the card shows the effect without hovering first
 export const featured = "jackInTheBox";
 
-/** 首頁型錄：一個預設一張卡。全部用 loop 觸發，進場與退場會來回播放，強調類照示範頁的節奏循環 */
+/** Home catalog: one card per preset. All use the loop trigger, entrances and exits play back and forth, and emphasis presets loop at the demo page's pace */
 export default function AnimatePresetsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const preset = variant as AnimatePreset;
   const family = presetFamily(preset);
   const repeatDelay = family === "emphasis" ? (preset === "spin" || preset === "float" ? 0.2 : 1.2) : 0.8;
   return (
-    // 框要接近卡片大小：backIn 系列從 120 到 160px 外起跳，框太小時起點整個被裁掉，
-    // IntersectionObserver 判定不在畫面上，loop 就永遠不會開始
+    // The frame should be close to the card size: the backIn presets start 120 to 160px outside, and in a small frame the start point is clipped away entirely,
+    // IntersectionObserver then reports it as off screen, and the loop would never start
     <div className="grid h-72 w-80 place-items-center overflow-hidden">
       <Animate preset={preset} trigger="loop" repeatDelay={repeatDelay}>
         <Subject label={t.sample} />

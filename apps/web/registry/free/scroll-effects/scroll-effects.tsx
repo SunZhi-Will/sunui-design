@@ -14,7 +14,7 @@ import { Children, useEffect, useRef, type ReactNode, type RefObject } from "rea
 
 import { cn } from "@/lib/utils";
 
-/** 九種捲動效果，每種一個具名元件 */
+/** Nine scroll effects, each a named component */
 export const scrollEffects = [
   "parallax",
   "horizontal-scroll",
@@ -31,18 +31,18 @@ export type ScrollEffectId = (typeof scrollEffects)[number];
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
 export interface ScrollEffectBaseProps {
-  /** 在可捲動容器裡使用時傳入（容器需要 position: relative）；預設跟著整個視窗捲動 */
+  /** Pass this when used inside a scrollable container (the container needs position: relative); by default it follows the whole window scroll */
   container?: RefObject<HTMLElement | null>;
-  /** 外部提供的 0 到 1 進度，給了就不讀捲動，釘住的區段也不再拉長（適合縮圖或自動播放） */
+  /** Externally supplied progress from 0 to 1; when given, scroll is not read and pinned sections no longer stretch (good for thumbnails or autoplay) */
   progress?: MotionValue<number>;
-  /** 一個「畫面」的高度，釘住的區段以它為單位；在容器裡使用時傳容器高度，例如 "480px" */
+  /** Height of one "screen"; pinned sections use it as their unit. Inside a container pass the container height, e.g. "480px" */
   stageHeight?: string;
   className?: string;
 }
 
 const DEFAULT_STAGE = "100dvh";
 
-/** 讀取 target 相對於捲動容器的進度；layoutEffect: false 讓父層的 container ref 先掛上 */
+/** Reads the target's progress relative to the scroll container; layoutEffect: false lets the parent's container ref attach first */
 function useSectionProgress(
   target: RefObject<HTMLElement | null>,
   container: RefObject<HTMLElement | null> | undefined,
@@ -53,7 +53,7 @@ function useSectionProgress(
   return external ?? scrollYProgress;
 }
 
-/** 釘住區段的總長度：外部進度時只佔一個畫面 */
+/** Total length of a pinned section: with external progress it takes only one screen */
 function trackHeight(stage: string, screens: number, external: boolean) {
   return external ? stage : `calc(${stage} * ${screens})`;
 }
@@ -61,16 +61,16 @@ function trackHeight(stage: string, screens: number, external: boolean) {
 const tint = (n: number) => `color-mix(in oklab, var(--primary) ${n}%, var(--background))`;
 
 /* ------------------------------------------------------------------ */
-/* 1. parallax：遠、中、近三層以不同速度移動                              */
+/* 1. parallax: far, middle and near layers move at different speeds */
 /* ------------------------------------------------------------------ */
 
 export interface ParallaxLayersProps extends ScrollEffectBaseProps {
-  /** 中央的前景內容，跟著頁面正常移動 */
+  /** Central foreground content, moves normally with the page */
   children?: ReactNode;
   far?: ReactNode;
   mid?: ReactNode;
   near?: ReactNode;
-  /** 近景最大位移（px），遠景與中景按比例縮小 */
+  /** Maximum offset of the near layer (px); the far and middle layers scale down proportionally */
   distance?: number;
 }
 
@@ -88,7 +88,7 @@ export function ParallaxLayers({
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion() ?? false;
   const p = useSectionProgress(ref, container, ["start end", "end start"], progress);
-  // 遠景往反方向補償（看起來慢），近景加速（看起來快）
+  // The far layer compensates in the opposite direction (looks slower), the near layer speeds up (looks faster)
   const yFar = useTransform(p, [0, 1], [-distance * 0.6, distance * 0.6]);
   const yMid = useTransform(p, [0, 1], [-distance * 0.25, distance * 0.25]);
   const yNear = useTransform(p, [0, 1], [distance * 0.5, -distance * 0.5]);
@@ -127,13 +127,13 @@ export function ParallaxLayers({
 }
 
 /* ------------------------------------------------------------------ */
-/* 2. horizontal-scroll：區段釘住，一排面板隨往下捲而橫移                 */
+/* 2. horizontal-scroll: the section pins and a row of panels moves sideways as you scroll down */
 /* ------------------------------------------------------------------ */
 
 export interface HorizontalScrollProps extends ScrollEffectBaseProps {
-  /** 每個子元素是一個面板 */
+  /** Each child is a panel */
   children: ReactNode;
-  /** 每個面板的 class，預設寬度約為畫面的八成 */
+  /** Class for each panel; the default width is about 80% of the screen */
   panelClassName?: string;
 }
 
@@ -151,7 +151,7 @@ export function HorizontalScroll({
   const reduce = useReducedMotion() ?? false;
   const panels = Children.toArray(children);
   const p = useSectionProgress(ref, container, ["start start", "end end"], progress);
-  // 可橫移的距離 = 整排寬度 減 舞台寬度，尺寸變動時重新量
+  // Scrollable distance = row width minus stage width, measured again when sizes change
   const shift = useMotionValue(0);
   const x = useTransform(() => -p.get() * shift.get());
 
@@ -170,7 +170,7 @@ export function HorizontalScroll({
   const panelCls = cn("w-[min(80%,28rem)] shrink-0 snap-center", panelClassName);
 
   if (reduce) {
-    // 減少動態：一般的橫向捲動列表
+    // Reduced motion: a plain horizontal scroll list
     return (
       <section ref={ref} className={cn("relative", className)}>
         <div ref={stage} className="overflow-x-auto">
@@ -202,15 +202,15 @@ export function HorizontalScroll({
 }
 
 /* ------------------------------------------------------------------ */
-/* 3. zoom-on-scroll：小圖放大到填滿畫面，接著標題淡入                     */
+/* 3. zoom-on-scroll: a small image grows to fill the screen, then the title fades in */
 /* ------------------------------------------------------------------ */
 
 export interface ZoomOnScrollProps extends ScrollEffectBaseProps {
   src?: string;
   alt?: string;
-  /** 沒有圖片時放自訂的畫面（例如 SVG 或漸層） */
+  /** Custom visual to use when there is no image (e.g. SVG or a gradient) */
   art?: ReactNode;
-  /** 放大完成後淡入的標題 */
+  /** Title that fades in after the zoom completes */
   title?: ReactNode;
   children?: ReactNode;
 }
@@ -270,13 +270,13 @@ export function ZoomOnScroll({
 }
 
 /* ------------------------------------------------------------------ */
-/* 4. velocity-skew：依捲動速度傾斜，停下後彈回                            */
+/* 4. velocity-skew: skews with scroll velocity and springs back when it stops */
 /* ------------------------------------------------------------------ */
 
 export interface VelocitySkewProps extends ScrollEffectBaseProps {
-  /** 每個子元素各自傾斜 */
+  /** Each child skews on its own */
   children: ReactNode;
-  /** 最大傾斜角度（deg） */
+  /** Maximum skew angle (deg) */
   maxSkew?: number;
 }
 
@@ -284,7 +284,7 @@ export function VelocitySkew({ children, maxSkew = 10, container, progress, clas
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion() ?? false;
   const { scrollY } = useScroll({ target: ref, container, layoutEffect: false });
-  // 外部進度換算成假想的像素，讓縮圖也能看到傾斜
+  // Convert external progress into imaginary pixels so thumbnails can show the skew too
   const zero = useMotionValue(0);
   const fakeY = useTransform(progress ?? zero, (v) => v * 2400);
   const velocity = useVelocity(progress ? fakeY : scrollY);
@@ -301,14 +301,14 @@ export function VelocitySkew({ children, maxSkew = 10, container, progress, clas
 }
 
 /* ------------------------------------------------------------------ */
-/* 5. scroll-marquee：大字列隨捲動往相反方向橫移                           */
+/* 5. scroll-marquee: rows of large text move sideways in opposite directions as you scroll */
 /* ------------------------------------------------------------------ */
 
 export interface ScrollMarqueeProps extends ScrollEffectBaseProps {
   rows: string[];
-  /** 橫移距離，佔一列總寬的百分比 */
+  /** Horizontal travel as a percentage of the total row width */
   distance?: number;
-  /** 偶數列改成描邊字 */
+  /** Even rows become outlined text */
   outlineAlternate?: boolean;
   rowClassName?: string;
 }
@@ -389,13 +389,13 @@ function MarqueeRow({
 }
 
 /* ------------------------------------------------------------------ */
-/* 6. circle-reveal：圓形遮罩從中心擴大，揭開下一段                        */
+/* 6. circle-reveal: a circular mask grows from the center to reveal the next section */
 /* ------------------------------------------------------------------ */
 
 export interface CircleRevealProps extends ScrollEffectBaseProps {
-  /** 一開始看到的畫面 */
+  /** The visual seen at first */
   front: ReactNode;
-  /** 被圓形揭開的下一段 */
+  /** The next section revealed by the circle */
   children: ReactNode;
 }
 
@@ -403,7 +403,7 @@ export function CircleReveal({ front, children, container, progress, stageHeight
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion() ?? false;
   const p = useSectionProgress(ref, container, ["start start", "end end"], progress);
-  // 半徑 75% 足以蓋過四個角
+  // A radius of 75% is enough to cover all four corners
   const clipPath = useTransform(p, [0.1, 0.9], ["circle(0% at 50% 50%)", "circle(75% at 50% 50%)"]);
 
   if (reduce) {
@@ -428,15 +428,15 @@ export function CircleReveal({ front, children, container, progress, stageHeight
 }
 
 /* ------------------------------------------------------------------ */
-/* 7. split-doors：畫面從中間分成兩扇門，隨捲動往兩側滑開                  */
+/* 7. split-doors: the visual splits into two doors from the middle and slides apart as you scroll */
 /* ------------------------------------------------------------------ */
 
 export interface SplitDoorsProps extends ScrollEffectBaseProps {
-  /** 門板上的畫面，會從正中間切成左右兩半 */
+  /** Visual on the doors, cut into left and right halves at the exact center */
   cover: ReactNode;
-  /** 門後的內容 */
+  /** Content behind the doors */
   children: ReactNode;
-  /** 門板的 class，預設 bg-foreground text-background */
+  /** Class for the doors, default bg-foreground text-background */
   doorClassName?: string;
 }
 
@@ -472,7 +472,7 @@ export function SplitDoors({ cover, children, doorClassName, container, progress
           <div className="absolute inset-y-0 left-0 w-[200%]">{cover}</div>
         </motion.div>
         <motion.div className={cn(door, "right-0 shadow-[-8px_0_24px_-12px_rgba(0,0,0,0.5)]")} style={{ x: rightX }}>
-          {/* 右半扇承載可讀文字給讀屏，左半扇 aria-hidden */}
+          {/* The right door carries the readable text for screen readers, the left door is aria-hidden */}
           <div className="absolute inset-y-0 right-0 w-[200%]">{cover}</div>
         </motion.div>
       </div>
@@ -481,14 +481,14 @@ export function SplitDoors({ cover, children, doorClassName, container, progress
 }
 
 /* ------------------------------------------------------------------ */
-/* 8. stacking-cards：卡片黏在頂端疊起來，前面的縮小變暗                   */
+/* 8. stacking-cards: cards stick to the top and stack up, earlier ones shrink and darken */
 /* ------------------------------------------------------------------ */
 
 export interface StackingCardsProps extends ScrollEffectBaseProps {
-  /** 每個子元素是一張卡 */
+  /** Each child is a card */
   children: ReactNode;
   cardClassName?: string;
-  /** 每張卡往下錯開的距離（px），讓後面的卡露出邊 */
+  /** Downward offset of each card (px), so the cards behind show their edge */
   peek?: number;
 }
 
@@ -519,7 +519,7 @@ export function StackingCards({
     );
   }
 
-  // 外部進度：所有卡疊在同一個畫面裡，依進度逐張滑入
+  // External progress: all cards stack in one screen and slide in one by one with the progress
   if (progress) {
     return (
       <section ref={ref} className={cn("relative overflow-hidden", className)} style={{ height: stageHeight }}>
@@ -566,7 +566,7 @@ function StackCard({
   const start = index / total;
   const scale = useTransform(progress, [start, 1], [1, 1 - depth * 0.06]);
   const filter = useTransform(progress, [start, 1], ["brightness(1)", `brightness(${1 - depth * 0.15})`]);
-  // 只在 overlay 模式使用：卡片從下方滑進來
+  // Used only in overlay mode: the card slides in from below
   const enter = useTransform(progress, [Math.max(0, (index - 1) / total), start], index === 0 ? ["0%", "0%"] : ["120%", "0%"]);
 
   if (overlay) {
@@ -586,16 +586,16 @@ function StackCard({
 }
 
 /* ------------------------------------------------------------------ */
-/* 9. scroll-draw-path：一條曲線隨捲動畫出來，串起各段                     */
+/* 9. scroll-draw-path: a curve is drawn as you scroll, linking the sections */
 /* ------------------------------------------------------------------ */
 
 export interface ScrollDrawPathProps extends ScrollEffectBaseProps {
-  /** 沿著曲線排列的段落 */
+  /** Paragraphs laid out along the curve */
   children: ReactNode;
-  /** SVG path，座標系為 0 到 100（寬）乘 0 到 100（高），會拉伸到整個區段 */
+  /** SVG path in a 0 to 100 (width) by 0 to 100 (height) coordinate system, stretched to the whole section */
   d?: string;
   strokeWidth?: number;
-  /** 線條顏色，預設 var(--primary) */
+  /** Line color, default var(--primary) */
   color?: string;
 }
 

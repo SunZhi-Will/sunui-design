@@ -22,7 +22,7 @@ const base = [
 
 const steps = [420, 1760, 3400, 9150];
 
-/** 型錄卡片：按 +pts 累積點數，半圓弧與指針彈到下一級，最高級蓋上朱紅章。 */
+/** Catalog card: press +pts to accumulate points; the half-ring arc and needle spring to the next tier, and the top tier gets a vermilion seal. */
 export default function TierProgressCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

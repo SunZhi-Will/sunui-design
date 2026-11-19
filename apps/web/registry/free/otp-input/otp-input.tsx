@@ -10,27 +10,27 @@ import { cn } from "@/lib/utils";
 export type OtpStatus = "idle" | "success" | "error";
 
 export interface OtpInputProps {
-  /** 格數 */
+  /** Number of cells */
   length?: number;
-  /** 受控值 */
+  /** Controlled value */
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
-  /** 填滿時觸發 */
+  /** Fires when all cells are filled */
   onComplete?: (value: string) => void;
-  /** success 蓋上「已驗證」印章；error 輕搖一次並顯示錯誤文字 */
+  /** success lands a "verified" stamp; error shakes once and shows the error text */
   status?: OtpStatus;
-  /** numeric 只收數字；alphanumeric 收英數字 */
+  /** numeric accepts digits only; alphanumeric accepts letters and digits */
   mode?: "numeric" | "alphanumeric";
-  /** 每幾格插入一條分隔短線，例如 6 格時傳 3 */
+  /** Insert a short divider every this many cells, for example pass 3 for 6 cells */
   groupSize?: number;
-  /** 以圓點遮蔽輸入內容 */
+  /** Masks the input with dots */
   mask?: boolean;
   disabled?: boolean;
   autoFocus?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: Partial<OtpInputLabels>;
   className?: string;
 }
@@ -45,7 +45,7 @@ export interface OtpInputLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -84,17 +84,17 @@ const MESSAGES: Record<SunLocale, OtpInputLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colors, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
 const vermilion = "text-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 
-// 游標不在選取狀態時，新輸入會與舊字元並存，先去掉舊字元
+// When the caret is not a selection, a new keystroke coexists with the old character, so drop the old one first
 function stripExisting(next: string, prev: string) {
   if (!prev || next.length < 2) return next;
   if (next.startsWith(prev)) return next.slice(prev.length);
@@ -129,7 +129,7 @@ export function OtpInput({
   const chars = Array.from({ length }, (_, i) => code[i] ?? "");
   const pattern = mode === "numeric" ? /[0-9]/ : /[0-9a-zA-Z]/;
 
-  // 錯誤時整排輕搖一次，像紙被推回來；減少動態時不搖
+  // On error the whole row shakes once, like a sheet of paper pushed back; no shake with reduced motion
   useEffect(() => {
     if (status === "error" && !reduceMotion) {
       void controls.start({ ...shakeKeyframes, transition: shakeTransition });
@@ -153,7 +153,7 @@ export function OtpInput({
     el?.select();
   };
 
-  // 中間的空洞以空白保留位置，尾端空白去掉
+  // Gaps in the middle keep their position as spaces; trailing spaces are removed
   const write = (start: number, input: string[]) => {
     const arr = chars.map((c) => c || " ");
     input.slice(0, length - start).forEach((c, k) => (arr[start + k] = c || " "));
@@ -245,7 +245,7 @@ export function OtpInput({
                       disabled && "cursor-not-allowed opacity-50",
                     )}
                   />
-                  {/* 細線游標：印刷表格上的填寫位置 */}
+                  {/* Thin line caret: the fill-in position on a printed form */}
                   {focused === i && !disabled && status !== "success" && (
                     <span aria-hidden="true" className={cn("pointer-events-none absolute inset-x-2.5 bottom-2 h-0.5 bg-current sm:inset-x-3", spot)} />
                   )}

@@ -21,33 +21,33 @@ import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
 
-// 移植自 Schedary 的 components/layout（app-shell.tsx、sidebar.tsx、mobile-nav.tsx）。
-// 分組、tabLabel 與 sidebar: false 的設定方式對照 ComfyUI 的 nav-config.ts；
-// spliteat-web、voxcpm-video-generator 用的也是同一套外殼。
-// 桌面：左側分組導覽列，可收合成圖示列（Cmd/Ctrl + B），收合時第二層改成右側浮出選單。
-// 手機：頂部列（iOS 大標題做法）＋底部分頁列（只放有 tabLabel 的頁面）＋「更多」抽屜。
-// 與原版不同的地方：路由、身分、門市都改成 props；Popover、Tooltip、DropdownMenu、Sheet 改為元件內實作；
-// 切換斷點預設用 container query，放在任何寬度的容器裡都會正確切換。
+// Ported from Schedary's components/layout (app-shell.tsx, sidebar.tsx, mobile-nav.tsx).
+// Grouping, tabLabel and the sidebar: false option follow ComfyUI's nav-config.ts;
+// spliteat-web and voxcpm-video-generator use the same shell.
+// Desktop: grouped nav on the left that collapses to an icon rail (Cmd/Ctrl + B); when collapsed, the second level becomes a flyout menu on the right.
+// Mobile: top bar (iOS large-title pattern) + bottom tab bar (only pages with a tabLabel) + a "More" drawer.
+// Differences from the original: routing, identity and store are props; Popover, Tooltip, DropdownMenu and Sheet are implemented inside the component;
+// the switch breakpoint uses a container query by default, so it switches correctly inside a container of any width.
 
-/* ------------------------------------------------------------------ 型別 */
+/* ------------------------------------------------------------------ types */
 
-/** 跟 lucide-react 的 icon 相容：直接傳 lucide 元件即可 */
+/** Compatible with lucide-react icons: just pass a lucide component */
 export type AppShellIcon = ComponentType<{ className?: string; strokeWidth?: number }>;
 
-/** 可點擊的頁面（葉節點） */
+/** A clickable page (leaf node) */
 export interface AppShellNavItem {
   href: string;
   label: string;
   icon: AppShellIcon;
-  /** 手機底部分頁列的短標籤；有設定才會出現在底部分頁列 */
+  /** Short label for the mobile bottom tab bar; the page appears there only when set */
   tabLabel?: string;
-  /** 數量徽章（例如待審核件數）；收合時改成小圓點 */
+  /** Count badge (e.g. pending reviews); becomes a small dot when collapsed */
   badge?: number;
-  /** false：桌面側邊欄不列出，手機分頁列與「更多」照常顯示 */
+  /** false: not listed in the desktop sidebar; the mobile tab bar and "More" still show it */
   sidebar?: false;
 }
 
-/** 第二層：本身不是頁面，只負責收納子頁面 */
+/** Second level: not a page itself, only groups child pages */
 export interface AppShellNavParent {
   id: string;
   label: string;
@@ -62,28 +62,28 @@ export interface AppShellNavGroup {
   items: AppShellNavEntry[];
 }
 
-/** renderLink 收到的屬性；Next.js 可直接 `renderLink={(p) => <Link {...p} />}` */
+/** Props passed to renderLink; in Next.js use `renderLink={(p) => <Link {...p} />}` */
 export type AppShellLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 export interface AppShellWorkspace {
-  /** 目前所在的門市、專案或組織名稱 */
+  /** Name of the current store, project or organization */
   label: string;
   icon?: AppShellIcon;
-  /** 兩個以上才會變成可切換的選單 */
+  /** Becomes a switchable menu with two or more entries */
   options?: { id: string; label: string }[];
   value?: string;
   onChange?: (id: string) => void;
-  /** 選單最下方的額外動作，例如「所有門市」 */
+  /** Extra action at the bottom of the menu, e.g. "All stores" */
   action?: { label: string; icon?: AppShellIcon; onSelect: () => void };
 }
 
 export interface AppShellAccount {
   name: string;
-  /** 角色或方案，顯示在名字下方 */
+  /** Role or plan, shown under the name */
   detail?: string;
-  /** 只出現在帳號選單裡 */
+  /** Shown only in the account menu */
   email?: string;
-  /** 頭像字首，預設取名字第一個字 */
+  /** Avatar initial; defaults to the first character of the name */
   initial?: string;
   actions?: { label: string; icon?: AppShellIcon; onSelect: () => void }[];
 }
@@ -105,44 +105,44 @@ export interface AppShellLabels {
 
 export interface AppShellProps {
   groups: AppShellNavGroup[];
-  /** 目前路徑，例如 Next.js 的 usePathname() */
+  /** Current path, e.g. Next.js usePathname() */
   activeHref: string;
-  /** 點任何導覽連結時呼叫；用 client 路由的話在這裡 preventDefault 再自己換頁 */
+  /** Called on any nav link click; with client-side routing, preventDefault here and navigate yourself */
   onNavigate?: (href: string, event: ReactMouseEvent<HTMLAnchorElement>) => void;
-  /** 換成框架的 Link，預設是 <a> */
+  /** Swap in your framework's Link; defaults to <a> */
   renderLink?: (props: AppShellLinkProps) => ReactNode;
   brand: { name: string; logo?: ReactNode; href?: string };
   workspace?: AppShellWorkspace;
   account?: AppShellAccount;
-  /** 手機頂部列標題；不給就依 activeHref 從導覽裡找 */
+  /** Mobile top bar title; if omitted, it is looked up in the nav from activeHref */
   title?: string;
-  /** 手機頂部列的返回路徑；null 強制不顯示，不給就自動判斷（子頁面才出現） */
+  /** Back path for the mobile top bar; null forces it hidden, omitted means automatic (shown on sub-pages only) */
   backHref?: string | null;
-  /** 子頁面（例如 /history/12）在頂部列顯示的標題，key 是上層頁面的 href */
+  /** Title shown in the top bar for a sub-page (e.g. /history/12); the key is the parent page's href */
   detailTitles?: Record<string, string>;
-  /** 手機頂部列右側 */
+  /** Right side of the mobile top bar */
   mobileAction?: ReactNode;
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
-  /** Cmd/Ctrl + B 切換收合，預設開啟 */
+  /** Cmd/Ctrl + B toggles collapse; on by default */
   shortcut?: boolean;
-  /** 一開始就展開的第二層 id；含有目前頁面的分區會自動展開 */
+  /** Second-level ids that start expanded; the section containing the current page expands automatically */
   defaultOpenSections?: string[];
   /**
-   * container（預設）：依外殼本身的寬度切換，外殼要有固定高度（例如 h-dvh），內容在外殼裡捲動。
-   * viewport：依視窗寬度（md）切換，用整頁捲動，底部分頁列固定在視窗底部。
+   * container (default): switches on the shell's own width. The shell needs a fixed height (e.g. h-dvh) and the content scrolls inside it.
+   * viewport: switches on the window width (md), scrolls the whole page, and pins the bottom tab bar to the bottom of the window.
    */
   breakpoint?: "container" | "viewport";
   locale?: string;
   labels?: AppShellLabels;
   className?: string;
-  /** 主內容外層，預設置中、最大寬 max-w-6xl */
+  /** Outer wrapper of the main content; centered with max-w-6xl by default */
   contentClassName?: string;
   children?: ReactNode;
 }
 
-/* ------------------------------------------------------------------ 文案 */
+/* ------------------------------------------------------------------ copy */
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
@@ -212,13 +212,13 @@ const MESSAGES: Record<SunLocale, Required<AppShellLabels>> = {
   },
 };
 
-/* ------------------------------------------------------------------ 工具 */
+/* ------------------------------------------------------------------ utilities */
 
 export function isNavParent(entry: AppShellNavEntry): entry is AppShellNavParent {
   return "children" in entry;
 }
 
-/** 攤平成所有可點擊的頁面，供手機頂部標題與底部分頁列使用 */
+/** Flatten into all clickable pages, for the mobile top title and the bottom tab bar */
 export function flattenNav(groups: AppShellNavGroup[]): AppShellNavItem[] {
   return groups.flatMap((g) => g.items.flatMap((e) => (isNavParent(e) ? e.children : [e])));
 }
@@ -229,8 +229,8 @@ export function isActiveHref(pathname: string, href: string) {
 }
 
 /*
- * 收合動畫（照原版）：側邊欄在兩種狀態下 DOM 完全相同，圖示固定在同一個 x 座標（寬 56px 時剛好置中），
- * 只有寬度與文字透明度在變。文字收起時立刻淡出，展開時等寬度走了一段再淡入，避免被擠壓的文字閃一下。
+ * Collapse animation (as in the original): the sidebar DOM is identical in both states and icons stay at the same x position (centered at 56px wide);
+ * only the width and text opacity change. Text fades out immediately on collapse and fades in after the width has travelled a bit on expand, so squeezed text does not flash.
  */
 const EASE = "ease-[cubic-bezier(0.32,0.72,0,1)]";
 const FADE =
@@ -242,7 +242,7 @@ const ROW_ACTIVE = "bg-background font-medium text-foreground shadow-[inset_0_0_
 const ROW_IDLE = "text-muted-foreground hover:bg-muted hover:text-foreground";
 const SIDEBAR_BG = "bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]";
 
-// Tailwind 要看到完整的 class 字串才會產生，兩種斷點各寫一份
+// Tailwind needs to see complete class strings to generate them, so write one copy for each breakpoint kind
 const BP = {
   container: {
     root: "@container/shell relative flex h-full min-h-0 overflow-hidden",
@@ -270,7 +270,7 @@ interface ShellContext {
   link: (props: AppShellLinkProps) => ReactNode;
   navigate: (href: string, e: ReactMouseEvent<HTMLAnchorElement>) => void;
   rootRef: RefObject<HTMLDivElement | null>;
-  /** 把元素位置換算成外殼內的座標（外殼被 transform 縮放時也對） */
+  /** Convert an element's position to coordinates inside the shell (also correct when the shell is scaled by a transform) */
   measure: (el: HTMLElement) => Rect;
 }
 
@@ -283,7 +283,7 @@ function useShell() {
 
 const defaultLink = ({ children, ...rest }: AppShellLinkProps) => <a {...rest}>{children}</a>;
 
-/* ------------------------------------------------------------------ 圖示（形狀照 lucide） */
+/* ------------------------------------------------------------------ icons (shapes follow lucide) */
 
 function Svg({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -344,9 +344,9 @@ const Check = ({ className }: { className?: string }) => (
   </Svg>
 );
 
-/* ------------------------------------------------------------------ 浮層 */
+/* ------------------------------------------------------------------ overlays */
 
-/** 收合時的 tooltip：只有一個，畫在外殼裡，不受側邊欄 overflow 裁切 */
+/** Tooltip while collapsed: there is only one, drawn inside the shell so the sidebar's overflow cannot clip it */
 interface TipState {
   label: string;
   top: number;
@@ -366,7 +366,7 @@ interface MenuItemDef {
 
 type Placement = "below" | "above" | "right" | "right-end";
 
-/** 下拉選單：方向鍵移動、Esc 關閉並把焦點還給按鈕、點外面關閉 */
+/** Dropdown menu: arrow keys move, Esc closes and returns focus to the button, clicking outside closes */
 function FloatingMenu({
   anchor,
   open,
@@ -479,7 +479,7 @@ function FloatingMenu({
   );
 }
 
-/* ------------------------------------------------------------------ 導覽列 */
+/* ------------------------------------------------------------------ navigation */
 
 function RowIcon({ icon: Icon, active, dot }: { icon: AppShellIcon; active: boolean; dot: boolean }) {
   return (
@@ -512,7 +512,7 @@ function CountBadge({ count }: { count?: number | null }) {
   );
 }
 
-/** 收合時滑過或聚焦才顯示 tooltip；DOM 在兩種狀態下一致 */
+/** While collapsed, the tooltip shows on hover or focus; the DOM is the same in both states */
 function TipTarget({ collapsed, label, children }: { collapsed: boolean; label: string; children: ReactNode }) {
   const tip = useContext(TipCtx);
   const ref = useRef<HTMLDivElement>(null);
@@ -569,7 +569,7 @@ function NavLinkRow({
   );
 }
 
-/** 子頁面：不放圖示，文字與父項目的文字對齊，左側一條細線表示層級 */
+/** Sub-page: no icon, text aligned with the parent's text, a thin line on the left marks the level */
 function NavChildLink({
   item,
   size,
@@ -618,7 +618,7 @@ function NavParentRow({
   const childActive = entry.children.some((c) => isActiveHref(activeHref, c.href));
   const childBadge = entry.children.reduce((sum, c) => sum + (c.badge && c.badge > 0 ? c.badge : 0), 0) || null;
 
-  // 收合狀態：滑過父項目圖示時，在右側浮出子選單（離開 120ms 後才收，讓滑鼠來得及移過去）
+  // Collapsed: hovering the parent icon opens a submenu flyout on the right (it closes 120ms after the pointer leaves, so the mouse has time to cross over)
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [flyout, setFlyout] = useState<{ top: number; left: number } | null>(null);
   const closeTimer = useRef<number | undefined>(undefined);
@@ -639,7 +639,7 @@ function NavParentRow({
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   const contentId = `shell-section-${entry.id}`;
-  // 收合、或分區收起時看不到子頁面，改由父項目顯示選取狀態
+  // When collapsed or the section is closed, child pages are not visible, so the parent shows the selected state instead
   const showActive = childActive && !expanded;
 
   return (
@@ -669,7 +669,7 @@ function NavParentRow({
         <RowIcon icon={entry.icon} active={childActive} dot={collapsed && childBadge !== null} />
         <span className={FADE}>{entry.label}</span>
         {open ? null : <CountBadge count={childBadge} />}
-        {/* 淡出與旋轉分在兩層，避免兩個 transition 互相覆蓋 */}
+        {/* Fade and rotation live on two layers so the two transitions do not override each other */}
         <span aria-hidden className={cn("flex shrink-0", (open || !childBadge) && "ml-auto", FADE)}>
           <ChevronRight
             className={cn(
@@ -694,7 +694,7 @@ function NavParentRow({
         />
       ) : null}
 
-      {/* 高度用 grid-template-rows 0fr ↔ 1fr 做動畫，不需要量測高度 */}
+      {/* Height animates with grid-template-rows 0fr <-> 1fr, so no height measuring is needed */}
       <div
         id={contentId}
         inert={!expanded}
@@ -719,7 +719,7 @@ function NavParentRow({
   );
 }
 
-/** 收合時第二層的浮出選單；畫在外殼的浮層裡，不受側邊欄 overflow 裁切 */
+/** Flyout menu for the second level while collapsed; drawn in the shell's overlay so the sidebar's overflow cannot clip it */
 function FlyoutLayer({
   entry,
   position,
@@ -750,7 +750,7 @@ function FlyoutLayer({
   );
 }
 
-/** 浮層宿主：浮出選單從各列 render，但要畫在外殼最上層 */
+/** Overlay host: flyout menus render from each row but must be drawn at the top of the shell */
 const LayerCtx = createContext<{ portal: (node: ReactNode) => ReactNode } | null>(null);
 
 function useSections(groups: AppShellNavGroup[], activeHref: string, defaults?: string[]) {
@@ -763,7 +763,7 @@ function useSections(groups: AppShellNavGroup[], activeHref: string, defaults?: 
       return next;
     });
   }, []);
-  // 進入某個子頁面時自動展開它所在的分區；只在換頁時檢查，使用者之後手動收起就尊重他的選擇
+  // Entering a sub-page expands its section automatically; this only checks on navigation, so a section the user later closes by hand stays closed
   useEffect(() => {
     for (const g of groups)
       for (const e of g.items)
@@ -797,7 +797,7 @@ function NavList({
         return (
           <div key={group.label ?? index} className="flex flex-col gap-0.5">
             {group.label ? (
-              // 固定高度：文字標題與收合時的分隔線疊在同一格交叉淡化，項目不會上下跳
+              // Fixed height: the text title and the divider line shown while collapsed overlap in the same cell and cross-fade, so items do not jump vertically
               <div className="relative mb-0.5 h-6">
                 <p
                   className={cn(
@@ -838,9 +838,9 @@ function NavList({
   );
 }
 
-/* ------------------------------------------------------------------ 門市切換與身分 */
+/* ------------------------------------------------------------------ store switcher and identity */
 
-/** 只有一個選項時只顯示名稱；兩個以上（或有額外動作）才是可切換的選單 */
+/** With one option, only the name is shown; with two or more (or an extra action) it is a switchable menu */
 function WorkspaceSwitcher({
   workspace,
   collapsed,
@@ -953,7 +953,7 @@ function Avatar({ account, ring }: { account: AppShellAccount; ring?: boolean })
   );
 }
 
-/** 桌面側邊欄底部：整列是一個選單按鈕，兩種狀態下位置都不變 */
+/** Bottom of the desktop sidebar: the whole row is one menu button, and its position is the same in both states */
 function SidebarAccount({ account, collapsed }: { account: AppShellAccount; collapsed: boolean }) {
   const { t } = useShell();
   const ref = useRef<HTMLButtonElement>(null);
@@ -1006,7 +1006,7 @@ function SidebarAccount({ account, collapsed }: { account: AppShellAccount; coll
   );
 }
 
-/** 手機「更多」抽屜底部的身分列 */
+/** Identity row at the bottom of the mobile "More" drawer */
 function SheetAccount({ account, onDone }: { account: AppShellAccount; onDone: () => void }) {
   return (
     <div className="flex items-center gap-2.5 px-2">
@@ -1037,15 +1037,15 @@ function SheetAccount({ account, onDone }: { account: AppShellAccount; onDone: (
   );
 }
 
-/* ------------------------------------------------------------------ 浮層宿主 */
+/* ------------------------------------------------------------------ overlay host */
 
-/** 把子元素送到外殼的浮層（跟 createPortal 一樣，但目標是外殼裡的節點，外殼被縮放時位置也對） */
+/** Send children to the shell's overlay (like createPortal, but the target is a node inside the shell, so positions stay correct when the shell is scaled) */
 function LayerOut({ children }: { children: ReactNode }) {
   const host = useContext(LayerCtx);
   return host ? <>{host.portal(children)}</> : null;
 }
 
-/* ------------------------------------------------------------------ 桌面側邊欄 */
+/* ------------------------------------------------------------------ desktop sidebar */
 
 function Sidebar({
   groups,
@@ -1069,14 +1069,14 @@ function Sidebar({
   bp: (typeof BP)[keyof typeof BP];
 }) {
   const { t, link, navigate } = useShell();
-  // 首次載入時不要播收合動畫（收合狀態可能是剛從儲存讀回來的）
+  // Do not play the collapse animation on first load (the collapsed state may have just been read back from storage)
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const frame = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // 與常見工具一致：Cmd/Ctrl + B 切換側邊欄
+  // Same as common tools: Cmd/Ctrl + B toggles the sidebar
   useEffect(() => {
     if (!shortcut) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -1092,7 +1092,7 @@ function Sidebar({
   const logo = brand.logo ?? <span className="text-xs font-semibold">{Array.from(brand.name)[0]}</span>;
 
   return (
-    // 外層負責佔位；展開按鈕掛在外層右緣之外，落在右側內容區的左上角
+    // The outer layer reserves space; the expand button hangs off its right edge, landing at the top-left of the content area on the right
     <div className={cn(bp.desktop, !ready && "[&,&_*]:transition-none!")}>
       <aside
         data-collapsed={collapsed ? "true" : "false"}
@@ -1103,7 +1103,7 @@ function Sidebar({
           collapsed ? "w-14" : "w-56",
         )}
       >
-        {/* 品牌列：logo 固定在與導覽圖示同一條中線上，收合按鈕在右側 */}
+        {/* Brand row: the logo sits on the same centre line as the nav icons, with the collapse button on the right */}
         <div className="flex h-8 items-center gap-2.5">
           {link({
             href: brand.href ?? "/",
@@ -1150,7 +1150,7 @@ function Sidebar({
         ) : null}
       </aside>
 
-      {/* 展開按鈕：收合後出現在內容區左上角，與收合按鈕同一高度；等寬度縮得差不多才淡入，展開時立刻淡出 */}
+      {/* Expand button: after collapsing it appears at the top-left of the content area, at the same height as the collapse button; it fades in once the width has almost finished shrinking, and fades out immediately on expand */}
       <button
         type="button"
         onClick={toggle}
@@ -1170,11 +1170,11 @@ function Sidebar({
   );
 }
 
-/* ------------------------------------------------------------------ 手機頂部列與分頁列 */
+/* ------------------------------------------------------------------ mobile top bar and tab bar */
 
 /**
- * 手機頂部列，採 iOS 大標題的做法：頁面頂端時由內容區的大標題負責，往下捲動後標題才淡入頂部列並出現分隔線，
- * 避免同一個標題在畫面上重複出現。子頁面左側固定顯示返回按鈕。
+ * Mobile top bar, using the iOS large-title pattern: at the top of the page the large title in the content area is in charge, and only after scrolling down does the title fade into the top bar together with a divider line,
+ * so the same title never appears twice on screen. Sub-pages always show a back button on the left.
  */
 function MobileTopBar({
   title,
@@ -1240,7 +1240,7 @@ function MobileTopBar({
   );
 }
 
-/** 手機底部分頁列：常用頁面放在拇指容易點到的位置，其餘頁面與身分切換收進「更多」抽屜 */
+/** Mobile bottom tab bar: frequent pages sit where the thumb reaches easily; the other pages and the identity switcher go into the "More" drawer */
 function MobileTabBar({
   items,
   showMore,
@@ -1326,7 +1326,7 @@ function MobileTabBar({
   );
 }
 
-/** 「更多」底部抽屜：所有頁面、門市切換、身分列；Esc、點遮罩或往下拖都能關閉 */
+/** "More" bottom drawer: all pages, store switcher and identity row; Esc, tapping the backdrop or dragging down closes it */
 function MoreSheet({
   open,
   onClose,
@@ -1359,7 +1359,7 @@ function MoreSheet({
       onClose();
       return;
     }
-    // 焦點留在抽屜裡
+    // Keep focus inside the drawer
     if (e.key === "Tab" && panelRef.current) {
       const list = Array.from(
         panelRef.current.querySelectorAll<HTMLElement>("a[href],button:not([disabled]),[tabindex]:not([tabindex='-1'])"),
@@ -1442,7 +1442,7 @@ function MoreSheet({
   );
 }
 
-/* ------------------------------------------------------------------ 外殼 */
+/* ------------------------------------------------------------------ shell */
 
 function usePageTitle(
   groups: AppShellNavGroup[],
@@ -1490,7 +1490,7 @@ export function AppShell({
   const columnRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLButtonElement>(null);
 
-  // 收合：受控或非受控
+  // Collapse state: controlled or uncontrolled
   const [innerCollapsed, setInnerCollapsed] = useState(defaultCollapsed);
   const collapsed = collapsedProp ?? innerCollapsed;
   const collapsedRef = useRef(collapsed);
@@ -1506,7 +1506,7 @@ export function AppShell({
   const pageTitle = title ?? auto.title;
   const pageBack = backHref === undefined ? auto.backHref : backHref;
 
-  // 頂部列標題：捲過 44px 才淡入
+  // Top bar title: fades in after scrolling past 44px
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const target: HTMLElement | Window | null = breakpoint === "container" ? columnRef.current : window;
@@ -1523,7 +1523,7 @@ export function AppShell({
     setMoreOpen(false);
     moreRef.current?.focus();
   }, []);
-  // 換頁就收起抽屜
+  // Close the drawer on navigation
   useEffect(() => setMoreOpen(false), [activeHref]);
 
   const all = flattenNav(groups);
@@ -1550,7 +1550,7 @@ export function AppShell({
     [onNavigate],
   );
 
-  // 浮層宿主：tooltip、浮出選單、下拉選單都畫在這裡
+  // Overlay host: tooltips, flyout menus and dropdown menus are all drawn here
   const [layerEl, setLayerEl] = useState<HTMLDivElement | null>(null);
   const portal = useCallback(
     (node: ReactNode) => (layerEl ? <LayerPortal target={layerEl}>{node}</LayerPortal> : null),
@@ -1630,7 +1630,7 @@ export function AppShell({
               sections={sections}
               layer={bp.layer}
             />
-            {/* 浮層：絕對定位在外殼左上角，座標由 measure 換算 */}
+            {/* Overlay: absolutely positioned at the shell's top-left corner, coordinates converted by measure */}
             <div ref={setLayerEl} className="pointer-events-none absolute inset-0 z-[60] overflow-visible [&>*]:pointer-events-auto">
               {tip ? (
                 <div
@@ -1649,7 +1649,7 @@ export function AppShell({
   );
 }
 
-/** 只建立一次的物件（API 內只用到穩定的 measure 與 setState） */
+/** Created only once (the API uses only the stable measure and setState) */
 function useStableValue<T>(factory: () => T): T {
   const ref = useRef<T | null>(null);
   if (ref.current === null) ref.current = factory();

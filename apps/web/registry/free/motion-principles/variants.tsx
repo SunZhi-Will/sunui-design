@@ -5,10 +5,10 @@ import { motionPrinciples, type MotionPrincipleName } from "./motion-principles"
 
 export const variants = motionPrinciples;
 
-// 首頁預設只放這一種當代表，挑常駐循環的，卡片不用重播就看得到
+// The home page shows only this one as the representative, picking a continuous loop so the card is visible without a replay
 export const featured = "squash-stretch";
 
-/** 首頁型錄：一種動態原理一張卡。 */
+/** Home catalog: one card per motion principle. */
 export default function MotionPrinciplesVariant({ variant }: { variant: string }) {
   return (
     <div className="w-80">

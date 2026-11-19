@@ -6,7 +6,7 @@ import { HeroBillboardCarousel, type HeroBillboardSlide } from "./hero-billboard
 
 type PosterKind = "kiln" | "type" | "run" | "books";
 
-// 示範照片（AI 生成），放在 public/blocks/hero-billboard-carousel，16:9，主體在右半邊，左下留給疊字
+// Demo photos (AI generated), stored in public/blocks/hero-billboard-carousel, 16:9, subject on the right half, lower left clear for overlaid text
 const poster = (kind: PosterKind) => `/blocks/hero-billboard-carousel/${kind}.webp`;
 
 type SlideText = Pick<HeroBillboardSlide, "title" | "subtitle" | "badge" | "eyebrow" | "meta" | "price" | "cta">;

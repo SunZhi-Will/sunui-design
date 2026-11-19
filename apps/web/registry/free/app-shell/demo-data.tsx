@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 
 import type { AppShellAccount, AppShellNavGroup, AppShellWorkspace } from "./app-shell";
 
-// demo 與 card 共用：排班工具的導覽（對照 Schedary 店長身分的導覽結構）。
-// icon 形狀照 lucide，實際專案直接傳 lucide-react 元件即可。
+// Shared by demo and card: navigation for a shift-scheduling tool (mirrors the nav structure of the Schedary store-manager role).
+// Icon shapes follow lucide; in a real project pass lucide-react components directly.
 
 function make(paths: ReactNode) {
   return function Icon({ className, strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {

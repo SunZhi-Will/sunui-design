@@ -27,7 +27,7 @@ export default function ScrollTiltStageDemo() {
 
       <section className="px-4 pb-24 md:px-10">
         <ScrollTiltStage scrollContainer={scroller}>
-          {/* 替身畫面：擴充功能的對齊視窗 */}
+          {/* Stand-in scene: the alignment window of an extension */}
           <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-[#141414] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
             <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2.5">
               <span className="size-1.5 rounded-full bg-[#a3a3a3]" />
@@ -37,7 +37,7 @@ export default function ScrollTiltStageDemo() {
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
               {[0, 1].map((i) => (
                 <div key={i} className="relative aspect-video min-w-0 overflow-hidden rounded-lg border border-white/[0.08] bg-[#0a0a0a]">
-                  {/* 中性的畫面示意：地平線與兩個色塊 */}
+                  {/* Neutral scene sketch: a horizon line and two color blocks */}
                   <span className="absolute inset-x-0 top-[62%] h-px bg-white/[0.08]" />
                   <span className={i ? "absolute left-[58%] top-[30%] h-[32%] w-[18%] rounded-sm bg-white/10" : "absolute left-[22%] top-[24%] h-[38%] w-[24%] rounded-sm bg-white/10"} />
                   <span className="absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[10px] text-[#d4d4d4]">{i ? "Twitch" : "YouTube"}</span>

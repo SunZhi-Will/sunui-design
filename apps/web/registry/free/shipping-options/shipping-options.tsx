@@ -7,13 +7,13 @@ import { cn } from "@/lib/utils";
 
 export interface ShippingOption {
   id: string;
-  /** 配送方式，例如「宅配」「超商取貨」 */
+  /** Shipping method, e.g. "Home delivery" or "Convenience store pickup" */
   name: ReactNode;
-  /** 預計到貨，例如「Thu, Nov 7」或「2 到 3 個工作天」 */
+  /** Estimated arrival, e.g. "Thu, Nov 7" or "2 to 3 business days" */
   eta: ReactNode;
-  /** 運費；0 顯示為免運 */
+  /** Shipping fee; 0 is shown as free shipping */
   fee: number;
-  /** 小字補充，例如承運商或取件說明 */
+  /** Small supplementary text, e.g. carrier or pickup instructions */
   note?: ReactNode;
   disabled?: boolean;
 }
@@ -23,14 +23,14 @@ export interface ShippingOptionsProps {
   value?: string;
   defaultValue?: string;
   onChange?: (id: string) => void;
-  /** radiogroup 的無障礙名稱 */
+  /** Accessible name of the radiogroup */
   label?: string;
-  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and currency format: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
   currency?: string;
   freeLabel?: ReactNode;
   etaLabel?: ReactNode;
-  /** 覆寫內建字串，優先於 locale；label、freeLabel、etaLabel 又優先於這裡 */
+  /** Override built-in strings; takes priority over locale; label, freeLabel and etaLabel take priority over this */
   labels?: Partial<ShippingOptionsLabels>;
   className?: string;
 }
@@ -43,7 +43,7 @@ export interface ShippingOptionsLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -58,12 +58,12 @@ const MESSAGES: Record<SunLocale, ShippingOptionsLabels> = {
   ja: { label: "配送方法", free: "送料無料", eta: "お届け予定" },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colours, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers, and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
@@ -71,7 +71,7 @@ const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
 } as const;
 
-/** 左欄（配送方式與選取圈）寬度 */
+/** Width of the left column (shipping method and selection ring) */
 const STUB = "5.75rem";
 
 export function ShippingOptions({
@@ -97,7 +97,7 @@ export function ShippingOptions({
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const fmt = new Intl.NumberFormat(locale, { style: "currency", currency });
 
-  // roving tabindex：選中的那張可 Tab 進入；沒有選中時第一張可用的
+  // roving tabindex: the selected card can be tabbed into; when none is selected, the first available one
   const focusable = options.findIndex((o) => o.id === selected && !o.disabled);
   const tabStop = focusable >= 0 ? focusable : options.findIndex((o) => !o.disabled);
 
@@ -148,7 +148,7 @@ export function ShippingOptions({
               o.disabled && "cursor-not-allowed opacity-50",
             )}
           >
-            {/* 表面另成一層，選取時只換邊線顏色，焦點框不受影響 */}
+            {/* The surface is its own layer, so selection only changes the edge colour and the focus ring is unaffected */}
             <span
               aria-hidden="true"
               className={cn(
@@ -158,13 +158,13 @@ export function ShippingOptions({
                 !on && !o.disabled && "group-hover:border-foreground/30",
               )}
             />
-            {/* 左欄：配送方式與選取圈 */}
+            {/* Left column: shipping method and selection ring */}
             <span className="flex shrink-0 flex-col justify-between gap-2 px-3 py-3" style={{ width: STUB }}>
               <Dot on={on} reduceMotion={!!reduceMotion} />
               <span className="text-sm leading-tight font-semibold tracking-tight">{o.name}</span>
             </span>
             <span aria-hidden="true" className={cn("my-2 border-l", on ? "border-current/40" : edge)} />
-            {/* 右欄：到貨日與運費 */}
+            {/* Right column: arrival date and shipping fee */}
             <span className="flex min-w-0 flex-1 items-start justify-between gap-3 px-3.5 py-3">
               <span className="min-w-0">
                 <span className={cn("block text-[11px] tracking-[0.14em] uppercase", inkMuted)}>{etaLabel}</span>
@@ -182,7 +182,7 @@ export function ShippingOptions({
   );
 }
 
-/** 選取圈：選中時中心墨點以 snappy 彈簧壓入 */
+/** Selection ring: when selected, the center dot presses in with a snappy spring */
 function Dot({ on, reduceMotion }: { on: boolean; reduceMotion: boolean }) {
   return (
     <span aria-hidden="true" className={cn("grid size-4 place-items-center rounded-full border", on ? cn("border-current", spot) : edge)}>

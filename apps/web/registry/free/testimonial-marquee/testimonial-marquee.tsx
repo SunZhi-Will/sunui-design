@@ -12,17 +12,17 @@ import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
 
-/* ───────── 型別 ───────── */
+/* ───────── types ───────── */
 
 export type TestimonialAuthor = {
   name?: string | null;
   avatarUrl?: string | null;
 };
 
-/** 卡片與展開視窗都會顯示的純文字事實列（課程名稱、角色等） */
+/** Plain-text fact rows shown on both the card and the expanded dialog (course name, role, etc.) */
 export type TestimonialMetaRow = { label: string; value: string };
 
-/** 只在展開視窗顯示的數值細項（整體滿意度、教學品質等） */
+/** Numeric details shown only in the expanded dialog (overall satisfaction, teaching quality, etc.) */
 export type TestimonialRatingRow = { label: string; value: number };
 
 export type TestimonialTagTone =
@@ -33,7 +33,7 @@ export type TestimonialTagTone =
   | "refunded"
   | "info";
 
-/** 單一彩色徽章（推薦程度、已購買標記等） */
+/** A single coloured badge (recommendation level, purchased flag, etc.) */
 export type TestimonialTag = {
   label: string;
   tone: TestimonialTagTone;
@@ -43,9 +43,9 @@ export type TestimonialTag = {
 export type Testimonial = {
   id: string;
   author: TestimonialAuthor;
-  /** 0 到 5，可小數 */
+  /** 0 to 5, fractions allowed */
   rating: number;
-  /** 主要回饋文字。空字串合法，卡面改顯示只有星等的預設面 */
+  /** Main feedback text. An empty string is valid; the card then shows a default face with stars only */
   quote: string;
   ratingBreakdown?: TestimonialRatingRow[];
   meta?: TestimonialMetaRow[];
@@ -54,15 +54,15 @@ export type Testimonial = {
 
 export interface TestimonialMarqueeLabels {
   anonymous?: string;
-  /** 卡片右下角的展開提示 */
+  /** Expand hint at the bottom right of the card */
   expandHint?: string;
-  /** 沒有文字時卡面中央的說明 */
+  /** Description in the middle of the card face when there is no text */
   ratingOnly?: (rating: string) => string;
-  /** 沒有文字時的展開提示 */
+  /** Expand hint when there is no text */
   viewFull?: string;
-  /** 卡片按鈕的無障礙名稱 */
+  /** Accessible name of the card button */
   openCard?: (name: string) => string;
-  /** 對話框的無障礙名稱 */
+  /** Accessible name of the dialog */
   dialog?: (name: string) => string;
   close?: string;
   stars?: (rating: string) => string;
@@ -70,7 +70,7 @@ export interface TestimonialMarqueeLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -123,28 +123,28 @@ const MESSAGES: Record<SunLocale, Required<TestimonialMarqueeLabels>> = {
 
 export interface TestimonialMarqueeProps {
   testimonials: Testimonial[];
-  /** 1、2 或 3 列，預設 2 */
+  /** 1, 2 or 3 rows, default 2 */
   rows?: 1 | 2 | 3;
-  /** 點擊展開詳情視窗與 3D 傾斜 hover，預設 true */
+  /** Click to open the detail dialog, plus 3D tilt on hover; default true */
   expandable?: boolean;
-  /** 唯一強調色（星等、評分條、hover 邊框），必須是 hex 色碼（內部會接透明度尾碼），預設琥珀金 #d4a24c */
+  /** The single accent colour (stars, rating bars, hover border); must be a hex colour (an alpha suffix is appended internally), default amber gold #d4a24c */
   accentColor?: string;
   cardWidth?: number;
-  /** 卡片不足時補到這個數量，避免一圈太短看起來原地打轉 */
+  /** Pad up to this many cards when there are too few, so a loop that is too short does not look like it is spinning in place */
   minCardsPerRow?: number;
-  /** 左右邊緣淡出寬度（px） */
+  /** Width of the fade on the left and right edges (px) */
   fadeWidth?: number;
-  /** 對話框是否以 fixed 蓋滿視窗；false 時以 absolute 蓋滿最近的 relative 父層 */
+  /** Whether the dialog covers the window with fixed; when false, it covers the nearest relative ancestor with absolute */
   fixed?: boolean;
   emptyFallback?: ReactNode;
-  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and number format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: TestimonialMarqueeLabels;
   className?: string;
 }
 
-/* ───────── 暗色 token（元件自帶，不依賴網站主題） ───────── */
+/* ───────── dark tokens (bundled with the component, independent of the site theme) ───────── */
 
 const THEME = {
   "--tm-text-primary": "#f5f5f5",
@@ -162,7 +162,7 @@ const THEME = {
   "--tm-gold": "#d4a24c",
 } as CSSProperties;
 
-/** 徽章一律是中性膠囊，狀態只上在 6px 的點上；refunded、info、neutral 不上色 */
+/** Badges are always neutral pills and status shows only on a 6px dot; refunded, info and neutral get no colour */
 const TONE_DOT: Record<TestimonialTagTone, string | null> = {
   neutral: null,
   free: "#34d399",
@@ -174,7 +174,7 @@ const TONE_DOT: Record<TestimonialTagTone, string | null> = {
 
 const DEFAULT_ACCENT = "#d4a24c";
 
-/** 依名字雜湊出低彩度的暖灰底色，頭像不用強調色 */
+/** Hash the name into a low-saturation warm grey background; avatars do not use the accent colour */
 function avatarTone(name?: string | null) {
   const key = name?.trim() || "?";
   let h = 0;
@@ -207,7 +207,7 @@ const KEYFRAMES = `
 }
 `;
 
-/* ───────── 圖示（形狀照 lucide） ───────── */
+/* ───────── icons (shapes follow lucide) ───────── */
 
 const STAR_PATH =
   "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z";
@@ -238,7 +238,7 @@ function XIcon({ size }: { size: number }) {
   );
 }
 
-/* ───────── 小零件（內嵌原站 StarRating / Badge / InitialAvatar） ───────── */
+/* ───────── small parts (StarRating / Badge / InitialAvatar inlined from the original site) ───────── */
 
 function StarRating({ value, size = 13, label }: { value: number; size?: number; label: string }) {
   const clamped = Math.max(0, Math.min(5, value));
@@ -311,7 +311,7 @@ function InitialAvatar({
   );
 }
 
-/* ───────── 分列 ───────── */
+/* ───────── splitting into rows ───────── */
 
 function padCards<T>(cards: T[], minCount: number): T[] {
   if (!cards.length) return [];
@@ -322,7 +322,7 @@ function padCards<T>(cards: T[], minCount: number): T[] {
   return result;
 }
 
-/** rows=2 時第二列刻意倒序，不是隨機打亂 */
+/** With rows=2 the second row is deliberately reversed, not randomly shuffled */
 function distributeRows(list: Testimonial[], rows: 1 | 2 | 3, min: number): Testimonial[][] {
   if (rows === 1) return [padCards(list, min)];
   if (rows === 2) return [padCards(list, min), padCards([...list].reverse(), min)];
@@ -331,7 +331,7 @@ function distributeRows(list: Testimonial[], rows: 1 | 2 | 3, min: number): Test
   return chunks.map((c) => padCards(c, min));
 }
 
-/* ───────── 單張卡片（3D 視差與點擊展開） ───────── */
+/* ───────── single card (3D parallax and click to expand) ───────── */
 
 function TestimonialCard({
   t,
@@ -486,7 +486,7 @@ function TestimonialCard({
   );
 }
 
-/* ───────── 展開視窗（內嵌原站 Modal 的焦點鎖、Escape、鎖捲動） ───────── */
+/* ───────── expanded dialog (focus trap, Escape and scroll lock inlined from the original site's Modal) ───────── */
 
 function ExpandedDialog({
   t,
@@ -515,7 +515,7 @@ function ExpandedDialog({
     };
   }, [fixed]);
 
-  // 開啟時焦點移進面板，關閉時還給觸發的卡片
+  // On open, move focus into the panel; on close, give it back to the card that triggered it
   useEffect(() => {
     const restore = document.activeElement as HTMLElement | null;
     const panel = panelRef.current;
@@ -667,11 +667,11 @@ function ExpandedDialog({
   return fixed ? createPortal(node, document.body) : node;
 }
 
-/* ───────── 主元件 ───────── */
+/* ───────── main component ───────── */
 
 /**
- * 多列學員留言跑馬燈：列與列方向交錯、hover 或鍵盤聚焦時暫停、左右邊緣淡出，
- * 點卡片開啟詳情對話框。手機寬度與 reduced motion 時改為各列獨立的靜態橫捲。
+ * Multi-row learner review marquee: rows alternate direction, pause on hover or keyboard focus, fade at the left and right edges,
+ * and clicking a card opens a detail dialog. On phone widths and under reduced motion, each row becomes an independent static horizontal scroll.
  */
 export function TestimonialMarquee({
   testimonials,
@@ -732,7 +732,7 @@ export function TestimonialMarquee({
         <div
           className={className}
           style={themed}
-          // JS 驅動暫停：鍵盤使用者 Tab 進卡片時也要停
+          // JS-driven pause: keyboard users tabbing into a card must stop it too
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setPaused(true)}
@@ -760,7 +760,7 @@ export function TestimonialMarquee({
           })}
         </div>
       ) : (
-        // 手機與 reduced motion：每列獨立靜態橫捲，不重複內容
+        // Phone and reduced motion: each row is a separate static horizontal scroll, with no duplicated content
         <div className={className} style={themed}>
           {groups.map((cards, ri) => (
             <div key={ri} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ paddingBottom: 8 }}>

@@ -20,20 +20,20 @@ export interface StoreHeaderProps {
   brand: ReactNode;
   links: StoreHeaderLink[];
   cartCount?: number;
-  /** 掛在購物車按鈕上，可直接當 add-to-cart-button 的 cartRef（飛行終點） */
+  /** Attached to the cart button; can be used directly as the cartRef of add-to-cart-button (the fly-to target) */
   cartRef?: Ref<HTMLButtonElement>;
   onCartClick?: () => void;
-  /** 換掉預設的購物袋圖示，例如 <ShoppingCart />；任何 SVG 都會縮到 20px */
+  /** Replaces the default shopping bag icon, for example <ShoppingCart />; any SVG is scaled to 20px */
   cartIcon?: ReactNode;
-  /** 購物車左邊的額外按鈕，例如搜尋、帳號 */
+  /** Extra buttons to the left of the cart, for example search or account */
   actions?: ReactNode;
-  /** 頁首最上方的一條，例如 AnnouncementStrip；收起時一起收 */
+  /** A strip at the very top of the header, for example AnnouncementStrip; it collapses together with the header */
   announcement?: ReactNode;
-  /** 頁首放在可捲動容器內時傳入，預設跟隨視窗 */
+  /** Pass this when the header lives inside a scrollable container; defaults to the viewport */
   scrollContainer?: RefObject<HTMLElement | null>;
-  /** 捲過這個距離後，往下捲才會收起 */
+  /** After scrolling past this distance, scrolling down collapses the header */
   hideAfter?: number;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like ja-JP are also accepted */
   locale?: string;
   labels?: StoreHeaderLabels;
   className?: string;
@@ -56,7 +56,7 @@ const MESSAGES: Record<SunLocale, Required<StoreHeaderLabels>> = {
 };
 
 const edge = "border-foreground/10";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, offers and current progress */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
@@ -64,7 +64,7 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 位移小於這個值不判斷方向，避免觸控板抖動讓頁首忽隱忽現 */
+/** Movement below this value does not decide a direction, so trackpad jitter does not make the header flicker in and out */
 const JITTER = 4;
 
 export function StoreHeader({
@@ -96,7 +96,7 @@ export function StoreHeader({
     setCompact(y > 8);
     if (y <= 8) return setHidden(false);
     if (Math.abs(delta) < JITTER) return;
-    // 減少動態時不收起，只縮高；鍵盤焦點在頁首內或選單打開時也不收
+    // With reduced motion it does not collapse, only shrinks in height; it also does not collapse while keyboard focus is inside the header or the menu is open
     const canHide = !reduce && !focusInside.current && !menuOpen;
     if (delta > 0 && y > hideAfter && canHide) setHidden(true);
     else if (delta < 0) setHidden(false);
@@ -175,7 +175,7 @@ export function StoreHeader({
         </motion.div>
       </div>
 
-      {/* 手機選單疊在頁面上方，不推擠下面的內容 */}
+      {/* The mobile menu overlays the page without pushing the content below */}
       <AnimatePresence initial={false}>
         {menuOpen && (
           <motion.div
@@ -199,7 +199,7 @@ export function StoreHeader({
             transition={springs.gentle}
             className={cn("absolute inset-x-0 top-full overflow-hidden border-b bg-background md:hidden", edge)}
           >
-            {/* 收合狀態頁首已有底線，展開時不再疊一條 */}
+            {/* The collapsed header already has a bottom line, so do not stack another one when expanded */}
             <ul className={cn("flex flex-col px-4 py-2 sm:px-6", !compact && cn("border-t", edge))}>
               {links.map((link) => (
                 <li key={link.href}>

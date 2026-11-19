@@ -24,11 +24,11 @@ const copy = {
   ja: { alt: "笑顔のメイの肖像", poke: "メイをつつく", hint: "ほっぺをつまんで引っぱって" },
 };
 
-/** 型錄卡片：一張圓框肖像，滑過會轉頭看你，抓住臉頰拉開放手會彈回來。 */
+/** Catalog card: a round-framed portrait that turns its head to look at you on hover, and springs back when you grab the cheeks, pull and release. */
 export default function PlushPortraitCard() {
   const t = useDemoText(copy);
   return (
-    // 拉長的畫布會超出肖像，卡片範圍內裁掉
+    // The stretched canvas overflows the portrait, so clip it at the card bounds
     <div className="flex h-[260px] w-[300px] flex-col items-center justify-center gap-3 overflow-clip">
       <div className="w-[200px]">
         <PlushPortrait faces={faces} alt={t.alt} pokeLabel={t.poke} frame="circle" />

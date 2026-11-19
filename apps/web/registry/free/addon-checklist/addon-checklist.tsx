@@ -8,45 +8,45 @@ import { cn } from "@/lib/utils";
 export interface AddonItem {
   id: string;
   label: ReactNode;
-  /** 品項下方的一行說明，例如「每件 +$4」 */
+  /** One-line note under the item, e.g. "+$4 each" */
   note?: ReactNode;
   price: number;
-  /** 必選項目：永遠勾選、不能取消，例如基本運費 */
+  /** Required item: always checked and cannot be unchecked, e.g. base shipping */
   required?: boolean;
 }
 
 export interface AddonChecklistLabels {
-  /** 未傳 title 時的預設標題 */
+  /** Default title when no title is passed */
   title?: ReactNode;
   base?: ReactNode;
   subtotal?: ReactNode;
   required?: ReactNode;
   free?: ReactNode;
-  /** 給螢幕閱讀器的小計朗讀文字 */
+  /** Subtotal text read aloud by screen readers */
   announce?: (total: string, count: number) => string;
 }
 
 export interface AddonChecklistProps {
   title?: ReactNode;
-  /** 主商品價格，列在第一行，不能取消 */
+  /** Price of the main product, listed on the first row and not removable */
   basePrice?: number;
   items: AddonItem[];
-  /** 受控模式：目前勾選的 id */
+  /** Controlled mode: the ids currently checked */
   value?: string[];
   defaultValue?: string[];
-  /** 回傳勾選的 id 與畫面上的總額；伺服器結帳時仍要自行重算 */
+  /** Reports the checked ids and the total shown on screen; recompute the total on the server at checkout */
   onChange?: (ids: string[], total: number) => void;
-  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and currency format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
   currency?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: AddonChecklistLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -89,12 +89,12 @@ const MESSAGES: Record<SunLocale, Required<AddonChecklistLabels>> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colour
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for selected state, deals and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
@@ -137,7 +137,7 @@ export function AddonChecklist({
     setAnnouncement(t.announce(fmt.format(nextTotal), next.length));
   }
 
-  // 小計：數值改變時用 gentle 彈簧滾到新值；reduced motion 直接跳
+  // Subtotal: when the value changes, roll to the new value with a gentle spring; jump straight there under reduced motion
   const mv = useMotionValue(total);
   const shown = useTransform(mv, (n) => fmt.format(n));
   useEffect(() => {
@@ -225,7 +225,7 @@ export function AddonChecklist({
   );
 }
 
-/** 收據上品名與金額之間的點線 */
+/** Dotted leader between the item name and the amount on the receipt */
 function Leader() {
   return <span aria-hidden="true" className="min-w-4 flex-1 translate-y-[-0.2em] border-b border-dotted border-current opacity-30" />;
 }

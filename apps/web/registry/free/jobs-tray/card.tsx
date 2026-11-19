@@ -9,7 +9,7 @@ import { JobsTray, useBackgroundJobs, type Job } from "./jobs-tray";
 
 type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;
 
-// 排隊、理解描述、載入模型、取樣 28 步、輸出、完成；完成後停 3 拍再從頭
+// Queued, reading the prompt, loading the model, 28 sampling steps, output, done; after done it holds for 3 beats, then restarts
 const timeline: Frame[] = [
   { status: "queued", queuePosition: 2, etaSeconds: 40 },
   { status: "queued", queuePosition: 1, etaSeconds: 32 },
@@ -29,7 +29,7 @@ const copy = {
   ja: { queue: "キュー", rows: ["リネンの上の陶器のマグ、朝の光", "夜市のポスター、ネオン看板"], upscale: "高解像度化 · rooftop-dusk.png", sync: "共有ドライブへ同期" },
 };
 
-/** 型錄卡片：佇列裡兩張圖一路從排隊跑到完成，右下角的工作匣同時在背景放大，另一個同步失敗留著等你關。 */
+/** Catalog card: two images in the queue run from queued to done, the jobs tray at the bottom right upscales in the background, and another failed sync stays until you dismiss it. */
 export default function JobsTrayCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

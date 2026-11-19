@@ -21,14 +21,14 @@ const copy = {
 
 const sizes = ["S", "M", "L", "XL"].map((s) => ({ id: s, label: s }));
 
-// 依顏色與尺寸的庫存；沒列到的組合視為售完。白色的 M 售完
+// Stock by color and size; combinations not listed count as sold out. White M is sold out
 const stock: Record<string, number> = {
   "white:S": 10, "white:XL": 3,
   "fog:S": 7, "fog:M": 2, "fog:XL": 4,
   "black:S": 6, "black:M": 14, "black:L": 1, "black:XL": 5,
 };
 
-/** 型錄卡片：選了 M 之後換到白色，M 在白色售完但沒有被清掉，提示行列出還有 M 的顏色。 */
+/** Catalog card: after picking M, switch to white. M is sold out in white but stays selected, and the hint line lists the colors that still have M. */
 export default function VariantPickerCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

@@ -25,7 +25,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-/** 全部動畫原理 id；demo 與文件都從這裡讀 */
+/** All animation principle ids. The demo and the docs both read from here */
 export const motionPrinciples = [
   "burst",
   "easing",
@@ -51,7 +51,7 @@ export type MotionPrincipleName = (typeof motionPrinciples)[number];
 export type MotionPrincipleTrigger = "mount" | "inView" | "hover" | "click" | "loop";
 export type ExplodeAxis = "x" | "y" | "z";
 
-/** 常駐循環的原理；其餘是單次動作（可重播） */
+/** Principles that run continuously. The rest are one-shot actions (replayable) */
 export const loopingMotionPrinciples: readonly MotionPrincipleName[] = [
   "motion-trail",
   "wiggle",
@@ -67,7 +67,7 @@ export function isLoopingMotionPrinciple(effect: MotionPrincipleName) {
   return loopingMotionPrinciples.includes(effect);
 }
 
-/** 具名的緩動曲線（cubic-bezier），可直接傳給 ease prop 或 framer-motion */
+/** Named easing curves (cubic-bezier). Pass one straight to the ease prop or to framer-motion */
 export const easings = {
   linear: [0, 0, 1, 1],
   ease: [0.25, 0.1, 0.25, 1],
@@ -88,7 +88,7 @@ function toEase(e: EaseValue): Easing {
   return typeof e === "string" ? easings[e] : e;
 }
 
-// 每個原理的預設時長（秒）與距離（px）。line-boil 的 duration 是每張「手繪稿」停留的秒數
+// Default duration (seconds) and distance (px) for each principle. For line-boil, duration is how many seconds each "hand-drawn frame" is held
 const base: Record<MotionPrincipleName, { duration: number; distance: number }> = {
   burst: { duration: 0.7, distance: 44 },
   easing: { duration: 1.2, distance: 160 },
@@ -110,9 +110,9 @@ const base: Record<MotionPrincipleName, { duration: number; distance: number }> 
   stagger: { duration: 0.5, distance: 16 },
 };
 
-/* ---------- 共用小工具 ---------- */
+/* ---------- shared helpers ---------- */
 
-/** 以索引產生穩定的偽亂數（0 到 1），SSR 與 client 一致 */
+/** Stable pseudo-random number (0 to 1) from an index, identical on the server and the client */
 function rand(i: number, salt = 1) {
   const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
   return x - Math.floor(x);
@@ -123,7 +123,7 @@ function subscribeVisibility(cb: () => void) {
   return () => document.removeEventListener("visibilitychange", cb);
 }
 
-/** 分頁是否在前景；切到別的分頁時循環暫停 */
+/** Whether the tab is in the foreground. Loops pause while another tab is active */
 function usePageVisible() {
   return useSyncExternalStore(
     subscribeVisibility,
@@ -132,7 +132,7 @@ function usePageVisible() {
   );
 }
 
-/** 依 trigger 決定：單次動作何時播放（play / cycle），循環何時在跑（running） */
+/** Derived from trigger: when a one-shot plays (play / cycle) and when a loop runs (running) */
 function useTrigger(trigger: MotionPrincipleTrigger, looping: boolean, cycleSeconds: number) {
   const reduce = useReducedMotion() ?? false;
   const ref = useRef<HTMLSpanElement>(null);
@@ -150,7 +150,7 @@ function useTrigger(trigger: MotionPrincipleTrigger, looping: boolean, cycleSeco
     pageVisible &&
     (trigger === "hover" ? hovered : trigger === "click" ? toggled : trigger === "inView" ? seen : true);
 
-  // trigger="loop" 的單次動作：在畫面內定期重播
+  // One-shot with trigger="loop": replays periodically while in view
   useEffect(() => {
     if (looping || trigger !== "loop" || reduce || !visible || !pageVisible) return;
     const id = setInterval(() => setCycle((c) => c + 1), cycleSeconds * 1000);
@@ -166,7 +166,7 @@ function useTrigger(trigger: MotionPrincipleTrigger, looping: boolean, cycleSeco
     handlers.onMouseLeave = () => setHovered(false);
   }
   if (trigger === "click") {
-    // click 事件會從子元素冒泡上來：包一顆 button 時鍵盤操作也會觸發
+    // Click events bubble up from children, so keyboard activation also fires when a button is wrapped
     handlers.onClick = () => {
       setToggled((v) => !v);
       if (!looping && !reduce) setCycle((c) => c + 1);
@@ -176,32 +176,32 @@ function useTrigger(trigger: MotionPrincipleTrigger, looping: boolean, cycleSeco
   return { ref, reduce, play, running, cycle, handlers };
 }
 
-// 疊在同一格（grid 1/1）的圖層
+// Layers stacked in the same grid cell (grid 1/1)
 const cell = "[grid-area:1/1]";
 
-/* ---------- 主元件 ---------- */
+/* ---------- main component ---------- */
 
 export interface MotionPrincipleProps {
   effect?: MotionPrincipleName;
-  /** 單次動作：何時播放；循環原理：hover / click / inView 時才跑 */
+  /** One-shot actions: when to play. Looping principles: run only on hover / click / inView */
   trigger?: MotionPrincipleTrigger;
-  /** 幅度倍率，1 為預設；0.5 收斂、1.5 誇張 */
+  /** Amplitude multiplier, 1 is the default. 0.5 is subtle, 1.5 is exaggerated */
   intensity?: number;
-  /** 單次動作或一個循環週期的秒數，省略用預設 */
+  /** Seconds for a one-shot action or one loop cycle. Omit to use the default */
   duration?: number;
-  /** 開始前延遲（秒），只用於單次動作 */
+  /** Delay before starting (seconds). One-shot actions only */
   delay?: number;
-  /** 位移距離或半徑（px）：移動類為行程、bounce 為落下高度、repeater 為半徑 */
+  /** Travel distance or radius (px): travel for movement types, drop height for bounce, radius for repeater */
   distance?: number;
-  /** 爆開線條、脈衝光環等裝飾的顏色，預設 currentColor */
+  /** Color of decorations such as burst lines and pulse rings. Defaults to currentColor */
   color?: string;
-  /** burst 的線數、bounce 的彈跳次數、motion-trail 的殘影數、repeater / kaleidoscope 的份數 */
+  /** Line count for burst, bounce count for bounce, afterimage count for motion-trail, copy count for repeater / kaleidoscope */
   count?: number;
-  /** easing / ping-pong 使用的緩動 */
+  /** Easing used by easing / ping-pong */
   ease?: EaseValue;
-  /** follow-through：掛在主體上方、停下後繼續擺動的附屬部件（旗子、天線、尾巴） */
+  /** follow-through: an appendage (flag, antenna, tail) attached above the subject that keeps swinging after it stops */
   trailing?: ReactNode;
-  /** exploded-view：分層展開的方向 */
+  /** exploded-view: direction in which the layers spread */
   axis?: ExplodeAxis;
   className?: string;
   children?: ReactNode;
@@ -223,9 +223,9 @@ interface InnerProps {
 }
 
 /**
- * 經典動畫原理包裝器：把任何子元素（圖示、徽章、按鈕、商品圖）用 effect 指定的原理動起來。
- * 單次動作在 trigger 時播放，循環原理離開畫面或分頁隱藏時暫停；reduced motion 下直接顯示靜止的子元素。
- */
+  * Classic animation principles wrapper: animates any child (icon, badge, button, product image) with the principle named by effect.
+  * One-shot actions play on trigger. Looping principles pause when off screen or when the tab is hidden. Under reduced motion the child is shown static.
+  */
 export function MotionPrinciple({
   effect = "bounce",
   trigger = "mount",
@@ -279,7 +279,7 @@ export function MotionPrinciple({
   );
 }
 
-/** inView 尚未進入畫面前的靜止狀態 */
+/** Resting state before inView has entered the viewport */
 function Rest({ children, effect, trailing, axis, dist }: InnerProps & { effect: MotionPrincipleName }) {
   if (effect === "exploded-view") return <Layers layers={Children.toArray(children)} axis={axis} gap={dist} progress={0} />;
   if (effect === "stagger")
@@ -296,9 +296,9 @@ function Rest({ children, effect, trailing, axis, dist }: InnerProps & { effect:
   return <span className="inline-block">{children}</span>;
 }
 
-/* ---------- 各原理 ---------- */
+/* ---------- principles ---------- */
 
-// 003 爆開：子元素彈一下，同時一圈光環、放射線與小點往外散
+// 003 Burst: the child pops while a ring, radiating lines and dots scatter outward
 function Burst({ children, d, delay, dist, k, color, count, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const n = count ?? 8;
@@ -367,7 +367,7 @@ function Burst({ children, d, delay, dist, k, color, count, reduce }: InnerProps
   );
 }
 
-// 009 緩動：同樣距離、同樣時間，只換速度曲線
+// 009 Easing: same distance and same duration, only the speed curve changes
 function EasingMove({ children, d, delay, dist, ease = "inOut", reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const h = dist / 2;
@@ -383,7 +383,7 @@ function EasingMove({ children, d, delay, dist, ease = "inOut", reduce }: InnerP
   );
 }
 
-// 010 超越：衝過頭、拉回、再穩定下來
+// 010 Overshoot: shoots past the target, pulls back, then settles
 function Overshoot({ children, d, delay, k, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   return (
@@ -401,7 +401,7 @@ function Overshoot({ children, d, delay, k, reduce }: InnerProps) {
   );
 }
 
-// 011 擠壓與伸展：起跳前壓扁、離地拉長、落地再壓扁（以底部為軸）
+// 011 Squash and stretch: squashes before the jump, stretches in the air, squashes again on landing (pivot at the bottom)
 function SquashStretch({ children, d, delay, dist, k, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const h = dist;
@@ -432,7 +432,7 @@ function SquashStretch({ children, d, delay, dist, k, reduce }: InnerProps) {
   );
 }
 
-/** 只在 running 時排程逐幀回呼；停住時完全不佔用幀迴圈 */
+/** Schedules a per-frame callback only while running. When stopped it uses no frame loop at all */
 function useRunningFrame(running: boolean, cb: (deltaMs: number) => void) {
   const cbRef = useRef(cb);
   cbRef.current = cb;
@@ -450,7 +450,7 @@ function useRunningFrame(running: boolean, cb: (deltaMs: number) => void) {
   }, [running]);
 }
 
-// 014 動態殘影：沿 8 字軌跡移動，後面跟著逐漸淡出的分身
+// 014 Motion trail: moves along a figure-8 path with fading copies behind it
 function MotionTrail({ children, d, dist, count, running, reduce }: InnerProps) {
   const time = useMotionValue(0);
   useRunningFrame(!!running && !reduce, (delta) => time.set(time.get() + Math.min(delta, 64) / 1000));
@@ -459,7 +459,7 @@ function MotionTrail({ children, d, dist, count, running, reduce }: InnerProps) 
   return (
     <span className="inline-grid place-items-center">
       {Array.from({ length: n }, (_, j) => {
-        const i = n - 1 - j; // 殘影先畫，本體最後畫在最上層
+        const i = n - 1 - j; // Trail copies are drawn first, the main element last on top
         return (
           <TrailCopy key={i} time={time} lag={i * d * 0.035} d={d} amp={dist / 2} index={i} total={n}>
             {children}
@@ -501,7 +501,7 @@ function TrailCopy({
   );
 }
 
-// 024 衝擊震動：子元素重重落下，著地瞬間整個容器跟著震
+// 024 Impact shake: the child slams down and the whole container shakes the moment it lands
 function ImpactShake({ children, d, delay, dist, k, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const times = [0, 0.4, 0.52, 0.64, 1];
@@ -532,7 +532,7 @@ function ImpactShake({ children, d, delay, dist, k, reduce }: InnerProps) {
   );
 }
 
-// 121 預備動作：先往反方向退、壓低蓄力，再一口氣衝出去
+// 121 Anticipation: pulls back the opposite way and crouches to build energy, then bursts out
 function Anticipation({ children, d, delay, dist, k, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const h = dist / 2;
@@ -560,7 +560,7 @@ function Anticipation({ children, d, delay, dist, k, reduce }: InnerProps) {
   );
 }
 
-/** 主體上方掛一個附屬部件（以底部為軸） */
+/** An appendage attached above the subject (pivot at the bottom) */
 function WithTrailing({ trailing, rotate, children }: { trailing: ReactNode; rotate?: Partial<FollowKeys>; children?: ReactNode }) {
   return (
     <span className="relative inline-block">
@@ -585,7 +585,7 @@ interface FollowKeys {
   transition: { duration: number; delay: number; times: number[]; ease: Easing };
 }
 
-// 122 跟隨動作：主體突然停下，附屬部件（或主體本身的上半部）繼續擺動才停
+// 122 Follow-through: the subject stops suddenly while the appendage (or the subject's upper half) keeps swinging before it settles
 function FollowThrough({ children, d, delay, dist, k, trailing, reduce }: InnerProps) {
   if (reduce) {
     return trailing ? <WithTrailing trailing={trailing}>{children}</WithTrailing> : <span className="inline-block">{children}</span>;
@@ -622,7 +622,7 @@ function FollowThrough({ children, d, delay, dist, k, trailing, reduce }: InnerP
   return move;
 }
 
-// 123 彈跳：落下後一次比一次彈得低，最後停住
+// 123 Bounce: after landing, each bounce is lower than the last until it stops
 function Bounce({ children, d, delay, dist, k, count, reduce }: InnerProps) {
   if (reduce) return <span className="inline-block">{children}</span>;
   const n = Math.max(1, count ?? 3);
@@ -656,7 +656,7 @@ function Bounce({ children, d, delay, dist, k, count, reduce }: InnerProps) {
   );
 }
 
-// 124 抖動：不規則的小幅晃動，持續不停（以上緣為軸，像鈴鐺）
+// 124 Jitter: small irregular shaking that never stops (pivot at the top edge, like a bell)
 function Wiggle({ children, d, k, running }: InnerProps) {
   const rot = [0, -9, 7, -11, 5, -4, 10, -6, 3, 0].map((v) => v * k);
   const xs = [0, 1, -1, 1.5, -1, 0.5, -1.5, 1, 0, 0].map((v) => v * k);
@@ -672,7 +672,7 @@ function Wiggle({ children, d, k, running }: InnerProps) {
   );
 }
 
-// 125 脈搏：一次兩下的心跳，同時往外擴散光環
+// 125 Pulse: a double heartbeat that sends a ring spreading outward
 function Pulse({ children, d, k, color, running }: InnerProps) {
   const loop = { duration: d, repeat: Infinity, ease: "easeOut" as const };
   return (
@@ -699,7 +699,7 @@ function Pulse({ children, d, k, color, running }: InnerProps) {
   );
 }
 
-// 127 來回：走到一端，再像倒帶一樣沿原路回來，反覆
+// 127 Ping-pong: travels to one end, then returns along the same path like a rewind, repeatedly
 function PingPong({ children, d, dist, ease = "inOut", running }: InnerProps) {
   const h = dist / 2;
   return (
@@ -714,7 +714,7 @@ function PingPong({ children, d, dist, ease = "inOut", running }: InnerProps) {
   );
 }
 
-// 128 定格動畫：每秒約 8 格，每格位置與角度都略有偏差，留下淡淡的前兩格
+// 128 Stop motion: about 8 frames per second, each frame slightly off in position and angle, leaving a faint ghost of the previous two frames
 function StopMotion({ children, d, dist, k, running, reduce }: InnerProps) {
   const fps = 8;
   const frames = Math.max(4, Math.round(d * fps));
@@ -753,7 +753,7 @@ function StopMotion({ children, d, dist, k, running, reduce }: InnerProps) {
   );
 }
 
-// 134 重複器：把子元素複製一圈，每份錯開一點時間轉動與脈動
+// 134 Repeater: copies the child into a ring, each copy offset slightly in time for rotation and pulsing
 function RepeaterFx({ children, d, dist, k, count, running }: InnerProps) {
   const n = Math.max(2, count ?? 8);
   return (
@@ -778,7 +778,7 @@ function RepeaterFx({ children, d, dist, k, count, running }: InnerProps) {
   );
 }
 
-// 135 萬花筒：八向鏡射的分身一起旋轉，並從中心呼吸般擴散
+// 135 Kaleidoscope: eight-way mirrored copies rotate together and spread from the center as if breathing
 function KaleidoscopeFx({ children, d, dist, k, count, running }: InnerProps) {
   const n = Math.max(4, Math.round((count ?? 8) / 2) * 2);
   return (
@@ -810,7 +810,7 @@ function KaleidoscopeFx({ children, d, dist, k, count, running }: InnerProps) {
   );
 }
 
-// 136 線條沸騰：SVG 雜訊位移每隔幾格換一次，靜止的畫也像手繪逐格
+// 136 Line boil: the SVG noise displacement changes every few frames, so a still drawing looks hand-drawn frame by frame
 function LineBoil({ children, d, k, running, reduce }: InnerProps) {
   const id = `boil-${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
   const [frame, setFrame] = useState(0);
@@ -835,7 +835,7 @@ function LineBoil({ children, d, k, running, reduce }: InnerProps) {
   );
 }
 
-/** 分層圖：progress 0 為組合，1 為完全展開 */
+/** Layered drawing: progress 0 is assembled, 1 is fully exploded */
 function Layers({
   layers,
   axis,
@@ -881,7 +881,7 @@ function Layers({
   );
 }
 
-// 143 分解圖：子元素當成圖層，沿軸分開再組回去
+// 143 Exploded view: children become layers that separate along an axis and then reassemble
 function Exploded({ children, d, delay, dist, axis, reduce }: InnerProps) {
   const layers = Children.toArray(children);
   return <Layers layers={layers} axis={axis} gap={dist} progress={0} animate={reduce ? undefined : { d, delay }} />;
@@ -892,7 +892,7 @@ const staggerItem: Variants = {
   show: (c: { d: number; at: number }) => ({ opacity: 1, y: 0, transition: { duration: c.d, delay: c.at, ease: [0.2, 0.7, 0.3, 1] } }),
 };
 
-// 002 錯開：每個子元素依序進場
+// 002 Stagger: each child enters in sequence
 function StaggerInner({ children, d, delay, dist, reduce }: InnerProps) {
   return (
     <span className="contents">
@@ -933,11 +933,11 @@ const renderers: Record<MotionPrincipleName, (p: InnerProps) => ReactNode> = {
   stagger: StaggerInner,
 };
 
-/* ---------- 個別匯出 ---------- */
+/* ---------- individual exports ---------- */
 
 type Shared = Omit<MotionPrincipleProps, "effect">;
 
-/** 002 錯開進場：清單、卡片、長條圖逐一出現。as="ul" / "ol" 時每項包成 li */
+/** 002 Staggered entrance: lists, cards and bar charts appear one by one. With as="ul" / "ol" each item is wrapped in an li */
 export function Stagger({
   children,
   as = "div",
@@ -951,11 +951,11 @@ export function Stagger({
 }: {
   children?: ReactNode;
   as?: "div" | "ul" | "ol" | "span";
-  /** 每項之間的間隔秒數 */
+  /** Interval between items in seconds */
   stagger?: number;
   duration?: number;
   delay?: number;
-  /** 每項往上滑入的距離（px） */
+  /** Distance (px) each item slides up from */
   distance?: number;
   trigger?: Exclude<MotionPrincipleTrigger, "hover">;
   className?: string;
@@ -982,17 +982,17 @@ export function Stagger({
   );
 }
 
-/** 143 分解圖：每個子元素是一層，第一個在最底下 */
+/** 143 Exploded view: each child is a layer, the first one at the bottom */
 export function ExplodedView(props: Shared) {
   return <MotionPrinciple {...props} effect="exploded-view" />;
 }
 
-/** 134 重複器：子元素複製成一圈 */
+/** 134 Repeater: copies the child into a ring */
 export function Repeater(props: Shared) {
   return <MotionPrinciple trigger="loop" {...props} effect="repeater" />;
 }
 
-/** 135 萬花筒：子元素（或一張圖）八向鏡射並旋轉 */
+/** 135 Kaleidoscope: the child (or an image) is mirrored eight ways and rotated */
 export function Kaleidoscope(props: Shared) {
   return <MotionPrinciple trigger="loop" {...props} effect="kaleidoscope" />;
 }

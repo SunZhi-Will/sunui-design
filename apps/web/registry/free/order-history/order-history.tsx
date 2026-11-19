@@ -10,16 +10,16 @@ export type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancel
 
 export interface OrderLine {
   name: string;
-  /** 規格，例如 "Size M, Oat" */
+  /** Variant, for example "Size M, Oat" */
   variant?: string;
   qty: number;
-  /** 單價 */
+  /** Unit price */
   price: number;
 }
 
 export interface HistoryOrder {
   id: string;
-  /** 顯示用訂單編號 */
+  /** Order number for display */
   number: string;
   date: string;
   status: OrderStatus;
@@ -42,24 +42,24 @@ export interface OrderHistoryLabels {
 export interface OrderHistoryProps {
   orders: HistoryOrder[];
   title?: ReactNode;
-  /** 介面語言與金額格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and currency format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
   currency?: string;
-  /** 展開後明細下方的動作，例如「再買一次」或「追蹤包裹」 */
+  /** Actions below the expanded details, for example "Buy again" or "Track parcel" */
   renderActions?: (order: HistoryOrder) => ReactNode;
-  /** 沒有訂單時放在提示文字下方，例如回到商店的連結 */
+  /** Shown below the hint text when there are no orders, for example a link back to the shop */
   emptyAction?: ReactNode;
-  /** 換掉沒有訂單時的收據圖示；任何 SVG 都會縮到 32px */
+  /** Replaces the receipt icon shown when there are no orders; any SVG is scaled to 32px */
   emptyIcon?: ReactNode;
   defaultExpandedId?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: OrderHistoryLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -121,7 +121,7 @@ const MESSAGES: Record<SunLocale, OrderHistoryMessages> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colour, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -132,7 +132,7 @@ const springs = {
   stamp: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
-/** 朱紅只留給「待付款」這個需要買家行動的狀態；取消用淡色字 */
+/** The accent colour is reserved for "Awaiting payment", the one state that needs buyer action; cancelled uses muted text */
 
 export function OrderHistory({
   orders,

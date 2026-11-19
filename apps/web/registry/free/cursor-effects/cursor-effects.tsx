@@ -24,10 +24,10 @@ export interface CursorPreviewItem {
   title: string;
   meta?: string;
   href?: string;
-  /** 預覽圖片網址 */
+  /** Preview image URL */
   src?: string;
   alt?: string;
-  /** 不用圖片時，可直接給一段預覽內容（例如 inline SVG） */
+  /** Without an image, pass preview content directly (for example inline SVG) */
   preview?: ReactNode;
 }
 
@@ -35,21 +35,21 @@ export interface CursorEffectProps {
   effect?: CursorEffectName;
   children?: ReactNode;
   className?: string;
-  /** 套用到整個頁面，而不是只在這個容器內 */
+  /** Apply to the whole page instead of only inside this container */
   global?: boolean;
-  /** follower、blend-circle、crosshair 時隱藏系統游標 */
+  /** Hide the system cursor for follower, blend-circle and crosshair */
   hideCursor?: boolean;
-  /** 指標不在範圍內時，效果停在這個位置（0 到 1 的比例）；不給就隱藏 */
+  /** Where the effect rests when the pointer is outside the area (ratio from 0 to 1); hidden when omitted */
   idle?: { x: number; y: number };
-  /** image-hover 的清單項目 */
+  /** Items for image-hover */
   items?: CursorPreviewItem[];
-  /** 主要圓形或光圈的尺寸（px） */
+  /** Size of the main circle or ring (px) */
   size?: number;
-  /** magnetic-area 的吸力（0 到 1），元素也可用 data-magnetic="0.5" 個別設定 */
+  /** Pull strength of magnetic-area (0 to 1); an element can also set it individually with data-magnetic="0.5" */
   strength?: number;
 }
 
-/* ---------- 共用：觸控偵測與指標追蹤 ---------- */
+/* ---------- Shared: touch detection and pointer tracking ---------- */
 
 const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
 const subscribeHover = (cb: () => void) => {
@@ -58,7 +58,7 @@ const subscribeHover = (cb: () => void) => {
   return () => mq.removeEventListener("change", cb);
 };
 
-/** 只有滑鼠或觸控板這類可懸停的裝置才顯示效果 */
+/** Show effects only on hover-capable devices such as a mouse or trackpad */
 function useCanHover() {
   return useSyncExternalStore(
     subscribeHover,
@@ -79,7 +79,7 @@ interface Pointer {
   subscribe: (fn: MoveListener) => () => void;
 }
 
-/** 追蹤指標：區域模式回傳相對容器的座標，global 模式回傳視窗座標 */
+/** Track the pointer: area mode returns coordinates relative to the container, global mode returns viewport coordinates */
 function usePointer(container: RefObject<HTMLDivElement | null>, global: boolean, enabled: boolean, idle?: { x: number; y: number }): Pointer {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -135,7 +135,7 @@ function usePointer(container: RefObject<HTMLDivElement | null>, global: boolean
     };
   }, [container, global, enabled, x, y]);
 
-  // 指標離開後回到 idle 位置
+  // Return to the idle position after the pointer leaves
   const idleX = idle?.x;
   const idleY = idle?.y;
   useEffect(() => {
@@ -158,7 +158,7 @@ interface EffectProps {
   size?: number;
 }
 
-/** 效果的圖層：區域模式貼齊容器並裁切，global 模式固定在視窗上 */
+/** Effect layer: area mode fits the container and clips, global mode is fixed to the viewport */
 function Layer({ global, children }: { global: boolean; children: ReactNode }) {
   return (
     <div aria-hidden="true" className={cn("pointer-events-none inset-0", global ? "fixed z-[100]" : "absolute overflow-hidden")}>
@@ -169,7 +169,7 @@ function Layer({ global, children }: { global: boolean; children: ReactNode }) {
 
 const follow = { stiffness: 170, damping: 18, mass: 0.6 };
 
-/* ---------- 各效果 ---------- */
+/* ---------- Effects ---------- */
 
 function Follower({ pointer, visible, reduce, global, size = 32 }: EffectProps) {
   const rx = useSpring(pointer.x, follow);
@@ -237,7 +237,7 @@ function Trail({ pointer, visible, reduce, global, size = 6 }: EffectProps) {
         ctx.fill();
       }
       ctx.globalAlpha = 1;
-      // 點都消失就停掉 rAF，閒置時不耗電
+      // Stop the rAF once all points have faded, so it uses no power when idle
       raf = points.length ? requestAnimationFrame(draw) : 0;
     };
 
@@ -245,7 +245,7 @@ function Trail({ pointer, visible, reduce, global, size = 6 }: EffectProps) {
       const now = performance.now();
       const last = points[points.length - 1];
       if (last) {
-        // 移動很快時在兩點間補點，尾巴才連續
+        // When moving fast, interpolate between two points so the tail stays continuous
         const steps = Math.min(10, Math.floor(Math.hypot(px - last.x, py - last.y) / 8));
         for (let i = 1; i < steps; i++) {
           points.push({ x: last.x + ((px - last.x) * i) / steps, y: last.y + ((py - last.y) * i) / steps, t: now });
@@ -268,7 +268,7 @@ function Trail({ pointer, visible, reduce, global, size = 6 }: EffectProps) {
   return (
     <Layer global={global}>
       {reduce ? (
-        // 減少動態：不畫拖尾，只留一個跟隨的點
+        // Reduced motion: no trail, keep a single following dot
         <motion.span
           className="absolute left-0 top-0 -ml-1 -mt-1 size-2 rounded-full bg-primary transition-opacity"
           style={{ x: pointer.x, y: pointer.y, opacity: visible ? 1 : 0 }}
@@ -316,7 +316,7 @@ function BlendCircle({ pointer, visible, reduce, global, size = 80 }: EffectProp
       transition={{ duration: 0.25 }}
     />
   );
-  // fixed 會自成堆疊環境，混合模式就失效，所以 global 時圓形直接 fixed，不包圖層
+  // fixed creates its own stacking context and breaks the blend mode, so in global mode the circle is fixed directly without a wrapper layer
   if (global) return circle;
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -370,7 +370,7 @@ function ImageHover({
 }: EffectProps & { enabled: boolean; items: CursorPreviewItem[]; container: RefObject<HTMLDivElement | null>; children?: ReactNode }) {
   const [active, setActive] = useState<number | null>(null);
   const [shown, setShown] = useState(0);
-  // 記住最後一個項目，卡片淡出時內容不會跳掉（render 期間的衍生狀態）
+  // Remember the last item so the content does not jump while the card fades out (state derived during render)
   if (active !== null && active !== shown) setShown(active);
 
   const sx = useSpring(pointer.x, { stiffness: 260, damping: 26 });
@@ -383,7 +383,7 @@ function ImageHover({
     setActive(i);
     const box = container.current;
     if (!box) return;
-    // 鍵盤聚焦時，卡片放在該列右側
+    // On keyboard focus, place the card to the right of the row
     const r = el.getBoundingClientRect();
     const origin = global ? { left: 0, top: 0 } : box.getBoundingClientRect();
     pointer.x.set(r.left - origin.left + r.width * 0.6);
@@ -480,7 +480,7 @@ function useMagneticArea(container: RefObject<HTMLDivElement | null>, global: bo
       root.querySelectorAll<HTMLElement>("[data-magnetic]").forEach((el) => {
         const r = el.getBoundingClientRect();
         const cur = offsets.get(el) ?? { x: 0, y: 0 };
-        // 用未位移前的中心計算距離
+        // Measure distance from the center before the offset is applied
         const dx = e.clientX - (r.left + r.width / 2 - cur.x);
         const dy = e.clientY - (r.top + r.height / 2 - cur.y);
         const reach = Math.max(r.width, r.height) / 2 + 60;
@@ -506,7 +506,7 @@ function useMagneticArea(container: RefObject<HTMLDivElement | null>, global: bo
   }, [container, global, enabled, strength]);
 }
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 export function CursorEffect({
   effect = "follower",
@@ -528,7 +528,7 @@ export function CursorEffect({
   const visible = pointer.inside || idle !== undefined;
   const hides = hideCursor && canHover && (effect === "follower" || effect === "blend-circle" || effect === "crosshair");
 
-  // global 模式隱藏游標要掛在根元素上
+  // In global mode, hiding the cursor must be set on the root element
   useEffect(() => {
     if (!hides || !global) return;
     const root = document.documentElement;

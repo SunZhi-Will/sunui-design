@@ -62,7 +62,7 @@ const orders = [
   ["SU-20479", "$219.00"],
 ];
 
-/** 文章裡的一段示範：左邊是後台網頁（瀏覽器外框），右邊是拿來總結的提示詞（視窗外框） */
+/** A sample inside an article: on the left a back-office web page (browser frame), on the right the prompt used to summarize it (window frame) */
 export default function BrowserFrameDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

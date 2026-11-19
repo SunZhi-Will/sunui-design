@@ -14,7 +14,7 @@ const copy = {
   ja: { variant: "ステンレス、20 mm ベルト", updated: "たった今更新", buy: "1 点購入", restock: "再入荷" },
 };
 
-/** 型錄卡片：一件商品的庫存條，按 Buy one 一路從充足掉到告急，再蓋上售完章。 */
+/** Catalog card: stock bar for one product; press Buy one and it drops from plenty to critical, then a sold-out stamp lands. */
 export default function LowStockIndicatorCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

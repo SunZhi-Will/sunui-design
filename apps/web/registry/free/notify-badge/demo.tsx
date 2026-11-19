@@ -35,7 +35,7 @@ export default function NotifyBadgeDemo() {
   const [notes, setNotes] = useState(2);
   const [cart, setCart] = useState(1);
 
-  // 模擬通知陸續進來：前 3 則每 2.5 秒一則，之後停住
+  // Simulates notifications arriving one after another: the first 3 come every 2.5 seconds, then it stops
   useEffect(() => {
     if (notes >= 5) return;
     const id = setTimeout(() => setNotes((n) => n + 1), 2500);

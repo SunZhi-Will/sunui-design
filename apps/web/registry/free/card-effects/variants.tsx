@@ -19,10 +19,10 @@ import { copy, demoArt } from "./demo";
 
 export const variants = [...cardEffects, ...cardGroupEffects];
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative, one that moves on its own so the card needs no hover to show the effect
 export const featured = "tilt-3d";
 
-/** 首頁型錄：一種卡片效果一張卡，設定與 demo 的同名格子一致，下方標出怎麼觸發。 */
+/** Home catalog: one card per card effect, matching the same-named cell in the demo, with how to trigger it noted below. */
 export default function CardEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const items: EffectCardItem[] = t.cards.map((c, i) => ({
@@ -63,12 +63,12 @@ export default function CardEffectsVariant({ variant }: { variant: string }) {
           <StackFan items={items.slice(0, 4)} cardWidth={110} />
         </div>
       ) : group === "focus-dim" ? (
-        // 三欄排成 560px 寬會在卡片裡縮到一半以下：兩張並排就看得出「滑過一張、旁邊變暗」
+        // Three columns at 560px wide shrink to under half inside the card: with two side by side you can still see "hover one, the neighbor dims"
         <div className="w-[26rem]">
           <FocusGrid items={items.slice(0, 2)} className="grid-cols-2 sm:grid-cols-2 lg:grid-cols-2" />
         </div>
       ) : group === "border-spotlight-grid" ? (
-        // 2×2 比一排三張窄，游標經過時光暈跨越相鄰邊框的效果也看得更清楚
+        // 2×2 is narrower than a row of three, and the glow crossing adjacent borders is easier to see as the cursor passes
         <div className="w-[22rem]">
           <SpotlightGrid items={items.slice(2, 6).map((it) => ({ ...it, media: undefined }))} className="grid-cols-2 sm:grid-cols-2" />
         </div>

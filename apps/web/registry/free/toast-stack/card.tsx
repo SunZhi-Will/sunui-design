@@ -12,7 +12,7 @@ const copy = {
   ja: { added: "カートに追加しました", removed: "カートから削除しました", undo: "元に戻す", glaze: "オート釉", add: "追加" },
 };
 
-/** 型錄卡片：連按幾次加入購物車，通知疊成一疊，滑過展開、左右拖曳關閉。 */
+/** Catalog card: press add-to-cart a few times and the notifications stack up; hover to expand, drag sideways to dismiss. */
 export default function ToastStackCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

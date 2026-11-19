@@ -19,7 +19,7 @@ import { useEffect, useId, useRef, useState, type PointerEvent, type ReactNode }
 
 import { cn } from "@/lib/utils";
 
-/** 單張圖片效果，用 ImageEffect 的 effect prop 切換 */
+/** Single-image effects, switched with the effect prop of ImageEffect */
 export const imageEffects = [
   "ken-burns",
   "clip-reveal",
@@ -33,7 +33,7 @@ export const imageEffects = [
 ] as const;
 export type ImageEffectName = (typeof imageEffects)[number];
 
-/** 需要多張圖的效果，各自是獨立元件（吃 images 陣列） */
+/** Effects that need several images, each its own component (they take an images array) */
 export const imageGroupEffects = ["slice-transition", "lightbox-zoom"] as const;
 export type ImageGroupEffect = (typeof imageGroupEffects)[number];
 
@@ -48,22 +48,22 @@ export interface ImageEffectProps {
   effect?: ImageEffectName;
   src: string;
   alt: string;
-  /** image-swap 用：所有要切換的圖（第一張可與 src 相同） */
+  /** For image-swap: every image to cycle through (the first may equal src) */
   images?: ImageItem[];
-  /** hover-zoom 浮起的說明文字 */
+  /** Caption that floats up on hover-zoom */
   caption?: ReactNode;
-  /** clip-reveal 的擦除方向 */
+  /** Wipe direction of clip-reveal */
   direction?: ClipDirection;
-  /** 進場類效果（clip-reveal、soft-mask）的觸發方式 */
+  /** How entrance effects (clip-reveal, soft-mask) are triggered */
   trigger?: "mount" | "inView";
-  /** 秒；進場效果的長度，或 ken-burns 一輪的長度 */
+  /** Seconds: length of an entrance effect, or of one ken-burns cycle */
   duration?: number;
   delay?: number;
-  /** zoom-lens 放大倍率 */
+  /** zoom-lens magnification */
   zoom?: number;
-  /** zoom-lens 鏡片直徑（px） */
+  /** zoom-lens lens diameter (px) */
   lensSize?: number;
-  /** 外框 className，預設 aspect-[4/3] */
+  /** Outer frame className, defaults to aspect-[4/3] */
   className?: string;
 }
 
@@ -98,7 +98,7 @@ export function ImageEffect(props: ImageEffectProps) {
 
 type P = ImageEffectProps & { reduce: boolean; className: string };
 
-/* ken-burns：緩慢而持續的放大與漂移，離開畫面時暫停 */
+/* ken-burns: slow, continuous zoom and drift; pauses when off screen */
 function KenBurns({ src, alt, duration = 14, reduce, className }: P) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref);
@@ -143,7 +143,7 @@ const clipTo: Record<ClipDirection, string> = {
   circle: "circle(75% at 50% 50%)",
 };
 
-/* clip-reveal：clip-path 擦開圖片，同時從 1.15 縮回 1 */
+/* clip-reveal: clip-path wipes the image open while it scales from 1.15 back to 1 */
 function ClipReveal({ src, alt, direction = "up", trigger, duration = 1.1, delay = 0, reduce, className }: P) {
   const [ref, show] = useReveal(trigger);
   const variants: Variants = {
@@ -168,10 +168,10 @@ function ClipReveal({ src, alt, direction = "up", trigger, duration = 1.1, delay
   );
 }
 
-/* soft-mask：柔邊漸層遮罩由左往右掃過，把圖片顯露出來 */
+/* soft-mask: a soft-edged gradient mask sweeps left to right and reveals the image */
 function SoftMask({ src, alt, trigger, duration = 1.4, delay = 0, reduce, className }: P) {
   const [ref, show] = useReveal(trigger);
-  // 遮罩邊緣位置（%），從 -30 走到 100
+  // Mask edge position (%), from -30 to 100
   const edge = useMotionValue(reduce ? 100 : -30);
   const soft = useTransform(edge, (v) => v + 30);
   const mask = useMotionTemplate`linear-gradient(to right, #000 ${edge}%, transparent ${soft}%)`;
@@ -191,7 +191,7 @@ function SoftMask({ src, alt, trigger, duration = 1.4, delay = 0, reduce, classN
   );
 }
 
-/* hover-zoom：圖片在固定框內放大，說明文字由下浮起 */
+/* hover-zoom: the image scales inside a fixed frame and the caption floats up from below */
 const zoomImg: Variants = { rest: { scale: 1 }, hover: { scale: 1.1 } };
 const zoomCaption: Variants = { rest: { y: "100%", opacity: 0 }, hover: { y: 0, opacity: 1 } };
 
@@ -219,7 +219,7 @@ function HoverZoom({ src, alt, caption, reduce, className }: P) {
   );
 }
 
-/* zoom-lens：放大鏡跟著指標，顯示 2 倍的局部 */
+/* zoom-lens: a magnifier follows the pointer and shows a 2x crop */
 function ZoomLens({ src, alt, zoom = 2, lensSize = 140, reduce, className }: P) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -270,7 +270,7 @@ function ZoomLens({ src, alt, zoom = 2, lensSize = 140, reduce, className }: P) 
   );
 }
 
-/* image-swap：滑過時換成第二張，指標左右移動可切換更多張，小圓點標示目前是哪張 */
+/* image-swap: on hover, swaps to the second image; moving the pointer left and right cycles through more; small dots mark the current one */
 function ImageSwap({ src, alt, images, reduce, className }: P) {
   const list = images && images.length > 0 ? images : [{ src, alt }];
   const [index, setIndex] = useState(0);
@@ -318,7 +318,7 @@ function ImageSwap({ src, alt, images, reduce, className }: P) {
   );
 }
 
-/* glitch：滑過時拆成錯位的色版，加上閃爍的橫向切片 */
+/* glitch: on hover, splits into offset color channels with flickering horizontal slices */
 const slices = [
   { top: 12, h: 9, dx: [0, -14, 8, -4, 0] },
   { top: 41, h: 6, dx: [0, 18, -10, 6, 0] },
@@ -335,7 +335,7 @@ function Glitch({ src, alt, reduce, className }: P) {
       onPointerLeave={() => setOn(false)}
       className={cn(className, "isolate bg-black")}
     >
-      {/* 只保留紅色版與青色版（綠＋藍），兩者 screen 疊合時還原成原圖 */}
+      {/* Keep only the red and cyan (green + blue) channels; screen-blended together they restore the original image */}
       <svg aria-hidden className="absolute size-0">
         <filter id={`${id}-r`} colorInterpolationFilters="sRGB">
           <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
@@ -384,7 +384,7 @@ function Glitch({ src, alt, reduce, className }: P) {
   );
 }
 
-/* saturate：平時去色變暗，滑過時恢復全彩並輕微放大 */
+/* saturate: desaturated and dimmed at rest; on hover returns to full color and scales up slightly */
 function Saturate({ src, alt, reduce, className }: P) {
   const [on, setOn] = useState(false);
   return (
@@ -409,7 +409,7 @@ function Saturate({ src, alt, reduce, className }: P) {
   );
 }
 
-/* parallax-frame：捲動時圖片移動得比外框慢 */
+/* parallax-frame: the image moves slower than its frame while scrolling */
 function ParallaxFrame({ src, alt, reduce, className }: P) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -428,18 +428,18 @@ function ParallaxFrame({ src, alt, reduce, className }: P) {
   );
 }
 
-/* ───────── 多張圖效果 ───────── */
+/* ───────── Multi-image effects ───────── */
 
 export interface SliceSlideshowProps {
   images: ImageItem[];
-  /** 切成幾條直條 */
+  /** Number of vertical strips */
   slices?: number;
-  /** 每張停留多久（ms） */
+  /** How long each image stays (ms) */
   interval?: number;
   className?: string;
 }
 
-/** slice-transition：圖片切成直條，交錯上下滑走，露出下一張 */
+/** slice-transition: the image is cut into vertical strips that slide up and down in alternation to reveal the next one */
 export function SliceSlideshow({ images, slices: count = 6, interval = 3200, className }: SliceSlideshowProps) {
   const reduce = useReducedMotion() ?? false;
   const ref = useRef<HTMLDivElement>(null);
@@ -454,7 +454,7 @@ export function SliceSlideshow({ images, slices: count = 6, interval = 3200, cla
     setIndex(((next % n) + n) % n);
   };
 
-  // 自動播放：離開畫面、滑過或 reduced motion 時停止
+  // Autoplay: stops when off screen, hovered, or with reduced motion
   useEffect(() => {
     if (reduce || !inView || hover || n < 2) return;
     const t = setTimeout(() => {
@@ -519,13 +519,13 @@ export function SliceSlideshow({ images, slices: count = 6, interval = 3200, cla
 
 export interface LightboxProps {
   images: ImageItem[];
-  /** 縮圖網格的 className */
+  /** Thumbnail grid className */
   className?: string;
-  /** 關閉按鈕的無障礙標籤 */
+  /** Accessible label for the close button */
   closeLabel?: string;
 }
 
-/** lightbox-zoom：縮圖從原位長大到畫面中央並暗下背景，點擊或 Esc 關閉 */
+/** lightbox-zoom: a thumbnail grows from its place to the center of the screen and dims the background; click or Esc closes it */
 export function Lightbox({ images, className, closeLabel = "Close" }: LightboxProps) {
   const reduce = useReducedMotion() ?? false;
   const group = useId();
@@ -535,7 +535,7 @@ export function Lightbox({ images, className, closeLabel = "Close" }: LightboxPr
 
   useEffect(() => {
     if (open === null) return;
-    // 開啟時把焦點移到關閉按鈕，Esc 可關閉
+    // On open, move focus to the close button; Esc closes
     closeRef.current?.focus();
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Escape") setOpen(null);

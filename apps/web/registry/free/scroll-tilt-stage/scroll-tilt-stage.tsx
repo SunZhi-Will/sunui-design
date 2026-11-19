@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 
 export interface ScrollTiltStageProps {
   children: ReactNode;
-  /** 地面細線的顏色（唯一強調色），預設琥珀金 #d4a24c */
+  /** Color of the thin ground line (the only accent color), defaults to amber gold #d4a24c */
   accent?: string;
-  /** 在可捲動容器裡使用時傳入；預設跟著整個視窗捲動 */
+  /** Pass it when used inside a scrollable container; by default it follows the whole window scroll */
   scrollContainer?: RefObject<HTMLElement | null>;
   className?: string;
 }
@@ -16,8 +16,8 @@ export interface ScrollTiltStageProps {
 const clamp = (x: number) => Math.min(1, Math.max(0, x));
 
 /**
- * 3D 進場舞台：還在畫面下方時往後倒著放，捲上來的過程中慢慢立起來，到畫面中間時正對著看。
- * 下面有一道柔和的黑色落影與一條地面細線。偏好減少動態時直接正對著。
+ * 3D entrance stage: while still below the viewport it leans back, slowly stands up as it scrolls in, and faces straight on at the middle of the screen.
+ * Below it sit a soft black drop shadow and a thin ground line. With reduced motion preferred it simply faces front.
  */
 export function ScrollTiltStage({ children, accent = "#d4a24c", scrollContainer, className }: ScrollTiltStageProps) {
   const outer = useRef<HTMLDivElement>(null);
@@ -43,7 +43,7 @@ export function ScrollTiltStage({ children, accent = "#d4a24c", scrollContainer,
       const box = root?.getBoundingClientRect();
       const top = box ? r.top - box.top : r.top;
       const vh = box ? box.height : window.innerHeight;
-      // 上緣從畫面底部到畫面 15% 的位置之間，0 → 1（ease-out 二次方）
+      // From the top edge at the bottom of the viewport to 15% of the viewport, 0 → 1 (ease-out quadratic)
       const p = 1 - Math.pow(1 - clamp((vh - top) / (vh * 0.85)), 2);
       el.style.transform = `rotateX(${(1 - p) * 28}deg) scale(${0.88 + 0.12 * p}) translateY(${(1 - p) * 30}px)`;
       el.style.opacity = String(0.6 + 0.4 * p);
@@ -66,13 +66,13 @@ export function ScrollTiltStage({ children, accent = "#d4a24c", scrollContainer,
 
   return (
     <div ref={outer} className={cn("relative overflow-x-clip [perspective:1600px]", className)}>
-      {/* 落影：單色黑，不發光 */}
+      {/* Drop shadow: solid black, no glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-[6%] -bottom-10 h-20"
         style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55), transparent 100%)" }}
       />
-      {/* 地面細線：兩端淡出 */}
+      {/* Thin ground line: faded at both ends */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-[4%] -bottom-6 h-px"

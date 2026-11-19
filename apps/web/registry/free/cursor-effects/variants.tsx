@@ -7,10 +7,10 @@ import { copy, CursorEffectArea } from "./demo";
 
 export const variants = cursorEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as a representative; pick one that moves on its own so the card needs no hover to show the effect
 export const featured = "spotlight";
 
-/** 首頁型錄：一種游標效果一張卡，互動區和示範頁共用 */
+/** Home catalog: one card per cursor effect; the interaction area is shared with the demo page */
 export default function CursorEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const effect = variant as CursorEffectName;

@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { TextMask, TextOnPath, VariableWeight } from "./type-motion";
 
-// 示範照片（AI 生成）：和 image-effects 共用的潟湖海景，字形挖空後看得到水色與沙灘
+// Demo photo (AI generated): the lagoon seascape shared with image-effects, so water and beach show through the cut-out glyphs
 const sea = "/blocks/image-effects/lagoon.webp";
 
 const copy = {
@@ -93,7 +93,7 @@ function Tile({ name, hint, replay, children }: { name: string; hint: string; re
   );
 }
 
-// 每一格的代號：首頁型錄（variants.tsx）一格一張卡
+// Key for each cell: the home catalog (variants.tsx) has one card per cell
 export const typeMotionTiles = [
   "text-on-path-wave",
   "text-on-path-circle",
@@ -105,7 +105,7 @@ export const typeMotionTiles = [
 ] as const;
 export type TypeMotionTileId = (typeof typeMotionTiles)[number];
 
-/** 單一字體動態的示範格：完整 demo 與首頁型錄共用 */
+/** One typographic motion demo cell: shared by the full demo and the home catalog */
 export function TypeMotionTile({ id }: { id: TypeMotionTileId }) {
   const t = useDemoText(copy);
   switch (id) {

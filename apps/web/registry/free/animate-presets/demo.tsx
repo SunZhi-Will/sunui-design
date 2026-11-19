@@ -101,7 +101,7 @@ function EntranceTile({ preset, label, replay }: { preset: AnimatePreset; label:
   );
 }
 
-/** 退場格：播完後停一下就重新掛載，讓內容回到畫面上；離開畫面時不再重播 */
+/** Exit cell: after playing it pauses briefly and remounts so the content comes back; it does not replay while off screen */
 function ExitTile({ preset, label, replay }: { preset: ExitPreset; label: string; replay: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.3 });

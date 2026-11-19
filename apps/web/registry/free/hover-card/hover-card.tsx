@@ -17,43 +17,43 @@ import { cn } from "@/lib/utils";
 export interface HoverCardProduct {
   name: ReactNode;
   price: number;
-  /** 原價，提供時顯示刪除線與折扣 */
+  /** Original price; when provided, shows a strikethrough and the discount */
   compareAt?: number;
-  /** 商品圖，建議傳 <img> 或中性插圖 */
+  /** Product image, ideally an <img> or a neutral illustration */
   image?: ReactNode;
-  /** 規格、評分這類一行小字 */
+  /** A line of small text such as specs or rating */
   meta?: ReactNode;
 }
 
 export interface HoverCardLabels {
   addToCart?: ReactNode;
-  /** 卡片的無障礙名稱 */
+  /** Accessible name of the card */
   quickView?: string;
   off?: (pct: number) => ReactNode;
 }
 
 export interface HoverCardProps {
-  /** 觸發文字，例如商品名稱 */
+  /** Trigger text, e.g. the product name */
   children: ReactNode;
   product: HoverCardProduct;
-  /** 提供時觸發元素是連結；觸控第一次點開卡片，第二次才前往 */
+  /** When provided, the trigger is a link; on touch the first tap opens the card and the second goes to the link */
   href?: string;
   onAddToCart?: () => void;
-  /** 滑鼠停留多久才開（毫秒） */
+  /** How long the pointer must rest before it opens (ms) */
   openDelay?: number;
-  /** 滑鼠離開多久才關，讓指標能移進卡片 */
+  /** How long after the pointer leaves before it closes, so the pointer can move into the card */
   closeDelay?: number;
-  /** 介面語言與貨幣格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and currency format: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
   currency?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: HoverCardLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -68,12 +68,12 @@ const MESSAGES: Record<SunLocale, Required<HoverCardLabels>> = {
   ja: { addToCart: "カートに追加", quickView: "クイックビュー", off: (pct) => <>{pct}%オフ</> },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colors and brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand color. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -82,8 +82,8 @@ const springs = {
 } as const;
 
 /**
- * 商品快速預覽卡：hover 延遲開關、鍵盤 focus 也會開、Escape 關閉並把焦點還給觸發元素，
- * 觸控改為點擊開啟。卡片放在觸發元素下方，靠近視窗底部時翻到上方。
+ * Quick product preview card: opens and closes with a hover delay, also opens on keyboard focus, closes on Escape and returns focus to the trigger,
+ * and opens on tap for touch. The card sits below the trigger and flips above it near the bottom of the viewport.
  */
 export function HoverCard({
   children,
@@ -116,7 +116,7 @@ export function HoverCard({
   const cancel = () => clearTimeout(timer.current);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  // 開啟時：點卡片外面關閉；Escape 關閉，焦點在卡片內就還給觸發元素
+  // While open: a click outside the card closes it; Escape closes it, and if focus is inside the card it returns to the trigger
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
@@ -128,7 +128,7 @@ export function HoverCard({
       setOpen(false);
       const active = document.activeElement;
       if (active && active !== triggerRef.current && rootRef.current?.contains(active)) {
-        skipFocus.current = true; // 這次 focus 不重新開卡片
+        skipFocus.current = true; // This focus does not reopen the card
         triggerRef.current?.focus({ preventScroll: true });
       }
     };
@@ -140,7 +140,7 @@ export function HoverCard({
     };
   }, [open]);
 
-  // 簡單定位：下方放不下而上方較寬就翻上去；右側超出就改為右對齊
+  // Simple positioning: flip above when there is no room below and more room above; align right when it overflows on the right
   useLayoutEffect(() => {
     if (!open || !triggerRef.current || !cardRef.current) return;
     const tr = triggerRef.current.getBoundingClientRect();
@@ -170,14 +170,14 @@ export function HoverCard({
     },
     onFocus: () => {
       if (skipFocus.current) return void (skipFocus.current = false);
-      // 觸控的 focus 交給 click 處理，避免第一下就開又穿透到連結
+      // On touch, leave focus to click, so the first tap does not open it and then pass through to the link
       if (pointer.current !== "mouse") return;
       cancel();
       setOpen(true);
     },
     onClick: (e: MouseEvent) => {
       if (pointer.current === "mouse") return;
-      // 觸控：第一下開卡片，開著時再點才照常前往連結
+      // Touch: the first tap opens the card, and a tap while open follows the link as usual
       if (!open) {
         e.preventDefault();
         setOpen(true);

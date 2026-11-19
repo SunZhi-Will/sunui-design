@@ -6,7 +6,7 @@ import { HeroBillboardCarousel, type HeroBillboardSlide } from "./hero-billboard
 
 type PosterKind = "kiln" | "type" | "run";
 
-// 示範照片（AI 生成），放在 public/blocks/hero-billboard-carousel，16:9，主體在右半邊，左下留給疊字
+// Demo photos (AI generated), stored in public/blocks/hero-billboard-carousel, 16:9, subject on the right half, lower left clear for overlaid text
 const poster = (kind: PosterKind) => `/blocks/hero-billboard-carousel/${kind}.webp`;
 
 type SlideText = Pick<HeroBillboardSlide, "title" | "badge" | "eyebrow" | "cta">;
@@ -48,7 +48,7 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", { slides: SlideText[] }> = {
   },
 };
 
-/** 型錄卡片：手機寬的主視覺輪播，自動換張，左右滑或點側邊那張切換，點中間那張進入活動。 */
+/** Catalog card: a phone-width hero carousel that advances on its own; swipe or tap a side slide to switch, tap the center slide to open the event. */
 export default function HeroBillboardCarouselCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -66,8 +66,8 @@ export default function HeroBillboardCarouselCard() {
       <HeroBillboardCarousel
         items={slides}
         locale={locale}
-        // 卡片裡拿掉 CTA 鈕（整張卡本來就能點）並壓低文字區與上下留白，讓主視覺放得大一點。
-        // 元件樣式寫在未分層的 <style>，會蓋過 Tailwind 的 utilities 層，所以這裡要加 !
+        // The card drops the CTA button (the whole card is already clickable) and tightens the text area and vertical padding, so the hero image can be larger.
+        // Component styles live in an unlayered <style>, which beats Tailwind's utilities layer, so the ! is needed here.
         className="[&_.hbc-inner]:py-4! [&_.hbc-inner]:[--panel-h:96px]! [&_.hbc-cta]:hidden!"
       />
     </div>

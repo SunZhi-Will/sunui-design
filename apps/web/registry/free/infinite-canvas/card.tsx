@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { InfiniteCanvas, type InfiniteCanvasItem } from "./infinite-canvas";
 
-// 與 demo 相同的靜物佔位插畫（SVG data URI）
+// The same still-life placeholder illustrations as the demo (SVG data URIs)
 const tones = [
   ["#e9e2d4", "#6b5a45"],
   ["#dfe6e1", "#3f5b4f"],
@@ -37,7 +37,7 @@ const copy = {
   ja: { label: "秋のルックブック", names: ["リネントート", "陶器のフラワーベース", "モーニングマグ", "真鍮のデスクランプ", "ウールのバケットハット", "フィールドノート", "キャンバスのマルシェバッグ", "一輪挿し", "エスプレッソカップ"] },
 };
 
-/** 型錄卡片：一面無限延伸的選品牆，緩慢漂移，可往任何方向拖曳，點一件放大。 */
+/** Catalog card: an endless wall of picks that drifts slowly, can be dragged in any direction, and enlarges an item on click. */
 export default function InfiniteCanvasCard() {
   const t = useDemoText(copy);
   const items: InfiniteCanvasItem[] = t.names.map((name, i) => ({ id: String(i), src: plate(i), alt: name, label: name, caption: name }));

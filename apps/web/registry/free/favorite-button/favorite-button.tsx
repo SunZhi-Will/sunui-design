@@ -6,16 +6,16 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export interface FavoriteButtonProps {
-  /** 受控狀態；不給時元件自行管理 */
+  /** Controlled state. When omitted, the component manages its own */
   pressed?: boolean;
   defaultPressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
-  /** 顯示收藏數；不給則只顯示愛心 */
+  /** Shows the favorite count. When omitted, only the heart is shown */
   count?: number;
   size?: "sm" | "md" | "lg";
-  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and number format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings, takes priority over locale */
   labels?: Partial<FavoriteButtonLabels>;
   className?: string;
 }
@@ -27,7 +27,7 @@ export interface FavoriteButtonLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -42,9 +42,9 @@ const MESSAGES: Record<SunLocale, FavoriteButtonLabels> = {
   ja: { add: "お気に入りに追加", remove: "お気に入りから削除" },
 };
 
-// 設計語言（DESIGN.md）：文字色外框，收藏時品牌專色實心
+// Design language (DESIGN.md): an outline in the text color, filled with the brand accent once favorited
 const ink = "text-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent color: follows the theme's --primary by default, and buyers can set --sunui-spot to use their own brand color. Used only for selected, deal and current-progress states */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
@@ -106,7 +106,7 @@ export function FavoriteButton({
         )}
       >
         <svg viewBox="0 0 24 24" className={cn("overflow-visible", s.icon)} aria-hidden="true">
-          {/* 實心像印章壓上去：先大後落定 */}
+          {/* The fill presses on like a stamp: large first, then settles */}
           <AnimatePresence initial={false}>
             {pressed && (
               <motion.path

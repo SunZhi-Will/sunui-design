@@ -4,7 +4,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { ProductMedia } from "./product-media";
 
-// 示範照片（AI 生成）：同一個石器馬克杯的正面、側面與釉面微距，放在 public/blocks/product-media
+// Demo photos (AI-generated): front, side and glaze macro of the same stoneware mug, stored in public/blocks/product-media
 const dir = "/blocks/product-media";
 const front = `${dir}/front.webp`;
 const side = `${dir}/side.webp`;

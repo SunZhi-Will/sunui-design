@@ -12,7 +12,7 @@ const springs = {
 
 export interface TimelineItem {
   id: string;
-  /** 左側的小字，例如年份、日期或時間 */
+  /** Small text on the left, e.g. a year, date or time */
   time?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
@@ -21,20 +21,20 @@ export interface TimelineItem {
 export interface ScrollTimelineProps {
   items: TimelineItem[];
   /**
-   * scroll：線條隨捲動往下畫，經過的節點填滿（品牌故事、活動流程）。
-   * progress：由 current 決定進度，不看捲動（訂單追蹤、申請進度）。
+   * scroll: the line draws downward with scrolling and nodes it passes fill in (brand story, campaign flow).
+   * progress: progress is set by current, independent of scrolling (order tracking, application status).
    */
   mode?: "scroll" | "progress";
-  /** progress 模式：已完成到第幾個（從 0 起算）；-1 表示都還沒開始 */
+  /** progress mode: how many are completed (counting from 0); -1 means none have started */
   current?: number;
-  /** scroll 模式在可捲動容器裡時傳入 */
+  /** Pass this when scroll mode runs inside a scrollable container */
   container?: RefObject<HTMLElement | null>;
-  /** scroll 模式：線頭停在捲動區的哪個高度（0 頂端、1 底端） */
+  /** scroll mode: at what height of the scroll area the line head rests (0 top, 1 bottom) */
   anchor?: number;
   className?: string;
 }
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selected state, offers and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 
 function Dot({ reached, current, reduce }: { reached: boolean; current: boolean; reduce: boolean | null }) {
@@ -59,16 +59,16 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
     target: listRef,
     container,
     offset: [`start ${anchor}`, `end ${anchor}`],
-    // 讓父層的 container ref 先掛上，否則在容器裡會讀成視窗捲動
+    // Let the parent's container ref attach first, otherwise inside a container it would read as window scroll
     layoutEffect: false,
   });
   const smooth = useSpring(scrollYProgress, reduce ? { stiffness: 10000, damping: 1000 } : springs.gentle);
   const [reachedCount, setReachedCount] = useState(0);
-  // progress 模式要量節點位置，掛載後再算一次
+  // progress mode needs to measure node positions, so compute once more after mount
   const [, setMeasured] = useState(false);
   useEffect(() => setMeasured(true), []);
 
-  // 換算每個節點的位置比例，線頭經過就算到達
+  // Convert each node to a position ratio; a node counts as reached once the line head passes it
   useMotionValueEvent(scrollYProgress, "change", (p) => {
     if (mode !== "scroll") return;
     const list = listRef.current;

@@ -6,7 +6,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { CjkHeading } from "./cjk-heading";
 
-// 英文介面沿用繁中範例：這個 block 專為中日文標題而做
+// The English UI reuses the Traditional Chinese sample: this block is made for Chinese and Japanese headings
 const zhTW = { lang: "zh-Hant", title: "「週年慶」滿千送百，\n會員再享9折。", titleSeal: "滿千送百", sub: "11月7日起，\nApp獨享加碼5%回饋。", subSeal: "5%回饋" };
 const copy = {
   en: zhTW,
@@ -15,7 +15,7 @@ const copy = {
   ja: { lang: "ja", title: "「周年祭」1万円で千円還元、\n会員はさらに10%オフ。", titleSeal: "千円還元", sub: "11月7日から、\nアプリ限定で5%還元を上乗せ。", subSeal: "5%還元" },
 };
 
-/** 型錄卡片：一張中英混排的活動標題，看標點擠壓、自動細空格與朱紅印章關鍵字。 */
+/** Catalog card: a mixed Chinese and English campaign heading, showing punctuation squeezing, automatic thin spaces and the vermilion seal keyword. */
 export default function CjkHeadingCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

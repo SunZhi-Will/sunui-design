@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { StepDemo, cue, ease, lerp, typed, typingTime, type StepDemoStep, type StepViewProps } from "./step-demo";
 
-// 茶行的活動工具：描述 → 產生 → 上線。每個畫面只依 t 畫出來，時間點用具名常數排。
+// A campaign tool for a tea shop: describe, generate, go live. Each screen is drawn purely from t, with timing laid out as named constants.
 
 const copy = {
   en: {
@@ -90,15 +90,15 @@ const copy = {
 
 type Copy = (typeof copy)["en"];
 
-/* ---------- 具名時間點（秒） ---------- */
+/* ---------- Named time points (seconds) ---------- */
 
 const TYPE_FROM = 1.5;
-const READY = 2.0; // 第二步：產生完成
-const PICK = 4.8; // 第二步：點選第二個版本
-const PUBLISH = 1.4; // 第三步：按下發布
-const LIVE = 2.0; // 第三步：上線
+const READY = 2.0; // Step two: generation finishes
+const PICK = 4.8; // Step two: pick the second variant
+const PUBLISH = 1.4; // Step three: press publish
+const LIVE = 2.0; // Step three: goes live
 
-// 三個版本靠底色層次區分，不依賴主題的強調色是否接近前景色。
+// The three variants are told apart by background tone, not by whether the theme accent is close to the foreground colour.
 const TONES = ["bg-primary text-primary-foreground", "bg-muted text-foreground", "bg-card text-foreground ring-1 ring-inset ring-border"];
 
 function Spinner({ t }: { t: number }) {
@@ -109,7 +109,7 @@ function Spinner({ t }: { t: number }) {
   );
 }
 
-// 示範照片（AI 生成），放在 public/blocks/step-demo；三個版本各配一張，順序對應 TONES
+// Demo photos (AI generated) live in public/blocks/step-demo; each of the three variants gets one, in the order of TONES
 const BANNER_PHOTOS = ["tea-dark", "tea-tray", "tea-glass"].map((name) => `/blocks/step-demo/${name}.webp`);
 
 function Banner({ c, tone = 0, small }: { c: Copy; tone?: number; small?: boolean }) {
@@ -130,7 +130,7 @@ function Banner({ c, tone = 0, small }: { c: Copy; tone?: number; small?: boolea
   );
 }
 
-/** 共用外殼：上方工具列、左側面板、右側畫布 */
+/** Shared shell: top toolbar, left panel, right canvas */
 function Shell({ c, panel, canvas }: { c: Copy; panel: ReactNode; canvas: ReactNode }) {
   return (
     <div className="flex h-full flex-col text-foreground">
@@ -168,7 +168,7 @@ function ActionButton({ aim, label, pressed, busy, t, done }: { aim: string; lab
   );
 }
 
-/* ---------- 三個步驟 ---------- */
+/* ---------- The three steps ---------- */
 
 function useClickAt(c: Copy) {
   return TYPE_FROM + typingTime(c.prompt, c.cps) + 1.1;
@@ -220,13 +220,13 @@ function Generate({ t }: StepViewProps) {
       }
       canvas={
         <div className="relative h-full overflow-hidden rounded-xl">
-          {/* 產生中：骨架掃光 */}
+          {/* Generating: skeleton shimmer sweep */}
           {!cue(t, READY) ? (
             <div className="absolute inset-0 overflow-hidden rounded-xl bg-muted">
               <div className="absolute inset-y-0 w-1/3 bg-background/60" style={{ transform: `translateX(${lerp(-100, 300, (t % 1.2) / 1.2)}%)` }} />
             </div>
           ) : null}
-          {/* 結果：模糊暗底上由上往下畫出，掃描線跟著走，最後亮度回穩 */}
+          {/* Result: drawn top to bottom over a blurred dark base, the scan line follows, and brightness settles at the end */}
           {cue(t, READY) ? (
             <>
               <div className="absolute inset-0" style={{ filter: "blur(10px) brightness(0.5) saturate(0.4)", transform: "scale(1.08)", opacity: 1 - settle }}>

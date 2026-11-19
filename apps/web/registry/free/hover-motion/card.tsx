@@ -43,7 +43,7 @@ const copy = {
 
 const tones = ["bg-foreground/10", "bg-[#cdcdcd]", "bg-[#bfbfbf]"];
 
-/** 型錄卡片：選單滑過時文字上捲、底線墨水般畫出；滑過商品列，預覽圖跟著游標浮出來。 */
+/** Catalog card: on menu hover the text rolls up and the underline draws like ink; hover a product row and the preview image floats out following the cursor. */
 export default function HoverMotionCard() {
   const t = useDemoText(copy);
   const [hoverNav, setHoverNav] = useState<number | null>(null);

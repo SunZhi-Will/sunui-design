@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 export interface ConsentItem {
   id: string;
   label: ReactNode;
-  /** 條款下方的補充說明，例如退貨天數或資料用途 */
+  /** Supplementary note below the term, e.g. return period or how data is used */
   description?: ReactNode;
-  /** 必填：沒勾就不能送出。選填項目一律預設不勾 */
+  /** Required: cannot submit without ticking it. Optional items are always unticked by default */
   required?: boolean;
 }
 
@@ -18,34 +18,34 @@ export interface TermsConsentLabels {
   eyebrow?: ReactNode;
   required?: ReactNode;
   optional?: ReactNode;
-  /** 必填計數，例如「1 / 2 required」 */
+  /** Required count, e.g. "1 / 2 required" */
   counter?: (done: number, total: number) => ReactNode;
-  /** 按鈕停用時的原因，會透過 aria-describedby 讀給螢幕閱讀器 */
+  /** Reason shown when the button is disabled, read to screen readers through aria-describedby */
   blocked?: (missing: number) => ReactNode;
   ready?: ReactNode;
-  /** 預設按鈕文字；submitLabel 優先 */
+  /** Default button text; submitLabel takes priority */
   submit?: ReactNode;
 }
 
 export interface TermsConsentProps {
   items: ConsentItem[];
-  /** 受控：目前勾選的 id */
+  /** Controlled: the ids currently ticked */
   value?: string[];
   defaultValue?: string[];
   onChange?: (checked: string[]) => void;
-  /** 必填全勾後點按鈕觸發，回傳所有勾選的 id（含選填） */
+  /** Fires when the button is clicked after all required items are ticked; returns all ticked ids (including optional ones) */
   onSubmit?: (checked: string[]) => void;
   submitLabel?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: TermsConsentLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -92,13 +92,13 @@ const MESSAGES: Record<SunLocale, Required<TermsConsentLabels>> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colours, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
 const vermilion = "text-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers, and current progress */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -107,8 +107,8 @@ const springs = {
 } as const;
 
 /**
- * 結帳前的條款同意：必填項目計數 n / m，全部勾完才啟用結帳按鈕。
- * 按鈕停用時用 aria-disabled（保留可聚焦），並以 aria-describedby 說明原因。
+ * Terms consent before checkout: counts required items n / m, and the checkout button is enabled only when all are ticked.
+ * While the button is disabled it uses aria-disabled (so it stays focusable) and explains why through aria-describedby.
  */
 export function TermsConsent({
   items,

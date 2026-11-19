@@ -7,10 +7,10 @@ import { copy, interactive } from "./demo";
 
 export const variants = backgroundEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as a representative; pick one that moves on its own so the card needs no hover to show the effect
 export const featured = "aurora";
 
-/** 首頁型錄：一種背景一張卡，放在固定大小的圓角面板裡，不鋪滿整個畫面。 */
+/** Home catalog: one card per background, inside a fixed-size rounded panel rather than filling the whole screen. */
 export default function BackgroundEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const effect = variant as BackgroundEffect;

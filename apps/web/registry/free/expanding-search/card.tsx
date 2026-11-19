@@ -45,7 +45,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：頂列一個放大鏡，點開展成搜尋框並跳出商品建議。 */
+/** Catalog card: a magnifier in the top bar that opens into a search box and pops up product suggestions. */
 export default function ExpandingSearchCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -65,7 +65,7 @@ export default function ExpandingSearchCard() {
       <div className="flex h-14 items-center gap-2 border-b border-border px-3">
         {!searching && <span className="text-sm font-semibold tracking-tight whitespace-nowrap">Northwind</span>}
         <div className="ml-auto flex min-w-0 flex-1 justify-end">
-          {/* 建議清單限高，留在卡片範圍內 */}
+          {/* Suggestion list has a height limit so it stays inside the card */}
           <ExpandingSearch
             locale={locale}
             suggestions={suggestions}

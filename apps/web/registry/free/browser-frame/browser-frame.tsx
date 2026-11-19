@@ -3,15 +3,15 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export type BrowserFrameTone = "default" | "danger" | "success" | "brand";
-/** auto 跟著深淺色切換；dark／light 固定色，給不吃主題的簡報舞台用 */
+/** auto follows light and dark; dark / light are fixed colors, for presentation stages that do not follow the theme */
 export type BrowserFrameScheme = "auto" | "dark" | "light";
-/** 視窗版（WindowFrame）與瀏覽器版共用同一組色調與配色 */
+/** The window version (WindowFrame) and the browser version share the same tones and palette */
 export type WindowFrameTone = BrowserFrameTone;
 export type WindowFrameScheme = BrowserFrameScheme;
 
 /*
- * 色彩 token。auto 沿用部落格 tokens.css（淺色 stone、深色 zinc），
- * dark／light 沿用簡報裝置外框的固定色。
+ * Color tokens. auto reuses the blog's tokens.css (stone in light, zinc in dark),
+ * dark / light reuse the fixed colors of the presentation device frames.
  */
 const lightVars =
   "[--wf-surface:#ffffff] [--wf-raised:#f5f5f5] [--wf-sunken:#f3f1ed] [--wf-fg:#171717] [--wf-fg-body:#262626] [--wf-fg-muted:#525252] [--wf-line:rgba(28,25,23,0.1)] [--wf-line-strong:rgba(28,25,23,0.22)] [--wf-dot:rgba(28,25,23,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(217,119,6,0.7)] [--wf-shadow:0_1px_2px_rgba(28,25,23,0.05),0_4px_14px_-6px_rgba(28,25,23,0.08)]";
@@ -35,7 +35,7 @@ const toneRing: Record<BrowserFrameTone, string> = {
   brand: "border-[var(--wf-brand)]",
 };
 
-/** macOS 紅黃綠三顆燈 */
+/** macOS red, yellow and green traffic lights */
 export function TrafficLights({ className }: { className?: string }) {
   return (
     <span aria-hidden="true" className={cn("flex shrink-0 gap-1.5", className)}>
@@ -74,7 +74,7 @@ function LockIcon({ size }: { size: number }) {
   );
 }
 
-/** 兩種外框共用的殼：圓角、配色變數、色調外框 */
+/** Shell shared by both frames: rounded corners, color variables, tinted outline */
 function frameShell(scheme: BrowserFrameScheme, tone: BrowserFrameTone, className?: string) {
   return cn(
     "m-0 min-w-0 overflow-hidden rounded-xl border bg-[var(--wf-surface)] transition-colors",
@@ -84,7 +84,7 @@ function frameShell(scheme: BrowserFrameScheme, tone: BrowserFrameTone, classNam
   );
 }
 
-/** 內容區，有 maxHeight 時在框內捲動 */
+/** Content area, scrolls inside the frame when maxHeight is set */
 function FrameBody({ maxHeight, className, children }: { maxHeight?: number; className?: string; children: ReactNode }) {
   return (
     <div className={className} style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
@@ -93,16 +93,16 @@ function FrameBody({ maxHeight, className, children }: { maxHeight?: number; cla
   );
 }
 
-/* ───────── 電腦瀏覽器 ───────── */
+/* ───────── Desktop browser ───────── */
 
 export interface BrowserFrameLabels {
-  /** 外框的無障礙名稱 */
+  /** Accessible name of the frame */
   window: (url: string) => string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -118,17 +118,17 @@ const MESSAGES: Record<SunLocale, BrowserFrameLabels> = {
 };
 
 export interface BrowserFrameProps {
-  /** 網址列（只顯示網域與路徑） */
+  /** Address bar (shows only the domain and path) */
   url: string;
-  /** 分頁標題，不給就顯示網址 */
+  /** Tab title; shows the URL when not given */
   title?: ReactNode;
   tone?: BrowserFrameTone;
   scheme?: BrowserFrameScheme;
   badge?: ReactNode;
   maxHeight?: number;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings, takes priority over locale */
   labels?: Partial<BrowserFrameLabels>;
   children: ReactNode;
   className?: string;
@@ -177,29 +177,29 @@ export function BrowserFrame({
   );
 }
 
-/* ───────── macOS 視窗（原 window-frame） ───────── */
+/* ───────── macOS window (formerly window-frame) ───────── */
 
 export interface WindowFrameProps {
-  /** 標題列置中的文字（檔名、App 名稱） */
+  /** Centered text in the title bar (file name, app name) */
   title: ReactNode;
-  /** 標題前的小圖示 */
+  /** Small icon before the title */
   icon?: ReactNode;
-  /** 標題列右側插槽 */
+  /** Slot on the right of the title bar */
   right?: ReactNode;
-  /** 標題列下方的選單列（窄螢幕隱藏） */
+  /** Menu bar below the title bar (hidden on narrow screens) */
   menus?: string[];
-  /** 外框顏色表示示範狀態：失敗、成功、品牌 */
+  /** Outline color for demo states: failed, success, brand */
   tone?: WindowFrameTone;
   scheme?: WindowFrameScheme;
-  /** 有給就在右上角掛小徽章，例如「Simulated」，表示畫面是程式畫的 */
+  /** When given, a small badge hangs at the top right, for example "Simulated", showing the picture is drawn by code */
   badge?: ReactNode;
-  /** 內容區最大高度，超過在框內捲動 */
+  /** Maximum height of the content area, scrolls inside the frame beyond that */
   maxHeight?: number;
   children: ReactNode;
   className?: string;
 }
 
-/** 像編輯器或 App 的視窗外框：標題置中，沒有網址列 */
+/** Window frame like an editor or app: centered title, no address bar */
 export function WindowFrame({
   title,
   icon,
@@ -244,7 +244,7 @@ export function WindowFrame({
   );
 }
 
-/* ───────── 展示區 ───────── */
+/* ───────── Showcase area ───────── */
 
 export interface StageProps {
   children: ReactNode;
@@ -253,7 +253,7 @@ export interface StageProps {
   style?: CSSProperties;
 }
 
-/** 帶點點底紋的展示區，放圖表、插圖與外框 */
+/** Showcase area with a dotted pattern, for charts, illustrations and frames */
 export function Stage({ children, scheme = "auto", className, style }: StageProps) {
   return (
     <div

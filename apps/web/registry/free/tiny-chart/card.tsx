@@ -85,12 +85,12 @@ function boxMachine(t: Text): TinyMachine {
   };
 }
 
-/** 型錄卡片：一張訂閱盒的循環狀態圖，按「全部播放」看它繞一圈再從唯一出口離開，或一步一步按。 */
+/** Catalog card: a subscription box's cycle diagram. Press "Play all" to watch it loop once and leave through the single exit, or step through by hand. */
 export default function TinyChartCard() {
   const t = useDemoText(copy);
   const machine = useMemo(() => boxMachine(t), [t]);
   return (
-    // 狀態圖預設跟著寬度長高；卡片裡限制圖的高度（viewBox 等比置中），事件按鈕也縮短成一個詞，排得下一行
+    // The diagram grows with its width by default; the card caps its height (the viewBox stays centered, scaled proportionally) and shortens the event buttons to one word so they fit on one row
     <div className="mx-auto w-[28rem] [&_svg[role=img]]:h-48">
       <TinyChart machine={machine} layout="cycle" title={t.title} subtitle={t.sub} copy={t.ui} showLogic={false} />
     </div>

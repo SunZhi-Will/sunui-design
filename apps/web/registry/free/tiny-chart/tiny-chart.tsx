@@ -9,9 +9,9 @@ import { Figure, ISO_C, ISO_S, iso, placeScene, r1, SceneParts, type Pt, type Sc
 
 export { tinyProps, type TinyProp, type TinyScene } from "./tiny-scenes";
 
-/* 一張會動的流程小圖：畫面背後是一台真的狀態機，每個按鈕都照規則走。
-   不合規則的按鈕不會被藏起來，按下去會用一句話說明為什麼不行，這是讀者理解規則的方式。
-   三種版面共用同一台機器：flow（流程與分岔）、timeline（照比例的時間軸）、cycle（循環與出口）。 */
+/* An animated flow diagram. A real state machine sits behind it, and every button follows its rules.
+   Buttons that break the rules are not hidden: pressing one explains in a sentence why it is not allowed, which is how readers learn the rules.
+   Three layouts share one machine: flow (steps and branches), timeline (to-scale time axis), cycle (loops and exits). */
 
 export const NEXT = "next";
 
@@ -20,28 +20,28 @@ export type TinyChartLayout = "flow" | "timeline" | "cycle" | "isometric";
 export interface TinyState {
   id: string;
   label: string;
-  /** 節點旁的小字 */
+  /** Small text beside the node */
   note?: string;
-  /** 進入這一步時的旁白；省略時用步驟名稱 */
+  /** Narration shown when entering this step; falls back to the step name */
   say?: string;
-  /** 終點：畫成靶心，按下一步會說已經結束 */
+  /** Terminal step: drawn as a bullseye; pressing next says it is already finished */
   final?: boolean;
-  /** flow 與 isometric 版面的格位 [欄, 列]；省略時依距離起點的步數自動排 */
+  /** Grid cell [column, row] for the flow and isometric layouts; placed automatically by distance from the start when omitted */
   at?: [number, number];
-  /** isometric 版面：放在這一步旁邊的小場景，例如 "truck" 或 { prop: "counter", person: true } */
+  /** Isometric layout: small scene beside this step, e.g. "truck" or { prop: "counter", person: true } */
   scene?: TinyScene;
-  /** timeline 版面的相對長度，預設 1 */
+  /** Relative length in the timeline layout, default 1 */
   duration?: number;
 }
 
 export interface TinyTransition {
   from: string;
   to: string;
-  /** 觸發事件，預設 "next"（下一步按鈕）；其他值會變成一顆選擇按鈕 */
+  /** Triggering event, default "next" (the next-step button); any other value becomes a choice button */
   on?: string;
-  /** 連線上的說明 */
+  /** Label on the connection */
   label?: string;
-  /** 條件，畫成 [方括號] */
+  /** Condition, drawn in [square brackets] */
   guard?: string;
 }
 
@@ -49,11 +49,11 @@ export interface TinyMachine {
   initial: string;
   states: TinyState[];
   transitions: TinyTransition[];
-  /** 事件 id 對應的按鈕文字 */
+  /** Button label for each event id */
   events?: Record<string, string>;
-  /** 全部播放時依序送出的事件；省略時沿著下一步走到終點 */
+  /** Events sent in order by Play all; when omitted, follows next steps to the end */
   play?: string[];
-  /** 顯示在邏輯面板的業務規則 */
+  /** Business rules shown in the logic panel */
   rules?: { rule: string; says?: string }[];
 }
 
@@ -90,12 +90,12 @@ export const defaultTinyChartCopy: TinyChartCopy = {
   },
 };
 
-/* ---------- 規則檢查：讓「每個按鈕都照規則走」可以被驗證 ---------- */
+/* ---------- Rule checks: make "every button follows the rules" verifiable ---------- */
 
 export interface TinyCheck {
   id: "ids" | "reach" | "exits" | "oneWay";
   ok: boolean;
-  /** 出問題的步驟或連線 */
+  /** The step or transition at fault */
   detail: string[];
 }
 
@@ -130,9 +130,9 @@ export function checkMachine(m: TinyMachine): TinyCheck[] {
   ];
 }
 
-/* ---------- 引擎：不畫任何東西，可以拿去驅動自己的插圖 ---------- */
+/* ---------- Engine: draws nothing, so you can use it to drive your own illustration ---------- */
 
-/** 旁白存成資料，不存句子：換語系時畫面上的那句話也會跟著換 */
+/** Narration is stored as data, not sentences, so the on-screen line follows a locale change */
 type Note =
   | { kind: "idle" }
   | { kind: "enter"; id: string }
@@ -142,19 +142,19 @@ type Note =
   | { kind: "notHere"; event: string; where: string[] };
 
 interface Run {
-  /** 機器的結構指紋；機器換了（步驟或連線不同）就從頭開始，舊的 path 索引不會指到不存在的連線 */
+  /** Fingerprint of the machine structure; when the machine changes (different steps or transitions) it restarts, so a stale path index never points at a missing transition */
   sig: string;
   at: string;
-  /** 走過的連線（transitions 的索引） */
+  /** Transitions taken so far (indexes into transitions) */
   path: number[];
   note: Note;
-  /** 每次回應加一，用來觸發被拒絕時的輕搖 */
+  /** Incremented on every response, used to trigger the shake on rejection */
   beat: number;
 }
 
 type Action = { type: "send"; event: string } | { type: "reset" };
 
-/** 沒有給 play 時：沿下一步走（沒有下一步就取第一條出路），遇到終點或走回頭路就停 */
+/** When no play script is given: follow next steps (take the first exit if there is no next), and stop at a terminal step or when a path doubles back */
 function autoScript(m: TinyMachine) {
   const out: string[] = [];
   const seen = new Set([m.initial]);
@@ -197,7 +197,7 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
       note = { kind: "notHere", event: a.event, where: [...new Set(machine.transitions.filter((t) => (t.on ?? NEXT) === a.event).map((t) => t.from))] };
     return { ...s, note, beat: s.beat + 1 };
   }, fresh);
-  // 機器結構變了：這一輪先用新的起點畫，下一次按鈕時 reducer 也會從新起點算
+  // Machine structure changed: this render draws from the new start, and the reducer also computes from the new start on the next button press
   const run = stored.sig === sig ? stored : fresh;
 
   const n = run.note;
@@ -234,7 +234,7 @@ export function useStatechart(machine: TinyMachine, copy: TinyChartCopy = defaul
   };
 }
 
-/* ---------- 版面：把機器排成三種圖 ---------- */
+/* ---------- Layout: arrange the machine into three kinds of diagram ---------- */
 
 interface Box { x: number; y: number; w: number; h: number }
 interface Edge { d: string; lx: number; ly: number; anchor: "start" | "middle" | "end"; text: string; tape?: boolean }
@@ -244,15 +244,15 @@ interface Layout {
   edges: Edge[];
   start: [Pt, Pt];
   tick: boolean;
-  /** isometric 版面才有：每一步的三個面與地板格線 */
+  /** Isometric layout only: the three faces of each step, plus the floor grid lines */
   iso?: {
     blocks: Map<string, IsoBlock>;
     floor: string;
     scenes: Map<string, SceneDraw>;
-    /** 小人站在每一步的哪裡（方塊頂面中心或終點圓盤） */
+    /** Where the figure stands at each step (center of the block top, or the terminal disc) */
     stands: Map<string, Pt>;
   };
-  /** 視框也要包進來的額外點（場景道具） */
+  /** Extra points the viewBox must also contain (scene props) */
   extra?: Pt[];
 }
 
@@ -261,12 +261,12 @@ const EDGE_FONT = 11;
 const NODE_H = 28;
 const textW = (s: string, size: number) =>
   [...s].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? size * 1.08 : size * 0.68), 0);
-// 終點畫成靶心，方框只是用來算箭頭停在哪
+// The terminal step is drawn as a bullseye; the box is only used to work out where arrows stop
 const nodeBox = (s: TinyState, x: number, y: number): Box =>
   s.final ? { x, y, w: 22, h: 22 } : { x, y, w: Math.max(60, textW(s.label.toUpperCase(), NODE_FONT) + 24), h: NODE_H };
 const edgeText = (t: TinyTransition) => [t.guard && `[${t.guard}]`, t.label].filter(Boolean).join(" ");
 
-/** 直角折線，轉角帶小圓角 */
+/** Right-angle polyline with slightly rounded corners */
 function ortho(p: Pt[], radius = 8) {
   const toward = (a: Pt, b: Pt, r: number): Pt => {
     const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
@@ -280,7 +280,7 @@ function ortho(p: Pt[], radius = 8) {
   return `${d} L${p[p.length - 1].join(" ")}`;
 }
 
-/** 文字放在最長的那一段旁邊 */
+/** Place the label beside the longest segment */
 function orthoLabel(p: Pt[], text: string): Edge {
   let best = 0;
   for (let i = 1; i < p.length - 1; i++)
@@ -292,7 +292,7 @@ function orthoLabel(p: Pt[], text: string): Edge {
     : { d: ortho(p), lx: (a[0] + b[0]) / 2, ly: a[1] - 7, anchor: "middle", text };
 }
 
-/** 從方框中心往某點的方向，取方框邊上的點 */
+/** From the box center toward a point, take the point on the box edge */
 function rim(b: Box, toward: Pt, gap = 3): Pt {
   const dx = toward[0] - b.x, dy = toward[1] - b.y;
   const t = Math.min((b.w / 2 + gap) / (Math.abs(dx) || 1e-6), (b.h / 2 + gap) / (Math.abs(dy) || 1e-6));
@@ -310,7 +310,7 @@ function selfLoop(b: Box, text: string): Edge {
   return { d: `M${x + 2} ${y0} C${x + 34} ${y0 - 16}, ${x + 34} ${y1 + 16}, ${x + 3} ${y1}`, lx: x + 36, ly: b.y + 4, anchor: "start", text };
 }
 
-/** 每一步的格位 [欄, 列]：有 at 用 at，沒有就依距離起點的步數排列，同列置中 */
+/** Grid cell [column, row] per step: use at if given, otherwise arrange by distance from the start, centered within a row */
 function gridOf(m: TinyMachine) {
   const depth = new Map([[m.initial, 0]]);
   const queue = [m.initial];
@@ -339,11 +339,11 @@ function layoutFlow(m: TinyMachine): Layout {
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     const top = a.y + a.h / 2, bottom = b.y - b.h / 2;
     if (b.y > a.y + 1) {
-      // 一分多：在出發處就轉彎；多合一：在抵達前才轉彎
+      // One-to-many: turn right at the departure point; many-to-one: turn only just before arriving
       const splits = m.transitions.filter((x) => x.from === t.from && nodes.get(x.to)!.y > a.y + 1).length > 1;
       if (Math.abs(a.x - b.x) < 1) {
         const e = orthoLabel([[a.x, top], [b.x, bottom]], edgeText(t));
-        // 分岔時直走那條的文字放左邊，讓出右邊給轉彎那條
+        // At a fork, put the label of the straight-ahead line on the left, leaving the right side for the one that turns
         return splits ? { ...e, lx: a.x - 8, anchor: "end" as const } : e;
       }
       const ym = splits ? top + (rowH - NODE_H) / 2 : bottom - (rowH - NODE_H) / 2;
@@ -353,7 +353,7 @@ function layoutFlow(m: TinyMachine): Layout {
       const dir = b.x > a.x ? 1 : -1;
       return orthoLabel([[a.x + (dir * a.w) / 2, a.y], [b.x - (dir * b.w) / 2, b.y]], edgeText(t));
     }
-    // 回頭的線走右側外圈，每一條錯開一點
+    // Lines that go back run around the right-hand outside, each offset a little from the last
     const lane = right + 26 + (i % 3) * 12;
     return orthoLabel([[a.x + a.w / 2, a.y], [lane, a.y], [lane, b.y], [b.x + b.w / 2, b.y]], edgeText(t));
   });
@@ -376,9 +376,9 @@ function layoutTimeline(m: TinyMachine): Layout {
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     if (index.get(t.to) === index.get(t.from)! + 1)
       return { d: `M${x} ${a.y + 8} L${x} ${b.y - 8}`, lx: x - 14, ly: (a.y + b.y) / 2 + 4, anchor: "end", text: edgeText(t), tape: true };
-    // 跳過或折返的線，從時間軸左側繞過去
+    // Lines that skip ahead or turn back go around the left side of the timeline
     const bend = x - 46 - Math.min(40, Math.abs(b.y - a.y) / 10);
-    // 文字靠近出發端，避開時間段中間的長度標示
+    // Keep the label near the departure end, away from the duration marks in the middle of each segment
     return { d: `M${x - 7} ${a.y} C${bend} ${a.y}, ${bend} ${b.y}, ${x - 8} ${b.y}`, lx: 0.75 * bend - 8, ly: a.y + (b.y - a.y) * 0.3 + 4, anchor: "end", text: edgeText(t) };
   });
   const first = nodes.get(m.initial)!;
@@ -386,7 +386,7 @@ function layoutTimeline(m: TinyMachine): Layout {
 }
 
 function layoutCycle(m: TinyMachine): Layout {
-  // 圈上只放主循環：從起點沿下一步走回起點的那幾步；其他步驟（暫停、終點）放在圈外
+  // Only the main loop goes on the ring: the steps that lead from the start along next back to the start; other steps (pause, terminal) sit outside the ring
   const loop: string[] = [m.initial];
   for (let at = m.initial; ; ) {
     const t = m.transitions.find((x) => x.from === at && (x.on ?? NEXT) === NEXT);
@@ -402,7 +402,7 @@ function layoutCycle(m: TinyMachine): Layout {
   const nodes = new Map<string, Box>();
   loop.forEach((id, i) => nodes.set(id, nodeBox(byId.get(id)!, Math.cos(angle(i)) * R, Math.sin(angle(i)) * R)));
   for (const s of m.states.filter((x) => !nodes.has(x.id))) {
-    // 圈外的步驟放在它連到的圈上步驟的方向，往外推
+    // A step outside the ring sits in the direction of the ring step it connects to, pushed outward
     const near = m.transitions.flatMap((t) => (t.to === s.id ? [t.from] : t.from === s.id ? [t.to] : [])).filter((id) => nodes.has(id));
     const vx = near.reduce((n, id) => n + nodes.get(id)!.x, 0), vy = near.reduce((n, id) => n + nodes.get(id)!.y, 0);
     const l = Math.hypot(vx, vy) || 1;
@@ -415,17 +415,17 @@ function layoutCycle(m: TinyMachine): Layout {
     if (t.from === t.to) return selfLoop(a, edgeText(t));
     const i = pos.get(t.from), j = pos.get(t.to);
     if (i === undefined || j === undefined) {
-      // 進出圈外的線向外微彎
+      // Lines going into or out of an outside step curve slightly outward
       const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, l = Math.hypot(mx, my) || 1;
       return curve(a, b, [mx + (mx / l) * 18, my + (my / l) * 18], edgeText(t));
     }
     const forward = (i + 1) % loop.length === j;
     const mid = angle(i) + (((j - i + loop.length) % loop.length) / loop.length) * Math.PI;
-    // 順著走的沿外圈，跨步或倒退的從圈內穿過
+    // Lines that follow the flow use the outer ring; lines that skip or go backward cut through the inside
     const k = forward ? R * 1.18 : R * 0.3;
     return curve(a, b, [Math.cos(mid) * k, Math.sin(mid) * k], edgeText(t));
   });
-  // 起點箭頭從圈外指進來
+  // The start arrow points in from outside the ring
   const first = nodes.get(m.initial)!;
   const fl = Math.hypot(first.x, first.y) || 1;
   const from: Pt = [first.x + (first.x / fl) * 44, first.y + (first.y / fl) * 44];
@@ -433,7 +433,7 @@ function layoutCycle(m: TinyMachine): Layout {
 }
 
 
-/* ---------- 等角版面：步驟是立在等角地板上的方塊，連線走在地板上 ---------- */
+/* ---------- Isometric layout: steps are blocks standing on an isometric floor, with connections running along the floor ---------- */
 
 const ISO_FONT = 11;
 const BLOCK_D = 30, BLOCK_H = 24, DISC = 13;
@@ -443,7 +443,7 @@ function layoutIso(m: TinyMachine): Layout {
   const byId = new Map(m.states.map((s) => [s.id, s]));
   const width = (s: TinyState) => (s.final ? DISC * 2 : Math.max(76, textW(s.label.toUpperCase(), ISO_FONT) + 28));
   const colW = Math.max(...m.states.map(width)) + 70, rowW = 136;
-  // 世界座標裡的方塊：中心、x 方向長度、y 方向深度
+  // Blocks in world coordinates: center, length along x, depth along y
   const world = new Map<string, { x: number; y: number; w: number; d: number }>();
   for (const [id, [c, r]] of cells) {
     const s = byId.get(id)!;
@@ -493,12 +493,12 @@ function layoutIso(m: TinyMachine): Layout {
       const dir = b.x > a.x ? 1 : -1;
       return floorEdge([[a.x + (dir * a.w) / 2, a.y], [b.x - dir * (b.w / 2 + 4), b.y]], edgeText(t));
     }
-    // 回頭的線沿地板外側繞回去
+    // Lines that go back loop around the outside of the floor
     const lane = right + 34 + (i % 3) * 14;
     return floorEdge([[a.x + a.w / 2, a.y], [lane, a.y], [lane, b.y], [b.x + b.w / 2 + 4, b.y]], edgeText(t));
   });
 
-  // 場景：主線上的步驟放在遠側（畫面右上），分岔出去的步驟放在近側（左下），不擋住主線
+  // Scene: steps on the main line sit on the far side (upper right of the view), branch steps on the near side (lower left), so the main line is never blocked
   const scenes = new Map<string, SceneDraw>();
   const stands = new Map<string, Pt>();
   const extra: Pt[] = [];
@@ -511,7 +511,7 @@ function layoutIso(m: TinyMachine): Layout {
     for (const part of draw.parts) part.kind === "person" ? extra.push(part.at, [part.at[0], part.at[1] - 38]) : extra.push(...part.pts);
   }
 
-  // 地板：每 26 單位一條格線，範圍比方塊與場景多出一圈
+  // Floor: one grid line every 26 units, extending one ring beyond the blocks and scenes
   const all = [
     ...[...world.values()].map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d / 2, y1: b.y + b.d / 2 })),
     ...[...scenes.values()].map((d) => d.footprint),
@@ -534,7 +534,7 @@ function layoutIso(m: TinyMachine): Layout {
   };
 }
 
-/** 手畫感方框：四條線各自略超出轉角，端點有一點點偏移，由 id 決定，重繪不會跳 */
+/** Hand-drawn-looking box: each of the four lines overshoots its corner slightly, with a small endpoint offset derived from the id, so it does not jump on redraw */
 function sketchRect(b: Box, id: string) {
   let seed = [...id].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619), 2166136261);
   const rnd = () => ((seed = Math.imul(seed ^ (seed >>> 15), 1 | seed) + 0x6d2b79f5) >>> 0) / 4294967296;
@@ -548,32 +548,32 @@ function sketchRect(b: Box, id: string) {
   ].join(" ");
 }
 
-/* ---------- 元件 ---------- */
+/* ---------- Component ---------- */
 
 export interface TinyChartProps {
   machine: TinyMachine;
   layout?: TinyChartLayout;
   title: string;
   subtitle?: string;
-  /** 手畫感方框，關掉是乾淨的直線框 */
+  /** Hand-drawn-looking box; turn off for a clean straight-line box */
   sketch?: boolean;
-  /** 顯示「邏輯」面板的按鈕 */
+  /** Button that shows the "logic" panel */
   showLogic?: boolean;
   copy?: Partial<TinyChartCopy>;
   onStateChange?: (id: string) => void;
-  /** isometric 版面：一個小人站在目前這一步，換步時跳過去；預設開啟 */
+  /** Isometric layout: a figure stands at the current step and jumps across when the step changes; on by default */
   walker?: boolean;
   className?: string;
 }
 
 const INK = "stroke-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
-// RED：走過的路與目前所在的狀態外框
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers, and current progress */
+// RED: outline of the path taken and of the current state
 const RED = "stroke-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const PAPER = "fill-card";
 const MUTED = "stroke-muted-foreground/70";
-// 等角方塊的兩個側面：同一張紙的兩階明度，平塗，不用漸層
+// The two side faces of an isometric block: two lightness steps of the same surface, flat fill, no gradient
 const FACE_FRONT = "fill-[#e8e8e8] dark:fill-[#272727]";
 const FACE_SIDE = "fill-[#dbdbdb] dark:fill-[#131313]";
 const poly = (p: Pt[]) => p.map((q) => q.join(",")).join(" ");
@@ -595,7 +595,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
   const moved = path.length;
   const isIso = !!shape.iso;
   const byId = useMemo(() => new Map(machine.states.map((s) => [s.id, s])), [machine]);
-  // 等角方塊與場景一起由遠到近畫，近的才會蓋住遠的
+  // Isometric blocks and scenes are drawn far to near, so nearer ones cover farther ones
   const isoOrder = useMemo(() => {
     if (!shape.iso) return [];
     const { blocks, scenes } = shape.iso;
@@ -604,7 +604,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     return items.sort((a, b) => a.depth - b.depth);
   }, [shape, machine, byId]);
 
-  // 視框依內容算，連線文字也算進去，避免被切掉
+  // The viewBox is computed from the content, including connection labels, so nothing gets clipped
   const box = useMemo(() => {
     const xs: number[] = [], ys: number[] = [];
     for (const [id, b] of shape.nodes) {
@@ -618,7 +618,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
       const w = textW(e.text, EDGE_FONT);
       xs.push(e.anchor === "start" ? e.lx + w : e.anchor === "end" ? e.lx - w : e.lx + w / 2, e.anchor === "middle" ? e.lx - w / 2 : e.lx);
       ys.push(e.ly - 12, e.ly + 4);
-      // 路徑上的數字依序是 x, y 成對
+      // The numbers in a path are x, y pairs, in order
       (e.d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number).forEach((n, i) => (i % 2 ? ys : xs).push(n));
     }
     for (const [x, y] of shape.extra ?? []) xs.push(x), ys.push(y);
@@ -629,10 +629,10 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     return { minX, minY, w: maxX - minX, h: maxY - minY };
   }, [shape, byId]);
 
-  // 全部播放：從頭開始，一步一步送出劇本裡的事件；手動按任何按鈕就停
+  // Play all: start from the beginning and send the script's events one step at a time; pressing any button by hand stops it
   const stop = () => window.clearTimeout(timer.current);
   useEffect(() => () => window.clearTimeout(timer.current), []);
-  // 機器換了就停掉播放，舊劇本的事件不會送進新機器
+  // Stop playback when the machine changes, so events from an old script never reach the new machine
   useEffect(() => () => window.clearTimeout(timer.current), [chart.sig]);
 
   const playAll = () => {
@@ -653,7 +653,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
 
   useEffect(() => onStateChange?.(at), [at, onStateChange]);
 
-  // 圖比卡片寬時（手機），橫向捲動跟著目前這一步走
+  // When the diagram is wider than the card (mobile), horizontal scroll follows the current step
   useEffect(() => {
     const el = scroller.current, b = shape.nodes.get(at);
     if (!el || !b || el.scrollWidth <= el.clientWidth) return;
@@ -661,13 +661,13 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     el.scrollTo({ left: x - el.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
   }, [at, shape, box, reduce]);
 
-  // 被拒絕時旁白輕搖一下，像紙被推回來；減少動態時只換字
+  // On rejection the narration shakes briefly, as if pushed back; with reduced motion only the text changes
   useEffect(() => {
     if (!message.refused || reduce || !lineRef.current) return;
     void animateLine(lineRef.current, { x: [0, -6, 5, -3, 2, 0] }, { duration: 0.32, ease: "easeOut" });
   }, [beat, message.refused, reduce, animateLine, lineRef]);
 
-  // 等角版面：小人站在目前這一步的頂面，換步時沿弧線跳過去（落點算上方塊浮起的高度）
+  // Isometric layout: the figure stands on the top face of the current step and hops along an arc when the step changes (the landing point accounts for the block's lift)
   const stands = shape.iso?.stands;
   useEffect(() => {
     if (!stands || !walker) return;
@@ -690,7 +690,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     return () => run.stop();
   }, [path, at, stands, walker, reduce, byId, machine, tx, ty]);
 
-  // 朱紅小點沿著剛走過的線移動，停在箭頭處（等角版面改由小人表示）
+  // The accent dot travels along the line just taken and stops at the arrowhead (the isometric layout uses the figure instead)
   useEffect(() => {
     if (isIso) return;
     const el = path.length ? svgRef.current?.querySelector<SVGPathElement>(`[data-edge="${path[path.length - 1]}"]`) : null;
@@ -704,7 +704,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
     if (reduce) return put(1);
     const run = animate(0, 1, { duration: 0.4, ease: "easeOut", onUpdate: put });
     return () => run.stop();
-    // path 只在真的移動或重來時換新陣列，被拒絕時沿用舊的，所以不會重播
+    // path gets a new array only on a real move or a restart; on rejection the old one is kept, so nothing replays
   }, [path, reduce, isIso, tx, ty]);
 
   const visited = new Set([machine.initial, ...path.map((i) => machine.transitions[i].to)]);
@@ -740,7 +740,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             ))}
           </defs>
 
-          {/* 起點：實心圓點加短箭頭 */}
+          {/* Start: a solid dot with a short arrow */}
           <circle cx={shape.start[0][0]} cy={shape.start[0][1]} r="4.5" className="fill-foreground" />
           <line x1={shape.start[0][0]} y1={shape.start[0][1]} x2={shape.start[1][0]} y2={shape.start[1][1]} strokeWidth="1.3" className={INK} markerEnd={arrow("ink")} />
 
@@ -770,7 +770,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
             </g>
           ))}
 
-          {/* 走過的路用品牌專色描一遍，最新的一段畫出來 */}
+          {/* Retrace the path taken in the brand accent, drawing the latest segment */}
           {path.map((ti, k) => (
             <motion.path
               key={k}
@@ -803,12 +803,12 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                     </g>
                   );
                 return (
-                  // 目前這一步的方塊浮起一點，像被拿起來看
+                  // The current step's block lifts slightly, as if picked up for a closer look
                   <motion.g key={s.id} animate={{ y: here ? -7 : 0 }} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 34 }}>
                     <polygon points={poly(k.side)} strokeWidth="1.2" strokeLinejoin="round" className={cn(FACE_SIDE, INK)} />
                     <polygon points={poly(k.front)} strokeWidth="1.2" strokeLinejoin="round" className={cn(FACE_FRONT, INK)} />
                     <polygon points={poly(k.top)} strokeWidth={here ? 2 : 1.2} strokeLinejoin="round" className={cn(PAPER, here ? RED : MUTED)} />
-                    {/* 名稱印在正面，跟著面一起斜 */}
+                    {/* Name printed on the front face, skewed along with it */}
                     <text transform={`matrix(${ISO_C} ${-ISO_S} 0 1 ${k.label[0]} ${k.label[1]})`} textAnchor="middle" fontSize={ISO_FONT} letterSpacing="0.08em" className={labelCls}>
                       {s.label}
                     </text>
@@ -831,7 +831,7 @@ export function TinyChart({ machine, layout = "flow", title, subtitle, sketch = 
                 ),
             )}
 
-          {/* 走流程的小人：穿朱紅上衣，和描線、目前方塊是同一種「現在在這」的顏色 */}
+          {/* Figure walking the flow: wears an accent-coloured top, the same "you are here" colour as the outline and the current block */}
           {isIso && walker && (
             <motion.g style={{ x: tx, y: ty }} aria-hidden>
               <Figure tone="red" />

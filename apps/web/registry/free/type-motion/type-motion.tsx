@@ -13,8 +13,8 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore, type HTMLAttr
 
 import { cn } from "@/lib/utils";
 
-/** 全部字體動效 id；demo 與文件都從這裡讀 */
-/** 只在 running 時排程逐幀回呼；停住時完全不佔用幀迴圈 */
+/** All typographic motion ids; the demo and the docs both read from here */
+/** Schedules per-frame callbacks only while running; when stopped it uses no frame loop at all */
 function useRunningFrame(running: boolean, cb: (deltaMs: number) => void) {
   const cbRef = useRef(cb);
   cbRef.current = cb;
@@ -37,14 +37,14 @@ export const typeMotions = ["text-on-path", "variable-font", "text-mask"] as con
 export type TypeMotionName = (typeof typeMotions)[number];
 export type TypeMotionTrigger = "mount" | "inView" | "hover" | "click" | "loop";
 
-/* ---------- 共用小工具 ---------- */
+/* ---------- Shared helpers ---------- */
 
 function subscribeVisibility(cb: () => void) {
   document.addEventListener("visibilitychange", cb);
   return () => document.removeEventListener("visibilitychange", cb);
 }
 
-/** 分頁是否在前景；切到別的分頁時循環暫停 */
+/** Whether the tab is in the foreground; loops pause when you switch to another tab */
 function usePageVisible() {
   return useSyncExternalStore(
     subscribeVisibility,
@@ -53,7 +53,7 @@ function usePageVisible() {
   );
 }
 
-/** 依 trigger 算出：是否已開始（play）、是否該動（running）、hover / click 的狀態（active） */
+/** From trigger, works out whether it has started (play), whether it should move (running), and the hover / click state (active) */
 function useTrigger<T extends HTMLElement>(trigger: TypeMotionTrigger) {
   const reduce = useReducedMotion() ?? false;
   const ref = useRef<T>(null);
@@ -91,7 +91,7 @@ function cleanId(id: string) {
   return id.replace(/[^a-zA-Z0-9-]/g, "");
 }
 
-/* ---------- 131 路徑文字 ---------- */
+/* ---------- 131 Text on path ---------- */
 
 export type TextPathPreset = "wave" | "circle" | "arc";
 
@@ -118,26 +118,26 @@ const pathPresets: Record<TextPathPreset, { d: string; viewBox: string; closed: 
 
 export interface TextOnPathProps {
   text: string;
-  /** 內建路徑；傳 d 時改用自訂路徑 */
+  /** Built-in path; when d is passed the custom path is used instead */
   preset?: TextPathPreset;
-  /** 自訂 SVG 路徑 d，搭配 viewBox */
+  /** Custom SVG path d, used together with viewBox */
   d?: string;
   viewBox?: string;
-  /** 自訂路徑是否為封閉圖形（封閉時文字會首尾相接繞圈） */
+  /** Whether the custom path is a closed shape (when closed, the text joins end to end around the loop) */
   closed?: boolean;
-  /** viewBox 單位的字級 */
+  /** Font size in viewBox units */
   fontSize?: number;
-  /** 文字繞完一趟的秒數 */
+  /** Seconds for the text to travel once around */
   duration?: number;
-  /** 反方向流動 */
+  /** Flow in the opposite direction */
   reverse?: boolean;
-  /** 顯示路徑本身（淡淡的線） */
+  /** Show the path itself (a faint line) */
   showPath?: boolean;
   trigger?: TypeMotionTrigger;
   className?: string;
 }
 
-/** 文字沿著任意 SVG 路徑流動，每個字自動轉向貼合路徑（以 startOffset 驅動）。 */
+/** Text flows along any SVG path, each glyph rotating to follow the path (driven by startOffset). */
 export function TextOnPath({
   text,
   preset = "wave",
@@ -166,7 +166,7 @@ export function TextOnPath({
   const len = useRef({ path: 0, text: 0 });
   const pos = useRef<number | null>(null);
 
-  // 依位置算 startOffset：開放路徑從尾端流入、從起點流出；封閉路徑兩份首尾相接
+  // Compute startOffset from position: on an open path text enters from the end and leaves at the start; on a closed path two copies join end to end
   const apply = (value: number) => {
     const L = len.current.path;
     if (!L) return;
@@ -179,14 +179,14 @@ export function TextOnPath({
     }
   };
 
-  // 量路徑與文字長度；字型載入後再量一次
+  // Measure the path and text lengths; measure again after the font loads
   useEffect(() => {
     let alive = true;
     const measure = () => {
       if (!alive || !pathRef.current || !textRef.current) return;
       len.current = { path: pathRef.current.getTotalLength(), text: textRef.current.getComputedTextLength() };
       const { path: L, text: T } = len.current;
-      // 起始位置：開放路徑讓文字置中，封閉路徑從 0 開始
+      // Start position: on an open path the text is centered, on a closed path it starts at 0
       if (pos.current === null) pos.current = isClosed ? 0 : (L + T) / 2;
       apply(pos.current);
     };
@@ -195,7 +195,7 @@ export function TextOnPath({
     return () => {
       alive = false;
     };
-    // apply 只讀 ref，不需要列入
+    // apply only reads refs, so it does not need to be listed
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, pathD, size, isClosed]);
 
@@ -241,32 +241,32 @@ export function TextOnPath({
   );
 }
 
-/* ---------- 132 可變字重 ---------- */
+/* ---------- 132 Variable font weight ---------- */
 
 export interface VariableWeightProps {
   text: string;
-  /** 起始字重（wght），100 到 900 */
+  /** Starting weight (wght), 100 to 900 */
   from?: number;
-  /** 目標字重 */
+  /** Target weight */
   to?: number;
-  /** 字寬（wdth，百分比）的起點與終點，字型支援才有效 */
+  /** Start and end of the width axis (wdth, percent); only works if the font supports it */
   width?: [number, number];
-  /** 其他可變軸，例如 { slnt: [0, -10] } */
+  /** Other variable axes, for example { slnt: [0, -10] } */
   axes?: Record<string, [number, number]>;
-  /** word：整個詞一起變；wave：逐字錯開成波浪 */
+  /** word: the whole word changes together; wave: staggered per letter into a wave */
   mode?: "word" | "wave";
-  /** 一個來回（loop）或一次變化的秒數 */
+  /** Seconds for one round trip (loop) or one change */
   duration?: number;
-  /** wave 模式的逐字間隔秒數 */
+  /** Seconds between letters in wave mode */
   stagger?: number;
-  /** loop：持續來回；mount / inView：變一次停在 to；hover：滑過時變粗；click：切換 */
+  /** loop: keeps going back and forth; mount / inView: changes once and stays at to; hover: gets bolder on hover; click: toggles */
   trigger?: TypeMotionTrigger;
   className?: string;
 }
 
 /**
- * 在 from 與 to 之間平滑改變字重（以及字寬或任意可變軸）。
- * 用一般靜態字型時瀏覽器會跳到最接近的字重，不會壞掉。
+ * Smoothly changes the weight between from and to (and the width or any variable axis).
+ * With an ordinary static font the browser snaps to the nearest weight instead of breaking.
  */
 export function VariableWeight({
   text,
@@ -392,21 +392,21 @@ function WeightSpan({ p, config, ch }: { p: MotionValue<number>; config: AxisCon
   );
 }
 
-/* ---------- 133 文字遮罩 ---------- */
+/* ---------- 133 Text mask ---------- */
 
 export interface TextMaskProps {
   text: string;
-  /** 透出的圖片網址 */
+  /** Image URL to show through */
   src?: string;
-  /** 透出的影片網址（靜音循環） */
+  /** Video URL to show through (muted, looping) */
   video?: string;
-  /** 沒有圖片或影片時，用這組顏色畫流動漸層；省略跟隨主題 token */
+  /** When there is no image or video, this set of colors draws a flowing gradient; omit it to follow the theme tokens */
   colors?: string[];
-  /** 字重，越粗透出越多 */
+  /** Font weight; the bolder, the more shows through */
   weight?: number;
-  /** 背景飄移一趟的秒數；reveal 時也是一個循環的長度 */
+  /** Seconds for the background to drift once; with reveal it is also the length of one cycle */
   duration?: number;
-  /** 結尾讓整張畫面浮現：loop 時每個循環一次，其他 trigger 播一次後停在全圖 */
+  /** At the end the whole picture appears: once per cycle when looping, for other triggers it plays once and stays on the full image */
   reveal?: boolean;
   trigger?: TypeMotionTrigger;
   className?: string;
@@ -419,7 +419,7 @@ const defaultMaskColors = [
   "var(--chart-4, var(--primary))",
 ];
 
-/** 粗字挖空，只在字裡透出圖片、影片或流動漸層，背景緩慢飄移。字會自動撐滿容器寬度。 */
+/** Bold text is cut out so only the glyphs show an image, video or flowing gradient, with the background drifting slowly. The text stretches to fill the container width. */
 export function TextMask({
   text,
   src,
@@ -437,7 +437,7 @@ export function TextMask({
   const svgRef = useRef<SVGSVGElement>(null);
   const [box, setBox] = useState({ x: 0, y: -74, w: Math.max(1, Array.from(text).length) * 62, h: 92 });
 
-  // 量字的實際外框，作為 viewBox；字型載入後再量一次
+  // Measure the actual text box to use as the viewBox; measure again after the font loads
   useEffect(() => {
     let alive = true;
     const measure = () => {
@@ -454,7 +454,7 @@ export function TextMask({
     };
   }, [text, weight]);
 
-  // 影片跟著循環一起暫停
+  // The video pauses along with the loop
   useEffect(() => {
     svgRef.current?.querySelectorAll("video").forEach((v) => {
       if (t.running) v.play().catch(() => {});
@@ -464,7 +464,7 @@ export function TextMask({
 
   const pad = box.h * 0.04;
   const vb = { x: box.x - pad, y: box.y - pad, w: box.w + pad * 2, h: box.h + pad * 2 };
-  // 背景比字大一圈，飄移時邊緣不會露出來
+  // The background is slightly larger than the text so its edges never show while drifting
   const bg = { x: vb.x - vb.w * 0.15, y: vb.y - vb.h * 0.3, w: vb.w * 1.3, h: vb.h * 1.6 };
   const dx = vb.w * 0.12;
   const drift = t.running ? { x: [-dx, dx], y: [vb.h * 0.08, -vb.h * 0.08] } : undefined;
@@ -529,7 +529,7 @@ export function TextMask({
             ))}
           </linearGradient>
         </defs>
-        {/* 只拿來量尺寸，不顯示 */}
+        {/* Only used to measure size, not displayed */}
         <text ref={measureRef} x={0} y={0} fontSize={100} visibility="hidden" style={{ letterSpacing: "-0.02em" }}>
           {text}
         </text>
@@ -544,14 +544,14 @@ export function TextMask({
   );
 }
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 export type TypeMotionProps =
   | ({ effect: "text-on-path" } & TextOnPathProps)
   | ({ effect: "variable-font" } & VariableWeightProps)
   | ({ effect: "text-mask" } & TextMaskProps);
 
-/** 用 effect 切換三種字體動效：text-on-path、variable-font、text-mask。 */
+/** Switches between three typographic motions with effect: text-on-path, variable-font, text-mask. */
 export function TypeMotion(props: TypeMotionProps): ReactNode {
   switch (props.effect) {
     case "text-on-path": {

@@ -8,7 +8,7 @@ import { RedeemKeyInput, type LicenseState } from "./redeem-key-input";
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-/** 型錄卡片：同一格輸入兌換碼或授權碼，打字時自動分組並判斷是哪一種；兌換成功時輸入列變成贊助卡。可在框內捲動。 */
+/** Catalog card: one field takes either a redeem code or a license key, groups as you type and detects which kind it is. On a successful redeem the input row turns into a supporter card. Scrollable inside the frame. */
 export default function RedeemKeyInputCard() {
   const locale = useDemoLocale();
   const haveKey = useDemoText({
@@ -28,7 +28,7 @@ export default function RedeemKeyInputCard() {
         labels={{ haveKey }}
         onActivate={async (_code, kind) => {
           await wait(700);
-          // 示範用：任何 12 碼兌換碼都算有效，UUID 一律查無此碼
+          // Demo only: any 12-character redeem code counts as valid, any UUID is reported as not found
           if (kind === "pro") return { ok: false, error: "not_found" };
           setLicense({ tier: "supporter" });
           return { ok: true };

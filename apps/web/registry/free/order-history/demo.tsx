@@ -11,7 +11,7 @@ const names = {
   ja: { sweater: "メリノ クルーネックセーター", sweaterV: "M サイズ、オートミール", overshirt: "ウール オーバーシャツ", overshirtV: "L サイズ、ネイビー", socks: "コットンソックス 3 足組", tote: "キャンバストート", linen: "リネンシャツ", linenV: "M サイズ、ホワイト" },
 };
 
-/** 範例訂單：商品名與日期依目前語言 */
+/** Sample orders: product names and dates follow the current language */
 function useOrders(): HistoryOrder[] {
   const locale = useDemoLocale();
   const n = useDemoText(names);

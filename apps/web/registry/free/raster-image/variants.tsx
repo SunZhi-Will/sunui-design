@@ -5,10 +5,10 @@ import { rasterModes, type RasterMode } from "./raster-image";
 
 export const variants = rasterModes;
 
-// 首頁預設只放這一種當代表：網點最像印刷品，縮圖也認得出來
+// The home page shows only this one as the representative: halftone looks most like print and is recognizable even as a thumbnail
 export const featured = "halftone";
 
-/** 首頁型錄：一種點陣化樣式一張卡，進場時跑一次顯影。 */
+/** Home catalog: one card per rasterization style, with a develop-in animation that runs once on entry. */
 export default function RasterImageVariant({ variant }: { variant: string }) {
   return (
     <div className="w-72">

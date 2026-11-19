@@ -14,7 +14,7 @@ const copy = {
   ja: { save: (n: string) => `${n}を保存`, unsave: (n: string) => `${n}を保存から外す` },
 };
 
-/** 型錄卡片：一件商品角落的愛心，點一下看收藏蓋章與數字跳動。 */
+/** Catalog card: a heart in the corner of a product. Click it to see the favorite stamp and the count tick. */
 export default function FavoriteButtonCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

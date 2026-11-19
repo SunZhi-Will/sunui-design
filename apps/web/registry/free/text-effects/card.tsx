@@ -11,7 +11,7 @@ const copy = {
   ja: { a: "文字を動かそう", b: "サマーセール", c: "もっと", words: ["速く", "シンプルに", "一緒に"] },
 };
 
-/** 型錄卡片：四個最搶眼的文字效果疊在一起。 */
+/** Catalog card: the four most eye-catching text effects stacked together. */
 export default function TextEffectsCard() {
   const t = useDemoText(copy);
   return (

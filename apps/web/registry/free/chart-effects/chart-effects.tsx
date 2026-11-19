@@ -15,7 +15,7 @@ import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "rea
 
 import { cn } from "@/lib/utils";
 
-/** 全部圖表效果 id */
+/** All chart effect ids */
 export const chartEffects = [
   "bar-grow",
   "donut-segments",
@@ -36,31 +36,31 @@ export interface ChartDatum {
 
 export interface ChartEffectProps {
   variant?: ChartEffectVariant;
-  /** 預設進入畫面才播；loop 會在畫面內定期重播 */
+  /** By default plays only once on screen. loop replays periodically while in view */
   trigger?: ChartEffectTrigger;
-  /** bar-grow、donut-segments、line-draw、sparkline 的資料 */
+  /** Data for bar-grow, donut-segments, line-draw and sparkline */
   data?: ChartDatum[];
-  /** bar-race 的每一格資料（每格是一組 label / value） */
+  /** Each frame of data for bar-race (each frame is a set of label / value) */
   frames?: ChartDatum[][];
-  /** bar-race 每一格的標題，例如年份 */
+  /** Title of each bar-race frame, for example the year */
   frameLabels?: string[];
-  /** number-counter 的目標值；radial-progress 的百分比 (0 到 100) */
+  /** Target value for number-counter; percentage (0 to 100) for radial-progress */
   value?: number;
-  /** number-counter 進度條的滿格值 */
+  /** Full value of the number-counter progress bar */
   max?: number;
-  /** 圖表標題或數字說明 */
+  /** Chart title or number caption */
   label?: string;
-  /** 數字格式化 */
+  /** Number formatting */
   format?: (n: number) => string;
-  /** 主要動畫秒數 */
+  /** Main animation duration in seconds */
   duration?: number;
   delay?: number;
-  /** 系列色，省略跟隨主題 token */
+  /** Series colors, omit to follow the theme tokens */
   colors?: string[];
   className?: string;
 }
 
-// 預設色：有 shadcn chart token 就用，沒有就以 primary 的不同濃度區分
+// Default colors: use the shadcn chart tokens when present, otherwise tell series apart by different strengths of primary
 const defaultColors = [
   "var(--chart-1, var(--primary))",
   "var(--chart-2, color-mix(in oklch, var(--primary) 70%, transparent))",
@@ -163,7 +163,7 @@ export function ChartEffect({
   const d = duration ?? defaultDuration[variant];
 
   const play = trigger === "mount" ? true : seen;
-  // bar-race 本身就是循環：開始後在畫面內持續換格
+  // bar-race is itself a loop: once started it keeps advancing frames while on screen
   const running = !reduce && visible && play;
 
   useEffect(() => {
@@ -197,9 +197,9 @@ export function ChartEffect({
   );
 }
 
-/* ---------- 共用 ---------- */
+/* ---------- shared ---------- */
 
-/** 從 0 數到 target；reduced motion 直接給終值 */
+/** Counts from 0 to target. Under reduced motion it gives the final value directly */
 function useCountUp(target: number, play: boolean, reduce: boolean, duration: number, delay: number): MotionValue<number> {
   const mv = useMotionValue(0);
   useEffect(() => {
@@ -214,7 +214,7 @@ function useCountUp(target: number, play: boolean, reduce: boolean, duration: nu
   return mv;
 }
 
-/** 把 MotionValue 以格式化字串輸出（SVG 與 HTML 都能用） */
+/** Outputs a MotionValue as a formatted string (works in both SVG and HTML) */
 function Count({ mv, format }: { mv: MotionValue<number>; format: (n: number) => string }) {
   const [text, setText] = useState(() => format(mv.get()));
   useMotionValueEvent(mv, "change", (v) => setText(format(v)));
@@ -357,7 +357,7 @@ function DonutSegments({ play, reduce, d, delay, colors, data, label, format }: 
 
 /* ---------- line-draw ---------- */
 
-/** 簡單的 Catmull-Rom 平滑曲線 */
+/** A simple Catmull-Rom smooth curve */
 function smoothPath(pts: [number, number][]) {
   if (pts.length < 2) return "";
   let p = `M${pts[0][0]},${pts[0][1]}`;
@@ -479,7 +479,7 @@ function BarRace({ running, reduce, d, colors, frames, frameLabels, label, forma
   const frame = useMemo(() => frames[current] ?? [], [frames, current]);
   const sorted = useMemo(() => [...frame].sort((a, b) => b.value - a.value), [frame]);
   const top = Math.max(...frame.map((x) => x.value), 1);
-  // 顏色依 label 固定，換名次時不會換色
+  // Color is fixed per label, so it does not change when the ranking changes
   const colorOf = useMemo(() => {
     const names = Array.from(new Set(frames.flat().map((x) => x.label)));
     return (name: string) => colors[names.indexOf(name) % colors.length];

@@ -14,7 +14,7 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState, type CSSProperti
 
 import { cn } from "@/lib/utils";
 
-/** 全部效果 id；demo 與文件都從這裡讀 */
+/** All effect ids; the demo and the docs both read from here */
 export const textEffects = [
   "wave",
   "letter-bounce",
@@ -42,7 +42,7 @@ export const textEffects = [
 export type TextEffectName = (typeof textEffects)[number];
 export type TextEffectTrigger = "mount" | "inView" | "hover" | "click" | "loop";
 
-/** 常駐循環的效果；其餘是進場效果（可重播） */
+/** Effects that run continuously; the rest are entrance effects (replayable) */
 export const loopingTextEffects: readonly TextEffectName[] = [
   "wave",
   "word-rotate",
@@ -57,7 +57,7 @@ export function isLoopingTextEffect(effect: TextEffectName) {
   return loopingTextEffects.includes(effect);
 }
 
-// 每個效果的預設時長（秒）與逐字間隔
+// Default duration (seconds) and per-character stagger for each effect
 const base: Record<TextEffectName, { duration: number; stagger: number }> = {
   wave: { duration: 1.4, stagger: 0.07 },
   "letter-bounce": { duration: 0.6, stagger: 0.05 },
@@ -87,17 +87,17 @@ const defaultColors = ["var(--chart-1, var(--primary))", "var(--chart-2, var(--r
 export interface TextEffectProps {
   text: string;
   effect?: TextEffectName;
-  /** 進場效果：何時播放；循環效果：hover / click 時才跑 */
+  /** Entrance effects: when to play; looping effects: run only on hover / click */
   trigger?: TextEffectTrigger;
-  /** 單次動畫（或一個循環週期）的秒數，省略用效果預設 */
+  /** Seconds for one animation (or one loop cycle); omit to use the effect's default */
   duration?: number;
-  /** 開始前延遲（秒） */
+  /** Delay before starting (seconds) */
   delay?: number;
-  /** 逐字（逐詞）間隔秒數，省略用效果預設 */
+  /** Per-character (per-word) stagger in seconds; omit to use the effect's default */
   stagger?: number;
-  /** 漸層、光暈、螢光筆等用色，省略跟隨主題 token */
+  /** Colours for gradients, glows, highlighter and so on; omit to follow the theme tokens */
   colors?: string[];
-  /** word-rotate 輪播的詞 */
+  /** Words cycled by word-rotate */
   words?: string[];
   className?: string;
 }
@@ -138,13 +138,13 @@ export function TextEffect({
   const st = stagger ?? base[effect].stagger;
   const count = Array.from(text).length;
 
-  // 進場效果是否顯示；hover / click 一開始就顯示，觸發時重播
+  // Whether the entrance effect is shown; hover / click show it from the start and replay on trigger
   const play = trigger === "inView" ? seen : true;
-  // 循環效果是否在跑：離開畫面一律暫停
+  // Whether the looping effect is running: always paused when off screen
   const running =
     !reduce && visible && (trigger === "hover" ? hovered : trigger === "click" ? toggled : trigger === "inView" ? seen : true);
 
-  // trigger="loop" 的進場效果：在畫面內定期重播
+  // Entrance effects with trigger="loop": replay periodically while in view
   useEffect(() => {
     if (looping || trigger !== "loop" || reduce || !visible) return;
     const ms = (delay + d + st * count + 1.8) * 1000;
@@ -152,7 +152,7 @@ export function TextEffect({
     return () => clearInterval(id);
   }, [looping, trigger, reduce, visible, delay, d, st, count]);
 
-  // click 觸發：循環效果切換開關，進場效果重播
+  // click trigger: looping effects toggle on and off, entrance effects replay
   const fire = () => {
     setToggled((v) => !v);
     if (!looping && !reduce) setCycle((c) => c + 1);
@@ -197,20 +197,20 @@ export function TextEffect({
   );
 }
 
-/* ---------- 共用小工具 ---------- */
+/* ---------- shared helpers ---------- */
 
-/** 以索引產生穩定的偽亂數（0 到 1），SSR 與 client 一致 */
+/** Stable pseudo-random number from an index (0 to 1), identical on SSR and the client */
 function rand(i: number, salt = 1) {
   const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
   return x - Math.floor(x);
 }
 
-/** 進場效果的 initial / animate；reduced motion 直接停在最終狀態 */
+/** initial / animate for entrance effects; under reduced motion it stays on the final state */
 function enter(play: boolean, reduce: boolean) {
   return { initial: reduce ? (false as const) : "hidden", animate: reduce || play ? "show" : "hidden" };
 }
 
-/** 依空白切成不換行的詞組，逐字呼叫 render，保留自然換行 */
+/** Split on whitespace into non-breaking word groups and call render per unit, keeping natural line wrapping */
 function Split({ text, render }: { text: string; render: (ch: string, i: number) => ReactNode }) {
   const groups = useMemo(() => {
     let start = 0;
@@ -226,7 +226,7 @@ function Split({ text, render }: { text: string; render: (ch: string, i: number)
       {groups.map((g, wi) => (
         <Fragment key={wi}>
           {wi > 0 && " "}
-          {/* 中日文沒有空白，逐字可換行；拉丁字以詞為單位不拆開 */}
+          {/* CJK text has no spaces, so each character may wrap; Latin words stay whole */}
           {CJK.test(g.chars.join("")) ? (
             g.chars.map((c, ci) => render(c, g.start + ci))
           ) : (
@@ -241,7 +241,7 @@ function Split({ text, render }: { text: string; render: (ch: string, i: number)
 const CJK = /[\u3000-\u9fff\uac00-\ud7af\uff00-\uffef]/;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=?";
 
-/* ---------- 各效果 ---------- */
+/* ---------- the effects ---------- */
 
 function Wave({ text, running, d, stagger }: InnerProps) {
   return (
@@ -328,7 +328,7 @@ const maskVariants: Variants = {
   }),
 };
 
-/** 用 \n 分行，每行從遮罩線下方滑上來 */
+/** Split lines on \n; each line slides up from below the mask line */
 function MaskReveal({ text, play, reduce, d, delay, stagger }: InnerProps) {
   return (
     <span className="inline-flex flex-col">
@@ -357,7 +357,7 @@ function Scramble({ text, play, reduce, d, delay }: InnerProps) {
     const step = (t: number) => {
       if (!startAt) startAt = t + delay * 1000;
       const p = Math.max(0, (t - startAt) / (d * 1000));
-      // 約每 45ms 換一次亂碼，避免閃得太兇
+      // Swap the scramble roughly every 45ms, so it does not flicker too hard
       if (t - last > 45) {
         last = t;
         setSeed((s) => s + 1);
@@ -424,7 +424,7 @@ function SplitFlap({ text, play, reduce, d, delay, stagger }: InnerProps) {
             >
               {shown}
             </motion.span>
-            {/* 翻牌中線 */}
+            {/* Flip-card centre line */}
             <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-border" />
           </span>
         );
@@ -508,7 +508,7 @@ function GradientFlow({ text, running, d, colors }: InnerProps) {
   );
 }
 
-/** 底色是 currentColor（預設 muted），亮帶用 foreground */
+/** Base colour is currentColor (muted by default); the bright band uses foreground */
 function Shimmer({ text, running, d }: InnerProps) {
   return (
     <motion.span
@@ -529,7 +529,7 @@ function Shimmer({ text, running, d }: InnerProps) {
 }
 
 function Glitch({ text, running, d, colors }: InnerProps) {
-  // 紅藍分色是 RGB 錯位的慣例色，可由 colors[3]、colors[4] 覆寫
+  // Red and blue are the conventional colours for an RGB split, and can be overridden via colors[3] and colors[4]
   const red = colors[3] ?? "#ff3344";
   const cyan = colors[4] ?? "#22d3ee";
   const t = { duration: d * 0.25, repeat: Infinity, repeatDelay: d * 0.75, ease: "linear" as const };
@@ -771,7 +771,7 @@ function KineticStack({ text, play, reduce, d, delay, stagger }: InnerProps) {
   );
 }
 
-/** 文字排在圓環上慢慢轉；暫停時保留目前角度 */
+/** Text laid out on a ring that turns slowly; keeps the current angle while paused */
 function CircleText({ text, running, d }: InnerProps) {
   const rotate = useMotionValue(0);
   const transform = useTransform(rotate, (r) => `rotate(${r}deg)`);

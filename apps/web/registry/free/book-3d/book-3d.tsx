@@ -15,14 +15,15 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * 能真的翻閱的 3D 書：書封、書脊、書口三面與書背組成的長方體。
+ * A 3D book you can actually page through: a cuboid made of the front cover, spine, fore-edge and back cover.
  *
- * - 一開始是闔著、側轉露出書脊的書；點書封或「翻開」會轉正並翻開書封。
- * - 內文（children）以 CSS 多欄切成固定大小的頁。每一個看得到的頁面都是
- *   同一份內容平移後的一個視窗，頁數由實際排版量出來，不寫死每頁幾段。
- * - 翻頁時有一張紙從書口繞著書脊翻過去；邏輯頁碼立刻更新，動畫只是疊在
- *   上面的視覺層。
- * - 書封預設以 CSS 繪製；傳入 frontSrc／spineSrc／backSrc 則改用圖片。
+ * - It starts closed and turned sideways to show the spine; clicking the cover or "Open" turns it face-on and opens the cover.
+ * - The body (children) is cut into fixed-size pages with CSS columns. Every visible page is
+ *   a window onto the same content, shifted sideways; the page count is measured from the real layout,
+ *   not hard-coded as a number of paragraphs per page.
+ * - When turning a page, a sheet swings from the fore-edge around the spine; the logical page number updates immediately and the animation is only a visual layer
+ *   on top.
+ * - The cover is drawn with CSS by default; pass frontSrc / spineSrc / backSrc to use images instead.
  */
 
 const TURN_DURATION_MS = 720;
@@ -56,15 +57,15 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * 由舞台可用空間推出書頁大小。高度夠時用接近實體書的 0.72 頁寬比；
- * 高度很少時就讓頁面變寬，換取每行多幾個字。
+ * Derive the page size from the space available on the stage. When there is enough height, use a 0.72 page width ratio close to a real book;
+ * when height is tight, widen the page to fit a few more characters per line.
  */
 function computeGeometry(availableWidth: number, availableHeight: number): Geometry {
   const baseHeight = Math.max(200, Math.min(availableHeight * (availableHeight < 480 ? 0.97 : 0.9), 820));
   const ratio = baseHeight >= 480 ? 0.72 : 1.1;
   const pageWidth = Math.round(Math.max(150, Math.min((availableWidth * 0.94) / 2, baseHeight * ratio)));
   const pageHeight = Math.round(Math.min(baseHeight, pageWidth / 0.5));
-  // 紙頁比書殼小一圈（rim），內文版心依紙頁而不是書殼計算。
+  // The paper pages are one rim smaller than the cover; the text block is sized from the paper, not the cover.
   const rim = Math.max(3, Math.round(pageWidth * 0.016));
   const sheetWidth = pageWidth - rim;
   const sheetHeight = pageHeight - rim * 2;
@@ -98,7 +99,7 @@ function buildVirtualPages(pageCount: number): VirtualPage[] {
   return pages;
 }
 
-/** 量頁數用：內文裡標了 data-book-end 的元素，沒有就取最後一個最深的元素。 */
+/** Used to measure page count: the element in the body marked data-book-end, or the last deepest element if none is marked. */
 function findEndMark(flow: HTMLElement): Element | null {
   const marked = flow.querySelector("[data-book-end]");
   if (marked) return marked;
@@ -112,7 +113,7 @@ function isEditable(target: EventTarget | null): boolean {
   return target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
 }
 
-/** 書目前朝哪一面：闔著看封面、翻開閱讀、闔著看書背。 */
+/** Which side the book faces: closed showing the front cover, open for reading, or closed showing the back cover. */
 export type Book3DSide = "front" | "open" | "back";
 
 export interface Book3DPosition {
@@ -120,7 +121,7 @@ export interface Book3DPosition {
   open: boolean;
   spread: number;
   spreadCount: number;
-  /** 目前跨頁實際印著的內文頁碼（從 1 起算），闔書時為空陣列。 */
+  /** Body page numbers currently printed on the visible spread (1-based); an empty array when the book is closed. */
   pageNumbers: number[];
   pageCount: number;
 }
@@ -141,55 +142,55 @@ export interface Book3DLabels {
   next?: string;
   close?: string;
   prev?: string;
-  /** 控制列的頁碼，例如 3–4 / 9 */
+  /** Page number shown in the control bar, e.g. 3-4 / 9 */
   pageOf?: (pages: number[], total: number) => string;
 }
 
 export interface Book3DCover {
-  /** 書封書名下方的英文副題 */
+  /** English subtitle under the title on the cover */
   subtitle?: string;
-  /** 書封上的短文案，一行一句 */
+  /** Short copy on the cover, one sentence per line */
   blurb?: string[];
-  /** 書封下方的分類標 */
+  /** Category label below the cover */
   tagline?: string;
-  /** 書背的長文案，一行一句 */
+  /** Long copy on the back cover, one sentence per line */
   backBlurb?: string[];
   backTagline?: string;
 }
 
 export interface Book3DProps {
-  /** 這一本的書名：題簽、扉頁、右頁書眉 */
+  /** Title of this book: spine label, title page, running head on the right page */
   title: string;
-  /** 書系名：書封大字、扉頁上方、左頁書眉 */
+  /** Series name: large type on the cover, top of the title page, running head on the left page */
   seriesTitle?: string;
-  /** 扉頁下方的體裁 */
+  /** Genre line below the title page */
   genre?: string;
-  /** 內文。可用 novella-* class（見下方樣式）排出與原作相同的版面 */
+  /** Body content. Use the novella-* classes (see the styles below) to get the same layout as the original */
   children: ReactNode;
-  /** 書背摘要籤上的一行，例如卷數與抉擇次數 */
+  /** One line on the back-cover summary label, e.g. volume count and number of choices */
   summary?: ReactNode;
-  /** 日期區間：書背摘要籤與版權頁 */
+  /** Date range: back-cover summary label and copyright page */
   date?: string;
-  /** 版權頁的句子，一行一句 */
+  /** Sentences on the copyright page, one per line */
   colophon?: string[];
   cover?: Book3DCover;
   frontSrc?: string;
   spineSrc?: string;
   backSrc?: string;
-  /** 方向鍵與 PageUp／PageDown 聽整個視窗，或只在元件內有焦點時 */
+  /** Whether arrow keys and PageUp / PageDown listen on the whole window, or only when the component has focus */
   keyboard?: "window" | "self";
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤；也決定書系名、書封文案等預設內容 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too; it also decides default content such as the series name and cover copy */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: Book3DLabels;
-  /** 自訂書下方的控制列；預設是上一頁、頁碼、下一頁 */
+  /** Custom control bar below the book; the default is previous page, page number, next page */
   renderControls?: (controls: Book3DControls) => ReactNode;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -197,13 +198,13 @@ function resolveLocale(tag?: string): SunLocale {
   return "en";
 }
 
-/** 控制列字串之外，也包含沒傳入時的預設書系名、體裁、版權頁與書封文案 */
+/** Besides the control bar strings, this also holds the default series name, genre, copyright page and cover copy used when none are passed */
 interface Book3DMessages extends Required<Book3DLabels> {
   seriesTitle: string;
   genre: string;
   colophon: string[];
   cover: Required<Book3DCover>;
-  /** 書系名與書名之間的分隔 */
+  /** Separator between the series name and the title */
   titleSeparator: string;
 }
 
@@ -322,7 +323,7 @@ const MESSAGES: Record<SunLocale, Book3DMessages> = {
   },
 };
 
-/** 書系名沒有中日文字時，書封大字改成可換行的較小字級 */
+/** When the series name has no CJK characters, the large cover type switches to a smaller size that can wrap */
 const CJK_RE = /[\u3000-\u30ff\u3400-\u9fff\uf900-\ufaff\uff00-\uffef]/;
 
 export function Book3D({
@@ -371,8 +372,8 @@ export function Book3D({
     const stage = stageRef.current;
     if (!stage) return;
     const update = () => {
-      // 用版面尺寸而不是 getBoundingClientRect：外層若有 transform: scale（例如縮圖、卡片預覽），
-      // 量到的是縮放後的大小，書會被算成一小本、比例也被最小值卡歪
+      // Use layout size, not getBoundingClientRect: if an ancestor has transform: scale (e.g. a thumbnail or card preview),
+      // the measured size is the scaled one, so the book would be computed as a tiny book and its proportions skewed by the minimum clamp
       const rect = { width: stage.clientWidth, height: stage.clientHeight };
       if (rect.width > 0 && rect.height > 0) {
         setStageSize((previous) =>
@@ -389,8 +390,8 @@ export function Book3D({
     return () => observer.disconnect();
   }, []);
 
-  // 量頁數：看全書最後一個元素落在第幾欄。字型晚到會改變斷行，
-  // 所以 document.fonts 就緒後再量一次。
+  // Measure page count: see which column the last element of the whole book falls in. Late-loading fonts change line breaks,
+  // so measure once more after document.fonts is ready.
   useLayoutEffect(() => {
     const measure = () => {
       const flow = measureFlowRef.current;
@@ -411,7 +412,7 @@ export function Book3D({
     };
   }, [geometry, children]);
 
-  // 版面改變後頁數可能變少，目前跨頁要夾回範圍內。
+  // The page count can shrink after a layout change, so clamp the current spread back into range.
   useEffect(() => {
     setSpread((current) => Math.min(current, spreadCount - 1));
   }, [spreadCount]);
@@ -428,8 +429,8 @@ export function Book3D({
     turnTimer.current = window.setTimeout(() => setTurn(null), TURN_DURATION_MS);
   }, []);
 
-  // 翻到最後一個跨頁再往後翻，書就闔上並轉到背面；從書背往前翻回到最後
-  // 一頁。封面那一側同理：第一個跨頁往前翻就闔回封面。
+  // Turning forward past the last spread closes the book and rotates it to the back cover; turning back from the back cover returns to the last
+  // page. The front cover side works the same way: turning back from the first spread closes the book to the cover.
   const goNext = useCallback(() => {
     if (side === "front") {
       setSide("open");
@@ -501,7 +502,7 @@ export function Book3D({
   function renderFace(page: VirtualPage | undefined, faceSide: "left" | "right"): ReactNode {
     if (!page) return <div className={`m3d-page m3d-page-${faceSide} m3d-page-endpaper`} />;
     if (page.kind === "endpaper") {
-      // 全書最後一頁的版權頁：頁數是奇數時補在最後，讓書不是停在一張白紙上。
+      // Copyright page on the last page of the book: when the page count is odd it is appended at the end, so the book does not stop on a blank sheet.
       return (
         <div className={`m3d-page m3d-page-${faceSide} m3d-page-endpaper m3d-colophon`}>
           <div className="m3d-colophon-content">
@@ -533,8 +534,8 @@ export function Book3D({
     );
   }
 
-  // 翻頁途中：往後翻時左頁還停在舊的那一頁，直到翻起的紙落下蓋住它；
-  // 往前翻時右頁則已經是目的地的右頁，紙從左邊翻回來。
+  // Mid-turn: when turning forward, the left page still shows the old page until the lifted sheet lands and covers it;
+  // when turning back, the right page is already the destination's right page and the sheet swings back from the left.
   const leftStatic = turn?.direction === "next" ? turn.from : spread;
   const rightStatic = turn?.direction === "prev" ? turn.from : spread;
   const leftPage = virtualPages[leftStatic * 2];
@@ -562,7 +563,7 @@ export function Book3D({
     >
       <style>{BOOK_CSS}</style>
       <div className="m3d-stage" ref={stageRef}>
-        {/* 輔助科技讀這一份線性的全文；下面每一頁的畫面都只是它的視窗。 */}
+        {/* Assistive tech reads this one linear full text; every page shown below is just a window onto it. */}
         <article className="sr-only" aria-label={fullTitle}>
           {children}
         </article>
@@ -609,7 +610,7 @@ export function Book3D({
               ) : (
                 <BackArt seriesTitle={seriesTitle} blurb={c.backBlurb} tagline={c.backTagline} />
               )}
-              {/* 書背下方貼的摘要籤：像實體書背面的條碼貼紙那一塊。 */}
+              {/* Summary label stuck on the lower back cover: like the barcode sticker on the back of a real book. */}
               <div className="m3d-back-summary">
                 <span className="m3d-back-summary-title">{fullTitle}</span>
                 {summary && <span>{summary}</span>}
@@ -683,7 +684,7 @@ function DefaultControls({ position, goNext, goPrev, labels: l }: Book3DControls
   );
 }
 
-/** 雲霧群山與瀑布：書封與書背共用的夜景底圖。 */
+/** Misty mountains and a waterfall: the night scene shared by the front and back cover. */
 function NightRange({ variant }: { variant: "front" | "back" }) {
   const lanterns =
     variant === "front"
@@ -735,7 +736,7 @@ function NightRange({ variant }: { variant: "front" | "back" }) {
   );
 }
 
-/** 山門印記：圓環裡一座山與山門，下方一道河。 */
+/** Mountain gate emblem: a mountain and a gate inside a ring, with a river below. */
 function Emblem() {
   return (
     <svg viewBox="0 0 40 40" aria-hidden="true">
@@ -1103,7 +1104,7 @@ const BOOK_CSS = `
 .m3d-cover-inside-title { color: #5c4a34; font-size: 1.05em; letter-spacing: 0.2em; }
 .m3d-cover-inside-genre { margin-top: 1.8em; color: #8a6a3f; font-size: 0.88em; letter-spacing: 0.4em; }
 
-/* 內文排版：novella-* 是原作短篇小說的版式，children 可直接套用。 */
+/* Body typography: novella-* is the original novella layout; children can use it directly. */
 .novella-flow { column-fill: auto; font-size: var(--m3d-fs); line-height: 1.9; letter-spacing: 0.05em; orphans: 2; widows: 2; }
 .novella-flow p, .novella-flow h2, .novella-flow h3, .novella-flow li, .novella-flow blockquote { overflow-wrap: anywhere; }
 .novella-break { break-before: column; }
@@ -1145,7 +1146,7 @@ const BOOK_CSS = `
 .novella-final-line { margin: 1.2em 0 0; padding-top: 0.8em; border-top: 1px solid rgba(138, 106, 63, 0.35); color: #6d5334; text-align: justify; }
 .novella-end-mark { margin: 1.4em 0 0; color: #8a6a3f; letter-spacing: 0.4em; text-align: center; }
 
-/* 控制列：與原作回憶錄畫面下方的翻頁列相同。 */
+/* Control bar: the same as the page-turn bar under the original memoir view. */
 .m3d-controls {
   display: flex;
   align-items: center;
@@ -1174,7 +1175,7 @@ const BOOK_CSS = `
   .m3d-nav-button { min-width: 5.2rem; padding: 0.3rem 0.5rem; }
 }
 
-/* 預設書封：依原作書封圖的配色與版面以 CSS 繪製。 */
+/* Default cover: drawn in CSS from the colors and layout of the original cover art. */
 .m3d-art { position: absolute; inset: 0; overflow: hidden; font-family: var(--m3d-font-display); }
 .m3d-art-front, .m3d-art-back {
   background:

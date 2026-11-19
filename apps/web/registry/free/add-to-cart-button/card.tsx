@@ -9,7 +9,7 @@ import { AddToCartButton, CartIcon } from "./add-to-cart-button";
 
 const mug = "/blocks/add-to-cart-button/mug.webp";
 
-/** 型錄卡片：一件商品、一顆按鈕、一個購物車，只看商品小卡飛進去那一下。 */
+/** Catalog card: one product, one button, one cart. Only the moment the mini product card flies in. */
 export default function AddToCartButtonCard() {
   const locale = useDemoLocale();
   const names = useProductNames();

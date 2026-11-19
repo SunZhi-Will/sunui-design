@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { ScrollStory, StoryPanel, useLoop, type ScrollStoryStep } from "./scroll-story";
 
 const PEOPLE = ["Alex", "Mia", "Jordan", "Tina", "Ken"];
-// 單一強調色的深淺，不用多色
+// Shades of a single accent colour, not multiple colours
 const COLORS = [100, 78, 58, 42, 28].map((n) => `color-mix(in oklab, var(--primary) ${n}%, var(--muted))`);
 
 const copy = {
@@ -99,7 +99,7 @@ const VISUALS = [
   { key: "fair", Visual: FairnessVisual },
 ];
 
-/** 型錄卡片：在框內往下捲，每段文字淡入，下方場景進入畫面才開始循環播放。 */
+/** Catalog card: scroll down inside the frame; each paragraph fades in, and the scene below starts looping only once it enters the view. */
 export default function ScrollStoryCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

@@ -16,7 +16,7 @@ const copy = {
   ja: { horizontal: "横スクロール", circle: "サークル", marquee: "マーキー", doors: "スプリットドア", rows: ["スクロール", "モーション"], open: "開く" },
 };
 
-/** 型錄縮圖：用自動來回的進度代替捲動，展示四種效果 */
+/** Catalog thumbnail: an auto-looping progress stands in for scrolling to show four effects */
 export default function ScrollEffectsCard() {
   const t = useDemoText(copy);
   const ref = useRef<HTMLDivElement>(null);

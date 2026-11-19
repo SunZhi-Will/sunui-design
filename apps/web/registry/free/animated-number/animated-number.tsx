@@ -8,22 +8,22 @@ import { cn } from "@/lib/utils";
 export interface AnimatedNumberProps {
   value: number;
   locale?: string;
-  /** 有給就以貨幣格式顯示，例如 "USD"、"TWD" */
+  /** Shown in currency format when given, e.g. "USD", "TWD" */
   currency?: string;
-  /** 額外的 Intl.NumberFormat 選項，會覆蓋預設 */
+  /** Extra Intl.NumberFormat options, overriding the defaults */
   formatOptions?: Intl.NumberFormatOptions;
-  /** 數值變動後在右側短暫顯示一個文字色小箭頭 */
+  /** After the value changes, briefly show a small text-coloured arrow on the right */
   trendArrow?: boolean;
-  /** 箭頭維持多久（ms） */
+  /** How long the arrow stays (ms) */
   trendHold?: number;
-  /** 由右而左每一位數的延遲（秒），像機械計數器逐輪帶動 */
+  /** Per-digit delay in seconds from right to left, so the wheels turn one after another like a mechanical counter */
   stagger?: number;
-  /** 數值變動時是否透過 aria-live 朗讀 */
+  /** Whether to announce value changes through aria-live */
   announce?: boolean;
   className?: string;
 }
 
-// 狀態切換用 gentle 彈簧（DESIGN.md）
+// gentle spring for state changes (DESIGN.md)
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -47,7 +47,7 @@ export function AnimatedNumber({
   const text = format.format(value);
   const chars = Array.from(text);
 
-  // 由前後值推導滾動方向（render 期間的衍生狀態，React 官方寫法）
+  // Derive the scroll direction from the previous and next values (derived state during render, the approach the React docs recommend)
   const [prev, setPrev] = useState(value);
   const [dir, setDir] = useState<1 | -1>(1);
   const [trend, setTrend] = useState<{ dir: 1 | -1; key: number } | null>(null);
@@ -71,7 +71,7 @@ export function AnimatedNumber({
       </span>
       <span aria-hidden="true" className="inline-flex">
         {chars.map((ch, i) => {
-          // 以「距離右邊的位置」當 key，位數增減時個位數與小數點保持穩定
+          // Key by "position from the right", so the ones digit and decimal point stay stable when the digit count changes
           const fromRight = chars.length - 1 - i;
           if (ch < "0" || ch > "9") {
             return (
@@ -104,7 +104,7 @@ export function AnimatedNumber({
   );
 }
 
-/** 一個數字輪：十個數字排成一圈，只往數值變動的方向轉，9 到 0 會繼續往前捲 */
+/** One digit wheel: ten digits arranged in a ring, rotating only in the direction the value changes; 9 to 0 keeps rolling forward */
 function DigitWheel({ digit, dir, reduce, delay }: { digit: number; dir: 1 | -1; reduce: boolean; delay: number }) {
   const pos = useMotionValue(digit);
   const target = useRef(digit);
@@ -123,7 +123,7 @@ function DigitWheel({ digit, dir, reduce, delay }: { digit: number; dir: 1 | -1;
 
   return (
     <span className="relative inline-block overflow-hidden">
-      {/* 佔位字元決定欄寬與行高 */}
+      {/* Placeholder character sets the column width and line height */}
       <span className="invisible">0</span>
       {DIGITS.map((d) => (
         <WheelDigit key={d} digit={d} pos={pos} />
@@ -133,7 +133,7 @@ function DigitWheel({ digit, dir, reduce, delay }: { digit: number; dir: 1 | -1;
 }
 
 function WheelDigit({ digit, pos }: { digit: number; pos: MotionValue<number> }) {
-  // 把與目前位置的距離收斂到 [-5, 5)，讓數字繞成一圈
+  // Reduce the distance from the current position into [-5, 5), so the digits wrap into a ring
   const y = useTransform(pos, (p) => `${((((digit - p) % 10) + 15) % 10) * 100 - 500}%`);
   return (
     <motion.span className="absolute inset-x-0 top-0 text-center" style={{ y }}>

@@ -5,10 +5,10 @@ import { DemoChart } from "./demo";
 
 export const variants = chartEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative, picking one that moves on its own so the card shows the effect without hovering first
 export const featured = "bar-race";
 
-/** 首頁型錄：一種圖表效果一張卡，用 loop 在畫面內定期重播。 */
+/** Home catalog: one card per chart effect, replaying periodically on screen with loop. */
 export default function ChartEffectsVariant({ variant }: { variant: string }) {
   return (
     <div className="w-72 text-card-foreground">

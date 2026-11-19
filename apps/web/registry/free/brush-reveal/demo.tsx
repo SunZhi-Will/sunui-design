@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import { BrushReveal } from "./brush-reveal";
 
-// 示範照片（AI 生成），放在 public/blocks/brush-reveal：同一盞檯燈的方格紙鉛筆線稿與夜間點燈實拍，兩張像素對齊
+// Demo photos (AI generated) in public/blocks/brush-reveal: a graph-paper pencil sketch and a night-time photo of the same lamp, pixel-aligned
 const sketch = "/blocks/brush-reveal/lamp-sketch.webp";
 const finished = "/blocks/brush-reveal/lamp-finished.webp";
 
@@ -84,7 +84,7 @@ const copy = {
   },
 };
 
-/** 線稿刷出上色版：完整 demo 的主圖，也是首頁型錄卡片（card.tsx）的內容 */
+/** Line drawing brushed into the coloured version: the main image of the full demo, also the content of the home catalog card (card.tsx) */
 export function LampReveal({ className, wide = false }: { className?: string; wide?: boolean }) {
   const t = useDemoText(copy);
   return (

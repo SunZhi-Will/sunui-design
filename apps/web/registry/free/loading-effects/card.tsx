@@ -15,7 +15,7 @@ const copy = {
 
 const VALUES = [25, 60, 90];
 
-/** 型錄縮圖：四種最醒目的載入效果 */
+/** Catalog thumbnail: the four most eye-catching loading effects */
 export default function LoadingEffectsCard() {
   const t = useDemoText(copy);
   const [i, setI] = useState(0);

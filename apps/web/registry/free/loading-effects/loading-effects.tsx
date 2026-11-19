@@ -15,7 +15,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode 
 
 import { cn } from "@/lib/utils";
 
-/** 全部載入效果的 id（含獨立元件） */
+/** IDs of all loading effects (including standalone components) */
 export const loadingEffects = [
   "bouncing-dots",
   "equalizer",
@@ -33,7 +33,7 @@ export const loadingEffects = [
 ] as const;
 export type LoadingEffectId = (typeof loadingEffects)[number];
 
-/** Loader 的 variant 清單 */
+/** List of Loader variants */
 export const loaderVariants = [
   "bouncing-dots",
   "equalizer",
@@ -56,12 +56,12 @@ const loop = (t: Transition): Transition => ({ repeat: Infinity, ease: "easeInOu
 const clampPct = (v: number) => Math.min(100, Math.max(0, v));
 const track = "color-mix(in oklab, currentColor 18%, transparent)";
 
-/** 讀屏用的隱藏文字 */
+/** Hidden text for screen readers */
 function SrOnly({ children }: { children: ReactNode }) {
   return <span className="sr-only">{children}</span>;
 }
 
-/** reduced motion 或離開畫面時不跑循環 */
+/** Do not run the loop under reduced motion or when off screen */
 function useActive<T extends Element>() {
   const ref = useRef<T>(null);
   const inView = useInView(ref);
@@ -72,11 +72,11 @@ function useActive<T extends Element>() {
 export interface LoaderProps {
   variant?: LoaderVariant;
   size?: LoaderSize;
-  /** 讀屏念出的文字 */
+  /** Text read out by screen readers */
   label?: string;
-  /** 0 到 100，給 progress-ring、bar、liquid 使用 */
+  /** 0 to 100, used by progress-ring, bar and liquid */
   value?: number;
-  /** 主色，預設 var(--primary) */
+  /** Main color, default var(--primary) */
   color?: string;
   className?: string;
 }
@@ -113,7 +113,7 @@ export function Loader({ variant = "ring-spinner", size = "md", label = "Loading
   );
 }
 
-/* ---- 不定進度 ---- */
+/* ---- Indeterminate ---- */
 
 function BouncingDots({ s, active }: { s: number; active: boolean }) {
   const d = Math.max(4, s * 0.22);
@@ -263,7 +263,7 @@ function TypingIndicator({ s, active }: { s: number; active: boolean }) {
   );
 }
 
-/* ---- 確定進度 ---- */
+/* ---- Determinate ---- */
 
 function ProgressRing({ s, pct, reduce }: { s: number; pct: number; reduce: boolean }) {
   const size = Math.max(s, 28);
@@ -311,9 +311,9 @@ function Liquid({ s, pct, active, reduce }: { s: number; pct: number; active: bo
     if (reduce) level.jump(pct);
     else level.set(pct);
   }, [pct, reduce, level]);
-  // 液面高度：100% 時整個填滿，留一點波峰
+  // Liquid level: fully filled at 100%, leaving a small crest
   const y = useTransform(level, (v) => `${100 - v}%`);
-  // 波長 50，路徑畫到 200 寬，平移 100 剛好無縫循環
+  // Wavelength is 50 and the path is drawn 200 wide, so shifting by 100 loops seamlessly
   const wave = "M0 6 Q12.5 0 25 6 T50 6 T75 6 T100 6 T125 6 T150 6 T175 6 T200 6 V100 H0Z";
   return (
     <span
@@ -342,15 +342,15 @@ function Liquid({ s, pct, active, reduce }: { s: number; pct: number; active: bo
 }
 
 /* ------------------------------------------------------------------ */
-/* top-loading-bar：快速衝到約 80%，接著慢慢爬，完成時補滿再淡出          */
+/* top-loading-bar: rushes to about 80% quickly, then creeps slowly, fills up and fades out on completion */
 /* ------------------------------------------------------------------ */
 
 export interface TopLoadingBarProps {
   loading: boolean;
   label?: string;
-  /** "fixed" 貼在視窗頂端（預設），"absolute" 貼在最近的 relative 父層頂端 */
+  /** "fixed" sticks to the top of the window (default), "absolute" sticks to the top of the nearest relative parent */
   position?: "fixed" | "absolute";
-  /** 高度（px） */
+  /** Height (px) */
   height?: number;
   color?: string;
   className?: string;
@@ -414,16 +414,16 @@ export function TopLoadingBar({ loading, label = "Loading", position = "fixed", 
 }
 
 /* ------------------------------------------------------------------ */
-/* multi-step：步驟逐一打勾，亮底跟著目前步驟移動                         */
+/* multi-step: steps are ticked off one by one, a bright background follows the current step */
 /* ------------------------------------------------------------------ */
 
 export interface MultiStepLoaderProps {
   steps: string[];
-  /** 受控：目前步驟的索引；等於 steps.length 代表全部完成 */
+  /** Controlled: index of the current step; equal to steps.length means all done */
   current?: number;
-  /** 非受控時每一步的間隔（ms） */
+  /** Interval between steps when uncontrolled (ms) */
   interval?: number;
-  /** 非受控時跑完是否重來 */
+  /** Whether to restart after finishing when uncontrolled */
   loop?: boolean;
   label?: string;
   className?: string;
@@ -509,17 +509,17 @@ export function MultiStepLoader({ steps, current, interval = 1400, loop = false,
 }
 
 /* ------------------------------------------------------------------ */
-/* skeleton-shimmer：佔位方塊與一道掃過的光                               */
+/* skeleton-shimmer: placeholder blocks with a sweeping light */
 /* ------------------------------------------------------------------ */
 
 export interface SkeletonBlockProps {
   className?: string;
   style?: CSSProperties;
-  /** 由 Skeleton 傳入；單獨使用時自己判斷 */
+  /** Passed in by Skeleton; decided on its own when used standalone */
   shimmer?: boolean;
 }
 
-/** 單一佔位方塊，用 className 決定形狀與尺寸 */
+/** A single placeholder block; use className to set shape and size */
 export function SkeletonBlock({ className, style, shimmer = true }: SkeletonBlockProps) {
   const { ref, active } = useActive<HTMLDivElement>();
   return (
@@ -537,17 +537,17 @@ export function SkeletonBlock({ className, style, shimmer = true }: SkeletonBloc
 }
 
 export interface SkeletonProps {
-  /** 文字列數 */
+  /** Number of text lines */
   lines?: number;
-  /** 顯示圓形頭像 */
+  /** Show a round avatar */
   avatar?: boolean;
-  /** 顯示上方大圖 */
+  /** Show a large image on top */
   media?: boolean;
   label?: string;
   className?: string;
 }
 
-/** 一組常見的卡片骨架：大圖、頭像、標題與幾行文字 */
+/** A common card skeleton: large image, avatar, title and a few lines of text */
 export function Skeleton({ lines = 3, avatar = true, media = false, label = "Loading", className }: SkeletonProps) {
   return (
     <div role="status" className={cn("flex w-full flex-col gap-3", className)}>

@@ -30,7 +30,7 @@ const copy = {
   },
 } satisfies Record<string, { names: Record<SpringRigPreset, string> } & Record<string, unknown>>;
 
-/** 單一彈簧骨架的示範格：首頁型錄（variants.tsx）用，預設自動擺動，卡片不用先拖曳才看得出效果 */
+/** Demo cell for a single spring rig: used by the home catalog (variants.tsx); swings on its own by default so the card needs no dragging to show the effect */
 export function SpringRigTile({ preset }: { preset: SpringRigPreset }) {
   const t = useDemoText(copy);
   return (

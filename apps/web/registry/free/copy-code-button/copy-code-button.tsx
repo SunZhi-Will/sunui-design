@@ -7,37 +7,37 @@ import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 export interface CopyCodeButtonProps {
-  /** 要複製的優惠碼 */
+  /** The discount code to copy */
   code: string;
-  /** 代碼左側的小標，例如折扣內容 */
+  /** Small label to the left of the code, e.g. what the discount is */
   caption?: ReactNode;
-  /** 印章停留多久後復原（ms） */
+  /** How long the stamp stays before resetting (ms) */
   resetAfter?: number;
-  /** 複製成功後呼叫 */
+  /** Called after a successful copy */
   onCopy?: (code: string) => void;
   size?: "sm" | "md" | "lg";
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<CopyCodeButtonLabels>;
   className?: string;
 }
 
 export interface CopyCodeButtonLabels {
-  /** 按鈕可見文字 */
+  /** Visible button text */
   button: ReactNode;
-  /** 按鈕的無障礙名稱 */
+  /** Accessible name of the button */
   copy: (code: string) => string;
-  /** 朗讀給螢幕閱讀器 */
+  /** Announced to screen readers */
   copied: string;
-  /** 複製後蓋在紙條上的印章字 */
+  /** Stamp text pressed onto the slip after copying */
   stamp: ReactNode;
   failed: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -76,13 +76,13 @@ const MESSAGES: Record<SunLocale, CopyCodeButtonLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colour, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
-// 虛線用淡色字色，邊線色在表面上幾乎看不見
+// The dashed line uses a faint text colour; a border colour would be almost invisible on the surface
 const edge = "border-foreground/25";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selected state, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
@@ -100,7 +100,7 @@ async function writeClipboard(text: string) {
     await navigator.clipboard.writeText(text);
     return;
   } catch {
-    // 沒有權限、舊瀏覽器或非安全環境時改用下面的備案
+    // Without permission, in an old browser, or in an insecure context, fall back to the approach below
   }
   const el = document.createElement("textarea");
   el.value = text;
@@ -168,7 +168,7 @@ export function CopyCodeButton({ code, caption, resetAfter = 1800, onCopy, size 
           <span className="truncate">{caption}</span>
         </span>
       )}
-      {/* 代碼可直接選取，作為剪貼簿失敗時的退路；複製後印章蓋在代碼上，代碼淡成墨印 */}
+      {/* The code stays selectable as a fallback when the clipboard fails; after copying the stamp lands on the code and the code fades into an ink impression */}
       <span className={cn("relative flex shrink-0 items-center", s.code)}>
         <span
           id={codeId}

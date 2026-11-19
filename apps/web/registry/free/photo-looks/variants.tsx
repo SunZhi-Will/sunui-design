@@ -5,10 +5,10 @@ import { photoLooks, type PhotoLookName } from "./photo-looks";
 
 export const variants = photoLooks;
 
-// 首頁預設只放這一種當代表：色調差異一眼就看得出來
+// The home page shows only this one as the representative: the tonal difference is obvious at a glance
 export const featured = "golden-hour";
 
-/** 首頁型錄：一種攝影風格一張卡，滑過看原圖。 */
+/** Home catalog: one card per photographic look, hover to see the original. */
 export default function PhotoLooksVariant({ variant }: { variant: string }) {
   return (
     <div className="w-80">

@@ -5,44 +5,44 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface CompareSliderLabels {
-  /** 左右兩邊的預設標籤；beforeLabel / afterLabel 優先 */
+  /** Default labels for the left and right sides. beforeLabel / afterLabel take priority */
   before?: string;
   after?: string;
-  /** range 的無障礙名稱 */
+  /** Accessible name of the range */
   slider?: (before: string, after: string) => string;
   valueText?: (before: string, after: string, pos: number) => string;
 }
 
 export interface CompareSliderProps {
-  /** 左半：圖片網址或任意節點 */
+  /** Left half: an image URL or any node */
   before: ReactNode | string;
-  /** 右半：圖片網址或任意節點 */
+  /** Right half: an image URL or any node */
   after: ReactNode | string;
-  /** 外框比例照成品的寬高 */
+  /** Frame ratio matches the finished image's width and height */
   width?: number;
   height?: number;
   beforeLabel?: string;
   afterLabel?: string;
-  /** before 的填法；比例不同時預設 contain 置中，不裁切也不變形 */
+  /** How before is fitted. When the ratios differ, the default is contain, centered, with no cropping or distortion */
   beforeFit?: "contain" | "cover";
   afterFit?: "contain" | "cover";
-  /** 分隔線起始位置（0 到 100） */
+  /** Starting position of the divider (0 to 100) */
   initial?: number;
-  /** 第一次進入畫面時掃一次示範（中間、左、右、回中間，約 2.4 秒），一碰就停 */
+  /** On first entering the viewport, sweeps once as a demo (center, left, right, back to center, about 2.4 seconds) and stops on first touch */
   demoSweep?: boolean;
-  /** 由父層控制何時開始示範；給了就不看進入畫面 */
+  /** Lets the parent control when the demo starts. When given, entering the viewport is ignored */
   play?: boolean;
   onChange?: (pos: number) => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings, takes priority over locale */
   labels?: CompareSliderLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -81,7 +81,7 @@ const clamp = (v: number) => Math.max(0, Math.min(100, v));
 const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const SWEEP_MS = 2400;
 
-/** 開場示範的關鍵影格：[進度, 位置]，起點與終點用 initial */
+/** Keyframes of the intro demo: [progress, position], with initial as the start and end point */
 function sweepAt(t: number, home: number) {
   const keys: [number, number][] = [
     [0, home],
@@ -117,10 +117,10 @@ function ChevronsLeftRight() {
 }
 
 /**
- * 前後對照：左半是 before，右半是 after，拖曳分隔線、點擊或用方向鍵調整比例。
- * 底下是一個透明的 range input，點哪裡分隔線就到哪裡，鍵盤與螢幕報讀器也能操作。
- * 外框比例照成品，before 比例不同時以 contain 置中，留白用 muted 底色。
- */
+  * Before and after comparison: the left half is before, the right half is after. Drag the divider, click, or use the arrow keys to change the split.
+  * Underneath is a transparent range input, so the divider goes wherever you click, and keyboard and screen reader users can operate it too.
+  * The frame ratio follows the finished image. When before has a different ratio it is centered with contain, and the empty space uses the muted background.
+  */
 export function CompareSlider({
   before,
   after,
@@ -148,7 +148,7 @@ export function CompareSlider({
   const touched = useRef(false);
   const running = play ?? (demoSweep && inView);
 
-  // 第一次進入畫面（底部扣掉 20%）才開始示範
+  // Start the demo on first entering the viewport (bottom inset by 20%)
   useEffect(() => {
     if (play !== undefined || !demoSweep) return;
     const el = root.current;
@@ -166,7 +166,7 @@ export function CompareSlider({
     return () => io.disconnect();
   }, [play, demoSweep]);
 
-  // 示範掃動：使用者一碰就停，減少動態時不掃
+  // Demo sweep: stops as soon as the user touches it, and does not sweep under reduced motion
   useEffect(() => {
     if (!running || touched.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

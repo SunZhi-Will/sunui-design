@@ -2,25 +2,25 @@
 
 import { cn } from "@/lib/utils";
 
-/* tiny-chart 的等角小場景：道具與人物全部用程式畫，只有平塗的表面色多邊形和細線，沒有圖片、漸層或陰影。
-   座標是世界座標 (x, y, z)：y 是流程前進方向（畫面右下）、x 是分岔方向（畫面左下）、z 往上。 */
+/* Isometric mini scenes for tiny-chart: props and people are all drawn in code, using only flat-filled surface polygons and thin lines, with no images, gradients or shadows.
+   Coordinates are world coordinates (x, y, z): y is the direction of the flow (toward lower right on screen), x is the branch direction (toward lower left), z is up. */
 
 export type Pt = [number, number];
 
 export const r1 = (n: number) => Math.round(n * 10) / 10;
 export const ISO_C = Math.cos(Math.PI / 6);
 export const ISO_S = 0.5;
-/** 世界座標投影到畫面，讀起來由左上到右下 */
+/** Project world coordinates to the screen, reading from upper left to lower right */
 export const iso = (x: number, y: number, z = 0): Pt => [r1((y - x) * ISO_C), r1((x + y) * ISO_S - z)];
 
-/** 可以放在步驟旁邊的道具 */
+/** Props that can sit beside a step */
 export const tinyProps = ["home", "shop", "counter", "warehouse", "parcels", "truck", "house", "shelf", "post"] as const;
 export type TinyProp = (typeof tinyProps)[number];
-/** 步驟旁的場景：只給道具名稱，或加上一位站在旁邊的人 */
+/** Scene beside a step: just a prop name, or add a person standing next to it */
 export type TinyScene = TinyProp | { prop: TinyProp; person?: boolean };
 
 type Tone = "paper" | "card" | "ink";
-/** 同一張紙的三階明度：頂面最亮、正面次之、側面最暗 */
+/** Three lightness steps of the same surface: top is lightest, front next, side darkest */
 const FILL: Record<Tone, { top: string; front: string; side: string }> = {
   paper: { top: "fill-card", front: "fill-[#e8e8e8] dark:fill-[#272727]", side: "fill-[#dbdbdb] dark:fill-[#131313]" },
   card: { top: "fill-[#e3e3e3] dark:fill-foreground/10", front: "fill-foreground/15 dark:fill-[#282828]", side: "fill-[#c2c2c2] dark:fill-[#1a1a1a]" },
@@ -32,8 +32,8 @@ export type ScenePart =
   | { kind: "line"; pts: Pt[] }
   | { kind: "person"; at: Pt; tone: PersonTone };
 
-/** 在某個錨點上用世界座標疊方塊；每個方法依「先遠後近」的順序呼叫，畫的時候照順序疊上去 */
-/** 道具在世界座標裡的縮放：讓門、桌子、櫃台和小人（約 35 高）的比例接近真實 */
+/** Stack boxes at an anchor in world coordinates; call each method in far-to-near order, since drawing stacks in call order */
+/** Prop scale in world coordinates: keeps doors, desks, counters and people (about 35 tall) in believable proportion */
 const K = 1.35;
 
 class Sketch {
@@ -50,24 +50,24 @@ class Sketch {
     this.poly([p(x, y1, z), p(x1, y1, z), p(x1, y1, z1), p(x, y1, z1)], f.front);
     return this.poly([p(x, y, z1), p(x1, y, z1), p(x1, y1, z1), p(x, y1, z1)], f.top);
   }
-  /** 貼在朝 +y 那一面的平面：門、窗、螢幕 */
+  /** A plane on the +y face: doors, windows, screens */
   face(x: number, y: number, z: number, w: number, h: number, fill: string) {
     const { p } = this;
     return this.poly([p(x, y, z), p(x + w, y, z), p(x + w, y, z + h), p(x, y, z + h)], fill);
   }
-  /** 貼在朝 +x 那一面的平面 */
+  /** A plane on the +x face */
   flank(x: number, y: number, z: number, d: number, h: number, fill: string) {
     const { p } = this;
     return this.poly([p(x, y, z), p(x, y + d, z), p(x, y + d, z + h), p(x, y, z + h)], fill);
   }
-  /** 屋脊沿 x 方向的兩坡屋頂 */
+  /** Gable roof with its ridge along x */
   roof(x: number, y: number, z: number, w: number, d: number, rh: number, tone: Tone = "card") {
     const { p } = this, f = FILL[tone], [x1, ym, y1, zt] = [x + w, y + d / 2, y + d, z + rh];
     this.poly([p(x, y, z), p(x1, y, z), p(x1, ym, zt), p(x, ym, zt)], f.side);
     this.poly([p(x1, y, z), p(x1, y1, z), p(x1, ym, zt)], FILL.paper.front);
     return this.poly([p(x, ym, zt), p(x1, ym, zt), p(x1, y1, z), p(x, y1, z)], f.top);
   }
-  /** 立在 +y 面上的輪子（八角形） */
+  /** Wheel standing on the +y face (octagon) */
   wheel(cx: number, y: number, cz: number, r: number) {
     const pts = Array.from({ length: 8 }, (_, i) => this.p(cx + Math.cos((i * Math.PI) / 4) * r, y, cz + Math.sin((i * Math.PI) / 4) * r));
     return this.poly(pts, FILL.ink.front);
@@ -82,9 +82,9 @@ class Sketch {
   }
 }
 
-/** 每個道具的占地（世界單位）與畫法；person 是站在道具前的人要站哪 */
+/** Footprint of each prop (world units) and how it is drawn; person is where someone standing in front of the prop stands */
 const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number, number]; draw: (s: Sketch) => Sketch }> = {
-  // 家裡的書桌：桌腳、桌面、筆電、馬克杯
+  // Desk at home: legs, tabletop, laptop, mug
   home: {
     w: 64, d: 40, h: 36, person: [0, 30],
     draw: (s) =>
@@ -94,7 +94,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .cube(-6, -6, 21, 18, 12, 1.5, "paper")
         .cube(-22, 4, 21, 5, 5, 6, "paper"),
   },
-  // 店面：兩坡屋頂、門、窗、門上的雨棚
+  // Storefront: gable roof, door, window, awning over the door
   shop: {
     w: 66, d: 50, h: 50, person: [16, 36],
     draw: (s) =>
@@ -105,7 +105,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .face(12, 22, 10, 12, 10, FILL.card.top)
         .face(-10, 22, 25, 20, 3, FILL.card.side),
   },
-  // 服務台：櫃台、檯面、立牌，櫃台後站一個人
+  // Service desk: counter, countertop, sign, a person behind the counter
   counter: {
     w: 64, d: 40, h: 40, person: [0, 24],
     draw: (s) =>
@@ -115,7 +115,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .cube(-30, -6, 0, 60, 14, 15, "card")
         .cube(-32, -8, 15, 64, 18, 2, "paper"),
   },
-  // 倉庫：寬矮的量體、平屋頂、捲門
+  // Warehouse: wide low volume, flat roof, roll-up door
   warehouse: {
     w: 84, d: 64, h: 38, person: [24, 42],
     draw: (s) =>
@@ -124,7 +124,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .face(-14, 30, 0, 28, 24, FILL.paper.front)
         .line([-14, 30, 6], [14, 30, 6]).line([-14, 30, 12], [14, 30, 12]).line([-14, 30, 18], [14, 30, 18]),
   },
-  // 一疊包裹，頂面有封箱膠帶
+  // A stack of parcels, with sealing tape on the top face
   parcels: {
     w: 40, d: 30, h: 24, person: [0, 26],
     draw: (s) =>
@@ -132,7 +132,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .cube(-18, -10, 0, 20, 18, 14, "card").line([-8, -10, 14], [-8, 8, 14])
         .cube(-12, -8, 14, 14, 12, 10, "card").line([-5, -8, 24], [-5, 4, 24]),
   },
-  // 貨車：貨櫃、車頭、車窗、兩個輪子
+  // Truck: cargo box, cab, windows, two wheels
   truck: {
     w: 64, d: 26, h: 36, person: [-14, 26],
     draw: (s) =>
@@ -141,7 +141,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .flank(32, -8, 18, 16, 8, FILL.ink.side)
         .wheel(-20, 13.2, 5, 5).wheel(22, 13.2, 5, 5),
   },
-  // 住家：兩坡屋頂、門、窗、煙囪
+  // House: gable roof, door, window, chimney
   house: {
     w: 50, d: 46, h: 52, person: [8, 32],
     draw: (s) =>
@@ -152,7 +152,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .face(4, 20, 12, 10, 8, FILL.card.top)
         .flank(22, -10, 10, 12, 8, FILL.card.top),
   },
-  // 層架：兩片側板、四層板子、上面的盒子
+  // Shelving: two side panels, four shelves, boxes on top
   shelf: {
     w: 60, d: 16, h: 46, person: [0, 22],
     draw: (s) =>
@@ -163,7 +163,7 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
         .cube(-27, -8, 42, 54, 16, 2, "paper")
         .cube(27, -8, 0, 3, 16, 44, "card"),
   },
-  // 郵筒：柱子、筒身、投信口、頂蓋
+  // Mailbox: post, body, mail slot, top cap
   post: {
     w: 22, d: 18, h: 24, person: [0, 20],
     draw: (s) =>
@@ -176,14 +176,14 @@ const PROPS: Record<TinyProp, { w: number; d: number; h: number; person: [number
 
 export interface SceneDraw {
   parts: ScenePart[];
-  /** 世界座標的占地，用來排地板格線 */
+  /** Footprint in world coordinates, used to lay out the floor grid lines */
   footprint: { x0: number; x1: number; y0: number; y1: number };
   depth: number;
 }
 
 /**
- * 把場景放在方塊旁邊：side 為 -1 放在畫面右上（遠側），+1 放在左下（近側）。
- * blockX、blockY 是方塊中心，blockW 是方塊在 x 方向的長度。
+ * Put a scene beside a block: side -1 places it upper right on screen (far side), +1 lower left (near side).
+ * blockX and blockY are the block center; blockW is the block length along x.
  */
 export function placeScene(scene: TinyScene, blockX: number, blockY: number, blockW: number, side: 1 | -1): SceneDraw {
   const { prop, person } = typeof scene === "string" ? { prop: scene, person: false } : scene;
@@ -208,7 +208,7 @@ const SHIRT: Record<PersonTone, string> = {
   red: "fill-foreground",
 };
 
-/** 一個小人：腳底在 (0, 0)，身高約 35；red 是正在走流程的那個人 */
+/** A figure: feet at (0, 0), about 35 tall; red is the one walking the flow */
 export function Figure({ tone = "card" }: { tone?: PersonTone }) {
   return (
     <g transform="scale(1.1)">
@@ -220,7 +220,7 @@ export function Figure({ tone = "card" }: { tone?: PersonTone }) {
   );
 }
 
-/** 畫一組場景零件 */
+/** Draw a set of scene parts */
 export function SceneParts({ parts }: { parts: ScenePart[] }) {
   return (
     <>

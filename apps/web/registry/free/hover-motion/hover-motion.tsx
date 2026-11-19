@@ -10,7 +10,7 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 只在有滑鼠的裝置啟用；觸控裝置上這些效果自動關閉 */
+/** Enabled only on devices with a mouse; on touch devices these effects turn off automatically */
 function useFinePointer() {
   const [fine, setFine] = useState(false);
   useEffect(() => {
@@ -27,14 +27,14 @@ function useFinePointer() {
 
 export interface MagneticProps {
   children: ReactNode;
-  /** 跟隨游標的比例，0.35 表示移動游標距離的 35% */
+  /** Fraction of the cursor movement to follow; 0.35 means 35% of the distance the cursor moves */
   strength?: number;
-  /** 感應範圍，元件邊緣往外多少 px 就開始吸 */
+  /** Sensing range: how many px beyond the element edge the pull starts */
   radius?: number;
   className?: string;
 }
 
-/** 磁吸：游標靠近時元件被輕輕拉過去，離開後彈回原位。包住一顆按鈕使用。 */
+/** Magnetic: the element is gently pulled toward the cursor as it approaches, and springs back when it leaves. Wrap a single button with it. */
 export function Magnetic({ children, strength = 0.35, radius = 48, className }: MagneticProps) {
   const reduce = useReducedMotion();
   const fine = useFinePointer();
@@ -70,18 +70,18 @@ export function Magnetic({ children, strength = 0.35, radius = 48, className }: 
 
 export interface InkUnderlineProps {
   children: ReactNode;
-  /** 預設是 a；也可以傳 "button" 或自己的 Link 元件 */
+  /** Defaults to a; you can also pass "button" or your own Link component */
   as?: ElementType;
   href?: string;
-  /** 目前所在頁面：底線常駐 */
+  /** The current page: its underline stays visible */
   active?: boolean;
-  /** 底線顏色：ink 文字色、accent 朱紅 */
+  /** Underline colour: ink is the text colour, accent is vermilion */
   tone?: "ink" | "accent";
   className?: string;
   [key: string]: unknown;
 }
 
-/** 細線底線：滑入時從左畫出，滑出時往右收走。 */
+/** Thin underline: draws in from the left on hover, and retracts to the right on leave. */
 export function InkUnderline({ children, as: Tag = "a", active = false, tone = "ink", className, ...rest }: InkUnderlineProps) {
   return (
     <Tag
@@ -92,7 +92,7 @@ export function InkUnderline({ children, as: Tag = "a", active = false, tone = "
         "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-right after:scale-x-0 after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none",
         "hover:after:origin-left hover:after:scale-x-100 focus-visible:after:origin-left focus-visible:after:scale-x-100",
         active && "after:scale-x-100",
-        // 目前頁的底線用品牌專色，其餘維持文字色
+        // The current page's underline uses the brand accent; the rest keep the text colour
         active ? "after:bg-[color:var(--sunui-spot,var(--primary))]" : tone === "ink" ? "after:bg-foreground" : "after:bg-foreground",
         className,
       )}
@@ -105,18 +105,18 @@ export function InkUnderline({ children, as: Tag = "a", active = false, tone = "
 /* ───────────── TextRoll ───────────── */
 
 export interface TextRollProps {
-  /** 只接受文字，才能逐字滾動 */
+  /** Text only, so it can roll character by character */
   children: string;
-  /** 每個字之間的延遲（秒） */
+  /** Delay between characters (seconds) */
   stagger?: number;
-  /** 滾入的那一層用的 class，例如換成朱紅 */
+  /** Class for the layer that rolls in, e.g. switch it to vermilion */
   rollClassName?: string;
-  /** 由父層控制是否處於 hover；不傳時自己偵測 */
+  /** Hover state controlled by the parent; detected internally when omitted */
   hovered?: boolean;
   className?: string;
 }
 
-/** 文字滾動：滑入時每個字往上滾出，同一個字從下方滾入。放在選單連結或按鈕裡。 */
+/** Text roll: on hover each character rolls up and out while the same character rolls in from below. Use it inside menu links or buttons. */
 export function TextRoll({ children, stagger = 0.025, rollClassName, hovered, className }: TextRollProps) {
   const reduce = useReducedMotion();
   const [self, setSelf] = useState(false);
@@ -152,21 +152,21 @@ export function TextRoll({ children, stagger = 0.025, rollClassName, hovered, cl
 export interface HoverPreviewItem {
   id: string;
   title: ReactNode;
-  /** 右側的次要資訊，例如價格或年份 */
+  /** Secondary info on the right, e.g. price or year */
   meta?: ReactNode;
-  /** 游標旁浮出的預覽，通常是一張圖 */
+  /** Preview that floats next to the cursor, usually an image */
   preview: ReactNode;
   href?: string;
 }
 
 export interface HoverPreviewListProps {
   items: HoverPreviewItem[];
-  /** 預覽框尺寸（px） */
+  /** Preview box size (px) */
   previewSize?: { width: number; height: number };
   className?: string;
 }
 
-/** 文字清單：滑到哪一列，那一列的圖就出現在游標旁並跟著走。觸控裝置不顯示預覽。 */
+/** Text list: whichever row you hover, its image appears next to the cursor and follows it. Touch devices show no preview. */
 export function HoverPreviewList({ items, previewSize = { width: 200, height: 250 }, className }: HoverPreviewListProps) {
   const reduce = useReducedMotion();
   const fine = useFinePointer();

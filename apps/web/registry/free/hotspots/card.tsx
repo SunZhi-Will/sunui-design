@@ -27,7 +27,7 @@ const copy = {
   ],
 };
 
-// 和完整 demo 同一張照片，裁成正方形（上下各裁 10%），熱點座標已換算
+// Same photo as the full demo, cropped to a square (10% off the top and bottom), with hotspot coordinates converted
 function Jacket() {
   return (
     <img
@@ -39,7 +39,7 @@ function Jacket() {
   );
 }
 
-/** 型錄卡片：夾克圖上的編號熱點，點數字跳出那一處的細節小卡，再點別的數字切換。 */
+/** Catalog card: numbered hotspots on a jacket photo, click a number to pop up a detail card for that spot, click another number to switch. */
 export default function HotspotsCard() {
   const spots = useDemoText(copy);
   return (

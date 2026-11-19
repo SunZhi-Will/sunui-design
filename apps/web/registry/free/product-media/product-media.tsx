@@ -18,18 +18,18 @@ export interface ProductMediaLabels {
 }
 
 export interface ProductMediaProps {
-  /** 第一張是主圖，第二張是滑過時換上的角度圖 */
+  /** The first is the main image, the second is the angle shown on hover */
   images: ProductMediaImage[];
-  /** 換成 next/image 等元件；預設用 <img> */
+  /** Swap in a component such as next/image. Defaults to <img> */
   renderImage?: (image: ProductMediaImage, props: { className: string; loading: "eager" | "lazy" }) => ReactNode;
-  /** 桌機點一下放大、跟著游標移動 */
+  /** On desktop, click to zoom and follow the cursor */
   zoom?: boolean;
   zoomScale?: number;
-  /** 長寬比，例如 "4/5"、"1/1" */
+  /** Aspect ratio, for example "4/5", "1/1" */
   aspect?: string;
-  /** 疊在左上角，例如售完印章或「新品」 */
+  /** Overlaid at the top left, for example a sold-out stamp or a "New" badge */
   badge?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as ja-JP are also accepted */
   locale?: string;
   labels?: ProductMediaLabels;
   className?: string;
@@ -52,12 +52,12 @@ const MESSAGES: Record<SunLocale, Required<ProductMediaLabels>> = {
 };
 
 const edge = "border-foreground/10";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent color: follows the theme's --primary by default, and buyers can set --sunui-spot to use their own brand color. Used only for selected, deal and current-progress states */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 
 const gentle = { type: "spring", stiffness: 240, damping: 30 } as const;
 
-/** 只有真的能 hover、指標精準的裝置才換圖與放大；觸控改成左右滑 */
+/** Swap images and zoom only on devices that can truly hover and have a precise pointer; touch uses left and right swipes instead */
 function useFinePointer() {
   const [fine, setFine] = useState(false);
   useEffect(() => {
@@ -91,7 +91,7 @@ export function ProductMedia({
   const originX = useMotionValue(0.5);
   const originY = useMotionValue(0.5);
 
-  // 滑過時換上下一張角度圖；放大中維持原圖
+  // On hover, swap to the next angle image. While zoomed, keep the original
   const shown = fine && hovering && !zoomed && total > 1 ? (index + 1) % total : index;
   const canZoom = zoom && fine;
 

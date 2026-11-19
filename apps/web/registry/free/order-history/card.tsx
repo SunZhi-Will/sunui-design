@@ -11,7 +11,7 @@ const names = {
   ja: { sweater: "メリノ クルーネックセーター", sweaterV: "M サイズ、オートミール", overshirt: "ウール オーバーシャツ", overshirtV: "L サイズ、ネイビー", socks: "コットンソックス 3 足組", tote: "キャンバストート", linen: "リネンシャツ", linenV: "M サイズ、ホワイト" },
 };
 
-/** 範例訂單：商品名與日期依目前語言 */
+/** Sample orders: product names and dates follow the current language */
 function useOrders(): HistoryOrder[] {
   const locale = useDemoLocale();
   const n = useDemoText(names);
@@ -34,7 +34,7 @@ function useOrders(): HistoryOrder[] {
   ];
 }
 
-/** 型錄卡片：三筆訂單收合成一列列，點開任一筆看明細與小計。 */
+/** Catalog card: three orders collapsed into rows; open any one to see its details and subtotal. */
 export default function OrderHistoryCard() {
   const locale = useDemoLocale();
   const orders = useOrders().slice(0, 3);

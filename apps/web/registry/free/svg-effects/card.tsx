@@ -2,7 +2,7 @@
 
 import { AnimatedBeam, BlobMorph, LiquidFill, RadarSweep } from "./svg-effects";
 
-/** 型錄卡片：光束連線、有機形變、雷達掃描與液體填充 */
+/** Catalog card: animated beam, organic morph, radar sweep and liquid fill */
 export default function SvgEffectsCard() {
   return (
     <div className="mx-auto grid w-72 grid-cols-3 items-center gap-3 rounded-md border border-border bg-card p-4">
