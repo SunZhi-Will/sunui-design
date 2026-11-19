@@ -72,6 +72,8 @@ const en = {
       getPro: "Get Pro",
       install: "Install any block with one command",
       showcase: {
+        cloud: "A cloud of dots that slowly turns and changes shape",
+        cloudHint: "This is the point-cloud block. Drag it.",
         marquee: "Blocks from the catalog. Hover to pause, press one to open it.",
         stats: ["blocks", "motion libraries", "Pro scenes", "languages built in"],
         playTitle: "Try them right here",
@@ -640,6 +642,8 @@ const zhTW: Messages = {
       getPro: "取得 Pro",
       install: "一行指令安裝任何一個區塊",
       showcase: {
+        cloud: "一團慢慢旋轉、會變換形狀的點",
+        cloudHint: "這是 point-cloud 區塊，拖拖看",
         marquee: "型錄裡的區塊。滑鼠移上去會停，點一下打開。",
         stats: ["個區塊", "套動效庫", "個 Pro 場景", "種語言內建"],
         playTitle: "在這裡直接試",
@@ -1184,6 +1188,8 @@ const zhCN: Messages = {
       getPro: "获取 Pro",
       install: "一行命令安装任何一个区块",
       showcase: {
+        cloud: "一团慢慢旋转、会变换形状的点",
+        cloudHint: "这是 point-cloud 区块，拖拖看",
         marquee: "目录里的区块。鼠标移上去会停，点一下打开。",
         stats: ["个区块", "套动效库", "个 Pro 场景", "种语言内置"],
         playTitle: "在这里直接试",
@@ -1721,6 +1727,8 @@ const ja: Messages = {
       getPro: "Pro を入手",
       install: "コマンド一行でどのブロックも導入できます",
       showcase: {
+        cloud: "ゆっくり回りながら形を変える点の集まり",
+        cloudHint: "これは point-cloud ブロックです。ドラッグしてみてください",
         marquee: "カタログのブロック。カーソルを重ねると止まり、押すと開きます。",
         stats: ["個のブロック", "種のモーションライブラリ", "個の Pro シーン", "言語を標準搭載"],
         playTitle: "ここで試せます",

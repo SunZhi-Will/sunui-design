@@ -6,6 +6,7 @@ import { permanentRedirect } from "next/navigation";
 import { AgentSteps } from "@/components/agent-steps";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
+import { HeroCloud } from "@/components/home/hero-cloud";
 import { SceneMarquee, type MarqueeItem } from "@/components/home/scene-marquee";
 import { LivePreview } from "@/components/live-preview";
 import { WaitlistForm } from "@/components/waitlist-form";
@@ -82,44 +83,54 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      {/* 開場：置中的標題、一句話、兩顆按鈕、安裝指令。背景是很淡的格線，從上往下淡出 */}
-      <section aria-labelledby="home-title" className="relative isolate pt-16 text-center sm:pt-24">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-[calc(50%-50vw)] h-[640px] bg-[linear-gradient(to_right,var(--line)_1px,transparent_1px),linear-gradient(to_bottom,var(--line)_1px,transparent_1px)] bg-[size:64px_64px] bg-center [mask-image:radial-gradient(ellipse_55%_80%_at_50%_0%,#000_20%,transparent_72%)]"
-        />
-        {chip && (
-          <Link
-            href={chip.href}
-            className="group inline-flex items-center gap-2 rounded-full bg-card py-1 pr-3 pl-2 text-[13px] font-medium text-subtle shadow-e1 transition-colors hover:text-fg"
-          >
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-fg" />
-            {chip.text}
-            <Arrow className="size-3 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        )}
-        <h1 id="home-title" className="mx-auto mt-7 max-w-4xl text-[clamp(40px,5.4vw,72px)] leading-[1.08] font-semibold tracking-[-0.035em] text-balance [word-break:auto-phrase]">
-          {m.home.title}
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-pretty text-subtle">{m.home.hero.sub}</p>
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/blocks" className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-semibold btn-primary">
-            {browseLabel}
-            <Arrow className="size-4" />
-          </Link>
-          <Link href="/pricing" className="inline-flex h-11 items-center rounded-lg px-5 text-[15px] font-medium btn-secondary">
-            {m.home.hero.proCta}
-          </Link>
+      {/* 開場：標題後面是一整團會轉、會變形、可以拖的點雲（免費區塊 point-cloud）。文字那一層不接事件，讓點雲拖得到 */}
+      <section aria-labelledby="home-title" className="relative mx-[calc(50%-50vw)] flex min-h-[max(calc(92svh-3.5rem),640px)] flex-col items-center justify-center overflow-hidden px-4 py-16 text-center sm:px-6">
+        <div className="absolute top-1/2 left-1/2 aspect-square w-[185vw] max-w-none sm:w-[max(150vh,900px)] -translate-x-1/2 -translate-y-1/2">
+          <HeroCloud label={s.cloud} />
         </div>
-        {firstFree && (
-          <div className="mx-auto mt-8 max-w-xl text-left" aria-label={m.home.hero.install}>
-            <Command value={installCommand(firstFree)} />
+        {/* 文字後面的暗區：點雲在標題四周，不壓在字上 */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 h-[430px] w-[min(820px,120vw)] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,var(--bg)_35%,transparent)]" />
+        <div className="pointer-events-none relative [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+          {chip && (
+            <Link
+              href={chip.href}
+              className="group inline-flex items-center gap-2 rounded-full bg-card py-1 pr-3 pl-2 text-[13px] font-medium text-subtle shadow-e1 transition-colors hover:text-fg"
+            >
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-fg" />
+              {chip.text}
+              <Arrow className="size-3 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          )}
+          <h1 id="home-title" className="mx-auto mt-7 max-w-4xl text-[clamp(40px,5.4vw,72px)] leading-[1.08] font-semibold tracking-[-0.035em] text-balance [word-break:auto-phrase]">
+            {m.home.title}
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-pretty text-subtle">{m.home.hero.sub}</p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/blocks" className="inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-semibold btn-primary">
+              {browseLabel}
+              <Arrow className="size-4" />
+            </Link>
+            <Link href="/pricing" className="inline-flex h-11 items-center rounded-lg px-5 text-[15px] font-medium btn-secondary">
+              {m.home.hero.proCta}
+            </Link>
           </div>
-        )}
+          {firstFree && (
+            <div className="pointer-events-auto mx-auto mt-8 max-w-xl text-left" aria-label={m.home.hero.install}>
+              <Command value={installCommand(firstFree)} />
+            </div>
+          )}
+        </div>
+        <Link
+          href="/blocks/point-cloud"
+          className="absolute bottom-5 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-card/80 px-3 py-1 font-mono text-[11px] whitespace-nowrap text-subtle shadow-e1 transition-colors hover:text-fg"
+        >
+          {s.cloudHint}
+          <Arrow className="size-3" />
+        </Link>
       </section>
 
       {/* 區塊跑馬燈：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊 */}
-      <section aria-label={s.marquee} className="mx-[calc(50%-50vw)] mt-16 space-y-6 sm:mt-20">
+      <section aria-label={s.marquee} className="mx-[calc(50%-50vw)] mt-10 space-y-6 sm:mt-14">
         <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
         <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
       </section>

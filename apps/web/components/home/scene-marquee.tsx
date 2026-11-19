@@ -13,7 +13,7 @@ export type MarqueeItem = { name: string; title: string; pro: boolean };
 export function SceneMarquee({ items, reverse, proLabel, className }: { items: MarqueeItem[]; reverse?: boolean; proLabel: string; className?: string }) {
   if (items.length === 0) return null;
   const track = cn(
-    "flex shrink-0 gap-4 pr-4 animate-marquee group-hover/marquee:[animation-play-state:paused] group-focus-within/marquee:[animation-play-state:paused] motion-reduce:animate-none",
+    "flex shrink-0 gap-4 pr-4 animate-[marquee_150s_linear_infinite] group-hover/marquee:[animation-play-state:paused] group-focus-within/marquee:[animation-play-state:paused] motion-reduce:animate-none",
     reverse && "[animation-direction:reverse]",
   );
   const row = (hidden: boolean) => (
