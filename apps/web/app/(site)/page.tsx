@@ -99,7 +99,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           <HeroCloud label={s.cloud} />
         </div>
         {/* 文字後面的暗區：點雲在標題四周，不壓在字上 */}
-        <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 h-[430px] w-[min(820px,120vw)] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,var(--bg)_35%,transparent)]" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 h-[540px] w-[150vw] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,var(--bg)_62%,transparent)] sm:h-[430px] sm:w-[min(820px,120vw)] sm:bg-[radial-gradient(closest-side,var(--bg)_35%,transparent)]" />
         <div className="pointer-events-none relative [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
           {chip && (
             <Link
@@ -188,7 +188,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                 locale={locale}
                 previewLabel={previewLabel(item.title)}
                 className={i === 0 ? "md:col-span-4" : "md:col-span-2"}
-                frame={i < 2 ? "h-[340px] md:h-[440px]" : "h-[340px]"}
+                frame={i < 2 ? "h-[280px] md:h-[440px]" : "h-[280px] md:h-[340px]"}
               />
             ))}
           </ul>

@@ -41,11 +41,11 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
 
   return (
     <ul className="mt-10 grid gap-x-4 gap-y-8 md:grid-cols-6">
-      <Tile lib={libs["background-effects"]} note={note} className="md:col-span-4" frame="h-[320px] md:h-[440px]" night>
+      <Tile lib={libs["background-effects"]} note={note} className="md:col-span-4" frame="h-[250px] md:h-[440px]" night>
         <EffectBackground key={BACKGROUNDS[bg]} effect={BACKGROUNDS[bg]} colors={MONO} className="absolute inset-0" />
         <span className="absolute bottom-4 left-4 rounded-full bg-bg/70 px-2.5 py-1 font-mono text-[11px] text-subtle shadow-e1">{BACKGROUNDS[bg]}</span>
       </Tile>
-      <Tile lib={libs["text-effects"]} note={note} className="md:col-span-2" frame="h-[320px] md:h-[440px]">
+      <Tile lib={libs["text-effects"]} note={note} className="md:col-span-2" frame="h-[250px] md:h-[440px]">
         <div className="grid h-full place-items-center px-6 text-center">
           <div className="space-y-7">
             <TextEffect text={copy.prefix} effect="word-rotate" words={copy.words} className="text-4xl font-semibold tracking-[-0.03em] sm:text-5xl" />
@@ -54,7 +54,7 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
           </div>
         </div>
       </Tile>
-      <Tile lib={libs["chart-effects"]} note={note} className="md:col-span-2" frame="h-[320px]">
+      <Tile lib={libs["chart-effects"]} note={note} className="md:col-span-2" frame="h-[230px] md:h-[320px]">
         <div className="grid h-full place-items-center p-7">
           <ChartEffect
             variant="bar-grow"
@@ -66,7 +66,7 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
           />
         </div>
       </Tile>
-      <Tile lib={libs["button-effects"]} note={note} className="md:col-span-2" frame="h-[320px]">
+      <Tile lib={libs["button-effects"]} note={note} className="md:col-span-2" frame="h-[230px] md:h-[320px]">
         <div className="grid h-full grid-cols-2 place-items-center gap-4 p-7">
           <EffectButton effect="shine-sweep">{copy.buttons[0]}</EffectButton>
           <EffectButton effect="rotating-border">{copy.buttons[1]}</EffectButton>
@@ -74,7 +74,7 @@ export function MotionBento({ libs, note, copy }: { libs: Record<string, MotionL
           <EffectButton effect="direction-fill">{copy.buttons[3]}</EffectButton>
         </div>
       </Tile>
-      <Tile lib={libs["svg-effects"]} note={note} className="md:col-span-2" frame="h-[320px]">
+      <Tile lib={libs["svg-effects"]} note={note} className="md:col-span-2" frame="h-[230px] md:h-[320px]">
         <div className="grid h-full place-items-center p-6">
           {mounted && <OrbitingCircles colors={MONO} className="aspect-square h-full max-h-[260px]" />}
         </div>
