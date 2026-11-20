@@ -148,7 +148,7 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
               )}
               {k.expiresAt && (
                 <span className="ml-1.5 text-xs text-subtle tabular-nums">
-                  {k.plan === "monthly" ? "月訂" : "年訂"} 至 {k.expiresAt.slice(0, 10)}
+                  {k.plan === "monthly" ? "月訂" : "年訂"} 至 {new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Taipei" }).format(new Date(k.expiresAt))}
                 </span>
               )}
             </span>,
