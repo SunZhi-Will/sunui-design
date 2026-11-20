@@ -27,7 +27,8 @@ import { chargeRecurring, unbindCard } from "@/lib/shopline";
 import { isSubscription } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+// Vercel Hobby 方案上限 60 秒（超過會讓整個部署失敗）。訂閱量大到一次跑不完時，升級方案再調高，或把扣款拆成多次
+export const maxDuration = 60;
 
 // 訂閱排程：每天跑一次（vercel.json 的 crons）。Vercel Cron 會帶 Authorization: Bearer ${CRON_SECRET}；沒設定 CRON_SECRET 時拒絕執行。
 // 1. 新台幣（SHOPLINE）續扣：SHOPLINE 只提供「用存的卡扣一次」，排程與重試在這裡做。到期前 12 小時內扣款，
