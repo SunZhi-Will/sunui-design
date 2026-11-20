@@ -21,7 +21,7 @@ const copy = {
   en: {
     heading: "Your bag",
     items: (n: number) => `${n} items`,
-    variants: { sand: "Sand, 350 ml", natural: "Natural", steel: "Brushed steel" },
+    variants: { sand: "Sand, 350 ml", natural: "Natural", steel: "Matte sand, 500 ml" },
     limit: (n: number) => `Limit ${n} per order`,
     quantity: (name: string) => `${name} quantity`,
     remove: (name: string) => `Remove ${name}`,
@@ -31,7 +31,7 @@ const copy = {
   "zh-TW": {
     heading: "你的購物袋",
     items: (n: number) => `${n} 件商品`,
-    variants: { sand: "沙色，350 ml", natural: "原色", steel: "霧面不鏽鋼" },
+    variants: { sand: "沙色，350 ml", natural: "原色", steel: "霧面砂色，500 ml" },
     limit: (n: number) => `每筆訂單限購 ${n} 件`,
     quantity: (name: string) => `${name} 數量`,
     remove: (name: string) => `移除 ${name}`,
@@ -41,7 +41,7 @@ const copy = {
   "zh-CN": {
     heading: "你的购物袋",
     items: (n: number) => `${n} 件商品`,
-    variants: { sand: "沙色，350 ml", natural: "本色", steel: "拉丝不锈钢" },
+    variants: { sand: "沙色，350 ml", natural: "本色", steel: "哑光砂色，500 ml" },
     limit: (n: number) => `每单限购 ${n} 件`,
     quantity: (name: string) => `${name} 数量`,
     remove: (name: string) => `移除 ${name}`,
@@ -51,7 +51,7 @@ const copy = {
   ja: {
     heading: "ショッピングバッグ",
     items: (n: number) => `${n} 点`,
-    variants: { sand: "サンド、350 ml", natural: "ナチュラル", steel: "ヘアライン仕上げ" },
+    variants: { sand: "サンド、350 ml", natural: "ナチュラル", steel: "マットサンド、500 ml" },
     limit: (n: number) => `1 回のご注文につき ${n} 点まで`,
     quantity: (name: string) => `${name}の数量`,
     remove: (name: string) => `${name}を削除`,

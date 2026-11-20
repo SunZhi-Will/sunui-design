@@ -8,43 +8,43 @@ import { ProductArt, useProductNames } from "@/registry/_demo/product-art";
 import { AnimatedNumber } from "./animated-number";
 
 const finishes = [
-  { id: "black", extra: 0 },
-  { id: "walnut", extra: 40 },
+  { id: "steel", extra: 0 },
+  { id: "brass", extra: 40 },
 ] as const;
 
 const copy = {
   en: {
-    blurb: "Closed back, 40 h battery, folds flat.",
+    blurb: "Hand-wound, sapphire crystal, 100 m water resistant.",
     finish: "Finish",
-    finishes: { black: "Matte black", walnut: "Walnut cups" },
-    addCase: "Add travel case",
+    finishes: { steel: "Brushed steel case", brass: "Brass case" },
+    addCase: "Add a spare leather strap",
     total: "Total",
     dec: "Decrease quantity",
     inc: "Increase quantity",
   },
   "zh-TW": {
-    blurb: "封閉式耳罩，續航 40 小時，可平折收納。",
+    blurb: "手上鍊機芯，藍寶石鏡面，100 米防水。",
     finish: "外觀",
-    finishes: { black: "霧面黑", walnut: "胡桃木耳罩" },
-    addCase: "加購旅行收納盒",
+    finishes: { steel: "霧面鋼殼", brass: "黃銅錶殼" },
+    addCase: "加購一條備用皮錶帶",
     total: "總計",
     dec: "減少數量",
     inc: "增加數量",
   },
   "zh-CN": {
-    blurb: "封闭式耳罩，续航 40 小时，可平折收纳。",
+    blurb: "手动上链机芯，蓝宝石镜面，100 米防水。",
     finish: "外观",
-    finishes: { black: "磨砂黑", walnut: "胡桃木耳罩" },
-    addCase: "加购旅行收纳盒",
+    finishes: { steel: "磨砂钢壳", brass: "黄铜表壳" },
+    addCase: "加购一条备用皮表带",
     total: "合计",
     dec: "减少数量",
     inc: "增加数量",
   },
   ja: {
-    blurb: "密閉型、バッテリー 40 時間、フラットに折りたためます。",
+    blurb: "手巻き、サファイアクリスタル、100 m 防水。",
     finish: "仕上げ",
-    finishes: { black: "マットブラック", walnut: "ウォルナットのイヤーカップ" },
-    addCase: "トラベルケースを追加",
+    finishes: { steel: "ブラッシュドスチール", brass: "真鍮ケース" },
+    addCase: "替えの革ベルトを追加",
     total: "合計",
     dec: "数量を減らす",
     inc: "数量を増やす",
@@ -62,11 +62,11 @@ export default function AnimatedNumberDemo() {
 
   return (
     <div className="grid w-full max-w-2xl gap-6 rounded-xl border border-border bg-card p-4 text-card-foreground sm:grid-cols-[14rem_1fr] sm:p-5">
-      <ProductArt kind="headphones" className="aspect-[3/2] rounded-md sm:aspect-square" />
+      <ProductArt kind="watch" className="aspect-[3/2] rounded-md sm:aspect-square" />
 
       <div className="flex min-w-0 flex-col gap-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">{productNames.headphones}</h2>
+          <h2 className="text-lg font-semibold tracking-tight">{productNames.watch}</h2>
           <p className="text-sm text-muted-foreground">{t.blurb}</p>
         </div>
 

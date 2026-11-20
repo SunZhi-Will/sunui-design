@@ -7,7 +7,7 @@ import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/
 
 import { ExpandingSearch, type ExpandingSearchSuggestion } from "./expanding-search";
 
-type Category = "shoes" | "outerwear" | "bags" | "kitchen" | "home" | "audio";
+type Category = "shoes" | "outerwear" | "bags" | "kitchen" | "home";
 
 const catalog: { kind: ProductKind; category: Category; price: string }[] = [
   { kind: "sneaker", category: "shoes", price: "$88" },
@@ -15,30 +15,30 @@ const catalog: { kind: ProductKind; category: Category; price: string }[] = [
   { kind: "tote", category: "bags", price: "$36" },
   { kind: "mug", category: "kitchen", price: "$24" },
   { kind: "lamp", category: "home", price: "$96" },
-  { kind: "headphones", category: "audio", price: "$210" },
+  { kind: "headphones", category: "bags", price: "$148" },
 ];
 
 const copy = {
   en: {
-    categories: { shoes: "Shoes", outerwear: "Outerwear", bags: "Bags", kitchen: "Kitchen", home: "Home", audio: "Audio" },
+    categories: { shoes: "Shoes", outerwear: "Outerwear", bags: "Bags", kitchen: "Kitchen", home: "Home" },
     placeholder: "Search products",
     results: (q: string) => `Results for "${q}"`,
     hint: "Tap the magnifier to search.",
   },
   "zh-TW": {
-    categories: { shoes: "鞋款", outerwear: "外套", bags: "包款", kitchen: "廚房", home: "居家", audio: "音響" },
+    categories: { shoes: "鞋款", outerwear: "外套", bags: "包款", kitchen: "廚房", home: "居家" },
     placeholder: "搜尋商品",
     results: (q: string) => `「${q}」的搜尋結果`,
     hint: "點放大鏡開始搜尋。",
   },
   "zh-CN": {
-    categories: { shoes: "鞋履", outerwear: "外套", bags: "包袋", kitchen: "厨房", home: "家居", audio: "音频" },
+    categories: { shoes: "鞋履", outerwear: "外套", bags: "包袋", kitchen: "厨房", home: "家居" },
     placeholder: "搜索商品",
     results: (q: string) => `“${q}”的搜索结果`,
     hint: "点放大镜开始搜索。",
   },
   ja: {
-    categories: { shoes: "シューズ", outerwear: "アウター", bags: "バッグ", kitchen: "キッチン", home: "ホーム", audio: "オーディオ" },
+    categories: { shoes: "シューズ", outerwear: "アウター", bags: "バッグ", kitchen: "キッチン", home: "ホーム" },
     placeholder: "商品を検索",
     results: (q: string) => `「${q}」の検索結果`,
     hint: "虫めがねをタップして検索。",

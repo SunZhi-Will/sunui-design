@@ -20,7 +20,7 @@ type Line = { id: string; kind: ProductKind };
 const copy = {
   en: {
     heading: "New this week",
-    variants: { sneaker: "Chalk, size 42", mug: "Oat glaze, 350 ml", jacket: "Navy canvas, M", tote: "Natural, one size", bottle: "Brushed steel" } as Partial<Record<ProductKind, string>>,
+    variants: { sneaker: "Black leather, size 42", mug: "Oat glaze, 350 ml", jacket: "Olive wax, M", tote: "Natural, one size", bottle: "Sand, 500 ml" } as Partial<Record<ProductKind, string>>,
     added: "Added to cart",
     removed: "Removed from cart",
     undo: "Undo",
@@ -36,7 +36,7 @@ const copy = {
   },
   "zh-TW": {
     heading: "本週新品",
-    variants: { sneaker: "粉筆白，42 號", mug: "燕麥釉，350 ml", jacket: "海軍藍帆布，M", tote: "原色，單一尺寸", bottle: "髮絲紋不鏽鋼" },
+    variants: { sneaker: "黑色皮革，42 號", mug: "燕麥釉，350 ml", jacket: "橄欖綠蠟布，M", tote: "原色，單一尺寸", bottle: "砂色，500 ml" },
     added: "已加入購物車",
     removed: "已從購物車移除",
     undo: "復原",
@@ -52,7 +52,7 @@ const copy = {
   },
   "zh-CN": {
     heading: "本周新品",
-    variants: { sneaker: "粉笔白，42 码", mug: "燕麦釉，350 ml", jacket: "海军蓝帆布，M", tote: "原色，均码", bottle: "拉丝不锈钢" },
+    variants: { sneaker: "黑色皮革，42 码", mug: "燕麦釉，350 ml", jacket: "橄榄绿蜡布，M", tote: "原色，均码", bottle: "砂色，500 ml" },
     added: "已加入购物车",
     removed: "已从购物车移除",
     undo: "撤销",
@@ -68,7 +68,7 @@ const copy = {
   },
   ja: {
     heading: "今週の新着",
-    variants: { sneaker: "チョーク、42", mug: "オート釉、350 ml", jacket: "ネイビーキャンバス、M", tote: "ナチュラル、フリー", bottle: "ヘアライン仕上げのスチール" },
+    variants: { sneaker: "ブラックレザー、42", mug: "オート釉、350 ml", jacket: "オリーブのオイルド、M", tote: "ナチュラル、フリー", bottle: "サンド、500 ml" },
     added: "カートに追加しました",
     removed: "カートから削除しました",
     undo: "元に戻す",

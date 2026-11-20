@@ -20,10 +20,10 @@ const orders: { kind: ProductKind; no: string; month: number; day: number; retur
 ];
 
 export const copy = {
-  en: { tracking: "Tracking SU-24817", trackingLabel: "Loading tracking updates", events: ["Delivered to front desk", "Out for delivery", "Arrived at local hub"], picks: "Picked for you", orders: "Recent orders", add: "Add", delivered: "Delivered", returned: "Returned", details: { bottle: "Brushed steel", lamp: "Powder-coated, warm white", watch: "Canvas strap" } as Record<string, string> },
-  "zh-TW": { tracking: "物流追蹤 SU-24817", trackingLabel: "正在載入物流進度", events: ["已送達管理室", "配送中", "已抵達轉運站"], picks: "為你精選", orders: "近期訂單", add: "加入", delivered: "已送達", returned: "已退貨", details: { bottle: "髮絲紋不鏽鋼", lamp: "粉體烤漆，暖白光", watch: "帆布錶帶" } },
-  "zh-CN": { tracking: "物流跟踪 SU-24817", trackingLabel: "正在加载物流进度", events: ["已送达前台", "派送中", "已到达转运中心"], picks: "为你精选", orders: "最近订单", add: "加购", delivered: "已送达", returned: "已退货", details: { bottle: "拉丝不锈钢", lamp: "粉末喷涂，暖白光", watch: "帆布表带" } },
-  ja: { tracking: "配送状況 SU-24817", trackingLabel: "配送状況を読み込み中", events: ["受付に配達しました", "配達中", "最寄りの拠点に到着"], picks: "あなたへのおすすめ", orders: "最近の注文", add: "追加", delivered: "配達済み", returned: "返品済み", details: { bottle: "ヘアライン仕上げのスチール", lamp: "粉体塗装、電球色", watch: "キャンバスストラップ" } },
+  en: { tracking: "Tracking SU-24817", trackingLabel: "Loading tracking updates", events: ["Delivered to front desk", "Out for delivery", "Arrived at local hub"], picks: "Picked for you", orders: "Recent orders", add: "Add", delivered: "Delivered", returned: "Returned", details: { bottle: "Sand, 500 ml", lamp: "Slate grey, warm white", watch: "Leather strap" } as Record<string, string> },
+  "zh-TW": { tracking: "物流追蹤 SU-24817", trackingLabel: "正在載入物流進度", events: ["已送達管理室", "配送中", "已抵達轉運站"], picks: "為你精選", orders: "近期訂單", add: "加入", delivered: "已送達", returned: "已退貨", details: { bottle: "砂色，500 ml", lamp: "石板灰，暖白光", watch: "皮革錶帶" } },
+  "zh-CN": { tracking: "物流跟踪 SU-24817", trackingLabel: "正在加载物流进度", events: ["已送达前台", "派送中", "已到达转运中心"], picks: "为你精选", orders: "最近订单", add: "加购", delivered: "已送达", returned: "已退货", details: { bottle: "砂色，500 ml", lamp: "石板灰，暖白光", watch: "皮革表带" } },
+  ja: { tracking: "配送状況 SU-24817", trackingLabel: "配送状況を読み込み中", events: ["受付に配達しました", "配達中", "最寄りの拠点に到着"], picks: "あなたへのおすすめ", orders: "最近の注文", add: "追加", delivered: "配達済み", returned: "返品済み", details: { bottle: "サンド、500 ml", lamp: "スレートグレー、電球色", watch: "レザーストラップ" } },
 };
 
 /** 每區塊的資料到達時間不同，像真實頁面陸續載入；工具列的 Replay 會重來一次 */

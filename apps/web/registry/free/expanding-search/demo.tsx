@@ -7,7 +7,7 @@ import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/
 
 import { ExpandingSearch, type ExpandingSearchSuggestion } from "./expanding-search";
 
-type Category = "shoes" | "outerwear" | "bags" | "kitchen" | "home" | "audio" | "accessories";
+type Category = "shoes" | "outerwear" | "bags" | "kitchen" | "home" | "accessories";
 
 const catalog: { kind: ProductKind; category: Category; price: string }[] = [
   { kind: "sneaker", category: "shoes", price: "$88" },
@@ -16,13 +16,13 @@ const catalog: { kind: ProductKind; category: Category; price: string }[] = [
   { kind: "mug", category: "kitchen", price: "$24" },
   { kind: "bottle", category: "kitchen", price: "$32" },
   { kind: "lamp", category: "home", price: "$96" },
-  { kind: "headphones", category: "audio", price: "$210" },
+  { kind: "headphones", category: "bags", price: "$148" },
   { kind: "watch", category: "accessories", price: "$185" },
 ];
 
 const copy = {
   en: {
-    categories: { shoes: "Shoes", outerwear: "Outerwear", bags: "Bags", kitchen: "Kitchen", home: "Home", audio: "Audio", accessories: "Accessories" },
+    categories: { shoes: "Shoes", outerwear: "Outerwear", bags: "Bags", kitchen: "Kitchen", home: "Home", accessories: "Accessories" },
     nav: ["New", "Shop", "Sale"],
     main: "Main",
     placeholder: "Search products",
@@ -32,7 +32,7 @@ const copy = {
     empty: "No products match. Try a shorter word.",
   },
   "zh-TW": {
-    categories: { shoes: "鞋款", outerwear: "外套", bags: "包款", kitchen: "廚房", home: "居家", audio: "音響", accessories: "配件" },
+    categories: { shoes: "鞋款", outerwear: "外套", bags: "包款", kitchen: "廚房", home: "居家", accessories: "配件" },
     nav: ["新品", "商店", "特價"],
     main: "主選單",
     placeholder: "搜尋商品",
@@ -42,7 +42,7 @@ const copy = {
     empty: "沒有符合的商品，試試更短的關鍵字。",
   },
   "zh-CN": {
-    categories: { shoes: "鞋履", outerwear: "外套", bags: "包袋", kitchen: "厨房", home: "家居", audio: "音频", accessories: "配饰" },
+    categories: { shoes: "鞋履", outerwear: "外套", bags: "包袋", kitchen: "厨房", home: "家居", accessories: "配饰" },
     nav: ["新品", "商店", "特价"],
     main: "主导航",
     placeholder: "搜索商品",
@@ -52,7 +52,7 @@ const copy = {
     empty: "没有匹配的商品，试试更短的关键词。",
   },
   ja: {
-    categories: { shoes: "シューズ", outerwear: "アウター", bags: "バッグ", kitchen: "キッチン", home: "ホーム", audio: "オーディオ", accessories: "アクセサリー" },
+    categories: { shoes: "シューズ", outerwear: "アウター", bags: "バッグ", kitchen: "キッチン", home: "ホーム", accessories: "アクセサリー" },
     nav: ["新着", "ショップ", "セール"],
     main: "メイン",
     placeholder: "商品を検索",
