@@ -136,12 +136,15 @@ async function validateKey(key: string): Promise<LicenseResult> {
     if (license.status !== "active") {
       return { ok: false, status: 403, message: "This license key has been disabled or revoked." };
     }
-    // 訂閱到期：已經裝進專案的 block 照常可用，只是不能再裝新的或拿更新
+    // 訂閱到期：已經裝進專案的 block 照常可用，只是不能再裝新的或拿更新。
+    // 自動續扣中的授權有 7 天寬限期（licenseExpired 已算進去），走到這裡代表寬限期也過了還沒扣到
     if (licenseExpired(license)) {
       return {
         ok: false,
         status: 403,
-        message: `This SunUI Pro subscription ended on ${license.expiresAt!.slice(0, 10)}. Blocks you already installed keep working. Renew with the same email at ${siteUrl()}/pricing (the key stays the same), or buy lifetime Pro for $${prices.pro}.`,
+        message: license.autoRenew
+          ? `This SunUI Pro subscription could not be renewed: the last payment failed. Blocks you already installed keep working. Update your card at ${siteUrl()}/account (the key stays the same).`
+          : `This SunUI Pro subscription ended on ${license.expiresAt!.slice(0, 10)}. Blocks you already installed keep working. Subscribe again with the same email at ${siteUrl()}/pricing (the key stays the same; it renews automatically and you can cancel anytime), or buy lifetime Pro for $${prices.pro}.`,
       };
     }
     return { ok: true, licenseId: license.id, displayKey: license.display };

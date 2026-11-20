@@ -8,8 +8,10 @@ type Copy = {
   back: string;
   planName: Record<Plan, string>;
   planNote: Record<Plan, string>;
-  /** 訂閱方案結帳頁：已經訂閱的人用同一個 email 會延長同一把授權碼 */
+  /** 訂閱方案結帳頁：之前訂過（已取消或預付制）的人用同一個 email，授權碼不變 */
   renewHint: string;
+  /** 訂閱方案結帳頁的自動續扣揭露：今天付多少、之後每期哪天扣、怎麼取消 */
+  autoRenewNote: (price: string, period: "month" | "year", firstRenewal: string) => string;
   /** 定價頁的訂閱區塊 */
   subscribe: {
     title: string;
@@ -54,7 +56,50 @@ type Copy = {
   terms: string;
   secure: string;
   secureUsd: string;
-  errors: { email: string; closed: string; soldOut: string; upstream: string; rate: string };
+  errors: { email: string; closed: string; soldOut: string; upstream: string; rate: string; alreadySubscribed: string; card: string };
+  /** 新台幣訂閱的內嵌式刷卡頁（SHOPLINE SDK，綁卡並付款） */
+  card: {
+    metaTitle: string;
+    title: string;
+    loading: string;
+    loadError: string;
+    pay: (price: string) => string;
+    paying: string;
+    secure: string;
+  };
+  /** /account：用 email 連結管理訂閱 */
+  account: {
+    metaTitle: string;
+    title: string;
+    lead: string;
+    emailLabel: string;
+    send: string;
+    sending: string;
+    sent: string;
+    invalidLink: string;
+    noSubscription: string;
+    plan: string;
+    key: string;
+    status: string;
+    renews: (date: string, price: string) => string;
+    ends: (date: string) => string;
+    pastDue: (date: string) => string;
+    ended: (date: string) => string;
+    prepaid: (date: string) => string;
+    cancel: string;
+    cancelNote: (date: string) => string;
+    canceled: string;
+    resume: string;
+    resumed: string;
+    updateCard: string;
+    updateCardLead: string;
+    saveCard: string;
+    cardSaved: string;
+    portal: string;
+    portalLead: string;
+    failed: string;
+    resubscribe: string;
+  };
   done: {
     title: string;
     renewedTitle: string;
@@ -92,19 +137,21 @@ const en: Copy = {
     founding: "Lifetime Pro at the founding price. Limited seats.",
     pro: "One-time payment. All Pro blocks and future updates.",
     team: "One-time payment, 5 license keys (one per developer). All Pro blocks and future updates.",
-    monthly: "One month of Pro for 1 developer.",
-    yearly: "One year of Pro for 1 developer.",
+    monthly: "Pro for 1 developer, billed every month until you cancel.",
+    yearly: "Pro for 1 developer, billed every year until you cancel.",
   },
-  renewHint: "Already subscribed? Use the same email and your current key is extended. Nothing to change in your project.",
+  renewHint: "Subscribed before? Use the same email and you keep the same key. Nothing to change in your project.",
+  autoRenewNote: (price, period, date) =>
+    `Renews automatically: ${price} today, then ${price} every ${period} starting ${date}, until you cancel. We email you 7 days before each charge. Cancel anytime from your account page; Pro stays active until the end of the period you paid for. No partial refunds.`,
   subscribe: {
     title: "Or subscribe",
-    lead: "Try Pro for a month or a year. Nothing renews by itself: we email you a week before it ends, and the blocks you installed stay yours.",
+    lead: "Pro by the month or the year. It renews automatically, we email you a week before each charge, and you can cancel anytime. The blocks you installed stay yours.",
     perMonth: "/ month",
     perYear: "/ year",
-    monthlyNote: "1 developer, billed once",
-    yearlyNote: "1 developer, billed once",
+    monthlyNote: "1 developer, billed monthly",
+    yearlyNote: "1 developer, billed yearly",
     yearlySave: (pct) => `Save ${pct}% over monthly`,
-    features: ["Every Pro block while active", "Installed blocks keep working after it ends", "Renew with the same email, same key"],
+    features: ["Every Pro block while active", "Renews automatically, cancel anytime", "Installed blocks keep working after you cancel"],
     cta: "Subscribe",
     orMonthly: (price) => `Or subscribe from ${price} / month`,
   },
@@ -144,6 +191,49 @@ const en: Copy = {
     soldOut: "Founding seats are sold out.",
     upstream: "The payment page could not be opened. Please try again in a moment.",
     rate: "Too many attempts. Please try again later.",
+    alreadySubscribed: "This email already has a subscription that renews automatically. Manage it from your account page instead of buying a second one.",
+    card: "The card payment did not go through. Check the card details and try again, or use another card.",
+  },
+  card: {
+    metaTitle: "Card payment",
+    title: "Pay by card",
+    loading: "Loading the secure card form…",
+    loadError: "The card form could not load. Refresh the page or try again later.",
+    pay: (price) => `Pay ${price} and subscribe`,
+    paying: "Processing…",
+    secure: "Card details go straight to SHOPLINE Payments and are saved there for renewals. SunUI never sees your card number.",
+  },
+  account: {
+    metaTitle: "Manage subscription",
+    title: "Manage your subscription",
+    lead: "Enter the email you subscribed with. We will send you a link to see your plan, cancel it, or change your card.",
+    emailLabel: "Email",
+    send: "Email me a link",
+    sending: "Sending…",
+    sent: "If that email has a SunUI subscription, a link is on its way. It works for 24 hours.",
+    invalidLink: "This link has expired or is not valid. Ask for a new one below.",
+    noSubscription: "There is no subscription on this license.",
+    plan: "Plan",
+    key: "License key",
+    status: "Status",
+    renews: (date, price) => `Renews automatically on ${date} for ${price}.`,
+    ends: (date) => `Canceled. Active until ${date}, nothing more will be charged.`,
+    pastDue: (date) => `The last payment failed. Pro keeps working until ${date} while we retry. Update your card to keep it.`,
+    ended: (date) => `Ended on ${date}.`,
+    prepaid: (date) => `Paid in advance until ${date}. It does not renew by itself.`,
+    cancel: "Cancel renewal",
+    cancelNote: (date) => `Pro stays active until ${date}. You will not be charged again, and installed blocks keep working.`,
+    canceled: "Renewal canceled.",
+    resume: "Turn renewal back on",
+    resumed: "Renewal is back on.",
+    updateCard: "Change card",
+    updateCardLead: "Your new card is checked with a NT$1 authorization that is released right away. Future renewals use the new card.",
+    saveCard: "Save card",
+    cardSaved: "Card saved. It may take a minute to show here.",
+    portal: "Open billing portal",
+    portalLead: "Change your card or download receipts on Polar, our reseller. Sign in with this email.",
+    failed: "That did not work. Please try again, or reply to any SunUI email for help.",
+    resubscribe: "Subscribe again",
   },
   done: {
     title: "You are in",
@@ -153,7 +243,7 @@ const en: Copy = {
     seatLabel: (n) => `Seat ${n}`,
     seatPlaceholder: "<your seat key>",
     renewedBody: (date) => `Your license now runs until ${date}. The key stays the same, so there is nothing to change in your project.`,
-    subscriptionUntil: (date) => `Active until ${date}. It does not renew by itself; we email you a week before it ends.`,
+    subscriptionUntil: (date) => `Next renewal on ${date}. We email you a week before; cancel anytime from your account page.`,
     pendingTitle: "Confirming your payment",
     pendingBody: "This usually takes a few seconds. Keep this page open.",
     pendingSlow: "Still waiting for the payment confirmation. If you were charged, your key will appear here and in your email shortly.",
@@ -182,19 +272,21 @@ const zhTW: Copy = {
     founding: "以創始價取得終身 Pro，名額有限。",
     pro: "一次付清，含全部 Pro 區塊與之後的更新。",
     team: "一次付清，5 把授權碼，每位開發者一把，含全部 Pro 區塊與之後的更新。",
-    monthly: "一個月的 Pro，1 位開發者。",
-    yearly: "一年的 Pro，1 位開發者。",
+    monthly: "Pro，1 位開發者，每月自動扣款直到取消。",
+    yearly: "Pro，1 位開發者，每年自動扣款直到取消。",
   },
-  renewHint: "已經訂閱了嗎？用同一個 email 購買，會直接延長你現在的授權碼，專案裡不用改任何設定。",
+  renewHint: "以前訂閱過嗎？用同一個 email 購買，授權碼不變，專案裡不用改任何設定。",
+  autoRenewNote: (price, period, date) =>
+    `自動續扣：今天付 ${price}，從 ${date} 起每${period === "year" ? "年" : "月"}扣 ${price}，直到你取消為止。每次扣款前 7 天會寄信通知。隨時可以在帳戶頁取消，取消後用到已付期間結束，不按比例退款。`,
   subscribe: {
     title: "或是用訂閱",
-    lead: "先用一個月或一年試試看。不會自動扣款：到期前一週寄信提醒，已經裝進專案的區塊都可以繼續用。",
+    lead: "按月或按年訂閱 Pro。到期自動續扣，每次扣款前一週寄信通知，隨時可以取消。已經裝進專案的區塊都可以繼續用。",
     perMonth: "/ 月",
     perYear: "/ 年",
-    monthlyNote: "1 位開發者，單次付款",
-    yearlyNote: "1 位開發者，單次付款",
+    monthlyNote: "1 位開發者，每月自動扣款",
+    yearlyNote: "1 位開發者，每年自動扣款",
     yearlySave: (pct) => `比月訂省 ${pct}%`,
-    features: ["訂閱期間可用所有 Pro 區塊", "到期後已安裝的區塊照常可用", "用同一個 email 續訂，授權碼不變"],
+    features: ["訂閱期間可用所有 Pro 區塊", "自動續扣，隨時可以取消", "取消後已安裝的區塊照常可用"],
     cta: "訂閱",
     orMonthly: (price) => `或訂閱：${price} / 月起`,
   },
@@ -234,6 +326,49 @@ const zhTW: Copy = {
     soldOut: "創始會員名額已售完。",
     upstream: "付款頁開不起來，請稍後再試。",
     rate: "嘗試次數太多，請稍後再試。",
+    alreadySubscribed: "這個 email 已經有自動續扣中的訂閱，不用再買一份，到帳戶頁管理即可。",
+    card: "刷卡沒有成功。請確認卡片資料後再試一次，或換一張卡。",
+  },
+  card: {
+    metaTitle: "信用卡付款",
+    title: "信用卡付款",
+    loading: "正在載入安全刷卡表單…",
+    loadError: "刷卡表單載入失敗，請重新整理頁面或稍後再試。",
+    pay: (price) => `付款 ${price} 並訂閱`,
+    paying: "處理中…",
+    secure: "卡片資料直接送到 SHOPLINE Payments，並由它保存供續扣使用。SunUI 不會看到你的卡號。",
+  },
+  account: {
+    metaTitle: "管理訂閱",
+    title: "管理你的訂閱",
+    lead: "輸入訂閱時用的 email，我們會寄一個連結給你，可以查看方案、取消續扣或更換信用卡。",
+    emailLabel: "Email",
+    send: "寄連結給我",
+    sending: "寄送中…",
+    sent: "如果這個 email 有 SunUI 訂閱，連結已經寄出，24 小時內有效。",
+    invalidLink: "這個連結已過期或無效，請在下面重新索取。",
+    noSubscription: "這把授權沒有訂閱。",
+    plan: "方案",
+    key: "授權碼",
+    status: "狀態",
+    renews: (date, price) => `將於 ${date} 自動扣款 ${price}。`,
+    ends: (date) => `已取消。可以用到 ${date}，之後不會再扣款。`,
+    pastDue: (date) => `上一次扣款失敗。重試期間 Pro 可以用到 ${date}，請更換信用卡以免中斷。`,
+    ended: (date) => `已於 ${date} 結束。`,
+    prepaid: (date) => `預付到 ${date}，不會自動續扣。`,
+    cancel: "取消自動續扣",
+    cancelNote: (date) => `Pro 可以用到 ${date}，之後不會再扣款，已安裝的區塊照常可用。`,
+    canceled: "已取消自動續扣。",
+    resume: "恢復自動續扣",
+    resumed: "已恢復自動續扣。",
+    updateCard: "更換信用卡",
+    updateCardLead: "新卡會先做一筆 NT$1 的授權驗證，隨即取消，不會真的扣款。之後的續扣都用新卡。",
+    saveCard: "儲存信用卡",
+    cardSaved: "信用卡已儲存，可能要一分鐘才會顯示在這裡。",
+    portal: "開啟帳單入口",
+    portalLead: "在 Polar（我們的代收商）更換信用卡或下載收據，用這個 email 登入。",
+    failed: "操作沒有成功，請再試一次，或回覆任何一封 SunUI 的信尋求協助。",
+    resubscribe: "重新訂閱",
   },
   done: {
     title: "購買完成",
@@ -243,7 +378,7 @@ const zhTW: Copy = {
     seatLabel: (n) => `席位 ${n}`,
     seatPlaceholder: "<你的席位授權碼>",
     renewedBody: (date) => `授權已延長到 ${date}。授權碼不變，專案裡不用改任何設定。`,
-    subscriptionUntil: (date) => `有效期限到 ${date}。不會自動續扣，到期前一週會寄信提醒。`,
+    subscriptionUntil: (date) => `下次扣款日 ${date}，扣款前一週會寄信通知，隨時可以在帳戶頁取消。`,
     pendingTitle: "正在確認付款",
     pendingBody: "通常只要幾秒，請不要關閉這個頁面。",
     pendingSlow: "還在等付款確認。如果已經扣款，授權碼很快會出現在這裡和你的信箱。",
@@ -273,19 +408,21 @@ const zhCN: Copy = {
     founding: "以创始价获得终身 Pro，名额有限。",
     pro: "一次付清，含全部 Pro 区块与之后的更新。",
     team: "一次付清，5 把授权码，每位开发者一把，含全部 Pro 区块与之后的更新。",
-    monthly: "一个月的 Pro，1 位开发者。",
-    yearly: "一年的 Pro，1 位开发者。",
+    monthly: "Pro，1 位开发者，每月自动扣费直到取消。",
+    yearly: "Pro，1 位开发者，每年自动扣费直到取消。",
   },
-  renewHint: "已经订阅了？用同一个 email 购买，会直接延长你现在的授权码，项目里不用改任何设置。",
+  renewHint: "以前订阅过？用同一个 email 购买，授权码不变，项目里不用改任何设置。",
+  autoRenewNote: (price, period, date) =>
+    `自动续费：今天支付 ${price}，从 ${date} 起每${period === "year" ? "年" : "月"}扣 ${price}，直到你取消为止。每次扣费前 7 天会发邮件通知。随时可以在账户页取消，取消后用到已付期间结束，不按比例退款。`,
   subscribe: {
     title: "或者订阅",
-    lead: "先用一个月或一年试试。不会自动扣费：到期前一周发邮件提醒，已经装进项目的区块都可以继续用。",
+    lead: "按月或按年订阅 Pro。到期自动续费，每次扣费前一周发邮件通知，随时可以取消。已经装进项目的区块都可以继续用。",
     perMonth: "/ 月",
     perYear: "/ 年",
-    monthlyNote: "1 位开发者，单次付款",
-    yearlyNote: "1 位开发者，单次付款",
+    monthlyNote: "1 位开发者，每月自动扣费",
+    yearlyNote: "1 位开发者，每年自动扣费",
     yearlySave: (pct) => `比月付省 ${pct}%`,
-    features: ["订阅期间可用所有 Pro 区块", "到期后已安装的区块照常可用", "用同一个 email 续订，授权码不变"],
+    features: ["订阅期间可用所有 Pro 区块", "自动续费，随时可以取消", "取消后已安装的区块照常可用"],
     cta: "订阅",
     orMonthly: (price) => `或订阅：${price} / 月起`,
   },
@@ -324,6 +461,49 @@ const zhCN: Copy = {
     soldOut: "创始会员名额已售完。",
     upstream: "付款页打不开，请稍后再试。",
     rate: "尝试次数太多，请稍后再试。",
+    alreadySubscribed: "这个 email 已经有自动续费中的订阅，不用再买一份，到账户页管理即可。",
+    card: "刷卡没有成功。请确认卡片信息后再试一次，或换一张卡。",
+  },
+  card: {
+    metaTitle: "信用卡支付",
+    title: "信用卡支付",
+    loading: "正在加载安全刷卡表单…",
+    loadError: "刷卡表单加载失败，请刷新页面或稍后再试。",
+    pay: (price) => `支付 ${price} 并订阅`,
+    paying: "处理中…",
+    secure: "卡片信息直接发送到 SHOPLINE Payments，并由它保存用于续费。SunUI 不会看到你的卡号。",
+  },
+  account: {
+    metaTitle: "管理订阅",
+    title: "管理你的订阅",
+    lead: "输入订阅时使用的 email，我们会发一个链接给你，可以查看方案、取消续费或更换信用卡。",
+    emailLabel: "Email",
+    send: "把链接发给我",
+    sending: "发送中…",
+    sent: "如果这个 email 有 SunUI 订阅，链接已经发出，24 小时内有效。",
+    invalidLink: "这个链接已过期或无效，请在下面重新获取。",
+    noSubscription: "这个授权没有订阅。",
+    plan: "方案",
+    key: "授权码",
+    status: "状态",
+    renews: (date, price) => `将于 ${date} 自动扣费 ${price}。`,
+    ends: (date) => `已取消。可以用到 ${date}，之后不会再扣费。`,
+    pastDue: (date) => `上一次扣费失败。重试期间 Pro 可以用到 ${date}，请更换信用卡以免中断。`,
+    ended: (date) => `已于 ${date} 结束。`,
+    prepaid: (date) => `预付到 ${date}，不会自动续费。`,
+    cancel: "取消自动续费",
+    cancelNote: (date) => `Pro 可以用到 ${date}，之后不会再扣费，已安装的区块照常可用。`,
+    canceled: "已取消自动续费。",
+    resume: "恢复自动续费",
+    resumed: "已恢复自动续费。",
+    updateCard: "更换信用卡",
+    updateCardLead: "新卡会先做一笔 NT$1 的授权验证，随即撤销，不会真的扣费。之后的续费都用新卡。",
+    saveCard: "保存信用卡",
+    cardSaved: "信用卡已保存，可能要一分钟才会显示在这里。",
+    portal: "打开账单入口",
+    portalLead: "在 Polar（我们的代收商）更换信用卡或下载收据，用这个 email 登录。",
+    failed: "操作没有成功，请再试一次，或回复任何一封 SunUI 的邮件寻求帮助。",
+    resubscribe: "重新订阅",
   },
   done: {
     title: "购买完成",
@@ -333,7 +513,7 @@ const zhCN: Copy = {
     seatLabel: (n) => `席位 ${n}`,
     seatPlaceholder: "<你的席位授权码>",
     renewedBody: (date) => `授权已延长到 ${date}。授权码不变，项目里不用改任何设置。`,
-    subscriptionUntil: (date) => `有效期至 ${date}。不会自动续费，到期前一周会发邮件提醒。`,
+    subscriptionUntil: (date) => `下次扣费日 ${date}，扣费前一周会发邮件通知，随时可以在账户页取消。`,
     pendingTitle: "正在确认付款",
     pendingBody: "通常只要几秒，请不要关闭这个页面。",
     pendingSlow: "还在等付款确认。如果已经扣款，授权码很快会出现在这里和你的邮箱。",
@@ -362,19 +542,21 @@ const ja: Copy = {
     founding: "創設価格で生涯 Pro。席数限定。",
     pro: "買い切り。すべての Pro ブロックと今後のアップデート。",
     team: "買い切り、ライセンスキー 5 本（開発者 1 名につき 1 本）。すべての Pro ブロックと今後のアップデート。",
-    monthly: "開発者 1 名、1 か月分の Pro。",
-    yearly: "開発者 1 名、1 年分の Pro。",
+    monthly: "開発者 1 名の Pro。停止するまで毎月請求します。",
+    yearly: "開発者 1 名の Pro。停止するまで毎年請求します。",
   },
-  renewHint: "すでにご利用中ですか？同じメールアドレスで購入すると、今のキーの期限が延長されます。プロジェクト側の変更は不要です。",
+  renewHint: "以前登録していましたか？同じメールアドレスで購入すればキーはそのままです。プロジェクト側の変更は不要です。",
+  autoRenewNote: (price, period, date) =>
+    `自動更新：本日 ${price}、${date} から${period === "year" ? "毎年" : "毎月"} ${price} を、停止するまで請求します。各請求の 7 日前にメールでお知らせします。アカウントページからいつでも停止でき、停止後も支払い済みの期間の終わりまで使えます。日割りの返金はありません。`,
   subscribe: {
     title: "期間プランもあります",
-    lead: "まずは 1 か月か 1 年で試せます。自動更新はなく、終了の 1 週間前にメールでお知らせします。インストール済みのブロックはそのまま使えます。",
+    lead: "Pro を月額または年額で。自動更新で、各請求の 1 週間前にメールでお知らせし、いつでも停止できます。インストール済みのブロックはそのまま使えます。",
     perMonth: "/ 月",
     perYear: "/ 年",
-    monthlyNote: "開発者 1 名、1 回払い",
-    yearlyNote: "開発者 1 名、1 回払い",
+    monthlyNote: "開発者 1 名、毎月自動更新",
+    yearlyNote: "開発者 1 名、毎年自動更新",
     yearlySave: (pct) => `月額より ${pct}% お得`,
-    features: ["期間中はすべての Pro ブロック", "終了後もインストール済みのブロックは使える", "同じメールで更新、キーはそのまま"],
+    features: ["期間中はすべての Pro ブロック", "自動更新、いつでも停止できる", "停止後もインストール済みのブロックは使える"],
     cta: "申し込む",
     orMonthly: (price) => `月額 ${price} からのプランもあります`,
   },
@@ -414,6 +596,49 @@ const ja: Copy = {
     soldOut: "ファウンディングメンバーの席は完売しました。",
     upstream: "支払いページを開けませんでした。しばらくしてからもう一度お試しください。",
     rate: "試行回数が多すぎます。しばらくしてからお試しください。",
+    alreadySubscribed: "このメールアドレスにはすでに自動更新中のサブスクリプションがあります。2 つ目を購入せず、アカウントページから管理してください。",
+    card: "カード決済が完了しませんでした。カード情報を確認してもう一度お試しいただくか、別のカードをご利用ください。",
+  },
+  card: {
+    metaTitle: "カード決済",
+    title: "カードで支払う",
+    loading: "安全なカード入力フォームを読み込んでいます…",
+    loadError: "カード入力フォームを読み込めませんでした。ページを再読み込みするか、しばらくしてからお試しください。",
+    pay: (price) => `${price} を支払って登録`,
+    paying: "処理中…",
+    secure: "カード情報は SHOPLINE Payments に直接送られ、更新時の決済用に保管されます。SunUI がカード番号を見ることはありません。",
+  },
+  account: {
+    metaTitle: "サブスクリプションの管理",
+    title: "サブスクリプションの管理",
+    lead: "登録したメールアドレスを入力してください。プランの確認、自動更新の停止、カードの変更ができるリンクをお送りします。",
+    emailLabel: "メールアドレス",
+    send: "リンクを送る",
+    sending: "送信中…",
+    sent: "このメールアドレスに SunUI のサブスクリプションがあれば、リンクを送信しました。有効期限は 24 時間です。",
+    invalidLink: "このリンクは期限切れか無効です。下から新しいリンクをリクエストしてください。",
+    noSubscription: "このライセンスにはサブスクリプションがありません。",
+    plan: "プラン",
+    key: "ライセンスキー",
+    status: "状態",
+    renews: (date, price) => `${date} に ${price} で自動更新されます。`,
+    ends: (date) => `停止済みです。${date} まで使え、以降の請求はありません。`,
+    pastDue: (date) => `前回の決済に失敗しました。再試行の間、Pro は ${date} まで使えます。中断を避けるためカードを変更してください。`,
+    ended: (date) => `${date} に終了しました。`,
+    prepaid: (date) => `${date} まで前払い済みです。自動更新はありません。`,
+    cancel: "自動更新を停止",
+    cancelNote: (date) => `Pro は ${date} まで使えます。以降の請求はなく、インストール済みのブロックはそのまま使えます。`,
+    canceled: "自動更新を停止しました。",
+    resume: "自動更新を再開",
+    resumed: "自動更新を再開しました。",
+    updateCard: "カードを変更",
+    updateCardLead: "新しいカードは NT$1 のオーソリで確認し、すぐに取り消します。以降の更新は新しいカードで決済されます。",
+    saveCard: "カードを保存",
+    cardSaved: "カードを保存しました。ここに表示されるまで 1 分ほどかかることがあります。",
+    portal: "請求ポータルを開く",
+    portalLead: "販売代理の Polar でカードの変更や領収書のダウンロードができます。このメールアドレスでログインしてください。",
+    failed: "うまくいきませんでした。もう一度お試しいただくか、SunUI からのメールに返信してお問い合わせください。",
+    resubscribe: "もう一度登録",
   },
   done: {
     title: "購入が完了しました",
@@ -423,7 +648,7 @@ const ja: Copy = {
     seatLabel: (n) => `シート ${n}`,
     seatPlaceholder: "<あなたのシートのキー>",
     renewedBody: (date) => `ライセンスは ${date} まで延長されました。キーは変わらないので、プロジェクト側の変更は不要です。`,
-    subscriptionUntil: (date) => `${date} まで有効です。自動更新はなく、終了の 1 週間前にメールでお知らせします。`,
+    subscriptionUntil: (date) => `次回の更新日は ${date} です。1 週間前にメールでお知らせし、アカウントページからいつでも停止できます。`,
     pendingTitle: "お支払いを確認しています",
     pendingBody: "通常は数秒で終わります。このページを開いたままにしてください。",
     pendingSlow: "お支払いの確認を待っています。請求済みの場合、まもなくこことメールにキーが表示されます。",

@@ -72,6 +72,17 @@ export type ParsedPolarEvent = {
   netAmount: number | null;
   refundedAmount: number | null;
   currency: string;
+  /** order：purchase / subscription_create / subscription_cycle / subscription_update */
+  billingReason: string;
+  /** order.* 的 subscription_id，或 subscription.* 事件本身的 id */
+  subscriptionId: string;
+  customerId: string;
+  /** 這一期的結束時間（order 帶的 subscription 物件，或 subscription.* 事件本身） */
+  periodEnd: string;
+  /** subscription.*：active / past_due / canceled / unpaid / incomplete 等 */
+  subscriptionStatus: string;
+  cancelAtPeriodEnd: boolean;
+  productId: string;
 };
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
@@ -79,15 +90,25 @@ const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : n
 
 export function parsePolarEvent(event: Loose): ParsedPolarEvent {
   const data: Loose = event?.data ?? {};
+  const type = str(event?.type);
+  const isSubscription = type.startsWith("subscription.");
+  const subscription: Loose = isSubscription ? data : data?.subscription ?? {};
   return {
-    type: str(event?.type),
+    type,
     orderId: str(data?.metadata?.sunui_order),
     checkoutId: str(data?.checkout_id),
-    polarOrderId: str(data?.id),
+    polarOrderId: isSubscription ? "" : str(data?.id),
     paid: data?.paid === true,
     netAmount: num(data?.net_amount),
     refundedAmount: num(data?.refunded_amount),
     currency: str(data?.currency).toLowerCase(),
+    billingReason: str(data?.billing_reason),
+    subscriptionId: isSubscription ? str(data?.id) : str(data?.subscription_id) || str(subscription?.id),
+    customerId: str(data?.customer_id) || str(data?.customer?.id),
+    periodEnd: str(subscription?.current_period_end),
+    subscriptionStatus: isSubscription ? str(data?.status) : "",
+    cancelAtPeriodEnd: subscription?.cancel_at_period_end === true,
+    productId: str(data?.product_id) || str(data?.product?.id) || str(data?.items?.[0]?.product_id),
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

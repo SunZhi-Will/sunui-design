@@ -1,7 +1,7 @@
 // 訂單與授權碼，存在 Upstash Redis（SHOPLINE 只負責收款，沒有訂單後台與授權碼）。
 //
 // order:{id}          hash：plan、amountTwd、email、status、createdAt、paidAt、sessionId、tradeId、licenseId、keyEnc、viewToken、refundedTwd、
-//                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）、
+//                     renewal（1 = 延長既有訂閱）、periodEnd（訂閱：這筆付款後授權的到期時間）、recurring（1 = 自動續扣的那一期）、
 //                     licenseIds、seatKeysEnc（Team：5 個席位各一把授權碼，逗號分隔的 id 與加密的 JSON 陣列）、
 //                     provider（shopline / polar，沒有這欄的舊訂單是 shopline）、amountUsd（polar 訂單的美金金額，此時 amountTwd 為 0）
 // orders              zset：createdAt → 訂單編號（後台列表）
@@ -9,10 +9,14 @@
 // ordertrade:{tid}    string：SHOPLINE tradeOrderId → 訂單編號（退款、爭議的通知只帶這個）
 // order:{id}:fulfill  string：入帳鎖（SET NX），重複的付款通知不會發兩把授權碼
 // license:{hash}      hash：id、orderId、plan、status（active / revoked）、email、createdAt、display、
-//                     expiresAt（只有訂閱有）、remindedFor（已寄過到期提醒的 expiresAt）、seat（Team 的席位編號）
+//                     expiresAt（只有訂閱有）、remindedFor（已寄過到期提醒的 expiresAt）、seat（Team 的席位編號）、
+//                     autoRenew（1 = 到期自動扣款，0 = 已取消）、renewVia（polar / shopline）、polarSubscription、polarCustomer、
+//                     slpCustomer、slpInstrument（SHOPLINE 會員 id 與綁定的卡）、chargeFails、lastChargeAt、pastDueSince
 // licid:{id}          string：授權 id → 授權碼雜湊
 // licenses            zset：createdAt → 授權 id
 // licsub:{emailHash}  string：email → 這個人的訂閱授權 id。再買一期就延長這把，授權碼不變
+// polarsub:{subId}    string：Polar 訂閱 id → 授權 id（續扣的 order 用這個找授權）
+// charge:{lic}:{exp}:{n} string：SHOPLINE 續扣鎖（SET NX），同一期同一次重試不會扣兩次
 // seats:founding      counter：已付款的 Founding 筆數（退款會扣回）
 // webhook:log         list：最近 200 則付款通知的處理結果（不含個資）
 //
@@ -23,11 +27,12 @@ import { hashToStrings, pipeline, randomHex, sha256, type RedisCommand } from ".
 import type { WebhookIds } from "./shopline-core";
 import { ORDER_PATTERN } from "./shopline-core";
 import { addTerm, isSubscription, prices, pricesTwd, type Plan } from "./site";
+import { licenseExpired } from "./subscription-core";
 
 /** 完成頁只對「發起結帳的那個瀏覽器」顯示授權碼：cookie 存訂單編號與 viewToken。 */
 export const ORDER_COOKIE = "sunui_order";
 
-export type OrderStatus = "pending" | "paid" | "refunded" | "amount_mismatch" | "disputed";
+export type OrderStatus = "pending" | "paid" | "refunded" | "amount_mismatch" | "disputed" | "failed";
 
 export type Order = {
   id: string;
@@ -49,6 +54,8 @@ export type Order = {
   renewal?: boolean;
   /** 訂閱：這筆付款之後授權的到期時間 */
   periodEnd?: string;
+  /** 自動續扣產生的訂單（不是客戶自己結帳的） */
+  recurring?: boolean;
   /** Team：每個席位一把授權碼，依席位順序（licenseId / keyEnc 是第 1 席，向下相容） */
   licenseIds?: string[];
   /** Team：所有席位授權碼的加密 JSON 陣列 */
@@ -95,7 +102,23 @@ export type License = {
   /** 疑似分享：最近一次一天內超過 10 個 IP 的日期與 IP 數 */
   shareAlertDay?: string;
   shareIps?: number;
+  /** 訂閱：true = 到期自動扣款；false = 客戶已取消，用到這期結束；沒有這欄 = 舊的預付制授權 */
+  autoRenew?: boolean;
+  renewVia?: Provider;
+  polarSubscription?: string;
+  polarCustomer?: string;
+  /** SHOPLINE 會員 id（paymentCustomerId）與綁定的卡（paymentInstrumentId） */
+  slpCustomer?: string;
+  slpInstrument?: string;
+  /** SHOPLINE 續扣：這一期已經失敗幾次、最近一次嘗試的時間 */
+  chargeFails?: number;
+  lastChargeAt?: string;
+  /** 扣款失敗、還在寬限期內 */
+  pastDueSince?: string;
 };
+
+// 自動續扣的純判斷放在 subscription-core.ts（沒有 I/O，單元測試直接引用）
+export { chargeDue, GRACE_MS, licenseExpired, MAX_CHARGE_ATTEMPTS, renewalGaveUp, RETRY_GAPS_MS } from "./subscription-core";
 
 /** 一筆訂單發出的所有授權 id（Team 有多把）。 */
 export function orderLicenseIds(order: Pick<Order, "licenseId" | "licenseIds">) {
@@ -103,10 +126,6 @@ export function orderLicenseIds(order: Pick<Order, "licenseId" | "licenseIds">) 
   return order.licenseId ? [order.licenseId] : [];
 }
 
-/** 訂閱過了到期時間。買斷永遠回 false。 */
-export function licenseExpired(license: Pick<License, "expiresAt">, now = new Date()) {
-  return Boolean(license.expiresAt) && new Date(license.expiresAt!).getTime() <= now.getTime();
-}
 
 async function subscriptionKey(email: string) {
   return `licsub:${(await sha256(`licsub:${email.trim().toLowerCase()}`)).slice(0, 32)}`;
@@ -143,6 +162,7 @@ function toOrder(raw: Record<string, string>): Order | null {
     seatKeysEnc: raw.seatKeysEnc || undefined,
     provider: raw.provider === "polar" ? "polar" : "shopline",
     amountUsd: raw.amountUsd ? Number(raw.amountUsd) : undefined,
+    recurring: raw.recurring === "1",
   };
 }
 
@@ -161,10 +181,19 @@ function toLicense(raw: Record<string, string>): License | null {
     seat: raw.seat ? Number(raw.seat) : undefined,
     shareAlertDay: raw.shareAlertDay || undefined,
     shareIps: raw.shareIps ? Number(raw.shareIps) : undefined,
+    autoRenew: raw.autoRenew === "1" ? true : raw.autoRenew === "0" ? false : undefined,
+    renewVia: raw.renewVia === "polar" || raw.renewVia === "shopline" ? raw.renewVia : undefined,
+    polarSubscription: raw.polarSubscription || undefined,
+    polarCustomer: raw.polarCustomer || undefined,
+    slpCustomer: raw.slpCustomer || undefined,
+    slpInstrument: raw.slpInstrument || undefined,
+    chargeFails: raw.chargeFails ? Number(raw.chargeFails) : undefined,
+    lastChargeAt: raw.lastChargeAt || undefined,
+    pastDueSince: raw.pastDueSince || undefined,
   };
 }
 
-export async function createOrder(plan: Plan, email: string, options: { test?: boolean; provider?: Provider } = {}) {
+export async function createOrder(plan: Plan, email: string, options: { test?: boolean; provider?: Provider; recurring?: boolean } = {}) {
   const provider = options.provider ?? "shopline";
   const order: Order = {
     id: `SU${randomHex(11)}`,
@@ -178,8 +207,9 @@ export async function createOrder(plan: Plan, email: string, options: { test?: b
     createdAt: new Date().toISOString(),
     viewToken: randomHex(16),
     ...(options.test ? { test: true } : {}),
+    ...(options.recurring ? { recurring: true } : {}),
   };
-  const fields = Object.entries(order).flatMap(([k, v]) => [k, k === "test" ? "1" : String(v)]);
+  const fields = Object.entries(order).flatMap(([k, v]) => [k, k === "test" || k === "recurring" ? "1" : String(v)]);
   await run([
     ["HSET", `order:${order.id}`, ...fields],
     ["ZADD", "orders", Date.now(), order.id],
@@ -271,7 +301,12 @@ async function licenseById(licenseId: string) {
  * 授權碼不變，客戶不用改 .env.local。
  * secret 用來加密一份授權碼存在訂單裡，讓完成頁可以再顯示。
  */
-export async function fulfillOrder(order: Order, tradeId: string, secret: string): Promise<Fulfilled | null> {
+export async function fulfillOrder(
+  order: Order,
+  tradeId: string,
+  secret: string,
+  options: { periodEnd?: string } = {},
+): Promise<Fulfilled | null> {
   const [lock] = await run([["SET", `order:${order.id}:fulfill`, "1", "NX"]]);
   if (lock.result !== "OK") return null;
 
@@ -286,12 +321,18 @@ export async function fulfillOrder(order: Order, tradeId: string, secret: string
     const existing = typeof existingId.result === "string" ? await licenseById(existingId.result) : null;
     if (existing && existing.license.status === "active") {
       const current = existing.license.expiresAt ? new Date(existing.license.expiresAt) : nowDate;
-      const expiresAt = addTerm(order.plan, current > nowDate ? current : nowDate).toISOString();
+      // 自動續扣：從原本的到期日往後加一期（寬限期內晚幾天扣到，帳期也不會漂移）；
+      // 客戶自己結帳：從到期日或現在，取較晚的往後加。Polar 給了這期的結束時間就用它，和 Polar 的帳期一致
+      const base = order.recurring || current > nowDate ? current : nowDate;
+      const computed = addTerm(order.plan, base);
+      const given = options.periodEnd ? new Date(options.periodEnd) : null;
+      const expiresAt = (given && !Number.isNaN(given.getTime()) && given > current ? given : computed).toISOString();
       const original = await getOrder(existing.license.orderId);
       const keyEnc = original?.keyEnc ?? "";
       await run([
         // 方案跟著最新一期走（月訂改年訂時後台顯示年訂）
-        ["HSET", `license:${existing.hash}`, "expiresAt", expiresAt, "plan", order.plan],
+        ["HSET", `license:${existing.hash}`, "expiresAt", expiresAt, "plan", order.plan, "chargeFails", 0],
+        ["HDEL", `license:${existing.hash}`, "pastDueSince", "lastChargeAt"],
         ["HSET", `order:${order.id}`, ...paidFields, "licenseId", existing.license.id, "renewal", "1", "periodEnd", expiresAt, ...(keyEnc ? ["keyEnc", keyEnc] : [])],
         ...tradeIndex,
       ]);
@@ -329,7 +370,10 @@ export async function fulfillOrder(order: Order, tradeId: string, secret: string
     return { key: keys[0], licenseId: ids[0], renewal: false, seatKeys: keys };
   }
 
-  const expiresAt = isSubscription(order.plan) ? addTerm(order.plan, nowDate).toISOString() : undefined;
+  const given = options.periodEnd ? new Date(options.periodEnd) : null;
+  const expiresAt = isSubscription(order.plan)
+    ? (given && !Number.isNaN(given.getTime()) && given > nowDate ? given : addTerm(order.plan, nowDate)).toISOString()
+    : undefined;
   const { key, license, commands } = await newLicense({ orderId: order.id, plan: order.plan, email: order.email, expiresAt }, now);
   const licenseId = license.id;
   commands.push(
@@ -416,7 +460,10 @@ export async function refundOrder(order: Order, refunded: number | null) {
   return "refunded";
 }
 
-/** 到期提醒：expiresAt 落在 [now, now + withinMs) 而且這個到期日還沒提醒過的訂閱授權。 */
+/**
+ * 到期前通知：expiresAt 落在 [now, now + withinMs) 而且這個到期日還沒通知過的訂閱授權。
+ * 寄哪一種信由呼叫端依 autoRenew 決定（將自動扣款 / 將結束 / 舊的預付制提醒）。
+ */
 export async function licensesToRemind(withinMs: number, now = new Date()) {
   const all = await listLicenses(5000);
   return all.filter((l) => {
@@ -536,4 +583,176 @@ export async function webhookLog(limit = 50) {
       return [];
     }
   });
+}
+
+/* ---------- 自動續扣 ---------- */
+
+export async function getLicense(licenseId: string) {
+  return (await licenseById(licenseId))?.license ?? null;
+}
+
+async function setLicenseFields(licenseId: string, fields: Record<string, string | number>, remove: string[] = []) {
+  const found = await licenseById(licenseId);
+  if (!found) return null;
+  const commands: RedisCommand[] = [];
+  const entries = Object.entries(fields).flat();
+  if (entries.length) commands.push(["HSET", `license:${found.hash}`, ...entries]);
+  if (remove.length) commands.push(["HDEL", `license:${found.hash}`, ...remove]);
+  if (commands.length) await run(commands);
+  return found.license;
+}
+
+/** 這個 email 目前的訂閱授權（沒有或已撤銷回 null）。 */
+export async function subscriptionLicenseFor(email: string) {
+  const [r] = await run([["GET", await subscriptionKey(email)]]);
+  if (typeof r.result !== "string") return null;
+  const license = await getLicense(r.result);
+  return license && license.status === "active" ? license : null;
+}
+
+/** 這個 email 已經有自動續扣中、還沒過期的訂閱：再結帳一次會變成兩份扣款，結帳頁要擋下來。 */
+export async function hasActiveAutoRenew(email: string, now = new Date()) {
+  const license = await subscriptionLicenseFor(email);
+  return Boolean(license?.autoRenew && !licenseExpired(license, now));
+}
+
+/** Polar 訂閱第一期入帳後：記下訂閱 id，之後的續扣靠它找到授權。 */
+export async function linkPolarSubscription(licenseId: string, subscriptionId: string, customerId: string) {
+  await setLicenseFields(licenseId, {
+    autoRenew: "1",
+    renewVia: "polar",
+    polarSubscription: subscriptionId,
+    ...(customerId ? { polarCustomer: customerId } : {}),
+  });
+  await run([["SET", `polarsub:${subscriptionId}`, licenseId]]);
+}
+
+export async function licenseForPolarSubscription(subscriptionId: string) {
+  if (!subscriptionId) return null;
+  const [r] = await run([["GET", `polarsub:${subscriptionId}`]]);
+  return typeof r.result === "string" ? getLicense(r.result) : null;
+}
+
+/** SHOPLINE 第一期綁卡付款成功（或換卡成功）：記下會員 id 與卡片 id，到期由 cron 扣款。 */
+export async function enableShoplineRenewal(licenseId: string, customerId: string, instrumentId: string) {
+  await setLicenseFields(licenseId, { autoRenew: "1", renewVia: "shopline", slpCustomer: customerId, slpInstrument: instrumentId });
+}
+
+/** 取消自動續扣：到期日不動，用到這期結束。 */
+export async function setAutoRenew(licenseId: string, on: boolean) {
+  return setLicenseFields(licenseId, { autoRenew: on ? "1" : "0" });
+}
+
+/** 扣款失敗：記下第一次失敗的時間（寬限期從到期日算，這個只給信件與後台看）。 */
+export async function markPastDue(licenseId: string, now = new Date()) {
+  const license = await getLicense(licenseId);
+  if (!license || license.pastDueSince) return license;
+  return setLicenseFields(licenseId, { pastDueSince: now.toISOString() });
+}
+
+/** 訂閱結束（取消到期、重試全部失敗、Polar revoked）：不再續扣，寬限期立刻結束。 */
+export async function endSubscription(licenseId: string, now = new Date()) {
+  const license = await getLicense(licenseId);
+  if (!license) return null;
+  const fields: Record<string, string> = { autoRenew: "0" };
+  if (license.expiresAt && new Date(license.expiresAt) > now) fields.expiresAt = now.toISOString();
+  return setLicenseFields(licenseId, fields, ["pastDueSince"]);
+}
+
+export async function recordChargeAttempt(licenseId: string, failed: boolean, now = new Date()) {
+  const license = await getLicense(licenseId);
+  if (!license) return null;
+  return setLicenseFields(licenseId, {
+    lastChargeAt: now.toISOString(),
+    ...(failed ? { chargeFails: (license.chargeFails ?? 0) + 1, ...(license.pastDueSince ? {} : { pastDueSince: now.toISOString() }) } : {}),
+  });
+}
+
+/** SHOPLINE 續扣鎖：同一期的第 n 次嘗試只會跑一次（兩個 cron 同時跑也不會扣兩次）。 */
+export async function lockCharge(license: License) {
+  const [r] = await run([["SET", `charge:${license.id}:${license.expiresAt}:${license.chargeFails ?? 0}`, "1", "NX", "EX", 2 * 24 * 60 * 60]]);
+  return r.result === "OK";
+}
+
+export async function markOrderFailed(order: Order, tradeId: string) {
+  await run([["HSET", `order:${order.id}`, "status", "failed", ...(tradeId ? ["tradeId", tradeId] : [])]]);
+}
+
+/** 收款方的交易編號只入帳一次（續扣的 order 沒有我們的訂單編號，靠這個擋重送）。 */
+export async function claimTrade(provider: Provider, tradeId: string) {
+  const [r] = await run([["SET", `tradeclaim:${provider}:${tradeId}`, "1", "NX"]]);
+  return r.result === "OK";
+}
+
+export async function releaseTrade(provider: Provider, tradeId: string) {
+  await run([["DEL", `tradeclaim:${provider}:${tradeId}`]]);
+}
+
+/**
+ * Polar 訂閱在入口改了方案：授權的方案跟著換。到期日不在這裡動：Polar 換帳期時還沒扣到錢，
+ * 到期日只跟著扣款成功的 order.paid 走。
+ */
+export async function syncSubscriptionPlan(licenseId: string, plan: Plan | null) {
+  const license = await getLicense(licenseId);
+  if (!license || !plan || !isSubscription(plan) || plan === license.plan) return license;
+  return setLicenseFields(licenseId, { plan });
+}
+
+/* ---------- SHOPLINE 綁卡對回授權 ---------- */
+// slpref:{customerRef}      string：SHOPLINE 顧客編號（email 雜湊）→ 授權 id。入帳後才有
+// slppending:{customerRef}  string：入帳前先到的綁卡結果（JSON：customerId、instrumentId），1 天後過期
+
+/**
+ * 收到綁好的卡（付款回應、trade.succeeded、customer.instrument.binded 都可能先到）：
+ * 已經知道是哪一把授權就直接啟用續扣（換卡時回傳舊卡讓呼叫端解除綁定），還不知道就先暫存。
+ */
+export async function rememberShoplineCard(customerRef: string, customerId: string, instrumentId: string) {
+  if (!customerRef || !customerId || !instrumentId) return null;
+  const [r] = await run([["GET", `slpref:${customerRef}`]]);
+  if (typeof r.result !== "string") {
+    await run([["SET", `slppending:${customerRef}`, JSON.stringify({ customerId, instrumentId }), "EX", 24 * 60 * 60]]);
+    return null;
+  }
+  const license = await getLicense(r.result);
+  if (!license || license.status !== "active") return null;
+  const previous = license.slpInstrument && license.slpInstrument !== instrumentId ? { customerId: license.slpCustomer ?? "", instrumentId: license.slpInstrument } : null;
+  await attachCard(license, customerId, instrumentId);
+  return { license, previous };
+}
+
+async function attachCard(license: License, customerId: string, instrumentId: string) {
+  const changed = license.slpInstrument !== instrumentId;
+  // 換了新卡：重試次數歸零、馬上可以再扣一次（寬限期內扣款失敗的人換卡後不用等）
+  await setLicenseFields(
+    license.id,
+    { autoRenew: "1", renewVia: "shopline", slpCustomer: customerId, slpInstrument: instrumentId, ...(changed ? { chargeFails: 0 } : {}) },
+    changed ? ["lastChargeAt"] : [],
+  );
+}
+
+/** 新台幣訂閱入帳後：記下這個顧客編號對應的授權，把先到的綁卡結果（或這次通知帶的卡）接上去。 */
+export async function linkShoplineCustomer(licenseId: string, customerRef: string, card?: { customerId: string; instrumentId: string }) {
+  if (!customerRef) return;
+  const [, pending] = await run([
+    ["SET", `slpref:${customerRef}`, licenseId],
+    ["GET", `slppending:${customerRef}`],
+  ]);
+  let found = card?.customerId && card.instrumentId ? card : null;
+  if (!found && typeof pending.result === "string") {
+    try {
+      const parsed = JSON.parse(pending.result) as { customerId?: unknown; instrumentId?: unknown };
+      if (typeof parsed.customerId === "string" && typeof parsed.instrumentId === "string") found = { customerId: parsed.customerId, instrumentId: parsed.instrumentId };
+    } catch {
+      // 壞掉的暫存就當沒有
+    }
+  }
+  if (!found) return;
+  const license = await getLicense(licenseId);
+  if (license) await attachCard(license, found.customerId, found.instrumentId);
+  await run([["DEL", `slppending:${customerRef}`]]);
+}
+
+/** 卡解除綁定後清掉授權上的卡（取消到期後由 cron 呼叫）。 */
+export async function clearShoplineCard(licenseId: string) {
+  await setLicenseFields(licenseId, {}, ["slpInstrument"]);
 }

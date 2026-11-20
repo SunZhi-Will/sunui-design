@@ -37,3 +37,52 @@ test("addTerm adds one month or one year", () => {
   // 不改到傳進來的日期
   assert.equal(from.toISOString(), "2026-11-15T03:00:00.000Z");
 });
+
+// ---------- 自動續扣（2026-11-20 起）----------
+
+import { chargeDue, GRACE_MS, licenseExpired, MAX_CHARGE_ATTEMPTS, renewalGaveUp, type RenewalState } from "../lib/subscription-core.ts";
+
+const DAY = 24 * 60 * 60 * 1000;
+const EXPIRES = "2026-12-20T03:00:00.000Z";
+const at = (offsetMs: number) => new Date(new Date(EXPIRES).getTime() + offsetMs);
+const shopline = (extra: Partial<RenewalState> = {}): RenewalState => ({
+  status: "active",
+  expiresAt: EXPIRES,
+  autoRenew: true,
+  renewVia: "shopline",
+  slpCustomer: "cus_1",
+  slpInstrument: "pi_1",
+  ...extra,
+});
+
+test("auto-renewing licenses get a 7-day grace period, canceled and prepaid ones do not", () => {
+  assert.equal(licenseExpired({ expiresAt: EXPIRES, autoRenew: true }, at(DAY)), false);
+  assert.equal(licenseExpired({ expiresAt: EXPIRES, autoRenew: true }, at(GRACE_MS)), true);
+  assert.equal(licenseExpired({ expiresAt: EXPIRES, autoRenew: false }, at(1)), true);
+  assert.equal(licenseExpired({ expiresAt: EXPIRES }, at(1)), true);
+  assert.equal(licenseExpired({}, at(1000 * DAY)), false);
+});
+
+test("SHOPLINE renewal is charged from 12 hours before expiry, only for active auto-renewing cards", () => {
+  assert.equal(chargeDue(shopline(), at(-13 * 60 * 60 * 1000)), false);
+  assert.equal(chargeDue(shopline(), at(-11 * 60 * 60 * 1000)), true);
+  assert.equal(chargeDue(shopline({ autoRenew: false }), at(0)), false);
+  assert.equal(chargeDue(shopline({ renewVia: "polar" }), at(0)), false);
+  assert.equal(chargeDue(shopline({ slpInstrument: undefined }), at(0)), false);
+  assert.equal(chargeDue(shopline({ status: "revoked" }), at(0)), false);
+  assert.equal(chargeDue(shopline(), at(GRACE_MS)), false);
+});
+
+test("failed SHOPLINE charges retry on days 1, 3 and 5, then give up", () => {
+  const failedAt = at(0).toISOString();
+  assert.equal(chargeDue(shopline({ chargeFails: 1, lastChargeAt: failedAt }), at(12 * 60 * 60 * 1000)), false);
+  assert.equal(chargeDue(shopline({ chargeFails: 1, lastChargeAt: failedAt }), at(DAY)), true);
+  assert.equal(chargeDue(shopline({ chargeFails: 2, lastChargeAt: at(DAY).toISOString() }), at(2 * DAY)), false);
+  assert.equal(chargeDue(shopline({ chargeFails: 2, lastChargeAt: at(DAY).toISOString() }), at(3 * DAY)), true);
+  assert.equal(chargeDue(shopline({ chargeFails: MAX_CHARGE_ATTEMPTS, lastChargeAt: at(5 * DAY).toISOString() }), at(6 * DAY)), false);
+  assert.equal(renewalGaveUp(shopline({ chargeFails: MAX_CHARGE_ATTEMPTS }), at(5 * DAY)), true);
+  assert.equal(renewalGaveUp(shopline({ chargeFails: 1 }), at(2 * DAY)), false);
+  assert.equal(renewalGaveUp(shopline({ chargeFails: 1 }), at(GRACE_MS)), true);
+  // 已取消的不算放棄（它本來就會到期）
+  assert.equal(renewalGaveUp(shopline({ autoRenew: false }), at(GRACE_MS)), false);
+});

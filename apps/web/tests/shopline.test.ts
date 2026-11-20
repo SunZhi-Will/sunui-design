@@ -65,3 +65,23 @@ test("license keys are well formed, unique, hashed and encrypted", async () => {
   assert.equal(await decryptLicenseKey(sealed, "another-secret"), null);
   assert.equal(await decryptLicenseKey("junk", "secret-one-long-enough"), null);
 });
+
+test("reads the saved card from card-bind payments and instrument events", () => {
+  const paid = parseWebhook({
+    type: "trade.succeeded",
+    data: {
+      referenceOrderId: "SU0123456789abcdef012345",
+      tradeOrderId: "T1",
+      order: { customer: { referenceCustomerId: "ref1", customerId: "C1" } },
+      payment: { paymentBehavior: "CardBindPayment", paymentCustomerId: "C1", paymentInstrument: { paymentInstrumentId: "PI1" } },
+    },
+  });
+  assert.equal(paid.paymentBehavior, "CardBindPayment");
+  assert.deepEqual([paid.card.customerId, paid.card.instrumentId, paid.customerRef], ["C1", "PI1", "ref1"]);
+
+  const bound = parseWebhook({
+    type: "customer.instrument.binded",
+    data: { customerId: "C1", referenceCustomerId: "ref1", paymentInstrument: { instrumentId: "PI2", instrumentStatus: "SUCCESSED" } },
+  });
+  assert.deepEqual([bound.card.customerId, bound.card.instrumentId, bound.card.status, bound.customerRef], ["C1", "PI2", "SUCCESSED", "ref1"]);
+});

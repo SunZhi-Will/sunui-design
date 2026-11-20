@@ -21,14 +21,15 @@ export function foundingState(now = new Date()): FoundingState {
 
 /**
  * 定價（美元）。pricing 頁、401 訊息與 agent 說明都從這裡取。
- * founding / pro / team 是買斷；monthly / yearly 是預付期間制訂閱：不綁卡、不自動扣款，
- * 到期前寄信提醒，續約就是用同一個 email 再買一期，同一把授權碼往後延。
+ * founding / pro / team 是買斷；monthly / yearly 是自動續扣的訂閱（2026-11-20 起）：
+ * 美金走 Polar 的訂閱商品，新台幣走 SHOPLINE 內嵌式綁卡 + SunUI 的 cron 定期扣款。
+ * 扣款前 7 天寄信通知，隨時可以在 /account 取消，取消後用到這期結束。授權碼一直是同一把。
  */
 export const prices = { pro: 129, team: 349, founding: 79, monthly: 19, yearly: 99, teamSeats: 5 };
 
 /** 給終端機與 agent 看的一句話方案說明（英文）。 */
 export function licenseSummary(now = new Date()) {
-  const base = `Pro is a one-time $${prices.pro} (Team: $${prices.team} for ${prices.teamSeats} people), or $${prices.monthly}/month or $${prices.yearly}/year with no auto-renewal, and covers unlimited personal and client projects.`;
+  const base = `Pro is a one-time $${prices.pro} (Team: $${prices.team} for ${prices.teamSeats} people), or $${prices.monthly}/month or $${prices.yearly}/year (renews automatically, cancel anytime), and covers unlimited personal and client projects.`;
   return foundingState(now) === "open"
     ? `${base} Founding members pay $${prices.founding} for lifetime Pro until the seats run out.`
     : base;

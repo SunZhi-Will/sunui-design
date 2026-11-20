@@ -1,13 +1,28 @@
 import { after } from "next/server";
 
-import { notifyOwner, sendLicenseEmail } from "@/lib/mailer";
-import { disputeOrder, findOrder, fulfillOrder, logWebhook, markAmountMismatch, refundOrder } from "@/lib/orders";
+import { notifyOwner, sendLicenseEmail, sendPaymentFailed } from "@/lib/mailer";
+import {
+  disputeOrder,
+  findOrder,
+  fulfillOrder,
+  linkShoplineCustomer,
+  logWebhook,
+  markAmountMismatch,
+  markOrderFailed,
+  recordChargeAttempt,
+  refundOrder,
+  rememberShoplineCard,
+  subscriptionLicenseFor,
+} from "@/lib/orders";
+import { shoplineCustomerRef, unbindCard } from "@/lib/shopline";
 import { isForeignReference, parseWebhook, verifyShoplineSignature } from "@/lib/shopline-core";
+import { isSubscription } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 // SHOPLINE Payments 付款通知。在 SHOPLINE 後台「設定 → 開發者管理 → Webhook 管理」新增
-// <site>/api/shopline/webhook，勾選 trade.succeeded、trade.failed、trade.expired、trade.refund.succeeded 與 dispute.*，
+// <site>/api/shopline/webhook，勾選 trade.succeeded、trade.failed、trade.expired、trade.refund.succeeded、dispute.*
+// 與 customer.instrument.binded（訂閱綁卡、換卡），
 // 這一列專屬的 Sign Key 填進 SHOPLINE_SIGN_KEY。
 // 流程照作者 VideoAligner 的 webhook：別家產品的訂單回 200、找不到訂單回 404 讓對方重送、入帳冪等。
 // 回應碼：驗簽失敗 401；儲存失敗 500（SHOPLINE 會照排程重送，最多 16 次）。
@@ -33,7 +48,7 @@ export async function POST(request: Request) {
   } catch {
     return Response.json({ error: "bad_request" }, { status: 400 });
   }
-  const { type, ids, paid, refunded, foreignProduct } = parseWebhook(event);
+  const { type, ids, paid, refunded, foreignProduct, card, customerRef } = parseWebhook(event);
   const record = (order: string | null, result: string) => after(() => logWebhook({ type, order, result }));
 
   if (foreignProduct) {
@@ -42,6 +57,21 @@ export async function POST(request: Request) {
   }
 
   try {
+    // 綁卡成功（訂閱第一期或換卡）：對得上授權就接上去，換卡時解除舊卡；對不上（別家產品或還沒入帳）先暫存
+    if (type === "customer.instrument.binded" || type === "customer.instrument.updated") {
+      if (card.status && card.status !== "SUCCESSED" && card.status !== "ENABLED") {
+        record(null, "ignored");
+        return ok({ ignored: true });
+      }
+      const linked = await rememberShoplineCard(customerRef, card.customerId, card.instrumentId);
+      if (linked?.previous) {
+        const old = linked.previous;
+        after(() => unbindCard(old.customerId, old.instrumentId).then(() => undefined));
+      }
+      record(linked?.license.orderId ?? null, linked ? "card_linked" : "card_pending");
+      return ok();
+    }
+
     if (type.startsWith("dispute.")) {
       const order = await findOrder(ids);
       // 拒付成立代表錢會被拿回去，授權先撤銷；其他爭議事件只記下來，到 SHOPLINE 後台回覆
@@ -60,7 +90,23 @@ export async function POST(request: Request) {
       return ok();
     }
 
-    // 其他事件（失敗、過期、取消）回 200 讓對方不要重送；訂閱是預付期間制、沒有續扣，不需要處理
+    // 續扣失敗（cron 送出時還在處理中，之後才失敗）：記一次失敗，cron 照重試排程再扣
+    if (type === "trade.failed" || type === "trade.expired" || type === "trade.cancelled") {
+      const order = await findOrder(ids);
+      if (order?.recurring && order.status === "pending") {
+        await markOrderFailed(order, ids.tradeOrderId);
+        const subLicense = await subscriptionLicenseFor(order.email);
+        if (subLicense) {
+          const firstFailure = !subLicense.pastDueSince;
+          const updated = await recordChargeAttempt(subLicense.id, true);
+          if (firstFailure && updated) after(() => sendPaymentFailed(updated).then(() => undefined));
+        }
+        record(order.id, "renewal_failed");
+        return ok();
+      }
+    }
+
+    // 其他事件（失敗、過期、取消）回 200 讓對方不要重送
     if (type !== "trade.succeeded") {
       record(null, "ignored");
       return ok({ ignored: true });
@@ -91,6 +137,10 @@ export async function POST(request: Request) {
       record(order.id, "duplicate");
       return ok({ duplicate: true });
     }
+    // 新台幣訂閱：第一期是綁卡付款，把卡接到授權上，之後由 cron 續扣
+    if (isSubscription(order.plan) && !order.recurring) {
+      await linkShoplineCustomer(issued.licenseId, customerRef || (await shoplineCustomerRef(order.email)), card.instrumentId ? card : undefined);
+    }
     // 只有第一次入帳會走到這裡，重送的通知不會多寄
     after(async () => {
       await sendLicenseEmail(order, issued);
@@ -103,3 +153,4 @@ export async function POST(request: Request) {
     return Response.json({ error: "server_error" }, { status: 500 });
   }
 }
+

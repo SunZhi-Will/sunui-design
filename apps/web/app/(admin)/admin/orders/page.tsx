@@ -18,6 +18,7 @@ const STATUS: Record<Order["status"], { label: string; tone: "ok" | "warn" | "ba
   refunded: { label: "已退款", tone: "bad" },
   amount_mismatch: { label: "金額不符", tone: "warn" },
   disputed: { label: "爭議中", tone: "bad" },
+  failed: { label: "續扣失敗", tone: "warn" },
 };
 const RESULT_TONE: Record<string, "ok" | "warn" | "bad" | "idle"> = {
   paid: "ok",
