@@ -7,7 +7,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { ChapterSeekbar, formatTime } from "./chapter-seekbar";
 import { DURATION, FRAME, demoCopy, frameThumb, lessonChapters, lessonMarks } from "./demo";
 
-/** 型錄卡片：課程畫面加章節進度條，停在第三章中段。 */
+/** Catalog card: a course screen with the chapter seekbar, paused midway through chapter three. */
 export default function ChapterSeekbarCard() {
   const t = useDemoText(demoCopy);
   const locale = useDemoLocale();

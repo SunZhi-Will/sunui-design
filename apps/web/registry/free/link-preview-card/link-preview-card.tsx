@@ -12,28 +12,28 @@ const springs = {
 } as const;
 
 export interface LinkMeta {
-  /** 站名（og:site_name）；沒有時顯示網域 */
+  /** Site name (og:site_name); falls back to the domain */
   siteName?: string;
   title?: string;
   description?: string;
-  /** 預覽圖（og:image） */
+  /** Preview image (og:image) */
   image?: string;
-  /** 網站小圖示；沒有時顯示地球圖示 */
+  /** Site favicon; falls back to a globe icon */
   favicon?: string;
 }
 
 export interface LinkPreviewCardProps {
-  /** 使用者貼上的網址；沒有通訊協定時會補 https:// */
+  /** URL the user pasted; https:// is added when there is no protocol */
   url: string;
-  /** 已取得的資料，有給就不呼叫 fetchMeta */
+  /** Data already fetched; when given, fetchMeta is not called */
   meta?: LinkMeta | null;
-  /** 依網址取資料，應呼叫你自己的伺服器路由（瀏覽器讀不到別站的 HTML）。換網址時 signal 會中止 */
+  /** Fetch data by URL; call your own server route (the browser cannot read other sites' HTML). The signal aborts when the URL changes */
   fetchMeta?: (url: string, signal: AbortSignal) => Promise<LinkMeta>;
-  /** 取得資料後回呼，可用來補上空白的標題 */
+  /** Called after data is fetched, e.g. to fill in a blank title */
   onResolve?: (meta: LinkMeta) => void;
-  /** 有給才出現移除按鈕，例如撰寫框裡收掉預覽 */
+  /** The remove button appears only when given, e.g. to dismiss the preview in a composer */
   onRemove?: () => void;
-  /** row：文字在左、縮圖在右；stacked：圖在上 */
+  /** row: text left, thumbnail right; stacked: image on top */
   layout?: "row" | "stacked";
   target?: string;
   labels?: Partial<typeof defaultLabels>;
@@ -48,7 +48,7 @@ const defaultLabels = {
   remove: "Remove preview",
 };
 
-/** 補上 https:// 並確認是 http(s) 網址；不是就回傳 null */
+/** Add https:// and check it is an http(s) URL; otherwise return null */
 export function normalizeUrl(input: string): URL | null {
   const raw = input.trim();
   if (!raw || /\s/.test(raw)) return null;
@@ -99,7 +99,7 @@ export function LinkPreviewCard({
   const href = parsed?.href ?? "";
   const domain = parsed?.hostname.replace(/^www\./, "") ?? "";
 
-  // 抓到的結果跟網址綁在一起，換網址時自然回到載入中
+  // The fetched result is tied to the URL, so changing the URL naturally goes back to loading
   const [result, setResult] = useState<{ href: string; meta: LinkMeta | null } | null>(null);
   const [brokenImage, setBrokenImage] = useState<string | null>(null);
   const latest = useRef({ fetchMeta, onResolve });
@@ -116,7 +116,7 @@ export function LinkPreviewCard({
         setResult({ href, meta: m });
         latest.current.onResolve?.(m);
       })
-      // 失敗時退回只有網域與網址的卡，連結照樣能開
+      // On failure, fall back to a card with just the domain and URL; the link still opens
       .catch(() => !controller.signal.aborted && setResult({ href, meta: null }));
     return () => controller.abort();
   }, [href, metaProp, willFetch]);
@@ -137,7 +137,7 @@ export function LinkPreviewCard({
           exit: { opacity: 0, transition: { duration: 0.1 } },
         };
 
-  // 錨點：小圖示加網域，載入前後都在同一個位置
+  // Anchor: favicon plus domain, in the same place before and after loading
   const anchorIcon =
     status === "empty" ? glyphs.link : status === "invalid" ? glyphs.alert : meta?.favicon ? (
       <img src={meta.favicon} alt="" className="size-3.5 rounded-[3px]" />
@@ -201,7 +201,7 @@ export function LinkPreviewCard({
           linkable && "cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}
       >
-        {/* e2 疊在 e1 上，懸停時切換透明度，陰影本身不做動畫 */}
+        {/* e2 stacked over e1, opacity switches on hover; the shadow itself is not animated */}
         {linkable && (
           <span
             aria-hidden="true"

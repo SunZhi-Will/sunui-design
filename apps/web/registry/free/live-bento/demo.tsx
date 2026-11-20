@@ -6,8 +6,8 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { BentoTile, LiveBento, springs, useTicker } from "./live-bento";
 
-// 元件庫首頁的功能區：四格，各自用小畫面示範一個真實功能。
-// 小畫面只在畫面內、分頁可見時重播；減少動態效果時停在資訊完整的最後一格。
+// Feature section of a component library home page: four tiles, each with a mini screen showing a real feature.
+// Mini screens replay only on screen and in a visible tab; with reduced motion they rest on the final, fully informative frame.
 
 export const demoCopy = {
   en: {
@@ -95,7 +95,7 @@ const CHECK = "M5 12.5l4.5 4.5L19 7.5";
 const BAG = "M5 8h14l-1 12H6L5 8zM9 8V6a3 3 0 0 1 6 0v2";
 const SEARCH = "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4";
 
-/* ---------- 1. 安裝：指令與輸出逐行出現，預留高度不推動版面 ---------- */
+/* ---------- 1. Install: command and output appear line by line, height reserved so layout does not shift ---------- */
 
 const INSTALL_LINES = [
   { mark: "", text: "Resolving @sunui/coupon-wallet" },
@@ -138,7 +138,7 @@ export function InstallVisual() {
   );
 }
 
-/* ---------- 2. 減少動態：前四拍徽章數字回彈，開關打開後只換數字不彈 ---------- */
+/* ---------- 2. Reduced motion: for the first four beats the badge number bounces; once the switch is on, only the number changes ---------- */
 
 export function MotionVisual({ t }: { t: Copy }) {
   const { ref, step, playing } = useTicker(1000, 8);
@@ -177,7 +177,7 @@ export function MotionVisual({ t }: { t: Copy }) {
   );
 }
 
-/* ---------- 3. 四種語言：商品名與按鈕跟著換語言，價格是不動的錨點 ---------- */
+/* ---------- 3. Four languages: product name and button change language, the price is the fixed anchor ---------- */
 
 const LANGS = [
   { chip: "EN", name: "Linen tote", cta: "Add to bag" },
@@ -236,7 +236,7 @@ export function LanguageVisual() {
   );
 }
 
-/* ---------- 4. 代理搜尋：查詢、計分條長出來，第一名用品牌專色 ---------- */
+/* ---------- 4. Agent search: query, score bars grow, first place in the brand spot colour ---------- */
 
 const RESULTS = [
   { name: "coupon-wallet", score: 0.94 },

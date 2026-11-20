@@ -1,21 +1,21 @@
 "use client";
 
-// 功能 Bento 格：每一格有一個小型示意畫面，示範該功能怎麼運作。
-// 格子本身不做進場動畫（DESIGN.md 5.2）：一捲到就已經在那裡。
-// 小畫面是內容，可以重播，但只在進入畫面且分頁可見時播放；減少動態效果時停在資訊完整的最後一格。
-// 懸停時從 e1 升到 e2：兩層陰影疊在一起切換透明度，陰影本身不做動畫。
+// Feature bento grid: each tile has a small illustrative screen showing how the feature works.
+// Tiles have no entrance animation (DESIGN.md 5.2): they are already there when scrolled to.
+// Mini screens are content and may replay, but only on screen and in a visible tab; with reduced motion they rest on the final, fully informative frame.
+// On hover, rise from e1 to e2: two stacked shadows switch opacity, the shadow itself is not animated.
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** 三種彈簧，格子裡的小畫面用 framer-motion 時只用這三種 */
+/** Three springs; mini screens using framer-motion inside tiles use only these */
 export const springs = {
-  /** 按壓回饋、小元件位移 */
+  /** Press feedback, small element moves */
   snappy: { type: "spring", stiffness: 520, damping: 34 },
-  /** 狀態切換、展開收合 */
+  /** State changes, expand and collapse */
   gentle: { type: "spring", stiffness: 240, damping: 30 },
-  /** 小元件落定一次的回彈 */
+  /** One-time settle bounce of a small element */
   pop: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
@@ -32,9 +32,9 @@ function useReducedMotionPref() {
 }
 
 /**
- * 小畫面的節拍器：在畫面內且分頁可見時，每 period 毫秒前進一步，走到 steps 後從 0 重來。
- * 起始與減少動態效果時停在最後一步，所以最後一步要畫成資訊完整的樣子。
- * 把回傳的 ref 掛在小畫面的外層。
+ * Metronome for mini screens: on screen and in a visible tab, it advances one step every period ms and restarts from 0 after steps.
+ * At start and with reduced motion it rests on the last step, so draw the last step fully informative.
+ * Attach the returned ref to the mini screen's outer element.
  */
 export function useTicker(period: number, steps: number) {
   const reduced = useReducedMotionPref();
@@ -76,10 +76,10 @@ const E2 =
 export interface BentoTileProps {
   title: ReactNode;
   body?: ReactNode;
-  /** md 以上橫跨兩欄 */
+  /** Spans two columns at md and up */
   wide?: boolean;
   className?: string;
-  /** 小畫面。只是示意，會被標成 aria-hidden，意思要由 title 與 body 說完 */
+  /** Mini screen. Illustrative only and marked aria-hidden; title and body must carry the meaning */
   children: ReactNode;
 }
 
@@ -93,7 +93,7 @@ export function BentoTile({ title, body, wide, className, children }: BentoTileP
         className,
       )}
     >
-      {/* e2 疊在 e1 上，懸停時淡入（進 0ms、退 150ms）；深色模式改成表面提亮一階 */}
+      {/* e2 stacked over e1, fades in on hover (0ms in, 150ms out); dark mode lifts the surface one step instead */}
       <span
         aria-hidden
         className={cn(
@@ -105,7 +105,7 @@ export function BentoTile({ title, body, wide, className, children }: BentoTileP
         <h3 className="font-semibold tracking-tight">{title}</h3>
         {body ? <p className="mt-1.5 text-pretty text-sm text-muted-foreground">{body}</p> : null}
       </div>
-      {/* 凹面的展示區：卡片 12px、內距 4px，所以 8px */}
+      {/* Inset display area: card 12px, padding 4px, so 8px */}
       <div
         aria-hidden
         className="relative flex min-h-44 min-w-0 flex-1 items-center justify-center overflow-hidden rounded-lg bg-muted p-5 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]"

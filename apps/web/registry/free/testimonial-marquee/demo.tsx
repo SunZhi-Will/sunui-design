@@ -11,7 +11,7 @@ import {
   type TestimonialTagTone,
 } from "./testimonial-marquee";
 
-// 封面牆模式：共用的灰底商品照當 16:9 封面
+// Cover wall mode: shared grey-backdrop product photos as 16:9 covers
 const coverKinds: ProductKind[] = [
   "jacket",
   "mug",
@@ -235,7 +235,7 @@ export default function TestimonialMarqueeDemo() {
           locale={locale}
         />
       </section>
-      {/* 封面牆模式：傾斜的封面列在 hero 背後交錯流動，文字放在一層壓暗的底上 */}
+      {/* Cover wall mode: tilted rows of covers flow in alternating directions behind the hero, text sits on a darkened layer */}
       <section className="relative isolate w-full min-w-0 overflow-hidden rounded-2xl bg-background">
         <CoverMarquee covers={covers} tileWidth={240} />
         <div aria-hidden className="absolute inset-0 bg-background/75" />

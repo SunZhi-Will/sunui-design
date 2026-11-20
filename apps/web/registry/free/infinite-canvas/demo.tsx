@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { InfiniteCanvas, type InfiniteCanvasItem } from "./infinite-canvas";
 
-// 示範圖：同一組灰底棚拍商品照，放在 public/demo/products/
+// Demo images: one set of grey-backdrop studio product shots in public/demo/products/
 const photos = ["tote", "vase", "mug", "lamp", "cap", "notebook", "candle", "tea", "wallet", "scarf", "gloves", "watch"];
 const photo = (i: number) => `/demo/products/${photos[i % photos.length]}.webp`;
 

@@ -149,10 +149,10 @@ export function BrowserFrame(props: BrowserFrameProps) {
   return <BrowserChrome {...props} />;
 }
 
-/** 與網站外殼同一條 ease-out 曲線 */
+/** Same ease-out curve as the site shell */
 const EASE = [0.23, 1, 0.32, 1] as const;
 
-/** 換頁時網址與標題的文字：舊的約 100ms 退場，新的再進來；減少動態時直接換 */
+/** URL and title text on page change: the old one exits in about 100ms, then the new one enters; with reduced motion it swaps instantly */
 function SwapText({ swapKey, reduce, children }: { swapKey?: number; reduce?: boolean; children: ReactNode }) {
   if (swapKey === undefined) return <>{children}</>;
   return (
@@ -170,7 +170,7 @@ function SwapText({ swapKey, reduce, children }: { swapKey?: number; reduce?: bo
   );
 }
 
-/** BrowserFrame 的本體；swapKey 給 BrowserStack 用，讓網址列與標題在換頁時淡入淡出，外框本身不動 */
+/** The BrowserFrame body. swapKey is for BrowserStack: the URL bar and title fade on page change while the frame stays put */
 function BrowserChrome({
   url,
   title,
@@ -318,16 +318,16 @@ export function Stage({ children, scheme = "auto", className, style }: StageProp
   );
 }
 
-/* ───────── 3D 疊放輪播（原 browser-showcase-3d） ───────── */
+/* ───────── 3D stacked carousel (formerly browser-showcase-3d) ───────── */
 
 export interface BrowserStackSlide {
-  /** 這一張的網址，換頁時網址列跟著換 */
+  /** URL of this slide; the URL bar changes with the slide */
   url: string;
-  /** 分頁標題，不給就顯示網址 */
+  /** Tab title; falls back to the URL */
   title?: ReactNode;
-  /** 截圖；與 content 二選一 */
+  /** Screenshot; use either this or content */
   image?: { src: string; alt: string };
-  /** 自訂畫面內容 */
+  /** Custom screen content */
   content?: ReactNode;
 }
 
@@ -349,9 +349,9 @@ const STACK_MESSAGES: Record<SunLocale, BrowserStackLabels> = {
 
 export interface BrowserStackProps {
   slides: BrowserStackSlide[];
-  /** 自動換頁的間隔（毫秒）。預設關閉；開啟時離開畫面、分頁隱藏、游標或焦點在上面時暫停，偏好減少動態時不自動換 */
+  /** Autoplay interval (ms). Off by default. When on, it pauses off screen, in a hidden tab, and on hover or focus, and does not autoplay with reduced motion */
   autoplay?: number;
-  /** 游標跟隨傾斜，預設開啟；只在滑鼠這類精準指標上作用 */
+  /** Tilt that follows the cursor, on by default; only for fine pointers such as a mouse */
   parallax?: boolean;
   tone?: BrowserFrameTone;
   scheme?: BrowserFrameScheme;
@@ -362,7 +362,7 @@ export interface BrowserStackProps {
 }
 
 const GENTLE = { stiffness: 240, damping: 30 };
-/** 控制鈕：e1 陰影、hover 進快退慢、按下 0.97、focus-visible 外圈 */
+/** Control button: e1 shadow, hover fast in and slow out, 0.97 on press, focus-visible ring */
 const controlBtn =
   "grid size-8 place-items-center rounded-full bg-[var(--wf-surface)] text-[var(--wf-fg-muted)] shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] transition-[color,scale] duration-150 hover:text-[var(--wf-fg)] hover:duration-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wf-fg)] motion-safe:active:scale-[0.97] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
@@ -375,8 +375,8 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 }
 
 /**
- * 在 3D 裡傾斜的 BrowserFrame，後面疊兩個較安靜的視窗。換頁時外框、紅黃綠燈與網址列都不動，
- * 只有網址文字與畫面淡出淡入。只在按箭頭、圓點、鍵盤左右鍵，或明確開啟 autoplay 時換頁。
+ * A BrowserFrame tilted in 3D with two quieter windows stacked behind. On slide change the frame, traffic lights and URL bar stay put;
+ * only the URL text and the screen fade. Slides change only on arrows, dots, left/right keys, or when autoplay is explicitly on.
  */
 export function BrowserStack({
   slides,
@@ -433,7 +433,7 @@ export function BrowserStack({
     };
   }, [canAutoplay]);
 
-  // 每次換頁重新計時，手動換頁後也會等滿一個間隔
+  // Restart the timer on every slide change, so a manual change also waits a full interval
   useEffect(() => {
     if (!running) return;
     const id = window.setTimeout(() => setIndex((i) => (i + 1) % total), autoplay);

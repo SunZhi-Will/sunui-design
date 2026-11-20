@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RasterImage, type RasterMode } from "./raster-image";
 
-// 示範圖：棚拍商品與風景照，轉灰階並拉高對比，放在 public/demo/raster/（同源，canvas 才能取樣）
+// Demo images: studio product and landscape photos, greyscaled with raised contrast, in public/demo/raster/ (same origin so canvas can sample them)
 const boots = "/demo/raster/boots.webp";
 const lamp = "/demo/raster/lamp.webp";
 const ridge = "/demo/raster/peaks.webp";
@@ -62,7 +62,7 @@ const copy = {
 
 const images: Record<string, string> = { halftone: boots, ascii: lamp, dots: boots, dither: lamp, lines: ridge };
 
-/** 單一點陣化樣式的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** Demo tile for one rasterize style: shared by the full demo and the home catalog (variants.tsx) */
 export function RasterTile({ mode, animateIn = false, className }: { mode: RasterMode; animateIn?: boolean; className?: string }) {
   const t = useDemoText(copy);
   const item = t.items.find((x) => x.mode === mode)!;

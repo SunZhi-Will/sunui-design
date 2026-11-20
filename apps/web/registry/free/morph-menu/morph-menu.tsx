@@ -9,46 +9,46 @@ import { cn } from "@/lib/utils";
 export interface MorphMenuItem {
   id: string;
   label: ReactNode;
-  /** 16px inline SVG，跟隨 currentColor */
+  /** 16px inline SVG, follows currentColor */
   icon?: ReactNode;
-  /** 右側小字，例如快捷鍵或數量 */
+  /** Small text on the right, e.g. a shortcut or count */
   hint?: ReactNode;
-  /** 破壞性動作，例如移除 */
+  /** Destructive action, e.g. remove */
   danger?: boolean;
   disabled?: boolean;
-  /** 在這一項上方畫一條分隔線 */
+  /** Draw a separator above this item */
   separator?: boolean;
   onSelect?: () => void;
 }
 
 export interface MorphMenuProps {
   items: MorphMenuItem[];
-  /** 觸發按鈕的無障礙名稱，未提供時依 locale 用「更多動作」 */
+  /** Accessible name of the trigger; defaults to "More actions" per locale */
   label?: string;
-  /** 觸發按鈕裡的圖示，預設是三個點 */
+  /** Icon inside the trigger, defaults to three dots */
   icon?: ReactNode;
   onSelect?: (id: string) => void;
   onOpenChange?: (open: boolean) => void;
-  /** 收合動畫結束、選單卸載後呼叫；放在 overflow hidden 的列裡時，用它把列的裁切還原 */
+  /** Called after the collapse animation ends and the menu unmounts; inside an overflow-hidden row, use it to restore the row's clipping */
   onClosed?: () => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; also accepts tags like zh-Hant-HK or ja-JP */
   locale?: string;
   className?: string;
   menuClassName?: string;
   /**
-   * list（預設）：觸發鈕撐開成整張選單。
-   * radial：角落的浮動動作鈕，動作從觸發鈕中心沿弧線散開；separator 與 hint 不顯示，label 在懸停與聚焦時出現
+   * list (default): the trigger expands into the full menu.
+   * radial: a floating corner action button; actions fan out from its centre along an arc. separator and hint are not shown, label appears on hover and focus
    */
   layout?: "list" | "radial";
-  /** radial 時觸發鈕所在的角，弧線往畫面內側展開；位置本身用 className 定，例如 fixed bottom-6 right-6 */
+  /** For radial, the corner the trigger sits in; the arc opens toward the inside of the screen. Set the position itself with className, e.g. fixed bottom-6 right-6 */
   corner?: RadialCorner;
 }
 
 export type RadialCorner = "bottom-right" | "bottom-left" | "top-right" | "top-left";
 
-/** 觸發鈕落在選單的哪個角；選單從這個角長出來 */
+/** Which menu corner the trigger lands on; the menu grows from this corner */
 type Corner = { x: "left" | "right"; y: "top" | "bottom" };
-/** 起點裁切：上、右、下、左的內縮與圓角半徑；終點是全部 0、圓角 RADIUS */
+/** Start clip: top, right, bottom, left insets and corner radius; the end is all 0 with radius RADIUS */
 type Inset = [number, number, number, number, number];
 
 const RADIUS = 10;
@@ -60,7 +60,7 @@ function defaultLabel(tag?: string) {
   return t.startsWith("ja") ? LABELS.ja : LABELS.en;
 }
 
-/** 可見範圍：視窗與所有會裁切的祖先取交集，抽屜、捲動清單裡也能正確翻面 */
+/** Visible area: intersection of the viewport and all clipping ancestors, so flipping works inside drawers and scroll lists */
 function visibleBounds(el: HTMLElement) {
   const root = document.documentElement;
   let b = { top: 0, left: 0, right: root.clientWidth, bottom: root.clientHeight };
@@ -74,7 +74,7 @@ function visibleBounds(el: HTMLElement) {
   return b;
 }
 
-/** 橫向往空間大的一側長（列尾的按鈕會往左蓋回自己那一列）；縱向預設往下，不夠才往上 */
+/** Horizontally grow toward the side with more space (a button at the end of a row covers back over its own row); vertically down by default, up only when needed */
 function pickCorner(trigger: DOMRect, h: number, b: ReturnType<typeof visibleBounds>): Corner {
   const right = b.right - trigger.left;
   const left = trigger.right - b.left;
@@ -86,20 +86,20 @@ function pickCorner(trigger: DOMRect, h: number, b: ReturnType<typeof visibleBou
   };
 }
 
-/** 起點是觸發鈕大小、落在對應角的圓；終點是整張選單 */
+/** Start is a circle the size of the trigger at the matching corner; end is the full menu */
 function insetFor({ x, y }: Corner, w: number, h: number, tw: number, th: number): Inset {
   const dx = Math.max(0, w - tw);
   const dy = Math.max(0, h - th);
   return [y === "top" ? 0 : dy, x === "left" ? dx : 0, y === "top" ? dy : 0, x === "left" ? 0 : dx, th / 2];
 }
 
-/** 進度 0 是觸發鈕形狀，1 是整張選單；彈簧過衝時可略超出 0 到 1 */
+/** Progress 0 is the trigger shape, 1 is the full menu; may slightly exceed 0 to 1 on spring overshoot */
 function clipAt(start: Inset, p: number) {
   const [t, r, b, l, rad] = start.map((v, i) => v + ((i === 4 ? RADIUS : 0) - v) * p);
   return `inset(${t}px ${r}px ${b}px ${l}px round ${Math.max(0, rad)}px)`;
 }
 
-/** 弧線起訖角度（螢幕座標，y 向下），一律朝畫面內側的四分之一圓 */
+/** Arc start and end angles (screen coordinates, y down), always the quarter circle facing the inside of the screen */
 const ARC: Record<RadialCorner, [number, number]> = {
   "bottom-right": [180, 270],
   "bottom-left": [0, -90],
@@ -107,7 +107,7 @@ const ARC: Record<RadialCorner, [number, number]> = {
   "top-left": [0, 90],
 };
 
-/** 項目 40px、間隔至少 8px：依數量算出半徑，弦長不小於 48px */
+/** Items 40px with at least 8px gap: radius is derived from the count so the chord is at least 48px */
 function radialOffsets(count: number, corner: RadialCorner) {
   const [from, to] = ARC[corner];
   const step = count > 1 ? Math.abs(to - from) / (count - 1) : 90;
@@ -143,7 +143,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const geo = useRef<Inset | null>(null);
-  /** 目前的展開進度、內容與圖示的不透明度；中途反向時從這裡接續 */
+  /** Current expand progress and content and icon opacity; a mid-way reversal continues from here */
   const now = useRef({ p: 0, content: 0, ghost: 1 });
   const running = useRef<{ stop: () => void }[]>([]);
   const returnFocus = useRef(false);
@@ -159,12 +159,12 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     onOpenChange?.(next);
   }
 
-  // 開與關都在繪製前處理：先量尺寸、定角落、設好起點裁切，第一格畫面就是觸發鈕的形狀
+  // Both open and close are handled before paint: measure, pick the corner, set the start clip, so the first frame is the trigger shape
   useLayoutEffect(() => {
     const menu = menuRef.current;
     const trigger = triggerRef.current;
     if (!mounted || !menu || !trigger) return;
-    // radial 由 AnimatePresence 負責進出場，這裡只把焦點交給第一項
+    // For radial, AnimatePresence handles enter and exit; here we only move focus to the first item
     if (radial) {
       if (open) enabled()[0]?.focus({ preventScroll: true });
       return;
@@ -173,8 +173,8 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     running.current = [];
     const content = menu.querySelector<HTMLElement>("[data-content]")!;
     const ghost = menu.querySelector<HTMLElement>("[data-ghost]")!;
-    // 只補間數字、每格自己寫 style，不交給 WAAPI：WAAPI 結束時會有一格退回 inline 的舊值，
-    // 選單每次開完、關完都會閃一下起點形狀
+    // Tween numbers only and write style each frame, not WAAPI: when WAAPI finishes one frame falls back to the old inline value,
+    // so the menu would flash the start shape after every open and close
     const v = now.current;
     const paint = () => {
       if (geo.current) menu.style.clipPath = clipAt(geo.current, v.p);
@@ -196,7 +196,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
         return paint();
       }
       paint();
-      // 依序：外框先從角落長開，圖示 100ms 退場，內容晚約 60ms 進場
+      // In order: the frame grows from the corner first, the icon exits in 100ms, the content enters about 60ms later
       running.current = [
         tween("p", 1, springs.gentle),
         tween("ghost", 0, { duration: 0.1 }),
@@ -212,7 +212,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     if (reduce || !geo.current) return done();
     const shrink = tween("p", 0, { ...springs.snappy, restDelta: 0.005, restSpeed: 0.05 });
     running.current = [tween("content", 0, { duration: 0.08 }), tween("ghost", 1, { duration: 0.12, delay: 0.1 }), shrink];
-    // stop() 也會讓 promise 完成，被重新打開打斷時不能卸載
+    // stop() also resolves the promise; do not unmount when interrupted by reopening
     void shrink.then(() => {
       if (running.current.includes(shrink)) done();
     });
@@ -274,7 +274,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
             <div ref={menuRef} id={id} role="menu" aria-label={name} onKeyDown={onMenuKey} className={cn("absolute inset-0", menuClassName)}>
               {items.map((item, i) => {
                 const { x, y } = offsets[i];
-                // 從觸發鈕中心出發，0.96 起跳，依序錯開 30ms；收合時反向回到中心
+                // Start from the trigger centre at 0.96, staggered by 30ms; on collapse, reverse back to the centre
                 const fly = reduce ? { duration: 0 } : { ...springs.snappy, delay: i * 0.03, opacity: { duration: 0.12, delay: i * 0.03 } };
                 const back = reduce ? { duration: 0 } : { ...springs.snappy, delay: (n - 1 - i) * 0.02, opacity: { duration: 0.1, delay: (n - 1 - i) * 0.02 } };
                 return (
@@ -332,7 +332,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
           whileTap={reduce ? undefined : { scale: 0.97, transition: springs.snappy }}
           className="relative inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground outline-none shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5"
         >
-          {/* 預設的加號轉成叉，同一個圖示說明「再按一次收起」 */}
+          {/* The default plus turns into a cross, the same icon saying "press again to close" */}
           <motion.span className="flex" animate={{ rotate: open && !icon ? 45 : 0 }} transition={reduce ? { duration: 0 } : springs.snappy}>
             {icon ?? <Plus />}
           </motion.span>
@@ -374,7 +374,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
             menuClassName,
           )}
         >
-          {/* 觸發鈕的圖示留在原位，外框長開時才退場，視線有錨點 */}
+          {/* The trigger icon stays in place and exits only as the frame grows, giving the eye an anchor */}
           <span data-ghost aria-hidden="true" className="pointer-events-none absolute flex items-center justify-center opacity-0">
             {icon ?? <Dots />}
           </span>

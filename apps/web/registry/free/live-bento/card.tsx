@@ -5,7 +5,7 @@ import { useDemoText } from "@/lib/demo-locale";
 import { AgentVisual, demoCopy } from "./demo";
 import { BentoTile, LiveBento } from "./live-bento";
 
-/** 型錄卡片：一格功能方塊（只放標題，讓縮圖夠大），小畫面在畫面內重播一次代理搜尋，計分條長出來、第一名用品牌專色。 */
+/** Catalog card: one feature tile (title only, so the thumbnail is large); the mini screen replays an agent search once, score bars grow, first place in the brand spot colour. */
 export default function LiveBentoCard() {
   const t = useDemoText(demoCopy);
   return (

@@ -14,36 +14,36 @@ import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, typ
 
 import { cn } from "@/lib/utils";
 
-/** 單張卡片效果，用 EffectCard 的 effect prop 切換 */
+/** Single-card effects, switched with EffectCard's effect prop */
 export const cardEffects = ["hover-lift", "spotlight", "tilt-3d", "glare", "flip", "info-slide-up", "wobble", "curl", "border-beam"] as const;
 export type CardEffect = (typeof cardEffects)[number];
 
-/** 卡片群組效果，各自是獨立元件（吃 items 陣列） */
+/** Card group effects, each its own component (takes an items array) */
 export const cardGroupEffects = ["focus-dim", "stack-fan", "border-spotlight-grid", "expanding-panels", "bento-expand"] as const;
 export type CardGroupEffect = (typeof cardGroupEffects)[number];
 
 export interface EffectCardProps {
   effect?: CardEffect;
-  /** 卡片上方的圖片區，通常放一個 <img>，會自動填滿 */
+  /** Image area at the top of the card, usually one <img>; it fills automatically */
   media?: ReactNode;
   title?: ReactNode;
-  /** 標題右側的價格或數字，tabular-nums；tilt-3d 時浮在最上層 */
+  /** Price or number right of the title, tabular-nums; floats on the top layer with tilt-3d */
   price?: ReactNode;
-  /** 內文；info-slide-up 時是滑上來的資訊面板 */
+  /** Body text; with info-slide-up it is the panel that slides up */
   children?: ReactNode;
-  /** flip 的背面內容 */
+  /** Back face content for flip */
   back?: ReactNode;
-  /** flip 的觸發方式 */
+  /** How flip is triggered */
   flipOn?: "hover" | "click";
-  /** 光暈與箔光顏色，預設跟隨 var(--primary) */
+  /** Glow and foil colour, defaults to var(--primary) */
   colors?: string[];
-  /** tilt / glare 的最大傾斜角度 */
+  /** Maximum tilt angle for tilt / glare */
   intensity?: number;
-  /** curl 捲角的大小（px） */
+  /** Size of the curl corner (px) */
   curlSize?: number;
-  /** tilt-3d 的圖層深度（px）：圖片、標題、價格依序浮出，數字越大分得越開 */
+  /** Layer depth for tilt-3d (px): image, title and price lift in turn; larger values spread them further */
   depth?: number;
-  /** border-beam：為真時（處理中、已選取）細線以品牌專色持續繞行；否則只在滑過或聚焦時繞一圈 */
+  /** border-beam: when true (processing, selected) the thin line keeps circling in the brand spot colour; otherwise it circles once on hover or focus */
   active?: boolean;
   className?: string;
 }
@@ -52,7 +52,7 @@ const shell = "relative rounded-xl border border-border bg-card text-card-foregr
 const soft = { type: "spring", stiffness: 260, damping: 26 } as const;
 const tiltSpring = { stiffness: 220, damping: 20, mass: 0.6 };
 
-// 指標在元素內的相對位置（0 到 1），掛在外層不動的元素上，避免卡片自己移動造成回授抖動
+// Pointer position inside the element (0 to 1), read from the static outer element so the moving card does not cause feedback jitter
 function usePointer() {
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -82,7 +82,7 @@ interface BodyProps {
   title?: ReactNode;
   price?: ReactNode;
   children?: ReactNode;
-  /** 價格相對內文再浮出的距離（px），只有 tilt-3d 用 */
+  /** Extra lift of the price above the body (px), tilt-3d only */
   lift?: number;
   className?: string;
 }
@@ -142,7 +142,7 @@ export function EffectCard(props: EffectCardProps) {
   }
 }
 
-// reduced motion：不位移不旋轉，只保留邊框顏色變化；翻面與資訊面板直接顯示，不遺失內容
+// Reduced motion: no translate or rotate, only the border colour changes; flip back and info panel show directly so no content is lost
 function ReducedCard({ effect = "hover-lift", media, title, price, children, back, flipOn = "hover", active, className }: EffectCardProps) {
   const [flipped, setFlipped] = useState(false);
   if (effect === "flip") {
@@ -172,7 +172,7 @@ function ReducedCard({ effect = "hover-lift", media, title, price, children, bac
       </div>
     );
   }
-  // border-beam 的 active 不繞行，改成整圈品牌色邊框，狀態不遺失
+  // Active border-beam with reduced motion: no circling, a full brand-colour border instead, so the state is kept
   const on = effect === "border-beam" && active;
   return (
     <div
@@ -191,7 +191,7 @@ function toggleKey(e: KeyboardEvent<HTMLElement>, fn: () => void) {
   }
 }
 
-/* hover-lift：卡片上浮、陰影加深，縮圖在框內放大 */
+/* hover-lift: card rises, shadow deepens, thumbnail zooms inside its frame */
 const liftCard: Variants = {
   rest: { y: 0, boxShadow: "0 1px 2px rgb(0 0 0 / 0.06)" },
   hover: { y: -6, boxShadow: "0 18px 40px -12px rgb(0 0 0 / 0.28)" },
@@ -222,7 +222,7 @@ function HoverLift({ media, title, price, children, className }: EffectCardProps
   );
 }
 
-/* spotlight：一束光跟著指標在卡片內移動，並把附近的邊框點亮 */
+/* spotlight: a beam of light follows the pointer inside the card and lights the nearby border */
 function Spotlight({ media, title, price, children, colors, className }: EffectCardProps) {
   const glow = colors?.[0] ?? "var(--primary)";
   const { px, py, onPointerMove } = usePointer();
@@ -252,7 +252,7 @@ function Spotlight({ media, title, price, children, colors, className }: EffectC
   );
 }
 
-/* tilt-3d：卡片朝指標方向立體傾斜，圖片、標題、價格分層浮出 */
+/* tilt-3d: card tilts toward the pointer in 3D, image, title and price lift in layers */
 function Tilt3d({ media, title, price, children, intensity = 12, depth = 48, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const rotateX = useSpring(useTransform(py, [0, 1], [intensity, -intensity]), tiltSpring);
@@ -275,7 +275,7 @@ function Tilt3d({ media, title, price, children, intensity = 12, depth = 48, cla
   );
 }
 
-/* glare：全像箔光與反光隨指標角度流動，卡片同時輕微傾斜 */
+/* glare: holographic foil and reflection flow with the pointer angle while the card tilts slightly */
 function Glare({ media, title, price, children, colors, intensity = 10, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const [on, setOn] = useState(false);
@@ -284,7 +284,7 @@ function Glare({ media, title, price, children, colors, intensity = 10, classNam
   const angle = useTransform([px, py], ([a, b]: number[]) => (Math.atan2(b - 0.5, a - 0.5) * 180) / Math.PI + 90);
   const x = usePercent(px);
   const y = usePercent(py);
-  // 預設箔色由 --primary 的色相轉出四段，主題換了箔光也跟著換
+  // Default foil colours are four hues derived from --primary, so the foil follows the theme
   const foilStops = (
     colors ?? [0, 70, 140, 210].map((h) => `oklch(from var(--primary) 0.82 max(c, 0.14) calc(h + ${h}))`)
   ).join(", ");
@@ -319,7 +319,7 @@ function Glare({ media, title, price, children, colors, intensity = 10, classNam
   );
 }
 
-/* flip：滑過或點擊時 3D 翻到背面 */
+/* flip: flips to the back in 3D on hover or click */
 function Flip({ media, title, price, children, back, flipOn = "hover", className }: EffectCardProps) {
   const [flipped, setFlipped] = useState(false);
   const hover = flipOn === "hover";
@@ -354,7 +354,7 @@ function Flip({ media, title, price, children, back, flipOn = "hover", className
   );
 }
 
-/* info-slide-up：圖卡平時只有標題，滑過時資訊面板由下滑上 */
+/* info-slide-up: the card shows only the title at rest; the info panel slides up on hover */
 const slideTitle: Variants = { rest: { opacity: 1, y: 0 }, open: { opacity: 0, y: -10 } };
 const slidePanel: Variants = { rest: { y: "101%" }, open: { y: 0 } };
 
@@ -392,7 +392,7 @@ function InfoSlideUp({ media, title, children, className }: EffectCardProps) {
   );
 }
 
-/* wobble：卡片跟著指標輕微晃動，離開時像果凍般彈回 */
+/* wobble: card sways slightly with the pointer and springs back like jelly on leave */
 function Wobble({ media, title, price, children, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const jelly = { stiffness: 170, damping: 7, mass: 0.7 };
@@ -409,7 +409,7 @@ function Wobble({ media, title, price, children, className }: EffectCardProps) {
   );
 }
 
-/* curl：滑過時右下角像紙一樣捲起 */
+/* curl: bottom-right corner curls up like paper on hover */
 function Curl({ media, title, price, children, curlSize = 56, className }: EffectCardProps) {
   const c = useSpring(0, { stiffness: 260, damping: 22 });
   const clip = useMotionTemplate`polygon(0 0, 100% 0, 100% calc(100% - ${c}px), calc(100% - ${c}px) 100%, 0 100%)`;
@@ -422,7 +422,7 @@ function Curl({ media, title, price, children, curlSize = 56, className }: Effec
       <motion.div style={{ clipPath: clip }} className={cn(shell, "h-full overflow-hidden")}>
         <Front media={media} title={title} price={price}>{children}</Front>
       </motion.div>
-      {/* 捲起的紙背：角落方塊的左上半三角，靠近摺線處最亮 */}
+      {/* Back of the curl: top-left triangle of the corner square, brightest near the fold */}
       <motion.div
         aria-hidden
         className="pointer-events-none absolute bottom-0 right-0 [filter:drop-shadow(-3px_-3px_4px_rgb(0_0_0/0.18))]"
@@ -437,11 +437,11 @@ function Curl({ media, title, price, children, curlSize = 56, className }: Effec
   );
 }
 
-/* border-beam：滑過或聚焦時，一段細線沿邊框繞一圈後收起，是回應不是裝飾循環。
-   active 為真（處理中、已選取）時改用品牌專色持續繞行，屬於「載入中」的例外。不加光暈、不用多色漸層。 */
+/* border-beam: on hover or focus a thin line circles the border once and stops. It is a response, not a decorative loop.
+   When active is true (processing, selected) it keeps circling in the brand spot colour, the loading exception. No glow, no multi-colour gradient. */
 const e1 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
-// 線段長度與間距合計為 1，繞行時首尾相接不跳
+// Dash length plus gap equals 1, so the loop joins end to start without a jump
 const beamPath = { pathLength: 0.22, pathSpacing: 0.78 };
 
 function BorderBeam({ media, title, price, children, active = false, className }: EffectCardProps) {
@@ -465,7 +465,7 @@ function BorderBeam({ media, title, price, children, active = false, className }
       <div className="h-full overflow-hidden rounded-[inherit]">
         <Front media={media} title={title} price={price}>{children}</Front>
       </div>
-      {/* 線段壓在 1px 外框上：SVG 往外擴 1px，描邊中心再內縮半個線寬 */}
+      {/* Line sits on the 1px border: the SVG extends 1px outward and the stroke centre moves in by half a stroke width */}
       <svg aria-hidden className="pointer-events-none absolute -left-px -top-px size-[calc(100%+2px)] overflow-visible">
         <g transform="translate(0.75 0.75)">
           {active ? (
@@ -493,7 +493,7 @@ function BorderBeam({ media, title, price, children, active = false, className }
   );
 }
 
-/* ───────── 群組效果 ───────── */
+/* ───────── Group effects ───────── */
 
 export interface EffectCardItem {
   id: string;
@@ -516,7 +516,7 @@ function ItemCard({ item, className }: { item: EffectCardItem; className?: strin
   );
 }
 
-/** focus-dim：滑過的卡片上浮，其他卡片變暗並略縮小 */
+/** focus-dim: the hovered card rises, the others dim and shrink slightly */
 export function FocusGrid({ items, className }: CardGroupProps) {
   const reduce = useReducedMotion() ?? false;
   const [active, setActive] = useState<number | null>(null);
@@ -552,7 +552,7 @@ export function FocusGrid({ items, className }: CardGroupProps) {
   );
 }
 
-// 量測容器寬度，給需要依寬度排版的群組用
+// Measure container width for groups that lay out by width
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [width, setWidth] = useState(0);
@@ -567,19 +567,19 @@ function useWidth<T extends HTMLElement>() {
 }
 
 export interface StackFanProps extends CardGroupProps {
-  /** 每張卡片的寬度（px） */
+  /** Width of each card (px) */
   cardWidth?: number;
   gap?: number;
 }
 
-/** stack-fan：微微錯開旋轉的一疊卡片，滑過時展開成一排 */
+/** stack-fan: a slightly offset, rotated stack of cards that fans out into a row on hover */
 export function StackFan({ items, cardWidth = 150, gap = 12, className }: StackFanProps) {
   const reduce = useReducedMotion() ?? false;
   const [ref, width] = useWidth<HTMLDivElement>();
   const [open, setOpen] = useState(false);
   const n = items.length;
   const mid = (n - 1) / 2;
-  // 容器太窄時讓卡片互相重疊，不超出邊界
+  // When the container is too narrow the cards overlap instead of overflowing
   const step = n > 1 ? Math.min(cardWidth + gap, Math.max(0, (width - cardWidth) / (n - 1))) : 0;
   return (
     <div
@@ -614,16 +614,16 @@ export function StackFan({ items, cardWidth = 150, gap = 12, className }: StackF
 
 export interface SpotlightGridProps extends CardGroupProps {
   colors?: string[];
-  /** 光圈半徑（px） */
+  /** Spotlight radius (px) */
   radius?: number;
 }
 
-/** border-spotlight-grid：一道指標光同時照亮附近所有卡片的邊框 */
+/** border-spotlight-grid: one pointer light lights the borders of all nearby cards */
 export function SpotlightGrid({ items, colors, radius = 240, className }: SpotlightGridProps) {
   const glow = colors?.[0] ?? "var(--primary)";
   const root = useRef<HTMLDivElement>(null);
   const cells = useRef<(HTMLDivElement | null)[]>([]);
-  // 直接寫 CSS 變數，不觸發 re-render
+  // Write CSS variables directly, no re-render
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
     for (const el of cells.current) {
       if (!el) continue;
@@ -674,7 +674,7 @@ export function SpotlightGrid({ items, colors, radius = 240, className }: Spotli
   );
 }
 
-/** expanding-panels：一排窄面板，滑過的那片變寬並顯示標題 */
+/** expanding-panels: a row of narrow panels; the hovered one widens and shows its title */
 export function ExpandingPanels({ items, className }: CardGroupProps) {
   const reduce = useReducedMotion() ?? false;
   const [active, setActive] = useState(0);
@@ -717,7 +717,7 @@ export interface BentoExpandProps extends CardGroupProps {
   columns?: number;
 }
 
-/** bento-expand：便當格，滑過的格子長大，其他格子讓出空間 */
+/** bento-expand: bento grid; the hovered cell grows and the others make room */
 export function BentoExpand({ items, columns = 3, className }: BentoExpandProps) {
   const reduce = useReducedMotion() ?? false;
   const [active, setActive] = useState<number | null>(null);

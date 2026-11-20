@@ -65,11 +65,11 @@ const BagIcon = () => (
   </svg>
 );
 
-/** 商店 header 裡的通知鈴：面板預設展開，點一則標為已讀，或一次全部已讀。 */
+/** Notification bell in a store header: the panel opens by default; click one to mark it read, or mark all read at once. */
 export default function NotificationBellDemo() {
   const t = useDemoText(copy);
   const locale = useDemoLocale();
-  // 只有已讀狀態是互動資料，文案跟著語言換
+  // Only the read state is interactive data; copy changes with the language
   const [read, setRead] = useState<string[]>(["n4", "n3"]);
   const actors = [{ name: "Field Goods" }, { name: "Mina Park" }, undefined, undefined];
   const ages = [6, 48, 60 * 26, 60 * 24 * 3];
@@ -107,7 +107,7 @@ export default function NotificationBellDemo() {
           </button>
         </div>
       </header>
-      {/* 底下的商品格，讓面板確實浮在內容上 */}
+      {/* Product grid underneath, so the panel visibly floats over content */}
       <div aria-hidden="true" className="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="space-y-2">

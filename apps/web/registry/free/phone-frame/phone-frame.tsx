@@ -5,12 +5,12 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type R
 
 import { cn } from "@/lib/utils";
 
-/** auto 跟著深淺色切換；dark／light 固定色，給不吃主題的簡報舞台用 */
+/** auto follows light/dark; dark / light are fixed, for presentation stages that ignore the theme */
 export type PhoneFrameScheme = "auto" | "dark" | "light";
 
 /*
- * 螢幕裡的色彩 token。auto 跟著網站深淺色，dark／light 固定，給不吃主題的簡報舞台用。
- * 全部是中性灰，不帶暖色。
+ * Colour tokens inside the screen. auto follows the site's light/dark, dark / light are fixed, for presentation stages that ignore the theme.
+ * All neutral grey, no warm tint.
  */
 const lightVars =
   "[--wf-surface:#ffffff] [--wf-raised:#f4f4f5] [--wf-sunken:#f4f4f5] [--wf-fg:#171717] [--wf-fg-muted:#525252] [--wf-line-strong:rgba(0,0,0,0.12)] [--wf-line:rgba(0,0,0,0.08)]";
@@ -43,7 +43,7 @@ function LockIcon() {
   );
 }
 
-/** 狀態列：實心訊號格、Wi-Fi 扇形、電池，和真的手機一樣是填色而不是線條 */
+/** Status bar: solid signal bars, Wi-Fi fan and battery, filled rather than outlined like a real phone */
 function StatusIcons() {
   return (
     <span className="inline-flex items-center gap-[1.4cqw]">
@@ -67,37 +67,37 @@ function StatusIcons() {
   );
 }
 
-/* ───────── 手機 ───────── */
+/* ───────── Phone ───────── */
 
 export interface PhoneFrameProps {
   children: ReactNode;
-  /** 瀏覽器網址列；不給就沒有網址列 */
+  /** Browser URL bar; no URL bar if omitted */
   url?: string;
   time?: string;
-  /** 手機寬度（px），窄容器裡會縮到 100%，外框、圓角、動態島跟著等比縮放 */
+  /** Phone width (px); shrinks to 100% in narrow containers, with frame, radius and Dynamic Island scaling proportionally */
   width?: number;
-  /** 手機整體高度。不給時用真實手機的 9:19.5 比例；內容超出時在螢幕裡捲動 */
+  /** Overall phone height. Defaults to a real phone's 9:19.5 ratio; overflowing content scrolls inside the screen */
   height?: number;
-  /** 手機上方的小標 */
+  /** Small caption above the phone */
   label?: ReactNode;
   scheme?: PhoneFrameScheme;
   badge?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; also accepts tags like zh-Hant-HK or ja-JP */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: Partial<PhoneFrameLabels>;
   className?: string;
 }
 
 export interface PhoneFrameLabels {
-  /** label 不是字串時 figure 的無障礙名稱 */
+  /** Accessible name of the figure when label is not a string */
   screen: string;
   url: (url: string) => string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -113,9 +113,9 @@ const MESSAGES: Record<SunLocale, PhoneFrameLabels> = {
 };
 
 /*
- * 外框由外到內三層：金屬中框（光從正上方來，上緣亮、下緣暗）、黑色玻璃邊、螢幕。
- * 所有尺寸用 cqw（手機寬度的百分比），縮小時圓角、邊框、動態島的比例不變。
- * 同心圓角：中框 14cqw，玻璃邊 13.2cqw，螢幕 13.2 − 3.2 = 10cqw。
+ * Three layers from outside in: metal mid-frame (light from directly above, bright top edge, dark bottom edge), black glass bezel, screen.
+ * All sizes use cqw (percent of phone width), so radius, borders and Dynamic Island keep their proportions when scaled down.
+ * Concentric radii: frame 14cqw, bezel 13.2cqw, screen 13.2 - 3.2 = 10cqw.
  */
 const frameMetal =
   "bg-[#2b2b2f] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_-1px_0_rgb(0_0_0/0.5),0_0_0_1px_rgb(0_0_0/0.55),0_2px_4px_rgb(0_0_0/0.12),0_24px_48px_-16px_rgb(0_0_0/0.35)]";
@@ -149,7 +149,7 @@ export function PhoneFrame({
         </figcaption>
       )}
       <div className="@container relative w-full">
-        {/* 側邊按鍵：左側動作鍵與音量鍵，右側電源鍵，各凸出機身一點點 */}
+        {/* Side buttons: action and volume buttons on the left, power on the right, each protruding slightly */}
         <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[17%] h-[5.5%] rounded-l-[0.6cqw]")} />
         <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[25%] h-[10%] rounded-l-[0.6cqw]")} />
         <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[37%] h-[10%] rounded-l-[0.6cqw]")} />
@@ -157,7 +157,7 @@ export function PhoneFrame({
         <div className={cn("relative rounded-[14cqw] p-[0.8cqw]", frameMetal)} style={height ? { height } : { aspectRatio: "9 / 19.5" }}>
           <div className="h-full rounded-[13.2cqw] bg-[#050506] p-[3.2cqw]">
             <div className={cn("relative flex h-full flex-col overflow-hidden rounded-[10cqw]", part)}>
-              {/* 動態島 */}
+              {/* Dynamic Island */}
               <div aria-hidden="true" className="absolute top-[3.2cqw] left-1/2 z-[2] h-[9cqw] w-[30cqw] -translate-x-1/2 rounded-full bg-[#050506]" />
               <div aria-hidden="true" className="flex h-[15.4cqw] flex-none items-center justify-between pr-[6.4cqw] pl-[8.6cqw] pt-[1cqw] text-[4.6cqw] font-semibold">
                 <span className="tabular-nums tracking-tight">{time}</span>
@@ -184,11 +184,11 @@ export function PhoneFrame({
   );
 }
 
-/* ───────── 兩支交疊的手機（原 tilted-phone-pair） ───────── */
+/* ───────── Two overlapping phones (formerly tilted-phone-pair) ───────── */
 
-/** gentle 彈簧：狀態切換、跟手的位移 */
+/** gentle spring: state changes, pointer-following moves */
 const GENTLE = { stiffness: 240, damping: 30 };
-/** 舞台的設計尺寸；容器較窄時整組等比縮小，不換版 */
+/** Design size of the stage; in narrower containers the whole group scales down without changing layout */
 const STAGE_W = 400;
 const STAGE_H = 580;
 
@@ -197,24 +197,24 @@ const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayout
 type PairFrameProps = Omit<PhoneFrameProps, "children" | "width" | "height" | "scheme" | "locale">;
 
 export interface PhonePairProps {
-  /** 後方較大的手機畫面 */
+  /** Screen of the larger phone at the back */
   back: ReactNode;
-  /** 前方較小的手機畫面 */
+  /** Screen of the smaller phone in front */
   front: ReactNode;
-  /** 傳給後方 PhoneFrame 的其他設定，例如 url、time、badge */
+  /** Other props for the back PhoneFrame, e.g. url, time, badge */
   backFrame?: PairFrameProps;
-  /** 傳給前方 PhoneFrame 的其他設定 */
+  /** Other props for the front PhoneFrame */
   frontFrame?: PairFrameProps;
   scheme?: PhoneFrameScheme;
   locale?: string;
-  /** 游標視差，預設開啟；只在滑鼠這類精準指標上作用，偏好減少動態時固定不動 */
+  /** Cursor parallax, on by default; only for fine pointers such as a mouse, static with reduced motion */
   parallax?: boolean;
-  /** 整組的無障礙名稱 */
+  /** Accessible name of the group */
   label?: string;
   className?: string;
 }
 
-/** 一支傾斜的手機：靜止角度加上游標偏移乘以跟隨倍率 */
+/** One tilted phone: rest angle plus cursor offset times the follow factor */
 function TiltedPhone({
   px,
   py,
@@ -236,8 +236,8 @@ function TiltedPhone({
 }
 
 /**
- * 兩支交疊、在 3D 裡傾斜的 PhoneFrame。游標移動時兩支一起跟著轉，
- * 前方手機跟得比後方多，做出前後景深。觸控裝置與減少動態時維持靜止角度。
+ * Two overlapping PhoneFrames tilted in 3D. Both turn with the cursor,
+ * the front phone more than the back, for depth. Touch devices and reduced motion keep the rest angle.
  */
 export function PhonePair({
   back,
@@ -278,7 +278,7 @@ export function PhonePair({
     return () => mq.removeEventListener("change", apply);
   }, []);
 
-  // 關掉視差時回到靜止角度；減少動態時直接跳回，不播彈簧
+  // With parallax off, return to the rest angle; with reduced motion jump back without the spring
   useEffect(() => {
     if (on) return;
     x.set(0);

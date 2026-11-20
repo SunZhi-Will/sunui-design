@@ -11,14 +11,14 @@ const springs = {
 } as const;
 
 export interface SeekChapter {
-  /** 起始秒數 */
+  /** Start time (seconds) */
   t: number;
   title: string;
 }
 
 export interface SeekMarker {
   t: number;
-  /** 滑到記號附近時顯示在浮層裡 */
+  /** Shown in the popover when near the marker */
   label?: string;
 }
 
@@ -28,28 +28,28 @@ export interface ChapterSeekbarLabels {
 }
 
 export interface ChapterSeekbarProps {
-  /** 總長（秒） */
+  /** Total length (seconds) */
   duration: number;
   current: number;
-  /** 已緩衝到的秒數；不給就不畫 */
+  /** Seconds buffered so far; not drawn if omitted */
   buffered?: number;
-  /** 兩章以上才會把進度條切段 */
+  /** The bar is split into segments only with two or more chapters */
   chapters?: SeekChapter[];
-  /** 書籤、片段這類記號，單色顯示；點在記號附近會吸附到它 */
+  /** Markers such as bookmarks or clips, drawn in one colour; clicking near one snaps to it */
   markers?: SeekMarker[];
   onSeek?: (t: number) => void;
   onMarkerClick?: (marker: SeekMarker) => void;
-  /** 浮層裡的縮圖（16:9，寬 160） */
+  /** Thumbnail in the popover (16:9, 160 wide) */
   renderThumb?: (t: number) => ReactNode;
   formatTime?: (t: number) => string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; also accepts tags like zh-Hant-HK or ja-JP */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: ChapterSeekbarLabels;
   className?: string;
 }
 
-/** 沒有小時時分鐘不補零：4:05、1:02:09 */
+/** Minutes are not zero-padded when there are no hours: 4:05, 1:02:09 */
 export function formatTime(sec: number) {
   if (!Number.isFinite(sec)) return "--:--";
   const s = Math.max(0, Math.floor(sec));
@@ -73,8 +73,8 @@ const MESSAGES: Record<SunLocale, Required<ChapterSeekbarLabels>> = {
   ja: { seek: "再生位置", valueText: (time, total, chapter) => `${chapter ? `${chapter}、` : ""}${time} / ${total}` },
 };
 
-const GAP = 3; // 章節之間的縫（px）
-const SNAP = 8; // 點在記號幾 px 內會吸附
+const GAP = 3; // Gap between chapters (px)
+const SNAP = 8; // Snap to a marker when clicking within this many px
 const spot = "bg-[color:var(--sunui-spot,var(--primary))]";
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
@@ -103,7 +103,7 @@ export function ChapterSeekbar({
 
   const d = duration > 0 ? duration : 0;
   const sorted = [...chapters].filter((c) => c.t < d || !d).sort((a, b) => a.t - b.t);
-  // 一章或沒有章節時整條就是一段
+  // With one chapter or none, the whole bar is one segment
   const segs = sorted.length > 1 && d ? sorted : [{ t: 0, title: sorted[0]?.title ?? "" }];
   const marks = d ? markers.filter((m) => m.t >= 0 && m.t <= d) : [];
   const chapterAt = (v: number) => segs.reduce((i, c, k) => (c.t <= v + 0.01 ? k : i), 0);
@@ -133,17 +133,17 @@ export function ChapterSeekbar({
   };
   const endDrag = (e: PointerEvent<HTMLDivElement>) => {
     setDrag(false);
-    // 觸控沒有懸停：放開手指就收起浮層
+    // Touch has no hover: hide the popover when the finger lifts
     if (e.pointerType !== "mouse" || !inside) setHover(null);
   };
 
-  // 浮層中心夾在進度條內，375px 也不會超出
+  // Clamp the popover centre inside the bar so it never overflows, even at 375px
   const shown = useRef(false);
   useLayoutEffect(() => {
     if (!hover) return void (shown.current = false);
     const cw = chipRef.current?.offsetWidth ?? 0;
     const x = cw >= hover.w ? (hover.w - cw) / 2 : Math.min(Math.max(hover.x - cw / 2, 0), hover.w - cw);
-    // 剛出現時直接就位，之後用彈簧跟手
+    // Jump into place on first show, then follow with a spring
     if (reduce || !shown.current) chipX.jump(x);
     else chipX.set(x);
     shown.current = true;
@@ -160,7 +160,7 @@ export function ChapterSeekbar({
       ArrowUp: current + step,
       Home: 0,
       End: d,
-      // 上一章：在章首 3 秒內就跳到前一章
+      // Previous chapter: within 3 seconds of a chapter start, jump to the one before
       PageDown: current - segs[i].t > 3 ? segs[i].t : segs[Math.max(0, i - 1)].t,
       PageUp: segs[i + 1]?.t ?? d,
     };

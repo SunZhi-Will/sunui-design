@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { InfiniteCanvas, type InfiniteCanvasItem } from "./infinite-canvas";
 
-// 示範圖：同一組灰底棚拍商品照，放在 public/demo/products/
+// Demo images: one set of grey-backdrop studio product shots in public/demo/products/
 const photos = ["tote", "vase", "mug", "lamp", "cap", "notebook", "candle", "tea", "wallet", "scarf", "gloves", "watch"];
 const photo = (i: number) => `/demo/products/${photos[i % photos.length]}.webp`;
 
@@ -15,7 +15,7 @@ const copy = {
   ja: { label: "日常のセレクト", names: ["キャンバストート", "一輪挿し", "陶器のマグ", "デスクランプ", "ウールのハンチング", "革の手帳", "ソイキャンドル", "煎茶の缶", "革の財布"] },
 };
 
-/** 型錄卡片：一面無限延伸的選品牆，緩慢漂移，可往任何方向拖曳，點一件放大。 */
+/** Catalog card: an endlessly extending product wall that drifts slowly; drag in any direction, click an item to enlarge it. */
 export default function InfiniteCanvasCard() {
   const t = useDemoText(copy);
   const items: InfiniteCanvasItem[] = t.names.map((name, i) => ({ id: String(i), src: photo(i), alt: name, label: name, caption: name }));

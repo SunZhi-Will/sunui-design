@@ -5,8 +5,8 @@ import { useDemoText } from "@/lib/demo-locale";
 import { LogoMarquee, type MarqueeItem } from "./logo-marquee";
 
 /*
- * 虛構的中性字標，全部自己畫：不使用任何真實公司的標誌或名稱。
- * 一律單色 currentColor、線寬 1.5，顏色交給 LogoMarquee 控制。
+ * Fictional neutral wordmarks, all drawn here: no real company logos or names.
+ * Always monochrome currentColor with 1.5 stroke width; LogoMarquee controls the colour.
  */
 const icon = {
   viewBox: "0 0 24 24",

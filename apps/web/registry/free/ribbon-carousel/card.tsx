@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RibbonCarousel, type RibbonItem } from "./ribbon-carousel";
 
-// 示範圖：同一組灰底棚拍單品照，放在 public/demo/looks/
+// Demo images: one set of grey-backdrop studio item shots in public/demo/looks/
 const looks = ["coat-camel", "cardigan-navy", "turtleneck", "trousers-grey", "coat-navy", "field-jacket", "scarf-oat", "boots-black"];
 const photo = (i: number) => `/demo/looks/${looks[i % looks.length]}.webp`;
 
@@ -15,7 +15,7 @@ const copy = {
   ja: { label: "秋のルック", previous: "前のルック", next: "次のルック", looks: ["キャメルのラップコート", "ネイビーのウールカーディガン", "チャコールのタートルネック", "グレーのタックワイドパンツ", "ネイビーのピーコート", "オイルドフィールドジャケット"] },
 };
 
-/** 型錄卡片：穿搭照片沿著弧面排開，自動輪播，拖曳或按箭頭換下一套。 */
+/** Catalog card: outfit photos laid out along a curved surface, autoplaying; drag or use the arrows for the next look. */
 export default function RibbonCarouselCard() {
   const t = useDemoText(copy);
   const items: RibbonItem[] = t.looks.map((title, i) => ({ src: photo(i), alt: title, title }));

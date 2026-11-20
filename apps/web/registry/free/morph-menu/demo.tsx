@@ -138,7 +138,7 @@ export default function MorphMenuDemo() {
           </li>
         ))}
       </ul>
-      {/* 清單層級的動作：角落的浮動鈕，動作沿弧線往上方內側散開 */}
+      {/* List-level actions: a floating corner button, actions fan out along an arc up and inward */}
       <div className="flex items-center justify-between border-t border-border pt-3">
         <p className="text-muted-foreground">
           {t.subtotal} <span className="font-medium text-card-foreground tabular-nums">{price(64)}</span>

@@ -19,12 +19,12 @@ import { cn } from "@/lib/utils";
 export type CommandItem = {
   id: string;
   label: string;
-  /** 額外的搜尋關鍵字，命中時也會列出（但不標示高亮） */
+  /** Extra search keywords; a match lists the item too (without highlighting) */
   keywords?: string[];
   icon?: ReactNode;
-  /** 快捷鍵提示，例如 ["⌘", "B"]，每個元素渲染成一個 kbd */
+  /** Shortcut hint, e.g. ["⌘", "B"]; each element renders as a kbd */
   shortcut?: string[];
-  /** 選取時呼叫 */
+  /** Called on select */
   onSelect?: () => void;
   disabled?: boolean;
 };
@@ -40,23 +40,23 @@ export interface CommandPaletteProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** 是否註冊全域 ⌘K / Ctrl+K 快捷鍵；在其他輸入框打字時不會觸發 */
+  /** Register the global ⌘K / Ctrl+K shortcut; it does not fire while typing in other inputs */
   hotkey?: boolean;
-  /** 搭配 ⌘ / Ctrl 的按鍵，預設 "k" */
+  /** Key used with ⌘ / Ctrl, defaults to "k" */
   hotkeyKey?: string;
   placeholder?: string;
-  /** 顯示幾筆最近使用的項目，0 表示停用 */
+  /** How many recent items to show, 0 disables */
   recentLimit?: number;
-  /** 初始的最近使用項目 id（由新到舊） */
+  /** Initial recent item ids (newest first) */
   defaultRecent?: string[];
-  /** 最近使用清單變動時呼叫，可用來寫入 localStorage */
+  /** Called when the recent list changes, e.g. to write to localStorage */
   onRecentChange?: (ids: string[]) => void;
-  /** 選取後是否自動關閉 */
+  /** Close automatically after select */
   closeOnSelect?: boolean;
   /**
-   * 直接在容器裡展開，不用 portal、遮罩與捲動鎖定，一直是開著的。
-   * 適合放在頁面中（例如說明文件、空狀態、型錄預覽）。此時 open 相關 props 不作用，
-   * 快捷鍵改為聚焦輸入框，Escape 清空搜尋字。
+   * Render open inside its container, with no portal, overlay or scroll lock; always open.
+   * For use within a page (docs, empty states, catalog previews). The open props have no effect then;
+   * the shortcut focuses the input instead, and Escape clears the query.
    */
   inline?: boolean;
   labels?: {
@@ -87,18 +87,18 @@ const defaultLabels = {
 
 type Match = { score: number; indices: number[] };
 
-// SunUI 的彈簧（DESIGN.md 第 5 節）：浮層落定與高亮滑動都用 snappy
+// SunUI springs (DESIGN.md section 5): the popover settle and the highlight slide both use snappy
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
 } as const;
 
-// 高度 e3（對話框）與 e1（按鍵帽）；有陰影就不再加 border，深色模式改用頂邊高光
+// Elevation e3 (dialog) and e1 (key caps); with a shadow there is no border, dark mode uses a top-edge highlight
 const E3 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.08)]";
 const E1 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
-// 近似模糊比對：依序找出每個字元，連續命中與字首命中加分
+// Approximate fuzzy match: find each character in order, with bonuses for consecutive and word-start hits
 export function fuzzyMatch(text: string, query: string): Match | null {
   const q = query.trim().toLowerCase();
   if (!q) return { score: 0, indices: [] };
@@ -117,12 +117,12 @@ export function fuzzyMatch(text: string, query: string): Match | null {
     indices.push(at);
     from = at + 1;
   }
-  // 完整子字串額外加分
+  // Extra bonus for a full substring
   if (t.includes(q)) score += 12;
   return { score, indices };
 }
 
-/** 偵測平台，回傳 "⌘" 或 "Ctrl"，SSR 時預設 "⌘" */
+/** Detect the platform and return "⌘" or "Ctrl"; defaults to "⌘" during SSR */
 export function useModKey() {
   const [mod, setMod] = useState("⌘");
   useEffect(() => {
@@ -203,7 +203,7 @@ export function CommandPalette({
   const baseId = useId();
   const listId = `${baseId}-list`;
   const [inner, setInner] = useState(defaultOpen);
-  // 內嵌模式一直是開著的
+  // Inline mode is always open
   const open = inline || (openProp ?? inner);
   const [query, setQuery] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -224,7 +224,7 @@ export function CommandPalette({
     [openProp, onOpenChange],
   );
 
-  // 全域快捷鍵：只在 hotkey 開啟時註冊，且不搶其他輸入框的按鍵
+  // Global shortcut: registered only when hotkey is on, and never steals keys from other inputs
   useEffect(() => {
     if (!hotkey) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
@@ -240,7 +240,7 @@ export function CommandPalette({
     return () => window.removeEventListener("keydown", onKey);
   }, [hotkey, hotkeyKey, inline, open, setOpen]);
 
-  // 開啟：記住焦點、鎖住捲動、聚焦輸入框；關閉：還原焦點（內嵌模式不做這些）
+  // Open: remember focus, lock scroll, focus the input. Close: restore focus. (Skipped in inline mode)
   useEffect(() => {
     if (!open || inline) return;
     restoreRef.current = document.activeElement as HTMLElement | null;
@@ -293,7 +293,7 @@ export function CommandPalette({
               .map((k) => fuzzyMatch(k, q))
               .filter((m): m is Match => Boolean(m))
               .sort((a, b) => b.score - a.score)[0];
-            // 只命中關鍵字的排在後面
+            // Keyword-only matches go last
             return onKeyword ? { item, score: onKeyword.score - 20, indices: [] } : null;
           })
           .filter((r): r is { item: CommandItem; score: number; indices: number[] } => Boolean(r))
@@ -310,14 +310,14 @@ export function CommandPalette({
   const rows = useMemo(() => sections.flatMap((s) => s.rows), [sections]);
   const enabled = useMemo(() => rows.filter((r) => !r.item.disabled), [rows]);
 
-  // 結果改變時，把高亮移到第一個可選項目
+  // When results change, move the highlight to the first selectable item
   useEffect(() => {
     setActiveKey(enabled[0]?.key ?? null);
   }, [enabled]);
 
   const optionId = (key: string) => `${baseId}-opt-${key.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
 
-  // 高亮項目捲入清單可視範圍；只捲清單本身，不用 scrollIntoView，內嵌時才不會帶動整頁
+  // Scroll the highlighted item into view within the list only, not with scrollIntoView, so inline mode does not scroll the page
   useEffect(() => {
     const list = listRef.current;
     const el = activeKey ? document.getElementById(optionId(activeKey)) : null;
@@ -375,7 +375,7 @@ export function CommandPalette({
     }
   };
 
-  // 焦點陷阱：Tab 只在對話框內循環；Escape 關閉（內嵌時清空搜尋字）
+  // Focus trap: Tab cycles inside the dialog; Escape closes (clears the query when inline)
   const onDialogKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
       if (inline) {
@@ -415,7 +415,7 @@ export function CommandPalette({
       aria-modal={inline ? undefined : true}
       aria-label={text.dialog}
       onKeyDown={onDialogKeyDown}
-      // 浮層落定：從 0.96 加淡入，200ms 內；內嵌時不進場
+      // Popover settle: from 0.96 with a fade, within 200ms; no entrance when inline
       initial={inline || reduce ? false : { opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.98, transition: { duration: 0.12 } }}
@@ -493,7 +493,7 @@ export function CommandPalette({
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => select(row)}
                     className={cn(
-                      // 列是大面積，按下用 0.99；高亮底由 layoutId 跟著指標與方向鍵滑動
+                      // Rows are large surfaces, so 0.99 on press; the highlight background slides with the pointer and arrow keys via layoutId
                       "relative flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-foreground transition-[scale] duration-150 select-none",
                       off ? "cursor-not-allowed opacity-50" : "cursor-pointer motion-safe:active:scale-[0.99]",
                     )}

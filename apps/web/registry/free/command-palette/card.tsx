@@ -7,7 +7,7 @@ import { useDemoText } from "@/lib/demo-locale";
 import { CommandPalette, useModKey } from "./command-palette";
 import { demoCopy, useDemoGroups } from "./demo";
 
-/** 型錄卡片：展開中的指令面板，直接打字就會模糊比對、高亮命中的字，方向鍵移動。 */
+/** Catalog card: an open command palette; typing fuzzy-matches and highlights the matched characters, arrow keys move. */
 export default function CommandPaletteCard() {
   const t = useDemoText(demoCopy);
   const mod = useModKey();

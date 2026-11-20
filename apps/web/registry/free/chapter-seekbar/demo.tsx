@@ -64,12 +64,12 @@ type Copy = (typeof demoCopy)["en"];
 export const lessonChapters = (t: Copy): SeekChapter[] => STARTS.map((s, i) => ({ t: s, title: t.chapters[i] }));
 export const lessonMarks = (t: Copy): SeekMarker[] => MARKS.map((s, i) => ({ t: s, label: t.marks[i] }));
 
-/** 縮圖：同一張靜止畫面，依時間上下移動取景，示意不同片段 */
+/** Thumbnail: the same still image, panned vertically by time to suggest different moments */
 export const frameThumb = (v: number) => (
   <img src={FRAME} alt="" draggable={false} className="size-full object-cover" style={{ objectPosition: `50% ${(v / DURATION) * 100}%` }} />
 );
 
-/** 播放時用 rAF 依實際經過時間前進；分頁隱藏時 rAF 自然停住 */
+/** While playing, advance by real elapsed time with rAF; rAF stops on its own in a hidden tab */
 function usePlayback(start: number) {
   const [current, setCurrent] = useState(start);
   const [playing, setPlaying] = useState(false);
@@ -84,7 +84,7 @@ function usePlayback(start: number) {
     });
     return () => cancelAnimationFrame(id);
   }, [playing]);
-  // 播到片尾就停
+  // Stop at the end
   useEffect(() => {
     if (current >= DURATION) setPlaying(false);
   }, [current]);
@@ -94,7 +94,7 @@ function usePlayback(start: number) {
 const e1 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
-/** 課程播放頁：畫面、進度條與控制列，旁邊的章節列表跟進度條同步。 */
+/** Course player page: screen, seekbar and controls, with a chapter list beside it kept in sync with the bar. */
 export default function ChapterSeekbarDemo() {
   const t = useDemoText(demoCopy);
   const locale = useDemoLocale();

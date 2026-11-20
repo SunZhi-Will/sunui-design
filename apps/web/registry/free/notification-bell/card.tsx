@@ -31,7 +31,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：精簡的商店 header，通知面板展開，兩則未讀一則已讀。 */
+/** Catalog card: a compact store header with the notification panel open, two unread and one read. */
 export default function NotificationBellCard() {
   const t = useDemoText(copy);
   const locale = useDemoLocale();

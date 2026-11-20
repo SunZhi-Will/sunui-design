@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { RibbonCarousel, type RibbonItem } from "./ribbon-carousel";
 
-// 示範圖：同一組灰底棚拍單品照，放在 public/demo/looks/
+// Demo images: one set of grey-backdrop studio item shots in public/demo/looks/
 const looks = ["coat-camel", "cardigan-navy", "turtleneck", "trousers-grey", "coat-navy", "field-jacket", "scarf-oat", "boots-black"];
 const photo = (i: number) => `/demo/looks/${looks[i % looks.length]}.webp`;
 
@@ -69,7 +69,7 @@ export default function RibbonCarouselDemo() {
         cardHeight={290}
         className="mt-6"
       />
-      {/* 同一組資料改用疊卡排法：較少張、一次看一張的精選區 */}
+      {/* Same data in a stacked-card layout: a curated section with fewer cards, one at a time */}
       <div className="mx-auto mt-10 grid max-w-3xl items-center gap-6 border-t border-border pt-8 text-left sm:grid-cols-[1fr_auto]">
         <div>
           <h3 className="text-lg font-semibold tracking-tight text-foreground">{t.picks}</h3>

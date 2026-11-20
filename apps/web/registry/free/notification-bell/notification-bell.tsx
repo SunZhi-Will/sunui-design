@@ -13,30 +13,30 @@ const springs = {
 
 export interface NotificationItem {
   id: string;
-  /** 通知內文 */
+  /** Notification body */
   text: ReactNode;
-  /** 觸發者；沒有圖片時顯示姓名縮寫，沒有觸發者時顯示鈴鐺 */
+  /** Actor; shows initials without an image, a bell without an actor */
   actor?: { name: string; avatarUrl?: string };
-  /** 發生時間 */
+  /** When it happened */
   time: Date | number | string;
   read?: boolean;
 }
 
 export interface NotificationBellProps {
   notifications: NotificationItem[];
-  /** 點擊「全部標為已讀」 */
+  /** Clicked "Mark all as read" */
   onMarkAllRead?: () => void;
-  /** 點擊單則通知；通常在此標為已讀並導頁 */
+  /** Clicked a single notification; usually mark it read and navigate here */
   onItemClick?: (item: NotificationItem) => void;
-  /** 徽章上限，超過顯示「max+」 */
+  /** Badge cap; above it shows "max+" */
   max?: number;
-  /** 面板對齊按鈕的哪一側 */
+  /** Which side of the button the panel aligns to */
   align?: "start" | "end";
-  /** 相對時間的語系，例如 "zh-TW" */
+  /** Locale for relative time, e.g. "zh-TW" */
   locale?: string;
-  /** 一開始就展開面板 */
+  /** Open the panel initially */
   defaultOpen?: boolean;
-  /** 自訂空狀態內容 */
+  /** Custom empty state content */
   emptyState?: ReactNode;
   labels?: { button?: string; markAll?: string; empty?: string; unread?: string; count?: (n: number) => string };
   className?: string;
@@ -50,7 +50,7 @@ const defaultLabels = {
   count: (n: number) => `${n} unread`,
 };
 
-/** 品牌專色：預設跟主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色 */
+/** Brand spot colour: defaults to the theme's --primary; set --sunui-spot to use your own brand colour */
 const spot = "bg-[color:var(--sunui-spot,var(--primary))]";
 const spotFg = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -107,7 +107,7 @@ export function NotificationBell({
   const unread = notifications.filter((n) => !n.read).length;
   const badge = unread > max ? `${max}+` : String(unread);
 
-  // 未讀數增加：鈴鐺被敲一下（帶初速的阻尼彈簧，擺一次就停），數字落定一次，並朗讀
+  // Unread count goes up: the bell is struck once (a damped spring with initial velocity, one swing then stop), the number settles once, and it is announced
   const prevUnread = useRef(unread);
   useEffect(() => {
     if (unread > prevUnread.current) {
@@ -116,10 +116,10 @@ export function NotificationBell({
       if (!reduce) swing.start({ rotate: 0, transition: { ...springs.pop, velocity: 420 } });
     }
     prevUnread.current = unread;
-    // countLabel 每次渲染都可能是新函式；只在未讀數增加時才有作用，重跑無妨
+    // countLabel may be a new function every render; it only matters when unread goes up, so rerunning is harmless
   }, [unread, reduce, swing, countLabel]);
 
-  // 開啟時更新「現在」，之後每分鐘刷新相對時間；使用者主動開啟才搶焦點
+  // On open, update "now", then refresh relative times every minute; take focus only when the user opened it
   const userOpened = useRef(false);
   useEffect(() => {
     if (!open) return;
@@ -129,7 +129,7 @@ export function NotificationBell({
     return () => window.clearInterval(t);
   }, [open]);
 
-  // 窄螢幕時面板可能超出視窗：用鈴鐺的位置和面板寬度算出要往內推多少，左右各留 16px
+  // On narrow screens the panel may overflow the viewport: compute how far to push it in from the bell position and panel width, keeping 16px on each side
   const [shift, setShift] = useState(0);
   useLayoutEffect(() => {
     if (!open) return;
@@ -146,7 +146,7 @@ export function NotificationBell({
     return () => window.removeEventListener("resize", fit);
   }, [open, align]);
 
-  // 點擊外部關閉，不搶焦點；Escape 關閉並把焦點還給鈴鐺
+  // Click outside closes without taking focus; Escape closes and returns focus to the bell
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
@@ -172,7 +172,7 @@ export function NotificationBell({
     <div
       ref={rootRef}
       onBlur={(e) => {
-        // Tab 離開整個元件時收合
+        // Collapse when Tab leaves the whole component
         if (open && e.relatedTarget && !e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
       }}
       className={cn("relative inline-block", className)}
@@ -191,7 +191,7 @@ export function NotificationBell({
         className={cn("grid size-10 place-items-center rounded-md text-foreground hover:bg-muted aria-expanded:bg-muted", press)}
       >
         <span className="relative inline-flex">
-          {/* 轉軸在鈴鐺頂端的掛點 */}
+          {/* Pivot at the bell's hanging point at the top */}
           <motion.span animate={swing} className="inline-flex origin-[50%_10%]">
             <BellIcon />
           </motion.span>
@@ -206,7 +206,7 @@ export function NotificationBell({
                   exit={{ scale: reduce ? 1 : 0, opacity: 0 }}
                   transition={reduce ? instant : springs.pop}
                 >
-                  {/* 數量增加時落定一次：放大再回彈；減少時不動 */}
+                  {/* Settle once when the count goes up: scale up then bounce back; no motion when it goes down */}
                   <motion.span
                     key={bump}
                     initial={reduce || bump === 0 ? false : { scale: 1.35 }}
@@ -245,7 +245,7 @@ export function NotificationBell({
             exit={{ opacity: 0, scale: reduce ? 1 : 0.96, transition: reduce ? instant : { duration: 0.12, ease: "easeIn" } }}
             transition={reduce ? instant : { duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
             className={cn(
-              // e3：邊線在陰影第一層，不另加 border；深色模式表面提亮一階加頂邊高光
+              // e3: the edge line is the first shadow layer, no extra border; dark mode lifts the surface one step and adds a top-edge highlight
               "absolute top-full z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl bg-card text-card-foreground outline-none",
               "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)]",
               "dark:bg-[color-mix(in_oklab,var(--card),white_4%)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.10)]",
@@ -282,7 +282,7 @@ export function NotificationBell({
               <ul className="max-h-80 overflow-y-auto p-1.5">
                 <AnimatePresence initial={false}>
                   {notifications.map((n) => (
-                    // 新通知從上方展開高度，下面的列跟著滑下去，不跳
+                    // New notifications expand in height from the top, rows below slide down without jumping
                     <motion.li
                       key={n.id}
                       layout={reduce ? false : "position"}
@@ -314,7 +314,7 @@ function Row({ item, now, locale, unreadLabel, reduce, onClick }: {
   onClick?: (item: NotificationItem) => void;
 }) {
   const time = new Date(item.time);
-  // 已讀時同一列原地變化：文字轉淡、圓點縮掉，頭像與時間是錨點不動
+  // When read, the row changes in place: text fades, the dot shrinks away, avatar and time stay as anchors
   const body = (
     <>
       <Avatar actor={item.actor} />
@@ -343,7 +343,7 @@ function Row({ item, now, locale, unreadLabel, reduce, onClick }: {
       </span>
     </>
   );
-  // 面板 16px、內距 6px，列的圓角 10px
+  // Panel 16px, padding 6px, row radius 10px
   const rowClass = "flex w-full items-start gap-3 rounded-[10px] px-2.5 py-2.5 text-left";
   if (!onClick) return <div className={rowClass}>{body}</div>;
   return (

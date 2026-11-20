@@ -6,41 +6,41 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type 
 import { cn } from "@/lib/utils";
 
 /*
- * 為什麼這裡可以有常駐循環（DESIGN.md §5.2）：
- * 規則禁止裝飾性的常駐循環。Logo 帶是內容（真實的合作夥伴與客戶標誌），
- * 循環是為了在一行裡放下比寬度更多的標誌，不是裝飾。所以保留，但收緊條件：
- * 只在進入畫面且分頁可見時跑；滑過或鍵盤聚焦就停；有暫停鈕（WCAG 2.2.2）；
- * reduced motion 直接改成靜態的換行清單，資訊不遺失。
- * 和 testimonial-marquee（評價卡片牆）、scroll-marquee（大字隨捲動位移）不同：
- * 這裡是小尺寸的標誌、字標與短字，依時間等速移動。
+ * Why a continuous loop is allowed here (DESIGN.md §5.2):
+ * the rules ban decorative continuous loops. A logo strip is content (real partner and customer logos);
+ * the loop fits more logos than the width allows in one row, it is not decoration. So it stays, with tighter conditions:
+ * runs only on screen and in a visible tab; stops on hover or keyboard focus; has a pause button (WCAG 2.2.2);
+ * reduced motion turns it into a static wrapped list with no loss of information.
+ * Unlike testimonial-marquee (a wall of review cards) and scroll-marquee (large text moved by scroll),
+ * this is small logos, wordmarks and short words moving at constant speed over time.
  */
 
 export type MarqueeItem = {
-  /** 唯一識別，用作 key */
+  /** Unique id, used as key */
   id: string;
-  /** Logo、字標或短字 */
+  /** Logo, wordmark or short text */
   content: ReactNode;
-  /** 純圖示時給螢幕閱讀器的名稱 */
+  /** Name for screen readers when the item is icon-only */
   label?: string;
 };
 
 export interface LogoMarqueeProps {
   items: MarqueeItem[];
-  /** 每秒移動的像素 */
+  /** Pixels moved per second */
   speed?: number;
   direction?: "left" | "right";
-  /** 2 = 第二排反向、順序倒過來，速度略慢；第二排是視覺複本，對輔助科技隱藏 */
+  /** 2 = second row reversed in direction and order, slightly slower; the second row is a visual copy hidden from assistive tech */
   rows?: 1 | 2;
-  /** 項目間距（px） */
+  /** Gap between items (px) */
   gap?: number;
-  /** 滑鼠懸停或鍵盤聚焦時暫停 */
+  /** Pause on mouse hover or keyboard focus */
   pauseOnHover?: boolean;
-  /** 左右邊緣漸隱 */
+  /** Fade at the left and right edges */
   fade?: boolean;
-  /** 顯示暫停按鈕（WCAG 2.2.2：持續移動的內容應可暫停） */
+  /** Show a pause button (WCAG 2.2.2: continuously moving content should be pausable) */
   showPauseControl?: boolean;
   labels?: {
-    /** 整個區塊的名稱 */
+    /** Name of the whole region */
     region?: string;
     pause?: string;
     play?: string;
@@ -55,10 +55,10 @@ const defaultLabels = {
   play: "Play scrolling logos",
 };
 
-// SSR 時改用 useEffect，避免警告
+// Use useEffect during SSR to avoid the warning
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-// 單色：預設次要文字色，滑過時亮到前景色；hover 進快退慢
+// Monochrome: secondary text colour by default, brightens to foreground on hover; hover fast in, slow out
 const baseItem =
   "flex shrink-0 items-center text-muted-foreground transition-colors duration-150 hover:text-foreground hover:duration-0 [&_svg]:h-7 [&_svg]:w-auto";
 
@@ -83,7 +83,7 @@ export function LogoMarquee({
   const [tabVisible, setTabVisible] = useState(true);
   const itemClass = cn(baseItem, itemClassName);
 
-  // 只在畫面內、分頁可見時播放
+  // Play only on screen and in a visible tab
   useEffect(() => {
     if (reduceMotion) return;
     const el = sectionRef.current;
@@ -192,7 +192,7 @@ function Track({
   const [listWidth, setListWidth] = useState(0);
   const [repeat, setRepeat] = useState(1);
 
-  // 量測單份清單寬度，不足容器寬時重複，確保無縫
+  // Measure one copy of the list; repeat it when narrower than the container so the loop is seamless
   useIsoLayoutEffect(() => {
     const container = containerRef.current;
     const list = listRef.current;
@@ -209,7 +209,7 @@ function Track({
     return () => ro.disconnect();
   }, [repeat, items]);
 
-  // 複本裡若有連結或按鈕，移出 Tab 順序，鍵盤只會走到第一份
+  // Remove links or buttons in the copies from the Tab order, so the keyboard only reaches the first copy
   useEffect(() => {
     containerRef.current
       ?.querySelectorAll<HTMLElement>('[aria-hidden="true"] a, [aria-hidden="true"] button, [aria-hidden="true"] [tabindex]')
@@ -221,7 +221,7 @@ function Track({
     items.map((item) => ({ ...item, key: `${r}-${item.id}`, ghost: hidden || r > 0 })),
   ).flat();
   const itemStyle: CSSProperties = { paddingRight: gap };
-  // 允許的漸層只有這個：兩端淡出遮罩
+  // The only gradient allowed: an edge fade mask
   const mask = fade ? "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" : undefined;
 
   return (
@@ -238,7 +238,7 @@ function Track({
             "group-hover/marquee:[animation-play-state:paused] group-focus-within/marquee:[animation-play-state:paused]",
         )}
         style={{
-          // 不用 animation 簡寫，否則行內的 play-state 會蓋掉 hover 暫停
+          // Not the animation shorthand, or the inline play-state would override the hover pause
           animationName: duration ? "sunui-marquee" : undefined,
           animationDuration: `${duration}s`,
           animationTimingFunction: "linear",
@@ -260,7 +260,7 @@ function Track({
             </li>
           ))}
         </ul>
-        {/* 第二份是視覺複本，對輔助科技隱藏；不用 inert，否則滑過複本時標誌不會亮起 */}
+        {/* The second copy is visual only and hidden from assistive tech; not inert, or logos in the copy would not light up on hover */}
         <ul className="flex shrink-0 items-center" aria-hidden="true">
           {group.map((item) => (
             <li key={item.key} className={itemClass} style={itemStyle}>

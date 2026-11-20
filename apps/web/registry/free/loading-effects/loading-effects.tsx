@@ -54,7 +54,7 @@ export type LoaderSize = "sm" | "md" | "lg";
 const SIZES: Record<LoaderSize, number> = { sm: 20, md: 36, lg: 56 };
 
 const spring = { type: "spring", stiffness: 140, damping: 22 } as const;
-// 和 sunui-motion 的 pop 相同：結果圓片落定一次的回彈
+// Same as sunui-motion's pop: the one-time settle bounce of the result disc
 const pop = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 const loop = (t: Transition): Transition => ({ repeat: Infinity, ease: "easeInOut", ...t });
 const clampPct = (v: number) => Math.min(100, Math.max(0, v));
@@ -82,9 +82,9 @@ export interface LoaderProps {
   value?: number;
   /** Main color, default var(--primary) */
   color?: string;
-  /** spinner-check：為 true 時弧線補滿，圓片落定並畫出勾 */
+  /** spinner-check: when true the arc completes, the disc settles and the check draws */
   done?: boolean;
-  /** spinner-check 完成後讀屏念出的文字 */
+  /** Text read by screen readers when spinner-check completes */
   doneLabel?: string;
   className?: string;
 }
@@ -184,14 +184,14 @@ function RingSpinner({ s, active }: { s: number; active: boolean }) {
   );
 }
 
-/** 轉圈的弧線在完成時補滿成圓，接著圓片用 pop 落定一次、勾線描出，和 Result 同一種手感 */
+/** The spinning arc closes into a circle on completion, then the disc settles once with pop and the check strokes in, same feel as Result */
 function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean; done: boolean; reduce: boolean }) {
   const sw = Math.max(2.5, s * 0.1);
   const r = (s - sw) / 2;
   const rot = useMotionValue(0);
   useEffect(() => {
     if (!active || done) return;
-    // 從目前角度接著轉；完成時停在原地，弧線補滿後角度就看不出來
+    // Continue from the current angle; on completion stop in place, and once the arc is full the angle is invisible
     const c = animate(rot, rot.get() + 360, { repeat: Infinity, ease: "linear", duration: 0.9 });
     return () => c.stop();
   }, [active, done, rot]);

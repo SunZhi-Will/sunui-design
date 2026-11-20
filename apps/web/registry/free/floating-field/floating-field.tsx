@@ -17,24 +17,24 @@ export type FieldValidator = (value: string) => string | true | undefined | null
 export interface FloatingFieldLabels {
   /** Sentence for the suggested fix; s is the clickable suggested value */
   didYouMean: (s: ReactNode) => ReactNode;
-  /** strength 模式：強度 0 到 4 的狀態字（0 是空白） */
+  /** Strength mode: status words for strength 0 to 4 (0 is empty) */
   strength: [string, string, string, string, string];
-  /** 螢幕閱讀器播報強度時的前綴 */
+  /** Prefix when screen readers announce the strength */
   strengthPrefix: string;
   met: string;
   unmet: string;
-  /** 內建四條密碼規則的文字 */
+  /** Text of the four built-in password rules */
   rules: { length: string; case: string; number: string; symbol: string };
 }
 
 export interface PasswordRule {
   id: string;
   label: ReactNode;
-  /** 回傳 true 代表符合 */
+  /** Return true when met */
   test: (value: string) => boolean;
 }
 
-/** 0：空白；1：弱；2：普通；3：良好；4：強（所有規則都符合） */
+/** 0: empty; 1: weak; 2: fair; 3: good; 4: strong (all rules met) */
 export type PasswordStrength = 0 | 1 | 2 | 3 | 4;
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
@@ -81,7 +81,7 @@ const MESSAGES: Record<SunLocale, FloatingFieldLabels> = {
   },
 };
 
-/** 內建的四條密碼規則，文字跟著 locale */
+/** The four built-in password rules, text follows locale */
 export function passwordRules(locale?: string): PasswordRule[] {
   const r = MESSAGES[resolveLocale(locale)].rules;
   return [
@@ -92,7 +92,7 @@ export function passwordRules(locale?: string): PasswordRule[] {
   ];
 }
 
-/** 強度條填色：前三級是前景色的深淺，全部符合才用品牌專色 */
+/** Strength bar fill: the first three levels are shades of the foreground; only all-met uses the brand spot colour */
 const FILL = ["", "bg-foreground/30", "bg-foreground/50", "bg-foreground/70", "bg-[color:var(--sunui-spot,var(--primary))]"];
 
 export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement & HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "size"> {
@@ -122,11 +122,11 @@ export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
   locale?: string;
   /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<FloatingFieldLabels>;
-  /** 密碼強度模式：欄位下方顯示四段強度條與即時條件清單。顯示密碼按鈕照舊放在 trailing */
+  /** Password strength mode: a four-segment strength bar and a live checklist below the field. The show-password button still goes in trailing */
   strength?: boolean;
-  /** strength 模式的規則，預設為 passwordRules(locale) */
+  /** Rules for strength mode, defaults to passwordRules(locale) */
   rules?: PasswordRule[];
-  /** 強度等級改變時觸發，allPassed 代表所有規則都符合 */
+  /** Fires when the strength level changes; allPassed means every rule is met */
   onStrengthChange?: (strength: PasswordStrength, allPassed: boolean) => void;
 }
 
@@ -259,7 +259,7 @@ export function FloatingField({
   const checks = rules.map((r) => ({ ...r, passed: r.test(value) }));
   const passed = checks.filter((c) => c.passed).length;
   const allPassed = rules.length > 0 && passed === rules.length;
-  // 有輸入但一條都沒符合時仍算 1，讓使用者看到回饋
+  // Any input that meets no rule still counts as 1, so the user sees feedback
   const level = (value && rules.length ? Math.max(1, Math.round((passed / rules.length) * 4)) : 0) as PasswordStrength;
   const strengthCb = useRef(onStrengthChange);
   strengthCb.current = onStrengthChange;
@@ -429,7 +429,7 @@ export function FloatingField({
               {t.strength[level]}
             </span>
           </div>
-          {/* 只有等級改變時文字才變，不會每打一個字就播報 */}
+          {/* Text changes only when the level changes, so it is not announced on every keystroke */}
           <p className="sr-only" aria-live="polite" aria-atomic="true">
             {level ? `${t.strengthPrefix}: ${t.strength[level]}` : ""}
           </p>

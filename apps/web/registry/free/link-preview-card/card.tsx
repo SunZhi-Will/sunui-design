@@ -12,7 +12,7 @@ const message = {
   ja: { name: "Mina", text: "言っていたのはこれです：" },
 };
 
-/** 型錄卡片：對話裡貼上的連結，先是同一個外框裡的骨架，再展開成預覽卡。 */
+/** Catalog card: a link pasted into a chat, first a skeleton inside the same frame, then expanded into a preview card. */
 export default function LinkPreviewCardCard() {
   const t = useDemoText(demoCopy);
   const m = useDemoText(message);

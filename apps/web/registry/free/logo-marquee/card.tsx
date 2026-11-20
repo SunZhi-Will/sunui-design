@@ -12,7 +12,7 @@ const copy = {
   ja: { heading: "個人店に選ばれています", region: "導入企業" },
 };
 
-/** 型錄卡片：一排單色字標等速橫移，滑過停下，滑到的標誌亮起。 */
+/** Catalog card: a row of monochrome wordmarks moving at constant speed; stops on hover, the hovered logo lights up. */
 export default function LogoMarqueeCard() {
   const t = useDemoText(copy);
   return (

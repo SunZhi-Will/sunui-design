@@ -10,24 +10,24 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand spot colour: defaults to the theme's --primary; set --sunui-spot to use your own brand colour. Only for selected, offers and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotOn = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
-/* folder：選中的分頁是一塊凸起的面，和下方面板接成同一個外形。
-   外框只靠 1px 的 e1 邊線（--tab-edge），面板的上邊線被選中分頁蓋住，兩側用內凹圓角接到面板 */
+/* folder: the selected tab is a raised surface joined to the panel below in one shape.
+   The outline is only the 1px e1 edge (--tab-edge); the selected tab covers the panel's top edge, and inverted corners join it to the panel on both sides */
 const edge = "[--tab-edge:rgb(0_0_0/0.06)] dark:[--tab-edge:rgb(255_255_255/0.08)]";
 const folderPanel = "rounded-xl bg-card text-card-foreground shadow-[0_0_0_1px_var(--tab-edge),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[0_0_0_1px_var(--tab-edge)]";
-// 內凹圓角：圓心在角落方塊的上角，圓外填面板色，圓周畫一條邊線
+// Inverted corner: circle centred at the top corner of the corner square, outside filled with panel colour, edge line drawn on the circumference
 const flare = (at: string) =>
   `radial-gradient(circle at ${at}, transparent 7.5px, var(--tab-edge) 7.5px, var(--tab-edge) 8.5px, var(--card) 8.5px)`;
 
-/** 徽章樣式與 notify-badge 一致：圓角膠囊、tabular-nums，超過 99 顯示 99+ */
+/** Badge style matches notify-badge: rounded pill, tabular-nums, 99+ above 99 */
 const badgeTones = {
   muted: "bg-foreground/[0.07] text-muted-foreground",
   spot: cn(spotBg, spotOn),
-  // 已經在品牌色上（選中的篩選籤）：淡一階的底，字跟著篩選籤
+  // Already on brand colour (selected filter chip): one step lighter background, text follows the chip
   onSpot: "bg-background/25",
 };
 
@@ -49,10 +49,10 @@ function CountBadge({ count, tone }: { count: number; tone: keyof typeof badgeTo
 export interface SlidingTabItem {
   value: string;
   label: ReactNode;
-  /** 跟在標籤後的小數字，例如篩選結果數 */
+  /** Small number after the label, e.g. a filter result count */
   count?: number;
   disabled?: boolean;
-  /** 給了就成為分頁內容；只做選擇器時不用給 */
+  /** When given, becomes the tab content; omit when used only as a selector */
   content?: ReactNode;
 }
 
@@ -61,16 +61,16 @@ type Multi = { multiple: true; value?: string[]; defaultValue?: string[]; onValu
 
 export type SlidingTabsProps = (Single | Multi) & {
   items: SlidingTabItem[];
-  /** underline：分頁底線；segment：分段控制；chips：篩選籤（可配 multiple）；folder：瀏覽器式資料夾分頁，選中的分頁和內容面板接在一起 */
+  /** underline: underlined tabs; segment: segmented control; chips: filter chips (works with multiple); folder: browser-style folder tabs, the selected tab joins the content panel */
   variant?: "underline" | "segment" | "chips" | "folder";
-  /** count 的樣式：inline 是標籤旁的淡色數字；badge 是小膠囊徽章，選中時用品牌專色。folder 預設 badge，其他預設 inline */
+  /** Style of count: inline is a muted number beside the label; badge is a small pill, brand spot colour when selected. folder defaults to badge, others to inline */
   countStyle?: "inline" | "badge";
-  /** 分段控制撐滿寬度 */
+  /** Segmented control fills the width */
   fullWidth?: boolean;
   size?: "sm" | "md";
   "aria-label"?: string;
   className?: string;
-  /** 套在內容面板上的 class */
+  /** Class applied to the content panel */
   contentClassName?: string;
 };
 
@@ -175,7 +175,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   />
                 )}
                 {on && folder && (
-                  // 凸起的面：上方圓角，下緣裁掉邊線好和面板接起來，兩側各一個內凹圓角
+                  // Raised surface: rounded top, bottom edge line cut so it joins the panel, an inverted corner on each side
                   <motion.span
                     layoutId="ind"
                     transition={t}

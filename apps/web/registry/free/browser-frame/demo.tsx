@@ -82,7 +82,7 @@ const orders = [
   ["SU-20479", "$219.00"],
 ];
 
-/** 替身畫面：用中性色塊畫出三個網站首頁的輪廓 */
+/** Placeholder screens: outlines of three site home pages drawn with neutral blocks */
 function SiteShot({ layout }: { layout: "hero" | "grid" | "split" }) {
   const bar = "rounded-full bg-[var(--wf-line-strong)]";
   return (
@@ -139,7 +139,7 @@ const shots = [
   { url: "lanebooks.example", layout: "split" },
 ] as const;
 
-/** 文章裡的一段示範：左邊是後台網頁（瀏覽器外框），右邊是拿來總結的提示詞（視窗外框） */
+/** An example inside an article: an admin page on the left (browser frame), the prompt used to summarise it on the right (window frame) */
 export default function BrowserFrameDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

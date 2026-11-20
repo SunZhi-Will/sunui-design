@@ -142,7 +142,7 @@ function Icon({ d }: { d: string }): ReactNode {
 const PAGES: Page[] = ["dashboard", "projects", "billing", "settings"];
 const NAV_KEYS: Record<Page, string> = { dashboard: "D", projects: "P", billing: "B", settings: "," };
 
-/** 範例資料：導覽項目會真的切換左側目前頁面 */
+/** Sample data: nav items really switch the current page on the left */
 export function useDemoGroups(t: Copy, mod: string, go: (page: Page) => void): CommandGroup[] {
   return useMemo(
     () => [
@@ -178,7 +178,7 @@ export { copy as demoCopy };
 const E1 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
-/** 示範：後台 app 的框，頂列有真正的搜尋按鈕（點擊或 ⌘K 開對話框），內容區上方是展開中的指令面板。 */
+/** Demo: an admin app frame with a real search button in the top bar (click or ⌘K opens the dialog), and an open command palette above the content. */
 export default function CommandPaletteDemo() {
   const t = useDemoText(copy);
   const mod = useModKey();
@@ -242,7 +242,7 @@ export default function CommandPaletteDemo() {
             ))}
           </div>
           <div aria-hidden="true" className="mt-3 h-40 rounded-xl bg-muted/60" />
-          {/* 面板浮在內容上：內容退後一階，面板本身照常可操作 */}
+          {/* Palette floats over the content: the content steps back one level, the palette stays fully usable */}
           <div aria-hidden="true" className="absolute inset-0 bg-background/60" />
           <div className="absolute inset-x-4 top-4 bottom-4 flex justify-center">
             <CommandPalette

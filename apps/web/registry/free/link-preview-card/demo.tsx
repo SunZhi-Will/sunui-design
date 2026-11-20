@@ -9,7 +9,7 @@ import { LinkPreviewCard, normalizeUrl, type LinkMeta } from "./link-preview-car
 
 type Page = { siteName: string; title: string; description: string };
 
-// 範例網址都是虛構網域；mock 只在本機回傳資料，不連任何外部服務
+// Sample URLs all use fictional domains; the mock returns data locally and calls no external service
 const PAGES: Record<string, ProductKind> = {
   "journal.example.com/packing-light": "headphones",
   "outfitters.example.org/field-watch": "watch",
@@ -83,7 +83,7 @@ export const demoCopy = {
 
 type Copy = (typeof demoCopy)["en"];
 
-/** 本機 mock：短暫延遲後回傳資料。實際專案請改成呼叫自己的 /api/unfurl */
+/** Local mock: returns data after a short delay. In a real project call your own /api/unfurl */
 export function useMockResolver(t: Copy) {
   return (href: string, signal: AbortSignal) =>
     new Promise<LinkMeta>((resolve) => {
@@ -102,7 +102,7 @@ export function useMockResolver(t: Copy) {
 const surface =
   "rounded-xl bg-background shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 
-/** 筆記頁：貼上的連結展開成預覽卡；底下的留言框可以自己貼網址看它從載入變成卡片。 */
+/** Notes page: pasted links expand into preview cards; paste a URL into the comment box below to watch it go from loading to card. */
 export default function LinkPreviewCardDemo() {
   const t = useDemoText(demoCopy);
   const resolve = useMockResolver(t);
