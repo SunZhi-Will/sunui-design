@@ -177,7 +177,7 @@ export default function SidePanelDemo() {
           <legend className={cn("mb-2.5 text-xs font-medium tracking-[0.14em] uppercase", inkMuted)}>{t.size}</legend>
           <div className="flex flex-wrap gap-1.5">
             {sizes.map((s) => (
-              <label key={s} className={cn("relative cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#171717] has-[:checked]:bg-[#171717] has-[:checked]:text-[#f7f7f7] dark:has-[:checked]:border-[#ededed] dark:has-[:checked]:bg-[#ededed] dark:has-[:checked]:text-[#1c1c1c] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring", edge)}>
+              <label key={s} className={cn("relative cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring", edge)}>
                 <input type="checkbox" checked={picked.includes(s)} onChange={() => toggle(s)} className="sr-only" />
                 {s}
               </label>

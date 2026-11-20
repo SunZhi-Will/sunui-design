@@ -327,11 +327,11 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         ))}
       </div>
 
-      <aside className="rounded-md border border-[#e2e2e2] bg-[#f7f7f7] p-5 text-[#171717] lg:sticky lg:top-20 dark:border-[#333333] dark:bg-[#1c1c1c] dark:text-[#ededed]">
-        <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">
+      <aside className="rounded-md border border-foreground/10 bg-card p-5 text-foreground lg:sticky lg:top-20">
+        <p className="text-[11px] font-medium tracking-[0.14em] text-foreground/60 uppercase">
           {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : isPixel ? t.pixelSelected : t.selected}
         </p>
-        <div ref={previewRef} className="relative mt-4 grid place-items-center rounded-sm border border-dashed border-[#e2e2e2] py-8 dark:border-[#333333]">
+        <div ref={previewRef} className="relative mt-4 grid place-items-center rounded-sm border border-dashed border-foreground/10 py-8">
           <div className="relative">
             {keylines && <Keylines pixel={isPixel} size={128} />}
             {renderIcon(selected, 128)}
@@ -343,8 +343,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             className={cn(
               "absolute right-2 bottom-2 h-6 rounded-[5px] border px-2 font-mono text-[10px] transition-colors",
               keylines
-                ? "border-[#171717]/30 text-[#171717] dark:border-[#ededed]/30 dark:text-[#ededed]"
-                : "border-transparent text-[#171717]/50 hover:text-[#171717] dark:text-[#ededed]/50 dark:hover:text-[#ededed]",
+                ? "border-foreground/30 text-foreground"
+                : "border-transparent text-foreground/50 hover:text-foreground",
             )}
           >
             {t.keylines}
@@ -358,7 +358,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
                 type="button"
                 onClick={() => toggle(selected)}
                 aria-pressed={Boolean(toggled[selected])}
-                className="h-8 shrink-0 rounded-md border border-[#e2e2e2] px-3 font-mono text-[11px] dark:border-[#333333]"
+                className="h-8 shrink-0 rounded-md border border-foreground/10 px-3 font-mono text-[11px]"
               >
                 active={String(Boolean(toggled[selected]))}
               </button>
@@ -375,7 +375,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           </div>
         )}
         <p className="mt-5 font-mono text-sm tracking-[0.04em]">{selected}</p>
-        <pre className="mt-2 overflow-x-auto rounded-sm bg-[#171717]/[0.05] px-3 py-2 font-mono text-[12px] dark:bg-[#ededed]/[0.07]">
+        <pre className="mt-2 overflow-x-auto rounded-sm bg-foreground/5 px-3 py-2 font-mono text-[12px]">
           {jsx}
         </pre>
         <div className={cn("mt-3 grid gap-2", isAnimated ? "grid-cols-1" : "grid-cols-2")}>
@@ -391,7 +391,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             <button
               type="button"
               onClick={() => copy("svg")}
-              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#e2e2e2] text-xs font-medium dark:border-[#333333]"
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-foreground/10 text-xs font-medium"
             >
               <Icon name={copied === "svg" ? "check" : "copy"} size={14} />
               {copied === "svg" ? t.copied : t.copySvg}
@@ -402,7 +402,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           <button
             type="button"
             onClick={download}
-            className="mt-2 flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-[#e2e2e2] text-xs font-medium dark:border-[#333333]"
+            className="mt-2 flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-foreground/10 text-xs font-medium"
           >
             <Icon name="download" size={14} />
             {t.downloadSvg}
@@ -410,14 +410,14 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         )}
         {tags.length > 0 && (
           <div className="mt-5">
-            <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">{t.tags}</p>
+            <p className="text-[11px] font-medium tracking-[0.14em] text-foreground/60 uppercase">{t.tags}</p>
             <ul className="mt-2 flex flex-wrap gap-1.5">
               {tags.map((tag) => (
                 <li key={tag}>
                   <button
                     type="button"
                     onClick={() => setQuery(tag)}
-                    className="h-6 rounded-[5px] bg-[#171717]/[0.05] px-2 text-[11px] hover:bg-[#171717]/10 dark:bg-[#ededed]/[0.07] dark:hover:bg-[#ededed]/15"
+                    className="h-6 rounded-[5px] bg-foreground/5 px-2 text-[11px] hover:bg-foreground/10"
                   >
                     {tag}
                   </button>
@@ -428,7 +428,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         )}
         {related.length > 0 && (
           <div className="mt-5">
-            <p className="text-[11px] font-medium tracking-[0.14em] text-[#171717]/60 uppercase dark:text-[#ededed]/60">{t.related}</p>
+            <p className="text-[11px] font-medium tracking-[0.14em] text-foreground/60 uppercase">{t.related}</p>
             <ul className="mt-2 grid grid-cols-8 gap-1">
               {related.map((name) => (
                 <li key={name}>
@@ -437,7 +437,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
                     title={name}
                     aria-label={name}
                     onClick={() => setSelected(name)}
-                    className="grid aspect-square w-full place-items-center rounded-[5px] hover:bg-[#171717]/[0.06] dark:hover:bg-[#ededed]/10"
+                    className="grid aspect-square w-full place-items-center rounded-[5px] hover:bg-foreground/[0.06]"
                   >
                     {renderIcon(name, isPixel ? 16 : 20)}
                   </button>

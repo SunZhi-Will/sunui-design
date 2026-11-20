@@ -224,7 +224,7 @@ export function DialogSheet({
                 type="button"
                 aria-label={closeLabel}
                 onClick={() => setOpen(false)}
-                className="-mr-1.5 -mt-1 grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,opacity,scale] hover:bg-[#e2e2e2]/60 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 dark:hover:bg-[#333333]/60 motion-safe:active:scale-[0.97]"
+                className="-mr-1.5 -mt-1 grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,opacity,scale] hover:bg-foreground/5 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 dark:hover:bg-[#333333]/60 motion-safe:active:scale-[0.97]"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="size-4" aria-hidden="true">
                   <path d="M6 6l12 12M18 6L6 18" />

@@ -68,7 +68,7 @@ const copy = {
 };
 
 const buttonClass =
-  "rounded-md border border-foreground/10 bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-[#e2e2e2]/60 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
+  "rounded-md border border-foreground/10 bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 
 export default function DialogSheetDemo() {
   const t = useDemoText(copy);

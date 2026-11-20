@@ -52,7 +52,7 @@ export default function SidePanelCard() {
             <label
               key={s}
               className={cn(
-                "cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-[#171717] has-[:checked]:bg-[#171717] has-[:checked]:text-[#f7f7f7] dark:has-[:checked]:border-[#ededed] dark:has-[:checked]:bg-[#ededed] dark:has-[:checked]:text-[#1c1c1c] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
+                "cursor-pointer rounded-[3px] border px-2.5 py-1 text-sm tabular-nums has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
                 edge,
               )}
             >
