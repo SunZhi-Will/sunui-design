@@ -61,8 +61,49 @@ test("parses order events", () => {
     netAmount: 12900,
     refundedAmount: 0,
     currency: "usd",
+    billingReason: "",
+    subscriptionId: "",
+    customerId: "",
+    periodEnd: "",
+    subscriptionStatus: "",
+    cancelAtPeriodEnd: false,
+    productId: "",
   });
   const empty = parsePolarEvent(null);
   assert.equal(empty.type, "");
   assert.equal(empty.netAmount, null);
+});
+
+test("parses subscription fields from renewal orders and subscription events", () => {
+  const renewal = parsePolarEvent({
+    type: "order.paid",
+    data: {
+      id: "ord_2",
+      paid: true,
+      net_amount: 1900,
+      currency: "USD",
+      billing_reason: "subscription_cycle",
+      subscription_id: "sub_1",
+      customer_id: "cus_1",
+      product_id: "prod_monthly",
+      subscription: { id: "sub_1", current_period_end: "2027-01-20T00:00:00Z", cancel_at_period_end: false },
+      metadata: {},
+    },
+  });
+  assert.equal(renewal.billingReason, "subscription_cycle");
+  assert.equal(renewal.subscriptionId, "sub_1");
+  assert.equal(renewal.customerId, "cus_1");
+  assert.equal(renewal.periodEnd, "2027-01-20T00:00:00Z");
+  assert.equal(renewal.productId, "prod_monthly");
+  assert.equal(renewal.polarOrderId, "ord_2");
+  assert.equal(renewal.orderId, "");
+
+  const canceled = parsePolarEvent({
+    type: "subscription.canceled",
+    data: { id: "sub_1", status: "active", customer_id: "cus_1", cancel_at_period_end: true, current_period_end: "2027-01-20T00:00:00Z" },
+  });
+  assert.equal(canceled.subscriptionId, "sub_1");
+  assert.equal(canceled.polarOrderId, "");
+  assert.equal(canceled.cancelAtPeriodEnd, true);
+  assert.equal(canceled.subscriptionStatus, "active");
 });

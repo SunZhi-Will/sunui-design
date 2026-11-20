@@ -62,6 +62,12 @@ export type ParsedWebhook = {
   refunded: number | null;
   /** 通知帶了商品名稱、而且都不是 SunUI 的 */
   foreignProduct: boolean;
+  /** 付款方式：Regular / CardBindPayment / CardBind / QuickPayment / Recurring */
+  paymentBehavior: string;
+  /** 綁好的卡：SHOPLINE 會員 id 與卡片 id（付款通知與 customer.instrument.* 通知都可能帶） */
+  card: { customerId: string; instrumentId: string; status: string };
+  /** 我們送出的顧客編號（email 雜湊） */
+  customerRef: string;
 };
 
 export function parseWebhook(event: Loose): ParsedWebhook {
@@ -79,6 +85,18 @@ export function parseWebhook(event: Loose): ParsedWebhook {
     paid: pickNumber(data?.payment?.paidAmount?.value, data?.order?.payment?.paidAmount?.value, data?.order?.amount?.value, data?.amount?.value),
     refunded: pickNumber(data?.refund?.amount?.value, data?.amount?.value),
     foreignProduct: names.length > 0 && !names.some((n: string) => n.startsWith(PRODUCT_PREFIX)),
+    paymentBehavior: pickString(data?.payment?.paymentBehavior, data?.order?.payment?.paymentBehavior),
+    card: {
+      customerId: pickString(
+        data?.payment?.paymentCustomerId,
+        data?.customerId,
+        data?.order?.customer?.customerId,
+        data?.customer?.customerId,
+      ),
+      instrumentId: pickString(data?.payment?.paymentInstrument?.paymentInstrumentId, data?.paymentInstrument?.instrumentId),
+      status: pickString(data?.paymentInstrument?.instrumentStatus).toUpperCase(),
+    },
+    customerRef: pickString(data?.referenceCustomerId, data?.order?.customer?.referenceCustomerId, data?.customer?.referenceCustomerId),
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

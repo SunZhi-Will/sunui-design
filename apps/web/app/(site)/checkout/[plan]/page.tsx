@@ -8,6 +8,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { intlLocale } from "@/lib/messages";
 import { foundingSold } from "@/lib/orders";
 import { defaultCurrency, paymentOptions } from "@/lib/payments";
+import { shoplineRecurringReady } from "@/lib/shopline";
 import { addTerm, foundingState, foundingWindow, isPlan, isSubscription, planPrice, planUsd, pricesTwd } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +32,10 @@ export default async function CheckoutPage({
   if (!isPlan(plan)) notFound();
   const locale = await getLocale();
   // 幣別：繁中預設新台幣（SHOPLINE），其他語系預設美金（Polar）；網址的 ?pay= 可以切換
-  const currency = defaultCurrency(locale, (await searchParams).pay);
+  // 月訂、年訂要綁卡自動續扣：新台幣得等內嵌式 SDK 設定好（SHOPLINE_CLIENT_KEY），不然只剩美金
+  const twdBlocked = isSubscription(plan) && !shoplineRecurringReady();
+  const requested = (await searchParams).pay;
+  const currency = twdBlocked ? (paymentOptions().usd ? "usd" : null) : defaultCurrency(locale, requested);
   if (!currency) redirect("/pricing#waitlist");
   if (plan === "founding") {
     if (foundingState() !== "open") redirect("/pricing");
@@ -39,7 +43,7 @@ export default async function CheckoutPage({
   }
 
   const t = checkoutCopy(locale);
-  const options = paymentOptions();
+  const options = { ...paymentOptions(), ...(twdBlocked ? { twd: false } : {}) };
   const usd = planUsd(plan);
   const twd = pricesTwd[plan].toLocaleString("en-US");
   const formatDay = (date: Date) =>
@@ -101,9 +105,11 @@ export default async function CheckoutPage({
 
         {isSubscription(plan) && (
           <>
-            {/* 付款前就看得到這一期到哪天 */}
-            <p className="mt-2 text-sm text-subtle">{t.done.subscriptionUntil(formatDay(addTerm(plan, new Date())))}</p>
-            <p className="mt-4 rounded-md border border-line bg-bg p-3 text-xs text-subtle">{t.renewHint}</p>
+            {/* 自動續扣的揭露：付款前就看得到之後每期扣多少、從哪天開始、怎麼取消 */}
+            <p className="mt-4 rounded-md border border-line bg-bg p-3 text-xs text-subtle">
+              {t.autoRenewNote(currency === "usd" ? `US$${usd}` : `NT$${twd}`, plan === "yearly" ? "year" : "month", formatDay(addTerm(plan, new Date())))}
+            </p>
+            <p className="mt-2 text-xs text-subtle">{t.renewHint}</p>
           </>
         )}
         {showGuard && (

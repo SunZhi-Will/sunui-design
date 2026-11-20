@@ -3,7 +3,7 @@
 // 所以在 synvize.com 驗證完成前，買家收不到授權碼信，只有作者收得到通知。
 
 import { orderAmountLabel, type Fulfilled, type License, type Order } from "./orders";
-import { planUsd, prices, siteUrl } from "./site";
+import { isSubscription, planUsd, prices, pricesTwd, siteUrl } from "./site";
 
 const PLAN_NAME: Record<Order["plan"], string> = {
   founding: "Founding member",
@@ -14,6 +14,14 @@ const PLAN_NAME: Record<Order["plan"], string> = {
 };
 
 const day = (iso: string) => iso.slice(0, 10);
+
+/** 訂閱一期的金額，照這把授權的扣款管道（Polar 美金、SHOPLINE 新台幣）。 */
+function termPrice(license: Pick<License, "plan" | "renewVia">) {
+  if (!isSubscription(license.plan)) return "";
+  return license.renewVia === "shopline" ? `NT$${pricesTwd[license.plan].toLocaleString("en-US")}` : `US$${prices[license.plan]}`;
+}
+
+const manageUrl = () => `${siteUrl()}/account`;
 
 async function send(to: string[], subject: string, text: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -46,10 +54,11 @@ export function sendLicenseEmail(order: Order, issued: Fulfilled) {
       [order.email],
       `Your SunUI Pro subscription is renewed`,
       [
-        `Thanks for renewing SunUI ${PLAN_NAME[order.plan]}.`,
+        order.recurring ? `Your SunUI ${PLAN_NAME[order.plan]} subscription renewed automatically.` : `Thanks for renewing SunUI ${PLAN_NAME[order.plan]}.`,
         paid,
         "",
         `Your license now runs until ${day(issued.expiresAt ?? "")}. The key stays the same${issued.key ? `: ${issued.key}` : ""}, so there is nothing to change in your project.`,
+        `It renews again automatically on that day. To cancel or change your card: ${manageUrl()}`,
         "",
         `Order ${order.id}. License terms: ${siteUrl()}/license`,
         "Reply to this email if you need help.",
@@ -64,7 +73,10 @@ export function sendLicenseEmail(order: Order, issued: Fulfilled) {
       `Thanks for buying SunUI ${PLAN_NAME[order.plan]}.`,
       paid,
       ...(issued.expiresAt
-        ? [`Your subscription runs until ${day(issued.expiresAt)}. It does not renew by itself: we email you a week before it ends, and buying again with this email extends the same key.`]
+        ? [
+            `Your subscription renews automatically on ${day(issued.expiresAt)} and every ${order.plan === "yearly" ? "year" : "month"} after that, at the same price, until you cancel. We email you 7 days before each charge.`,
+            `Cancel anytime at ${manageUrl()}. After you cancel, Pro stays active until the end of the period you paid for.`,
+          ]
         : []),
       "",
       ...(issued.seatKeys
@@ -135,22 +147,102 @@ export function notifyOwnerSharing(license: License, ips: number) {
   );
 }
 
-/** 訂閱到期前的提醒信。續約就是用同一個 email 再買一期。 */
+/** 舊的預付制授權（2026-11-20 前買的，沒有綁卡）到期前的提醒信。再訂一次會變成自動續扣，授權碼不變。 */
 export function sendRenewalReminder(license: License) {
   const ends = day(license.expiresAt ?? "");
   return send(
     [license.email],
     `Your SunUI Pro subscription ends on ${ends}`,
     [
-      `Your SunUI Pro subscription (${license.display}) ends on ${ends}. It does not renew by itself.`,
+      `Your SunUI Pro subscription (${license.display}) ends on ${ends}. It was paid in advance, so it does not renew by itself.`,
       "",
       "Blocks you already installed keep working after that. You just cannot install new Pro blocks or get updates.",
       "",
-      `To keep going, buy another month (US$${prices.monthly}) or year (US$${prices.yearly}) with this same email. The key stays the same:`,
+      `To keep going, subscribe again with this same email: US$${prices.monthly} a month or US$${prices.yearly} a year. The key stays the same. New subscriptions renew automatically and you can cancel anytime:`,
       `${siteUrl()}/pricing#subscribe`,
       "",
       `Or switch to lifetime Pro for US$${prices.pro} and never think about it again.`,
       "Reply to this email if you need help.",
+    ].join("\n"),
+  );
+}
+
+/** 自動續扣前 7 天的通知：哪天扣、扣多少、怎麼取消。 */
+export function sendUpcomingCharge(license: License) {
+  const on = day(license.expiresAt ?? "");
+  return send(
+    [license.email],
+    `Your SunUI Pro subscription renews on ${on}`,
+    [
+      `Your SunUI ${PLAN_NAME[license.plan]} subscription (${license.display}) renews automatically on ${on}. We will charge ${termPrice(license)} to the card on file.`,
+      "",
+      "Nothing to do if you want to keep it. Your key stays the same.",
+      "",
+      `To cancel or change your card before then: ${manageUrl()}`,
+      "If you cancel, Pro stays active until the end of the period you already paid for, and nothing more is charged.",
+      "Reply to this email if you need help.",
+    ].join("\n"),
+  );
+}
+
+/** 已取消、這期快結束：確認不會再扣款。 */
+export function sendSubscriptionEnding(license: License) {
+  const ends = day(license.expiresAt ?? "");
+  return send(
+    [license.email],
+    `Your SunUI Pro subscription ends on ${ends}`,
+    [
+      `You canceled SunUI ${PLAN_NAME[license.plan]} (${license.display}). It stays active until ${ends} and will not be charged again.`,
+      "",
+      "Blocks you already installed keep working after that. You just cannot install new Pro blocks or get updates.",
+      "",
+      `Changed your mind? Turn renewal back on before ${ends}: ${manageUrl()}`,
+      `Or switch to lifetime Pro for US$${prices.pro}: ${siteUrl()}/pricing`,
+    ].join("\n"),
+  );
+}
+
+/** 續扣失敗（第一次）：請客戶換卡。寬限期內授權照常可用。 */
+export function sendPaymentFailed(license: License) {
+  return send(
+    [license.email],
+    "Your SunUI Pro payment did not go through",
+    [
+      `We could not charge ${termPrice(license)} for your SunUI ${PLAN_NAME[license.plan]} subscription (${license.display}).`,
+      "",
+      "Pro keeps working for 7 more days while we try again. To avoid an interruption, update your card:",
+      manageUrl(),
+      "",
+      "Blocks you already installed keep working either way. Reply to this email if you need help.",
+    ].join("\n"),
+  );
+}
+
+/** 續扣重試用完：訂閱結束。 */
+export function sendSubscriptionEnded(license: License) {
+  return send(
+    [license.email],
+    "Your SunUI Pro subscription has ended",
+    [
+      `We could not renew SunUI ${PLAN_NAME[license.plan]} (${license.display}) after several tries, so the subscription has ended and your card will not be charged again.`,
+      "",
+      "Blocks you already installed keep working. To install new Pro blocks again, subscribe with this same email (the key stays the same):",
+      `${siteUrl()}/pricing#subscribe`,
+    ].join("\n"),
+  );
+}
+
+/** 管理訂閱的登入連結（/account）。 */
+export function sendAccountLink(email: string, link: string) {
+  return send(
+    [email],
+    "Manage your SunUI Pro subscription",
+    [
+      "Open this link to see your subscription, cancel it, or change your card. It works for 24 hours.",
+      "",
+      link,
+      "",
+      "If you did not ask for this, you can ignore this email.",
     ].join("\n"),
   );
 }
