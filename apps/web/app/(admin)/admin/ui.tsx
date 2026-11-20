@@ -4,6 +4,9 @@
 
 import Link from "next/link";
 
+import { polarConfigured } from "@/lib/polar";
+import { redisEnabled } from "@/lib/redis";
+import { shoplineConfigured } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 import { Icon, type IconName } from "./icons";
@@ -313,6 +316,73 @@ export function EmptyState({ title, description, icon = "pulse" }: EmptyProps) {
       <p className="mt-3 text-sm font-medium">{title}</p>
       {description && <p className="mt-1 max-w-sm text-xs text-subtle">{description}</p>}
     </div>
+  );
+}
+
+/* ---------- 資料來源未設定 ---------- */
+
+export type SetupItem = { label: string; unlocks: string; env: string[]; ok: boolean };
+
+/** 後台用到的三個資料來源。env 只在未設定時顯示，放在面板裡而不是頁首提示。 */
+export function setupItems(): SetupItem[] {
+  return [
+    {
+      label: "Upstash Redis",
+      unlocks: "訂單、授權、安裝數與購買漏斗",
+      env: ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"],
+      ok: redisEnabled(),
+    },
+    {
+      label: "SHOPLINE Payments",
+      unlocks: "新台幣收款",
+      env: ["SHOPLINE_MERCHANT_ID", "SHOPLINE_API_KEY", "SHOPLINE_SIGN_KEY"],
+      ok: shoplineConfigured(),
+    },
+    {
+      label: "Polar",
+      unlocks: "美金收款",
+      env: ["POLAR_ACCESS_TOKEN", "POLAR_WEBHOOK_SECRET", "POLAR_PRODUCT_IDS"],
+      ok: polarConfigured(),
+    },
+  ];
+}
+
+/** 資料來源沒接上時取代整頁內容：一張卡片說清楚缺什麼，不擺一排空的數字卡。 */
+export function SetupRequired({ title, description, items }: { title: string; description: string; items: SetupItem[] }) {
+  return (
+    <section className="overflow-hidden rounded-xl border border-line bg-card">
+      <header className="flex items-start gap-3 border-b border-line px-5 py-4">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-subtle">
+          <Icon name="pulse" className="size-4" />
+        </span>
+        <div>
+          <h2 className="text-sm font-medium">{title}</h2>
+          <p className="mt-0.5 text-sm text-subtle">{description}</p>
+        </div>
+      </header>
+      <ul className="divide-y divide-line">
+        {items.map((item) => (
+          <li key={item.label} className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 px-5 py-3.5 text-sm">
+            <div className="min-w-0">
+              <p className="font-medium">{item.label}</p>
+              <p className="mt-0.5 text-subtle">{item.unlocks}</p>
+              {!item.ok && (
+                <p className="mt-2 flex flex-wrap gap-1.5">
+                  {item.env.map((name) => (
+                    <code key={name} className="rounded border border-line bg-muted/50 px-1.5 py-0.5 font-mono text-xs text-subtle">
+                      {name}
+                    </code>
+                  ))}
+                </p>
+              )}
+            </div>
+            <StatusDot tone={item.ok ? "ok" : "idle"}>
+              <span className={item.ok ? undefined : "text-subtle"}>{item.ok ? "已設定" : "未設定"}</span>
+            </StatusDot>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
