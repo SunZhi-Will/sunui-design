@@ -1,6 +1,7 @@
 "use client";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
+import { productPhoto } from "@/registry/_demo/product-art";
 
 import { PhoneFrame, PhonePair } from "./phone-frame";
 
@@ -54,23 +55,29 @@ const copy = {
 type Copy = (typeof copy)["en"];
 
 const prices = ["$36.00", "$24.00"];
+const photos = [productPhoto("mug"), productPhoto("tote")];
 
 function CartScreen({ t }: { t: Copy }) {
   return (
-    <div className="space-y-3 p-4 text-sm">
-      <p className="font-semibold">{t.cart}</p>
-      {t.items.map((name, i) => (
-        <div key={name} className="flex items-center gap-2">
-          <span aria-hidden="true" className="size-9 shrink-0 rounded-lg bg-[var(--wf-sunken)]" />
-          <span className="min-w-0 flex-1 truncate">{name}</span>
-          <span className="tabular-nums">{prices[i]}</span>
-        </div>
-      ))}
-      <div className="flex justify-between border-t border-[var(--wf-line)] pt-2 font-semibold">
+    <div className="px-4 pt-1 pb-3 text-[13px]">
+      <p className="text-[22px] font-bold tracking-tight">{t.cart}</p>
+      <ul className="mt-3 divide-y divide-[var(--wf-line)]">
+        {t.items.map((name, i) => (
+          <li key={name} className="flex items-center gap-3 py-2.5">
+            <img src={photos[i]} alt="" className="size-12 shrink-0 rounded-[10px] bg-[var(--wf-sunken)] object-cover" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-medium">{name}</span>
+              <span className="text-[11px] text-[var(--wf-fg-muted)]">× 1</span>
+            </span>
+            <span className="tabular-nums">{prices[i]}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-1 flex justify-between border-t border-[var(--wf-line)] pt-3 font-semibold">
         <span>{t.total}</span>
         <span className="tabular-nums">$60.00</span>
       </div>
-      <span className="block rounded-xl bg-[var(--wf-fg)] py-2.5 text-center font-semibold text-[var(--wf-surface)]">
+      <span className="mt-4 block rounded-full bg-[var(--wf-fg)] py-3 text-center font-semibold text-[var(--wf-surface)]">
         {t.pay} $60.00
       </span>
     </div>
@@ -79,16 +86,18 @@ function CartScreen({ t }: { t: Copy }) {
 
 function ProductScreen({ t }: { t: Copy }) {
   return (
-    <div className="space-y-3 p-3 text-sm">
-      <span aria-hidden="true" className="block aspect-square rounded-xl bg-[var(--wf-sunken)]" />
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="min-w-0 truncate font-semibold">{t.product}</p>
-        <span className="tabular-nums">$36.00</span>
+    <div className="text-[13px]">
+      <img src={productPhoto("mug")} alt="" className="block aspect-[4/4.2] w-full bg-[var(--wf-sunken)] object-cover" />
+      <div className="space-y-2 px-4 pt-3 pb-3">
+        <div className="flex items-baseline justify-between gap-2">
+          <p className="min-w-0 truncate text-[17px] font-semibold tracking-tight">{t.product}</p>
+          <span className="tabular-nums">$36.00</span>
+        </div>
+        <p className="text-[12px] leading-snug text-[var(--wf-fg-muted)]">{t.detail}</p>
+        <span className="mt-2 block rounded-full bg-[var(--wf-fg)] py-3 text-center font-semibold text-[var(--wf-surface)]">
+          {t.add}
+        </span>
       </div>
-      <p className="text-xs text-[var(--wf-fg-muted)]">{t.detail}</p>
-      <span className="block rounded-xl bg-[var(--wf-fg)] py-2.5 text-center font-semibold text-[var(--wf-surface)]">
-        {t.add}
-      </span>
     </div>
   );
 }
@@ -111,7 +120,6 @@ export default function PhoneFrameDemo() {
         label={t.pair}
         locale={locale}
         backFrame={{ url: "shop.example.com/mug" }}
-        frontFrame={{ time: "20:43" }}
         back={<ProductScreen t={t} />}
         front={<CartScreen t={t} />}
         className="md:max-w-[400px]"

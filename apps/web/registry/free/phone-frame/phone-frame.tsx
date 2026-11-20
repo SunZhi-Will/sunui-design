@@ -113,13 +113,49 @@ const MESSAGES: Record<SunLocale, PhoneFrameLabels> = {
 };
 
 /*
- * 外框由外到內三層：金屬中框（光從正上方來，上緣亮、下緣暗）、黑色玻璃邊、螢幕。
- * 所有尺寸用 cqw（手機寬度的百分比），縮小時圓角、邊框、動態島的比例不變。
- * 同心圓角：中框 14cqw，玻璃邊 13.2cqw，螢幕 13.2 − 3.2 = 10cqw。
+ * 依 iPhone 17 Pro 的實際比例畫（機身 71.9 × 150 mm，螢幕 1206 × 2622）：
+ * 金屬中框 1cqw、黑色玻璃邊 2cqw（真機約為機身寬的 2%），螢幕幾乎佔滿正面。
+ * 所有尺寸用 cqw（手機寬度的百分比），縮小時圓角、黑邊、動態島的比例不變。
+ * 同心圓角：中框 15.6cqw，玻璃邊 14.6cqw，螢幕 14.6 − 2 = 12.6cqw。
+ * 中框是金屬，光從正上方來：上下兩端反光亮、側面暗，內緣一圈倒角高光。
  */
-const frameMetal =
-  "bg-[#2b2b2f] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_-1px_0_rgb(0_0_0/0.5),0_0_0_1px_rgb(0_0_0/0.55),0_2px_4px_rgb(0_0_0/0.12),0_24px_48px_-16px_rgb(0_0_0/0.35)]";
-const buttonMetal = "absolute w-[1.1cqw] bg-[#2b2b2f] shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_0_0_0.5px_rgb(0_0_0/0.5)]";
+const METAL = "linear-gradient(180deg,#9a9aa0 0%,#47474c 2.2%,#2c2c30 9%,#232327 50%,#2c2c30 91%,#47474c 97.8%,#7d7d83 100%)";
+const frameShadow =
+  "shadow-[inset_0_0_0_0.35cqw_rgb(255_255_255/0.10),inset_0_0_0_0.6cqw_rgb(0_0_0/0.35),0_0_0_0.5px_rgb(0_0_0/0.6),0_2px_4px_rgb(0_0_0/0.10),0_28px_56px_-20px_rgb(0_0_0/0.40)]";
+// 側鍵是圓柱：中間一道反光
+const KEY = "linear-gradient(90deg,#1b1b1e 0%,#5a5a60 45%,#2a2a2e 100%)";
+
+function SideKey({ side, top, h }: { side: "left" | "right"; top: string; h: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn("absolute w-[1.2cqw]", side === "left" ? "-left-[1cqw] rounded-l-[0.7cqw]" : "-right-[1cqw] rounded-r-[0.7cqw]")}
+      style={{ top, height: h, background: KEY }}
+    />
+  );
+}
+
+/** 中框上的天線分隔線：一小段塑料，真機的細節 */
+function Antenna({ className }: { className: string }) {
+  return <span aria-hidden="true" className={cn("absolute h-[0.9cqw] w-[1cqw] bg-[#55555b]", className)} />;
+}
+
+function Chevron() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-[4.6cqw]">
+      <path d="m15 6-6 6 6 6" />
+    </svg>
+  );
+}
+
+function TabsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" aria-hidden="true" className="size-[4.4cqw]">
+      <rect x="4" y="7" width="12" height="12" rx="2.5" />
+      <path d="M8 4h9.5A2.5 2.5 0 0 1 20 6.5V16" />
+    </svg>
+  );
+}
 
 export function PhoneFrame({
   children,
@@ -135,7 +171,6 @@ export function PhoneFrame({
   className,
 }: PhoneFrameProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
   return (
     <figure
       aria-label={typeof label === "string" ? label : t.screen}
@@ -149,33 +184,56 @@ export function PhoneFrame({
         </figcaption>
       )}
       <div className="@container relative w-full">
-        {/* 側邊按鍵：左側動作鍵與音量鍵，右側電源鍵，各凸出機身一點點 */}
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[17%] h-[5.5%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[25%] h-[10%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[37%] h-[10%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-right-[0.9cqw] top-[28%] h-[15%] rounded-r-[0.6cqw]")} />
-        <div className={cn("relative rounded-[14cqw] p-[0.8cqw]", frameMetal)} style={height ? { height } : { aspectRatio: "9 / 19.5" }}>
-          <div className="h-full rounded-[13.2cqw] bg-[#050506] p-[3.2cqw]">
-            <div className={cn("relative flex h-full flex-col overflow-hidden rounded-[10cqw]", part)}>
-              {/* 動態島 */}
-              <div aria-hidden="true" className="absolute top-[3.2cqw] left-1/2 z-[2] h-[9cqw] w-[30cqw] -translate-x-1/2 rounded-full bg-[#050506]" />
-              <div aria-hidden="true" className="flex h-[15.4cqw] flex-none items-center justify-between pr-[6.4cqw] pl-[8.6cqw] pt-[1cqw] text-[4.6cqw] font-semibold">
-                <span className="tabular-nums tracking-tight">{time}</span>
-                <StatusIcons />
+        {/* 左側：動作鍵、音量加、音量減；右側：電源鍵與相機控制鍵 */}
+        <SideKey side="left" top="17%" h="5%" />
+        <SideKey side="left" top="25%" h="9%" />
+        <SideKey side="left" top="36%" h="9%" />
+        <SideKey side="right" top="27%" h="14%" />
+        <SideKey side="right" top="58%" h="7%" />
+        <div
+          className={cn("relative rounded-[15.6cqw] p-[1cqw]", frameShadow)}
+          style={{ background: METAL, ...(height ? { height } : { aspectRatio: "71.9 / 150" }) }}
+        >
+          <Antenna className="top-[8%] left-0" />
+          <Antenna className="top-[8%] right-0" />
+          <Antenna className="bottom-[8%] left-0" />
+          <Antenna className="bottom-[8%] right-0" />
+          <div className="h-full rounded-[14.6cqw] bg-[#030304] p-[2cqw]">
+            <div className="relative flex h-full flex-col overflow-hidden rounded-[12.6cqw] bg-[var(--wf-surface)] text-[var(--wf-fg)]">
+              {/* 動態島：寬約螢幕 32%、高 9%，離頂端 2.7% */}
+              <div aria-hidden="true" className="absolute top-[2.7cqw] left-1/2 z-[3] h-[9.2cqw] w-[31cqw] -translate-x-1/2 rounded-full bg-black" />
+              {/* 狀態列：時間和圖示各自置中在動態島兩側 */}
+              <div aria-hidden="true" className="relative z-[2] grid h-[14.6cqw] flex-none grid-cols-[1fr_31cqw_1fr] items-center pt-[0.6cqw] text-[4.4cqw] font-semibold">
+                <span className="justify-self-center pl-[3cqw] tabular-nums tracking-tight">{time}</span>
+                <span />
+                <span className="justify-self-center pr-[2cqw]">
+                  <StatusIcons />
+                </span>
               </div>
+              <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">{children}</div>
+              {/* Safari 的網址列在底部，浮在內容上 */}
               {url && (
-                <div
-                  aria-label={t.url(url)}
-                  className="mx-[3.2cqw] mb-[2cqw] flex flex-none items-center justify-center gap-[1.4cqw] rounded-[3cqw] bg-[var(--wf-raised)] px-[3cqw] py-[1.8cqw] text-[3.8cqw] text-[var(--wf-fg-muted)]"
-                >
-                  <LockIcon />
-                  <span className="truncate text-[var(--wf-fg)]">{url}</span>
+                <div className="flex flex-none items-center gap-[2cqw] px-[3.6cqw] pt-[2cqw]">
+                  <span aria-hidden="true" className="grid size-[11cqw] flex-none place-items-center rounded-full bg-[var(--wf-raised)] shadow-[0_0_0_1px_var(--wf-line)]">
+                    <Chevron />
+                  </span>
+                  <div
+                    aria-label={t.url(url)}
+                    className="flex h-[11cqw] min-w-0 flex-1 items-center justify-center gap-[1.4cqw] rounded-full bg-[var(--wf-raised)] px-[3cqw] text-[3.9cqw] shadow-[0_0_0_1px_var(--wf-line)]"
+                  >
+                    <LockIcon />
+                    <span className="truncate">{url}</span>
+                  </div>
+                  <span aria-hidden="true" className="grid size-[11cqw] flex-none place-items-center rounded-full bg-[var(--wf-raised)] shadow-[0_0_0_1px_var(--wf-line)]">
+                    <TabsIcon />
+                  </span>
                 </div>
               )}
-              <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">{children}</div>
-              <div aria-hidden="true" className="relative h-[7cqw] flex-none">
-                <span className="absolute bottom-[2.4cqw] left-1/2 h-[1.4cqw] w-[36cqw] -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-80" />
+              <div aria-hidden="true" className="relative h-[7.4cqw] flex-none">
+                <span className="absolute bottom-[2.2cqw] left-1/2 h-[1.3cqw] w-[35cqw] -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-85" />
               </div>
+              {/* 玻璃：極淡的斜向反光，模擬上方光源打在蓋板玻璃上 */}
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[4] rounded-[inherit] bg-[linear-gradient(120deg,rgb(255_255_255/0.07)_0%,transparent_38%)]" />
             </div>
           </div>
         </div>
@@ -190,7 +248,7 @@ export function PhoneFrame({
 const GENTLE = { stiffness: 240, damping: 30 };
 /** 舞台的設計尺寸；容器較窄時整組等比縮小，不換版 */
 const STAGE_W = 400;
-const STAGE_H = 580;
+const STAGE_H = 530;
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -214,24 +272,45 @@ export interface PhonePairProps {
   className?: string;
 }
 
-/** 一支傾斜的手機：靜止角度加上游標偏移乘以跟隨倍率 */
+/** 機身厚度：真機約為寬度的 12%，用一疊同形狀的薄層往後推出側面 */
+const DEPTH_LAYERS = 14;
+
+/** 一支傾斜的手機：靜止角度加上游標偏移乘以跟隨倍率，背後疊出機身側面 */
 function TiltedPhone({
   px,
   py,
   pose,
   follow,
+  width,
   children,
 }: {
   px: MotionValue<number>;
   py: MotionValue<number>;
   pose: { x: number; y: number; z: number };
   follow: number;
+  width: number;
   children: ReactNode;
 }) {
   const rotateY = useTransform(px, (v) => pose.y + v * 14 * follow);
   const rotateX = useTransform(py, (v) => pose.x - v * 10 * follow);
+  const step = (width * 0.11) / DEPTH_LAYERS;
   return (
-    <motion.div style={{ rotateX, rotateY, rotateZ: pose.z, transformPerspective: 1400 }}>{children}</motion.div>
+    <motion.div style={{ rotateX, rotateY, rotateZ: pose.z, transformPerspective: 1400, transformStyle: "preserve-3d" }} className="relative">
+      {Array.from({ length: DEPTH_LAYERS }, (_, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            borderRadius: width * 0.156,
+            // 側面：靠近正面的幾層是中框的金屬色，越往後越暗
+            background: i < DEPTH_LAYERS - 2 ? `rgb(${52 - i * 1.6} ${52 - i * 1.6} ${57 - i * 1.6})` : "#141416",
+            transform: `translateZ(${-(i + 1) * step}px)`,
+          }}
+        />
+      ))}
+      <div style={{ transform: "translateZ(0.5px)" }}>{children}</div>
+    </motion.div>
   );
 }
 
@@ -315,14 +394,14 @@ export function PhonePair({
         style={{ width: STAGE_W, height: STAGE_H, transform: `translateX(-50%) scale(${scale})` }}
       >
         <div className="absolute top-0 left-[8px]" style={{ width: 236 }}>
-          <TiltedPhone px={px} py={py} pose={{ x: 6, y: 14, z: 0 }} follow={0.55}>
+          <TiltedPhone px={px} py={py} pose={{ x: 8, y: 22, z: -2 }} follow={0.55} width={236}>
             <PhoneFrame {...backFrame} width={236} scheme={scheme} locale={locale}>
               {back}
             </PhoneFrame>
           </TiltedPhone>
         </div>
         <div className="absolute top-[100px] left-[188px]" style={{ width: 196 }}>
-          <TiltedPhone px={px} py={py} pose={{ x: 6, y: -14, z: 0 }} follow={1}>
+          <TiltedPhone px={px} py={py} pose={{ x: 8, y: -22, z: 2 }} follow={1} width={196}>
             <PhoneFrame {...frontFrame} width={196} scheme={scheme} locale={locale}>
               {front}
             </PhoneFrame>
