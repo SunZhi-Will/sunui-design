@@ -25,7 +25,7 @@ export function DailyChart({ series }: { series: Series[] }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="指標" className="inline-flex rounded-lg bg-muted p-0.5 text-xs">
+        <div role="tablist" aria-label="指標" className="flex gap-1.5">
           {series.map((s) => (
             <button
               key={s.key}
@@ -33,10 +33,8 @@ export function DailyChart({ series }: { series: Series[] }) {
               role="tab"
               aria-selected={s.key === current.key}
               onClick={() => setActive(s.key)}
-              className={cn(
-                "rounded-md px-2.5 py-1 transition-colors",
-                s.key === current.key ? "bg-card font-medium shadow-[0_0_0_1px_var(--line)]" : "text-subtle hover:text-fg",
-              )}
+              aria-current={s.key === current.key ? "true" : undefined}
+              className="a-chip h-7 text-[12.5px]"
             >
               {s.label}
             </button>

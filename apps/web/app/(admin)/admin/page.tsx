@@ -2,25 +2,31 @@ import { requireAdmin } from "@/lib/admin";
 import { licenseOverview } from "@/lib/admin-data";
 import { eventStats } from "@/lib/events";
 import { installStats } from "@/lib/installs";
-import { foundingSold, listAllOrders, sumByCurrency, type Order } from "@/lib/orders";
-import { polarConfigured } from "@/lib/polar";
+import {
+  foundingSold,
+  listAllOrders,
+  sumByCurrency,
+  type Order,
+} from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
-import { foundingState, foundingWindow, shoplineConfigured } from "@/lib/site";
+import { foundingState, foundingWindow } from "@/lib/site";
 
 import { DailyChart } from "./daily-chart";
 import {
   BarList,
   DataTable,
   Funnel,
-  KpiStrip,
+  KpiGrid,
   Notice,
   PageHeader,
   parseRange,
   pct,
   Progress,
-  QueueStrip,
+  QueueSection,
   RangeTabs,
   Section,
+  setupItems,
+  SetupRequired,
   StatTile,
   StatusDot,
   type QueueItem,
@@ -39,56 +45,112 @@ function split(perDay: Daily[], days: number) {
   const current = perDay.slice(0, days);
   const previous = perDay.slice(days, days * 2);
   const sum = (list: Daily[]) => list.reduce((s, d) => s + d.value, 0);
-  return { series: [...current].reverse(), current: sum(current), previous: sum(previous) };
+  return {
+    series: [...current].reverse(),
+    current: sum(current),
+    previous: sum(previous),
+  };
 }
 
 /** 本期（最新 N 天）各欄位加總；prefix 給定時只加以它開頭的欄位。 */
 function sumPeriod(byDay: ByDay, days: number) {
   const total: Record<string, number> = {};
-  for (const d of byDay.slice(0, days)) for (const [k, v] of Object.entries(d.values)) total[k] = (total[k] ?? 0) + v;
+  for (const d of byDay.slice(0, days))
+    for (const [k, v] of Object.entries(d.values))
+      total[k] = (total[k] ?? 0) + v;
   return total;
 }
 
-const DENY_LABEL: Record<string, string> = { "401": "沒帶授權碼", "403": "撤銷或疑似分享", "429": "限流", "503": "授權資料讀取失敗" };
+const DENY_LABEL: Record<string, string> = {
+  "401": "沒帶授權碼",
+  "403": "撤銷或疑似分享",
+  "429": "限流",
+  "503": "授權資料讀取失敗",
+};
 
-export default async function AdminOverview({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
+export default async function AdminOverview({
+  searchParams,
+}: {
+  searchParams: Promise<{ days?: string }>;
+}) {
   await requireAdmin();
   const days = parseRange((await searchParams).days);
+  const header = (
+    <PageHeader
+      title="總覽"
+      description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC；新台幣與美金分開列，不換算。`}
+      actions={redisEnabled() ? <RangeTabs value={days} basePath="/admin" /> : undefined}
+    />
+  );
 
-  const [installs, events, orderList, licenses, foundingCount] = await Promise.all([
-    installStats(days * 2).catch(() => null),
-    eventStats(days * 2).catch(() => null),
-    redisEnabled() ? listAllOrders().catch(() => null) : Promise.resolve(null),
-    licenseOverview(),
-    redisEnabled() ? foundingSold().catch(() => null) : Promise.resolve(null),
-  ]);
+  // 沒有 Redis 就沒有任何數字：整頁收成一張「接上資料來源」的卡片，不擺一排空的數字卡
+  if (!redisEnabled()) {
+    return (
+      <>
+        {header}
+        <SetupRequired
+          title="接上資料來源後才有數字"
+          description="訂單、授權、安裝數與購買漏斗都存在 Upstash Redis。設定好下面標「未設定」的環境變數，重新部署後這裡就會出現資料。"
+          items={setupItems()}
+        />
+      </>
+    );
+  }
+
+  const [installs, events, orderList, licenses, foundingCount] =
+    await Promise.all([
+      installStats(days * 2).catch(() => null),
+      eventStats(days * 2).catch(() => null),
+      redisEnabled()
+        ? listAllOrders().catch(() => null)
+        : Promise.resolve(null),
+      licenseOverview(),
+      redisEnabled() ? foundingSold().catch(() => null) : Promise.resolve(null),
+    ]);
 
   const orders: Order[] = (orderList ?? []).filter((o) => !o.test);
   const counted = orders.filter((o) => o.status === "paid");
   // Founding 筆數以 seats:founding 計數器為準（付款加一、退款扣回，也是賣完判斷用的同一個數字）
-  const founding = foundingCount ?? counted.filter((o) => o.plan === "founding").length;
+  const founding =
+    foundingCount ?? counted.filter((o) => o.plan === "founding").length;
   const sales = sumByCurrency(counted);
   // 本期建立的結帳與成功付款（SunUI 自己的訂單，結帳頁送出 email 才會建立）
   const since = Date.now() - days * 86_400_000;
   const periodOrders = orders.filter((o) => Date.parse(o.createdAt) >= since);
-  const periodPaid = counted.filter((o) => o.paidAt && Date.parse(o.paidAt) >= since);
+  const periodPaid = counted.filter(
+    (o) => o.paidAt && Date.parse(o.paidAt) >= since,
+  );
   const periodSales = sumByCurrency(periodPaid);
   // 新台幣（SHOPLINE）與美金（Polar）分開列，不換算
   const twd = (n: { twd: number; usd: number }) =>
-    [`NT$${n.twd.toLocaleString("en-US")}`, ...(n.usd ? [`US$${n.usd.toLocaleString("en-US")}`] : [])].join(" + ");
+    [
+      `NT$${n.twd.toLocaleString("en-US")}`,
+      ...(n.usd ? [`US$${n.usd.toLocaleString("en-US")}`] : []),
+    ].join(" + ");
 
-  const free = installs ? split(installs.perDay.map((d) => ({ day: d.day, value: d.installs })), days) : null;
+  const free = installs
+    ? split(
+        installs.perDay.map((d) => ({ day: d.day, value: d.installs })),
+        days,
+      )
+    : null;
   const pro = events ? split(events.pro.perDay, days) : null;
   const intent = events ? split(events.intent.perDay, days) : null;
   const denied = events ? sumPeriod(events.deniedByDay, days) : {};
   const funnel = events ? sumPeriod(events.funnel.byDay, days) : null;
   const checkoutClicks = funnel
-    ? Object.entries(funnel).filter(([k]) => k.startsWith("checkout_click:")).reduce((s, [, v]) => s + v, 0)
+    ? Object.entries(funnel)
+        .filter(([k]) => k.startsWith("checkout_click:"))
+        .reduce((s, [, v]) => s + v, 0)
     : undefined;
 
   const now = new Date();
-  const daysLeft = Math.max(0, Math.ceil((foundingWindow.closesAt.getTime() - now.getTime()) / 86_400_000));
-  const behind = foundingState(now) === "open" && daysLeft < 21 && founding < FOUNDING_GATE;
+  const daysLeft = Math.max(
+    0,
+    Math.ceil((foundingWindow.closesAt.getTime() - now.getTime()) / 86_400_000),
+  );
+  const behind =
+    foundingState(now) === "open" && daysLeft < 21 && founding < FOUNDING_GATE;
 
   const queue: QueueItem[] = [
     {
@@ -103,144 +165,221 @@ export default async function AdminOverview({ searchParams }: { searchParams: Pr
       count: behind ? FOUNDING_GATE - founding : 0,
       tone: "bad",
     },
-    { label: "授權驗證失敗", hint: "付費客戶裝不到 Pro，檢查 Upstash Redis 狀態", count: denied["503"] ?? 0, tone: "bad" },
-    { label: "撤銷或疑似分享", hint: "退款撤銷，或同一把 key 一天超過 20 個 IP", count: denied["403"] ?? 0 },
+    {
+      label: "授權驗證失敗",
+      hint: "付費客戶裝不到 Pro，檢查 Upstash Redis 狀態",
+      count: denied["503"] ?? 0,
+      tone: "bad",
+    },
+    {
+      label: "撤銷或疑似分享",
+      hint: "退款撤銷，或同一把 key 一天超過 20 個 IP",
+      count: denied["403"] ?? 0,
+    },
   ];
 
-  const missing = [
-    !redisEnabled() && "Upstash Redis（訂單、授權、安裝與漏斗計數）",
-    !shoplineConfigured() && "SHOPLINE 新台幣收款（SHOPLINE_MERCHANT_ID、SHOPLINE_API_KEY、SHOPLINE_SIGN_KEY）",
-    !polarConfigured() && "Polar 美金收款（POLAR_ACCESS_TOKEN、POLAR_WEBHOOK_SECRET、POLAR_PRODUCT_IDS）",
-  ].filter(Boolean) as string[];
-  const errors = redisEnabled() && (!orderList || !licenses.ok) ? ["讀不到 Redis 的訂單或授權資料"] : [];
+  // 只缺金流時頁面照常顯示，提示一句即可
+  const missing = setupItems()
+    .filter((item) => !item.ok)
+    .map((item) => `${item.label}（${item.unlocks}）`);
+  const errors =
+    redisEnabled() && (!orderList || !licenses.ok)
+      ? ["讀不到 Redis 的訂單或授權資料"]
+      : [];
 
   return (
     <>
-      <PageHeader
-        title="總覽"
-        description={`近 ${days} 天，與前 ${days} 天比較。日期為 UTC；新台幣與美金分開列，不換算。`}
-        actions={<RangeTabs value={days} basePath="/admin" />}
-      />
+      {header}
 
-      {missing.length > 0 && <Notice>尚未設定：{missing.join("、")}。相關數字會是空的。</Notice>}
+      {missing.length > 0 && (
+        <Notice>還沒接上 {missing.join("、")}，付款相關的數字會是空的。</Notice>
+      )}
       {errors.length > 0 && <Notice tone="bad">{errors.join("；")}</Notice>}
 
-      <QueueStrip items={queue} />
+      <QueueSection items={queue} />
 
-      <KpiStrip>
+      <KpiGrid>
         <StatTile
-          icon="users"
+          hero
           label="Founding 付費"
           value={
             <>
               {founding}
-              <span className="text-base font-normal text-subtle"> / {foundingWindow.seats}</span>
+              <span className="text-base font-normal text-subtle">
+                {" "}
+                / {foundingWindow.seats}
+              </span>
             </>
           }
           hint={`門檻 ${FOUNDING_GATE} 筆，截止還有 ${daysLeft} 天`}
           tone={behind ? "warn" : undefined}
           href="/admin/orders"
         >
-          <Progress value={founding} max={foundingWindow.seats} mark={FOUNDING_GATE} />
+          <Progress
+            value={founding}
+            max={foundingWindow.seats}
+            mark={FOUNDING_GATE}
+          />
         </StatTile>
         <StatTile
-          icon="dollar"
+          hero
           label="累計銷售額"
           value={twd(sales)}
-          hint={
-            `${counted.length} 筆有效訂單；近 ${days} 天 ${twd(periodSales)}`
-          }
+          hint={`${counted.length} 筆有效訂單；近 ${days} 天 ${twd(periodSales)}`}
           href="/admin/orders"
         />
         <StatTile
-          icon="license"
           label="授權啟用率"
-          value={licenses.ok ? pct(licenses.activated.length, licenses.granted.length) : "–"}
-          hint={licenses.ok ? `${licenses.activated.length} / ${licenses.granted.length} 把有效授權裝過 Pro` : "需要 Upstash Redis"}
+          value={
+            licenses.ok
+              ? pct(licenses.activated.length, licenses.granted.length)
+              : "–"
+          }
+          hint={
+            licenses.ok
+              ? `${licenses.activated.length} / ${licenses.granted.length} 把有效授權裝過 Pro`
+              : undefined
+          }
           tone={
-            licenses.ok && licenses.granted.length >= 5 && licenses.activated.length / licenses.granted.length < 0.6
+            licenses.ok &&
+            licenses.granted.length >= 5 &&
+            licenses.activated.length / licenses.granted.length < 0.6
               ? "warn"
               : undefined
           }
           href="/admin/licenses"
         />
         <StatTile
-          icon="block"
           label="Pro 購買意圖"
           value={intent?.current ?? "–"}
-          delta={intent ? { current: intent.current, previous: intent.previous } : undefined}
-          hint="沒帶授權碼想裝 Pro 的次數"
+          delta={
+            intent
+              ? { current: intent.current, previous: intent.previous }
+              : undefined
+          }
+          hint="沒帶授權碼想裝 Pro"
           trend={intent?.series.map((d) => d.value)}
           href="/admin/licenses#pro-blocks"
         />
         <StatTile
-          icon="check"
           label="Pro 授權安裝"
           value={pro?.current ?? "–"}
-          delta={pro ? { current: pro.current, previous: pro.previous } : undefined}
+          delta={
+            pro ? { current: pro.current, previous: pro.previous } : undefined
+          }
           trend={pro?.series.map((d) => d.value)}
           href="/admin/licenses"
         />
         <StatTile
-          icon="download"
           label="免費安裝"
           value={free?.current ?? "–"}
-          delta={free ? { current: free.current, previous: free.previous } : undefined}
-          hint="shadcn CLI 與 agent，不含瀏覽器預覽"
+          delta={
+            free
+              ? { current: free.current, previous: free.previous }
+              : undefined
+          }
+          hint="shadcn CLI 與 agent"
           trend={free?.series.map((d) => d.value)}
           href="#free-installs"
         />
-      </KpiStrip>
+      </KpiGrid>
 
-      <Section title="每日趨勢" description="滑過長條看單日數字，方向鍵也可以逐日移動。">
-        {free || pro || intent ? (
-          <DailyChart
-            series={[
-              { key: "free", label: "免費安裝", values: free?.series ?? [] },
-              { key: "intent", label: "Pro 意圖", values: intent?.series ?? [] },
-              { key: "pro", label: "Pro 安裝", values: pro?.series ?? [] },
-            ]}
-          />
-        ) : (
-          <p className="text-sm text-subtle">需要 Upstash Redis 才有每日資料。</p>
-        )}
-      </Section>
+      <div className="grid items-start gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:col-span-2">
+          <Section
+            title="每日趨勢"
+            description="滑過長條看單日數字，方向鍵也可以逐日移動。"
+          >
+            <DailyChart
+              series={[
+                { key: "free", label: "免費安裝", values: free?.series ?? [] },
+                {
+                  key: "intent",
+                  label: "Pro 意圖",
+                  values: intent?.series ?? [],
+                },
+                { key: "pro", label: "Pro 安裝", values: pro?.series ?? [] },
+              ]}
+            />
+          </Section>
 
-      <div className="grid gap-x-6 lg:grid-cols-2">
-        <Section id="funnel" title="購買漏斗" description={`近 ${days} 天，全部由本站計數。`}>
-          <Funnel
-            steps={[
-              { label: "定價頁瀏覽", value: funnel?.pricing_view ?? (funnel ? 0 : undefined), source: "本站" },
-              { label: "點結帳", value: checkoutClicks, source: "本站" },
-              { label: "填完 email 前往付款", value: orderList ? periodOrders.length : undefined, source: "結帳頁" },
-              { label: "付款成功", value: orderList ? periodPaid.length : undefined, source: "SHOPLINE、Polar 通知" },
-            ]}
-          />
-        </Section>
+          <Section
+            title="授權失敗"
+            description={`近 ${days} 天 Pro registry 回傳的錯誤`}
+            flush
+          >
+            <DataTable
+              columns={[
+                { label: "狀態" },
+                { label: "意思" },
+                { label: "次數", num: true },
+              ]}
+              rows={Object.entries(denied)
+                .sort()
+                .map(([code, count]) => [
+                  <StatusDot
+                    key="s"
+                    tone={
+                      code === "503" ? "bad" : code === "401" ? "idle" : "warn"
+                    }
+                  >
+                    {code}
+                  </StatusDot>,
+                  DENY_LABEL[code] ?? "",
+                  count,
+                ])}
+              empty={{ title: "沒有失敗紀錄", icon: "check" }}
+            />
+          </Section>
+        </div>
 
-        <Section id="free-installs" title="免費安裝排行" description={`近 ${days * 2} 天前 8 名`}>
-          <BarList
-            items={(installs?.top ?? []).slice(0, 8).map((b) => ({ label: b.name, value: b.installs }))}
-            empty={{ title: "還沒有安裝紀錄", description: "有人用 shadcn CLI 或 agent 裝免費 block 後會出現在這裡。", icon: "download" }}
-          />
-        </Section>
+        <div className="grid gap-4">
+          <Section
+            id="funnel"
+            title="購買漏斗"
+            description={`近 ${days} 天，全部由本站計數`}
+          >
+            <Funnel
+              steps={[
+                {
+                  label: "定價頁瀏覽",
+                  value: funnel?.pricing_view ?? (funnel ? 0 : undefined),
+                  source: "本站",
+                },
+                { label: "點結帳", value: checkoutClicks, source: "本站" },
+                {
+                  label: "填完 email 前往付款",
+                  value: orderList ? periodOrders.length : undefined,
+                  source: "結帳頁",
+                },
+                {
+                  label: "付款成功",
+                  value: orderList ? periodPaid.length : undefined,
+                  source: "金流通知",
+                },
+              ]}
+            />
+          </Section>
+
+          <Section
+            id="free-installs"
+            title="免費安裝排行"
+            description={`近 ${days * 2} 天前 8 名`}
+          >
+            <BarList
+              items={(installs?.top ?? [])
+                .slice(0, 8)
+                .map((b) => ({ label: b.name, value: b.installs }))}
+              empty={{
+                title: "還沒有安裝紀錄",
+                description:
+                  "有人用 shadcn CLI 或 agent 裝免費 block 後會出現在這裡。",
+                icon: "download",
+              }}
+            />
+          </Section>
+        </div>
       </div>
-
-      <Section title="授權失敗" description={`近 ${days} 天 Pro registry 回傳的錯誤。`} flush>
-        <DataTable
-          columns={[{ label: "狀態" }, { label: "意思" }, { label: "次數", num: true }]}
-          rows={Object.entries(denied)
-            .sort()
-            .map(([code, count]) => [
-              <StatusDot key="s" tone={code === "503" ? "bad" : code === "401" ? "idle" : "warn"}>
-                {code}
-              </StatusDot>,
-              DENY_LABEL[code] ?? "",
-              count,
-            ])}
-          empty={{ title: "沒有失敗紀錄", icon: "check" }}
-        />
-      </Section>
     </>
   );
 }

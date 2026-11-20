@@ -7,7 +7,7 @@ import { licenseExpired } from "@/lib/orders";
 import { redisEnabled } from "@/lib/redis";
 
 import { ReissueButton } from "./reissue-button";
-import { DataTable, KpiStrip, Notice, PageHeader, parseRange, pct, RangeTabs, Section, StatTile, StatusDot } from "../ui";
+import { DataTable, KpiGrid, Notice, PageHeader, parseRange, pct, RangeTabs, Section, setupItems, SetupRequired, StatTile, StatusDot } from "../ui";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "授權使用" };
@@ -15,6 +15,26 @@ export const metadata: Metadata = { title: "授權使用" };
 export default async function AdminLicenses({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   await requireAdmin();
   const days = parseRange((await searchParams).days);
+  const header = (
+    <PageHeader
+      title="授權使用"
+      description="買了授權的人有沒有真的在用。只存授權碼的雜湊與最後 4 碼，不存授權碼本身。"
+      actions={redisEnabled() ? <RangeTabs value={days} basePath="/admin/licenses" /> : undefined}
+    />
+  );
+
+  if (!redisEnabled()) {
+    return (
+      <>
+        {header}
+        <SetupRequired
+          title="接上 Upstash Redis 後才有使用紀錄"
+          description="授權、安裝次數與沉睡名單都存在 Redis。設定好下面的環境變數，重新部署後這裡就會出現資料。"
+          items={setupItems().filter((item) => item.label === "Upstash Redis")}
+        />
+      </>
+    );
+  }
 
   const [overview, events] = await Promise.all([
     licenseOverview(),
@@ -31,24 +51,17 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageHeader
-        title="授權使用"
-        description="買了授權的人有沒有真的在用。只存授權碼的雜湊與最後 4 碼，不存授權碼本身。"
-        actions={<RangeTabs value={days} basePath="/admin/licenses" />}
-      />
+      {header}
 
-      {!redisEnabled() && <Notice>尚未設定 Upstash Redis，沒有使用紀錄。</Notice>}
-      {redisEnabled() && !overview.ok && <Notice tone="bad">{overview.error}</Notice>}
+      {!overview.ok && <Notice tone="bad">{overview.error}</Notice>}
 
-      <KpiStrip>
+      <KpiGrid cols={3}>
         <StatTile
-          icon="license"
           label="授權啟用率"
           value={ok ? pct(ok.activated.length, ok.granted.length) : "–"}
           hint={ok ? `${ok.activated.length} / ${ok.granted.length} 把有效授權至少裝過 1 個 Pro block` : undefined}
         />
         <StatTile
-          icon="clock"
           label="沉睡授權"
           value={ok?.dormant.length ?? "–"}
           hint={`購買超過 ${DORMANT_DAYS} 天仍未安裝`}
@@ -56,12 +69,11 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
           href="#dormant"
         />
         <StatTile
-          icon="check"
           label="購買到首次安裝"
           value={ok?.medianFirstInstall === null || !ok ? "–" : `${ok.medianFirstInstall} 天`}
           hint="中位數，越短代表上手越順"
         />
-      </KpiStrip>
+      </KpiGrid>
 
       <Section id="dormant" title="沉睡名單" description="寄一封安裝教學信。email 只顯示部分。" flush>
         <DataTable
@@ -79,6 +91,7 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
       </Section>
 
       <Section
+        className="mt-4"
         id="pro-blocks"
         title="Pro 區塊"
         description={`近 ${days} 天。意圖 = 沒帶授權碼想安裝的次數；意圖高、安裝低代表有興趣但被價格或說明擋住。`}
@@ -98,7 +111,7 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
         />
       </Section>
 
-      <Section title="全部授權" description={ok ? `共 ${ok.rows.length} 把` : undefined} flush>
+      <Section className="mt-4" title="全部授權" description={ok ? `共 ${ok.rows.length} 把` : undefined} flush>
         <DataTable
           columns={[
             { label: "授權碼" },

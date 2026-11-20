@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { SunMark } from "@/components/sun-mark";
 import { adminToken, isAdmin } from "@/lib/admin";
 import { googleClientId } from "@/lib/google-auth";
 
@@ -32,7 +33,9 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
       <div className="relative w-full max-w-[380px]">
         <div className="rounded-2xl border border-line bg-card px-7 pt-8 pb-7 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.18)]">
           <div className="flex flex-col items-center text-center">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-fg text-base font-semibold text-bg">S</span>
+            <span className="flex size-11 items-center justify-center rounded-xl border border-line bg-[var(--raised-2)]">
+              <SunMark className="size-6" />
+            </span>
             <h1 className="mt-5 text-xl font-semibold tracking-tight">登入 SunUI 後台</h1>
             <p className="mt-1.5 text-sm text-subtle">只有授權的帳號可以進入</p>
           </div>

@@ -9,13 +9,12 @@ import { webhookLast } from "@/lib/events";
 import { polarConfigured } from "@/lib/polar";
 import { redisEnabled } from "@/lib/redis";
 import { foundingState, foundingWindow, salesOpen, shoplineConfigured } from "@/lib/site";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
-import { themeScript } from "@/registry/free/theme-picker/theme-script";
 
 import { logout } from "./admin/login/actions";
 import { AdminSidebar, type SourceStatus } from "./admin/sidebar";
 
 import "../globals.css";
+import "./admin.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -70,13 +69,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const authed = await isAdmin();
   const railCollapsed = (await cookies()).get(RAIL_COOKIE)?.value === "1";
   return (
-    <html lang="zh-TW" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript(THEME_STORAGE_KEY) }} />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-dvh`}>
+    // 後台固定深色（照 VideoAligner 後台），不跟網站的淺深色設定
+    <html lang="zh-TW">
+      <body className={`${geistSans.variable} ${geistMono.variable} adm min-h-dvh antialiased`}>
         {authed ? (
-          <div className="lg:flex">
+          <div className="flex min-h-dvh">
             <AdminSidebar
               sources={await sources()}
               countdown={countdown()}
@@ -84,9 +81,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               initialCollapsed={railCollapsed}
               badges={{ dormant: await dormantCount() }}
             />
-            <main className="min-w-0 flex-1 px-4 py-6 md:px-10 md:py-10">
-              <div className="mx-auto max-w-6xl">{children}</div>
-            </main>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <main className="a-enter mx-auto w-full max-w-[1200px] flex-1 px-4 pt-20 pb-28 md:px-8 md:pt-9 md:pb-16">{children}</main>
+            </div>
           </div>
         ) : (
           // 未登入只會看到登入頁（自帶全版面版型）或 404

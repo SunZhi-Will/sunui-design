@@ -6,7 +6,7 @@ import { redisEnabled } from "@/lib/redis";
 import { salesOpen, shoplineConfigured, type Plan } from "@/lib/site";
 
 import { TestConnection } from "./test-connection";
-import { BarList, DataTable, EmptyState, KpiStrip, Notice, PageHeader, pct, Section, StatTile, StatusDot } from "../ui";
+import { BarList, DataTable, KpiGrid, Notice, PageHeader, pct, Section, setupItems, SetupRequired, StatTile, StatusDot } from "../ui";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "訂單" };
@@ -53,9 +53,11 @@ export default async function AdminOrders() {
     return (
       <>
         {header}
-        <div className="rounded-xl border border-dashed border-line">
-          <EmptyState icon="orders" title="尚未設定 Upstash Redis" description="訂單和授權碼都存在 Redis，設定後訂單會出現在這裡。" />
-        </div>
+        <SetupRequired
+          title="接上 Upstash Redis 後才有訂單"
+          description="訂單和授權碼都存在 Redis。設定好下面標「未設定」的環境變數，重新部署後訂單會出現在這裡。"
+          items={setupItems()}
+        />
       </>
     );
   }
@@ -90,23 +92,21 @@ export default async function AdminOrders() {
         <Notice tone="bad">有 {attention.length} 筆訂單需要處理（金額不符或爭議中），請到對應的金流後台確認。</Notice>
       )}
 
-      <KpiStrip cols={4}>
-        <StatTile icon="orders" label="有效訂單" value={paid.length} hint={`另有 ${real.length - finished.length} 筆未完成付款`} />
-        <StatTile icon="dollar" label="銷售額" value={money(sales)} hint="已扣退款，未扣金流手續費；美金未換算" />
+      <KpiGrid>
+        <StatTile label="有效訂單" value={paid.length} hint={`另有 ${real.length - finished.length} 筆未完成付款`} />
+        <StatTile label="銷售額" value={money(sales)} hint="已扣退款，未扣金流手續費；美金未換算" />
         <StatTile
-          icon="check"
           label="付款完成率"
           value={pct(finished.length, real.length)}
           hint="填完 email 前往付款後，實際付款的比例"
         />
         <StatTile
-          icon="alert"
           label="退款率"
           value={pct(refunded.length, paid.length + refunded.length)}
           hint={`${refunded.length} 筆全額退款`}
           tone={paid.length + refunded.length >= 10 && refunded.length / (paid.length + refunded.length) > 0.1 ? "warn" : undefined}
         />
-      </KpiStrip>
+      </KpiGrid>
 
       <Section title="方案組合" description="已付款訂單，依筆數排序">
         <BarList
@@ -117,7 +117,7 @@ export default async function AdminOrders() {
         />
       </Section>
 
-      <Section title="訂單明細" description={
+      <Section className="mt-4" title="訂單明細" description={
           orders.length > TABLE_LIMIT
             ? `共 ${orders.length} 筆，列出最新 ${TABLE_LIMIT} 筆；上方統計含全部訂單。時間為台北時間`
             : `共 ${orders.length} 筆，時間為台北時間`
@@ -157,6 +157,7 @@ export default async function AdminOrders() {
 
       {shoplineConfigured() && (
         <Section
+          className="mt-4"
           title="SHOPLINE 連線"
           description={`${process.env.SHOPLINE_ENV === "live" ? "正式環境" : "測試環境"}。公開結帳${salesOpen() ? "已開賣" : "未開賣（SUNUI_SALES_OPEN=1 才會開放定價頁的購買按鈕）"}。`}
         >
@@ -164,7 +165,7 @@ export default async function AdminOrders() {
         </Section>
       )}
 
-      <Section title="付款通知紀錄" description="SHOPLINE 與 Polar 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
+      <Section className="mt-4" title="付款通知紀錄" description="SHOPLINE 與 Polar 送來的最近 30 則通知與處理結果，用來對帳與排查。" flush>
         <DataTable
           columns={[{ label: "時間" }, { label: "來源" }, { label: "事件" }, { label: "訂單", hideOnMobile: true }, { label: "結果" }]}
           rows={log.map((e) => [

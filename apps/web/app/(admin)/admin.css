@@ -1,0 +1,140 @@
+/* 後台專用樣式，只在 .adm 底下生效。版型與層次照 VideoAligner（萬寶箱）後台：
+   表面分四層：側邊欄（最暗）→ 內容底 → 卡片 → 浮層，越上層越亮，邊框用很淡的白。
+   SunUI 只用黑白灰，所以萬寶箱的金色換成前景白；狀態色（綠、橘、紅）只用在有意義的狀態，而且一定搭配文字。
+   這裡直接覆寫網站的 token（--bg、--card、--line…），既有的 Tailwind class 會跟著換成後台的層次。 */
+
+.adm {
+  color-scheme: dark;
+  --rail: #0a0a0b;
+  --bg: #0e0e10;
+  --card: #151517;
+  --raised-2: #1c1c1f;
+  --overlay: #222225;
+  --muted: #1c1c1f;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.12);
+  --fg: #ececee;
+  --subtle: #9b9ba1;
+  --faint: #67676d;
+  --ok: #5cc99d;
+  --ok-soft: rgb(92 201 157 / 0.12);
+  --warn: #f2914e;
+  --warn-soft: rgb(242 145 78 / 0.13);
+  --bad: #f47c7c;
+  --bad-soft: rgb(244 124 124 / 0.12);
+  --destructive: var(--bad);
+  --grid: rgb(255 255 255 / 0.05);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 側邊欄收合：寬度走動畫，文字收起時立刻淡出、展開時晚一點淡入 */
+.adm .a-rail {
+  transition: width 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.adm .a-fade-label {
+  transition: opacity 0.2s 0.1s;
+}
+.adm .a-rail[data-collapsed="true"] .a-fade-label {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+
+/* 浮層：提示、收合時的子選單、帳號選單 */
+.adm .a-pop {
+  background: var(--overlay);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.adm .a-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+/* 篩選用的膠囊（期間切換） */
+.adm .a-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--subtle);
+  font-size: 13px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+}
+.adm .a-chip:hover {
+  color: var(--fg);
+  border-color: var(--line-strong);
+}
+.adm .a-chip[aria-current="true"] {
+  color: var(--fg);
+  background: var(--raised-2);
+  border-color: var(--line-strong);
+}
+
+/* 表格：數字靠右、等寬，列與列只用細線分隔 */
+.adm .a-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.adm .a-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--card);
+  color: var(--faint);
+  font-weight: 500;
+  font-size: 12px;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.adm .a-table td {
+  padding: 0 14px;
+  height: 46px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.adm .a-table tr:last-child td {
+  border-bottom: 0;
+}
+.adm .a-table tbody tr:hover td {
+  background: rgb(255 255 255 / 0.025);
+}
+
+/* 焦點框：鍵盤操作時一律看得到 */
+.adm :is(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.adm .a-enter {
+  animation: a-enter 0.2s ease-out;
+}
+/* 只位移不改透明度：分頁在背景時動畫可能停住，內容也不會卡在看不見 */
+@keyframes a-enter {
+  from {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm .a-enter {
+    animation: none;
+  }
+  .adm .a-rail,
+  .adm .a-fade-label {
+    transition: none;
+  }
+}
