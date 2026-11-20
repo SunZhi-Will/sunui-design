@@ -26,8 +26,12 @@ export function LocaleSwitcher({ locale, label }: { locale: Locale; label: strin
         </g>
       </svg>
       {/* 手機上只顯示縮寫，選單本身透明覆蓋在上面，點擊仍開啟原生選單 */}
-      <span aria-hidden="true" className={pending ? "pr-2 pl-7 opacity-60" : "pr-2 pl-7"}>
-        <span className="sm:hidden">{localeShort[locale]}</span>
+      {/* 窄於 440px 只留地球圖示（32px 方塊），導覽的四個連結才放得下 */}
+      <span
+        aria-hidden="true"
+        className={`pr-2 pl-7 max-[439px]:pr-0 max-[439px]:pl-8 ${pending ? "opacity-60" : ""}`}
+      >
+        <span className="max-[439px]:sr-only sm:hidden">{localeShort[locale]}</span>
         <span className="hidden sm:inline">{localeLabels[locale]}</span>
       </span>
       <select

@@ -278,6 +278,7 @@ const en = {
     generic: "Something went wrong.",
   },
   notFound: {
+    metaTitle: "Page not found",
     title: "This page took the day off.",
     body: "The block or page you are looking for does not exist.",
     cta: "Browse blocks",
@@ -396,6 +397,8 @@ const en = {
       `On sale until ${closes}, or until seats run out. Same as Pro, at the founding price.`,
     foundingCta: "Become a founding member",
     plansLabel: "Plans",
+    recommended: "Recommended",
+    billingToggle: { label: "Billing", subscription: "Subscription", oneTime: "One-time" },
     free: {
       name: "Free",
       note: "MIT license",
@@ -472,7 +475,7 @@ const en = {
     metaTitle: "License",
     metaDescription: "What you can and cannot do with SunUI free and Pro blocks.",
     title: "License",
-    updated: "Draft for review. Last updated November 4, 2026.",
+    updated: "Last updated November 4, 2026.",
     freeTitle: "Free blocks",
     freeBody: "Free blocks are released under the MIT license. Use, modify and distribute them however you like.",
     proTitle: "Pro blocks, in plain words",
@@ -855,6 +858,7 @@ const zhTW: Messages = {
     generic: "發生錯誤，請再試一次。",
   },
   notFound: {
+    metaTitle: "找不到頁面",
     title: "這一頁今天請假了。",
     body: "你要找的區塊或頁面不存在。",
     cta: "瀏覽區塊",
@@ -970,6 +974,8 @@ const zhTW: Messages = {
     foundingOpen: (closes) => `販售至 ${closes}，席位售完即提前結束。內容與 Pro 相同，以創始價格購買。`,
     foundingCta: "成為創始會員",
     plansLabel: "方案",
+    recommended: "推薦",
+    billingToggle: { label: "付款方式", subscription: "訂閱", oneTime: "買斷" },
     free: {
       name: "免費",
       note: "MIT 授權",
@@ -1034,7 +1040,7 @@ const zhTW: Messages = {
     metaTitle: "授權條款",
     metaDescription: "SunUI 免費與 Pro 區塊可以做什麼、不能做什麼。",
     title: "授權條款",
-    updated: "審閱用草稿。最後更新於 2026 年 11 月 4 日。",
+    updated: "最後更新於 2026 年 11 月 4 日。",
     freeTitle: "免費區塊",
     freeBody: "免費區塊以 MIT 授權釋出，可以自由使用、修改與散布。",
     proTitle: "Pro 區塊，用白話說明",
@@ -1410,6 +1416,7 @@ const zhCN: Messages = {
     generic: "出了点问题，请重试。",
   },
   notFound: {
+    metaTitle: "找不到页面",
     title: "这一页今天休息了。",
     body: "你要找的区块或页面不存在。",
     cta: "浏览区块",
@@ -1523,6 +1530,8 @@ const zhCN: Messages = {
     foundingOpen: (closes) => `销售至 ${closes}，名额售罄即提前结束。内容与 Pro 相同，按创始价购买。`,
     foundingCta: "成为创始会员",
     plansLabel: "方案",
+    recommended: "推荐",
+    billingToggle: { label: "付款方式", subscription: "订阅", oneTime: "买断" },
     free: {
       name: "免费",
       note: "MIT 许可",
@@ -1582,7 +1591,7 @@ const zhCN: Messages = {
     metaTitle: "许可协议",
     metaDescription: "SunUI 免费与 Pro 区块可以做什么、不能做什么。",
     title: "许可协议",
-    updated: "审阅用草案。最后更新于 2026 年 11 月 4 日。",
+    updated: "最后更新于 2026 年 11 月 4 日。",
     freeTitle: "免费区块",
     freeBody: "免费区块以 MIT 许可发布，可以自由使用、修改与分发。",
     proTitle: "Pro 区块，用大白话说明",
@@ -1958,6 +1967,7 @@ const ja: Messages = {
     generic: "問題が発生しました。",
   },
   notFound: {
+    metaTitle: "ページが見つかりません",
     title: "このページは本日お休みです。",
     body: "お探しのブロックまたはページは存在しません。",
     cta: "ブロックを見る",
@@ -2074,6 +2084,8 @@ const ja: Messages = {
     foundingOpen: (closes) => `${closes} まで、または枠がなくなるまで販売中。内容は Pro と同じで、創設メンバー価格です。`,
     foundingCta: "創設メンバーになる",
     plansLabel: "プラン",
+    recommended: "おすすめ",
+    billingToggle: { label: "支払い方法", subscription: "サブスク", oneTime: "買い切り" },
     free: {
       name: "無料",
       note: "MIT ライセンス",
@@ -2141,7 +2153,7 @@ const ja: Messages = {
     metaTitle: "ライセンス",
     metaDescription: "SunUI の無料ブロックと Pro ブロックでできること、できないこと。",
     title: "ライセンス",
-    updated: "レビュー用の草案です。最終更新日：2026 年 11 月 4 日。",
+    updated: "最終更新日：2026 年 11 月 4 日。",
     freeTitle: "無料ブロック",
     freeBody: "無料ブロックは MIT ライセンスで公開しています。自由に使用、改変、配布できます。",
     proTitle: "Pro ブロックをわかりやすく",

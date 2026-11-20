@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { NotFoundSuggestions } from "@/components/not-found-suggestions";
 import { getI18n } from "@/lib/i18n-server";
 import { getItems } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { m } = await getI18n();
+  return { title: m.notFound.metaTitle, robots: { index: false } };
+}
 
 export default async function NotFound() {
   const { locale, m } = await getI18n();
