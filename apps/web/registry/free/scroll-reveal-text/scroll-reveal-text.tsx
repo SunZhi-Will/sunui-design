@@ -58,8 +58,8 @@ export function ScrollRevealText({
 }: ScrollRevealTextProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  // layoutEffect: false, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
-  const { scrollYProgress } = useScroll({ target: ref, container, offset, layoutEffect: false });
+  // ...{ layoutEffect: false }, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
+  const { scrollYProgress } = useScroll({ target: ref, container, offset, ...{ layoutEffect: false } });
   const accentKey = accentWords.join("\u0000");
 
   const tokens = useMemo(() => {

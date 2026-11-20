@@ -60,7 +60,7 @@ export function ScrollTimeline({ items, mode = "scroll", current = -1, container
     container,
     offset: [`start ${anchor}`, `end ${anchor}`],
     // Let the parent's container ref attach first, otherwise inside a container it would read as window scroll
-    layoutEffect: false,
+    ...{ layoutEffect: false },
   });
   const smooth = useSpring(scrollYProgress, reduce ? { stiffness: 10000, damping: 1000 } : springs.gentle);
   const [reachedCount, setReachedCount] = useState(0);

@@ -78,8 +78,8 @@ export function ScrollProgress({
 }: ScrollProgressProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  // layoutEffect: false, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
-  const { scrollYProgress } = useScroll(container ? { container, layoutEffect: false } : undefined);
+  // ...{ layoutEffect: false }, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
+  const { scrollYProgress } = useScroll(container ? { container, ...{ layoutEffect: false } } : undefined);
   const spring = useSpring(scrollYProgress, { stiffness: 240, damping: 30, restDelta: 0.001 });
   const value: MotionValue<number> = smooth && !reduceMotion ? spring : scrollYProgress;
 

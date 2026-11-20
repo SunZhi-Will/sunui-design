@@ -84,7 +84,7 @@ export function StoreHeader({
 }: StoreHeaderProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
-  const { scrollY } = useScroll(scrollContainer ? { container: scrollContainer, layoutEffect: false } : undefined);
+  const { scrollY } = useScroll(scrollContainer ? { container: scrollContainer, ...{ layoutEffect: false } } : undefined);
   const [hidden, setHidden] = useState(false);
   const [compact, setCompact] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

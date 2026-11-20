@@ -192,7 +192,7 @@ export function AddToCartButton({
     : {
         initial: { opacity: 0, y: "70%" },
         animate: { opacity: 1, y: 0, transition: springs.gentle },
-        exit: { opacity: 0, y: "-70%", transition: { duration: 0.1, ease: "easeIn" } },
+        exit: { opacity: 0, y: "-70%", transition: { duration: 0.1, ease: "easeIn" as const } },
       };
 
   return (

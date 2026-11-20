@@ -42,14 +42,14 @@ export interface ScrollEffectBaseProps {
 
 const DEFAULT_STAGE = "100dvh";
 
-/** Reads the target's progress relative to the scroll container; layoutEffect: false lets the parent's container ref attach first */
+/** Reads the target's progress relative to the scroll container; ...{ layoutEffect: false } lets the parent's container ref attach first */
 function useSectionProgress(
   target: RefObject<HTMLElement | null>,
   container: RefObject<HTMLElement | null> | undefined,
   offset: ScrollOffset,
   external?: MotionValue<number>,
 ) {
-  const { scrollYProgress } = useScroll({ target, container, offset, layoutEffect: false });
+  const { scrollYProgress } = useScroll({ target, container, offset, ...{ layoutEffect: false } });
   return external ?? scrollYProgress;
 }
 
@@ -283,7 +283,7 @@ export interface VelocitySkewProps extends ScrollEffectBaseProps {
 export function VelocitySkew({ children, maxSkew = 10, container, progress, className }: VelocitySkewProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion() ?? false;
-  const { scrollY } = useScroll({ target: ref, container, layoutEffect: false });
+  const { scrollY } = useScroll({ target: ref, container, ...{ layoutEffect: false } });
   // Convert external progress into imaginary pixels so thumbnails can show the skew too
   const zero = useMotionValue(0);
   const fakeY = useTransform(progress ?? zero, (v) => v * 2400);
@@ -614,7 +614,8 @@ export function ScrollDrawPath({
   const reduce = useReducedMotion() ?? false;
   const p = useSectionProgress(ref, container, ["start center", "end center"], progress);
   const smooth = useSpring(p, { stiffness: 200, damping: 40, restDelta: 0.001 });
-  const pathLength = progress ? p : smooth;
+  const full = useMotionValue(1);
+  const pathLength = reduce ? full : progress ? p : smooth;
 
   return (
     <section ref={ref} className={cn("relative", className)}>
@@ -626,7 +627,7 @@ export function ScrollDrawPath({
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
-          style={{ pathLength: reduce ? 1 : pathLength }}
+          style={{ pathLength }}
         />
       </svg>
       <div className="relative z-10">{children}</div>
