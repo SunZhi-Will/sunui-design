@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { PlanCompare, type CompareRow } from "@/components/plan-compare";
 import { type Plan, PricingPlans } from "@/components/pricing-plans";
 import { SavingsCalculator } from "@/components/savings-calculator";
 import { ViewBeacon } from "@/components/view-beacon";
@@ -153,6 +154,29 @@ export default async function PricingPage() {
     },
   ];
 
+  // 方案比較表：五個方案並排，順序和切換鈕一致（訂閱在前、買斷在後）
+  const cmp = t.compare;
+  const v = cmp.values;
+  const compareColumns = [
+    { name: t.free.name, price: freePlan.price },
+    { name: planName.monthly, price: monthly.primary, per: sub.perMonth },
+    { name: planName.yearly, price: yearly.primary, per: sub.perYear, highlight: true },
+    { name: t.pro.name, price: proPrice.primary, highlight: true },
+    { name: t.team.name, price: teamPrice.primary },
+  ];
+  const compareRows: CompareRow[] = [
+    { label: cmp.rows.billing, cells: [v.free, v.monthly, v.yearly, v.once, v.once] },
+    { label: cmp.rows.seats, cells: [v.anyone, "1", "1", "1", String(prices.teamSeats)] },
+    { label: cmp.rows.freeBlocks, cells: [true, true, true, true, true] },
+    { label: cmp.rows.proBlocks, cells: [false, true, true, true, true] },
+    { label: cmp.rows.future, cells: [false, v.whileActive, v.whileActive, v.forever, v.forever] },
+    { label: cmp.rows.registry, cells: [false, true, true, true, true] },
+    { label: cmp.rows.projects, cells: [true, true, true, true, true] },
+    { label: cmp.rows.term, cells: [v.mit, v.afterEnd, v.afterEnd, v.forever, v.forever] },
+    { label: cmp.rows.keySwap, cells: [false, false, false, false, true] },
+    { label: cmp.rows.support, cells: [false, false, false, false, true] },
+  ];
+
   const closesLabel = dateFormat.format(
     new Date(foundingWindow.closesAt.getTime() - 1),
   );
@@ -252,6 +276,15 @@ export default async function PricingPage() {
         <p className="text-sm text-subtle">{t.footnote(proCount)}</p>
         <p className="mt-1 text-xs text-subtle">{billingNote}</p>
       </div>
+
+      <PlanCompare
+        title={cmp.title}
+        feature={cmp.feature}
+        yes={cmp.yes}
+        no={cmp.no}
+        columns={compareColumns}
+        rows={compareRows}
+      />
 
       <SavingsCalculator price={prices.pro} locale={locale} t={t.calculator} />
 
