@@ -5270,6 +5270,144 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "live-bento",
+      "type": "registry:block",
+      "title": "Live Bento",
+      "description": "Feature bento grid: each tile has a title, a short body and a recessed showcase area for your own small visual that demonstrates the feature. A useTicker hook replays each visual only while it is in view and the tab is visible, and holds the last, complete frame with reduced motion. Tiles have no entrance animation; on hover they crossfade from e1 to an e2 shadow layer, and dark mode lifts the surface instead.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "landing",
+        "section"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "section",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "A features section below the hero where each feature needs a small live illustration",
+            "Explaining secondary capabilities without heavy images or video"
+          ],
+          "watchOut": [
+            "Each visual runs its own observer and timer, so keep one grid to around 4 to 6 tiles",
+            "Visuals are aria-hidden, so the tile title and body must carry the meaning",
+            "Draw the last step as the complete state: with reduced motion it is the only frame shown"
+          ],
+          "aliases": [
+            "bento grid",
+            "feature grid",
+            "animated feature tiles",
+            "features section",
+            "more features"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/live-bento/live-bento.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "link-preview-card",
+      "type": "registry:block",
+      "title": "Link Preview Card",
+      "description": "Unfurls a pasted URL into a preview card with site name, title, description and image. Pass metadata you already have, or a fetchMeta function that calls your own endpoint. Empty, loading and resolved are one frame that morphs, with the skeleton inside the card and the favicon and domain held in place; an invalid URL shows an inline message, and a failed fetch falls back to a domain-only card that still opens. The whole card lifts on hover and presses in, with row or stacked layouts and an optional remove button.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "card",
+        "media",
+        "content"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "loading",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "Unfurling a pasted link into a card in a notes page, doc, comment box or chat composer",
+            "Bookmark or reference lists where the metadata comes from your own Open Graph endpoint"
+          ],
+          "watchOut": [
+            "fetchMeta must call your own server route; browsers cannot read another site's HTML because of CORS",
+            "The URL opens as given, so check user-supplied links on your server first"
+          ],
+          "aliases": [
+            "link card",
+            "url preview",
+            "link unfurl",
+            "open graph card",
+            "bookmark card",
+            "rich link"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/link-preview-card/link-preview-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "social-links",
+      "type": "registry:block",
+      "title": "Social Links",
+      "description": "Social profile links with built-in single-colour glyphs for GitHub, X, LinkedIn, Instagram, Facebook, YouTube, email and a website. Three variants: a round icon button, a pill with icon and label, and an expanding button whose label slides out on hover or focus while its width follows a spring. Monochrome by default (muted text that turns to the foreground on hover); turn on brand and the platform colour appears on the glyph only on hover and focus. Optional tooltips on four sides. External links get noopener and an \"opens in a new tab\" hint for screen readers.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "navigation",
+        "button",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "Social links in the header and footer of a personal site, portfolio or creator page",
+            "Profile links in an article byline, a team member card or a contact section"
+          ],
+          "watchOut": [
+            "These link to profiles; they are not share buttons. To share the current page, use the system share sheet or a copy-link button",
+            "Icon-only links need the tooltip or nearby text that says which accounts they are; keep it to six links or fewer",
+            "Brand colour shows only on hover; GitHub, X and email have no brand colour and stay on the foreground"
+          ],
+          "aliases": [
+            "social icons",
+            "social buttons",
+            "share links",
+            "social media links",
+            "profile links",
+            "follow buttons",
+            "footer social"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/social-links/social-links.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
