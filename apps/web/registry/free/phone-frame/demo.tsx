@@ -101,7 +101,6 @@ export default function PhoneFrameDemo() {
       <PhoneFrame
         url="shop.example.com/cart"
         width={260}
-        height={420}
         label={t.label}
         locale={locale}
         className="shrink-0"

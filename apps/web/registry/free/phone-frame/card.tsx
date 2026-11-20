@@ -18,7 +18,7 @@ export default function PhoneFrameCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   return (
-    <PhoneFrame url="shop.example.com" width={150} height={236} locale={locale} className="mx-auto">
+    <PhoneFrame url="shop.example.com" width={132} locale={locale} className="mx-auto">
       <div className="space-y-2.5 p-3 text-[11px]">
         <p className="font-semibold">{t.cart}</p>
         {t.items.map((name, i) => (
