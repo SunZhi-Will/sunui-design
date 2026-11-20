@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
-/** 一格的內容：true 打勾、false 不包含、字串直接顯示 */
-export type CompareCell = boolean | string;
+/** 一格的內容：true 打勾、false 不包含、字串直接顯示；{ text, good } 是這一列裡比較好的值，用字重強調 */
+export type CompareCell = boolean | string | { text: string; good: true };
 
 export type CompareColumn = {
   name: string;
@@ -25,6 +25,7 @@ export function PlanCompare({
   rows,
   yes,
   no,
+  allPlans,
 }: {
   title: string;
   feature: string;
@@ -33,6 +34,8 @@ export function PlanCompare({
   /** 打勾與不包含的無障礙文字 */
   yes: string;
   no: string;
+  /** 每個方案都一樣的項目，不放進表格，在表格下方一行列出，表格只留有差異的列 */
+  allPlans?: { label: string; items: string[] };
 }) {
   return (
     <section aria-labelledby="compare-title" className="mx-auto mt-20 max-w-6xl">
@@ -60,11 +63,11 @@ export function PlanCompare({
                 <th
                   key={column.name}
                   scope="col"
-                  className={cn("px-4 py-4 text-left align-bottom", column.highlight && "bg-[var(--tone-glow)]")}
+                  className={cn("px-4 py-4 text-left align-bottom", column.highlight && "bg-accent-soft/50")}
                 >
                   <span className="block font-medium">{column.name}</span>
                   <span className="mt-1 block text-xs font-normal whitespace-nowrap text-subtle tabular-nums">
-                    <span className="font-semibold text-[var(--tone)]">{column.price}</span>
+                    <span className="font-medium text-[var(--tone)]">{column.price}</span>
                     {column.per && <> {column.per}</>}
                   </span>
                 </th>
@@ -83,7 +86,7 @@ export function PlanCompare({
                 {row.cells.map((cell, i) => (
                   <td
                     key={columns[i]?.name ?? i}
-                    className={cn("px-4 py-3.5 align-middle text-pretty", columns[i]?.highlight && "bg-[var(--tone-glow)]")}
+                    className={cn("px-4 py-3.5 align-middle text-pretty", columns[i]?.highlight && "bg-accent-soft/50")}
                   >
                     <Cell value={cell} yes={yes} no={no} />
                   </td>
@@ -93,6 +96,17 @@ export function PlanCompare({
           </tbody>
         </table>
       </div>
+      {allPlans && allPlans.items.length > 0 && (
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-subtle">
+          <span className="font-medium text-fg">{allPlans.label}</span>
+          {allPlans.items.map((item) => (
+            <span key={item} className="inline-flex items-center gap-1.5">
+              <CheckMark small />
+              {item}
+            </span>
+          ))}
+        </p>
+      )}
     </section>
   );
 }
@@ -100,21 +114,37 @@ export function PlanCompare({
 function Cell({ value, yes, no }: { value: CompareCell; yes: string; no: string }) {
   if (value === true) {
     return (
-      <span className="inline-flex size-5 items-center justify-center rounded-full bg-accent-soft text-fg">
-        <svg viewBox="0 0 12 12" fill="none" aria-hidden="true" className="size-3">
-          <path d="M2.5 6.2 4.9 8.5 9.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+      <>
+        <CheckMark />
         <span className="sr-only">{yes}</span>
-      </span>
+      </>
     );
   }
   if (value === false) {
     return (
-      <span className="inline-flex h-5 items-center text-subtle/50">
+      <span className="inline-flex h-5 items-center text-subtle/40">
         <span aria-hidden="true" className="block h-px w-3 bg-current" />
         <span className="sr-only">{no}</span>
       </span>
     );
   }
-  return <span>{value}</span>;
+  if (typeof value === "object") {
+    // 這一列裡比較好的值（永久、不限、5 人）：用字重和墨色拉開，不另外上色
+    return <span className="font-medium text-fg">{value.text}</span>;
+  }
+  return <span className="text-subtle">{value}</span>;
+}
+
+/** 打勾：細線勾，用價格的色調（和卡片上的金額同色），不加底色 */
+function CheckMark({ small }: { small?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      className={cn("inline-block shrink-0 text-[var(--tone)]", small ? "size-3.5" : "size-4")}
+    >
+      <path d="M3.5 8.5 6.5 11.5 12.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }

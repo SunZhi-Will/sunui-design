@@ -404,6 +404,7 @@ const en = {
       feature: "Feature",
       yes: "Included",
       no: "Not included",
+      allPlans: "Every plan includes",
       rows: {
         billing: "Billing",
         seats: "Developers",
@@ -1010,6 +1011,7 @@ const zhTW: Messages = {
       feature: "項目",
       yes: "包含",
       no: "不包含",
+      allPlans: "所有方案都包含",
       rows: {
         billing: "付款方式",
         seats: "開發者人數",
@@ -1595,6 +1597,7 @@ const zhCN: Messages = {
       feature: "项目",
       yes: "包含",
       no: "不包含",
+      allPlans: "所有方案都包含",
       rows: {
         billing: "付款方式",
         seats: "开发者人数",
@@ -2178,6 +2181,7 @@ const ja: Messages = {
       feature: "項目",
       yes: "含まれる",
       no: "含まれない",
+      allPlans: "すべてのプランに含まれるもの",
       rows: {
         billing: "支払い方法",
         seats: "開発者の人数",

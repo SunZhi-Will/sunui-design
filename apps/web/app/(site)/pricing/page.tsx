@@ -164,15 +164,15 @@ export default async function PricingPage() {
     { name: t.pro.name, price: proPrice.primary, highlight: true },
     { name: t.team.name, price: teamPrice.primary },
   ];
+  // 比較好的值上色（good），每個方案都一樣的項目不進表格，放到下方「所有方案都包含」
+  const good = (text: string) => ({ text, good: true as const });
   const compareRows: CompareRow[] = [
     { label: cmp.rows.billing, cells: [v.free, v.monthly, v.yearly, v.once, v.once] },
-    { label: cmp.rows.seats, cells: [v.anyone, "1", "1", "1", String(prices.teamSeats)] },
-    { label: cmp.rows.freeBlocks, cells: [true, true, true, true, true] },
+    { label: cmp.rows.seats, cells: [good(v.anyone), "1", "1", "1", good(String(prices.teamSeats))] },
     { label: cmp.rows.proBlocks, cells: [false, true, true, true, true] },
-    { label: cmp.rows.future, cells: [false, v.whileActive, v.whileActive, v.forever, v.forever] },
+    { label: cmp.rows.future, cells: [false, v.whileActive, v.whileActive, good(v.forever), good(v.forever)] },
     { label: cmp.rows.registry, cells: [false, true, true, true, true] },
-    { label: cmp.rows.projects, cells: [true, true, true, true, true] },
-    { label: cmp.rows.term, cells: [v.mit, v.afterEnd, v.afterEnd, v.forever, v.forever] },
+    { label: cmp.rows.term, cells: [good(v.mit), v.afterEnd, v.afterEnd, good(v.forever), good(v.forever)] },
     { label: cmp.rows.keySwap, cells: [false, false, false, false, true] },
     { label: cmp.rows.support, cells: [false, false, false, false, true] },
   ];
@@ -284,6 +284,7 @@ export default async function PricingPage() {
         no={cmp.no}
         columns={compareColumns}
         rows={compareRows}
+        allPlans={{ label: cmp.allPlans, items: [cmp.rows.freeBlocks, cmp.rows.projects] }}
       />
 
       <SavingsCalculator price={prices.pro} locale={locale} t={t.calculator} />
