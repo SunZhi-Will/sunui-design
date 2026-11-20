@@ -187,7 +187,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                 poster={item.poster}
                 locale={locale}
                 previewLabel={previewLabel(item.title)}
-                className={i === 0 ? "md:col-span-4" : "md:col-span-2"}
+                className={cn(i === 0 ? "md:col-span-4" : "md:col-span-2", i > 2 && "hidden md:block")}
                 frame={i < 2 ? "h-[280px] md:h-[440px]" : "h-[280px] md:h-[340px]"}
               />
             ))}
@@ -207,7 +207,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           {/* 每個場景佔一整排，sticky 在頁首下面，下一張往上捲時疊在它上面，露出上一張的標題列 */}
           <ol className="mt-10 space-y-6">
             {[proLead, ...proRest].map((item, i) => (
-              <li key={item.name} className="sticky" style={{ top: `calc(4.75rem + ${i * 3.25}rem)` }}>
+              <li key={item.name} className={cn("sticky", i > 2 && "hidden md:block")} style={{ top: `calc(4.75rem + ${i * 3.25}rem)` }}>
                 <div className="overflow-hidden rounded-2xl bg-card shadow-e2 dark:bg-[#131313]">
                   <div className="flex h-13 items-center justify-between gap-4 border-b border-line px-5 text-sm">
                     <span className="flex items-center gap-3 font-medium">

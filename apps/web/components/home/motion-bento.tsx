@@ -112,5 +112,10 @@ export function CountUp({ value, className }: { value: number; className?: strin
 
 /** 收尾：點雲拼出 SunUI，和開場呼應。可以拖 */
 export function ClosingCloud({ label }: { label: string }) {
-  return <PointCloud shape="text" text="SunUI" count={3000} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-fg" />;
+  // 窄螢幕點數減少，理由同 hero-cloud.tsx
+  const [count, setCount] = useState(3000);
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) setCount(1800);
+  }, []);
+  return <PointCloud shape="text" text="SunUI" count={count} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-fg" />;
 }

@@ -17,6 +17,11 @@ const HOLD_MS = 5200;
 export function HeroCloud({ label }: { label: string }) {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
+  // 窄螢幕點數減半：手機上點雲大半被文字後面的暗區擋住，4200 顆在慢的手機上會掉到 40fps 左右
+  const [count, setCount] = useState(4200);
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) setCount(2200);
+  }, []);
 
   useEffect(() => {
     if (reduce) return;
@@ -26,5 +31,5 @@ export function HeroCloud({ label }: { label: string }) {
     return () => window.clearInterval(timer);
   }, [reduce]);
 
-  return <PointCloud shape={SHAPES[index]} count={4200} pointSize={1.7} label={label} className="size-full text-fg" />;
+  return <PointCloud shape={SHAPES[index]} count={count} pointSize={1.7} label={label} className="size-full text-fg" />;
 }

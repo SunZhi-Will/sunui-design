@@ -27,7 +27,6 @@ export function SceneMarquee({ items, reverse, proLabel, className }: { items: M
                 alt=""
                 fill
                 sizes="(min-width: 640px) 380px, 280px"
-                loading="eager"
                 className="object-cover transition-transform duration-500 ease-site group-hover/card:scale-[1.03]"
               />
               {item.pro && (
