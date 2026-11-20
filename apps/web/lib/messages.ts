@@ -28,6 +28,7 @@ const en = {
     tagline: "SunUI by Sun. Free blocks are MIT licensed.",
     changelog: "Changelog",
     license: "License",
+    account: "Manage subscription",
   },
   common: {
     copy: "Copy",
@@ -640,7 +641,7 @@ const zhTW: Messages = {
       "精緻的細節與克制的動態，適用 React 與 Tailwind：優惠券、購物車，還有首屏、圖表、選單與主題切換。無障礙，用 shadcn CLI 一行安裝。",
   },
   nav: { blocks: "區塊", icons: "圖示", docs: "文件", pricing: "價格", github: "GitHub", language: "語言", theme: "主題", themeSystem: "跟隨系統", themeLight: "淺色", themeDark: "深色", themeHint: "區塊預覽也會一起切換。" },
-  footer: { tagline: "SunUI，由 Sun 製作。免費區塊採 MIT 授權。", changelog: "更新紀錄", license: "授權條款" },
+  footer: { tagline: "SunUI，由 Sun 製作。免費區塊採 MIT 授權。", changelog: "更新紀錄", license: "授權條款", account: "管理訂閱" },
   common: {
     copy: "複製",
     copied: "已複製",
@@ -1228,7 +1229,7 @@ const zhCN: Messages = {
       "精致的细节与克制的动效，适用于 React 与 Tailwind：优惠券、购物车，还有首屏、图表、菜单与主题切换。无障碍，用 shadcn CLI 一行安装。",
   },
   nav: { blocks: "区块", icons: "图标", docs: "文档", pricing: "价格", github: "GitHub", language: "语言", theme: "主题", themeSystem: "跟随系统", themeLight: "浅色", themeDark: "深色", themeHint: "区块预览也会一起切换。" },
-  footer: { tagline: "SunUI，由 Sun 制作。免费区块采用 MIT 许可。", changelog: "更新日志", license: "许可协议" },
+  footer: { tagline: "SunUI，由 Sun 制作。免费区块采用 MIT 许可。", changelog: "更新日志", license: "许可协议", account: "管理订阅" },
   common: {
     copy: "复制",
     copied: "已复制",
@@ -1809,7 +1810,7 @@ const ja: Messages = {
       "精緻なディテールと控えめなモーションを React と Tailwind で。クーポン、カートから、ヒーロー、チャート、メニュー、テーマ切り替えまで。アクセシブルで、shadcn CLI でインストール。",
   },
   nav: { blocks: "ブロック", icons: "アイコン", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語", theme: "テーマ", themeSystem: "システム", themeLight: "ライト", themeDark: "ダーク", themeHint: "ブロックのプレビューも一緒に切り替わります。" },
-  footer: { tagline: "SunUI by Sun。無料ブロックは MIT ライセンスです。", changelog: "更新履歴", license: "ライセンス" },
+  footer: { tagline: "SunUI by Sun。無料ブロックは MIT ライセンスです。", changelog: "更新履歴", license: "ライセンス", account: "サブスク管理" },
   common: {
     copy: "コピー",
     copied: "コピー済み",

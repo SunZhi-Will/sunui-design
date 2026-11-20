@@ -99,6 +99,26 @@ type Copy = {
     portalLead: string;
     failed: string;
     resubscribe: string;
+    emailPlaceholder: string;
+    sentTitle: string;
+    sentNote: string;
+    resend: string;
+    noPro: string;
+    seePlans: string;
+    howToUse: string;
+    cancelConfirm: string;
+    cancelConfirmYes: string;
+    keep: string;
+    badge: { active: string; canceled: string; pastDue: string; ended: string; prepaid: string; none: string };
+    eyebrow: string;
+    welcome: string;
+    loginEyebrow: string;
+    memberSince: string;
+    validThrough: string;
+    lifetime: string;
+    perksTitle: string;
+    billingTitle: string;
+    lifetimeNote: string;
   };
   done: {
     title: string;
@@ -234,6 +254,26 @@ const en: Copy = {
     portalLead: "Change your card or download receipts on Polar, our reseller. Sign in with this email.",
     failed: "That did not work. Please try again, or reply to any SunUI email for help.",
     resubscribe: "Subscribe again",
+    emailPlaceholder: "you@example.com",
+    sentTitle: "Check your inbox",
+    sentNote: "Not there after a few minutes? Check spam, or send it again.",
+    resend: "Send again",
+    noPro: "No Pro yet?",
+    seePlans: "See plans",
+    howToUse: "How to use your key",
+    cancelConfirm: "Cancel automatic renewal?",
+    cancelConfirmYes: "Yes, cancel renewal",
+    keep: "Keep it",
+    badge: { active: "Active", canceled: "Canceled", pastDue: "Payment failed", ended: "Ended", prepaid: "Prepaid", none: "No subscription" },
+    eyebrow: "SunUI Pro member",
+    welcome: "Welcome back",
+    loginEyebrow: "Members",
+    memberSince: "Member since",
+    validThrough: "Valid through",
+    lifetime: "Lifetime",
+    perksTitle: "Included with your plan",
+    billingTitle: "Billing and renewal",
+    lifetimeNote: "Lifetime license. Nothing to renew, and every future Pro block is included.",
   },
   done: {
     title: "You are in",
@@ -369,6 +409,26 @@ const zhTW: Copy = {
     portalLead: "在 Polar（我們的代收商）更換信用卡或下載收據，用這個 email 登入。",
     failed: "操作沒有成功，請再試一次，或回覆任何一封 SunUI 的信尋求協助。",
     resubscribe: "重新訂閱",
+    emailPlaceholder: "you@example.com",
+    sentTitle: "請到信箱收信",
+    sentNote: "幾分鐘後還沒收到？看看垃圾郵件，或再寄一次。",
+    resend: "再寄一次",
+    noPro: "還沒有 Pro？",
+    seePlans: "查看方案",
+    howToUse: "怎麼使用授權碼",
+    cancelConfirm: "確定要取消自動續扣？",
+    cancelConfirmYes: "確定取消",
+    keep: "先保留",
+    badge: { active: "續訂中", canceled: "已取消續扣", pastDue: "扣款失敗", ended: "已結束", prepaid: "預付", none: "無訂閱" },
+    eyebrow: "SunUI Pro 會員",
+    welcome: "歡迎回來",
+    loginEyebrow: "會員專區",
+    memberSince: "會員起始",
+    validThrough: "有效期至",
+    lifetime: "終身",
+    perksTitle: "你的方案包含",
+    billingTitle: "帳單與續訂",
+    lifetimeNote: "終身授權，不需要續訂，之後所有新的 Pro 區塊都包含在內。",
   },
   done: {
     title: "購買完成",
@@ -504,6 +564,26 @@ const zhCN: Copy = {
     portalLead: "在 Polar（我们的代收商）更换信用卡或下载收据，用这个 email 登录。",
     failed: "操作没有成功，请再试一次，或回复任何一封 SunUI 的邮件寻求帮助。",
     resubscribe: "重新订阅",
+    emailPlaceholder: "you@example.com",
+    sentTitle: "请到邮箱查收",
+    sentNote: "几分钟后还没收到？看看垃圾邮件，或再发一次。",
+    resend: "再发一次",
+    noPro: "还没有 Pro？",
+    seePlans: "查看方案",
+    howToUse: "如何使用授权码",
+    cancelConfirm: "确定要取消自动续费？",
+    cancelConfirmYes: "确定取消",
+    keep: "先保留",
+    badge: { active: "续订中", canceled: "已取消续费", pastDue: "扣款失败", ended: "已结束", prepaid: "预付", none: "无订阅" },
+    eyebrow: "SunUI Pro 会员",
+    welcome: "欢迎回来",
+    loginEyebrow: "会员专区",
+    memberSince: "会员起始",
+    validThrough: "有效期至",
+    lifetime: "终身",
+    perksTitle: "你的方案包含",
+    billingTitle: "账单与续订",
+    lifetimeNote: "终身授权，无需续订，以后所有新的 Pro 区块都包含在内。",
   },
   done: {
     title: "购买完成",
@@ -639,6 +719,26 @@ const ja: Copy = {
     portalLead: "販売代理の Polar でカードの変更や領収書のダウンロードができます。このメールアドレスでログインしてください。",
     failed: "うまくいきませんでした。もう一度お試しいただくか、SunUI からのメールに返信してお問い合わせください。",
     resubscribe: "もう一度登録",
+    emailPlaceholder: "you@example.com",
+    sentTitle: "メールを確認してください",
+    sentNote: "数分たっても届かない場合は、迷惑メールを確認するか、もう一度送信してください。",
+    resend: "もう一度送る",
+    noPro: "まだ Pro をお持ちでない方",
+    seePlans: "プランを見る",
+    howToUse: "ライセンスキーの使い方",
+    cancelConfirm: "自動更新を停止しますか？",
+    cancelConfirmYes: "停止する",
+    keep: "続ける",
+    badge: { active: "有効", canceled: "更新停止済み", pastDue: "支払い失敗", ended: "終了", prepaid: "前払い", none: "サブスクなし" },
+    eyebrow: "SunUI Pro メンバー",
+    welcome: "おかえりなさい",
+    loginEyebrow: "メンバー",
+    memberSince: "メンバー登録日",
+    validThrough: "有効期限",
+    lifetime: "生涯",
+    perksTitle: "プランに含まれるもの",
+    billingTitle: "請求と更新",
+    lifetimeNote: "生涯ライセンスです。更新は不要で、今後の Pro ブロックもすべて含まれます。",
   },
   done: {
     title: "購入が完了しました",

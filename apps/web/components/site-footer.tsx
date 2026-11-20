@@ -25,6 +25,9 @@ export async function SiteFooter() {
           <Link href="/license" className="hover:text-fg">
             {m.footer.license}
           </Link>
+          <Link href="/account" className="hover:text-fg">
+            {m.footer.account}
+          </Link>
           <a href={githubUrl} className="hover:text-fg">
             {m.nav.github}
           </a>
