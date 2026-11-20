@@ -30,7 +30,7 @@ export function LivePreview({
   variant?: string;
   /** 示範品牌色，預覽頁的 layout 腳本讀 ?spot= 套上 */
   spot?: SpotKey;
-  /** iframe 載入前的底圖（區塊的分享圖），淺色主題才顯示；深色主題用骨架，避免一張白圖閃過 */
+  /** iframe 載入前的底圖（區塊的分享圖）。分享圖 2026-11-19 起是深色版，所以深色主題才顯示；淺色用骨架，避免一張黑圖閃過 */
   poster?: string;
   title: string;
   locale: Locale;
@@ -84,7 +84,7 @@ export function LivePreview({
 
   return (
     <div ref={frameRef} className="absolute inset-0">
-      {/* 載入前的佔位：淺色是分享圖，深色是靜態的淺底（不脈動，一整面卡片同時閃很吵）。
+      {/* 載入前的佔位：深色是分享圖，淺色是靜態的淺底（不脈動，一整面卡片同時閃很吵）。
           iframe 先花 300ms 淡入蓋上，佔位等它蓋滿才退場，中間不會露出空白或疊影（SITE-MOTION.md §4） */}
       <div
         aria-hidden="true"
@@ -95,7 +95,7 @@ export function LivePreview({
       >
         <div className="absolute inset-0 bg-stage/60" />
         {poster && (
-          <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover dark:hidden" />
+          <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="hidden object-cover dark:block" />
         )}
       </div>
       {near && (

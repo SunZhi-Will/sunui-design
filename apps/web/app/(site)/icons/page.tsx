@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
+import { CommandTabs } from "@/components/command-tabs";
 import { IconGallery } from "@/components/icon-gallery";
 import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
@@ -32,23 +33,13 @@ export default async function IconsPage() {
         <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
           {t.lead}
         </p>
-        <div className="mt-8 grid max-w-2xl gap-3">
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">{t.staticInstall}</p>
-            <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
-          </div>
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">{t.animatedInstall}</p>
-            <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
-          </div>
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">{t.pixelInstall}</p>
-            <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
-          </div>
-          <div>
-            <p className="mb-1.5 text-xs font-medium text-subtle">{t.pixelAnimatedInstall}</p>
-            <Command value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
-          </div>
+        <div className="mt-8 max-w-2xl">
+        <CommandTabs label={m.home.hero.install} tabs={[t.staticInstall, t.animatedInstall, t.pixelInstall, t.pixelAnimatedInstall]}>
+          <Command key="0" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
+          <Command key="1" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
+          <Command key="2" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
+          <Command key="3" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
+        </CommandTabs>
         </div>
       </section>
 
