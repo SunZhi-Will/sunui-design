@@ -5,11 +5,11 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type R
 
 import { cn } from "@/lib/utils";
 
-/** auto follows light/dark; dark / light are fixed, for presentation stages that ignore the theme */
+/** auto follows light and dark mode; dark / light are fixed, for presentation stages that ignore the theme */
 export type PhoneFrameScheme = "auto" | "dark" | "light";
 
 /*
- * Colour tokens inside the screen. auto follows the site's light/dark, dark / light are fixed, for presentation stages that ignore the theme.
+ * Colour tokens inside the screen. auto follows the site's light or dark mode; dark / light are fixed, for presentation stages that ignore the theme.
  * All neutral grey, no warm tint.
  */
 const lightVars =
@@ -43,7 +43,7 @@ function LockIcon() {
   );
 }
 
-/** Status bar: solid signal bars, Wi-Fi fan and battery, filled rather than outlined like a real phone */
+/** Status bar: solid signal bars, Wi-Fi fan and battery, filled like a real phone rather than outlined */
 function StatusIcons() {
   return (
     <span className="inline-flex items-center gap-[1.4cqw]">
@@ -71,33 +71,33 @@ function StatusIcons() {
 
 export interface PhoneFrameProps {
   children: ReactNode;
-  /** Browser URL bar; no URL bar if omitted */
+  /** Browser address bar; omit it for no address bar */
   url?: string;
   time?: string;
-  /** Phone width (px); shrinks to 100% in narrow containers, with frame, radius and Dynamic Island scaling proportionally */
+  /** Phone width (px). In a narrow container it shrinks to 100%, and the frame, corners and Dynamic Island scale with it */
   width?: number;
   /** Overall phone height. Defaults to a real phone's 9:19.5 ratio; overflowing content scrolls inside the screen */
   height?: number;
-  /** Small caption above the phone */
+  /** Small label above the phone */
   label?: ReactNode;
   scheme?: PhoneFrameScheme;
   badge?: ReactNode;
-  /** UI language: en, zh-TW, zh-CN, ja; also accepts tags like zh-Hant-HK or ja-JP */
+  /** Interface language: en, zh-TW, zh-CN, ja; tags like zh-Hant-HK or ja-JP also work */
   locale?: string;
-  /** Overrides built-in strings, takes precedence over locale */
+  /** Overrides the built-in strings; takes priority over locale */
   labels?: Partial<PhoneFrameLabels>;
   className?: string;
 }
 
 export interface PhoneFrameLabels {
-  /** Accessible name of the figure when label is not a string */
+  /** Accessible name for the figure when label is not a string */
   screen: string;
   url: (url: string) => string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** Map any language tag to one of the four built-in languages; everything else uses English */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -113,13 +113,49 @@ const MESSAGES: Record<SunLocale, PhoneFrameLabels> = {
 };
 
 /*
- * Three layers from outside in: metal mid-frame (light from directly above, bright top edge, dark bottom edge), black glass bezel, screen.
- * All sizes use cqw (percent of phone width), so radius, borders and Dynamic Island keep their proportions when scaled down.
- * Concentric radii: frame 14cqw, bezel 13.2cqw, screen 13.2 - 3.2 = 10cqw.
+ * Drawn to iPhone 17 Pro proportions (body 71.9 × 150 mm, screen 1206 × 2622):
+ * metal frame 1cqw, black glass border 2cqw (about 2% of body width on the real phone), and the screen fills almost the whole front.
+ * All sizes use cqw (percent of phone width), so corners, border and Dynamic Island keep their proportions when scaled down.
+ * Concentric corners: frame 15.6cqw, glass border 14.6cqw, screen 14.6 − 2 = 12.6cqw.
+ * The frame is metal lit from directly above: bright at top and bottom, darker on the sides, with a chamfer highlight around the inner edge.
  */
-const frameMetal =
-  "bg-[#2b2b2f] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),inset_0_-1px_0_rgb(0_0_0/0.5),0_0_0_1px_rgb(0_0_0/0.55),0_2px_4px_rgb(0_0_0/0.12),0_24px_48px_-16px_rgb(0_0_0/0.35)]";
-const buttonMetal = "absolute w-[1.1cqw] bg-[#2b2b2f] shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_0_0_0.5px_rgb(0_0_0/0.5)]";
+const METAL = "linear-gradient(180deg,#9a9aa0 0%,#47474c 2.2%,#2c2c30 9%,#232327 50%,#2c2c30 91%,#47474c 97.8%,#7d7d83 100%)";
+const frameShadow =
+  "shadow-[inset_0_0_0_0.35cqw_rgb(255_255_255/0.10),inset_0_0_0_0.6cqw_rgb(0_0_0/0.35),0_0_0_0.5px_rgb(0_0_0/0.6),0_2px_4px_rgb(0_0_0/0.10),0_28px_56px_-20px_rgb(0_0_0/0.40)]";
+// Side buttons are cylinders: one highlight down the middle
+const KEY = "linear-gradient(90deg,#1b1b1e 0%,#5a5a60 45%,#2a2a2e 100%)";
+
+function SideKey({ side, top, h }: { side: "left" | "right"; top: string; h: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn("absolute w-[1.2cqw]", side === "left" ? "-left-[1cqw] rounded-l-[0.7cqw]" : "-right-[1cqw] rounded-r-[0.7cqw]")}
+      style={{ top, height: h, background: KEY }}
+    />
+  );
+}
+
+/** Antenna band on the frame: a short plastic segment, a real-phone detail */
+function Antenna({ className }: { className: string }) {
+  return <span aria-hidden="true" className={cn("absolute h-[0.9cqw] w-[1cqw] bg-[#55555b]", className)} />;
+}
+
+function Chevron() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-[4.6cqw]">
+      <path d="m15 6-6 6 6 6" />
+    </svg>
+  );
+}
+
+function TabsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" aria-hidden="true" className="size-[4.4cqw]">
+      <rect x="4" y="7" width="12" height="12" rx="2.5" />
+      <path d="M8 4h9.5A2.5 2.5 0 0 1 20 6.5V16" />
+    </svg>
+  );
+}
 
 export function PhoneFrame({
   children,
@@ -135,7 +171,6 @@ export function PhoneFrame({
   className,
 }: PhoneFrameProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  const part = "bg-[var(--wf-surface)] text-[var(--wf-fg)]";
   return (
     <figure
       aria-label={typeof label === "string" ? label : t.screen}
@@ -149,33 +184,56 @@ export function PhoneFrame({
         </figcaption>
       )}
       <div className="@container relative w-full">
-        {/* Side buttons: action and volume buttons on the left, power on the right, each protruding slightly */}
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[17%] h-[5.5%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[25%] h-[10%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-left-[0.9cqw] top-[37%] h-[10%] rounded-l-[0.6cqw]")} />
-        <span aria-hidden="true" className={cn(buttonMetal, "-right-[0.9cqw] top-[28%] h-[15%] rounded-r-[0.6cqw]")} />
-        <div className={cn("relative rounded-[14cqw] p-[0.8cqw]", frameMetal)} style={height ? { height } : { aspectRatio: "9 / 19.5" }}>
-          <div className="h-full rounded-[13.2cqw] bg-[#050506] p-[3.2cqw]">
-            <div className={cn("relative flex h-full flex-col overflow-hidden rounded-[10cqw]", part)}>
-              {/* Dynamic Island */}
-              <div aria-hidden="true" className="absolute top-[3.2cqw] left-1/2 z-[2] h-[9cqw] w-[30cqw] -translate-x-1/2 rounded-full bg-[#050506]" />
-              <div aria-hidden="true" className="flex h-[15.4cqw] flex-none items-center justify-between pr-[6.4cqw] pl-[8.6cqw] pt-[1cqw] text-[4.6cqw] font-semibold">
-                <span className="tabular-nums tracking-tight">{time}</span>
-                <StatusIcons />
+        {/* Left: Action button, volume up, volume down; right: side button and Camera Control */}
+        <SideKey side="left" top="17%" h="5%" />
+        <SideKey side="left" top="25%" h="9%" />
+        <SideKey side="left" top="36%" h="9%" />
+        <SideKey side="right" top="27%" h="14%" />
+        <SideKey side="right" top="58%" h="7%" />
+        <div
+          className={cn("relative rounded-[15.6cqw] p-[1cqw]", frameShadow)}
+          style={{ background: METAL, ...(height ? { height } : { aspectRatio: "71.9 / 150" }) }}
+        >
+          <Antenna className="top-[8%] left-0" />
+          <Antenna className="top-[8%] right-0" />
+          <Antenna className="bottom-[8%] left-0" />
+          <Antenna className="bottom-[8%] right-0" />
+          <div className="h-full rounded-[14.6cqw] bg-[#030304] p-[2cqw]">
+            <div className="relative flex h-full flex-col overflow-hidden rounded-[12.6cqw] bg-[var(--wf-surface)] text-[var(--wf-fg)]">
+              {/* Dynamic Island: about 32% of screen width, 9% tall, 2.7% from the top */}
+              <div aria-hidden="true" className="absolute top-[2.7cqw] left-1/2 z-[3] h-[9.2cqw] w-[31cqw] -translate-x-1/2 rounded-full bg-black" />
+              {/* Status bar: time and icons each centred on either side of the Dynamic Island */}
+              <div aria-hidden="true" className="relative z-[2] grid h-[14.6cqw] flex-none grid-cols-[1fr_31cqw_1fr] items-center pt-[0.6cqw] text-[4.4cqw] font-semibold">
+                <span className="justify-self-center pl-[3cqw] tabular-nums tracking-tight">{time}</span>
+                <span />
+                <span className="justify-self-center pr-[2cqw]">
+                  <StatusIcons />
+                </span>
               </div>
+              <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">{children}</div>
+              {/* Safari's address bar sits at the bottom, floating over the content */}
               {url && (
-                <div
-                  aria-label={t.url(url)}
-                  className="mx-[3.2cqw] mb-[2cqw] flex flex-none items-center justify-center gap-[1.4cqw] rounded-[3cqw] bg-[var(--wf-raised)] px-[3cqw] py-[1.8cqw] text-[3.8cqw] text-[var(--wf-fg-muted)]"
-                >
-                  <LockIcon />
-                  <span className="truncate text-[var(--wf-fg)]">{url}</span>
+                <div className="flex flex-none items-center gap-[2cqw] px-[3.6cqw] pt-[2cqw]">
+                  <span aria-hidden="true" className="grid size-[11cqw] flex-none place-items-center rounded-full bg-[var(--wf-raised)] shadow-[0_0_0_1px_var(--wf-line)]">
+                    <Chevron />
+                  </span>
+                  <div
+                    aria-label={t.url(url)}
+                    className="flex h-[11cqw] min-w-0 flex-1 items-center justify-center gap-[1.4cqw] rounded-full bg-[var(--wf-raised)] px-[3cqw] text-[3.9cqw] shadow-[0_0_0_1px_var(--wf-line)]"
+                  >
+                    <LockIcon />
+                    <span className="truncate">{url}</span>
+                  </div>
+                  <span aria-hidden="true" className="grid size-[11cqw] flex-none place-items-center rounded-full bg-[var(--wf-raised)] shadow-[0_0_0_1px_var(--wf-line)]">
+                    <TabsIcon />
+                  </span>
                 </div>
               )}
-              <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">{children}</div>
-              <div aria-hidden="true" className="relative h-[7cqw] flex-none">
-                <span className="absolute bottom-[2.4cqw] left-1/2 h-[1.4cqw] w-[36cqw] -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-80" />
+              <div aria-hidden="true" className="relative h-[7.4cqw] flex-none">
+                <span className="absolute bottom-[2.2cqw] left-1/2 h-[1.3cqw] w-[35cqw] -translate-x-1/2 rounded-full bg-[var(--wf-fg)] opacity-85" />
               </div>
+              {/* Glass: a very faint diagonal reflection, as if light from above hits the cover glass */}
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[4] rounded-[inherit] bg-[linear-gradient(120deg,rgb(255_255_255/0.07)_0%,transparent_38%)]" />
             </div>
           </div>
         </div>
@@ -186,58 +244,79 @@ export function PhoneFrame({
 
 /* ───────── Two overlapping phones (formerly tilted-phone-pair) ───────── */
 
-/** gentle spring: state changes, pointer-following moves */
+/** gentle spring: state changes and pointer-following movement */
 const GENTLE = { stiffness: 240, damping: 30 };
-/** Design size of the stage; in narrower containers the whole group scales down without changing layout */
+/** Design size of the stage; in a narrower container the whole group scales down instead of reflowing */
 const STAGE_W = 400;
-const STAGE_H = 580;
+const STAGE_H = 530;
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 type PairFrameProps = Omit<PhoneFrameProps, "children" | "width" | "height" | "scheme" | "locale">;
 
 export interface PhonePairProps {
-  /** Screen of the larger phone at the back */
+  /** Screen content of the larger phone at the back */
   back: ReactNode;
-  /** Screen of the smaller phone in front */
+  /** Screen content of the smaller phone in front */
   front: ReactNode;
-  /** Other props for the back PhoneFrame, e.g. url, time, badge */
+  /** Other props for the back PhoneFrame, such as url, time, badge */
   backFrame?: PairFrameProps;
   /** Other props for the front PhoneFrame */
   frontFrame?: PairFrameProps;
   scheme?: PhoneFrameScheme;
   locale?: string;
-  /** Cursor parallax, on by default; only for fine pointers such as a mouse, static with reduced motion */
+  /** Pointer parallax, on by default; only for precise pointers like a mouse, and fixed when reduced motion is preferred */
   parallax?: boolean;
-  /** Accessible name of the group */
+  /** Accessible name for the group */
   label?: string;
   className?: string;
 }
 
-/** One tilted phone: rest angle plus cursor offset times the follow factor */
+/** Body thickness: about 12% of width on the real phone, built as a stack of same-shaped thin layers pushed back to form the side */
+const DEPTH_LAYERS = 14;
+
+/** One tilted phone: rest angle plus pointer offset times a follow factor, with the body side stacked behind */
 function TiltedPhone({
   px,
   py,
   pose,
   follow,
+  width,
   children,
 }: {
   px: MotionValue<number>;
   py: MotionValue<number>;
   pose: { x: number; y: number; z: number };
   follow: number;
+  width: number;
   children: ReactNode;
 }) {
   const rotateY = useTransform(px, (v) => pose.y + v * 14 * follow);
   const rotateX = useTransform(py, (v) => pose.x - v * 10 * follow);
+  const step = (width * 0.11) / DEPTH_LAYERS;
   return (
-    <motion.div style={{ rotateX, rotateY, rotateZ: pose.z, transformPerspective: 1400 }}>{children}</motion.div>
+    <motion.div style={{ rotateX, rotateY, rotateZ: pose.z, transformPerspective: 1400, transformStyle: "preserve-3d" }} className="relative">
+      {Array.from({ length: DEPTH_LAYERS }, (_, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            borderRadius: width * 0.156,
+            // Side: layers near the front use the frame's metal colour and get darker further back
+            background: i < DEPTH_LAYERS - 2 ? `rgb(${52 - i * 1.6} ${52 - i * 1.6} ${57 - i * 1.6})` : "#141416",
+            transform: `translateZ(${-(i + 1) * step}px)`,
+          }}
+        />
+      ))}
+      <div style={{ transform: "translateZ(0.5px)" }}>{children}</div>
+    </motion.div>
   );
 }
 
 /**
- * Two overlapping PhoneFrames tilted in 3D. Both turn with the cursor,
- * the front phone more than the back, for depth. Touch devices and reduced motion keep the rest angle.
+ * Two overlapping PhoneFrames tilted in 3D. Both turn with the pointer,
+ * the front one more than the back, for depth. Touch devices and reduced motion keep the rest angle.
  */
 export function PhonePair({
   back,
@@ -278,7 +357,7 @@ export function PhonePair({
     return () => mq.removeEventListener("change", apply);
   }, []);
 
-  // With parallax off, return to the rest angle; with reduced motion jump back without the spring
+  // With parallax off, return to the rest angle; with reduced motion, jump back without the spring
   useEffect(() => {
     if (on) return;
     x.set(0);
@@ -315,14 +394,14 @@ export function PhonePair({
         style={{ width: STAGE_W, height: STAGE_H, transform: `translateX(-50%) scale(${scale})` }}
       >
         <div className="absolute top-0 left-[8px]" style={{ width: 236 }}>
-          <TiltedPhone px={px} py={py} pose={{ x: 6, y: 14, z: 0 }} follow={0.55}>
+          <TiltedPhone px={px} py={py} pose={{ x: 8, y: 22, z: -2 }} follow={0.55} width={236}>
             <PhoneFrame {...backFrame} width={236} scheme={scheme} locale={locale}>
               {back}
             </PhoneFrame>
           </TiltedPhone>
         </div>
         <div className="absolute top-[100px] left-[188px]" style={{ width: 196 }}>
-          <TiltedPhone px={px} py={py} pose={{ x: 6, y: -14, z: 0 }} follow={1}>
+          <TiltedPhone px={px} py={py} pose={{ x: 8, y: -22, z: 2 }} follow={1} width={196}>
             <PhoneFrame {...frontFrame} width={196} scheme={scheme} locale={locale}>
               {front}
             </PhoneFrame>
