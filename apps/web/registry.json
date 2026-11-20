@@ -5408,6 +5408,50 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "chapter-seekbar",
+      "type": "registry:block",
+      "title": "Chapter Seekbar",
+      "description": "A video seek bar split into chapter segments with small gaps. The bar grows on hover and the segment under the pointer grows more, following it on springs. The played part and the knob use the brand spot colour on a concave track; a floating chip with optional thumbnail, chapter title and time follows the pointer and stays inside the bar. Monochrome markers snap clicks. Touch drag and keyboard (arrows 5 s, Shift 30 s, Page Up and Page Down for chapters, Home and End) work, and reduced motion switches instantly.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "media",
+        "input"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "drag",
+        "addedAt": "2026-11-20",
+        "usage": {
+          "whenToUse": [
+            "Long videos, courses and interviews with named chapters",
+            "Showing bookmarks, notes or clips on the timeline"
+          ],
+          "watchOut": [
+            "Many or very short chapters make thin segments; it reads best with about ten or fewer",
+            "The chip only shows on hover and drag, so show the chapter title elsewhere in the player too"
+          ],
+          "aliases": [
+            "video scrubber",
+            "chapter progress bar",
+            "timeline seek",
+            "video chapters",
+            "course player progress"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/chapter-seekbar/chapter-seekbar.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }
