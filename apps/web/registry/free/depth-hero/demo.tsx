@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { DepthHero } from "./depth-hero";
 
-// 示範照片（AI 生成）：去背的砂色保溫瓶，透明 WebP，放在 public/blocks/depth-hero
+// Demo photo (AI-generated): a cut-out sand-coloured thermos, transparent WebP, stored in public/blocks/depth-hero
 const bottle = "/blocks/depth-hero/bottle.webp";
 
 const copy = {

@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 export interface MembershipTier {
   id: string;
   name: string;
-  /** 達到這個等級所需的累積點數 */
+  /** Accumulated points needed to reach this tier */
   min: number;
-  /** 這個等級的福利，顯示在「下一級可解鎖」 */
+  /** Perks of this tier, shown under "Unlocks at the next tier" */
   perks?: string[];
 }
 
@@ -26,21 +26,21 @@ export interface TierProgressLabels {
 }
 
 export interface TierProgressProps {
-  /** 由低到高排列；第一級的 min 通常是 0 */
+  /** Ordered from low to high; the first tier's min is usually 0 */
   tiers: MembershipTier[];
   points: number;
-  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and number format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
-  /** 例如 "Points reset on Dec 31" */
+  /** e.g. "Points reset on Dec 31" */
   footnote?: ReactNode;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: TierProgressLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -103,19 +103,19 @@ const MESSAGES: Record<SunLocale, Required<TierProgressLabels>> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surface, hairline, text colour, brand accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for selected state, deals and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-// 半圓弧：圓心 (100, 100)，半徑 84
+// Half-ring arc: centre (100, 100), radius 84
 const ARC = "M 16 100 A 84 84 0 0 1 184 100";
 
 export function TierProgress({ tiers, points, locale = "en-US", footnote, labels, className }: TierProgressProps) {
@@ -131,7 +131,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
   const next = tiers[currentIndex + 1];
   const isTop = !next;
   const fraction = isTop ? 1 : Math.min(1, Math.max(0, (points - current.min) / (next.min - current.min)));
-  // 指針端點位置（角度從左 180° 到右 0°）
+  // Needle tip position (angle from 180° on the left to 0° on the right)
   const angle = Math.PI * (1 - fraction);
   const tip = { x: 100 + 84 * Math.cos(angle), y: 100 - 84 * Math.sin(angle) };
   const move = reduce ? { duration: 0 } : springs.gentle;
@@ -152,7 +152,7 @@ export function TierProgress({ tiers, points, locale = "en-US", footnote, labels
           aria-valuenow={points}
           aria-valuetext={isTop ? String(t.topTier) : t.valueText(fmt(points), fmt(next.min), next.name)}
         >
-          {/* 底線用虛線，像未打孔的點數格 */}
+          {/* The baseline is dashed, like an unpunched points card */}
           <path d={ARC} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={10} strokeDasharray="2 5" />
           <motion.path
             d={ARC}

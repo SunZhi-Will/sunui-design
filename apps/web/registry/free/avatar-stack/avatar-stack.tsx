@@ -7,45 +7,45 @@ import { cn } from "@/lib/utils";
 
 export interface AvatarStackPerson {
   id: string;
-  /** 顯示用名稱；建議只給名加姓氏首字，例如「Mina P.」 */
+  /** Display name; give only the first name plus the initial of the surname, for example "Mina P." */
   name: string;
-  /** 頭像圖片；缺少或載入失敗時顯示姓名縮寫 */
+  /** Avatar image; when missing or failed to load, the initials are shown */
   src?: string;
-  /** 提示框第二行，例如「Taipei, 2 hours ago」 */
+  /** Second line of the tooltip, for example "Taipei, 2 hours ago" */
   note?: string;
 }
 
 export interface AvatarStackProps {
   people: AvatarStackPerson[];
-  /** 實際總人數；大於 people 數量時，差額併入 +N */
+  /** Actual total count; when larger than the number of people, the difference is added to +N */
   total?: number;
-  /** 最多顯示幾個頭像，其餘收進 +N */
+  /** Maximum number of avatars shown, the rest go into +N */
   max?: number;
   size?: "sm" | "md" | "lg";
-  /** 整組頭像的無障礙名稱，等同 labels.label */
+  /** Accessible name for the whole group of avatars, same as labels.label */
   label?: string;
-  /** 點擊 +N 時觸發；未提供時 +N 僅為文字 */
+  /** Fired when +N is clicked; when not provided, +N is plain text */
   onOverflowClick?: () => void;
-  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and number format: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings, takes priority over locale */
   labels?: Partial<AvatarStackLabels>;
   className?: string;
 }
 
 export interface AvatarStackLabels {
   label: string;
-  /** +N 的名稱；names 是收起來的人名，可能是空字串 */
+  /** Name for +N; names are the collapsed people, and may be an empty string */
   more: (count: string, names: string) => string;
-  /** 可點擊的 +N 按鈕名稱 */
+  /** Name of the clickable +N button */
   showMore: (count: string, names: string) => string;
-  /** 串接人名用的分隔符 */
+  /** Separator used to join names */
   separator: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -80,7 +80,7 @@ const MESSAGES: Record<SunLocale, AvatarStackLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙、墨
+// Design language (DESIGN.md): neutral surfaces and text colors
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const ink = "text-foreground";
 const inkOutline = "border-foreground/70";
@@ -100,7 +100,7 @@ function initialsOf(name: string) {
   return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
 }
 
-/** 1,000 以上縮成 1.3K，維持圓片寬度 */
+/** From 1,000 up it is shortened to 1.3K, keeping the disc width */
 function compact(n: number, locale: string) {
   return new Intl.NumberFormat(locale, n >= 1_000 ? { notation: "compact", maximumFractionDigits: 1 } : {}).format(n);
 }
@@ -158,7 +158,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
   );
 }
 
-/** hover 或聚焦時抬起並顯示名稱；提示框只是視覺輔助，名稱已在 aria-label 裡 */
+/** Lifts and shows the name on hover or focus; the tooltip is only a visual aid, the name is already in aria-label */
 function Lift({ title, note, reduce, children }: { title: string; note?: string; reduce: boolean; children: ReactNode }) {
   const [active, setActive] = useState(false);
   return (

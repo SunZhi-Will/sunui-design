@@ -26,13 +26,13 @@ export const copy = {
   ja: { tracking: "配送状況 SU-24817", trackingLabel: "配送状況を読み込み中", events: ["受付に配達しました", "配達中", "最寄りの拠点に到着"], picks: "あなたへのおすすめ", orders: "最近の注文", add: "追加", delivered: "配達済み", returned: "返品済み", details: { bottle: "サンド、500 ml", lamp: "スレートグレー、電球色", watch: "レザーストラップ" } },
 };
 
-/** 每區塊的資料到達時間不同，像真實頁面陸續載入；工具列的 Replay 會重來一次 */
+/** Each section's data arrives at a different time, like a real page loading piece by piece; the toolbar's Replay starts over */
 const ARRIVAL = [900, 1500, 2100, 2700, 3300];
 
-/** 物流事件的時間（10 月 28 日） */
+/** Time of the shipping events (October 28) */
 const EVENT_TIMES = [[14, 32], [9, 5], [6, 48]];
 
-/** 日期格式化跟著 demo 語系 */
+/** Date formatting follows the demo locale */
 function useDate() {
   const locale = useDemoLocale();
   return {
@@ -41,7 +41,7 @@ function useDate() {
   };
 }
 
-/** 載入後的商品卡；首頁型錄的 variants.tsx 也用這三段真實內容 */
+/** Product card after loading; the home catalog's variants.tsx also uses these three pieces of real content */
 export function ProductPick({ kind, price }: { kind: ProductKind; price: string }) {
   const t = useDemoText(copy);
   const names = useProductNames();
@@ -144,7 +144,7 @@ export default function SkeletonSetDemo() {
         <h2 id="tracking-heading" className="mb-3 text-base font-semibold tracking-tight">
           {t.tracking}
         </h2>
-        {/* 不確定會有幾筆時，用通用的 rows 預設 */}
+        {/* When you do not know how many rows to expect, use the generic rows preset */}
         <SkeletonSet loaded={arrived > 4} skeleton="rows" count={3} label={t.trackingLabel} locale={locale}>
           <TrackingList />
         </SkeletonSet>

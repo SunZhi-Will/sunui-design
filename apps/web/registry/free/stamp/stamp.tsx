@@ -6,48 +6,48 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * SunUI 的結果標記 Result：放在動作發生的地方（原本按鈕的位置、狀態欄、步驟旁），不壓在內容上。
- * 正面結果：一顆品牌專色的小圓片，帶頂邊高光，勾線描出，圓片用 pop 彈簧落定一次。
- * 失效、結束、未中獎：淡色文字，不加圖示。
- * shape 決定附帶的資訊，不決定外觀：
- * - tick、box：只有文字（已複製、已領取、已售完）
- * - date：文字加日期（已付款 2026.11.06）
- * - seal：文字加第二行（中獎、等級名稱）
- * - chop：文字（受邀、會員名）
- * 結果以外的標籤（推薦、熱門）不要用它。
+ * SunUI's result marker, Result: place it where the action happened (where the button was, in a status bar, next to a step), not over the content.
+ * Positive result: a small disc in the brand accent colour with a top-edge highlight, the check drawn as a stroke, and the disc settling once with the pop spring.
+ * Expired, ended, did not win: faded text with no icon.
+ * shape decides what extra information comes with it, not the look:
+ * - tick, box: text only (Copied, Claimed, Sold out)
+ * - date: text plus a date (Paid 2026.11.06)
+ * - seal: text plus a second line (Winner, tier name)
+ * - chop: text (Invited, member name)
+ * Do not use it for labels that are not results (Recommended, Popular).
  *
- * 2026-11-19 起主名稱是 Result；Stamp 是舊名，同一個元件，舊安裝照常可用。
- * 檔名與 registry 名稱維持 stamp，安裝指令不變。
+ * Since 2026-11-19 the primary name is Result; Stamp is the old name, the same component, so existing installs keep working.
+ * The file name and registry name stay stamp, so the install command is unchanged.
  */
 export type ResultShape = "tick" | "box" | "seal" | "date" | "chop";
-/** positive：正面結果；muted：失效、結束、未中獎。vermilion 與 ink 是舊名，分別等於 positive 與 muted */
+/** positive: positive result; muted: expired, ended, did not win. vermilion and ink are old names, equal to positive and muted respectively */
 export type ResultTone = "positive" | "muted" | "vermilion" | "ink";
 export type ResultSize = "sm" | "md" | "lg";
 
 export interface ResultProps {
   children?: ReactNode;
   shape?: ResultShape;
-  /** 預設 positive */
+  /** Defaults to positive */
   tone?: ResultTone;
   size?: ResultSize;
-  /** 已不影響外觀，保留以相容舊程式 */
+  /** No longer affects the look; kept for compatibility with old code */
   seed?: string | number;
-  /** date 顯示的日期；seal 沒有 sub 時也可當第二行 */
+  /** Date shown by date; also usable as the second line of seal when there is no sub */
   date?: Date | string | number;
-  /** seal 的第二行，例如等級名稱 */
+  /** Second line of seal, e.g. a tier name */
   sub?: ReactNode;
-  /** 已不影響外觀，保留以相容舊程式 */
+  /** No longer affects the look; kept for compatibility with old code */
   filled?: boolean;
-  /** 加刪除線，表示作廢 */
+  /** Adds a strikethrough to mark it void */
   void?: boolean;
-  /** false 時直接顯示，不播落定（例如重新整理後的已領取狀態） */
+  /** When false, show immediately without the settle animation (e.g. the claimed state after a refresh) */
   appear?: boolean;
   delay?: number;
   className?: string;
   style?: CSSProperties;
 }
 
-// 和 sunui-motion 的 pop 相同：小元件落定一次的回彈
+// Same as pop in sunui-motion: the rebound of a small element settling once
 const pop = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 
 const TEXT: Record<ResultSize, string> = { sm: "text-xs", md: "text-sm", lg: "text-base" };
@@ -122,7 +122,7 @@ export function Result({
   );
 }
 
-/** 舊名，等於 Result */
+/** Old name, equal to Result */
 export const Stamp = Result;
 export type StampShape = ResultShape;
 export type StampTone = ResultTone;

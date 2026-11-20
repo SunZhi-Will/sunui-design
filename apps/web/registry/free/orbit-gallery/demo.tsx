@@ -6,7 +6,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { OrbitGallery, type OrbitImage } from "./orbit-gallery";
 
-// 示範圖：同一組灰底棚拍商品照，放在 public/blocks/orbit-gallery/
+// Demo images: one set of studio product photos on a grey background, stored in public/blocks/orbit-gallery/
 const photos = ["mug", "tote", "lamp", "bottle", "vase", "candle", "notebook", "tea", "backpack", "watch", "wallet", "scarf"];
 const photo = (i: number) => `/blocks/orbit-gallery/${photos[i % photos.length]}.webp`;
 
@@ -58,7 +58,7 @@ export default function OrbitGalleryDemo() {
       <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{t.heading}</h2>
       <p className="mt-1 text-sm text-muted-foreground">{t.hint}</p>
       <OrbitGallery images={images} label={t.label} onSelect={(_, index) => setPicked(index)} className="mt-4" />
-      {/* 選中的那件落在球下方：同一個位置換內容，不跳版 */}
+      {/* The selected item lands below the sphere: same slot, swapped content, no layout shift */}
       <div className="mt-2 flex h-11 items-center justify-center">
         {picked !== null && (
           <div className="inline-flex items-center gap-2.5 rounded-lg bg-card py-1 pr-3 pl-1 text-sm shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]">

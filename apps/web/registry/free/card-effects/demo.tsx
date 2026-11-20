@@ -16,7 +16,7 @@ import {
   type EffectCardItem,
 } from "./card-effects";
 
-// 示範照片（AI 生成），和 image-effects 共用 public/blocks/image-effects；順序對應 copy.cards
+// Demo photos (AI generated), shared with image-effects in public/blocks/image-effects; the order matches copy.cards
 const photos = ["lagoon", "desert", "harbor", "valley", "canyon", "peaks"];
 
 export function demoArt(i: number) {

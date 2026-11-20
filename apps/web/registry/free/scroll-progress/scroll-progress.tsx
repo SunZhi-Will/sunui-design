@@ -6,29 +6,29 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { cn } from "@/lib/utils";
 
 export type ScrollSection = {
-  /** 對應章節元素的 id */
+  /** ID of the matching section element */
   id: string;
   label: string;
 };
 
 export interface ScrollProgressProps {
-  /** 捲動容器；省略時追蹤 window */
+  /** Scroll container; when omitted, window is tracked */
   container?: RefObject<HTMLElement | null>;
-  /** 章節刻度，點擊可跳轉 */
+  /** Section ticks, clickable to jump */
   sections?: ScrollSection[];
-  /** fixed 固定在視窗頂端；sticky 黏在容器頂端；static 由父層排版。fixed 時刻度不印文字 */
+  /** fixed pins to the top of the window; sticky sticks to the top of the container; static leaves layout to the parent. With fixed, ticks print no text */
   position?: "fixed" | "sticky" | "static";
-  /** 細線粗細（px） */
+  /** Thickness of the thin line (px) */
   thickness?: number;
-  /** 細線顏色 class */
+  /** Class for the line color */
   barClassName?: string;
-  /** 在尺規右上方印出百分比 */
+  /** Print the percentage at the top right of the ruler */
   showPercent?: boolean;
-  /** 平滑跟隨；減少動態時自動關閉 */
+  /** Follow smoothly; turned off automatically under reduced motion */
   smooth?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: Partial<ScrollProgressLabels>;
   className?: string;
 }
@@ -40,7 +40,7 @@ export interface ScrollProgressLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -55,9 +55,9 @@ const MESSAGES: Record<SunLocale, ScrollProgressLabels> = {
   ja: { progress: "読書の進捗", jumpTo: (label) => `「${label}」へ移動` },
 };
 
-// 設計語言（DESIGN.md）：邊線作底線，品牌專色作進度
+// Design language (DESIGN.md): the border as the baseline, the brand accent as progress
 const edgeLine = "bg-foreground/10";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand color. Used only for selection, offers and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
@@ -78,12 +78,12 @@ export function ScrollProgress({
 }: ScrollProgressProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  // layoutEffect: false，等父層的 container ref 掛上後才綁定，否則會退回追蹤 window
+  // layoutEffect: false, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
   const { scrollYProgress } = useScroll(container ? { container, layoutEffect: false } : undefined);
   const spring = useSpring(scrollYProgress, { stiffness: 240, damping: 30, restDelta: 0.001 });
   const value: MotionValue<number> = smooth && !reduceMotion ? spring : scrollYProgress;
 
-  // 只在整數百分比變化時更新 state，避免每個 scroll frame 都重繪
+  // Update state only when the integer percentage changes, to avoid re-rendering on every scroll frame
   const [percent, setPercent] = useState(0);
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const next = Math.round(Math.min(Math.max(v, 0), 1) * 100);
@@ -91,7 +91,7 @@ export function ScrollProgress({
   });
 
   const [markers, setMarkers] = useState<Marker[]>([]);
-  // sections 常是 inline 陣列，用 id 串成 key 判斷是否需要重新量測
+  // sections is often an inline array, so join the ids into a key to decide whether to measure again
   const sectionKey = sections.map((s) => `${s.id}:${s.label}`).join("|");
   const sectionsRef = useRef(sections);
   sectionsRef.current = sections;
@@ -104,7 +104,7 @@ export function ScrollProgress({
     for (const s of sectionsRef.current) {
       const el = root ? root.querySelector<HTMLElement>(`#${CSS.escape(s.id)}`) : document.getElementById(s.id);
       if (!el) continue;
-      // 尊重 scroll-margin-top，跳轉後標題不會貼齊邊緣
+      // Respect scroll-margin-top, so the heading does not sit flush against the edge after jumping
       const top = el.getBoundingClientRect().top - rootTop - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0);
       next.push({ ...s, top, at: max > 0 ? Math.min(Math.max(top / max, 0), 1) : 0 });
     }
@@ -165,9 +165,9 @@ export function ScrollProgress({
         <nav aria-label={text.progress} className="absolute inset-x-0 top-0">
           <ul>
             {markers.map((m, i) => {
-              // percent 已四捨五入到整數，容許 1% 誤差，跳轉後該刻度立即算已讀
+              // percent is rounded to an integer; allow a 1% error so the tick counts as read right after jumping
               const passed = percent / 100 >= m.at - 0.01;
-              // 靠近尾端的刻度把字印在刻痕左側，並與前一格平分空間，避免擠成一點
+              // Ticks near the end print their text to the left of the mark and share space equally with the previous one, so they do not crowd into a point
               const flip = (k: number) => k > 0 && k < markers.length && (markers[k + 1]?.at ?? 1) - markers[k].at < 0.15;
               const room = flip(i)
                 ? (m.at - markers[i - 1].at) / 2
@@ -194,9 +194,9 @@ export function ScrollProgress({
                     )}
                     style={{ height: thickness + 18 }}
                   >
-                    {/* 刻度：像尺規上的一道刻痕 */}
+                    {/* Tick: like a mark on a ruler */}
                     <span aria-hidden="true" className="h-[9px] w-px shrink-0 bg-current" style={{ marginTop: thickness }} />
-                    {/* 空間不夠時只留刻痕，不印被截成一兩個字母的標籤 */}
+                    {/* When space is short keep only the mark, and do not print labels cut down to one or two letters */}
                     {printLabels && (
                       <span
                         aria-hidden="true"

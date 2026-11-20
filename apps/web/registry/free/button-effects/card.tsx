@@ -11,7 +11,7 @@ const copy = {
   ja: { shine: "アップグレード", border: "新リリース", press: "押す", neon: "配信開始" },
 };
 
-/** 型錄卡片：四種最醒目的按鈕效果 */
+/** Catalog card: the four most striking button effects */
 export default function ButtonEffectsCard() {
   const t = useDemoText(copy);
   return (

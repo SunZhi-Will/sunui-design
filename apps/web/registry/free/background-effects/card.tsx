@@ -4,7 +4,7 @@ import { EffectBackground, type BackgroundEffect } from "./background-effects";
 
 const picks: BackgroundEffect[] = ["aurora", "retro-grid", "meteors", "particles"];
 
-/** 型錄卡片：四格縮圖展示極光、復古網格、流星與粒子 */
+/** Catalog card: four thumbnails showing aurora, retro grid, meteors and particles */
 export default function BackgroundEffectsCard() {
   return (
     <div className="mx-auto grid w-72 grid-cols-2 gap-2">

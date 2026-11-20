@@ -14,7 +14,7 @@ const copy = {
   ja: { heading: "お届け先", name: "お名前", email: "メールアドレス", emailBad: "name@example.com のような形式で入力してください", emailOk: "配送状況をこちらにお送りします", zip: "郵便番号", zipBad: "郵便番号は 7 桁の数字です", zipTyped: "1500001", note: "配達メモ", noteHint: "任意", noteTyped: "宅配ボックスへお願いします", show: "表示", hide: "隠す", pw: "パスワードを作成" },
 };
 
-// 各地郵遞區號的格式範本：台灣 3+3、日本 3+4
+// Postal code format templates by region: Taiwan 3+3, Japan 3+4
 const zipMask = { en: "99999", "zh-TW": "999-999", "zh-CN": "999999", ja: "999-9999" };
 
 const email = (bad: string) => (v: string) => (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? true : bad);
@@ -26,7 +26,7 @@ export default function FloatingFieldDemo() {
   const [showPw, setShowPw] = useState(false);
   const ref = useRef<HTMLFormElement>(null);
 
-  // 預覽自己演：Email 打錯網域被建議修正、點一下只換掉錯的字母；郵遞區號逐字填滿灰格；備註打字看字數
+  // The preview plays itself: a mistyped email domain gets a suggested fix and one click swaps only the wrong letters; the postal code fills the grey cells character by character; the note types out and shows its character count
   const cursor = useDemoAutoplay(ref, async (d) => {
     const field = (name: string) => () => d.find(`[name=${name}]`);
     await d.click(field("email"));

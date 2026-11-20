@@ -7,18 +7,18 @@ import { useDemoText } from "@/lib/demo-locale";
 import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, loadingEffects, type LoaderVariant } from "./loading-effects";
 import { copy, smallBtn, VALUES } from "./demo";
 
-// loaderVariants 是 loadingEffects 的子集（Loader 的 variant），另外三個是獨立元件，合起來每種一張卡
+// loaderVariants is a subset of loadingEffects (the Loader variants); the other three are standalone components, together giving one card per effect
 export const variants = loadingEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// Only this one is shown on the home page as the representative, chosen because it moves by itself, so the card needs no hover to show the effect
 export const featured = "equalizer";
 
 const isLoader = (v: string): v is LoaderVariant => (loaderVariants as readonly string[]).includes(v);
 
-/** 首頁型錄：一種載入效果一張卡。 */
+/** Home catalog: one card per loading effect. */
 export default function LoadingEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
-  // 確定進度的效果跟 demo 一樣用自動前進的數值
+  // Effects with determinate progress use an auto-advancing value, same as the demo
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +27,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
     return () => clearInterval(id);
   }, []);
 
-  // 頂部載入條：卡片裡自動在載入與完成之間切換，按鈕也能手動切
+  // Top loading bar: switches between loading and done by itself in the card, and the button can also switch it by hand
   useEffect(() => {
     if (variant !== "top-loading-bar") return;
     const id = setTimeout(() => setLoading((l) => !l), loading ? 2400 : 1200);
@@ -67,7 +67,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
   }
 
   if (variant === "multi-step") {
-    // 卡片裡沒有重播鈕，改成跑完自動重來
+    // The card has no replay button, so it restarts automatically when it finishes
     return <MultiStepLoader steps={t.steps} label={t.loading} interval={1100} loop className="w-64" />;
   }
 

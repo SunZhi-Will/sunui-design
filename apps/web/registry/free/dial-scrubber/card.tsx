@@ -13,7 +13,7 @@ const copy = {
   ja: { title: "ギフトカード", label: "ギフトカードの金額", buy: "ギフトカードを追加", currency: { prefix: "¥", min: 1000, max: 30000, step: 500, major: 4, start: 5000 } },
 };
 
-/** 型錄卡片：禮物卡金額轉盤，左右拖曳或滾輪撥動刻度，下方按鈕的金額跟著變。 */
+/** Catalog card: a gift card amount dial; drag left or right, or use the wheel, to turn the ticks, and the button's amount below follows. */
 export default function DialScrubberCard() {
   const t = useDemoText(copy);
   const c = t.currency;

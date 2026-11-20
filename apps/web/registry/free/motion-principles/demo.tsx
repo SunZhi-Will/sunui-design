@@ -22,7 +22,7 @@ const copy = {
 
 const accent = "var(--chart-2, var(--primary))";
 
-/* ---------- 示範用的簡單 SVG 主角 ---------- */
+/* ---------- simple SVG subjects for the demo ---------- */
 
 function Ball({ size = 40 }: { size?: number }) {
   return (
@@ -123,7 +123,7 @@ function Gauge() {
   );
 }
 
-/** 手機分層：背殼、主機板、螢幕、玻璃 */
+/** Phone layers: back shell, mainboard, screen, glass */
 function PhoneLayers() {
   const w = 54;
   const h = 96;
@@ -162,7 +162,7 @@ function PhoneLayers() {
   ];
 }
 
-/* ---------- 示範格 ---------- */
+/* ---------- demo cells ---------- */
 
 function Tile({ name, hint, replay, children }: { name: string; hint: string; replay?: string; children: ReactNode }) {
   const [run, setRun] = useState(0);
@@ -330,7 +330,7 @@ function Subject({ effect, sale, linear, eased }: { effect: MotionPrincipleName;
   }
 }
 
-/** 單一動態原理的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** Demo cell for a single motion principle. Shared by the full demo and the home catalog (variants.tsx) */
 export function MotionPrincipleTile({ effect }: { effect: MotionPrincipleName }) {
   const t = useDemoText(copy);
   const looping = isLoopingMotionPrinciple(effect) || effect === "squash-stretch";

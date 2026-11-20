@@ -5,12 +5,12 @@ import { createContext, useContext, type CSSProperties, type ReactNode } from "r
 
 import { cn } from "@/lib/utils";
 
-/** pulse：緩慢的透明度呼吸（只在載入中）；none：靜止的表面色塊 */
+/** pulse: a slow opacity breathing (only while loading); none: static surface blocks */
 export type ShimmerStyle = "pulse" | "none";
 
 const ShimmerContext = createContext<ShimmerStyle>("pulse");
 
-// 設計語言（DESIGN.md）：表面與 hairline。色塊比表面深一階，表示還沒載入的版位
+// Design language (DESIGN.md): surface and hairline. Blocks are one step darker than the surface, marking slots that have not loaded yet
 const sheet = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const block = "bg-[#e7e7e7] dark:bg-[#292929]";
@@ -18,11 +18,11 @@ const block = "bg-[#e7e7e7] dark:bg-[#292929]";
 export interface SkeletonProps {
   className?: string;
   style?: CSSProperties;
-  /** 覆寫外層 SkeletonSet 的設定 */
+  /** Overrides the settings of the outer SkeletonSet */
   shimmer?: ShimmerStyle;
 }
 
-/** 基本骨架方塊，其餘元件都由它組成 */
+/** Basic skeleton block; every other component is built from it */
 export function Skeleton({ className, style, shimmer }: SkeletonProps) {
   const fromSet = useContext(ShimmerContext);
   const reduceMotion = useReducedMotion();
@@ -34,7 +34,7 @@ export function Skeleton({ className, style, shimmer }: SkeletonProps) {
       className={cn("rounded-[3px]", block, mode === "pulse" && "animate-[sunui-skeleton-pulse_2.4s_ease-in-out_infinite]", className)}
     >
       {mode === "pulse" && (
-        // React 19 會依 href 去重並提升到 head
+        // React 19 dedupes by href and hoists it to the head
         <style href="sunui-skeleton-pulse" precedence="default">{`@keyframes sunui-skeleton-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .55 } }`}</style>
       )}
     </div>
@@ -49,7 +49,7 @@ export function SkeletonCircle({ size = 40, className }: { size?: number; classN
   return <Skeleton className={cn("shrink-0 rounded-full", className)} style={{ width: size, height: size }} />;
 }
 
-/** 依 index 產生穩定的行寬，避免 SSR 不一致 */
+/** Produces stable line widths from the index, avoiding SSR mismatch */
 const LINE_WIDTHS = ["92%", "84%", "96%", "70%", "88%", "62%"];
 
 export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
@@ -62,7 +62,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
   );
 }
 
-/** 排版稿上的圖片版位：細線打叉的方框 */
+/** Image slot in a wireframe: a box crossed with thin lines */
 export function SkeletonImage({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("relative w-full bg-muted text-foreground/10", className)}>
@@ -123,7 +123,7 @@ export function SkeletonList({ rows = 4, className }: { rows?: number; className
   );
 }
 
-/** 通用的整列版位：不知道內容長怎樣時，用幾條等寬的表面色塊代表「這裡有幾筆資料」 */
+/** Generic full-row slot: when you do not know what the content looks like, a few equal-width surface blocks stand for "there are this many items here" */
 export function SkeletonRows({ rows = 4, className }: { rows?: number; className?: string }) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -137,19 +137,19 @@ export function SkeletonRows({ rows = 4, className }: { rows?: number; className
 export type SkeletonPreset = "text" | "card" | "product" | "list" | "rows";
 
 export interface SkeletonSetProps {
-  /** true 時換成真實內容 */
+  /** When true, shows the real content */
   loaded: boolean;
   children?: ReactNode;
-  /** 載入中要顯示的骨架；可傳 preset 名稱或自訂節點 */
+  /** Skeleton to show while loading; pass a preset name or a custom node */
   skeleton?: SkeletonPreset | ReactNode;
   shimmer?: ShimmerStyle;
-  /** preset 的行數或列數 */
+  /** Number of lines or rows in the preset */
   count?: number;
-  /** 載入中時讀屏念的名稱，例如「正在載入過往帳單」；不給時依 locale 用內建字串 */
+  /** Name read by screen readers while loading, for example "Loading past invoices"; when omitted, uses the built-in string for the locale */
   label?: string;
-  /** 讀屏文字的語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** Language of the screen reader text: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: Partial<SkeletonSetLabels>;
   className?: string;
 }
@@ -161,7 +161,7 @@ export interface SkeletonSetLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -192,7 +192,7 @@ function renderPreset(preset: SkeletonPreset, count?: number) {
   }
 }
 
-/** 包住真實內容：未載入時顯示骨架，載入後短暫交叉淡入 */
+/** Wraps the real content: shows the skeleton until loaded, then briefly cross-fades */
 export function SkeletonSet({ loaded, children, skeleton = "card", shimmer = "pulse", count, label, locale = "en", labels, className }: SkeletonSetProps) {
   const reduceMotion = useReducedMotion();
   const text = { ...MESSAGES[resolveLocale(locale)], ...labels };

@@ -45,7 +45,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：左邊目錄、右邊保養文章，捲動文章時目錄的指示條跟著移到目前段落，點目錄跳過去。 */
+/** Catalog card: a table of contents on the left and a care article on the right; as the article scrolls the indicator follows the current section, and clicking an entry jumps there. */
 export default function TocScrollspyCard() {
   const t = useDemoText(copy);
   const scroller = useRef<HTMLDivElement>(null);

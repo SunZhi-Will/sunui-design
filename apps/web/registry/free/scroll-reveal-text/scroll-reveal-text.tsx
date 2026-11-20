@@ -8,28 +8,28 @@ import { cn } from "@/lib/utils";
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
 export interface ScrollRevealTextProps {
-  /** 段落文字；中文、日文逐字由淡色字轉為實色，英文逐詞 */
+  /** Paragraph text. Chinese and Japanese reveal one character at a time, English one word at a time */
   text: string;
-  /** 捲動容器；省略時追蹤 window。容器需為定位元素（relative），位置才量得準 */
+  /** Scroll container. When omitted, tracks window. The container must be a positioned element (relative) for positions to be measured accurately */
   container?: RefObject<HTMLElement | null>;
   as?: ElementType;
-  /** 強制切分方式；auto 依文字自動判斷 */
+  /** Force how the text is split. auto decides from the text */
   splitBy?: "auto" | "word" | "char";
-  /** 尚未讀到時的文字色濃度（0 到 1） */
+  /** Text color strength before it has been read (0 to 1) */
   dimOpacity?: number;
-  /** 需要強調的字詞（可多字），讀到時以朱紅印出 */
+  /** Words to emphasize (may be multi-character), printed in vermilion once read */
   accentWords?: string[];
   accentClassName?: string;
-  /** framer-motion useScroll offset，決定何時開始與結束 */
+  /** framer-motion useScroll offset, decides when the reveal starts and ends */
   offset?: ScrollOffset;
-  /** 語言標記，例如 zh-Hant、ja；影響字型與斷行 */
+  /** Language tag, for example zh-Hant or ja. Affects fonts and line breaking */
   lang?: string;
-  /** 介面語言（en、zh-TW、zh-CN、ja 等）；沒給 lang 時當作語言標記。元件本身沒有內建字串 */
+  /** UI language (en, zh-TW, zh-CN, ja and so on). Used as the language tag when lang is not given. The component has no built-in strings */
   locale?: string;
   className?: string;
 }
 
-// 中日韓文字與全形標點各自成為一個 token
+// CJK characters and full-width punctuation each become one token
 const CJK = "\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Hangul}\\u3000-\\u303F\\uFF00-\\uFFEF\\u2018-\\u201F\\u2026";
 const AUTO_RE = new RegExp(`[${CJK}]|\\s+|[^\\s${CJK}]+`, "gu");
 const WORD_RE = /\s+|\S+/gu;
@@ -58,12 +58,12 @@ export function ScrollRevealText({
 }: ScrollRevealTextProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  // layoutEffect: false，等父層的 container ref 掛上後才綁定，否則會退回追蹤 window
+  // layoutEffect: false, so it binds only after the parent's container ref is attached, otherwise it falls back to tracking window
   const { scrollYProgress } = useScroll({ target: ref, container, offset, layoutEffect: false });
   const accentKey = accentWords.join("\u0000");
 
   const tokens = useMemo(() => {
-    // 先在原文標出強調字詞的位置，多字的中文詞也能整詞上色
+    // First mark where the emphasized words sit in the source text, so multi-character Chinese words are colored as a whole
     const marked = new Set<number>();
     for (const w of accentKey.split("\u0000")) {
       if (!w) continue;
@@ -75,12 +75,12 @@ export function ScrollRevealText({
     return splitReveal(text, splitBy).map((t) => {
       const start = pos;
       pos += t.length;
-      // 以 token 起點判斷，英文詞後接標點（例如 "ready,"）也能命中
+      // Judged by token start, so an English word followed by punctuation (for example "ready,") still matches
       return { text: t, accent: t.trim() !== "" && marked.has(start) };
     });
   }, [text, splitBy, accentKey]);
 
-  // 只有非空白 token 參與進度分配
+  // Only non-whitespace tokens take part in the progress distribution
   const visibleCount = tokens.filter((t) => t.text.trim()).length || 1;
   let cursor = 0;
 
@@ -126,7 +126,7 @@ function Token({
   className?: string;
   children: string;
 }) {
-  // 文字色由淡轉濃：只調濃度，不掃色、不模糊
+  // Text color goes from pale to strong: only the strength changes, with no hue sweep and no blur
   const opacity = useTransform(progress, range, [dim, 1]);
   return (
     <motion.span className={className} style={{ opacity }}>

@@ -53,10 +53,10 @@ const copy = {
   },
 };
 
-// 每一拍前進一站；走到最後多停兩拍再從頭來
+// Each beat advances one stop; after reaching the end it holds two extra beats, then starts over
 const TICKS = 7;
 
-/** 型錄卡片：訂單追蹤的時間軸自己往前走，線一路畫下去、到站的圓點像蓋章一樣壓下。 */
+/** Catalog card: an order-tracking timeline that advances on its own; the line draws all the way down and the dot at each stop presses down like a stamp. */
 export default function ScrollTimelineCard() {
   const t = useDemoText(copy);
   const [tick, setTick] = useState(2);

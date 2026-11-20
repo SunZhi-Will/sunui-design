@@ -14,32 +14,32 @@ const MAX_PIXEL_RATIO = 2;
 const SETTLE_STEPS = 45;
 const MAX_STEPS_PER_FRAME = 2;
 const STEP_MS = 1000 / 60;
-/** 布先垂好，風才慢慢起來，一出現就要是拉好的簾子。 */
+/** The cloth hangs first and the wind rises slowly; on first appearance it must already be a drawn curtain. */
 const BREEZE_RISE_SECONDS = 2.5;
 const OPEN_FOLLOW = 0.075;
 const OPEN_DAMPING = 0.72;
-/** 布邊要超出畫面，晃動時才不會露出沒有布的縫。 */
+/** The cloth edges extend past the frame so no gap without cloth shows while it sways. */
 const BLEED = 0.14;
 
 export interface ClothCurtainProps {
-  /** single：一整片，往右收。pair：左右兩片，從中間分開。 */
+  /** single: one piece, gathers to the right. pair: two pieces, part from the middle. */
   layout?: "single" | "pair";
-  /** 0 是拉上，1 是完全收到畫面外。 */
+  /** 0 is drawn shut, 1 is fully gathered off screen. */
   open: number;
-  /** 布有多透。整片蓋住畫面的轉場要用 0，後面換場景才不會露餡。 */
+  /** How see-through the cloth is. Use 0 for a transition that covers the whole screen, so the scene change behind it is not revealed. */
   sheer?: number;
   breeze?: number;
-  /** 一陣掀起簾子的強風，0 到 1。 */
+  /** A strong gust that lifts the curtain, 0 to 1. */
   gust?: number;
-  /** 從全關到全開至少要花幾秒。風和手都不該把布瞬間抽走。 */
+  /** Minimum seconds from fully closed to fully open. Neither wind nor hand should snatch the cloth away instantly. */
   openSeconds?: number;
-  /** 手的位置（視窗座標），放開時是 undefined。 */
+  /** Hand position (viewport coordinates), undefined when released. */
   handRef?: MutableRefObject<{ clientX: number; clientY: number } | undefined>;
-  /** 不跑模擬時顯示的靜態簾子：減量動作，或裝置沒有 WebGL。不給就用內建的條紋簾。 */
+  /** Static curtain shown when the simulation does not run: reduced motion, or a device without WebGL. Falls back to the built-in striped curtain. */
   fallback?: ReactNode;
-  /** 不跑模擬。不給時跟著 prefers-reduced-motion。 */
+  /** Skip the simulation. When omitted, follows prefers-reduced-motion. */
   still?: boolean;
-  /** 賽璐璐配色，預設是深酒紅色的厚簾布。 */
+  /** Cel-shaded palette, a thick dark wine-red curtain by default. */
   tones?: ClothTones;
   className?: string;
 }
@@ -54,7 +54,7 @@ function createPanels(layout: "single" | "pair", aspect: number): ClothPanel[] {
   ];
 }
 
-/** 原作減量動作時的靜態簾子：單片用半透明寬條紋，雙片用不透明細條紋，拉開時直接切換。 */
+/** Static curtain for reduced motion: a single piece uses wide translucent stripes, a pair uses thin opaque stripes, and opening switches directly. */
 function StaticCurtain({ layout, open, className }: { layout: "single" | "pair"; open: number; className?: string }) {
   if (layout === "single") {
     return (
@@ -83,7 +83,7 @@ function StaticCurtain({ layout, open, className }: { layout: "single" | "pair";
   );
 }
 
-/** 用 WebGL 算真布的簾子：Verlet 質點網格掛在橫桿上，被風吹、被手撥、拉開時收成皺褶。 */
+/** A real-cloth curtain simulated in WebGL: a Verlet particle grid hung on a rod, blown by wind, pushed by hand, and gathering into folds when opened. */
 export function ClothCurtain({
   layout = "single",
   open,
@@ -163,7 +163,7 @@ export function ClothCurtain({
     layoutToCanvas();
     renderer.draw(panels);
 
-    // 畫面外或分頁在背景時停下模擬，回來時從當下接著算。
+    // Pause the simulation while off screen or the tab is in the background; resume from the current state on return.
     let onScreen = true;
     let frame = 0;
     let last = performance.now();
@@ -203,7 +203,7 @@ export function ClothCurtain({
       document.removeEventListener("visibilitychange", run);
       renderer.dispose();
     };
-    // 模擬只在版型或布料變了才重建；open／breeze／gust 走 liveRef，改變時不重建。
+    // The simulation is rebuilt only when the layout or cloth changes; open/breeze/gust go through liveRef and do not rebuild.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStill, layout, sheer, openSeconds]);
 

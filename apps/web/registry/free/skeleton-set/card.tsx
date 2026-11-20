@@ -19,7 +19,7 @@ const copy = {
   ja: { delivered: "配達済み", replay: "もう一度" },
 };
 
-/** 型錄卡片：骨架列表在資料到達時交叉淡入真實內容，Replay 可重看。 */
+/** Catalog card: skeleton rows cross-fade into the real content when data arrives; Replay watches it again. */
 export default function SkeletonSetCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

@@ -7,13 +7,13 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { SkeletonSet } from "./skeleton-set";
 import { copy, OrderList, picks, ProductPick, TrackingList } from "./demo";
 
-// demo 用到的三種骨架形狀，各一張卡
+// The three skeleton shapes the demo uses, one card each
 export const variants = ["product", "list", "rows"] as const;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative; pick one that animates by itself so the card shows its effect without a hover
 export const featured = "product";
 
-/** 首頁型錄：骨架與真實內容輪流出現，看得到交叉淡入。 */
+/** Home catalog: the skeleton and the real content take turns, so the cross-fade is visible. */
 export default function SkeletonSetVariant({ variant }: { variant: string }) {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

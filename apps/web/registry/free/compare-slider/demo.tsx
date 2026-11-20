@@ -11,8 +11,8 @@ const copy = {
   ja: { sketch: "アップロードされた灯台の鉛筆スケッチ", render: "夕暮れの灯台を彩色した完成画", before: "元画像", after: "完成", caption: "夕暮れの灯台" },
 };
 
-// 示範照片（AI 生成），放在 public/blocks/compare-slider
-// 原圖：使用者上傳的方形鉛筆草稿（比例和成品不同，以 contain 置中）
+// Demo photos (AI-generated), stored in public/blocks/compare-slider
+// Before: a square pencil sketch uploaded by a user (a different ratio from the result, centered with contain)
 function Sketch({ label }: { label: string }) {
   return (
     <img
@@ -24,7 +24,7 @@ function Sketch({ label }: { label: string }) {
   );
 }
 
-// 成品：16:9 的上色結果
+// After: the 16:9 colored result
 function Render({ label }: { label: string }) {
   return (
     <img

@@ -13,11 +13,11 @@ const copy = {
   ja: { title: "Claude はチャットだけじゃない", subtitle: "ハンズオンワークショップ", signIn: "ログインして解除" },
 };
 
-/** 型錄卡片：上鎖的課程卡，按登入鈕看轉圈狀態，一會兒後回到初始狀態。試看上限的覆蓋層留在完整 demo。 */
+/** Catalog card: a locked course card. Press the sign-in button to see the spinner state, which returns to the initial state after a moment. The free-preview-limit overlay stays in the full demo. */
 export default function ContentGateCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
-  // 登入狀態在元件內部，換 key 讓卡片在示範後回到初始狀態
+  // The sign-in state lives inside the component; changing the key resets the card to its initial state after the demo
   const [round, setRound] = useState(0);
 
   return (

@@ -48,7 +48,7 @@ export default function ClothCurtainDemo() {
   return (
     <div className="w-full max-w-xl min-w-0 overflow-hidden rounded-lg border border-white/10 bg-[#0b0d13] text-[#e8e4f0]">
       <div className="relative aspect-[16/10] w-full overflow-hidden">
-        {/* 簾子後面：月光下的窗景，用漸層代替插畫 */}
+        {/* Behind the curtain: a moonlit window view, using a gradient in place of an illustration */}
         <div
           className="absolute inset-0"
           style={{ background: "radial-gradient(ellipse at 50% 30%, #2a3040 0%, #0b0d13 80%)" }}

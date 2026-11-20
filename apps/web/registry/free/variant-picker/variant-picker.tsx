@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 
 export interface VariantColor {
   id: string;
-  /** 顏色名稱，同時作為色票的 aria-label */
+  /** Color name, also used as the swatch aria-label */
   name: string;
-  /** 色票填色，例如 "#d0d0d0" */
+  /** Swatch fill, e.g. "#d0d0d0" */
   swatch: string;
 }
 
@@ -25,7 +25,7 @@ export interface VariantValue {
   size?: string;
 }
 
-/** onChange 的第二個參數：選中的組合現在買不買得到 */
+/** Second argument of onChange: whether the selected combination can currently be bought */
 export interface VariantChangeInfo {
   available: boolean;
 }
@@ -37,52 +37,52 @@ export interface VariantPickerLabels {
   inStock?: ReactNode;
   lowStock?: (n: number) => ReactNode;
   pickSize?: ReactNode;
-  /** 售完選項的無障礙名稱 */
+  /** Accessible name of a sold-out option */
   soldOutItem?: (name: string) => string;
-  /** 有 onNotify 時售完選項的無障礙名稱 */
+  /** Accessible name of a sold-out option when onNotify is set */
   soldOutNotify?: (name: string) => string;
-  /** 「白色的 M 已售完」 */
+  /** "White M is sold out" */
   soldOutIn?: (size: string, color: string) => string;
-  /** 「M 還有：」，後面接可切換的顏色 */
+  /** "M is still available in:", followed by colors that can be switched to */
   availableIn?: (size: string) => string;
-  /** 到貨通知按鈕 */
+  /** Restock notice button */
   notify?: (size: string) => string;
-  /** 登記到貨通知之後的結果 */
+  /** Result after signing up for a restock notice */
   notified?: string;
 }
 
 export interface VariantPickerProps {
   colors: VariantColor[];
   sizes: VariantSize[];
-  /** 每個組合的庫存，key 為 `${colorId}:${sizeId}`；沒列到視為售完 */
+  /** Stock for each combination, keyed by `${colorId}:${sizeId}`; combinations not listed count as sold out */
   stock: Record<string, number>;
   value?: VariantValue;
   defaultValue?: VariantValue;
-  /** 換顏色時尺寸會保留，即使在新顏色售完；用第二個參數的 available 決定能不能加入購物車 */
+  /** The size is kept when the color changes, even if it is sold out in the new color; use the second argument's available to decide whether it can be added to the cart */
   onChange?: (value: VariantValue, info: VariantChangeInfo) => void;
-  /** 傳入時，售完的尺寸可以點，在原位展開「到貨通知我」 */
+  /** When set, sold-out sizes are clickable and expand a "notify me" form in place */
   onNotify?: (value: { color: string; size: string }) => void;
-  /** 底部顯示「霧灰 · M · 只剩 2 件」，只有改到的那段會滾動 */
+  /** Shows "Mist grey · M · only 2 left" at the bottom; only the segment that changed scrolls */
   showSummary?: boolean;
-  /** 庫存小於等於此數字時顯示「剩 N 件」 */
+  /** Show "N left" when stock is at or below this number */
   lowStockAt?: number;
-  /** 尺寸列樣式：stamp 是表面格子加售完小字；chips 是文字膠囊，一個文字色外框滑動、售完劃線 */
+  /** Size row style: stamp is a surface grid with small sold-out text; chips are text capsules with one text-colored outline that slides and a strikethrough for sold out */
   sizeStyle?: "stamp" | "chips";
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: VariantPickerLabels;
   className?: string;
 }
 
 export interface OptionChipsLabels {
-  /** 沒有傳 aria-label 時整組的名稱 */
+  /** Name of the whole group when no aria-label is passed */
   group: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -137,17 +137,17 @@ const MESSAGES: Record<SunLocale, Required<VariantPickerLabels> & OptionChipsLab
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色，全部是中性灰
+// Design language (DESIGN.md, craft quality): surface, hairline and text colors, all neutral greys
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand color. Used only for selection, offers and current progress */
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
-// 預覽庫存時只動不透明度與刪除線顏色，不換版面
+// Previewing stock changes only opacity and strikethrough color, never the layout
 const fade = "transition-[color,opacity,translate,text-decoration-color] duration-150 motion-reduce:transition-none";
 
-/** 只在滑鼠這類精準指標上懸停預覽；觸控的 pointerenter 不算 */
+/** Hover preview only on precise pointers such as a mouse; touch pointerenter does not count */
 const finePointer = (e: { pointerType?: string }) =>
   e.pointerType !== "touch" && typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches;
 
@@ -167,7 +167,7 @@ export function VariantPicker({
   className,
 }: VariantPickerProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
-  // 只覆寫 soldOut 時，無障礙名稱沿用舊格式「名稱, soldOut」
+  // When only soldOut is overridden, the accessible name keeps the old "name, soldOut" format
   const soldOutItem = labels?.soldOutItem ?? (labels?.soldOut ? (n: string) => `${n}, ${labels.soldOut}` : t.soldOutItem);
   const reduce = !!useReducedMotion();
   const [inner, setInner] = useState<VariantValue>(defaultValue ?? { color: colors[0]?.id });
@@ -180,7 +180,7 @@ export function VariantPicker({
   const colorSoldOut = (c: string) => sizes.every((s) => qty(c, s.id) <= 0);
   const nameOf = (id?: string) => colors.find((c) => c.id === id)?.name ?? "";
   const labelOf = (id?: string) => sizes.find((s) => s.id === id)?.label ?? "";
-  // 尺寸列顯示的庫存：懸停或聚焦某個顏色時先看那個顏色的
+  // Stock shown in the size row: while a color is hovered or focused, show that color's stock first
   const shown = peek ?? current.color;
   const left = qty(current.color, current.size);
   const kept = !!current.size && left <= 0;
@@ -190,7 +190,7 @@ export function VariantPicker({
     onChange?.(next, { available: qty(next.color, next.size) > 0 });
   }
 
-  // 換顏色時保留尺寸：在新顏色售完就標示出來，並列出還有這個尺寸的顏色，不默默清掉
+  // Keep the size when the color changes: mark it if it is sold out in the new color and list the colors that still have it, rather than clearing it silently
   const pickColor = (id: string) => commit({ color: id, size: current.size });
   const pickSize = (id: string) => {
     setNotifyFor(undefined);
@@ -198,7 +198,7 @@ export function VariantPicker({
   };
   const pressSoldOut = (id: string) => onNotify && setNotifyFor((f) => (f === id ? undefined : id));
 
-  // 提示行：點過的售完尺寸優先，其次是換顏色後保留下來的尺寸
+  // Hint line: a sold-out size the user clicked comes first, then a size kept after a color change
   const noteSize = (notifyFor && qty(current.color, notifyFor) <= 0 ? notifyFor : undefined) ?? (kept ? current.size : undefined);
   const note = noteSize && current.color ? { size: noteSize, color: current.color } : undefined;
   const sizeName = (id: string, off: boolean) => (!off ? labelOf(id) : onNotify ? t.soldOutNotify(labelOf(id)) : soldOutItem(labelOf(id)));
@@ -262,7 +262,7 @@ export function VariantPicker({
               className: cn(
                 "relative h-10 overflow-hidden rounded-md border text-sm font-medium tabular-nums",
                 surface,
-                // 選中但這個顏色售完：外框改虛線，選擇還在
+                // Selected but sold out in this color: the outline turns dashed, the selection stays
                 on ? cn(spotBorder, off && "border-dashed") : edge,
               ),
               children: (
@@ -276,7 +276,7 @@ export function VariantPicker({
                   >
                     {labelOf(id)}
                   </span>
-                  {/* 售完：淡色字小字放在尺寸下方，不蓋住尺寸名稱；一直在版面裡，只淡入淡出 */}
+                  {/* Sold out: small pale text below the size so it does not cover the size name; always in the layout, it only fades in and out */}
                   <span
                     aria-hidden="true"
                     className={cn("absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] leading-[10px] whitespace-nowrap", inkMuted, fade, !off && "opacity-0")}
@@ -354,11 +354,11 @@ export function VariantPicker({
   );
 }
 
-/** 高度跟著內容走（gentle 彈簧），下方內容一起滑動；收起時保留最後的內容直到高度歸零 */
+/** Height follows the content (gentle spring) and content below slides along; when collapsing, the last content stays until the height reaches zero */
 function Expand({ open, reduce, children }: { open: boolean; reduce: boolean; children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const last = useRef<ReactNode>(null);
-  // 量到高度之前用 auto：一開始就展開時（例如靜態卡片）不會從 0 長出來
+  // Use auto until the height is measured: when open from the start (e.g. a static card) it does not grow from 0
   const [h, setH] = useState<number | null>(null);
   if (open) last.current = children;
   useLayoutEffect(() => {
@@ -389,7 +389,7 @@ interface SoldOutNoteProps {
   done: boolean;
 }
 
-/** 售完提示：哪個顏色還有這個尺寸（一鍵切過去），以及到貨通知；結果放在原本按鈕的位置 */
+/** Sold-out hint: which colors still have this size (one click to switch) and the restock notice; the result takes the place of the original button */
 function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: SoldOutNoteProps) {
   return (
     <div className={cn("mt-3 space-y-2 rounded-xl border p-3 text-sm", surface, edge)}>
@@ -443,7 +443,7 @@ function SoldOutNote({ text, alternatives, onAlternative, onNotify, done }: Sold
   );
 }
 
-/** 摘要的一段：值改變時舊值往上離開、新值從下面進來；沒變的段落不動 */
+/** One segment of the summary: when the value changes the old one leaves upward and the new one enters from below; unchanged segments stay still */
 function Roll({ k, reduce, className, children }: { k: string; reduce: boolean; className?: string; children: ReactNode }) {
   if (reduce) return <span className={className}>{children}</span>;
   return (
@@ -458,12 +458,12 @@ function Roll({ k, reduce, className, children }: { k: string; reduce: boolean; 
 }
 
 interface RadioRowProps {
-  /** focusable：停用但仍可聚焦、可點（售完但能登記到貨通知） */
+  /** focusable: disabled but still focusable and clickable (sold out but can sign up for a restock notice) */
   items: { id: string; disabled: boolean; focusable?: boolean }[];
   selected?: string;
   onSelect: (id: string) => void;
   onPressDisabled?: (id: string) => void;
-  /** 懸停或聚焦某一項時回報它，離開時回報 undefined */
+  /** Reports an item on hover or focus, and undefined on leave */
   onPeek?: (id: string | undefined) => void;
   render: (id: string, on: boolean, disabled: boolean) => { label: string; className: string; children: ReactNode };
   reduceMotion: boolean;
@@ -471,10 +471,10 @@ interface RadioRowProps {
   className?: string;
 }
 
-// 方向鍵移動焦點並同時選取（radio 的標準行為），Home／End 到頭尾，跳過停用項
+// Arrow keys move focus and select at the same time (standard radio behavior), Home/End jump to the ends, disabled items are skipped
 const keyMap: Record<string, 1 | -1 | "first" | "last"> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: "first", End: "last", };
 
-/** 兩種選項列共用的 roving focus：skip 為 true 的項目不會被聚焦；onMove 由呼叫端決定要不要選取 */
+/** Roving focus shared by both option rows: items with skip set to true are not focused; the caller decides in onMove whether to select */
 function useRovingRadio(skip: boolean[], onMove: (index: number) => void) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const onKeyDown = (e: KeyboardEvent, from: number) => {
@@ -499,10 +499,10 @@ function useRovingRadio(skip: boolean[], onMove: (index: number) => void) {
   return { setRef, onKeyDown };
 }
 
-/** radiogroup：方向鍵在可選項目間移動並選取，售完項目略過但仍會被朗讀 */
+/** radiogroup: arrow keys move between selectable items and select them; sold-out items are skipped but still announced */
 function RadioRow({ items, selected, onSelect, onPressDisabled, onPeek, render, reduceMotion, label, className }: RadioRowProps) {
   const skip = items.map((it) => it.disabled && !it.focusable);
-  // 移到售完但可聚焦的項目只移焦點，不選取
+  // Moving to a sold-out but focusable item only moves focus, it does not select
   const roving = useRovingRadio(skip, (i) => !items[i].disabled && onSelect(items[i].id));
   const sel = items.findIndex((it, i) => it.id === selected && !skip[i]);
   const tabStop = sel >= 0 ? sel : items.findIndex((it) => !it.disabled);
@@ -545,39 +545,39 @@ function RadioRow({ items, selected, onSelect, onPressDisabled, onPeek, render, 
   );
 }
 
-/* ───────── OptionChips（原 segmented-control）：文字膠囊，一個文字色外框在選項間滑動 ───────── */
+/* ───────── OptionChips (formerly segmented-control): text capsules, one text-colored outline slides between options ───────── */
 
 export interface OptionChip<T extends string = string> {
   value: T;
   label: ReactNode;
-  /** 顯示在文字前的圖示，例如顏色色票 */
+  /** Icon shown before the text, e.g. a color swatch */
   icon?: ReactNode;
-  /** 只顯示圖示時，提供給螢幕閱讀器的名稱 */
+  /** Name for screen readers when only the icon is shown */
   ariaLabel?: string;
-  /** 停用（例如售完），文字會劃線 */
+  /** Disabled (e.g. sold out); the text is struck through */
   disabled?: boolean;
 }
 
 export interface OptionChipsProps<T extends string = string> {
   options: OptionChip<T>[];
-  /** 受控值；傳 null 表示受控且目前沒有選取 */
+  /** Controlled value; pass null for controlled with nothing selected */
   value?: T | null;
-  /** 非受控時的初始值，預設為第一個可用選項 */
+  /** Initial value when uncontrolled, defaults to the first available option */
   defaultValue?: T;
   onValueChange?: (value: T) => void;
-  /** 傳入時，停用的選項仍可聚焦與點擊（不會被選取），例如售完時展開到貨通知 */
+  /** When set, disabled options stay focusable and clickable (they are not selected), e.g. to expand a restock notice when sold out */
   onDisabledPress?: (value: T) => void;
   size?: "sm" | "md" | "lg";
-  /** 撐滿父層寬度，各選項等寬 */
+  /** Fill the parent's width, with options of equal width */
   fullWidth?: boolean;
-  /** 只顯示圖示，文字改為 aria-label */
+  /** Show the icon only; the text becomes the aria-label */
   iconOnly?: boolean;
-  /** 整組的無障礙名稱 */
+  /** Accessible name of the whole group */
   "aria-label"?: string;
   disabled?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: Partial<OptionChipsLabels>;
   className?: string;
 }
@@ -621,7 +621,7 @@ export function OptionChips<T extends string = string>({
     (i) => !options[i].disabled && select(options[i].value),
   );
 
-  // 沒有任何選取時，讓第一個可用項可被 Tab 聚焦
+  // With nothing selected, make the first available item reachable with Tab
   const tabStop = options.some((o) => o.value === selected && !o.disabled) ? selected : firstEnabled;
 
   return (
@@ -641,7 +641,7 @@ export function OptionChips<T extends string = string>({
         {options.map((o, i) => {
           const active = o.value === selected;
           const off = disabled || !!o.disabled;
-          // 有 onDisabledPress 時停用項用 aria-disabled，才能聚焦與點擊
+          // With onDisabledPress, disabled items use aria-disabled so they can still be focused and clicked
           const soft = !disabled && !!o.disabled && !!onDisabledPress;
           return (
             <button
@@ -668,7 +668,7 @@ export function OptionChips<T extends string = string>({
                   : cn("decoration-transparent", active ? "text-current" : "text-current/70 hover:border-current/40 hover:text-current"),
               )}
             >
-              {/* 唯一一個選取外框，在選項之間滑動；選中的項目售完時改成虛線 */}
+              {/* The single selection outline, sliding between options; it turns dashed when the selected item is sold out */}
               {active && (
                 <motion.span
                   layoutId="variant-outline"
@@ -691,7 +691,7 @@ export function OptionChips<T extends string = string>({
   );
 }
 
-/** 舊 segmented-control 的名稱，與 OptionChips 相同 */
+/** Name of the old segmented-control, same as OptionChips */
 export const SegmentedControl = OptionChips;
 export type SegmentedOption<T extends string = string> = OptionChip<T>;
 export type SegmentedControlProps<T extends string = string> = OptionChipsProps<T>;

@@ -12,7 +12,7 @@ const copy = {
   ja: { offer: "初回注文がさらに 20% オフ：", caption: "20% オフ" },
 };
 
-/** 型錄卡片：一件商品配一張折扣碼，點一下看複製後蓋章的那一下。 */
+/** Catalog card: one product with one discount code; click to see the stamp land after copying. */
 export default function CopyCodeButtonCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

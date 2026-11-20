@@ -66,7 +66,7 @@ const copy = {
   },
 };
 
-/** 單一點雲形狀的示範格：首頁型錄（variants.tsx）用，形狀名稱沿用 demo 的文案 */
+/** Demo cell for a single point-cloud shape: used by the home catalog (variants.tsx); shape names reuse the demo's copy */
 export function PointCloudTile({ shape }: { shape: PointCloudShape }) {
   const t = useDemoText(copy);
   const feature = t.features.find((f) => f.shape === shape);

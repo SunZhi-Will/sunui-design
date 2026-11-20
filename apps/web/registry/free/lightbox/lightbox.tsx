@@ -15,23 +15,23 @@ export interface LightboxImage {
   id: string;
   src: string;
   alt: string;
-  /** 大圖下方的說明 */
+  /** Caption below the large image */
   caption?: ReactNode;
-  /** 縮圖可用較小的檔案；不給時用 src */
+  /** The thumbnail can use a smaller file; when omitted, src is used */
   thumbSrc?: string;
 }
 
 export interface LightboxProps {
   images: LightboxImage[];
-  /** 縮圖格線的 class，例如 "grid-cols-3 gap-2" */
+  /** Class for the thumbnail grid, e.g. "grid-cols-3 gap-2" */
   gridClassName?: string;
-  /** 自訂縮圖；需把 image 畫在一個會被放大的元素裡 */
+  /** Custom thumbnail; draw the image inside an element that will be enlarged */
   renderThumb?: (image: LightboxImage, index: number) => ReactNode;
-  /** 縮圖的長寬比 */
+  /** Aspect ratio of the thumbnail */
   aspect?: string;
-  /** fixed：蓋住整個視窗；contained：只蓋住最近的 relative 容器 */
+  /** fixed: covers the whole window; contained: covers only the nearest relative container */
   position?: "fixed" | "contained";
-  /** 受控：目前打開第幾張；null 表示關閉 */
+  /** Controlled: which image is open; null means closed */
   index?: number | null;
   onIndexChange?: (index: number | null) => void;
   labels?: { close?: string; previous?: string; next?: string; open?: (alt: string) => string };
@@ -140,7 +140,7 @@ export function Lightbox({
             </button>
           </div>
           <div className="pointer-events-none relative flex min-h-0 flex-1 items-center justify-center px-12 sm:px-16">
-            {/* 換張時舊圖縮回自己的縮圖、新圖從它的縮圖長出來，位置關係一直是清楚的 */}
+            {/* When switching, the old image shrinks back into its own thumbnail and the new one grows from its thumbnail, so the spatial relationship always stays clear */}
             <AnimatePresence initial={false} mode="popLayout">
               <motion.img
                 key={current.id}

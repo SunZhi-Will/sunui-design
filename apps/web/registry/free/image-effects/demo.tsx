@@ -6,14 +6,14 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { ImageEffect, Lightbox, SliceSlideshow, imageEffects, type ImageEffectName, type ImageItem } from "./image-effects";
 
-// 示範照片（AI 生成），放在 public/blocks/image-effects，順序對應 copy.alts
+// Demo photos (AI generated) in public/blocks/image-effects, in the same order as copy.alts
 const photos = ["lagoon", "desert", "fjord", "valley", "canyon", "peaks"];
 
 export function demoArt(i: number) {
   return `/blocks/image-effects/${photos[i % photos.length]}.webp`;
 }
 
-/** hover-zoom 那格配的照片，和 copy.caption（黃昏的港口）一致 */
+/** Photo for the hover-zoom tile, matches copy.caption (harbor at dusk) */
 export const harborArt = "/blocks/image-effects/harbor.webp";
 
 export const copy = {

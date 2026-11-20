@@ -35,7 +35,7 @@ const copy = {
 
 const HOUR = 3_600_000;
 
-/** 每週三 20:00（GMT+8）的直播：回傳這一場或下一場的開始時間 */
+/** Livestream every Wednesday 20:00 (GMT+8): returns the start time of this session or the next one */
 function nextStream() {
   const d = new Date();
   d.setUTCHours(12, 0, 0, 0);
@@ -47,7 +47,7 @@ function nextStream() {
 export default function CountdownBannerDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
-  // 結束時間在初始化時算一次，不在 render 中呼叫 Date.now()
+  // The end time is computed once at init, so Date.now() is not called during render
   const [dates] = useState(() => ({
     days: new Date(Date.now() + 3 * 86_400_000 + 5 * 3_600_000 + 12 * 60_000),
     hours: new Date(Date.now() + 4 * 3_600_000 + 26 * 60_000),
@@ -68,7 +68,7 @@ export default function CountdownBannerDemo() {
         ctaHref="#"
         endDate={dates.days}
       />
-      {/* 倒數到直播開始；伺服器只印固定的場次文字，不印會跳動的數字 */}
+      {/* Counts down to the livestream start; the server prints only the fixed session text, not the ticking digits */}
       <CountdownBanner
         locale={locale}
         title={t.live.title}

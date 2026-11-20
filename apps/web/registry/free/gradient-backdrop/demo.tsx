@@ -94,7 +94,7 @@ const copy = {
 
 const paletteNames = Object.keys(gradientPalettes) as GradientPalette[];
 
-/** 單一漸層樣式的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** Demo cell for a single gradient style: shared by the full demo and the home catalog (variants.tsx) */
 export function GradientPresetTile({ preset, palette }: { preset: GradientPreset; palette?: GradientPalette }) {
   const t = useDemoText(copy);
   return (

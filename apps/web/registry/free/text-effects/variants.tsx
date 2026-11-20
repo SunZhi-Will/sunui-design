@@ -8,10 +8,10 @@ import { copy, sampleFor } from "./demo";
 
 export const variants = textEffects;
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative; pick one that moves by itself, so a card needs no hover to show the effect
 export const featured = "gradient-flow";
 
-/** 首頁型錄：一種文字效果一張卡。用 loop 觸發，進場類效果會在畫面內定期重播 */
+/** Home catalog: one card per text effect. Uses the loop trigger, so entrance effects replay periodically while in view */
 export default function TextEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const effect = variant as TextEffectName;

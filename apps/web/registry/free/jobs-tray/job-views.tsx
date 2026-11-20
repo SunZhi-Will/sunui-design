@@ -18,12 +18,12 @@ import {
   type JobTileLabels,
 } from "./jobs-tray";
 
-// 同一個 Job 的三種版面：控制台單行 JobRow、進度頁側欄 JobPanel、網格格子 JobTile，加上狀態點 JobStatusDot。
-// 型別、進度百分比、狀態文字與四語字串都來自 ./jobs-tray。
+// Three layouts of the same Job: console single row JobRow, progress page sidebar JobPanel and grid tile JobTile, plus the status dot JobStatusDot.
+// The type, progress percentage, status text and four-language strings all come from ./jobs-tray.
 
-/* ───────────── 共用外觀 ───────────── */
+/* ───────────── Shared look ───────────── */
 
-// 原專案（Yumecanvas / Vozmira）共用的 zinc 色票，亮暗兩套
+// zinc palette shared by the original projects (Yumecanvas / Vozmira), light and dark
 const tokens =
   "[--yc-bg:#FAFAFA] [--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-input:#D4D4D8] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-ring:#71717A] [--yc-success:#15803D] [--yc-warning:#B45309] [--yc-destructive:#DC2626] " +
   "dark:[--yc-bg:#09090B] dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-input:rgba(255,255,255,0.12)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-ring:#A1A1AA] dark:[--yc-success:#4ADE80] dark:[--yc-warning:#FBBF24] dark:[--yc-destructive:#F87171]";
@@ -113,7 +113,7 @@ function Spinner({ className }: { className?: string }) {
   return <Icon d={P.loader} className={cn(!reduce && "animate-spin", className)} />;
 }
 
-/** 對應原本 shadcn Progress：h-1 灰底，指示條以 translateX 推進 */
+/** Equivalent to the original shadcn Progress: h-1 grey track, the indicator advances with translateX */
 function ProgressBar({ value, label, className }: { value: number; label: string; className?: string }) {
   return (
     <div
@@ -135,7 +135,7 @@ function ProgressBar({ value, label, className }: { value: number; label: string
 type Kind = "cancel" | "rerun" | "delete";
 type Action = (() => void | Promise<unknown>) | undefined;
 
-/** 對應原本的 useJobActions：記住哪個動作進行中，失敗時顯示錯誤，4 秒後收掉 */
+/** Equivalent to the original useJobActions: remembers which action is running, shows the error on failure and clears it after 4 seconds */
 function useActions(fail: string) {
   const [pending, setPending] = useState<Kind | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -167,7 +167,7 @@ const WAITING = "bg-[var(--yc-muted-fg)]";
 
 export type JobRowState = "running" | "waiting" | "completed" | "failed";
 
-/** Job 對應到狀態點：排隊與取消是灰點，生成中閃爍，完成綠點，失敗紅點 */
+/** Maps a Job to a status dot: queued and canceled are grey, generating pulses, done is green, failed is red */
 export function jobDotState(job: Pick<Job, "status">): JobRowState {
   if (job.status === "queued" || job.status === "canceled") return "waiting";
   if (isActive(job)) return "running";
@@ -175,7 +175,7 @@ export function jobDotState(job: Pick<Job, "status">): JobRowState {
   return "failed";
 }
 
-/** 點加文字的狀態，不用實心徽章：失敗是紅點，進行中是閃爍的墨點，等待是灰點 */
+/** Dot plus text status, no solid badge: failed is a red dot, running is a pulsing ink dot, waiting is a grey dot */
 export function JobStatusDot({ state, children, className }: { state: JobRowState; children: ReactNode; className?: string }) {
   const failed = state === "failed";
   const dot = state === "completed" ? "bg-[var(--yc-success)]" : failed ? "bg-[var(--yc-destructive)]" : state === "running" ? RUNNING : WAITING;
@@ -190,26 +190,26 @@ export function JobStatusDot({ state, children, className }: { state: JobRowStat
 /* ───────────── JobRow ───────────── */
 
 export interface JobRowProps {
-  /** 傳入 Job 時，title、progress、label、failed 沒給就從 Job 推出來 */
+  /** When a Job is passed, title, progress, label and failed are derived from it if not given */
   job?: Job;
   title?: string;
-  /** 來源類型，例如網址或文字 */
+  /** Source type, for example a URL or text */
   source?: { kind: "url" | "text"; label: string };
-  /** 0 到 100 */
+  /** 0 to 100 */
   progress?: number;
-  /** 進度旁的狀態文字 */
+  /** Status text next to the progress */
   label?: string;
   failed?: boolean;
   href?: string;
   onClick?: () => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale；也接受狀態文字（用在 job 推出的 label） */
+  /** Overrides built-in strings, takes precedence over locale; also accepts status text (used for the label derived from a job) */
   labels?: JobRowLabels & Omit<JobStatusLabels, "progress">;
   className?: string;
 }
 
-/** 控制台裡的單行進度列：刻意不是卡片，讀起來是「進行中、需要留意的工作」 */
+/** A single progress row in the console: deliberately not a card, so it reads as "work in progress that needs attention" */
 export function JobRow({ job, title, source, progress, label, failed, href, onClick, locale = "en", labels, className }: JobRowProps) {
   const t = { ...jobMessages(locale).row, ...labels };
   const isFailed = failed ?? (job ? job.status === "error" || job.status === "blocked" : false);
@@ -302,22 +302,22 @@ const btnGhost = "text-[var(--yc-muted-fg)] hover:bg-[var(--yc-muted)] hover:tex
 
 export interface JobPanelProps {
   job: Job;
-  /** 取消；回傳的 Promise 失敗會顯示錯誤 */
+  /** Cancel; if the returned Promise rejects, the error is shown */
   onCancel?: () => void | Promise<unknown>;
-  /** 帶著原本的描述回到輸入框 */
+  /** Return to the input with the original prompt */
   onEdit?: () => void;
   onRerun?: () => void | Promise<unknown>;
   onRemove?: () => void | Promise<unknown>;
-  /** 放在步驟與操作之間的內容，例如描述、AI 改寫結果 */
+  /** Content between the steps and the actions, for example the prompt or an AI rewrite */
   children?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: JobPanelLabels;
   className?: string;
 }
 
-/** 進度頁的側欄：狀態標題、進度條與具名步驟、錯誤說明、取消或重試 */
+/** Progress page sidebar: status title, progress bar with named steps, error explanation, cancel or retry */
 export function JobPanel({ job, onCancel, onEdit, onRerun, onRemove, children, locale = "en", labels, className }: JobPanelProps) {
   const m = jobMessages(locale);
   const t = { ...m.status, ...m.panel, ...labels };
@@ -429,7 +429,7 @@ export function JobPanel({ job, onCancel, onEdit, onRerun, onRemove, children, l
 
 /* ───────────── JobTile ───────────── */
 
-// 原本 globals.css 的 shimmer、shimmer-over、gen-preview
+// From the original globals.css: shimmer, shimmer-over, gen-preview
 const css = `
 @keyframes jt-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .jt-shimmer { background: linear-gradient(100deg, var(--yc-muted) 30%, color-mix(in oklab, var(--yc-muted), var(--yc-fg) 6%) 50%, var(--yc-muted) 70%); background-size: 200% 100%; animation: jt-shimmer 1.8s linear infinite; }
@@ -442,7 +442,7 @@ function Styles() {
   return <style href="sunui-jobs-tray-tile" precedence="default">{css}</style>;
 }
 
-/** 生成中、還沒有即時預覽時，用參考圖當底圖並疊上掃光 */
+/** While generating with no live preview yet, uses the reference image as the base and overlays a sweeping shine */
 function SourceUnderlay({ src }: { src: string }) {
   return (
     <>
@@ -466,18 +466,18 @@ function SourceChip({ src, label }: { src: string; label: string }) {
 
 export interface JobTileProps {
   job: Job;
-  /** 點格子到進度頁 */
+  /** Click a tile to open the progress page */
   onOpen?: () => void;
   onCancel?: () => void | Promise<unknown>;
   onRemove?: () => void | Promise<unknown>;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: JobTileLabels;
   className?: string;
 }
 
-/** 網格裡的格子：生成中、失敗或等待複查的一次生成，點一下到進度頁 */
+/** A tile in the grid: one generation that is running, failed or awaiting review; click to open the progress page */
 export function JobTile({ job, onOpen, onCancel, onRemove, locale = "en", labels, className }: JobTileProps) {
   const m = jobMessages(locale);
   const t = { ...m.status, ...m.tile, ...labels };

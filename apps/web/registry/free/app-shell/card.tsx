@@ -14,7 +14,7 @@ const listCopy = {
   ja: { rows: ["早番 07:00", "中番 11:00", "遅番 16:00"] },
 };
 
-/** 型錄卡片：手機寬度的外殼，點底部分頁切頁，點「更多」拉出所有頁面的抽屜。 */
+/** Catalog card: a phone-width shell; tap a bottom tab to switch pages, tap "More" to pull up a drawer with all pages. */
 export default function AppShellCard() {
   const locale = useDemoLocale();
   const t = useDemoText(shellCopy);

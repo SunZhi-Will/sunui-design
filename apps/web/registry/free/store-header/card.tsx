@@ -15,7 +15,7 @@ const copy = {
 
 const hrefs = ["#new", "#knitwear", "#home", "#sale"];
 
-/** 型錄卡片：手機寬的小店頁面，往下捲頁首收起、往上捲回來，點選單鈕展開分類，按「加入」購物車數字會跳。 */
+/** Catalog card: a phone-width small shop page. Scrolling down hides the header, scrolling up brings it back, the menu button expands the categories, and pressing "Add" makes the cart count bounce. */
 export default function StoreHeaderCard() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const locale = useDemoLocale();

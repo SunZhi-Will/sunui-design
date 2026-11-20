@@ -53,7 +53,7 @@ export const copy = {
   },
 };
 
-/** 預覽卡用的 inline SVG 插圖，不依賴外部圖片 */
+/** Inline SVG illustration for the preview card, with no external images */
 function Art({ variant }: { variant: number }) {
   const shapes = [
     <circle key="a" cx="60" cy="42" r="22" />,
@@ -81,7 +81,7 @@ function Tile({ name, children }: { name: CursorEffectName; children: ReactNode 
   );
 }
 
-/** 單一效果的互動區，示範頁與首頁型錄的單張卡共用 */
+/** Interaction area for a single effect, shared by the demo page and the home catalog card */
 export function CursorEffectArea({ effect }: { effect: CursorEffectName }) {
   const t = useDemoText(copy);
   const area = "flex h-52 flex-col items-center justify-center gap-3 rounded-md bg-muted/40 p-4 text-center text-sm text-muted-foreground";

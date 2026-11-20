@@ -40,7 +40,7 @@ export default function StatusDotDemo() {
   const label = useDemoText(statusText);
   const [now] = useState(() => Date.now());
   const ref = useRef<HTMLDivElement>(null);
-  // 資料自己更新：倉庫把 #1043 交給物流，接著 #1044 付款進來開始處理
+  // Data updates by itself: the warehouse hands #1043 to the carrier, then #1044 is paid and starts processing
   const [moves, setMoves] = useState<Record<string, { state: State; at: number }>>({});
   const cursor = useDemoAutoplay(ref, async (d) => {
     await d.wait(1600);

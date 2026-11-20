@@ -13,7 +13,7 @@ const copy = {
 
 const weekly = [32, 48, 41, 66, 58, 79, 72];
 
-/** 型錄卡片：長條長高、迷你折線與數字計數。 */
+/** Catalog card: bars growing, a mini line chart and a number counting up. */
 export default function ChartEffectsCard() {
   const t = useDemoText(copy);
   const data: ChartDatum[] = weekly.map((value, i) => ({ label: t.days[i] ?? "", value }));

@@ -9,19 +9,19 @@ import { cn } from "@/lib/utils";
 export type StockLevel = "in-stock" | "low" | "critical" | "sold-out";
 
 export interface LowStockIndicatorProps {
-  /** 真實庫存數量；元件只呈現資料，不會自行倒數 */
+  /** Real stock count; the component only presents data and never counts down by itself */
   stock: number;
-  /** 量表滿格代表的數量，通常是補貨量；24 以內逐格印出 */
+  /** Quantity a full gauge represents, usually the restock amount; up to 24 it prints one cell per unit */
   capacity?: number;
-  /** 庫存小於等於此值時進入 low */
+  /** Enters the low state when stock is at or below this value */
   lowAt?: number;
-  /** 庫存小於等於此值時進入 critical（朱紅） */
+  /** Enters the critical state (vermilion) when stock is at or below this value */
   criticalAt?: number;
-  /** 資料更新時間，例如 "Updated 2 min ago"，讓緊迫感有根據 */
+  /** When the data was last updated, for example "Updated 2 min ago", so the urgency has a basis */
   updatedLabel?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: Partial<LowStockIndicatorLabels>;
   className?: string;
 }
@@ -31,13 +31,13 @@ export interface LowStockIndicatorLabels {
   low: (n: number) => ReactNode;
   critical: (n: number) => ReactNode;
   soldOut: ReactNode;
-  /** 量表的無障礙名稱 */
+  /** Accessible name of the gauge */
   meter: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -124,10 +124,10 @@ const MESSAGES: Record<SunLocale, LowStockIndicatorLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md）：邊線、墨、品牌專色
+// Design language (DESIGN.md): border, ink, brand accent
 const edge = "border-foreground/10";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
@@ -163,7 +163,7 @@ export function LowStockIndicator({
   const ratio = capacity > 0 ? Math.min(safeStock / capacity, 1) : 0;
   const slips = capacity > 0 && capacity <= MAX_SLIPS ? Math.floor(capacity) : 0;
 
-  // 數量下降時從上方翻入，補貨時從下方翻入；在同一次 render 推導方向
+  // The digit flips in from above when the count drops and from below on restock; the direction is derived during the same render
   const [prevStock, setPrevStock] = useState(safeStock);
   const [dir, setDir] = useState<1 | -1>(-1);
   if (safeStock !== prevStock) {
@@ -171,7 +171,7 @@ export function LowStockIndicator({
     setDir(safeStock < prevStock ? -1 : 1);
   }
 
-  // 一開始就售完時直接印好；賣到售完那一刻才蓋章
+  // If it starts sold out, the stamp is already printed; it only lands at the moment stock sells out
   const wasSoldOut = useRef(level === "sold-out");
   const [stampLive, setStampLive] = useState(false);
   useEffect(() => {
@@ -210,7 +210,7 @@ export function LowStockIndicator({
           className={cn(critical && spot)}
         >
           {slips > 0 ? (
-            // 每格一件，像撕剩的票根
+            // One cell per unit, like the stubs left on a torn ticket
             <div aria-hidden="true" className="flex gap-[2px]">
               {Array.from({ length: slips }, (_, i) => (
                 <span
@@ -241,7 +241,7 @@ export function LowStockIndicator({
 
 const CountContext = createContext<{ dir: 1 | -1; reduceMotion: boolean; tone: string }>({ dir: -1, reduceMotion: false, tone: "" });
 
-/** 數字變化時上下翻動，讓使用者注意到真實的庫存變化 */
+/** The number flips up or down when it changes, so users notice a real stock change */
 function Count({ n }: { n: number }) {
   const { dir, reduceMotion, tone } = useContext(CountContext);
   return (

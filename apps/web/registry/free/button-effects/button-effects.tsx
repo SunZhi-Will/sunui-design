@@ -55,16 +55,16 @@ type NativeButtonProps = Omit<
 >;
 
 export interface EffectButtonProps extends NativeButtonProps {
-  /** 要套用的效果 */
+  /** The effect to apply */
   effect?: ButtonEffect;
   children?: ReactNode;
-  /** send-feedback 會等待回傳的 Promise 完成才顯示勾勾 */
+  /** send-feedback waits for this Promise to settle before showing the checkmark */
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<unknown>;
-  /** icon-slide 與 expand-label 使用的圖示，預設為箭頭與加號 */
+  /** Icon used by icon-slide and expand-label; defaults to an arrow and a plus */
   icon?: ReactNode;
-  /** 基本轉場秒數 */
+  /** Base transition duration in seconds */
   duration?: number;
-  /** send-feedback 給讀屏的狀態文字 */
+  /** Status text of send-feedback for screen readers */
   statusLabels?: { loading: string; done: string };
 }
 
@@ -119,7 +119,7 @@ export const EffectButton = forwardRef<HTMLButtonElement, EffectButtonProps>(fun
   );
 });
 
-/* ---------- 共用小工具 ---------- */
+/* ---------- shared helpers ---------- */
 
 function useMergedRef<T>(local: RefObject<T | null>, forwarded: Ref<T>) {
   return useCallback(
@@ -132,7 +132,7 @@ function useMergedRef<T>(local: RefObject<T | null>, forwarded: Ref<T>) {
   );
 }
 
-/** 0 到 1 循環的進度值；active 為假時停在原地，speed 可在 hover 時加快 */
+/** Progress value looping from 0 to 1; stays in place when active is false, and speed can be raised on hover */
 function useLoop(active: boolean, period: number, speed = 1) {
   const progress = useMotionValue(0);
   const state = useRef({ active, period, speed });
@@ -163,12 +163,12 @@ function PlusIcon() {
   );
 }
 
-/** hover 類效果共用：rest / hover 兩個狀態，鍵盤 focus-visible 時也觸發 */
+/** Shared by hover-style effects: rest / hover states, also triggered on keyboard focus-visible */
 const hoverStates = { initial: "rest", animate: "rest", whileHover: "hover", whileFocus: "hover" } as const;
-/** 減少動態時：停在 rest，不跟 hover 走 */
+/** Under reduced motion: stay on rest and do not follow hover */
 const restOnly = { initial: "rest", animate: "rest" } as const;
 
-/* ---------- 各效果 ---------- */
+/* ---------- the effects ---------- */
 
 function RollingText({ native, children, className, onClick, duration, reduce, forwardedRef }: ImplProps) {
   const text = typeof children === "string" || typeof children === "number" ? String(children) : null;
@@ -208,7 +208,7 @@ function RollingText({ native, children, className, onClick, duration, reduce, f
 type Side = "left" | "right" | "top" | "bottom";
 const sideOrigin: Record<Side, string> = { left: "0% 50%", right: "100% 50%", top: "50% 0%", bottom: "50% 100%" };
 
-/** 指標從哪一邊進出：取離四邊最近的一邊 */
+/** Which side the pointer enters and leaves from: the side nearest to it among the four */
 function nearestSide(e: ReactPointerEvent<HTMLElement>): Side {
   const r = e.currentTarget.getBoundingClientRect();
   const x = e.clientX - r.left;
@@ -255,7 +255,7 @@ function ShineSweep({ native, children, className, onClick, reduce, forwardedRef
   const inView = useInView(local);
   const [hover, setHover] = useState(false);
   const progress = useLoop(inView && !reduce, 3.2, hover ? 3 : 1);
-  // 前 40% 的時間掃過，其餘時間停在按鈕外
+  // The sweep takes the first 40% of the time; the rest of the time it rests outside the button
   const x = useTransform(progress, (v) => `${v < 0.4 ? -130 + (v / 0.4) * 440 : 310}%`);
   return (
     <motion.button
@@ -333,7 +333,7 @@ function Ripple({ native, children, className, onClick, reduce, forwardedRef }: 
         const r = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - r.left;
         const y = e.clientY - r.top;
-        // 直徑取到最遠角落，確保漣漪蓋滿按鈕
+        // Diameter reaches the farthest corner, so the ripple always covers the whole button
         const size = 2 * Math.hypot(Math.max(x, r.width - x), Math.max(y, r.height - y));
         const id = nextId.current++;
         setRipples((list) => [...list, { id, x, y, size }]);
@@ -374,7 +374,7 @@ function Magnetic({ native, children, className, onClick, reduce, forwardedRef }
       const el = local.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      // 扣掉目前位移，以原始中心計算距離
+      // Subtract the current offset and measure the distance from the original centre
       const dx = e.clientX - (r.left + r.width / 2 - x.get());
       const dy = e.clientY - (r.top + r.height / 2 - y.get());
       const reach = Math.max(r.width, r.height) / 2 + 48;
@@ -442,7 +442,7 @@ function Press3D({ native, children, className, onClick, reduce, forwardedRef }:
       whileTap="pressed"
       className={cn(base, "h-[46px] items-start bg-transparent p-0", className)}
     >
-      {/* 底下的厚度：同色加一層暗色，換主題也能看出深度 */}
+      {/* Thickness underneath: the same colour with a dark layer added, so depth is visible after a theme change too */}
       <span aria-hidden="true" className="absolute inset-x-0 bottom-0 top-1.5 rounded-md bg-primary">
         <span className="absolute inset-0 rounded-md bg-black/35" />
       </span>
@@ -486,7 +486,7 @@ function ExpandLabel({ native, children, className, onClick, icon, duration, red
   const shell: Variants = { rest: { width: "2.5rem", transition: t }, hover: { width: "auto", transition: t } };
   const plus: Variants = { rest: { rotate: 0, transition: t }, hover: { rotate: 90, transition: t } };
   const label: Variants = { rest: { opacity: 0, transition: t }, hover: { opacity: 1, transition: t } };
-  // 減少動態時直接展開，標籤不會被藏起來
+  // Under reduced motion, expand straight away so the label is never hidden
   const states = reduce ? { initial: "hover", animate: "hover" } : hoverStates;
   return (
     <motion.button
@@ -525,7 +525,7 @@ function BorderDraw({ native, children, className, onClick, duration, reduce, fo
       className={cn(base, "rounded-none border border-border bg-transparent text-foreground", className)}
     >
       {drawLines.map((l, i) => {
-        // 進場依序畫出四邊，離開時反向收回
+        // On enter, draw the four edges in order; on leave, retract in reverse
         const rest = { duration: step, ease: "linear" as const, delay: reduce ? 0 : (3 - i) * step };
         const hover = { duration: step, ease: "linear" as const, delay: reduce ? 0 : i * step };
         const v: Variants =
@@ -581,7 +581,7 @@ function NeonGlow({ native, children, className, onClick, reduce, forwardedRef }
 
 function BackgroundSweep({ native, children, className, onClick, duration, reduce, forwardedRef }: ImplProps) {
   const t = { scaleX: { duration: reduce ? 0 : duration, ease }, originX: { duration: 0 } };
-  // 從左邊掃入，離開時往右邊收走
+  // Sweep in from the left; on leave, retract to the right
   const fill: Variants = { rest: { scaleX: 0, originX: 1, transition: t }, hover: { scaleX: 1, originX: 0, transition: t } };
   return (
     <motion.button
@@ -652,7 +652,7 @@ function SendFeedback({ native, children, className, onClick, reduce, forwardedR
     setPhase("loading");
     try {
       const result = onClick?.(e);
-      // 有回傳 Promise 就等它；沒有就模擬一段送出時間
+      // If a Promise is returned, wait for it; otherwise simulate a submit duration
       if (result instanceof Promise) await result;
       else await wait(1100);
       if (!mounted.current) return;

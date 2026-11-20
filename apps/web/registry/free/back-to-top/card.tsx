@@ -13,11 +13,11 @@ const copy = {
   ja: { title: "ニット一覧", count: "48 件", label: "ページの先頭へ", item: "メリノ クルー", price: "¥9,900" },
 };
 
-/** 型錄卡片：一個已經往下捲的商品清單，角落的按鈕顯示捲動進度，點一下滑回頂端。 */
+/** Catalog card: a product list that is already scrolled down. The corner button shows scroll progress, and a click slides back to the top. */
 export default function BackToTopCard() {
   const t = useDemoText(copy);
   const scroller = useRef<HTMLDivElement>(null);
-  // 一開始就捲到中段，按鈕和進度環在卡片上直接看得到；等捲動監聽掛好再捲，否則按鈕不會出現
+  // Scroll to the middle at the start so the button and progress ring are visible on the card right away. Scroll only after the scroll listener is attached, otherwise the button does not appear
   useEffect(() => {
     const id = window.setTimeout(() => scroller.current?.scrollTo({ top: 220 }), 300);
     return () => window.clearTimeout(id);

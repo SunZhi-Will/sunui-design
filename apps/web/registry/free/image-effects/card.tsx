@@ -12,7 +12,7 @@ const copy = {
   ja: ["ティールの潟湖", "琥珀色の砂漠", "青いフィヨルド", "緑の谷"],
 };
 
-/** 型錄卡片：ken-burns、clip-reveal、saturate、zoom-lens 四格。 */
+/** Catalog card: four tiles, ken-burns, clip-reveal, saturate and zoom-lens. */
 export default function ImageEffectsCard() {
   const alts = useDemoText(copy);
   return (

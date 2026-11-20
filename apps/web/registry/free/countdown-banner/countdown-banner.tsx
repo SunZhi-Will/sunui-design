@@ -11,35 +11,35 @@ export type LanguageType = "zh" | "en";
 export interface CountdownBannerProps {
   title?: string;
   subtitle?: string;
-  /** 折扣字樣，例如「40% OFF」「6 折」 */
+  /** Discount text, for example "40% OFF" or "60% of original price" */
   discount?: string;
   originalPrice?: string;
   discountedPrice?: string;
-  /** 真實的結束時間（必填）。不提供預設值，避免每次載入都重新倒數的假稀缺 */
+  /** The real end time (required). There is no default, to avoid fake scarcity from a countdown that restarts on every load */
   endDate: Date | string;
   /**
-   * 活動或直播的開始時間。給了就先倒數到開始（「距離開始」），開始後顯示「進行中」並倒數到 endDate。
-   * 只倒數到真正的那一刻，不製造假的截止壓力。
+   * Start time of the event or livestream. When given, it counts down to the start first ("starts in"), then shows "live" after it begins and counts down to endDate.
+   * It only counts down to real moments and never creates fake deadline pressure.
    */
   startDate?: Date | string;
   /**
-   * hydration 前顯示的日期文字，例如「11/11（三）23:59」；有 startDate 時指開始時間，否則指結束時間。
-   * 伺服器與瀏覽器都只印這段文字，不印跳動的數字，兩邊輸出一致。不給時顯示 --。
+   * Date text shown before hydration, for example "11/11 (Wed) 23:59"; with startDate it means the start time, otherwise the end time.
+   * The server and the browser both print only this text, never the ticking digits, so the two outputs match. Shows -- when not given.
    */
   dateLabel?: string;
-  /** 倒數跨過 startDate 時呼叫一次 */
+  /** Called once when the countdown crosses startDate */
   onStart?: () => void;
-  /** 倒數結束時呼叫一次 */
+  /** Called once when the countdown ends */
   onEnd?: () => void;
   ctaText?: string;
-  /** 提供時 CTA 為連結 */
+  /** When provided, the CTA is a link */
   ctaHref?: string;
   onCtaClick?: () => void;
-  /** 舊版寫法：zh 等同 locale="zh-TW"，en 等同 locale="en"；有給 locale 時以 locale 為準 */
+  /** Legacy form: zh equals locale="zh-TW", en equals locale="en"; when locale is given, locale wins */
   language?: LanguageType;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings, takes priority over locale */
   labels?: Partial<CountdownBannerLabels>;
   className?: string;
   style?: CSSProperties;
@@ -52,21 +52,21 @@ export interface CountdownBannerLabels {
   seconds: string;
   endsIn: string;
   ended: string;
-  /** 有 startDate 時，開始前的小標 */
+  /** With startDate, the small label before the start */
   startsIn: string;
-  /** 有 startDate 時，開始後到結束前的狀態 */
+  /** With startDate, the status between the start and the end */
   live: string;
-  /** 掛載後計時器下方的日期說明 */
+  /** Date note under the timer after mount */
   startsOn: (date: string) => string;
   endsOn: (date: string) => string;
   endedOn: (date: string) => string;
-  /** 原價前的螢幕閱讀器文字 */
+  /** Screen reader text before the original price */
   original: string;
-  /** 倒數計時器的無障礙名稱 */
+  /** Accessible name of the countdown timer */
   timer: (p: { days: number; hours: number; minutes: number }) => string;
-  /** 距離開始的倒數的無障礙名稱 */
+  /** Accessible name of the countdown to the start */
   startTimer: (p: { days: number; hours: number; minutes: number }) => string;
-  /** 沒有給 title、subtitle、ctaText 時的預設文案 */
+  /** Default copy when title, subtitle and ctaText are not given */
   defaultTitle: string;
   defaultSubtitle: string;
   defaultCta: string;
@@ -74,7 +74,7 @@ export interface CountdownBannerLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -161,13 +161,13 @@ const MESSAGES: Record<SunLocale, CountdownBannerLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色、品牌專色
+// Design language (DESIGN.md, craft quality): surfaces, hairlines, text colors, brand accent color
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const surfaceUnder = "bg-muted dark:bg-foreground/10";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent color: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, the offer and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -206,11 +206,11 @@ export function CountdownBanner({
   const startTime = startDate === undefined ? NaN : new Date(startDate).getTime();
   const startKey = Number.isNaN(startTime) ? null : startTime;
 
-  // 現在時間只在瀏覽器取得；伺服器與 hydration 前只印 dateLabel，兩邊輸出一致
+  // The current time is only read in the browser; the server and pre-hydration output print only dateLabel, so both match
   const [now, setNow] = useState<number | null>(null);
   const [wasRunning, setWasRunning] = useState(false);
   useEffect(() => {
-    // 結束時間無效時不倒數，絕不自行編造期限
+    // When the end time is invalid it does not count down, and never makes up a deadline
     if (endKey === null) return;
     const end = endKey;
     let id: number | undefined;
@@ -224,7 +224,7 @@ export function CountdownBanner({
       if (n < end) setWasRunning(true);
       else stop();
     };
-    // 分頁隱藏時停止跳動，回到前景先對時再繼續
+    // Stop ticking while the tab is hidden; on return to the foreground, resync the time before continuing
     const resume = () => {
       tick();
       if (id === undefined && Date.now() < end) id = window.setInterval(tick, 1000);
@@ -246,7 +246,7 @@ export function CountdownBanner({
   const target = upcoming ? (startKey as number) : (endKey ?? 0);
   const remaining = now === null ? null : Math.max(0, target - now);
 
-  // 跨過開始、結束時各通知一次（只在親眼看到跨越時，重新整理不會補發）
+  // Notify once each when the start and the end are crossed (only when the crossing is actually seen, a refresh does not fire it again)
   const startRef = useRef(onStart);
   const endRef = useRef(onEnd);
   useEffect(() => {
@@ -261,7 +261,7 @@ export function CountdownBanner({
     prevPhase.current = phase;
   }, [phase]);
 
-  // 日期說明在掛載後才用使用者的時區排版
+  // The date note is laid out in the user's time zone only after mount
   const dateText =
     now === null ? null : new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(target);
   const dateLine = dateText && (upcoming ? t.startsOn(dateText) : ended ? t.endedOn(dateText) : t.endsOn(dateText));
@@ -309,7 +309,7 @@ export function CountdownBanner({
 
         <div className={cn("flex flex-wrap items-end gap-x-6 gap-y-4 border-t pt-5 @3xl:border-t-0 @3xl:border-l @3xl:px-6 @3xl:py-5", edge)}>
           <div>
-            {/* 進行中只在狀態改變時播報一次，不逐秒朗讀 */}
+            {/* While live, announce only once when the state changes, not every second */}
             <span className="sr-only" role="status">
               {live ? t.live : ""}
             </span>
@@ -352,11 +352,11 @@ export function CountdownBanner({
   );
 }
 
-/** 翻頁數字：只有值改變時，上半張沿中線翻下 */
+/** Flip digit: only when the value changes, the upper half flips down along the midline */
 function FlipCard({ value, reduceMotion }: { value: string; reduceMotion: boolean }) {
   const [state, setState] = useState({ prev: value, cur: value });
   if (state.cur !== value) setState({ prev: state.cur, cur: value });
-  // 用計時器收掉翻頁片，背景分頁暫停動畫時也不會卡住
+  // Remove the flip leaf with a timer, so it cannot get stuck when a background tab pauses animation
   useEffect(() => {
     if (state.prev === state.cur) return;
     const id = window.setTimeout(() => setState((st) => ({ ...st, prev: st.cur })), 340);

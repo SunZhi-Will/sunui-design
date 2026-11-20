@@ -22,7 +22,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-/** 攝影風格與打光效果，用 PhotoLook 的 effect prop 切換 */
+/** Photographic looks and lighting effects, switched with PhotoLook's effect prop */
 export const photoLooks = [
   "backlighting",
   "rim-light",
@@ -55,44 +55,44 @@ export type PhotoLookTrigger = "mount" | "inView" | "hover" | "loop" | "always";
 
 export interface PhotoLookProps {
   effect?: PhotoLookName;
-  /** 圖片網址；不給 src 時改套用在 children 上 */
+  /** Image URL; without src the effect is applied to children instead */
   src?: string;
   alt?: string;
-  /** 任意內容（影片、卡片、插畫）。部分效果會複製一份 children 當疊層 */
+  /** Any content (video, card, illustration). Some effects clone children as an overlay layer */
   children?: ReactNode;
-  /** 0 到 1，效果的最終強度 */
+  /** 0 to 1, final strength of the effect */
   intensity?: number;
-  /** 效果何時出現：mount（預設）、inView、hover、loop（來回循環）、always（不做動畫） */
+  /** When the effect shows: mount (default), inView, hover, loop (back and forth), always (no animation) */
   trigger?: PhotoLookTrigger;
-  /** 搭配 hover：掛載時淡入效果，滑過時退回原圖（常見的「滑過顯示原色」） */
+  /** With hover: fades the effect in on mount and returns to the original on hover (the common "reveal original colors on hover") */
   invert?: boolean;
-  /** 秒；效果淡入的長度，loop 時為半個循環 */
+  /** Seconds; length of the effect fade-in, half a cycle when looping */
   duration?: number;
   delay?: number;
   /**
-   * 色彩，依效果解讀：duotone [暗部, 亮部]、teal-and-orange [青, 橘]、
-   * light-leak [內側, 邊緣]，其餘取第一個色當光色或色調
+   * Colors, interpreted per effect: duotone [shadow, highlight], teal-and-orange [teal, orange],
+   * light-leak [inner, edge]; for the rest the first color is used as the light or tint
    */
   colors?: string[];
-  /** 光從哪個方向來，度數，0 為正上方、90 為右、270 為左（打光類效果） */
+  /** Direction the light comes from, in degrees: 0 is straight above, 90 right, 270 left (lighting effects) */
   lightAngle?: number;
-  /** 光源位置 [x%, y%]：backlighting、golden-hour、lens-flare */
+  /** Light source position [x%, y%]: backlighting, golden-hour, lens-flare */
   lightPosition?: [number, number];
-  /** 清楚對焦的中心 [x%, y%]：bokeh、panning-shot */
+  /** Center of the sharp area [x%, y%]: bokeh, panning-shot */
   focusPoint?: [number, number];
-  /** tilt-shift 清楚帶的上下緣 [top%, bottom%] */
+  /** Top and bottom edges of the tilt-shift sharp band [top%, bottom%] */
   focusBand?: [number, number];
-  /** double-exposure 疊進剪影裡的第二張圖，預設用同一張 */
+  /** Second image placed inside the silhouette for double-exposure; defaults to the same image */
   secondSrc?: string;
-  /** film-grain 顆粒閃動、light-leak 漏光擺動；false 時保持靜止 */
+  /** film-grain flicker and light-leak sway; false keeps them still */
   live?: boolean;
-  /** 外框 className；有 src 時預設 aspect-[4/3] */
+  /** className for the frame; defaults to aspect-[4/3] when src is set */
   className?: string;
-  /** 圖片（或 children 外層）的 className */
+  /** className for the image (or the wrapper around children) */
   contentClassName?: string;
 }
 
-/* ---------- 共用工具 ---------- */
+/* ---------- Shared helpers ---------- */
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const LUM = ".2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 .2126 .7152 .0722 0 0 0 0 0 1 0";
@@ -115,7 +115,7 @@ function alpha(hex: string, a: number) {
 }
 const mask = (m: string): CSSProperties => ({ maskImage: m, WebkitMaskImage: m });
 
-/** 以亮度對照色階：每個 stop 平均分布在暗到亮之間 */
+/** Map luminance to a color ramp: stops are spread evenly from dark to light */
 function ToneFilter({ id, stops, mix = 1 }: { id: string; stops: string[]; mix?: number }) {
   const rgb = stops.map(hexRgb);
   const table = (i: number) => rgb.map((c) => c[i].toFixed(3)).join(" ");
@@ -132,12 +132,12 @@ function ToneFilter({ id, stops, mix = 1 }: { id: string; stops: string[]; mix?:
   );
 }
 
-/** 最後一步：把效果結果與原圖依強度混合（k2、k3 由動畫寫入） */
+/** Final step: blend the effect result with the original by strength (k2 and k3 are written by the animation) */
 function Mix({ in: input, mix = 1 }: { in: string; mix?: number }) {
   return <feComposite in={input} in2="SourceGraphic" operator="arithmetic" k1={0} k2={0} k3={1} k4={0} data-mix={mix} />;
 }
 
-/* ---------- 每個效果拿到的資料 ---------- */
+/* ---------- Data each effect receives ---------- */
 
 interface Ctx {
   id: string;
@@ -147,30 +147,30 @@ interface Ctx {
   focus: [number, number];
   band: [number, number];
   size: { w: number; h: number };
-  /** 循環類小動畫（顆粒、漏光）是否該跑 */
+  /** Whether small looping animations (grain, light leak) should run */
   running: boolean;
-  /** 複製一份內容當疊層 */
+  /** Clone the content as an overlay layer */
   copy: (style?: CSSProperties, key?: string | number) => ReactNode;
   secondSrc?: string;
 }
 
 interface LookSpec {
-  /** 套在原圖上的 CSS filter，v 為目前強度 */
+  /** CSS filter applied to the original image; v is the current strength */
   filter?: (v: number, c: Ctx) => string;
-  /** 這個效果需要的 SVG filter（id 用 c.id） */
+  /** SVG filter this effect needs (use c.id for the id) */
   svg?: (c: Ctx) => ReactNode;
-  /** 疊在上面的圖層；放在 Fade 裡就會跟著強度淡入 */
+  /** Layers drawn on top; put them in Fade so they fade in with the strength */
   layers?: (c: Ctx) => ReactNode;
   colors?: string[];
   angle?: number;
   pos?: [number, number];
-  /** 需要量外框尺寸（fisheye、色收差） */
+  /** Needs the frame size measured (fisheye, chromatic aberration) */
   measure?: boolean;
 }
 
 const TContext = createContext<MotionValue<number> | null>(null);
 
-/** 跟著強度淡入的圖層 */
+/** Layer that fades in with the strength */
 function Fade({ children, style, className }: { children?: ReactNode; style?: CSSProperties; className?: string }) {
   const t = useContext(TContext)!;
   return (
@@ -180,7 +180,7 @@ function Fade({ children, style, className }: { children?: ReactNode; style?: CS
   );
 }
 
-/** 方向光：亮側暖光、暗側陰影；from / to 為陰影開始與完全變暗的位置（%） */
+/** Directional light: warm light on the bright side, shadow on the dark side; from / to are where the shadow starts and where it is fully dark (%) */
 function Light({ angle, from, to, shadow, tint }: { angle: number; from: number; to: number; shadow: number; tint: string }) {
   const dir = angle + 180;
   return (
@@ -191,7 +191,7 @@ function Light({ angle, from, to, shadow, tint }: { angle: number; from: number;
   );
 }
 
-/** 從原點依強度放大的小圖層（光點、散景、光軌） */
+/** Small layers scaled up from an origin by strength (light spots, bokeh, light trails) */
 function Grow({ style, from = 0.3, origin = "center" }: { style: CSSProperties; from?: number; origin?: string }) {
   const t = useContext(TContext)!;
   const scale = useTransform(t, [0, 1], [from, 1]);
@@ -203,13 +203,13 @@ function GrowX({ style }: { style: CSSProperties }) {
   return <motion.span aria-hidden className="pointer-events-none absolute" style={{ ...style, opacity: t, scaleX: t, transformOrigin: "left center" }} />;
 }
 
-/* ---------- 各效果 ---------- */
+/* ---------- Effects ---------- */
 
-// 散景光斑的固定位置（x%, y%, 寬%）
+// Fixed bokeh spot positions (x%, y%, width%)
 const bokehDots: [number, number, number][] = [
   [8, 18, 13], [22, 32, 9], [34, 12, 16], [52, 26, 10], [66, 10, 14], [78, 30, 11], [90, 16, 15], [14, 46, 8], [86, 44, 9], [46, 6, 7],
 ];
-// 鏡頭光斑：沿著光源到中心的線，k 為比例（2 為對角）
+// Lens flare: along the line from the light source to the center; k is the ratio (2 is the diagonal)
 const flareBits: { k: number; size: number; shape: "dot" | "hex" | "ring" }[] = [
   { k: 0.4, size: 3, shape: "dot" },
   { k: 0.75, size: 7, shape: "hex" },
@@ -224,7 +224,7 @@ const NOISE = `url("data:image/svg+xml,${encodeURIComponent(
   "<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>",
 )}")`;
 
-/** 魚眼的位移圖：中心往外推，四角不動。axis 0 = 水平，1 = 垂直 */
+/** Fisheye displacement map: pushes outward from the center, corners stay put. axis 0 = horizontal, 1 = vertical */
 function bulgeMap(w: number, h: number, axis: 0 | 1) {
   const [a, b] = axis === 0 ? ["rgb(255,128,128)", "rgb(0,128,128)"] : ["rgb(128,255,128)", "rgb(128,0,128)"];
   const [x2, y2] = axis === 0 ? [1, 0] : [0, 1];
@@ -267,7 +267,7 @@ function Leak({ colors, running }: { colors: string[]; running: boolean }) {
 }
 
 const specs: Record<PhotoLookName, LookSpec> = {
-  /* 逆光：光源在主體後方，整體泛起暖霧，朝向鏡頭的一面變暗 */
+  /* Backlighting: the light sits behind the subject, a warm haze rises, and the side facing the camera darkens */
   backlighting: {
     colors: ["#FFD48A"],
     pos: [50, 30],
@@ -280,7 +280,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 輪廓光：環境壓暗，左右兩側的邊緣被描出亮線 */
+  /* Rim light: ambient is dimmed and the left and right edges are traced with bright lines */
   "rim-light": {
     colors: ["#FFE3A3"],
     filter: (v) => `brightness(${1 - 0.55 * v}) contrast(${1 + 0.2 * v}) saturate(${1 - 0.3 * v})`,
@@ -310,7 +310,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 剪影：對著亮天空曝光，暗部全部壓成平面的黑 */
+  /* Silhouette: exposed for a bright sky, so shadows crush to flat black */
   silhouette: {
     colors: ["#FFB35C"],
     filter: (v, c) => `url(#${c.id}) saturate(${1 + 0.25 * v})`,
@@ -328,14 +328,14 @@ const specs: Record<PhotoLookName, LookSpec> = {
     ),
     layers: (c) => <Fade style={{ background: `linear-gradient(to bottom, ${alpha(c.colors[0], 0.4)}, transparent 55%)`, mixBlendMode: "screen" }} />,
   },
-  /* 分割光：光從正側面來，畫面在中線一分為二 */
+  /* Split lighting: light comes from the exact side and the frame splits at the midline */
   "split-lighting": {
     colors: ["#FFE7C2"],
     angle: 270,
     filter: (v) => `contrast(${1 + 0.15 * v})`,
     layers: (c) => <Light angle={c.angle} from={47} to={53} shadow={0.78} tint={c.colors[0]} />,
   },
-  /* 林布蘭光：側上方 45 度，暗側留一塊小小的三角亮區 */
+  /* Rembrandt lighting: 45 degrees from the upper side, leaving a small triangle of light on the dark side */
   rembrandt: {
     colors: ["#FFD9A8"],
     angle: 315,
@@ -352,7 +352,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       );
     },
   },
-  /* 蝴蝶光：正前上方的光，兩側均勻，下方落一點對稱陰影 */
+  /* Butterfly lighting: light from the front and above, even on both sides, with a small symmetric shadow below */
   butterfly: {
     colors: ["#FFF1DC"],
     angle: 0,
@@ -364,7 +364,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 黃金時刻：太陽貼近地平線，整體偏橘，亮側被染暖 */
+  /* Golden hour: the sun is near the horizon, the whole image shifts orange and the bright side turns warm */
   "golden-hour": {
     colors: ["#FFB547"],
     angle: 270,
@@ -377,7 +377,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 藍色時刻：日落後整片深藍，只有最亮的燈與窗亮成琥珀色 */
+  /* Blue hour: after sunset everything goes deep blue, and only the brightest lamps and windows glow amber */
   "blue-hour": {
     colors: ["#FFC75A"],
     filter: (v, c) => `url(#${c.id}) contrast(${1 + 0.05 * v})`,
@@ -390,7 +390,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
     ),
     layers: () => <Fade style={{ background: "linear-gradient(to bottom, rgba(44, 59, 94, .35), transparent 60%)", mixBlendMode: "multiply" }} />,
   },
-  /* 散景：背景失焦，亮點擴散成大而淡的光圈 */
+  /* Bokeh: the background is out of focus and highlights spread into large, soft discs */
   bokeh: {
     colors: ["#FFE3A3", "#FFFFFF"],
     layers: (c) => (
@@ -419,7 +419,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 移軸：上下兩條帶模糊，只留中間清楚，看起來像模型 */
+  /* Tilt-shift: bands at the top and bottom are blurred, leaving only the middle sharp, so the scene looks like a miniature */
   "tilt-shift": {
     filter: (v) => `saturate(${1 + 0.4 * v}) contrast(${1 + 0.06 * v})`,
     layers: (c) => {
@@ -435,7 +435,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       );
     },
   },
-  /* 長時間曝光：入夜，移動的東西拉成殘影，車燈畫出光軌 */
+  /* Long exposure: night falls, moving things smear into trails and car lights draw light streaks */
   "long-exposure": {
     colors: ["#FF3B30", "#FFFFFF", "#FFC75A"],
     filter: (v) => `brightness(${1 - 0.42 * v}) saturate(${1 - 0.2 * v}) contrast(${1 + 0.1 * v})`,
@@ -469,7 +469,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 追焦：主體清楚，背景往橫向拉成流線 */
+  /* Panning shot: the subject is sharp and the background streaks sideways */
   "panning-shot": {
     svg: (c) => (
       <filter id={`${c.id}-pan`} x="-10%" width="120%">
@@ -482,7 +482,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </Fade>
     ),
   },
-  /* 鏡頭光斑：光源周圍放射光芒，一串光點穿過畫面中心到對角 */
+  /* Lens flare: rays radiate around the light source and a string of spots crosses the center to the opposite corner */
   "lens-flare": {
     colors: ["#FFE3A3", "#9FD8FF"],
     pos: [78, 20],
@@ -522,7 +522,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       );
     },
   },
-  /* 魚眼：畫面中央鼓起，直線往外彎，四角不動 */
+  /* Fisheye: the center bulges, straight lines bend outward, corners stay put */
   fisheye: {
     measure: true,
     filter: (v, c) => (c.size.w ? `url(#${c.id})` : ""),
@@ -539,7 +539,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       );
     },
   },
-  /* 色收差：紅、綠、藍三色錯開，邊緣出現紅與青的色邊 */
+  /* Chromatic aberration: red, green and blue channels shift apart, giving red and cyan fringes at the edges */
   "chromatic-aberration": {
     measure: true,
     filter: (v, c) => `url(#${c.id})`,
@@ -558,18 +558,18 @@ const specs: Record<PhotoLookName, LookSpec> = {
       );
     },
   },
-  /* 暗角：四角平滑變暗，中央保持明亮 */
+  /* Vignette: corners darken smoothly while the center stays bright */
   vignette: {
     colors: ["#07070c"],
     layers: (c) => <Fade style={{ background: `radial-gradient(ellipse 75% 75% at 50% 50%, transparent 40%, ${alpha(c.colors[0], 0.45)} 75%, ${alpha(c.colors[0], 0.85)} 100%)` }} />,
   },
-  /* 高調：明亮、近白、陰影很淡 */
+  /* High key: bright, near-white, with very soft shadows */
   "high-key": {
     colors: ["#FFFFFF"],
     filter: (v) => `brightness(${1 + 0.32 * v}) contrast(${1 - 0.38 * v}) saturate(${1 - 0.3 * v})`,
     layers: (c) => <Fade style={{ background: alpha(c.colors[0], 0.18), mixBlendMode: "screen" }} />,
   },
-  /* 低調：大部分沉入黑暗，只留側光照到的一道亮邊 */
+  /* Low key: mostly sunk in darkness, with only a bright edge lit from the side */
   "low-key": {
     colors: ["#FFE7C2"],
     angle: 90,
@@ -581,11 +581,11 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 黑白：抽掉顏色，只用明暗讀形狀 */
+  /* Black and white: color is removed so shapes read through light and dark only */
   "black-and-white": {
     filter: (v) => `grayscale(${v}) contrast(${1 + 0.12 * v})`,
   },
-  /* 雙色調：整張圖只剩暗部與亮部兩個顏色之間的漸層 */
+  /* Duotone: the image becomes a gradient between just two colors, shadow and highlight */
   duotone: {
     colors: ["#1F2A5C", "#FF9FB2"],
     filter: (v, c) => `url(#${c.id})`,
@@ -595,7 +595,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       return <ToneFilter id={c.id} stops={stops} />;
     },
   },
-  /* 青橘調色：暗部與中間調偏青，亮部偏橘的互補色對比 */
+  /* Teal and orange grade: shadows and midtones lean teal, highlights lean orange, a complementary contrast */
   "teal-and-orange": {
     colors: ["#2F7F84", "#FF8A3D"],
     filter: (v, c) => `saturate(${1 + 0.15 * v}) url(#${c.id}) contrast(${1 + 0.06 * v})`,
@@ -606,7 +606,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       return <ToneFilter id={c.id} stops={stops} mix={0.6} />;
     },
   },
-  /* 底片顆粒：細顆粒蓋滿畫面，色彩略偏暖奶油色 */
+  /* Film grain: fine grain covers the frame, with colors slightly shifted toward warm cream */
   "film-grain": {
     colors: ["#F2DDBE"],
     filter: (v) => `sepia(${0.12 * v}) contrast(${1 + 0.05 * v})`,
@@ -619,7 +619,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </>
     ),
   },
-  /* 漏光：從右緣滲入一道暖光，內側淡黃、外緣偏紅，緩慢擺動 */
+  /* Light leak: a warm light seeps in from the right edge, pale yellow inside and reddish at the rim, swaying slowly */
   "light-leak": {
     colors: ["#FFD089", "#FF3B30"],
     filter: (v) => `contrast(${1 - 0.05 * v}) saturate(${1 + 0.08 * v})`,
@@ -629,7 +629,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
       </Fade>
     ),
   },
-  /* 雙重曝光：背景變白，第二張圖只出現在主體的剪影裡 */
+  /* Double exposure: the background turns white and the second image appears only inside the subject's silhouette */
   "double-exposure": {
     filter: (v) => `grayscale(${v}) contrast(${1 + 0.9 * v}) brightness(${1 + 0.22 * v})`,
     layers: (c) =>
@@ -641,7 +641,7 @@ const specs: Record<PhotoLookName, LookSpec> = {
   },
 };
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 export function PhotoLook({
   effect = "black-and-white",
@@ -679,7 +679,7 @@ export function PhotoLook({
   const startOn = trigger === "always" || (reduce && (trigger !== "hover" || invert));
   const t = useMotionValue(startOn ? target : 0);
 
-  // 量外框尺寸（只有需要像素尺寸的效果才量）
+  // Measure the frame size (only for effects that need pixel dimensions)
   useEffect(() => {
     if (!spec.measure || !frameRef.current) return;
     const el = frameRef.current;
@@ -692,19 +692,19 @@ export function PhotoLook({
     return () => ro.disconnect();
   }, [spec.measure]);
 
-  // 依 trigger 決定強度要往哪裡走
+  // Pick which way the strength should move based on trigger
   useEffect(() => {
     let goal: number;
     if (trigger === "always") goal = target;
     else if (trigger === "hover") goal = hovered !== invert ? target : 0;
     else if (trigger === "inView") goal = inViewOnce ? target : 0;
-    else goal = target; // mount、loop
+    else goal = target; // mount, loop
     if (reduce) {
       t.set(goal);
       return;
     }
     if (trigger === "loop") {
-      if (!inView) return; // 離開畫面時停在原地
+      if (!inView) return; // stay put when off screen
       const c = animate(t, [0, target], {
         duration: duration ?? 2.4,
         ease: "easeInOut",
@@ -746,7 +746,7 @@ export function PhotoLook({
       ),
   };
 
-  // 把強度寫進 CSS filter 與 SVG 屬性（不經過 React render）
+  // Write the strength into the CSS filter and SVG attributes (without going through a React render)
   const filterFn = spec.filter;
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;

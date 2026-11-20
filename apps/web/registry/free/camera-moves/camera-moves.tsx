@@ -23,11 +23,11 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * 電影運鏡：把買家自己的內容疊成幾層「場景」，用 move prop 套上一種鏡頭運動。
- * 每一層有 depth（0 = 最遠的背景，1 = 最近的前景），運鏡依深度算出每層的位移、縮放與模糊，
- * 所以視差是對的：搖鏡（pan）各層一起移，推軌（dolly）近景移得多，變焦（zoom）各層等比放大。
+ * Cinematic camera moves: stacks your own content into layers of a "scene" and applies one camera move through the move prop.
+ * Each layer has a depth (0 = farthest background, 1 = nearest foreground). The move computes each layer's offset, scale and blur from its depth,
+ * so parallax is correct: pan moves all layers together, dolly moves near layers more, and zoom scales all layers by the same factor.
  *
- * 用捲動驅動：
+ * Driven by scroll:
  *   const { scrollYProgress } = useScroll({ target: ref });
  *   <CameraStage move="dolly-zoom" progress={scrollYProgress}>...</CameraStage>
  */
@@ -58,10 +58,10 @@ export type CameraMove = (typeof cameraMoves)[number];
 
 export type CameraTrigger = "loop" | "mount" | "inView" | "hover" | "click";
 
-/** 持續晃動類的運鏡：沒有起點終點，靠時間跑（progress 只當作強度） */
+/** Continuous-shake moves: no start or end, they run on time (progress only acts as intensity) */
 export const ambientCameraMoves: readonly CameraMove[] = ["handheld", "steadicam", "fpv"];
 
-/** 各運鏡的預設長度（秒）；持續晃動類是一個循環週期 */
+/** Default length of each move in seconds; for continuous-shake moves this is one loop period */
 export const cameraMoveDurations: Record<CameraMove, number> = {
   pan: 4,
   tilt: 3.5,
@@ -86,39 +86,39 @@ export const cameraMoveDurations: Record<CameraMove, number> = {
   "bullet-time": 3,
 };
 
-/** 轉完一圈和起點相同，循環時直接接回起點，不倒帶 */
+/** A full turn ends where it started, so looping joins back to the start without rewinding */
 const wrapMoves: readonly CameraMove[] = ["barrel-roll"];
 
 export interface FocusPoint {
-  /** 0 到 100，畫面左到右 */
+  /** 0 to 100, left to right of the frame */
   x: number;
-  /** 0 到 100，畫面上到下 */
+  /** 0 to 100, top to bottom of the frame */
   y: number;
 }
 
-/** 某一刻的虛擬攝影機。位置以「主體距離 = 1」為單位；yaw、pitch 以畫面比例為單位 */
+/** The virtual camera at one moment. Position is in units where subject distance = 1; yaw and pitch are in frame fractions */
 export interface CameraState {
   x: number;
   y: number;
   z: number;
-  /** 正值向右看（畫面往左移） */
+  /** Positive looks right (the image moves left) */
   yaw: number;
-  /** 正值向上看（畫面往下移） */
+  /** Positive looks up (the image moves down) */
   pitch: number;
-  /** 畫面旋轉角度（deg） */
+  /** Frame rotation in degrees */
   roll: number;
-  /** 焦距倍率，1 = 起始焦距 */
+  /** Focal length multiplier, 1 = starting focal length */
   f: number;
-  /** 環繞角度（rad），orbit 與 bullet-time 用 */
+  /** Orbit angle (rad), used by orbit and bullet-time */
   orbit: number;
-  /** 每層額外的 3D 傾斜（deg），讓仰角、俯角、環繞更有立體感 */
+  /** Extra 3D tilt per layer (deg), gives low angle, high angle and orbit more depth */
   tiltX: number;
   turnY: number;
-  /** 景深模糊（px） */
+  /** Depth-of-field blur (px) */
   blurNear: number;
   blurFar: number;
   blurBg: number;
-  /** tracking：主體跟著攝影機走，主體層不受橫移影響 */
+  /** tracking: the subject follows the camera, so the subject layer is unaffected by lateral movement */
   track: boolean;
 }
 
@@ -147,18 +147,18 @@ const DEG = 180 / Math.PI;
 
 interface CameraInput {
   move: CameraMove;
-  /** 已套用 reverse 的進度 0..1 */
+  /** Progress 0..1 with reverse already applied */
   e: number;
-  /** 持續晃動類的強度 0..1 */
+  /** Intensity of continuous-shake moves, 0..1 */
   amp: number;
-  /** 時鐘（秒） */
+  /** Clock (seconds) */
   t: number;
   k: number;
   duration: number;
   focus: FocusPoint;
 }
 
-/** 由運鏡名稱、進度與時間算出攝影機狀態。每個運鏡一段，彼此獨立 */
+/** Computes the camera state from the move name, progress and time. One block per move, independent of each other */
 export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInput): CameraState {
   const c: CameraState = { ...REST };
   const ox = focus.x / 100 - 0.5;
@@ -167,63 +167,63 @@ export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInp
   const A = amp * k;
   switch (move) {
     case "pan":
-      // 原地左右轉，各層同樣位移，沒有視差
+      // Turn left and right in place; all layers shift equally, no parallax
       c.yaw = lerp(-0.07, 0.07, e) * k;
       break;
     case "tilt":
-      // 原地由下往上看
+      // Look up from below in place
       c.pitch = lerp(-0.03, 0.09, e) * k;
       break;
     case "dolly-in":
-      // 攝影機往前走：近景放大得多，遠景幾乎不動
+      // The camera walks forward: near layers grow a lot, far layers barely move
       c.z = 0.28 * e * k;
       c.yaw = ox * 0.3 * e;
       c.pitch = -oy * 0.3 * e;
       break;
     case "zoom-in":
-      // 攝影機不動只拉長焦距：各層等比放大，重疊關係不變
+      // The camera stays still and only lengthens the focal length: all layers scale equally, overlap is unchanged
       c.f = 1 + 1.2 * e * k;
       c.yaw = ox * e;
       c.pitch = -oy * e;
       break;
     case "tracking":
-      // 和主體並行橫移：主體留在畫面中央，背景與前景以不同速度滑過
+      // Moves sideways in parallel with the subject: the subject stays centred, background and foreground slide past at different speeds
       c.x = lerp(-0.1, 0.1, e) * k;
       c.track = true;
       break;
     case "orbit":
-      // 繞著主體轉約 ±20°，背景與前景往相反方向滑
+      // Circles the subject by about ±20°; background and foreground slide in opposite directions
       c.orbit = lerp(-0.35, 0.35, e) * k;
       c.turnY = -c.orbit * DEG * 0.6;
       c.f = 1.05;
       break;
     case "bullet-time":
-      // 和 orbit 相同的環繞，但時間幾乎停住（見 useCameraStage().footage）
+      // Same orbit as above, but time almost freezes (see useCameraStage().footage)
       c.orbit = lerp(-0.3, 0.3, e) * k;
       c.turnY = -c.orbit * DEG * 0.6;
       c.f = 1.05;
       break;
     case "crane-up":
-      // 升高並往下看，讓主體留在畫面中，地平線往上離開
+      // Rises and looks down, keeping the subject in frame while the horizon leaves upward
       c.y = 0.22 * e * k;
       c.z = 0.05 * e * k;
       c.pitch = -0.86 * c.y;
       break;
     case "dolly-zoom": {
-      // 往後退同時等比變焦：主體大小不變，只有背景逼近（希區考克的 vertigo effect）
+      // Pulls back while zooming in proportionally: the subject keeps its size and only the background closes in (Hitchcock's vertigo effect)
       const b = 1.0 * e * k;
       c.z = -b;
       c.f = 1 + b;
       break;
     }
     case "rack-focus":
-      // 焦點從前景移到後方：前景 0 → 7px 模糊，後方 6 → 0px
+      // Focus moves from foreground to background: foreground blur 0 → 7px, background 6 → 0px
       c.blurNear = 7 * e * k;
       c.blurFar = 6 * (1 - e) * k;
       c.f = 1 + 0.02 * e;
       break;
     case "handheld":
-      // 手持：幾組不同週期的正弦相加，快而不規則
+      // Handheld: several sine waves with different periods added together, fast and irregular
       c.yaw = 0.9 * (0.016 * Math.sin(3 * T) + 0.008 * Math.sin(7 * T + 1) + 0.004 * Math.sin(13 * T + 2)) * A;
       c.pitch = 1.4 * (0.012 * Math.sin(4 * T + 2) + 0.006 * Math.sin(9 * T + 0.5) + 0.003 * Math.sin(17 * T + 1.2)) * A;
       c.roll = (0.02 * Math.sin(5 * T + 1) + 0.008 * Math.sin(11 * T + 3)) * DEG * A;
@@ -231,7 +231,7 @@ export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInp
       c.f = 1 + 0.04 * A;
       break;
     case "steadicam":
-      // 穩定器：慢而寬的漂移，上下兩次、左右一次
+      // Stabilizer: slow, wide drift, two vertical cycles and one horizontal
       c.z = 0.06 * (1 - Math.cos(T)) * 0.5 * A;
       c.y = 0.012 * Math.sin(2 * T) * A;
       c.x = 0.02 * Math.sin(T) * A;
@@ -240,7 +240,7 @@ export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInp
       c.f = 1 + 0.03 * A;
       break;
     case "fpv":
-      // 穿越機：左右擺盪、上下起伏、壓坡傾斜，持續往前衝
+      // FPV drone: swings left and right, bobs up and down, banks into turns, and keeps pushing forward
       c.x = 0.075 * Math.sin(2 * T - 0.4) * A;
       c.y = 0.06 * Math.sin(2 * T) * A;
       c.roll = 0.22 * Math.sin(2 * T + 0.6) * DEG * A;
@@ -249,46 +249,46 @@ export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInp
       c.f = 1 + 0.14 * A;
       break;
     case "dutch-angle":
-      // 只轉畫面約 21°，製造不安
+      // Rotates only the frame by about 21° to create unease
       c.roll = 21 * e * k;
       c.f = 1 + 0.18 * e * k;
       break;
     case "pedestal":
-      // 方向不變，整台攝影機垂直升起：近景往下移得多
+      // Direction is unchanged and the whole camera rises vertically: near layers move down more
       c.y = 0.14 * e * k;
       break;
     case "barrel-roll":
-      // 畫面轉一整圈，中段放大遮住大部分角落
+      // The frame rotates a full turn; the middle section zooms in to hide most of the corners
       c.roll = 360 * e;
       c.f = 1 + 0.6 * Math.sin(Math.PI * e);
       break;
     case "fly-through":
-      // 往前穿過最近的一層（例如有窗的牆），它放大到畫面外後淡出
+      // Flies forward through the nearest layer (for example a wall with a window), which scales past the frame and then fades out
       c.z = 0.6 * e * k;
       c.yaw = ox * 0.4 * e;
       c.pitch = -oy * 0.4 * e;
       break;
     case "low-angle":
-      // 降低並往上看：主體變高大，地平線下沉
+      // Lowers and looks up: the subject looms taller and the horizon sinks
       c.y = -0.1 * e * k;
       c.pitch = 0.1 * e * k;
       c.tiltX = 10 * e * k;
       c.f = 1 + 0.06 * e * k;
       break;
     case "high-angle":
-      // 升高並往下看：主體變小，地面占滿畫面
+      // Rises and looks down: the subject shrinks and the ground fills the frame
       c.y = 0.14 * e * k;
       c.pitch = -0.16 * e * k;
       c.tiltX = -10 * e * k;
       c.z = -0.08 * e * k;
       break;
     case "establishing":
-      // 大遠景緩慢推進，交代地點
+      // Slow push in on a wide shot to establish the location
       c.z = 0.12 * e * k;
       c.pitch = -0.01 * e;
       break;
     case "extreme-close-up":
-      // 焦距指數拉長約 3.3 倍並對準 focusPoint，背景微糊
+      // Focal length stretches exponentially by about 3.3x toward focusPoint, with slight background blur
       c.f = Math.pow(3.3, e * k);
       c.yaw = ox * e;
       c.pitch = -oy * e;
@@ -298,7 +298,7 @@ export function computeCamera({ move, e, amp, t, k, duration, focus }: CameraInp
   return c;
 }
 
-/** 深度 0..1 換成到攝影機的距離（主體距離 = 1） */
+/** Converts depth 0..1 into distance from the camera (subject distance = 1) */
 export function depthToDistance(depth: number, pivot = 0.6) {
   return Math.pow(2, (pivot - depth) * 3);
 }
@@ -312,7 +312,7 @@ interface LayerInput {
   perspective: number;
 }
 
-/** 把攝影機投影到一層：回傳 transform、filter、opacity */
+/** Projects the camera onto one layer: returns transform, filter and opacity */
 export function projectLayer(c: CameraState, l: LayerInput) {
   const Z = l.subject ? 1 : depthToDistance(l.depth, l.pivot);
   let sx: number;
@@ -320,7 +320,7 @@ export function projectLayer(c: CameraState, l: LayerInput) {
   let scale: number;
   let ratio: number;
   if (c.orbit !== 0) {
-    // 攝影機在以主體為圓心的圓上，永遠朝向主體
+    // The camera sits on a circle centred on the subject and always faces it
     const xc = (Z - 1) * Math.sin(c.orbit);
     const zc = Math.max(0.05, 1 + (Z - 1) * Math.cos(c.orbit));
     sx = (xc / zc) * 0.45;
@@ -337,7 +337,7 @@ export function projectLayer(c: CameraState, l: LayerInput) {
   }
   sx += -c.yaw * c.f;
   sy += c.pitch * c.f;
-  // 快撞上攝影機的層淡出（fly-through 穿牆）
+  // Layers about to hit the camera fade out (fly-through passing through a wall)
   const opacity = clamp((ratio - 0.06) / 0.14);
   const focus = l.focus ?? (l.depth >= 0.7 ? "near" : "far");
   let blur = focus === "near" ? c.blurNear : c.blurFar;
@@ -361,7 +361,7 @@ interface StageContext {
 
 const CameraContext = createContext<StageContext | null>(null);
 
-/** 在 CameraStage 裡取得進度、時鐘與「片中時間」（bullet-time 時放慢到 0.1 倍），讓自己的動畫跟著運鏡 */
+/** Inside CameraStage, gets progress, the clock and "footage time" (slowed to 0.1x during bullet-time) so your own animation follows the move */
 export function useCameraStage() {
   const ctx = useContext(CameraContext);
   if (!ctx) throw new Error("useCameraStage must be used inside <CameraStage>");
@@ -379,11 +379,11 @@ function usePageVisible() {
   return visible;
 }
 
-/** bullet-time 預設的片中時間速率：運鏡中段放慢到 0.1 倍 */
+/** Default footage time rate for bullet-time: slows to 0.1x in the middle of the move */
 const defaultFootageRate = (move: CameraMove) =>
   move === "bullet-time" ? (p: number) => 1 - 0.9 * Math.pow(Math.sin(Math.PI * clamp(p)), 0.35) : () => 1;
 
-/** 循環的形狀：停在起點、運鏡、停在終點、倒回（wrap 類直接接回起點） */
+/** Shape of the loop: hold at start, move, hold at end, rewind (wrap moves join straight back to the start) */
 function loopProgress(t: number, d: number, wrap: boolean) {
   const h = Math.max(0.4, d * 0.25);
   if (wrap) {
@@ -403,27 +403,27 @@ function loopProgress(t: number, d: number, wrap: boolean) {
 
 export interface CameraStageProps {
   move?: CameraMove;
-  /** 預設 "inView"；持續晃動類（handheld、steadicam、fpv）在 loop 以外的觸發下會淡入晃動 */
+  /** Defaults to "inView"; continuous-shake moves (handheld, steadicam, fpv) fade the shake in under triggers other than loop */
   trigger?: CameraTrigger;
-  /** 秒；預設依運鏡（cameraMoveDurations） */
+  /** Seconds; defaults to the move's value (cameraMoveDurations) */
   duration?: number;
-  /** 運鏡幅度倍率，預設 1 */
+  /** Move amplitude multiplier, default 1 */
   intensity?: number;
-  /** CSS aspect-ratio，例如 "16/9"、"4/5"；傳 null 則由 className 決定高度 */
+  /** CSS aspect-ratio, e.g. "16/9", "4/5"; pass null to let className set the height */
   aspect?: string | null;
-  /** zoom-in、extreme-close-up、dolly-in、fly-through 的目標點（百分比），預設畫面中央 */
+  /** Target point (percent) for zoom-in, extreme-close-up, dolly-in and fly-through, defaults to the frame centre */
   focusPoint?: FocusPoint;
-  /** 受控進度 0..1（數字或 MotionValue，例如 useScroll 的 scrollYProgress）。給了就忽略 trigger */
+  /** Controlled progress 0..1 (a number or a MotionValue, e.g. scrollYProgress from useScroll). When given, trigger is ignored */
   progress?: number | MotionValue<number>;
-  /** 倒著播（dolly-in 變 dolly-out、crane-up 變 crane-down） */
+  /** Play backwards (dolly-in becomes dolly-out, crane-up becomes crane-down) */
   reverse?: boolean;
-  /** 哪個深度等於主體距離，預設 0.6 */
+  /** Which depth equals the subject distance, default 0.6 */
   pivot?: number;
-  /** 每層 3D 傾斜用的透視距離（px），預設 900 */
+  /** Perspective distance (px) for the per-layer 3D tilt, default 900 */
   perspective?: number;
-  /** 片中時間速率（依進度），預設只有 bullet-time 會放慢；可用來做 slow motion、speed ramp */
+  /** Footage time rate (by progress). By default only bullet-time slows down; use it for slow motion or speed ramps */
   footageRate?: (progress: number) => number;
-  /** 場景的無障礙名稱 */
+  /** Accessible name of the scene */
   label?: string;
   className?: string;
   style?: CSSProperties;
@@ -486,7 +486,7 @@ export function CameraStage({
   };
   const camera = useMotionValue<CameraState>(compute());
 
-  // 進度或時鐘一變就重算攝影機；props 改變時也重算一次
+  // Recompute the camera whenever progress or the clock changes; also once when props change
   useEffect(() => {
     const run = () => camera.set(compute());
     run();
@@ -501,7 +501,7 @@ export function CameraStage({
 
   useEffect(() => setMounted(true), []);
 
-  // 受控進度
+  // Controlled progress
   useEffect(() => {
     if (progress === undefined) return;
     if (isMotionValue(progress)) {
@@ -512,7 +512,7 @@ export function CameraStage({
     p.set(progress as number);
   }, [progress, p]);
 
-  // 單次觸發：mount、inView、hover、click
+  // Single-shot triggers: mount, inView, hover, click
   const target =
     trigger === "mount" ? mounted : trigger === "inView" ? seen : trigger === "hover" ? hovered : toggled;
   useEffect(() => {
@@ -529,7 +529,7 @@ export function CameraStage({
     return () => ctrl.stop();
   }, [target, trigger, controlled, reduce, ambient, d, p]);
 
-  // 時鐘：只在畫面內、分頁可見、沒有減少動態時跑
+  // Clock: runs only while in view, with the tab visible, and without reduced motion
   const needsClock = trigger === "loop" || ambient || move === "bullet-time" || footageRate !== undefined;
   const running = needsClock && inView && visible && !reduce;
   const rateRef = useRef(footageRate ?? defaultFootageRate(move));
@@ -587,13 +587,13 @@ export function CameraStage({
 }
 
 export interface CameraLayerProps {
-  /** 0 = 最遠的背景，1 = 最近的前景；預設 0.5 */
+  /** 0 = farthest background, 1 = nearest foreground; default 0.5 */
   depth?: number;
-  /** 主體層：dolly-zoom 時大小不變、tracking 時留在畫面中央、orbit 的圓心 */
+  /** Subject layer: keeps its size during dolly-zoom, stays centred during tracking, and is the centre of the orbit */
   subject?: boolean;
-  /** rack-focus 用；未指定時 depth >= 0.7 算前景 */
+  /** Used by rack-focus; when unspecified, depth >= 0.7 counts as foreground */
   focus?: "near" | "far";
-  /** 預先放大的比例，避免移動時露出邊緣；預設 0.26 × (1 - depth) */
+  /** Pre-scale to avoid showing edges while moving; default 0.26 × (1 - depth) */
   bleed?: number;
   className?: string;
   style?: CSSProperties;

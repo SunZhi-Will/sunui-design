@@ -1,9 +1,9 @@
 /**
- * 掛在橫桿上的布：Verlet 質點網格。純計算，不碰 DOM，方便單元測試。
+ * Cloth hung on a rod: a Verlet particle grid. Pure computation, no DOM, easy to unit test.
  *
- * 世界座標以畫面高度為 2：y 從 1（上緣）到 -1（下緣），x 從 -aspect 到
- * aspect，z 朝向鏡頭。第 0 欄是布的前緣（手拉的那一邊），最後一欄收在
- * gatherSide 那一側。
+ * World coordinates take the frame height as 2: y runs from 1 (top edge) to -1 (bottom edge), x from -aspect to
+ * aspect, and z points toward the camera. Column 0 is the cloth's leading edge (the side the hand pulls), and the last column gathers on the
+ * gatherSide side.
  */
 export const CLOTH_COLUMNS = 72;
 export const CLOTH_ROWS = 38;
@@ -12,12 +12,12 @@ const STEP_SECONDS = 1 / 60;
 const SOLVER_ITERATIONS = 7;
 const DAMPING = 0.982;
 const GRAVITY = 2.6;
-/** 布比窗寬多出來的比例：窗簾本來就不是平的，多出來的布才會垂成皺褶。 */
+/** How much wider the cloth is than the window: a curtain is never flat, and the extra cloth is what hangs into folds. */
 const FULLNESS = 1.55;
 const COLUMNS_PER_FOLD = 7;
 const RAIL_Y = 1.1;
 const DROP_LENGTH = 2.42;
-/** 完全拉開後，收攏的布還占多寬。 */
+/** How wide the gathered cloth still is when fully opened. */
 const GATHERED_WIDTH = 0.34;
 const OFFSCREEN_MARGIN = 0.3;
 const NORMAL_SMOOTHING_PASSES = 3;
@@ -26,12 +26,12 @@ const HAND_PULL = 0.03;
 const HAND_LIFT = 0.1;
 
 export interface ClothPanelSpec {
-  /** 拉開時布往哪一側收。 */
+  /** Which side the cloth gathers toward when opened. */
   gatherSide: 1 | -1;
-  /** 布拉上時，前緣與收攏側外緣的 x。 */
+  /** When drawn shut, the x of the leading edge and of the outer edge on the gathered side. */
   leadX: number;
   edgeX: number;
-  /** 畫面半寬，決定拉開後要退到哪裡才算出畫。 */
+  /** Half the frame width, which decides how far the cloth must retreat after opening to count as off screen. */
   aspect: number;
 }
 
@@ -41,9 +41,9 @@ export interface ClothHand {
 }
 
 export interface ClothForces {
-  /** 目前環境風的強度。 */
+  /** Strength of the current ambient wind. */
   breeze: number;
-  /** 一陣掀起簾子的強風，0 到 1。 */
+  /** A strong gust that lifts the curtain, 0 to 1. */
   gust: number;
   time: number;
   hand?: ClothHand;
@@ -61,7 +61,7 @@ function particle(column: number, row: number): number {
   return row * CLOTH_COLUMNS + column;
 }
 
-/** 皺褶不等距：一樣寬的波浪看起來就是瓦楞紙。 */
+/** Folds are unevenly spaced: equally wide waves look like corrugated cardboard. */
 function foldPhase(column: number): number {
   return (column * Math.PI * 2) / COLUMNS_PER_FOLD + 0.8 * Math.sin(column * 0.21) + 0.45 * Math.sin(column * 0.53);
 }
@@ -88,8 +88,8 @@ export function createClothPanel(spec: ClothPanelSpec): ClothPanel {
   const pinned = new Float32Array(CLOTH_COLUMNS * 3);
 
   /**
-   * 橫桿上的掛點。布長不變，掛點靠得越近，皺褶就要凸得越深：
-   * 正弦波每段平均長度是 sqrt(s² + (Ak)²/2)，令它等於布長即可解出 A。
+   * Attachment points on the rod. The cloth length is constant, so the closer the points sit, the deeper the folds must bulge:
+   * a sine wave has mean segment length sqrt(s² + (Ak)²/2); set it equal to the cloth length and solve for A.
    */
   const placeRail = (open: number) => {
     const leadX = spec.leadX + (openLeadX - spec.leadX) * open;
@@ -199,7 +199,7 @@ export function createClothPanel(spec: ClothPanelSpec): ClothPanel {
     }
   };
 
-  /** 把法線抹順：賽璐璐的色階邊界直接描著法線走，網格的碎折會變成鋸齒。 */
+  /** Smooths the normals: cel-shading tone boundaries trace the normals directly, so the mesh's small creases would turn into jaggies. */
   const smoothNormals = () => {
     for (let pass = 0; pass < NORMAL_SMOOTHING_PASSES; pass += 1) {
       smoothed.set(normals);
@@ -236,7 +236,7 @@ export function createClothPanel(spec: ClothPanelSpec): ClothPanel {
       const z = positions[i3 + 2];
       const hang = uvs[index * 2 + 1];
 
-      // 風只推得動正對它的布面，側著的皺褶吃不到風，布才會鼓起來而不是整片平移。
+      // Wind only pushes cloth facing it; sideways folds catch no wind, so the cloth billows instead of translating as a whole.
       const wave = Math.sin(x * 1.5 + time * 1.15 + y * 1.1) + 0.6 * Math.sin(x * 3.1 - time * 0.8 + y * 2.3);
       const windX = (0.05 * Math.sin(time * 0.6) + wave * 0.02) * breeze;
       const windZ = (0.1 + 0.11 * wave) * breeze + gust * (0.7 + 0.35 * wave);

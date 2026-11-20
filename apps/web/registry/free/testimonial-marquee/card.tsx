@@ -35,7 +35,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：一排評價卡持續橫向捲動，滑過會停下，點一張展開完整評價。 */
+/** Catalog card: a row of review cards scrolls sideways continuously, pauses on hover, and a click expands the full review. */
 export default function TestimonialMarqueeCard() {
   const locale = useDemoLocale();
   const c = useDemoText(copy);

@@ -37,7 +37,7 @@ const subtotal = 108;
 const off: Record<string, number> = { welcome: 10, autumn: 16.2, ship: 6 };
 const money = (n: number, locale: string) => new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(n);
 
-/** 型錄卡片：一疊優惠券，翻選一張套用，下方總額即時跟著變。 */
+/** Catalog card: a stack of coupons; flip through and pick one to apply, and the total below updates live. */
 export default function CouponWalletCard() {
   const locale = useDemoLocale();
   const list = useDemoText(coupons);

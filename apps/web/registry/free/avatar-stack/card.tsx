@@ -42,7 +42,7 @@ const copy = {
   ja: { bought: "人が過去 30 日間に購入" },
 };
 
-/** 型錄卡片：一排買家頭像，滑過任一個會抬起並顯示名字。 */
+/** Catalog card: a row of buyer avatars, hover any one to lift it and show the name. */
 export default function AvatarStackCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

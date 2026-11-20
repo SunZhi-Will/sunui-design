@@ -13,7 +13,7 @@ const copy = {
   ja: { title: "クーポン", claim: "獲得", claimed: "獲得済み", soldOut: "配布終了", rows: [["500円引き", "5,000円以上で利用可"], ["送料無料", "今週のご注文すべて"], ["ニット 15% オフ", "先着 100 名"]] },
 };
 
-/** 型錄卡片：優惠券清單，按「領取」後按鈕換成一枚蓋上去的「已領取」印章，領完的券是淡色字章。 */
+/** Catalog card: a coupon list; after pressing "Claim" the button is replaced by a "Claimed" stamp pressed on, and used-up coupons get a faded text stamp. */
 export default function StampCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

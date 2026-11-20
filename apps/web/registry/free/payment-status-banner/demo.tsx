@@ -16,7 +16,7 @@ const copy = {
 export default function PaymentStatusBannerDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
-  // 模擬 webhook：第二次重新整理時課程已開通
+  // Simulated webhook: access is unlocked by the second refresh
   const [unlocked, setUnlocked] = useState(false);
   const refreshes = useRef(0);
 

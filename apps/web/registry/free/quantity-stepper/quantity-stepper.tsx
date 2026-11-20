@@ -14,24 +14,24 @@ export interface QuantityStepperProps {
   min?: number;
   max?: number;
   step?: number;
-  /** 在最小值時把減號換成垃圾桶，點擊呼叫 onRemove */
+  /** At the minimum, replace the minus with a trash icon; clicking calls onRemove */
   removable?: boolean;
   onRemove?: () => void;
   disabled?: boolean;
   size?: QuantityStepperSize;
-  /** 長按多久後開始連續增減（ms） */
+  /** How long to hold before continuous stepping starts (ms) */
   repeatDelay?: number;
-  /** 連續增減的起始間隔（ms），之後會逐漸加速 */
+  /** Starting interval of continuous stepping (ms), which then speeds up gradually */
   repeatInterval?: number;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: Partial<QuantityStepperLabels>;
   className?: string;
 }
 
 export interface QuantityStepperLabels {
-  /** spinbutton 的無障礙名稱，也用在數量變動的朗讀 */
+  /** Accessible name of the spinbutton, also used when announcing quantity changes */
   quantity: string;
   decrement: string;
   increment: string;
@@ -40,7 +40,7 @@ export interface QuantityStepperLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -55,7 +55,7 @@ const MESSAGES: Record<SunLocale, QuantityStepperLabels> = {
   ja: { quantity: "数量", decrement: "数量を減らす", increment: "数量を増やす", remove: "商品を削除" },
 };
 
-// 設計語言（DESIGN.md）：收據紙、邊線虛線、文字色數字
+// Design language (DESIGN.md): receipt paper, dashed borders, text-colored digits
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -69,7 +69,7 @@ const sizeClass: Record<QuantityStepperSize, { root: string; button: string; fie
 
 function clampSnap(n: number, min: number, max: number, step: number) {
   if (!Number.isFinite(n)) return min;
-  // toFixed 修正浮點誤差
+  // toFixed corrects floating-point error
   const snapped = Number((Math.round((n - min) / step) * step + min).toFixed(6));
   return Math.min(max, Math.max(min, snapped));
 }
@@ -124,7 +124,7 @@ export function QuantityStepper({
   };
   useEffect(() => stop, []);
 
-  // 長按：先跳一次，延遲後持續增減並逐步加速，到邊界自動停止
+  // Press and hold: step once, then after a delay keep stepping and speed up gradually, stopping automatically at the bounds
   const startRepeat = (delta: number) => {
     stop();
     if (!set(valueRef.current + delta)) return;
@@ -147,7 +147,7 @@ export function QuantityStepper({
     onPointerUp: stop,
     onPointerCancel: stop,
     onLostPointerCapture: stop,
-    // 鍵盤觸發的 click（detail 為 0）才在這裡處理，滑鼠已由 pointerdown 處理
+    // Only a keyboard-triggered click (detail is 0) is handled here; the mouse is already handled by pointerdown
     onClick: (e: MouseEvent<HTMLButtonElement>) => {
       if (e.detail === 0) set(valueRef.current + delta);
     },
@@ -214,7 +214,7 @@ export function QuantityStepper({
         </button>
       )}
 
-      {/* 數字欄：左右虛線，像收據上的數量格 */}
+      {/* Number field: dashed lines on both sides, like a quantity cell on a receipt */}
       <div className={cn("relative border-x", dashed, s.field)}>
         <input
           type="text"
@@ -234,7 +234,7 @@ export function QuantityStepper({
           onKeyDown={onFieldKeyDown}
           className={cn(
             "size-full bg-transparent text-center font-mono font-medium tabular-nums outline-none focus-visible:bg-current/[0.04]",
-            // 非編輯狀態時文字透明，由下方滾動數字顯示
+            // The text is transparent when not editing; the rolling number below shows it
             editing ? "text-current" : "text-transparent caret-current selection:bg-current/15",
           )}
         />

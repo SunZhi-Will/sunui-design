@@ -343,7 +343,7 @@ export function InfiniteCanvas({
   }
   cells.current.length = cols * rows;
 
-  // 整塊畫布是一個可聚焦的平移控制項：方向鍵平移、Enter 開啟中央那張
+  // The whole canvas is one focusable pan control: arrow keys pan, Enter opens the center item
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div

@@ -8,13 +8,13 @@ import { cn } from "@/lib/utils";
 
 export interface WalletCoupon {
   id: string;
-  /** 面額，例如 "$10" 或 "15%" */
+  /** Face value, for example "$10" or "15%" */
   amount: string;
   title: string;
-  /** 使用條件，例如 "Orders over $60" */
+  /** Conditions of use, for example "Orders over $60" */
   condition?: string;
   expires?: string;
-  /** 有值時這張券不能選，並顯示原因（例如差多少才達門檻） */
+  /** When set, this coupon cannot be selected and the reason is shown (for example how much more to spend to qualify) */
   unavailableReason?: string;
 }
 
@@ -29,20 +29,20 @@ export interface CouponWalletLabels {
 
 export interface CouponWalletProps {
   coupons: WalletCoupon[];
-  /** 受控：目前選用的券 id，null 表示不用券 */
+  /** Controlled: id of the selected coupon, null means no coupon */
   value?: string | null;
   defaultValue?: string | null;
   onChange?: (id: string | null) => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: CouponWalletLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -85,12 +85,12 @@ const MESSAGES: Record<SunLocale, Required<CouponWalletLabels>> = {
   },
 };
 
-// 設計語言（DESIGN.md）：紙、紙邊、墨、朱紅
+// Design language (DESIGN.md): craft surfaces, edges, text colour, one accent
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
@@ -98,7 +98,7 @@ const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
 } as const;
 
-/** 左側面額凹面的寬度 */
+/** Width of the concave face-value area on the left */
 const STUB = 76;
 
 export function CouponWallet({ coupons, value, defaultValue = null, onChange, locale = "en", labels, className }: CouponWalletProps) {
@@ -114,10 +114,10 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
 
   const n = coupons.length;
   const mid = (n - 1) / 2;
-  // 扇形總寬控制在卡寬約 1.5 倍內，375px 也放得下
+  // Keep the fan's total width within about 1.5 times the card width so it fits at 375px
   const spread = n > 1 ? Math.min(22, 54 / (n - 1)) : 0;
   const selectedIndex = coupons.findIndex((c) => c.id === selected);
-  // 疊放時，已選用的券放最上面
+  // When stacked, the selected coupon goes on top
   const rank = (i: number) => (selectedIndex < 0 ? i : i === selectedIndex ? 0 : i < selectedIndex ? i + 1 : i);
   const tabIndexFor = (i: number) => (i === (active ?? (selectedIndex < 0 ? 0 : selectedIndex)) ? 0 : -1);
   const detail = coupons[active ?? selectedIndex] ?? null;
@@ -133,7 +133,7 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
   }
 
   function onCardClick(i: number) {
-    // 觸控第一下先展開，第二下才選用
+    // On touch, the first tap expands and the second tap selects
     if (!open) {
       setOpen(true);
       setActive(i);
@@ -217,7 +217,7 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                   isOn ? spotBorder : edge,
                 )}
               >
-                {/* 面額放在凹面裡（同心圓角 12 − 4 = 8）。不可用時只淡化內容，表面保持不透明，扇形展開時後面的券才不會透出來 */}
+                {/* The face value sits inside the concave area (concentric radii 12 - 4 = 8). When unavailable only the content is dimmed and the surface stays opaque, so coupons behind do not show through when the fan opens */}
                 <span
                   className={cn(
                     "flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted/70 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:bg-foreground/[0.04] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]",

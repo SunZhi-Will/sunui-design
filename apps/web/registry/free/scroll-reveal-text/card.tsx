@@ -34,7 +34,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：在框內往下捲，段落文字逐字由淡色字轉為實色，強調詞以朱紅印出。 */
+/** Catalog card: scroll down inside the frame and the paragraph turns from pale to solid one character at a time, with the emphasized words printed in vermilion. */
 export default function ScrollRevealTextCard() {
   const scroller = useRef<HTMLDivElement>(null);
   const locale = useDemoLocale();

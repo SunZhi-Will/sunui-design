@@ -92,7 +92,7 @@ export default function OtpInputDemo() {
         </p>
       </section>
 
-      {/* 收件匣裡的那封信，買家照著輸入 */}
+      {/* The email in the inbox, which buyers type the code from */}
       <aside
         aria-label={t.preview}
         className="rounded-xl border border-foreground/10 bg-card p-4 text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"

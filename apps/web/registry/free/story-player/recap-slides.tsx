@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import { resolveLocale, type SunLocale } from "./story-player";
 
 /* ------------------------------------------------------------------ */
-/* 共用：暗色雜誌風的色票、緩動與外框                                     */
+/* Shared: dark editorial palette, easing and frame                     */
 /* ------------------------------------------------------------------ */
 
-/** 年度回顧投影片的暗色色票（showcase 系列）。accent 只是預設值，各元件都能用 accent prop 換掉。 */
+/** Dark palette for the year-in-review slides (showcase series). accent is only a default; every component can override it with the accent prop. */
 export const recapPalette = {
   base: "#0a0a0a",
   surface: "#141414",
@@ -24,28 +24,28 @@ export const recapPalette = {
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
-/** reduced motion 時把所有過場改成 0 秒 */
+/** In reduced motion, make all transitions 0 seconds */
 function useRecapTransition() {
   const reduce = useReducedMotion() ?? false;
   return (t: Transition): Transition => (reduce ? { duration: 0 } : t);
 }
 
 export interface RecapFrameProps {
-  /** 頂端的小標，下方有一道細線 */
+  /** Small heading at the top, with a thin line below it */
   title: ReactNode;
-  /** 底部的一句話，上方有一道細線 */
+  /** One line at the bottom, with a thin line above it */
   footer?: ReactNode;
-  /** 唯一強調色，會寫進 --recap-accent 變數 */
+  /** The single accent colour, written into the --recap-accent variable */
   accent?: string;
   className?: string;
   style?: CSSProperties;
-  /** 中段內容，請自己加上 flex-1 撐滿 */
+  /** Middle content; add flex-1 yourself so it fills the space */
   children: ReactNode;
 }
 
 /**
- * 四張回顧投影片共用的外框：#0a0a0a 底、上方小標、下方一句話，整體淡入一次。
- * 自己做封面或結尾張時也可以直接用它，版面就會跟其他張一致。
+ * Shared frame of the four recap slides: #0a0a0a background, a small heading on top, one line below, and a single fade-in overall.
+ * Use it directly when building your own cover or closing slide, so the layout matches the others.
  */
 export function RecapFrame({ title, footer, accent = recapPalette.accent, className, style, children }: RecapFrameProps) {
   const tr = useRecapTransition();
@@ -85,25 +85,25 @@ function FooterLine({ children, tone = recapPalette.soft }: { children: ReactNod
   );
 }
 
-/** 共用的 props：強調色、語言、class */
+/** Shared props: accent colour, language, class */
 interface RecapBaseProps {
-  /** 唯一強調色，預設琥珀金 #d4a24c */
+  /** The single accent colour, default amber gold #d4a24c */
   accent?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
   className?: string;
 }
 
 /* ------------------------------------------------------------------ */
-/* 最活躍的月份                                                          */
+/* Most active month                                                    */
 /* ------------------------------------------------------------------ */
 
 export interface RecapMonthData {
-  /** 0 到 11 */
+  /** 0 to 11 */
   monthIndex: number;
-  /** 該月發文數 */
+  /** Post count for that month */
   count: number;
-  /** monthNames 沒有對應時的備用名稱 */
+  /** Fallback name when monthNames has no match */
   month?: string;
 }
 
@@ -146,10 +146,10 @@ const MONTH_MESSAGES: Record<SunLocale, RecapMonthLabels & { months: string[] }>
   },
 };
 
-/** 英文月份名稱（向下相容的匯出） */
+/** English month names (exported for backward compatibility) */
 export const recapMonthNames = MONTH_MESSAGES.en.months;
 
-/** 英文預設字串（向下相容的匯出） */
+/** English default strings (exported for backward compatibility) */
 export const recapMonthLabels: RecapMonthLabels = {
   title: MONTH_MESSAGES.en.title,
   posts: MONTH_MESSAGES.en.posts,
@@ -158,16 +158,16 @@ export const recapMonthLabels: RecapMonthLabels = {
 
 export interface RecapActiveMonthProps extends RecapBaseProps {
   data: RecapMonthData;
-  /** 12 個月份名稱，預設依 locale */
+  /** 12 month names, by locale by default */
   monthNames?: string[];
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<Omit<RecapMonthLabels, "comments">> & { comments?: Partial<RecapMonthLabels["comments"]> };
 }
 
 const allMonths = Array.from({ length: 12 }, (_, i) => i);
 
 /**
- * 「最活躍月份」：月份名稱與發文數用大號襯線字，下方 12 格月份條用強調色標出是哪一個月。
+ * "Most active month": the month name and post count in a large serif face, with a 12-cell month bar below marking which month in the accent colour.
  */
 export function RecapActiveMonth({ data, monthNames: monthNamesProp, accent = recapPalette.accent, locale = "en", labels, className }: RecapActiveMonthProps) {
   const base = MONTH_MESSAGES[resolveLocale(locale)];
@@ -177,7 +177,7 @@ export function RecapActiveMonth({ data, monthNames: monthNamesProp, accent = re
   const monthData = data ?? { month: "", monthIndex: 0, count: 0 };
   const monthName = monthNames[monthData.monthIndex] || monthData.month || monthNames[0] || base.months[0];
 
-  // 根據發佈數量產生評論
+  // Pick the comment based on the post count
   const comment = monthData.count < 5 ? l.comments.low : monthData.count < 15 ? l.comments.medium : l.comments.high;
 
   return (
@@ -192,7 +192,7 @@ export function RecapActiveMonth({ data, monthNames: monthNamesProp, accent = re
         </div>
         <div className="mt-3 h-px w-12" style={{ background: accent }} />
 
-        {/* 12 格月份條：當月用強調色 */}
+        {/* 12-cell month bar: the current month in the accent colour */}
         <div aria-hidden className="mt-10 grid grid-cols-12 gap-1">
           {allMonths.map((i) => (
             <div key={i} className="h-6 rounded-[2px]" style={{ background: i === monthData.monthIndex ? accent : recapPalette.line }} />
@@ -204,7 +204,7 @@ export function RecapActiveMonth({ data, monthNames: monthNamesProp, accent = re
 }
 
 /* ------------------------------------------------------------------ */
-/* 年度關鍵字                                                            */
+/* Yearly keywords                                                      */
 /* ------------------------------------------------------------------ */
 
 export interface RecapKeyword {
@@ -223,17 +223,17 @@ const KEYWORD_MESSAGES: Record<SunLocale, RecapKeywordCloudLabels> = {
   ja: { title: "よく使ったキーワード" },
 };
 
-/** 英文預設字串，保留舊的匯出名稱 */
+/** English default strings, keeping the old export name */
 export const recapKeywordLabels: RecapKeywordCloudLabels = KEYWORD_MESSAGES.en;
 
 export interface RecapKeywordCloudProps extends RecapBaseProps {
-  /** 關鍵字與出現次數，建議依次數由多到少排序 */
+  /** Keywords and occurrence counts, ideally sorted from most to least frequent */
   keywords: RecapKeyword[];
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<RecapKeywordCloudLabels>;
 }
 
-// 根據頻率計算字體大小（@md 為容器寬度斷點）
+// Compute font size from frequency (@md is a container width breakpoint)
 function keywordSize(ratio: number) {
   if (ratio > 0.8) return "text-5xl @md:text-6xl";
   if (ratio > 0.6) return "text-4xl @md:text-5xl";
@@ -242,7 +242,7 @@ function keywordSize(ratio: number) {
   return "text-xl @md:text-2xl";
 }
 
-// 次數越少字越淡：只用同一個暖灰的深淺，最常出現的字才用強調色
+// The fewer the occurrences, the lighter the word: only shades of one warm grey, and only the most frequent words use the accent colour
 function keywordTone(ratio: number) {
   if (ratio > 0.6) return recapPalette.text;
   if (ratio > 0.3) return recapPalette.soft;
@@ -250,7 +250,7 @@ function keywordTone(ratio: number) {
 }
 
 /**
- * 「年度關鍵字」：大小依出現次數的襯線字排成一段，像雜誌的拉頁引言；滑鼠移到字上時出現強調色底線。
+ * "Yearly keywords": serif words sized by occurrence run together as a paragraph, like a magazine pull quote; an accent underline appears when the mouse is over a word.
  */
 export function RecapKeywordCloud({ keywords, accent = recapPalette.accent, locale = "en", labels, className }: RecapKeywordCloudProps) {
   const l = { ...KEYWORD_MESSAGES[resolveLocale(locale)], ...labels };
@@ -283,7 +283,7 @@ export function RecapKeywordCloud({ keywords, accent = recapPalette.accent, loca
 }
 
 /* ------------------------------------------------------------------ */
-/* 百分位排名                                                            */
+/* Percentile rank                                                      */
 /* ------------------------------------------------------------------ */
 
 export type RecapRankLevel = "top01" | "top1" | "top5" | "top10" | "top25" | "top50" | "unknown";
@@ -292,7 +292,7 @@ export interface RecapPercentileLabels {
   title: string;
   subtitle: string;
   noData: string;
-  /** 沒有排名資料時大字顯示的內容 */
+  /** What the large text shows when there is no rank data */
   notAvailable: string;
   levels: Record<RecapRankLevel, string>;
 }
@@ -360,28 +360,28 @@ const PERCENTILE_MESSAGES: Record<SunLocale, RecapPercentileLabels> = {
   },
 };
 
-/** 英文預設字串，保留舊的匯出名稱 */
+/** English default strings, keeping the old export name */
 export const recapPercentileLabels = PERCENTILE_MESSAGES.en;
 
 export interface RecapPercentileRingProps extends RecapBaseProps {
-  /** 排名百分比（越小越好），null 代表沒有可比較的資料 */
+  /** Rank percentage (lower is better); null means no comparable data */
   percentileRank: number | null;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<Omit<RecapPercentileLabels, "levels">> & { levels?: Partial<Record<RecapRankLevel, string>> };
 }
 
-/** 格式化排名百分比顯示 */
+/** Format the rank percentage for display */
 export function formatPercentile(rank: number | null): string {
   if (rank === null || rank === undefined) return "N/A";
-  if (rank < 0.01) return "0.01"; // 最小顯示 0.01%
-  if (rank < 1) return rank.toFixed(2); // 小於 1% 顯示兩位小數
-  if (rank < 10) return rank.toFixed(1); // 1 到 10% 顯示一位小數
-  return Math.round(rank).toString(); // 大於 10% 顯示整數
+  if (rank < 0.01) return "0.01"; // Minimum displayed is 0.01%
+  if (rank < 1) return rank.toFixed(2); // Below 1%: two decimals
+  if (rank < 10) return rank.toFixed(1); // 1 to 10%: one decimal
+  return Math.round(rank).toString(); // Above 10%: whole number
 }
 
 /**
- * 根據排名百分比取得等級。
- * color 與 glow 為舊版 API 保留的欄位，元件本身已不使用，一律回傳中性值。
+ * Get the tier from the rank percentage.
+ * color and glow are fields kept for the old API; the component no longer uses them and always returns neutral values.
  */
 export function getRankLevel(rank: number | null): { level: RecapRankLevel; color: string; glow: string } {
   const neutral = { color: "from-neutral-400 to-neutral-300", glow: "transparent" };
@@ -395,7 +395,7 @@ export function getRankLevel(rank: number | null): { level: RecapRankLevel; colo
 }
 
 /**
- * 「百分位排名」：100 個刻度點排成一圈，填滿 100 減排名的數量；圈中央是大號襯線數字。
+ * "Percentile rank": 100 tick dots in a ring, filled with 100 minus the rank; a large serif number sits in the centre.
  */
 export function RecapPercentileRing({ percentileRank, accent = recapPalette.accent, locale = "en", labels, className }: RecapPercentileRingProps) {
   const base = PERCENTILE_MESSAGES[resolveLocale(locale)];
@@ -405,7 +405,7 @@ export function RecapPercentileRing({ percentileRank, accent = recapPalette.acce
   const displayValue = formatPercentile(rank);
   const rankLevel = getRankLevel(rank);
 
-  // 生成圓形刻度點（排名百分比越低越好，所以用 100 - rank）
+  // Generate the circular tick dots (a lower rank percentage is better, so use 100 - rank)
   const progressDots = useMemo(() => {
     const totalDots = 100;
     const activeDots = rank !== null ? Math.round(100 - rank) : 0;
@@ -425,7 +425,7 @@ export function RecapPercentileRing({ percentileRank, accent = recapPalette.acce
   return (
     <RecapFrame title={l.title} accent={accent} className={className} footer={footer}>
       <div className="relative flex flex-1 items-center justify-center">
-        {/* 刻度圈 */}
+        {/* Tick ring */}
         <svg aria-hidden className="absolute aspect-square w-full max-w-[22rem]" viewBox="0 0 200 200" style={{ transform: "rotate(-90deg)" }}>
           {progressDots.map((dot) => {
             const radian = (dot.angle * Math.PI) / 180;
@@ -466,13 +466,13 @@ export function RecapPercentileRing({ percentileRank, accent = recapPalette.acce
 }
 
 /* ------------------------------------------------------------------ */
-/* 連續發文                                                              */
+/* Consecutive posting                                                  */
 /* ------------------------------------------------------------------ */
 
 export interface RecapStreakLabels {
   title: string;
   subtitle: string;
-  /** 天數單位；給函式可依天數處理單複數 */
+  /** Day unit; pass a function to handle singular and plural by day count */
   days: string | ((n: number) => string);
   comments: { low: string; medium: string; high: string; veryHigh: string };
 }
@@ -514,21 +514,21 @@ const STREAK_MESSAGES: Record<SunLocale, RecapStreakLabels> = {
   },
 };
 
-/** 英文預設字串（保留舊的匯出名稱） */
+/** English default strings (kept under the old export name) */
 export const recapStreakLabels = STREAK_MESSAGES.en;
 
 export interface RecapStreakFlameProps extends RecapBaseProps {
-  /** 最長連續發文天數 */
+  /** Longest streak of consecutive posting days */
   streak: number;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<Omit<RecapStreakLabels, "comments">> & { comments?: Partial<RecapStreakLabels["comments"]> };
 }
 
-/** 天數格子：四週 28 格，超過的話全部填滿 */
+/** Day cells: 28 cells over four weeks; if exceeded, all are filled */
 const GRID_DAYS = 28;
 
 /**
- * 「連續發文」：大號襯線數字加一張四週的天數格，連續的天數用強調色填滿；天數改變時數字淡入替換。
+ * "Consecutive posting": a large serif number plus a four-week day grid, with consecutive days filled in the accent colour; the number fades in as a replacement when the days change.
  */
 export function RecapStreakFlame({ streak: streakProp, accent = recapPalette.accent, locale = "en", labels, className }: RecapStreakFlameProps) {
   const tr = useRecapTransition();
@@ -537,7 +537,7 @@ export function RecapStreakFlame({ streak: streakProp, accent = recapPalette.acc
   const streak = streakProp ?? 0;
   const days = typeof l.days === "function" ? l.days(streak) : l.days;
 
-  // 根據連續天數產生評論
+  // Pick the comment based on the streak length
   const comment = streak < 3 ? l.comments.low : streak < 7 ? l.comments.medium : streak < 14 ? l.comments.high : l.comments.veryHigh;
 
   return (
@@ -561,7 +561,7 @@ export function RecapStreakFlame({ streak: streakProp, accent = recapPalette.acc
           </span>
         </div>
 
-        {/* 四週天數格：連續的天數依序填滿 */}
+        {/* Four-week day grid: consecutive days fill in order */}
         <div aria-hidden className="mt-8 grid grid-cols-7 gap-1.5">
           {Array.from({ length: GRID_DAYS }, (_, i) => (
             <div key={i} className="aspect-square rounded-[3px]" style={{ background: i < streak ? accent : recapPalette.line }} />

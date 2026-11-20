@@ -6,8 +6,8 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { PhotoLook, photoLooks, type PhotoLookName } from "./photo-looks";
 
-// 示範照片（AI 生成），放在 public/blocks/photo-looks：
-// 風景是正午山丘、路燈、紅車與遠處一人；人像是淺色牆前的側臉半身，給 double-exposure 用
+// Demo photos (AI generated), stored in public/blocks/photo-looks:
+// the landscape is a midday hillside with streetlamps, a red car and a distant figure; the portrait is a half-length profile against a pale wall, for double-exposure
 const SCENE = "/blocks/photo-looks/scene.webp";
 const PORTRAIT = "/blocks/photo-looks/portrait.webp";
 
@@ -60,7 +60,7 @@ function Tile({ name, hint, replay, children }: { name: string; hint: string; re
   );
 }
 
-/** 單一攝影風格的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** One photo-look demo cell: shared by the full demo and the home catalog (variants.tsx) */
 export function PhotoLookTile({ effect }: { effect: PhotoLookName }) {
   const t = useDemoText(copy);
   const portrait = effect === "double-exposure";

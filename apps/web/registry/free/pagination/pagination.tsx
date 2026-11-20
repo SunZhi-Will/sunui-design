@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 export type PageRangeItem = number | "start-ellipsis" | "end-ellipsis";
 
 /**
- * 產生頁碼序列：永遠包含首頁、末頁、目前頁與前後 siblings 頁，其餘以省略號代替。
- * 輸出長度固定（頁數夠多時為 siblings * 2 + 5），切頁時版面不會跳動。
- * @example getPageRange(6, 12) // [1, "start-ellipsis", 5, 6, 7, "end-ellipsis", 12]
- */
+  * Builds the page number sequence: always includes the first page, the last page, the current page and its siblings, with ellipses for the rest.
+  * The output length is fixed (siblings * 2 + 5 when there are enough pages), so the layout does not jump when changing pages.
+  * @example getPageRange(6, 12) // [1, "start-ellipsis", 5, 6, 7, "end-ellipsis", 12]
+  */
 export function getPageRange(current: number, total: number, siblings = 1): PageRangeItem[] {
   const range = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
   if (total <= 0) return [];
@@ -32,34 +32,34 @@ export interface PaginationLabels {
   nav?: string;
   previous?: ReactNode;
   next?: ReactNode;
-  /** 頁碼的無障礙名稱 */
+  /** Accessible name of a page number */
   page?: (n: number) => string;
-  /** 緊湊模式的文字，例如「3 / 12」 */
+  /** Text in compact mode, for example "3 / 12" */
   compact?: (page: number, total: number) => ReactNode;
 }
 
 export interface PaginationProps {
   total: number;
-  /** 受控：目前頁（從 1 開始） */
+  /** Controlled: the current page (starting at 1) */
   page?: number;
   defaultPage?: number;
   onPageChange?: (page: number) => void;
-  /** 提供時每頁渲染成 <a href>，讓搜尋引擎能爬到每一頁 */
+  /** When provided, each page renders as <a href> so search engines can crawl every page */
   getHref?: (page: number) => string;
-  /** 目前頁左右各顯示幾頁 */
+  /** How many pages to show on each side of the current page */
   siblings?: number;
-  /** 只顯示「上一頁 3 / 12 下一頁」，適合窄欄 */
+  /** Shows only "Previous 3 / 12 Next", suited to narrow columns */
   compact?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings, takes priority over locale */
   labels?: PaginationLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -92,9 +92,9 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 }
 
 /**
- * 分頁：自動省略號、上一頁與下一頁、aria-current="page"。
- * 目前頁下方的小橫線用 snappy 彈簧滑到新頁；reduced motion 時直接跳過去。
- */
+  * Pagination: automatic ellipses, previous and next buttons, aria-current="page".
+  * The small underline below the current page slides to the new page on a snappy spring, and jumps straight there under reduced motion.
+  */
 export function Pagination({
   total,
   page: pageProp,
@@ -119,7 +119,7 @@ export function Pagination({
     onPageChange?.(n);
   };
 
-  // 依 getHref 決定是連結還是按鈕；用函式而非元件，避免每次 render 重新掛載而丟失焦點
+  // getHref decides between a link and a button. A function rather than a component, so it is not remounted on every render and focus is not lost
   const item = ({ to, disabled, current, label, children, extra }: {
     to: number;
     disabled?: boolean;

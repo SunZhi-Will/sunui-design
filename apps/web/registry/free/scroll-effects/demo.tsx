@@ -134,7 +134,7 @@ export const copy = {
   },
 };
 
-/** 黏在區段頂端的效果名稱標籤 */
+/** Effect name label stuck to the top of the section */
 function Labeled({ name, children }: { name: string; children: ReactNode }) {
   return (
     <div className="relative border-b border-border">
@@ -148,7 +148,7 @@ function Labeled({ name, children }: { name: string; children: ReactNode }) {
   );
 }
 
-/** 純 CSS / SVG 的佔位畫面 */
+/** Pure CSS / SVG placeholder visual */
 export function Art({ variant = 0 }: { variant?: number }) {
   const a = variant % 2 === 0 ? 80 : 30;
   const b = variant % 2 === 0 ? 25 : 70;

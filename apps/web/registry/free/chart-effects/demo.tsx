@@ -76,7 +76,7 @@ const raceValues = [
 
 const zip = (labels: string[], values: number[]): ChartDatum[] => values.map((value, i) => ({ label: labels[i] ?? String(i + 1), value }));
 
-/** 單一圖表效果，含 demo 的在地化資料；首頁型錄的 variants.tsx 也用它 */
+/** A single chart effect, with localized demo data. The home catalog's variants.tsx uses it too */
 export function DemoChart({ variant, trigger }: { variant: ChartEffectVariant; trigger?: ChartEffectTrigger }) {
   const t = useDemoText(copy);
   const locale = useDemoLocale();

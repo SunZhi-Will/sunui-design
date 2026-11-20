@@ -51,25 +51,25 @@ export type LiquidShape = (typeof liquidShapes)[number];
 
 export type LineDrawTrigger = "mount" | "inView" | "hover" | "loop";
 
-/** 預設配色：主題 primary 與它和 foreground 的混色 */
+/** Default colors: the theme's primary and its mixes with foreground */
 export const defaultSvgColors = ["var(--primary)", "color-mix(in oklch, var(--primary) 50%, var(--foreground))"];
 
 interface BaseProps {
   className?: string;
-  /** 效果用色，可放任何 CSS 顏色 */
+  /** Effect color, accepts any CSS color */
   colors?: string[];
-  /** 循環速度倍率，1 為預設 */
+  /** Loop speed multiplier, 1 is the default */
   speed?: number;
 }
 
-/* ---------- 共用工具 ---------- */
+/* ---------- Shared utilities ---------- */
 
 const pick = (colors: string[] | undefined, i: number) => {
   const list = colors && colors.length > 0 ? colors : defaultSvgColors;
   return list[i % list.length] ?? "currentColor";
 };
 
-/** useId 產生的字串含冒號，放進 url(#...) 前先清掉 */
+/** The string from useId contains colons; strip them before putting it into url(#...) */
 function useSvgId(prefix: string) {
   return `${prefix}-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 }
@@ -85,7 +85,7 @@ function usePageVisible() {
   return visible;
 }
 
-/** 可見、分頁在前景、且未開啟 reduced motion 時才為 true */
+/** True only when visible, the tab is in the foreground, and reduced motion is off */
 function useLoopActive(ref: RefObject<Element | null>) {
   const reduce = useReducedMotion() ?? false;
   const inView = useInView(ref);
@@ -93,7 +93,7 @@ function useLoopActive(ref: RefObject<Element | null>) {
   return { active: inView && visible && !reduce, reduce };
 }
 
-/** 只在 active 時前進的秒數時鐘；暫停時停在原地 */
+/** A clock in seconds that advances only while active; it stays put while paused */
 function useClock(active: boolean, speed = 1, start = 0) {
   const t = useMotionValue(start);
   useEffect(() => {
@@ -111,7 +111,7 @@ function useClock(active: boolean, speed = 1, start = 0) {
   return t;
 }
 
-/** 週期正弦波路徑（Q 後接 T 自動上下交替），底部封閉成可填色的形狀 */
+/** Periodic sine wave path (Q followed by T alternates up and down automatically), closed at the bottom into a fillable shape */
 function wavePath(period: number, amp: number, width: number, bottom: number) {
   let d = `M0 0 Q${period / 4} ${-amp} ${period / 2} 0`;
   for (let x = period; x <= width; x += period / 2) d += ` T${x} 0`;
@@ -121,7 +121,7 @@ function wavePath(period: number, amp: number, width: number, bottom: number) {
 /* ---------- line-draw ---------- */
 
 export interface LineDrawProps extends BaseProps {
-  /** 單一路徑；也可以改傳 SVG 圖形當 children（直接子層的 path、line、circle…） */
+  /** A single path; or pass SVG shapes as children instead (direct child path, line, circle...) */
   d?: string;
   children?: ReactNode;
   viewBox?: string;
@@ -129,7 +129,7 @@ export interface LineDrawProps extends BaseProps {
   trigger?: LineDrawTrigger;
   duration?: number;
   delay?: number;
-  /** 圖形的文字說明；沒給則視為裝飾 */
+  /** Text description of the graphic; treated as decorative when omitted */
   title?: string;
 }
 
@@ -183,7 +183,7 @@ export function LineDraw({
     }
   }, [trigger, inView, hovered, active, reduce, duration, delay, progress]);
 
-  // 每個直接子圖形加上 pathLength=1，用同一個 CSS 變數控制描邊進度
+  // Give every direct child shape pathLength=1 and drive the stroke progress with one CSS variable
   const drawStyle: CSSProperties = { strokeDasharray: "1 1", strokeDashoffset: "var(--draw)" };
   const shapes = children ? (
     Children.map(children, (child) =>
@@ -233,7 +233,7 @@ function blobPath(t: number, points = 8) {
     const r = 36 + Math.sin(t * 0.9 + i * 1.7) * 6 + Math.sin(t * 1.4 + i * 2.9) * 4;
     pts.push([50 + Math.cos(a) * r, 50 + Math.sin(a) * r]);
   }
-  // Catmull-Rom 轉三次貝茲，得到平滑封閉曲線
+  // Catmull-Rom converted to cubic Bezier, giving a smooth closed curve
   let d = `M${pts[0]![0].toFixed(2)} ${pts[0]![1].toFixed(2)}`;
   for (let i = 0; i < points; i++) {
     const p0 = pts[(i - 1 + points) % points]!;
@@ -283,7 +283,7 @@ export function Gooey({ colors, speed = 1, className }: BaseProps) {
       const el = dots.current[i];
       if (!el) continue;
       const a = (i / count) * Math.PI * 2 + v * 0.6;
-      // 每顆圓各自進出，靠近中心時被濾鏡黏成一團
+      // Each circle enters and leaves on its own; near the center the filter merges them into one blob
       const r = 6 + (Math.sin(v * 1.6 + i * 1.3) + 1) * 15;
       el.setAttribute("cx", (50 + Math.cos(a) * r).toFixed(2));
       el.setAttribute("cy", (50 + Math.sin(a) * r).toFixed(2));
@@ -322,14 +322,14 @@ export function Gooey({ colors, speed = 1, className }: BaseProps) {
 /* ---------- orbiting-circles ---------- */
 
 export interface OrbitRing {
-  /** 半徑，以容器半寬的比例表示（0 到 1） */
+  /** Radius as a fraction of the container's half width (0 to 1) */
   radius: number;
-  /** 繞一圈的秒數 */
+  /** Seconds per revolution */
   duration: number;
   reverse?: boolean;
-  /** 軌道上的項目；沒給就畫圓點 */
+  /** Items on the orbit; draws dots when omitted */
   items?: ReactNode[];
-  /** 沒給 items 時的圓點數 */
+  /** Number of dots when items is omitted */
   dots?: number;
 }
 
@@ -407,9 +407,9 @@ function OrbitRingView({ ring, t, color }: { ring: OrbitRing; t: MotionValue<num
 export interface MotionPathProps extends BaseProps {
   d?: string;
   viewBox?: string;
-  /** 走完一趟的秒數 */
+  /** Seconds for one trip */
   duration?: number;
-  /** 是否畫出軌跡線 */
+  /** Whether to draw the trail line */
   showPath?: boolean;
 }
 
@@ -480,11 +480,11 @@ export function MotionPath({
 
 export interface IconMorphProps {
   icon: IconMorphName;
-  /** 受控狀態；不給則元件自己管理 */
+  /** Controlled state; when omitted the component manages it itself */
   pressed?: boolean;
   defaultPressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
-  /** [未按下, 已按下] 的無障礙名稱 */
+  /** Accessible names for [unpressed, pressed] */
   labels?: [string, string];
   className?: string;
 }
@@ -495,7 +495,7 @@ const iconLabels: Record<IconMorphName, [string, string]> = {
   "plus-minus": ["Expand", "Collapse"],
 };
 
-// 兩個狀態的路徑指令結構相同，framer-motion 才能逐點補間
+// Both states have the same path command structure, so framer-motion can tween point by point
 const morphPaths: Record<IconMorphName, { stroke: boolean; from: string[]; to: string[] }> = {
   "menu-close": {
     stroke: true,
@@ -557,11 +557,11 @@ export function IconMorph({ icon, pressed, defaultPressed = false, onPressedChan
 /* ---------- animated-beam ---------- */
 
 export interface AnimatedBeamProps extends BaseProps {
-  /** 左側輸入節點數（1 到 5） */
+  /** Number of input nodes on the left (1 to 5) */
   inputs?: number;
-  /** 右側輸出節點數（1 到 4） */
+  /** Number of output nodes on the right (1 to 4) */
   outputs?: number;
-  /** 一輪（輸入流到中心再流出）的秒數 */
+  /** Seconds for one round (inputs flow to the center, then out) */
   duration?: number;
 }
 
@@ -614,7 +614,7 @@ function BeamPath({
   color: string;
 }) {
   const dash = 0.25;
-  // 只在自己的時間窗內跑一趟；窗外把光點移到路徑之外
+  // Each runs one trip only inside its own time window; outside the window the dot is moved off the path
   const offset = useTransform(t, (v) => {
     const cycle = ((v / duration) % 1 + 1) % 1;
     const local = (cycle - start - lag) / (end - start);
@@ -712,9 +712,9 @@ export function FlowingConnectors({ colors, speed = 1, className }: BaseProps) {
 /* ---------- radar-sweep ---------- */
 
 export interface RadarSweepProps extends BaseProps {
-  /** 掃一圈的秒數 */
+  /** Seconds per sweep */
   duration?: number;
-  /** 光點數 */
+  /** Number of blips */
   blips?: number;
 }
 
@@ -737,7 +737,7 @@ export function RadarSweep({ duration = 4, blips = 7, colors, speed = 1, classNa
   const c = pick(colors, 0);
   const slices = 18;
   const step = 4;
-  // 固定公式產生光點位置，伺服器與瀏覽器一致
+  // A fixed formula produces the blip positions, so server and browser agree
   const points = Array.from({ length: blips }, (_, i) => ({
     deg: (i * 137.5 + 20) % 360,
     r: 25 + ((i * 53) % 60),
@@ -775,7 +775,7 @@ export function RadarSweep({ duration = 4, blips = 7, colors, speed = 1, classNa
 
 function Blip({ deg, r, angle, color }: { deg: number; r: number; angle: MotionValue<number>; color: string }) {
   const [x, y] = polar(r, deg);
-  // 掃過的瞬間最亮，之後漸暗
+  // Brightest at the moment the sweep passes, then fades
   const opacity = useTransform(angle, (a) => {
     const behind = (a - deg + 360) % 360;
     return Math.max(0.08, 1 - behind / 220);
@@ -786,12 +786,12 @@ function Blip({ deg, r, angle, color }: { deg: number; r: number; angle: MotionV
 /* ---------- liquid-fill ---------- */
 
 export interface LiquidFillProps extends BaseProps {
-  /** 0 到 100 */
+  /** 0 to 100 */
   value: number;
   shape?: LiquidShape;
-  /** 讀屏用名稱，例如「電量」 */
+  /** Name for screen readers, for example "Battery" */
   label?: string;
-  /** 是否在中央顯示百分比 */
+  /** Whether to show the percentage in the center */
   showValue?: boolean;
 }
 
@@ -879,27 +879,27 @@ export function LiquidFill({ value, shape = "circle", label = "Progress", showVa
   );
 }
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 export interface SvgEffectProps extends BaseProps {
   effect: SvgEffectName;
-  /** line-draw、motion-path 用的路徑 */
+  /** Path used by line-draw and motion-path */
   d?: string;
   viewBox?: string;
-  /** line-draw 用的自訂圖形 */
+  /** Custom shapes used by line-draw */
   children?: ReactNode;
   trigger?: LineDrawTrigger;
   duration?: number;
   delay?: number;
-  /** icon-morph 用 */
+  /** Used by icon-morph */
   icon?: IconMorphName;
-  /** liquid-fill 用，0 到 100 */
+  /** Used by liquid-fill, 0 to 100 */
   value?: number;
   shape?: LiquidShape;
   label?: string;
 }
 
-/** 用 effect 切換十種 SVG 效果；個別效果也可直接匯入對應元件以取得完整 props */
+/** Switches between ten SVG effects with effect; each effect can also be imported as its own component for its full props */
 export function SvgEffect({ effect, d, viewBox, children, trigger, duration, delay, icon, value, shape, label, ...base }: SvgEffectProps) {
   switch (effect) {
     case "line-draw":

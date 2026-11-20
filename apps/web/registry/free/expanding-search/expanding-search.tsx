@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 export type ExpandingSearchSuggestion = {
   id: string;
   label: string;
-  /** 第二行的說明，例如分類或款式 */
+  /** Second-line description, for example category or style */
   description?: string;
-  /** 右側的輔助文字，例如價格 */
+  /** Auxiliary text on the right, for example price */
   hint?: string;
-  /** 左側縮圖，例如商品圖 */
+  /** Thumbnail on the left, for example a product image */
   thumbnail?: ReactNode;
 };
 
@@ -20,25 +20,25 @@ export interface ExpandingSearchProps {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** 按 Enter（且沒有選取建議）時呼叫 */
+  /** Called on Enter (when no suggestion is selected) */
   onSubmit?: (query: string) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** 建議清單；不給則不顯示下拉選單 */
+  /** Suggestion list; when not given, no dropdown is shown */
   suggestions?: ExpandingSearchSuggestion[];
-  /** 是否依輸入內容過濾建議（不分大小寫的子字串比對）；自行過濾時設為 false */
+  /** Whether to filter suggestions by the input (case-insensitive substring match); set to false to filter yourself */
   filterSuggestions?: boolean;
   onSuggestionSelect?: (suggestion: ExpandingSearchSuggestion) => void;
-  /** 展開後的寬度（px），窄螢幕時不會超出父層 */
+  /** Width when expanded (px); on narrow screens it never exceeds the parent */
   expandedWidth?: number;
-  /** 啟用 "/" 快捷鍵開啟搜尋；在其他輸入框打字時不會觸發 */
+  /** Enable the "/" shortcut to open search; it does not fire while typing in other inputs */
   slashShortcut?: boolean;
-  /** 不給時用 labels.placeholder */
+  /** When not given, labels.placeholder is used */
   placeholder?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings, takes priority over locale */
   labels?: Partial<ExpandingSearchLabels>;
   className?: string;
 }
@@ -54,7 +54,7 @@ export interface ExpandingSearchLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -97,7 +97,7 @@ const MESSAGES: Record<SunLocale, ExpandingSearchLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md，質感）：表面、hairline、文字色
+// Design language (DESIGN.md, craft quality): surfaces, hairlines, text colors
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const surfaceUnder = "bg-muted dark:bg-foreground/10";
 const edge = "border-foreground/10";
@@ -191,7 +191,7 @@ export function ExpandingSearch({
 
   const showList = open && listOpen && filtered.length > 0;
 
-  // 展開時自動聚焦；收合時視情況把焦點還給圖示按鈕
+  // Focus automatically when expanded; when collapsing, return focus to the icon button as appropriate
   useEffect(() => {
     if (open) {
       const raf = requestAnimationFrame(() => inputRef.current?.focus());
@@ -247,7 +247,7 @@ export function ExpandingSearch({
       choose(filtered[active]);
     } else if (e.key === "Escape") {
       e.preventDefault();
-      // 第一下關閉建議清單，第二下收合
+      // The first press closes the suggestion list, the second collapses it
       if (showList) {
         setListOpen(false);
         setActive(-1);
@@ -268,7 +268,7 @@ export function ExpandingSearch({
       role="search"
       onSubmit={onFormSubmit}
       onBlur={(e) => {
-        // 焦點離開整個元件：關閉清單，若沒有內容則收合
+        // Focus leaves the whole component: close the list, and collapse if there is no content
         if (rootRef.current?.contains(e.relatedTarget as Node)) return;
         setListOpen(false);
         if (!value.trim()) collapse(false);

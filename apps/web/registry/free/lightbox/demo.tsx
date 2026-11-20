@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { Lightbox } from "./lightbox";
 
-// 示範照片（AI 生成），放在 public/blocks/lightbox；縮圖另存 480 px 的 -thumb 版
+// Demo photos (AI generated), in public/blocks/lightbox; thumbnails are saved separately as 480 px -thumb versions
 const photos = ["front", "rib", "stack", "back", "cuff", "label"];
 const sources = photos.map((name) => `/blocks/lightbox/${name}.webp`);
 const thumbs = photos.map((name) => `/blocks/lightbox/${name}-thumb.webp`);

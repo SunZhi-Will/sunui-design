@@ -16,7 +16,7 @@ export default function ContentGateDemo() {
   const t = useDemoText(copy);
   return (
     <div className="grid w-full max-w-4xl min-w-0 gap-4 md:grid-cols-2">
-      {/* 頁內版：課程頁頂部，已登入但這個帳號沒有購買 */}
+      {/* In-page variant: top of a course page, signed in but this account has not purchased */}
       <div className="min-w-0 overflow-hidden rounded-xl border border-black/[0.06] dark:border-white/10">
         <div className="flex min-w-0 items-center justify-between gap-3 border-b border-black/[0.06] px-4 py-3 text-sm dark:border-white/10">
           <span className="min-w-0 truncate font-semibold">{t.title}</span>
@@ -25,7 +25,7 @@ export default function ContentGateDemo() {
         <ContentGate title={t.title} subtitle={t.subtitle} state="no-access" locale={locale} signInHref="#" contactHref="#" />
       </div>
 
-      {/* 覆蓋版：試看到第三張，付費牆蓋在投影片播放器上 */}
+      {/* Overlay variant: preview reached the third slide, with the paywall over the slide player */}
       <div className="relative min-h-80 w-full min-w-0 overflow-hidden rounded-xl border border-border bg-muted">
         <div className="absolute inset-0 flex flex-col justify-between p-5 text-foreground">
           <div>

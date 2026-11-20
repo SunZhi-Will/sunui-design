@@ -45,11 +45,11 @@ const copy = {
   },
 };
 
-/** 型錄卡片：手機寬的商店頁面底部浮出 Cookie 同意條，可全部接受、拒絕或展開逐項開關。 */
+/** Catalog card: a cookie consent bar slides up at the bottom of a phone-width store page. Accept all, reject, or expand to toggle each category. */
 export default function CookieConsentCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
-  // 選完之後同意條會收起，過一下換 key 讓卡片回到初始狀態
+  // After a choice the bar closes; after a pause the key changes so the card returns to its initial state
   const [round, setRound] = useState(0);
 
   return (

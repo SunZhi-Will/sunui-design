@@ -16,7 +16,7 @@ const breakdown = [
   { stars: 1, count: 31 },
 ];
 const total = breakdown.reduce((sum, b) => sum + b.count, 0);
-// StarRating 的 distribution 從 1 星排到 5 星
+// StarRating's distribution runs from 1 star to 5 stars
 const distribution = [...breakdown].reverse().map((b) => b.count);
 
 const copy = {
@@ -65,10 +65,10 @@ export default function StarRatingDemo() {
   const [mine, setMine] = useState(0);
   const ref = useRef<HTMLElement>(null);
 
-  // 預覽自己演：游標從 1 星慢慢滑到 5 星（標籤一路往上滾），停在 2 星點下去長出「哪裡不好」，
-  // 再改點 5 星，理由組就地換成「喜歡哪裡」，點兩個理由
+  // The preview plays itself: the cursor slowly slides from 1 star to 5 stars (the label scrolls up all the way), stops at 2 stars and clicks so "What went wrong" grows,
+  // then clicks 5 stars instead, the reason group swaps in place to "What did you like", and two reasons are clicked
   const cursor = useDemoAutoplay(ref, async (d) => {
-    // precision 0.5 時每顆星有兩個 radio，整顆星是第 2n 個
+    // With precision 0.5 each star has two radios; a whole star is the 2nth one
     const star = (n: number) => () => ref.current?.querySelectorAll<HTMLElement>("[role=radio]")[n * 2 - 1];
     const chip = (text: string) => () => d.find("button[aria-pressed]", text);
     for (const n of [1, 2, 3, 4, 5]) {

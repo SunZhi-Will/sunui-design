@@ -14,19 +14,19 @@ export interface SidePanelProps {
   title: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
-  /** 固定在底部的操作區 */
+  /** Actions area fixed at the bottom */
   footer?: ReactNode;
   side?: SidePanelSide;
   size?: "sm" | "md" | "lg";
-  /** 點擊遮罩是否關閉 */
+  /** Whether clicking the overlay closes it */
   dismissOnOverlay?: boolean;
-  /** 開啟時優先聚焦的元素，預設為面板內第一個可聚焦元素 */
+  /** Element to focus first on open, defaults to the first focusable element in the panel */
   initialFocusRef?: RefObject<HTMLElement | null>;
-  /** 渲染到 document.body；false 時渲染在原位置（容器需有 relative 與 overflow-hidden） */
+  /** Render into document.body; when false, render in place (the container needs relative and overflow-hidden) */
   portal?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes precedence over locale */
   labels?: Partial<SidePanelLabels>;
   className?: string;
 }
@@ -37,7 +37,7 @@ export interface SidePanelLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -64,7 +64,7 @@ const sideClass: Record<SidePanelSide, string> = {
   bottom: "inset-x-0 bottom-0 rounded-t-md border-t",
 };
 
-// 設計語言（DESIGN.md）：一張紙從邊緣滑進來，表面、邊線、文字色
+// Design language (DESIGN.md): a sheet slides in from the edge; surface, border and text colors
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const edge = "border-foreground/10";
 const ink = "text-foreground";
@@ -93,7 +93,7 @@ const panelVariants: Variants = {
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// 多個面板同時開啟時共用的捲動鎖計數
+// Scroll-lock count shared when several panels are open at once
 let lockCount = 0;
 let previousOverflow = "";
 
@@ -123,7 +123,7 @@ export function SidePanel({
 
   useEffect(() => setMounted(true), []);
 
-  // 捲動鎖與焦點還原
+  // Scroll lock and focus restore
   useEffect(() => {
     if (!open) return;
     restoreRef.current = document.activeElement as HTMLElement | null;
@@ -156,7 +156,7 @@ export function SidePanel({
       return;
     }
     if (e.key !== "Tab" || !panelRef.current) return;
-    // 焦點陷阱：Tab 在面板內循環
+    // Focus trap: Tab cycles inside the panel
     const nodes = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
       (n) => n.offsetParent !== null,
     );

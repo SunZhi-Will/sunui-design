@@ -11,7 +11,7 @@ const copy = {
   ja: { spotlight: "光を追いかける", blend: "反転" },
 };
 
-/** 型錄卡片：三格游標效果，idle 位置讓縮圖不用懸停也看得到 */
+/** Catalog card: three cursor effects; the idle position lets the thumbnails show without hovering */
 export default function CursorEffectsCard() {
   const t = useDemoText(copy);
   const tile = "grid h-24 place-items-center rounded-md border border-border bg-card text-sm font-medium text-foreground";

@@ -10,23 +10,23 @@ const springs = {
 } as const;
 
 export interface TocItem {
-  /** 對應段落元素的 id */
+  /** id of the matching section element */
   id: string;
   label: ReactNode;
-  /** 1 是主標題，2 會縮排 */
+  /** 1 is the main heading, 2 is indented */
   level?: 1 | 2;
 }
 
 export interface ScrollSpyOptions {
-  /** 在可捲動容器裡使用時傳入；預設跟著視窗 */
+  /** Pass this when used inside a scrollable container; defaults to the viewport */
   container?: RefObject<HTMLElement | null>;
-  /** 段落頂端距離捲動區頂端多少 px 以內算是「正在讀」，通常是固定 header 的高度再多一點 */
+  /** A section counts as "being read" when its top is within this many px of the scroll area top, usually the fixed header height plus a bit */
   offset?: number;
 }
 
 /**
- * 回傳目前正在讀的段落 id：最後一個頂端已經捲過 offset 的段落。
- * 捲到底時一律回傳最後一個，避免短的結尾段落永遠亮不起來。
+ * Returns the id of the section being read: the last section whose top has scrolled past offset.
+ * At the bottom it always returns the last one, so a short final section can still become active.
  */
 export function useScrollSpy(ids: string[], { container, offset = 96 }: ScrollSpyOptions = {}) {
   const [active, setActive] = useState<string | null>(ids[0] ?? null);
@@ -68,13 +68,13 @@ export function useScrollSpy(ids: string[], { container, offset = 96 }: ScrollSp
 export interface TocScrollspyProps extends ScrollSpyOptions {
   items: TocItem[];
   title?: ReactNode;
-  /** 點選時平滑捲動（減少動態時直接跳） */
+  /** Smooth scroll on click (jumps instantly with reduced motion) */
   smooth?: boolean;
   onNavigate?: (id: string) => void;
   className?: string;
 }
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, offers and current progress */
 const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 
 export function TocScrollspy({ items, title, container, offset = 96, smooth = true, onNavigate, className }: TocScrollspyProps) {

@@ -95,12 +95,12 @@ export type PresetFamily = "entrance" | "exit" | "emphasis";
 export type AnimateTrigger = "mount" | "inView" | "hover" | "click" | "loop";
 
 interface PresetDef {
-  /** 起始狀態（強調類由 to 的最後一格自動推出） */
+  /** Starting state (for emphasis presets it is derived automatically from the last keyframe of to) */
   from?: TargetAndTransition;
   to: TargetAndTransition;
   duration: number;
   ease?: Easing | Easing[];
-  /** 固定樣式，例如 3D 透視或旋轉軸心 */
+  /** Fixed styles, for example 3D perspective or a rotation pivot */
   style?: CSSProperties & { originX?: number; originY?: number; transformPerspective?: number };
 }
 
@@ -108,7 +108,7 @@ const out: Easing = [0.22, 1, 0.36, 1];
 const inEase: Easing = [0.55, 0, 1, 0.45];
 const persp = { transformPerspective: 500 };
 
-// 每個預設只描述「從哪裡到哪裡」，時間與觸發交給 Animate
+// Each preset only describes "from where to where"; timing and trigger are left to Animate
 const entrance: Record<EntrancePreset, PresetDef> = {
   fadeIn: { from: { opacity: 0 }, to: { opacity: 1 }, duration: 0.5 },
   fadeInUp: { from: { opacity: 0, y: 24 }, to: { opacity: 1, y: 0 }, duration: 0.55, ease: out },
@@ -272,7 +272,7 @@ function getDef(preset: AnimatePreset): PresetDef {
   return (entrance as Record<string, PresetDef>)[preset] ?? (exit as Record<string, PresetDef>)[preset] ?? emphasis[preset as EmphasisPreset];
 }
 
-/** 強調類的靜止狀態：每個屬性取關鍵影格的最後一格 */
+/** Resting state for emphasis presets: each property takes the last keyframe */
 function restOf(def: PresetDef): TargetAndTransition {
   if (def.from) return def.from;
   const rest: Record<string, unknown> = {};
@@ -299,18 +299,18 @@ export type AnimateTag = keyof typeof tags;
 
 export interface AnimateProps {
   preset: AnimatePreset;
-  /** 觸發方式，預設 mount */
+  /** How it triggers, defaults to mount */
   trigger?: AnimateTrigger;
-  /** 秒；不給就用預設各自的節奏 */
+  /** Seconds. When omitted, each preset uses its own pacing */
   duration?: number;
-  /** 秒 */
+  /** Seconds */
   delay?: number;
-  /** trigger="loop" 時每輪之間的停頓（秒） */
+  /** Pause between cycles (seconds) when trigger="loop" */
   repeatDelay?: number;
-  /** 受控播放：給了就忽略 trigger，變成 true 時播放一次 */
+  /** Controlled playback: when given, trigger is ignored and it plays once when this becomes true */
   play?: boolean;
   as?: AnimateTag;
-  /** 進場 inView 時要露出多少比例才觸發 */
+  /** What fraction must be visible to trigger the inView entrance */
   amount?: number;
   onComplete?: () => void;
   className?: string;
@@ -338,8 +338,8 @@ export function Animate({
   const controls = useAnimationControls();
   const ref = useRef<HTMLDivElement>(null);
   const isLoop = play === undefined && trigger === "loop";
-  // loop 只用來在離開畫面時暫停，露出一點就算在畫面上：
-  // 進場的起點常是位移到框外或 clip-path 全遮（backInRight、clipReveal），用 amount 比例判斷會永遠不開始
+  // loop only pauses while off screen, so any part showing counts as on screen:
+  // an entrance often starts translated outside the box or fully hidden by clip-path (backInRight, clipReveal), and judging by an amount ratio would never start
   const inView = useInView(ref, { once: !isLoop, amount: isLoop ? "some" : amount });
   const played = useRef(false);
 
@@ -354,7 +354,7 @@ export function Animate({
     controls.set("rest");
     played.current = true;
     if (reduce) {
-      // 減少動態：進場與退場直接跳到結果，強調類不動
+      // Reduced motion: entrances and exits jump straight to the result, emphasis presets do not move
       if (family !== "emphasis") controls.set("play");
       onComplete?.();
       return;
@@ -368,13 +368,13 @@ export function Animate({
     else void controls.start("rest", { duration: 0.35, ease: out });
   }, [controls, reduce]);
 
-  // 受控播放
+  // Controlled playback
   useEffect(() => {
     if (play === undefined) return;
     if (play) run();
   }, [play, run]);
 
-  // mount 與 inView
+  // mount and inView
   useEffect(() => {
     if (play !== undefined) return;
     if (trigger === "mount") run();
@@ -385,7 +385,7 @@ export function Animate({
     run();
   }, [play, trigger, inView, run]);
 
-  // loop：離開畫面就暫停；減少動態時停在可讀的狀態
+  // loop: pauses when off screen; under reduced motion it rests in a readable state
   useEffect(() => {
     if (!isLoop) return;
     if (reduce) {
@@ -407,7 +407,7 @@ export function Animate({
     return () => controls.stop();
   }, [isLoop, reduce, inView, family, transition, repeatDelay, controls]);
 
-  // 進場搭配 mount/inView/loop 時從隱藏開始；其他情況先顯示，觸發時才重播
+  // Entrances combined with mount/inView/loop start hidden; otherwise they show first and replay only when triggered
   const startHidden = family === "entrance" && (play !== undefined || trigger === "mount" || trigger === "inView" || trigger === "loop");
   const initial = startHidden && !reduce ? "rest" : family === "entrance" ? "play" : "rest";
 
@@ -440,14 +440,14 @@ export function Animate({
 
 export interface StaggerProps {
   preset: AnimatePreset;
-  /** 只支援 mount 與 inView，整組一起判斷 */
+  /** Supports only mount and inView, evaluated for the whole group together */
   trigger?: "mount" | "inView";
-  /** 每個子元素之間的間隔（秒） */
+  /** Interval between children (seconds) */
   stagger?: number;
   delay?: number;
   duration?: number;
   as?: AnimateTag;
-  /** 每個子元素外層的標籤 */
+  /** Tag that wraps each child */
   itemAs?: AnimateTag;
   itemClassName?: string;
   amount?: number;
@@ -455,7 +455,7 @@ export interface StaggerProps {
   children?: ReactNode;
 }
 
-/** 依序播放每個子元素的同一個預設 */
+/** Plays the same preset on each child in sequence */
 export function Stagger({
   preset,
   trigger = "mount",

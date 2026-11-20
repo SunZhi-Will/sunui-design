@@ -11,7 +11,7 @@ const copy = {
   ja: { title: "リネンのブランケット", wrap: "ギフトラッピング", card: "手書きカード", care: "お手入れキット" },
 };
 
-/** 型錄卡片：一張加購收據，勾選加購品，小計跟著滾動。 */
+/** Catalog card: an add-on receipt; tick add-ons and the subtotal rolls along. */
 export default function AddonChecklistCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

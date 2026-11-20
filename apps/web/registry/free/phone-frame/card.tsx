@@ -13,7 +13,7 @@ const copy = {
 
 const prices = ["$36", "$24", "$12", "$9"];
 
-/** 型錄卡片：一支小手機框，螢幕裡的購物車可以上下捲動。 */
+/** Catalog card: a small phone frame whose on-screen cart can scroll up and down. */
 export default function PhoneFrameCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

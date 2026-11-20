@@ -97,7 +97,7 @@ export default function ToastStackDemo() {
     { id: "l2", kind: "bottle" },
   ]);
   const seq = useRef(2);
-  // 移除立刻生效，通知上給「復原」，不跳確認視窗
+  // Removal takes effect immediately; the notification offers "Undo" instead of a confirmation dialog
   const undoable = useUndoable(cart, setCart, { push }, { locale });
 
   const add = (kind: ProductKind, variant: string) => {

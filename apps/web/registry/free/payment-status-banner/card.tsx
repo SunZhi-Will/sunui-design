@@ -13,7 +13,7 @@ const copy = {
   ja: { pending: "お支払いを確認中…", success: "お支払い完了！", successLink: "始める →", course: "はじめてのフィルム現像", replay: "もう一度" },
 };
 
-/** 型錄卡片：付款確認中的橫幅自己輪詢，第二次查詢開通後切成成功。 */
+/** Catalog card: the banner for a payment being confirmed polls by itself and switches to success once the second check shows access unlocked. */
 export default function PaymentStatusBannerCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -21,7 +21,7 @@ export default function PaymentStatusBannerCard() {
   const [unlocked, setUnlocked] = useState(false);
   const refreshes = useRef(0);
 
-  // 重播：重新掛載橫幅並把模擬的 webhook 歸零
+  // Replay: remount the banner and reset the simulated webhook
   const replay = () => {
     refreshes.current = 0;
     setUnlocked(false);

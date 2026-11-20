@@ -4,7 +4,7 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { ProductMedia } from "./product-media";
 
-// 和完整 demo 同一組示範照片：馬克杯正面、側面與釉面微距
+// Same demo photos as the full demo: mug front, side and glaze macro
 const sources = ["front", "side", "glaze"].map((name) => `/blocks/product-media/${name}.webp`);
 
 const copy = {
@@ -14,7 +14,7 @@ const copy = {
   ja: { name: "ストーンウェアのマグ", price: "$24", note: "ホバーで側面、クリックで拡大。", alts: ["ストーンウェアのマグ 正面", "ストーンウェアのマグ 側面", "釉薬のクローズアップ"], tag: "新着" },
 };
 
-/** 型錄卡片：商品主圖，滑過換側面角度、點一下跟著游標放大，下方圓點切換三張圖。 */
+/** Catalog card: the product hero image. Hover to swap to the side angle, click to zoom following the cursor, and the dots below switch between three images. */
 export default function ProductMediaCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

@@ -57,7 +57,7 @@ const copy = {
   },
 };
 
-// 票券的中性線稿，線寬 1.5
+// Neutral line drawing of a ticket, stroke width 1.5
 function TicketArt() {
   return (
     <svg viewBox="0 0 48 48" className="size-full p-2.5 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinejoin="round" aria-hidden>
@@ -67,7 +67,7 @@ function TicketArt() {
   );
 }
 
-/** 售票結帳的側欄：座位保留了 20 分鐘，進頁面時已過 15 分多，最後幾分鐘會顯示秒數 */
+/** Ticket checkout sidebar: seats are held for 20 minutes and a little over 15 have elapsed on page load, so seconds appear for the final minutes */
 export default function ReservationTimerDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
@@ -75,7 +75,7 @@ export default function ReservationTimerDemo() {
   const [expiresAt, setExpiresAt] = useState(() => startedAt + 20 * MIN);
   const [released, setReleased] = useState(false);
   const ref = useRef<HTMLElement>(null);
-  // 預覽自己演：剩 4 分多鐘時按延長，分鐘往上滾，超過 5 分鐘秒數就收起來
+  // The preview plays itself: with a little over 4 minutes left it presses extend, the minutes roll up, and past 5 minutes the seconds collapse
   const cursor = useDemoAutoplay(ref, async (d) => {
     await d.wait(2600);
     await d.click(() => d.find("button", t.extend));

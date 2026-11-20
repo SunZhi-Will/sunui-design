@@ -1,6 +1,6 @@
 import type { ClothPanel } from "./cloth-simulation";
 
-/** 鏡頭到 z=0 平面的距離。z=0 的點剛好落在畫面座標上，只有皺褶的深度會產生透視。 */
+/** Distance from the camera to the z=0 plane. Points at z=0 land exactly on frame coordinates; only the depth of the folds produces perspective. */
 const CAMERA_DISTANCE = 3.2;
 
 const VERTEX_SHADER = `
@@ -21,9 +21,9 @@ void main() {
 `;
 
 /**
- * 動畫賽璐璐上色，配合場景與立繪的繪風：布料的動態是物理算的，顏色卻是畫的。
- * 只分亮、中、暗三階，陰影往藍紫偏，側過去的皺褶收一條細線。
- * 不加布紋與連續漸層，那些一加就會變成寫實的布，和背景脫節。
+ * Anime-style cel shading to match the scene and character art: the cloth motion is physically simulated, but the colours are painted.
+ * Only three tones (light, mid, dark), shadows shift toward blue-violet, and folds turned sideways get a thin line.
+ * No fabric texture or continuous gradients: add either and it becomes realistic cloth, detached from the background.
  */
 const fragmentShader = (tones: ClothTones) => `
 precision highp float;
@@ -57,7 +57,7 @@ void main() {
 }
 `;
 
-/** 賽璐璐三階加描線的顏色，各為 0 到 1 的 RGB。預設是深酒紅色的厚簾布，原本的粉紅可用 tones 傳回。 */
+/** Colours of the three cel tones plus the outline, each an RGB in 0 to 1. Defaults to a thick dark wine-red curtain; the original pink can be passed back through tones. */
 export interface ClothTones {
   light: readonly [number, number, number];
   base: readonly [number, number, number];
@@ -90,7 +90,7 @@ function compile(gl: WebGLRenderingContext, type: number, source: string): WebGL
   return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
 }
 
-/** 回傳 undefined 代表這台裝置沒有 WebGL，呼叫端改畫靜態的簾子。 */
+/** Returns undefined when the device has no WebGL, so the caller draws a static curtain instead. */
 export function createClothRenderer(
   canvas: HTMLCanvasElement,
   sheer: number,
@@ -153,7 +153,7 @@ export function createClothRenderer(
       }
     },
     dispose() {
-      // 不能 loseContext：同一張畫布重新掛載（StrictMode 就會）時要再拿到可用的 context。
+      // Must not loseContext: when the same canvas remounts (StrictMode does this) it needs a usable context again.
       for (const buffer of [positionBuffer, normalBuffer, uvBuffer, indexBuffer]) gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.deleteShader(vertex);

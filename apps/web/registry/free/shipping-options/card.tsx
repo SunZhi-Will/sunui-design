@@ -11,7 +11,7 @@ const copy = {
   ja: { standard: ["通常配送", "11月10日（月）", "$50 以上のご注文"], express: ["お急ぎ便", "11月7日（金）", "追跡あり"] },
 };
 
-/** 型錄卡片：兩張票根式配送選項，點選或用方向鍵切換。 */
+/** Catalog card: two ticket-style shipping options; switch by clicking or with the arrow keys. */
 export default function ShippingOptionsCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

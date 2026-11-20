@@ -13,11 +13,11 @@ const copy = {
   ja: { title: "スタジオヘッドホン、発売記念週間", discount: "40% OFF" },
 };
 
-/** 型錄卡片：一條限時優惠，只看紙上翻頁數字每秒翻下的倒數。 */
+/** Catalog card: a limited-time offer, showing only the paper flip-clock digits turning down each second. */
 export default function CountdownBannerCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
-  // 結束時間在初始化時算一次，不在 render 中呼叫 Date.now()
+  // The end time is computed once at init, so Date.now() is not called during render
   const [end] = useState(() => new Date(Date.now() + 4 * 3_600_000 + 26 * 60_000));
 
   return (

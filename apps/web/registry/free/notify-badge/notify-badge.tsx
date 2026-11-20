@@ -10,25 +10,25 @@ const springs = {
 } as const;
 
 export interface NotifyBadgeProps {
-  /** 被標記的元素，例如鈴鐺或購物車圖示 */
+  /** The element being badged, e.g. a bell or cart icon */
   children: ReactNode;
-  /** 數量；0 時隱藏（除非 showZero） */
+  /** The count; hidden at 0 (unless showZero) */
   count?: number;
-  /** 超過時顯示「max+」 */
+  /** Shows "max+" when exceeded */
   max?: number;
-  /** 只顯示小圓點，不顯示數字 */
+  /** Show only a small dot, no number */
   dot?: boolean;
   showZero?: boolean;
-  /** accent：朱紅；ink：文字色；primary：主題主色 */
+  /** accent: vermilion; ink: the text colour; primary: the theme's primary colour */
   tone?: "accent" | "ink" | "primary";
-  /** 徽章位置 */
+  /** Badge position */
   placement?: "top-right" | "top-left" | "bottom-right";
-  /** 給螢幕閱讀器的完整說法，例如 (n) => `${n} 則新通知` */
+  /** Full wording for screen readers, e.g. (n) => `${n} new notifications` */
   label?: (count: number) => string;
   className?: string;
 }
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selected state, offers and current progress */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const tones = {
@@ -83,7 +83,7 @@ export function NotifyBadge({
               exit={{ scale: reduce ? 1 : 0, opacity: 0 }}
               transition={reduce ? { duration: 0 } : springs.stamp}
             >
-              {/* 數量增加時像被蓋了一下：先放大再落定；減少時不動 */}
+              {/* When the count goes up it is pressed like a stamp: scales up first, then settles; no motion when it goes down */}
               <motion.span
                 key={bump}
                 initial={reduce || bump === 0 ? false : { scale: 1.35 }}

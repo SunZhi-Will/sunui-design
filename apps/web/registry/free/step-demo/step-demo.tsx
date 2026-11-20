@@ -1,8 +1,8 @@
 "use client";
 
-// 以時間 t 驅動的產品 Demo 視窗：每一格畫面都是「這一步第幾秒」的純函式。
-// 所以可以跳步、拖曳時間軸、凍結某一秒截圖，減少動態效果時直接顯示每一步的完成畫面。
-// 舞台固定設計尺寸（預設 1200 × 750），用單一比例縮放，手機上看到的是同一個畫面而不是重排版。
+// A product demo window driven by time t: every frame is a pure function of "which second of this step".
+// That makes it possible to jump between steps, drag the timeline, freeze a given second for a screenshot, and under reduced motion show the finished frame of each step directly.
+// The stage has a fixed design size (1200 × 750 by default) and scales by a single ratio, so phones see the same picture instead of a reflowed layout.
 
 import {
   createContext,
@@ -18,16 +18,16 @@ import {
 
 import { cn } from "@/lib/utils";
 
-/* ---------- 時間工具：全部是純函式，只吃 t ---------- */
+/* ---------- Time helpers: all pure functions that take only t ---------- */
 
 type Curve = readonly [number, number, number, number];
 
 export const curves = {
-  /** 產品系列唯一的 expo-out */
+  /** The expo-out used across the product line */
   out: [0.23, 1, 0.32, 1],
-  /** 游標滑行 */
+  /** Cursor glide */
   glide: [0.55, 0, 0.25, 1],
-  /** 步驟淡入 */
+  /** Step fade-in */
   fade: [0.2, 0.7, 0.1, 1],
   linear: [0, 0, 1, 1],
 } as const satisfies Record<string, Curve>;
@@ -51,17 +51,17 @@ function bezier([x1, y1, x2, y2]: Curve, x: number) {
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
 
-/** 從 from 秒開始、歷時 dur 秒的 0 到 1 進度 */
+/** 0 to 1 progress starting at second from and lasting dur seconds */
 export function ease(t: number, from: number, dur: number, curve: keyof typeof curves | Curve = "out") {
   const c = typeof curve === "string" ? curves[curve] : curve;
   return bezier(c, clamp01((t - from) / Math.max(dur, 1e-6)));
 }
 
-/** t 是否已經到了 at 秒 */
+/** Whether t has reached second at */
 export const cue = (t: number, at: number) => t >= at;
-/** t 是否落在 [from, to) */
+/** Whether t falls in [from, to) */
 export const held = (t: number, from: number, to: number) => t >= from && t < to;
-/** 游標閃爍，回傳是否顯示 */
+/** Cursor blink, returns whether it is visible */
 export const blink = (t: number, hz = 1) => Math.floor(t * hz * 2) % 2 === 0;
 
 const graphemeCache = new Map<string, string[]>();
@@ -78,34 +78,34 @@ function graphemes(text: string) {
   return g;
 }
 
-/** 從 from 秒起以每秒 cps 個字打出 text，CJK 與 emoji 以字形計算 */
+/** Types text starting at second from at cps characters per second; CJK and emoji count by glyph */
 export function typed(text: string, t: number, from: number, cps = 50) {
   const g = graphemes(text);
   return g.slice(0, Math.max(0, Math.min(g.length, Math.floor((t - from) * cps)))).join("");
 }
 
-/** 打完 text 需要的秒數，拿來排下一個時間點 */
+/** Seconds needed to finish typing text, used to schedule the next time point */
 export const typingTime = (text: string, cps = 50) => graphemes(text).length / cps;
 
-/* ---------- 型別 ---------- */
+/* ---------- Types ---------- */
 
-/** 游標目標：舞台內 data-aim 的名稱，或舞台座標 [x, y] */
+/** Cursor target: the name of a data-aim element inside the stage, or stage coordinates [x, y] */
 export type Aim = string | readonly [number, number];
 
 export interface CursorKey {
-  /** 抵達目標的秒數 */
+  /** Seconds until the target is reached */
   at: number;
   to: Aim;
-  /** 按下的秒數，建議比 at 晚 0.3 到 0.6 秒 */
+  /** Second of the press, suggested 0.3 to 0.6 seconds after at */
   click?: number;
-  /** 滑行秒數，預設 0.7 */
+  /** Glide duration in seconds, default 0.7 */
   glide?: number;
-  /** 抵達後淡出，讓觀眾看結果 */
+  /** Fade out after arriving so viewers can see the result */
   hide?: boolean;
 }
 
 export interface StepViewProps {
-  /** 這一步的第幾秒 */
+  /** Which second of this step */
   t: number;
   dur: number;
   reduced: boolean;
@@ -113,9 +113,9 @@ export interface StepViewProps {
 
 export interface StepDemoStep {
   id: string;
-  /** 1 到 3 個字的步驟名稱 */
+  /** Step name of 1 to 3 characters */
   name: string;
-  /** 秒數，建議 4 到 8 秒，最後至少留 1 秒看結果 */
+  /** Duration in seconds, suggested 4 to 8, leaving at least 1 second at the end to see the result */
   dur: number;
   View: ComponentType<StepViewProps>;
   cursor?: CursorKey[];
@@ -132,19 +132,19 @@ export interface StepDemoLabels {
 
 export interface StepDemoProps {
   steps: StepDemoStep[];
-  /** 舞台設計尺寸，預設 [1200, 750] */
+  /** Stage design size, default [1200, 750] */
   size?: readonly [number, number];
   chrome?: "browser" | "window" | "none";
   url?: string;
   title?: string;
   autoPlay?: boolean;
   loop?: boolean;
-  /** steps：步驟列；scrubber：再加時間軸；none：只有畫面 */
+  /** steps: step bar; scrubber: adds a timeline; none: picture only */
   controls?: "steps" | "scrubber" | "none";
-  /** 受控的總秒數；給了就凍結在這一格（截圖、文件、測試） */
+  /** Controlled total seconds; when given, freezes on that frame (screenshots, docs, tests) */
   time?: number;
   onTimeChange?: (time: number) => void;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK are also accepted */
   locale?: string;
   labels?: Partial<StepDemoLabels>;
   className?: string;
@@ -169,7 +169,7 @@ const MESSAGES: Record<SunLocale, StepDemoLabels> = {
 
 const StepContext = createContext<(StepViewProps & { index: number; step: StepDemoStep }) | null>(null);
 
-/** 在步驟畫面深處拿到目前的 t，不必一路傳 props */
+/** Gets the current t deep inside a step's picture, without passing props all the way down */
 export function useStepDemo() {
   const ctx = useContext(StepContext);
   if (!ctx) throw new Error("useStepDemo must be used inside <StepDemo>");
@@ -190,11 +190,11 @@ function useReduced() {
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-/* ---------- 游標：位置由 t 算出，目標從 DOM 量測後除以縮放比 ---------- */
+/* ---------- Cursor: position computed from t, target measured from the DOM then divided by the scale ---------- */
 
 const PRESS = 0.18;
 
-/** 目標在舞台座標的中心。用 offset 量，不受縮放與進場 transform 影響，也不必除以縮放比。 */
+/** Centre of the target in stage coordinates. Measured with offset, so it is unaffected by scaling and the entrance transform, and needs no division by the scale. */
 function aimCenter(root: HTMLElement, name: string): [number, number] | null {
   const target = root.querySelector<HTMLElement>(`[data-stp-layer="current"] [data-aim="${name}"]`);
   if (!target) return null;
@@ -210,7 +210,7 @@ function aimCenter(root: HTMLElement, name: string): [number, number] | null {
 function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number; stage: RefObject<HTMLDivElement | null>; size: readonly [number, number]; layout: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLSpanElement>(null);
-  // 每一步、每次版面變動（縮放、字型載入）只量一次；還沒出現的目標不快取，下一格再量。
+  // Measure once per step and per layout change (scaling, font loading); targets that have not appeared yet are not cached, and are measured again on the next frame.
   const cache = useRef({ layout: "", points: new Map<string, [number, number]>() });
 
   useLayoutEffect(() => {
@@ -241,7 +241,7 @@ function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number
       x = lerp(pts[i - 1][0], pts[i][0], p);
       y = lerp(pts[i - 1][1], pts[i][1], p);
     }
-    // 開場淡入；hide 的目標抵達後淡出；從隱藏狀態出發的下一段再淡入。
+    // Fade in at the start; a hide target fades out after arrival; the next segment leaving the hidden state fades in again.
     const key = keys[cur];
     let opacity = clamp01(t / 0.3);
     if (key.hide && t >= key.at) opacity *= 1 - clamp01((t - key.at) / 0.3);
@@ -275,7 +275,7 @@ function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number
   );
 }
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 const DEFAULT_SIZE = [1200, 750] as const;
 
@@ -322,12 +322,12 @@ export function StepDemo({
   const t = reduced ? step.dur : time - starts[index];
   const active = playing && inView && !controlled && !reduced;
 
-  // 縮放：只量外框寬度，舞台用 transform 一次縮放。
+  // Scaling: measure only the outer frame width; the stage scales once with transform.
   useLayoutEffect(() => {
     const el = frameRef.current;
     if (!el) return;
     const measure = () => setK(el.clientWidth / w);
-    measure(); // 同步量一次，第一格就顯示，不等 ResizeObserver
+    measure(); // Measure synchronously once so the first frame shows, without waiting for ResizeObserver
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     let alive = true;
@@ -346,7 +346,7 @@ export function StepDemo({
     return () => io.disconnect();
   }, []);
 
-  // 時鐘：40ms 一拍，分頁隱藏時不走，單拍最多前進 0.25 秒，回來不會快轉。
+  // Clock: ticks every 40ms, pauses while the tab is hidden, advances at most 0.25 seconds per tick so it does not fast-forward on return.
   useEffect(() => {
     if (!active) return;
     let last = performance.now();

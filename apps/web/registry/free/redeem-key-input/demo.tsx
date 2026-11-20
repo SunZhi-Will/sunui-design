@@ -10,7 +10,7 @@ import { RedeemKeyInput, type LicenseState, type RedeemOutcome } from "./redeem-
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-// 模擬的授權後端：12 碼兌換碼本機比對，UUID 交給 Lemon Squeezy
+// Simulated license backend: 12-character redeem codes are matched locally, UUIDs are handed to Lemon Squeezy
 const SUPPORTER_CODES = new Set(["K7QM4XPR2HND"]);
 const PRO_KEYS: Record<string, RedeemOutcome> = {
   "3f2a9c1e-7b4d-4e8a-9c21-5d6e7f8a9b0c": { ok: true },
@@ -31,7 +31,7 @@ export default function RedeemKeyInputDemo() {
   const [license, setLicense] = useState<LicenseState>({ tier: "trial", trialDaysLeft: 9 });
   const ref = useRef<HTMLDivElement>(null);
 
-  // 預覽自己演：先打錯一組兌換碼被退回，再逐字打 Pro 金鑰並啟用
+  // The preview plays itself: first types a wrong redeem code and gets it rejected, then types a Pro key character by character and activates it
   const cursor = useDemoAutoplay(ref, async (d) => {
     const input = () => d.find("input[type=text]");
     const activate = () => input().parentElement?.parentElement?.querySelector<HTMLElement>(":scope > button");
@@ -75,7 +75,7 @@ export default function RedeemKeyInputDemo() {
           </div>
         }
       />
-      {/* 示範用的兩組碼放在面板外，像使用者手邊的訂單信；可以整段選取貼上 */}
+      {/* The two demo codes sit outside the panel like the order email a user would have at hand; the whole string can be selected and pasted */}
       <div className="w-[440px] max-w-full space-y-1.5 px-1 text-[11px] text-[#8a8a8a]">
         <p className="text-[#a3a3a3]">{t.hint}</p>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">

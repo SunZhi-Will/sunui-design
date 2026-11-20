@@ -10,7 +10,7 @@ export interface CookieCategory {
   id: string;
   label: ReactNode;
   description?: ReactNode;
-  /** 必要類別永遠開啟，不能關 */
+  /** The necessary category is always on and cannot be turned off */
   required?: boolean;
 }
 
@@ -31,14 +31,14 @@ export interface CookieConsentLabels {
 
 export interface CookieConsentProps {
   categories: CookieCategory[];
-  /** 使用者做出選擇時呼叫，在這裡寫 cookie 或通知分析工具 */
+  /** Called when the user makes a choice. Set cookies or notify your analytics tool here */
   onChange: (consent: CookieConsentValue) => void;
-  /** 有值時把選擇記在 localStorage，已選過的人不再出現 */
+  /** When set, saves the choice in localStorage so people who already chose do not see it again */
   storageKey?: string;
   policyHref?: string;
-  /** fixed：貼在視窗底部；contained：貼在最近的 relative 容器底部 */
+  /** fixed: pinned to the bottom of the viewport; contained: pinned to the bottom of the nearest relative container */
   position?: "fixed" | "contained";
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags like ja-JP are also accepted */
   locale?: string;
   labels?: CookieConsentLabels;
   className?: string;
@@ -108,7 +108,7 @@ const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand color. Used only for selection, offers and current progress */
 const spotTrack = "border-[color:var(--sunui-spot,var(--primary))] bg-[color:var(--sunui-spot,var(--primary))]";
 const spotThumb = "bg-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -118,14 +118,14 @@ const springs = {
 } as const;
 
 
-/** 蓋完章停留多久再收起 */
+/** How long the stamp stays after it lands, before the bar closes */
 const STAMP_HOLD = 700;
 
 export function CookieConsent({ categories, onChange, storageKey, policyHref, position = "fixed", locale = "en", labels, className }: CookieConsentProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduce = useReducedMotion() ?? false;
   const id = useId();
-  // 有 storageKey 時掛載後才知道是否選過，先不渲染，避免選過的人看到一閃
+  // With a storageKey, whether a choice was saved is only known after mount. Render nothing until then so people who already chose do not see a flash
   const [open, setOpen] = useState(!storageKey);
   const [customizing, setCustomizing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -149,7 +149,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(value));
       } catch {
-        // 隱私模式時只在這次瀏覽生效
+        // In private mode the choice only applies to this visit
       }
     }
     window.setTimeout(() => setOpen(false), STAMP_HOLD);
@@ -157,7 +157,7 @@ export function CookieConsent({ categories, onChange, storageKey, policyHref, po
 
   const all = (on: boolean) => Object.fromEntries(categories.map((c) => [c.id, on || !!c.required]));
 
-  // 拒絕與接受必須同等份量，不用顏色或大小誘導（GDPR、台灣個資法）
+  // Reject and accept must carry equal weight, with no color or size nudging (GDPR, Taiwan personal data law)
   const choiceButton = cn(
     "min-h-10 rounded-md border px-4 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60",
     edge,

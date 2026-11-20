@@ -20,7 +20,7 @@ const copy = {
   ja: { filters: "絞り込み", linen: "リネン" },
 };
 
-/** 型錄卡片：點 Filters，一張紙從左側滑進來，可勾尺寸、按 Esc 或遮罩關閉。 */
+/** Catalog card: click Filters, a sheet slides in from the left; tick sizes, close with Esc or the overlay. */
 export default function SidePanelCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

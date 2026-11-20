@@ -12,7 +12,7 @@ const copy = {
   ja: ["海岸", "砂丘", "港", "谷"],
 };
 
-/** 型錄卡片：tilt-3d、glare、spotlight 三張卡，加一排 expanding-panels。 */
+/** Catalog card: three cards (tilt-3d, glare, spotlight) plus a row of expanding-panels. */
 export default function CardEffectsCard() {
   const names = useDemoText(copy);
   return (

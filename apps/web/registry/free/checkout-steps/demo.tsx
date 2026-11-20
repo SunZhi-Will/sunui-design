@@ -55,7 +55,7 @@ export default function CheckoutStepsDemo() {
   const ref = useRef<HTMLElement>(null);
   const [current, setCurrent] = useState(0);
 
-  // 預覽自己演：按主按鈕走到付款，點已完成的取貨門市回去改，再前進
+  // The preview plays itself: press the main button to reach payment, click the completed pickup store to go back and edit, then advance again
   const cursor = useDemoAutoplay(ref, async (d) => {
     const next = () => d.find(":scope > button");
     await d.click(next);

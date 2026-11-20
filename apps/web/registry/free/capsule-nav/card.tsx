@@ -15,7 +15,7 @@ const copy = {
   ja: { labels: ["実績", "サービス", "私たち"], brandLabel: "Northlight ホーム", cta: "相談する", hint: "下にスクロール" },
 };
 
-/** 型錄卡片：在小視窗裡往下捲，滿版標頭收成浮起的膠囊。 */
+/** Catalog card: scroll down inside a small window and the full-width header collapses into a floating capsule. */
 export default function CapsuleNavCard() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const locale = useDemoLocale();

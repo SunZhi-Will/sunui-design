@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/* ---------- 按鈕（同 shadcn Button 的 default 與 outline） ---------- */
+/* ---------- Buttons (same as shadcn Button default and outline) ---------- */
 
 const buttonBase =
   "inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
@@ -20,7 +20,7 @@ const buttonSize = {
 export interface StateButtonProps extends Omit<ComponentProps<"button">, "type"> {
   variant?: keyof typeof buttonVariant;
   size?: keyof typeof buttonSize;
-  /** 給了就輸出成連結 */
+  /** When given, renders as a link */
   href?: string;
 }
 
@@ -51,19 +51,19 @@ export interface StateLink {
 export interface EmptyStateProps {
   title: ReactNode;
   description?: ReactNode;
-  /** 1.5 線寬的圖示，預設是收件匣 */
+  /** Icon drawn with a 1.5 stroke width; defaults to an inbox */
   icon?: ReactNode;
-  /** 自訂動作；給了就不輸出內建的雙按鈕 */
+  /** Custom actions; when given, the built-in two buttons are not rendered */
   action?: ReactNode;
-  /** 「載入範例」主按鈕，讓使用者先看到填好的樣子 */
+  /** Primary button such as "Load sample data", so users first see a filled-in view */
   onLoadExample?: () => void;
-  /** 旁邊的 outline 按鈕，例如「去加成員」 */
+  /** Outline button beside it, for example "Add members" */
   secondary?: StateLink;
-  /** start：靠左的版本（標題、說明、按鈕列靠左） */
+  /** start: left-aligned variant (title, description and button row aligned left) */
   align?: "center" | "start";
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: Partial<EmptyStateLabels>;
   className?: string;
 }
@@ -74,7 +74,7 @@ export interface EmptyStateLabels {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -123,7 +123,7 @@ export function EmptyState({ title, description, icon, action, onLoadExample, se
   );
 }
 
-/* ---------- 圖示（lucide 形狀，線寬 1.5） ---------- */
+/* ---------- Icons (lucide shapes, 1.5 stroke width) ---------- */
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -155,7 +155,7 @@ export function UsersIcon() {
   );
 }
 
-// 按鈕裡的圖示維持 lucide 預設線寬 2
+// Icons inside buttons keep lucide's default stroke width of 2
 function SparklesIcon() {
   return (
     <svg {...iconProps} strokeWidth={2}>

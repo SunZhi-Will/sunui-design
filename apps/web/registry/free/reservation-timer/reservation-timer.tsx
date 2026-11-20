@@ -7,13 +7,13 @@ import { Result } from "@/components/ui/stamp";
 import { cn } from "@/lib/utils";
 
 /**
- * 顏色全部是 shadcn token（bg-card、border-border、text-muted-foreground），強調只用 primary。
- * system 與 light 跟著頁面；dark 在元件上加 .dark，讓 shadcn 的深色 token 只套在這一張票上。
- */
+  * Every color is a shadcn token (bg-card, border-border, text-muted-foreground), and emphasis uses only primary.
+  * system and light follow the page. dark adds .dark on the component so shadcn's dark tokens apply to this one ticket only.
+  */
 export type ReservationTheme = "light" | "dark" | "system";
 const themeClass = (theme: ReservationTheme) => (theme === "system" ? undefined : theme);
 
-// 數值同 registry/lib/sunui-motion
+// Values match registry/lib/sunui-motion
 const snappy: Transition = { type: "spring", stiffness: 520, damping: 34 };
 const gentle: Transition = { type: "spring", stiffness: 240, damping: 30 };
 const instant: Transition = { duration: 0 };
@@ -28,63 +28,63 @@ const MIN = 60_000;
 const HOUR = 60 * MIN;
 const DOTS = 12;
 
-/** 時間戳可能是秒或毫秒，統一轉成毫秒 */
+/** Timestamps may be in seconds or milliseconds, normalized to milliseconds */
 const toMs = (n: number) => (n < 1e11 ? n * 1000 : n);
 const toTime = (v: Date | string | number) => (typeof v === "number" ? toMs(v) : new Date(v).getTime());
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** 舊版倒數格式：「0 hr 09 min 40 sec」。只在傳入 formatCountdown 或 labels.countdown 時才用逐秒格式 */
+/** Legacy countdown format: "0 hr 09 min 40 sec". The per-second format is used only when formatCountdown or labels.countdown is passed */
 export function formatHoldCountdown(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(s / 3600)} hr ${pad(Math.floor((s % 3600) / 60))} min ${pad(s % 60)} sec`;
 }
 
 export interface ReservationTimerLabels {
-  /** 小標，例如「為你保留中」 */
+  /** Eyebrow, for example "Held for you" */
   title?: ReactNode;
-  /** 主標：保留到幾點 */
+  /** Headline: the time until which the hold lasts */
   until?: (time: ReactNode) => ReactNode;
-  /** 剩一小時以上：只說大約幾小時 */
+  /** One hour or more left: only says roughly how many hours */
   about?: (hours: number) => ReactNode;
-  /** 剩一小時內：分鐘數（會滾動的數字） */
+  /** Under an hour left: the minute count (a rolling number) */
   minutes?: (digits: ReactNode) => ReactNode;
-  /** 最後五分鐘：分:秒 */
+  /** Final five minutes: minutes:seconds */
   seconds?: (digits: ReactNode) => ReactNode;
-  /** 逾時會發生什麼事，照實說 */
+  /** What happens on timeout, stated plainly */
   note?: ReactNode;
-  /** 到期後的結果標記文字 */
+  /** Result marker text after expiry */
   released?: ReactNode;
-  /** 到期後的說明 */
+  /** Explanation after expiry */
   releasedNote?: ReactNode;
-  /** 延長按鈕；extendLabel prop 優先 */
+  /** Extend button. The extendLabel prop takes priority */
   extend?: ReactNode;
-  /** 舊版：給了就用它當主標（保留期限加剩餘時間），取代 until */
+  /** Legacy: when given, used as the headline (hold deadline plus time remaining), replacing until */
   deadline?: (date: string, left: ReactNode) => ReactNode;
-  /** 舊版：搭配 deadline，到期後剩餘時間的字 */
+  /** Legacy: used with deadline, the wording for the time remaining after expiry */
   zero?: ReactNode;
-  /** 舊版：逐秒的剩餘時間格式；formatCountdown prop 優先 */
+  /** Legacy: per-second remaining-time format. The formatCountdown prop takes priority */
   countdown?: (ms: number) => string;
 }
 
 export interface ReservationTimerProps {
-  /** 保留到期時間，數字可為秒或毫秒 */
+  /** Hold expiry time, in seconds or milliseconds */
   expiresAt: Date | string | number;
-  /** 保留開始時間。有它（或 holdMs）才顯示代表整段保留的墨點 */
+  /** When the hold started. Only with this (or holdMs) are the ink dots shown that represent the whole hold */
   startedAt?: Date | string | number;
-  /** 整段保留的長度（毫秒），沒有 startedAt 時用來推算開始時間 */
+  /** Length of the whole hold in milliseconds, used to derive the start time when startedAt is absent */
   holdMs?: number;
-  /** 保留的是什麼：票的左側錨點，到期時不動 */
+  /** What is being held: the anchor on the left of the ticket, unchanged at expiry */
   item?: { name: ReactNode; detail?: ReactNode; image?: ReactNode };
-  /** 剩餘歸零時呼叫一次，請在這裡重新抓訂單 */
+  /** Called once when the remaining time reaches zero. Refetch the order here */
   onExpire?: () => void;
-  /** 一次性延長。按過或沒給就不顯示按鈕；延長後請傳入新的 expiresAt */
+  /** One-time extension. The button is hidden once pressed or when omitted. After extending, pass in the new expiresAt */
   onExtend?: () => void;
   extendLabel?: ReactNode;
   formatCountdown?: (ms: number) => string;
-  /** 介面語言與時間格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and time format: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
   timeZone?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings, takes priority over locale */
   labels?: ReservationTimerLabels;
   theme?: ReservationTheme;
   className?: string;
@@ -93,7 +93,7 @@ export interface ReservationTimerProps {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -141,7 +141,7 @@ const MESSAGES: Record<SunLocale, Messages> = {
   },
 };
 
-/** 只有變了的那一位數字滾動；dir 1 往上（增加），-1 往下（減少）。減少動態時直接換字，結構不變 */
+/** Only the digit that changed rolls. dir 1 is up (increase), -1 is down (decrease). Under reduced motion the text swaps directly and the structure stays the same */
 function Roll({ text, dir, reduce }: { text: string; dir: number; reduce: boolean }) {
   return (
     <span className="inline-flex whitespace-pre">
@@ -167,7 +167,7 @@ function Roll({ text, dir, reduce }: { text: string; dir: number; reduce: boolea
   );
 }
 
-/** 冷靜的保留票：先說保留到幾點，精度隨剩餘時間提高，墨點逐顆熄滅；到期時同一張票劃掉時刻、標上已釋出。 */
+/** A calm hold ticket: first says the time it is held until, precision increases as time runs down, and the ink dots go out one by one. At expiry the same ticket strikes through the time and is marked as released. */
 export function ReservationTimer({
   expiresAt,
   startedAt,
@@ -193,7 +193,7 @@ export function ReservationTimer({
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
 
-  // 以時間為準：每秒取一次現在時間，分頁回到前景時立刻重算（背景分頁的 interval 會被節流）
+  // Time-based: reads the current time every second and recalculates immediately when the tab returns to the foreground (intervals in background tabs are throttled)
   useEffect(() => {
     const sync = () => setNow(Date.now());
     const id = setInterval(sync, 1000);
@@ -206,7 +206,7 @@ export function ReservationTimer({
 
   const left = Math.max(0, end - now);
   const expired = left <= 0;
-  // 只在跨過到期線時通知一次
+  // Notify only once, when the expiry line is crossed
   useEffect(() => {
     if (expired) onExpireRef.current?.();
   }, [expired]);
@@ -326,7 +326,7 @@ export function ReservationTimer({
           )}
         </AnimatePresence>
       </motion.div>
-      {/* 只在狀態改變時播報，倒數本身不逐秒朗讀 */}
+      {/* Announce only on state changes, the countdown itself is not read out every second */}
       <span className="sr-only" aria-live="polite">
         {expired ? (
           <>
@@ -338,7 +338,7 @@ export function ReservationTimer({
   );
 }
 
-// lucide Clock，線寬 1.5
+// lucide Clock, stroke width 1.5
 function ClockIcon() {
   return (
     <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -351,11 +351,11 @@ function ClockIcon() {
 export interface ReservationExpiredPanelProps {
   title?: ReactNode;
   children?: ReactNode;
-  /** 例如「回到商品頁」按鈕 */
+  /** For example a "Back to product" button */
   action?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale；title / children prop 又優先於這裡 */
+  /** Overrides the built-in strings, takes priority over locale. The title / children props take priority over this */
   labels?: Partial<ReservationExpiredLabels>;
   theme?: ReservationTheme;
   className?: string;
@@ -374,7 +374,7 @@ const EXPIRED_MESSAGES: Record<SunLocale, ReservationExpiredLabels> = {
   ja: { title: "注文の期限が切れました", body: "お取り置き期間が終了したため、注文は自動でキャンセルされ、商品は再び販売中です。すでにお支払い済みの場合はご連絡ください。対応または返金いたします。" },
 };
 
-/** 保留逾時後取代整個結帳內容的狀態面板。只想在原處標示到期時，ReservationTimer 本身就會變形，不必換成這個。 */
+/** Status panel that replaces the whole checkout content after a hold times out. To just mark expiry in place, ReservationTimer itself morphs, so there is no need to swap to this. */
 export function ReservationExpiredPanel({ title, children, action, locale = "en", labels, theme = "system", className, style }: ReservationExpiredPanelProps) {
   const t = { ...EXPIRED_MESSAGES[resolveLocale(locale)], ...labels };
   return (

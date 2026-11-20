@@ -11,7 +11,7 @@ const copy = {
   ja: { heading: "お届け先", name: "お名前", email: "メールアドレス", emailBad: "name@example.com の形式で入力してください", emailOk: "配送状況をこちらにお送りします" },
 };
 
-/** 型錄卡片：Email 網域打錯，欄位下方直接建議修正，點一下只換掉錯的字母。 */
+/** Catalog card: a mistyped email domain gets a fix suggested right under the field; one click swaps only the wrong letters. */
 export default function FloatingFieldCard() {
   const t = useDemoText(copy);
   const locale = useDemoLocale();

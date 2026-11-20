@@ -9,7 +9,7 @@
     "prebuild": "node scripts/fetch-pro.mjs && node scripts/generate-previews.mjs",
     "build": "next build",
     "start": "next start -p 3100",
-    "pretypecheck": "node scripts/generate-previews.mjs",
+    "pretypecheck": "node scripts/generate-previews.mjs && node scripts/check-comments.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node --test \"tests/*.test.ts\"",
     "check:cards": "node scripts/check-cards.mjs"

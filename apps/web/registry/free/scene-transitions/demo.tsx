@@ -11,7 +11,7 @@ const copy = {
   ja: { day: "昼", night: "夜", dusk: "夕暮れ", next: "次のシーン", previous: "前のシーン", hint: "画面に入ると再生します。矢印でも切り替えられます。" },
 };
 
-// 三個示範畫面：白天、夜晚、黃昏（純 SVG，不讀外部圖片）
+// Three demo scenes: day, night, dusk (pure SVG, no external images)
 function Day({ label }: { label: string }) {
   return (
     <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" className="block size-full" role="img" aria-label={label}>
@@ -70,7 +70,7 @@ const options: Partial<Record<SceneTransitionName, { direction?: SceneDirection;
   liquid: { colors: ["#2a9d8f"] },
 };
 
-/** 單一轉場的示範格：完整 demo 與首頁型錄（variants.tsx）共用 */
+/** Demo cell for a single transition. Shared by the full demo and the home catalog (variants.tsx) */
 export function SceneTransitionTile({ name }: { name: SceneTransitionName }) {
   const t = useDemoText(copy);
   const scenes = [<Day key="d" label={t.day} />, <Night key="n" label={t.night} />, <Dusk key="k" label={t.dusk} />];

@@ -1,7 +1,7 @@
 "use client";
 
-// 腳本化的產品 Demo：瀏覽器框裡依場景自動播放，假游標移到目標、點擊漣漪、章節進度條。
-// 只在播放中且位於畫面內才前進；分頁在背景時也暫停。
+// Scripted product demo: plays scenes automatically inside a browser frame, with a fake cursor that moves to targets, click ripples and a chapter progress bar.
+// Advances only while playing and on screen; also pauses when the tab is in the background.
 
 import {
   createContext,
@@ -18,7 +18,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-/* ---------- 動畫樣式（原 welcome.css 的 ww-* keyframes） ---------- */
+/* ---------- Animation styles (the ww-* keyframes from the original welcome.css) ---------- */
 
 const CSS = `
 .sd-root{--sd-success:var(--success,#15803D);--sd-warning:var(--warning,#B45309);--sd-popover:var(--popover,var(--card))}
@@ -49,21 +49,21 @@ const CSS = `
 }
 `;
 
-/* ---------- 型別 ---------- */
+/* ---------- Types ---------- */
 
 export interface ScriptedDemoScene<K extends string = string> {
   key: K;
-  /** 這一幕停留的毫秒數 */
+  /** How long this scene stays, in ms */
   duration: number;
-  /** 所屬章節索引（0 起算） */
+  /** Index of the chapter it belongs to (0-based) */
   chapter: number;
-  /** 游標要移到的目標名稱（以 target(name) 註冊） */
+  /** Name of the target the cursor moves to (registered with target(name)) */
   cursor?: string;
-  /** 這一幕是否在游標位置播放點擊漣漪 */
+  /** Whether to play a click ripple at the cursor position in this scene */
   click?: boolean;
-  /** 漣漪延遲毫秒，例如等游標移到再點 */
+  /** Ripple delay in ms, e.g. wait for the cursor to arrive before clicking */
   clickDelay?: number;
-  /** 說明卡片要貼齊的目標名稱，位置由 popover 提供 */
+  /** Name of the target the explanation card sticks to; the position comes from popover */
   popover?: string;
 }
 
@@ -73,7 +73,7 @@ export interface ScriptedDemoChapter {
 }
 
 export interface ScriptedDemoLabels {
-  /** 整個 demo 的群組名稱 */
+  /** Group name for the whole demo */
   group: string;
   play: string;
   pause: string;
@@ -82,31 +82,31 @@ export interface ScriptedDemoLabels {
 export interface ScriptedDemoProps<K extends string = string> {
   scenes: ScriptedDemoScene<K>[];
   chapters: ScriptedDemoChapter[];
-  /** 瀏覽器框網址列的文字；不給就不顯示 */
+  /** Text in the browser frame's address bar; not shown if omitted */
   url?: string;
-  /** 一開始是否自動播放 */
+  /** Whether to autoplay at the start */
   autoPlay?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes priority over locale */
   labels?: Partial<ScriptedDemoLabels>;
   className?: string;
   children: ReactNode;
 }
 
 interface DemoContextValue {
-  /** 目前場景索引 */
+  /** Current scene index */
   scene: number;
-  /** 目前場景 key */
+  /** Current scene key */
   sceneKey: string;
-  /** 第幾輪；跳章或重播時加一，拿來當 key 讓進場動畫重播 */
+  /** Round number; incremented on a chapter jump or replay, used as a key so enter animations replay */
   loop: number;
-  /** 正在播放且位於畫面內 */
+  /** Playing and on screen */
   active: boolean;
   reduced: boolean;
-  /** 註冊游標目標或說明卡片錨點 */
+  /** Register a cursor target or the explanation card anchor */
   target: (name: string) => (el: HTMLElement | null) => void;
-  /** 說明卡片的位置（相對於瀏覽器框） */
+  /** Position of the explanation card (relative to the browser frame) */
   popover: { top: number; left: number; width: number };
 }
 
@@ -120,7 +120,7 @@ export function useScriptedDemo() {
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -135,7 +135,7 @@ const MESSAGES: Record<SunLocale, ScriptedDemoLabels> = {
   ja: { group: "製品のアニメーションデモ", play: "アニメーションを再生", pause: "アニメーションを一時停止" },
 };
 
-/* ---------- 小工具 ---------- */
+/* ---------- Helpers ---------- */
 
 function subscribeReduced(cb: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -207,7 +207,7 @@ export function SpinnerIcon({ className }: { className?: string }) {
   );
 }
 
-/* ---------- 主元件 ---------- */
+/* ---------- Main component ---------- */
 
 export function ScriptedDemo<K extends string = string>({
   scenes,
@@ -249,7 +249,7 @@ export function ScriptedDemo<K extends string = string>({
     return fn;
   }, []);
 
-  // 場景計時器：只在播放中且位於畫面內才前進。
+  // Scene timer: advances only while playing and on screen.
   useEffect(() => {
     if (!active) return;
     const timer = window.setTimeout(() => {
@@ -264,7 +264,7 @@ export function ScriptedDemo<K extends string = string>({
     return () => window.clearTimeout(timer);
   }, [active, scene, current.duration, loop, scenes.length]);
 
-  // 依場景量測游標目標與說明卡片位置。
+  // Measure the cursor target and explanation card position for each scene.
   const measure = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -315,7 +315,7 @@ export function ScriptedDemo<K extends string = string>({
           ref={containerRef}
           className="relative overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-20px_rgba(0,0,0,0.18)]"
         >
-          {/* 瀏覽器框 */}
+          {/* Browser frame */}
           <div aria-hidden className="flex items-center gap-2 border-b border-border bg-muted/50 px-4 py-2.5">
             <span className="size-2.5 rounded-full bg-[#FF5F57]" />
             <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
@@ -330,7 +330,7 @@ export function ScriptedDemo<K extends string = string>({
 
           {children}
 
-          {/* 模擬游標 */}
+          {/* Simulated cursor */}
           <div
             aria-hidden
             className={cn(
@@ -348,7 +348,7 @@ export function ScriptedDemo<K extends string = string>({
           </div>
         </div>
 
-        {/* 章節控制 */}
+        {/* Chapter controls */}
         <div className="mt-4 flex items-start gap-3">
           <button
             type="button"
@@ -412,9 +412,9 @@ export function ScriptedDemo<K extends string = string>({
   );
 }
 
-/* ---------- 場景裡常用的零件 ---------- */
+/* ---------- Parts commonly used inside scenes ---------- */
 
-/** 帶進場動畫的包裝：晶片一個接一個彈出，delay 為毫秒。 */
+/** Wrapper with an enter animation: chips pop in one after another, delay in ms. */
 export function Pop({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   return (
     <span className={cn("sd-pop", className)} style={{ animationDelay: `${delay}ms` }}>
@@ -425,7 +425,7 @@ export function Pop({ children, delay = 0, className }: { children: ReactNode; d
 
 export type DemoTone = "muted" | "brand" | "success" | "warning";
 
-/** 狀態膠囊：文字變了就重播淡入；brand 色調的圓點會閃爍。 */
+/** Status pill: replays a fade-in when the text changes; the brand-coloured dot pulses. */
 export function DemoStatus({ text, tone }: { text: string; tone: DemoTone }) {
   return (
     <span

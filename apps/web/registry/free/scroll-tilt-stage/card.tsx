@@ -15,12 +15,12 @@ const copy = {
 
 const ease = (p: number) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
 
-/** 型錄卡片：小捲動框自己往下捲，倒著放的畫面立起來再倒回去；滾輪或觸控一碰就交給你捲。 */
+/** Catalog card: a small scroll frame scrolls down on its own, the upside-down scene stands up and tips back; a wheel or touch hands control over to you. */
 export default function ScrollTiltStageCard() {
   const t = useDemoText(copy);
   const scroller = useRef<HTMLDivElement>(null);
 
-  // 卡片是靜止的縮圖，沒人會去捲它：自己來回捲一次又一次，讓「捲動時立起來」看得到
+  // The card is a static thumbnail nobody will scroll: it scrolls back and forth on its own, over and over, so "stands up while scrolling" is visible
   useEffect(() => {
     const el = scroller.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -30,7 +30,7 @@ export default function ScrollTiltStageCard() {
       stopped = true;
       cancelAnimationFrame(raf);
     };
-    // [起點比例, 終點比例, 毫秒]：往下捲、停、捲回、停
+    // [start ratio, end ratio, milliseconds]: scroll down, pause, scroll back, pause
     const legs: [number, number, number][] = [
       [0, 1, 2200],
       [1, 1, 1600],

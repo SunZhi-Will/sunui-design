@@ -8,13 +8,13 @@ import { instant, springs, useShake } from "@/lib/sunui-motion";
 import { cn } from "@/lib/utils";
 
 /*
- * 授權 / 兌換面板：同一個輸入框收兩種碼
- * - Supporter 兌換碼（12 碼，印成 ABCD-EFGH-JKLM）
- * - Pro 授權碼（Lemon Squeezy 的 UUID）
- * 版面與狀態流程移植自 KapZoom 的 LicenseDialog，偵測邏輯移植自 PostVault 的 redeem-input。
- * 打字時即時判斷是哪一種碼並自動分組，每組湊滿才「落座」；啟用成功時輸入列就地變形成授權卡，
- * 遮罩過的金鑰留在卡上當錨點，停用時反向變回輸入列。預設強調色是中性墨色，面板維持暗色。
- */
+  * License / redeem panel: one input accepts two kinds of code
+  * - Supporter redeem code (12 characters, printed as ABCD-EFGH-JKLM)
+  * - Pro license key (a Lemon Squeezy UUID)
+  * Layout and state flow are ported from KapZoom's LicenseDialog, detection logic from PostVault's redeem-input.
+  * As you type it detects which kind of code it is and groups it automatically; a group only "seats" once it is full. On successful activation the input row morphs in place into a license card,
+  * the masked key stays on the card as an anchor, and deactivating reverses it back into the input row. The default accent is neutral ink and the panel stays dark.
+  */
 
 export type LicenseTier = "free" | "trial" | "basic" | "pro" | "supporter";
 export type LicenseStatus = "active" | "grace" | "expired" | "invalid";
@@ -23,7 +23,7 @@ export type RedeemKeyKind = "supporter" | "pro";
 export interface LicenseState {
   tier: LicenseTier;
   status?: LicenseStatus;
-  /** 有沒有金鑰要看這個，不能看 tier（離線過久時 tier 會被打回 free） */
+  /** Use this to tell whether a key exists, not tier (tier is reset to free after being offline too long) */
   hasKey?: boolean;
   needsRevalidation?: boolean;
   maskedKey?: string | null;
@@ -33,7 +33,7 @@ export interface LicenseState {
   freeExportLimit?: number;
 }
 
-/** 供應商錯誤碼（PostVault 的 ProLicenseError）或伺服器原文 */
+/** Provider error code (PostVault's ProLicenseError) or the server's original message */
 export type RedeemOutcome =
   | { ok: true }
   | { ok: false; offline?: boolean; error?: string };
@@ -44,7 +44,7 @@ export interface LicensePricing {
   basic?: string | null;
   earlyBird?: boolean;
   competitorYearly?: string | null;
-  /** 顯示在地幣別時，標出實際結帳金額 */
+  /** When a local currency is shown, mark the actual checkout amount */
   checkoutNote?: string | null;
 }
 
@@ -86,10 +86,10 @@ export interface RedeemKeyInputLabels {
   field: string;
   detectedSupporter: string;
   detectedPro: string;
-  /** 啟用成功後，授權卡上取代按鈕的結果標記 */
+  /** Result marker that replaces the button on the license card after a successful activation */
   stampActivated: string;
   stampRedeemed: string;
-  /** 兌換後的贊助卡下方，回到輸入框輸入 Pro 授權碼 */
+  /** Below the supporter card after redeeming: go back to the input to enter a Pro license key */
   useAnotherKey: string;
   activate: string;
   revalidate: string;
@@ -105,15 +105,15 @@ export interface RedeemKeyInputLabels {
   revalidateFailed: string;
   invalidSupporter: string;
   desktopOnly: string;
-  /** 升級區列出的 Pro 功能；proFeatures prop 優先 */
+  /** Pro features listed in the upgrade section. The proFeatures prop takes priority */
   proFeatures: string[];
-  /** 錯誤碼對應的訊息與處理指引 */
+  /** Message and guidance for each error code */
   errors: Record<string, { text: string; hint?: string }>;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -413,17 +413,17 @@ const MESSAGES: Record<SunLocale, RedeemKeyInputLabels> = {
   },
 };
 
-/** 英文預設字串，保留舊的匯出名稱 */
+/** Default English strings, keeps the old export name */
 export const defaultRedeemLabels: RedeemKeyInputLabels = MESSAGES.en;
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** 兌換碼正規化：去空白與連字號、轉大寫（打的時候不必照抄連字號） */
+/** Redeem code normalization: strips spaces and hyphens and uppercases (the user does not have to type the hyphens) */
 export function normalizeSupporterCode(code: string): string {
   return code.trim().toUpperCase().replace(/[\s-]/g, "");
 }
 
-/** 判斷輸入的是哪一種碼，判斷不出來回傳 null */
+/** Detects which kind of code was entered, returns null when it cannot tell */
 export function detectKeyKind(input: string): RedeemKeyKind | null {
   const value = input.trim();
   if (!value) return null;
@@ -433,9 +433,9 @@ export function detectKeyKind(input: string): RedeemKeyKind | null {
 }
 
 /**
- * 錯誤碼或 Lemon Squeezy 原文對應成可處理的訊息。
- * 先比對錯誤碼，再比對最常見的三種原文；都對不上才回落原文。
- */
+  * Maps an error code or a Lemon Squeezy message to an actionable message.
+  * Matches the error code first, then the three most common raw messages, and falls back to the raw text only if none match.
+  */
 export function mapLicenseError(
   raw: string | undefined,
   errors: RedeemKeyInputLabels["errors"],
@@ -450,19 +450,19 @@ export function mapLicenseError(
 }
 
 
-/* 輸入時的分組：兌換碼 4-4-4，授權碼照 UUID 的 8-4-4-4-12 */
+/* Grouping while typing: redeem codes as 4-4-4, license keys as the UUID 8-4-4-4-12 */
 const GROUPS: Record<RedeemKeyKind, number[]> = { supporter: [4, 4, 4], pro: [8, 4, 4, 4, 12] };
 const TOTAL: Record<RedeemKeyKind, number> = { supporter: 12, pro: 32 };
 const STRIP = /[^0-9a-z]/gi;
 
-/** 還沒打完時猜是哪一種：有非十六進位字元是兌換碼；超過 12 碼或有小寫 a-f 是授權碼 */
+/** Guesses the kind before typing is finished: a non-hex character means a redeem code; more than 12 characters or lowercase a-f means a license key */
 function guessKeyKind(raw: string): RedeemKeyKind | null {
   if (!raw) return null;
   if (/[^0-9a-f]/i.test(raw)) return "supporter";
   return raw.length > 12 || /[a-f]/.test(raw) ? "pro" : "supporter";
 }
 
-/** 把去掉連字號的字元重新分組；多出來的字元接在最後一組，那一組就不會落座 */
+/** Regroups the characters with hyphens removed. Extra characters go on the last group, so that group will not seat */
 function formatKey(raw: string): string {
   const kind = guessKeyKind(raw);
   if (!kind) return "";
@@ -477,20 +477,20 @@ function formatKey(raw: string): string {
   return parts.join("-");
 }
 
-/** 第 n 個字元之後的游標位置（跳過連字號） */
+/** Caret position after the nth character (skipping hyphens) */
 function caretAfter(value: string, n: number) {
   let i = 0;
   for (; i < value.length && n > 0; i++) if (value[i] !== "-") n--;
   return i;
 }
 
-/** 卡上的金鑰存根：前四碼與後四碼 */
+/** Key stub shown on the card: first four and last four characters */
 const maskKey = (value: string) => {
   const r = value.replace(/-/g, "").toUpperCase();
   return r.length > 8 ? `${r.slice(0, 4)}····${r.slice(-4)}` : r;
 };
 
-/* lucide 圖示的 inline 版本，線寬 1.5 */
+/* Inline version of the lucide icon, stroke width 1.5 */
 type IconProps = { className?: string };
 const svg = (className: string | undefined, children: ReactNode) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
@@ -506,7 +506,7 @@ const ClockIcon = ({ className }: IconProps) => svg(className, <><circle cx="12"
 const AlertIcon = ({ className }: IconProps) => svg(className, <><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4M12 17h.01" /></>);
 const ExternalIcon = ({ className }: IconProps) => svg(className, <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />);
 const Spinner = ({ className }: IconProps) => svg(cn("motion-safe:animate-spin", className), <path d="M21 12a9 9 0 1 1-6.219-8.56" />);
-/* PostVault 贊助按鈕的咖啡杯 */
+/* Coffee cup from PostVault's supporter button */
 const CoffeeIcon = ({ className }: IconProps) => (
   <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
     <path d="M4 3h10v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V3z" />
@@ -526,7 +526,7 @@ const TIER_ICONS: Record<LicenseTier, (p: IconProps) => ReactNode> = {
   free: ShieldCheckIcon,
 };
 
-/** 有傳 tierIcons 就用它，否則用內建圖示 */
+/** Uses tierIcons when provided, otherwise the built-in icons */
 function TierIcon({ tier, icons, className }: { tier: LicenseTier; icons?: Partial<Record<LicenseTier, ReactNode>>; className?: string }) {
   const custom = icons?.[tier];
   if (custom) {
@@ -548,9 +548,9 @@ type Message = { type: "error" | "ok"; text: string; hint?: string } | null;
 
 export interface RedeemKeyInputProps {
   state: LicenseState;
-  /** 讀不到授權狀態：不顯示任何價格或購買按鈕 */
+  /** License status could not be read: show no price or purchase button */
   degraded?: boolean;
-  /** 不在可授權的環境（例如瀏覽器版） */
+  /** Not in an environment that can be licensed (for example the browser build) */
   available?: boolean;
   pricing?: LicensePricing;
   proFeatures?: string[];
@@ -561,15 +561,15 @@ export interface RedeemKeyInputProps {
   onPurchase?: () => void;
   onPurchaseBasic?: () => void;
   onClose?: () => void;
-  /** 面板底部的額外內容（例如版本資訊） */
+  /** Extra content at the bottom of the panel (for example version info) */
   footer?: ReactNode;
-  /** 換掉各方案的圖示，沒給的沿用內建：pro 皇冠、basic 解鎖、supporter 咖啡、trial 時鐘、free 盾牌；任何 SVG 都會縮到原本的尺寸 */
+  /** Replaces the icon of each plan, anything omitted keeps the built-in: pro crown, basic unlock, supporter coffee, trial clock, free shield. Any SVG is scaled to the original size */
   tierIcons?: Partial<Record<LicenseTier, ReactNode>>;
-  /** 強調色，預設中性墨色 #ededed（原本的 KapZoom 黃是 #eab308） */
+  /** Accent color, defaults to neutral ink #ededed (the original KapZoom yellow was #eab308) */
   accent?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings, takes priority over locale */
   labels?: Partial<RedeemKeyInputLabels>;
   className?: string;
 }
@@ -605,11 +605,11 @@ export function RedeemKeyInput({
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState<Busy>(null);
   const [message, setMessage] = useState<Message>(null);
-  // 這次啟用成功的金鑰存根（贊助卡用，Pro 優先用 state.maskedKey）
+  // Key stub from this activation (used by the supporter card; Pro prefers state.maskedKey)
   const [stub, setStub] = useState<string | null>(null);
-  // 這次有按過啟用：之後出現的授權卡與結果標記才淡入，重新整理後直接顯示
+  // Set once the user has pressed activate: the license card and result marker that appear afterwards fade in, while after a refresh they show immediately
   const [fresh, setFresh] = useState(false);
-  // 金鑰被退回時整排輕搖一次；減少動態時不搖，錯誤訊息照常顯示
+  // When a key is rejected the whole row shakes once; under reduced motion it does not shake and the error message shows as usual
   const [keyRowRef, shakeKeyRow] = useShake<HTMLDivElement>();
   const inputRef = useRef<HTMLInputElement>(null);
   const overlayRef = useRef<HTMLSpanElement>(null);
@@ -639,7 +639,7 @@ export function RedeemKeyInput({
   const tierName = isPro ? l.tierPro : isBasic ? l.tierBasic : isSupporter ? l.tierSupporter : isTrial ? l.tierTrial : l.tierFree;
   const layoutT = reduce ? instant : springs.gentle;
 
-  // 輸入框捲動時，墨色分組跟著平移，和真正的文字對齊
+  // When the input scrolls, the ink groups translate with it so they stay aligned with the real text
   const syncOverlay = () => {
     if (overlayRef.current && inputRef.current) overlayRef.current.style.transform = `translateX(${-inputRef.current.scrollLeft}px)`;
   };
@@ -651,7 +651,7 @@ export function RedeemKeyInput({
     syncOverlay();
   }, [key]);
 
-  // 面板高度跟著內容用 gentle 彈簧變，下面的內容滑動而不是跳動
+  // Panel height follows the content with a gentle spring, so the content below slides instead of jumping
   useEffect(() => {
     const el = bodyRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -664,7 +664,7 @@ export function RedeemKeyInput({
     const v = e.target.value;
     let n = v.slice(0, e.target.selectionStart ?? v.length).replace(STRIP, "").length;
     let next = v.replace(STRIP, "");
-    // 只刪到連字號時順手刪掉旁邊那一碼，不然刪除鍵會卡在連字號上
+    // When the deletion stops at a hyphen, also delete the character next to it, otherwise backspace would get stuck on the hyphen
     if (next === raw && v.length < key.length) {
       const type = (e.nativeEvent as InputEvent).inputType;
       if (type === "deleteContentBackward" && n > 0) next = next.slice(0, --n) + next.slice(n + 1);
@@ -685,7 +685,7 @@ export function RedeemKeyInput({
   const handleActivate = async () => {
     const value = key.trim();
     if (!value) return;
-    // 偵測不出時照原本的作法交給 supporter 兌換路徑判定為無效
+    // When detection fails, fall through to the supporter redeem path as before, which marks it invalid
     const k = kind ?? "supporter";
     setFresh(true);
     setBusy("activate");
@@ -748,7 +748,7 @@ export function RedeemKeyInput({
     "--rk-warning": "#f59e0b",
   } as CSSProperties;
 
-  /* 同一個外框：輸入列與授權卡共用 layoutId，啟用時就地變形，停用時變回來 */
+  /* One shared frame: the input row and the license card share a layoutId, morphing in place on activation and back on deactivation */
   const slot = { layoutId: "key-slot", transition: layoutT, style: { borderRadius: 8 }, className: "border border-[var(--rk-border)] bg-black/20" };
 
   const licenseCard = (cardStub: string, result: string | null, name: string) => (
@@ -761,7 +761,7 @@ export function RedeemKeyInput({
         className="flex min-h-11 items-center gap-3 px-3 py-2"
       >
         <div className="min-w-0 flex-1">
-          {/* 錨點：遮罩過的金鑰停在原本文字的位置 */}
+          {/* Anchor: the masked key stays where the typed text was */}
           <p className="truncate font-mono text-xs tracking-[0.04em] text-[var(--rk-text)] tabular-nums">{cardStub}</p>
           <p className="text-[11px] text-[var(--rk-muted)]">{name}</p>
         </div>
@@ -783,7 +783,7 @@ export function RedeemKeyInput({
       style={style}
       className={cn("w-[440px] max-w-full flex flex-col rounded-[14px] border border-[var(--rk-border)] bg-[var(--rk-surface)] shadow-sm overflow-hidden text-left", className)}
     >
-      {/* 標頭 */}
+      {/* Header */}
       <div className="relative shrink-0 px-5 py-4 border-b border-[var(--rk-border)]">
         {onClose && (
           <button
@@ -813,7 +813,7 @@ export function RedeemKeyInput({
       <motion.div initial={false} animate={{ height: bodyHeight }} transition={layoutT} className="overflow-hidden">
         <LayoutGroup id={groupId}>
           <div ref={bodyRef} className="p-5 space-y-4">
-            {/* 讀不到授權狀態時最先講清楚，不把人丟到購買頁 */}
+            {/* When license status cannot be read, say so first instead of sending people to a purchase page */}
             {degraded && (
               <div role="alert" className={cn(BOX, "p-3 space-y-2")}>
                 <p className="flex items-center gap-1.5 text-xs font-medium text-[var(--rk-text)]">
@@ -828,7 +828,7 @@ export function RedeemKeyInput({
               </div>
             )}
 
-            {/* 目前方案 */}
+            {/* Current plan */}
             <div className={cn(BOX, "p-3 flex items-center gap-3 text-[var(--rk-text-2)]")}>
               <TierIcon
                 tier={isPro ? "pro" : isBasic ? "basic" : isSupporter ? "supporter" : isTrial ? "trial" : "free"}
@@ -855,7 +855,7 @@ export function RedeemKeyInput({
             {showKeyControls ? (
               <div className="space-y-2">
                 {licenseCard(state.maskedKey ?? stub ?? "", (isPro || isBasic) && !statusNotice ? l.stampActivated : null, tierName)}
-                {/* grace / expired / invalid 各給一段說明，並把重新驗證抬成主要按鈕 */}
+                {/* grace / expired / invalid each get an explanation, and re-verify is promoted to the primary button */}
                 {statusNotice && (
                   <div className={cn(BOX, "px-3 py-2 text-[11px] text-[var(--rk-text-2)] flex items-start gap-1.5")}>
                     <ClockIcon className="w-3.5 h-3.5 shrink-0 mt-px text-[var(--rk-warning)]" />
@@ -891,7 +891,7 @@ export function RedeemKeyInput({
               </div>
             ) : (
               <>
-                {/* 免費 / 試用 / Supporter：升級區（degraded 時整塊拿掉） */}
+                {/* Free / trial / supporter: upgrade section (removed entirely when degraded) */}
                 {!degraded && pricing && (
                   <>
                     <div className={cn(BOX, "p-3")}>
@@ -948,7 +948,7 @@ export function RedeemKeyInput({
                 )}
 
                 {showSupporterCard ? (
-                  /* 兌換成功：輸入列變成贊助卡，下面留一個回到輸入框的入口給之後要輸入 Pro 授權碼的人 */
+                  /* Redeem succeeded: the input row becomes a supporter card, with an entry below to return to the input for anyone who will enter a Pro license key later */
                   <div className="space-y-1.5">
                     {licenseCard(stub ?? "", l.stampRedeemed, l.tierSupporter)}
                     <button
@@ -960,7 +960,7 @@ export function RedeemKeyInput({
                     </button>
                   </div>
                 ) : (
-                  /* 輸入金鑰：同一格收 12 碼兌換碼與 UUID 授權碼，打字時自動分組 */
+                  /* Key input: one field takes a 12-character redeem code or a UUID license key and groups it automatically while typing */
                   <div className="space-y-2">
                     <div className="relative min-h-4 text-xs">
                       <label htmlFor={inputId} className="sr-only">
@@ -994,7 +994,7 @@ export function RedeemKeyInput({
                       <motion.div {...slot} className={cn(slot.className, "focus-within:border-[color-mix(in_srgb,var(--rk-accent)_45%,transparent)] transition-colors")}>
                         <motion.div layout="position" transition={layoutT} className="flex items-center gap-1 p-1">
                           <div className={cn("relative min-w-0 flex-1", (busy !== null || !available) && "opacity-50")}>
-                            {/* 墨色分組疊在透明文字下面：湊滿且格式正確的一組才落座 */}
+                            {/* Ink groups sit under the transparent text: only a full group in the correct format seats */}
                             <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center overflow-hidden px-2 font-mono text-xs tracking-[0.04em]">
                               <span ref={overlayRef} className="whitespace-pre text-[var(--rk-text)]">
                                 {groups.map((g, i) => {
@@ -1059,7 +1059,7 @@ export function RedeemKeyInput({
               </>
             )}
 
-            {/* 訊息 */}
+            {/* Message */}
             <motion.div layout="position" transition={layoutT} role="status" aria-live="polite">
               {message && (
                 <div className={cn(BOX, "text-xs px-3 py-2 flex items-center gap-1.5", message.type === "ok" ? "text-[var(--rk-text)]" : "text-red-400")}>

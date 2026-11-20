@@ -9,10 +9,10 @@ import { copy, demoArt, harborArt, kinds } from "./demo";
 
 export const variants = [...imageEffects, ...imageGroupEffects];
 
-// 首頁預設只放這一種當代表，挑會自己動的，卡片不用先懸停才看得出效果
+// The home page shows only this one as the representative; pick one that animates by itself so the card shows its effect without a hover
 export const featured = "ken-burns";
 
-/** 首頁型錄：一種圖片效果一張卡，設定與 demo 的同名格子一致；進場類附重播鈕。 */
+/** Home catalog: one card per image effect, with the same settings as the same-named tile in the demo; entrance effects get a replay button. */
 export default function ImageEffectsVariant({ variant }: { variant: string }) {
   const t = useDemoText(copy);
   const [run, setRun] = useState(0);

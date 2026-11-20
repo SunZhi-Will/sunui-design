@@ -6,16 +6,16 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 import { cn } from "@/lib/utils";
 
 /*
- * 狀態圓點：形狀說進度，時間說新鮮度。
- * - shape：dot（預設，6px 實心圓點，和舊版一樣）、ring 空環＝待處理、half 半圓＝處理中、
- *   full 實心＝完成、slashed 斜線環＝取消。也可直接給 progress（0 到 1）畫任意扇形
- * - live：只有進行中的狀態會動，一圈安靜的外擴環；reduced motion 下不動
- * - since：後面接淡色的相對時間「· 2 小時前」，用 Intl.RelativeTimeFormat，每 30 秒更新
- * 狀態改變時就地變形：扇形填到新的量、文字上下滾動換字、寬度跟著走，圓點是錨點不動。
- * 顏色只在圓點上（8px 以下），文字維持一般字色；黑白下只看形狀也讀得懂。
+ * Status dot: the shape tells progress, the time tells freshness.
+ * - shape: dot (default, a 6px solid dot, same as the old version), ring (empty ring) = pending, half (half circle) = processing,
+ *   full (solid) = done, slashed (ring with a slash) = canceled. You can also pass progress (0 to 1) to draw any sector
+ * - live: only in-progress states move, with a quiet expanding ring; no motion under reduced motion
+ * - since: followed by pale relative time such as "· 2 hours ago", using Intl.RelativeTimeFormat, refreshed every 30 seconds
+ * When the status changes it morphs in place: the sector fills to the new amount, the text rolls up or down to swap, the width follows, and the dot is an anchor that stays put.
+ * Color is only on the dot (8px or smaller), the text keeps the normal text color; in black and white the shape alone is still readable.
  */
 
-// 中性色系 app（Schedary、usermeld、spliteat、ComfyUI）共用的狀態色，淺色與深色各一組
+// Status colors shared by the neutral-palette apps (Schedary, usermeld, spliteat, ComfyUI), one set each for light and dark
 const STATUS_TOKENS =
   "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#4F46E5] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#818CF8]";
 
@@ -35,7 +35,7 @@ const FILL: Record<StatusShape, number> = { dot: 1, ring: 0, half: 0.5, full: 1,
 const gentle: Transition = { type: "spring", stiffness: 240, damping: 30 };
 const instant: Transition = { duration: 0 };
 
-// sunui-motion 的 roll：舊字往變動方向離開，新字從另一側進來
+// roll from sunui-motion: the old text leaves in the direction of change, the new text enters from the other side
 const roll: Variants = {
   enter: (d: number) => ({ y: d >= 0 ? "60%" : "-60%", opacity: 0 }),
   center: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 520, damping: 34 } },
@@ -48,21 +48,21 @@ export interface StatusDotProps {
   tone: StatusTone;
   children: ReactNode;
   className?: string;
-  /** 形狀，預設 dot（和舊版相同的 6px 實心點） */
+  /** Shape, default dot (the same 6px solid dot as the old version) */
   shape?: StatusShape;
-  /** 0 到 1 的進度，畫成扇形；優先於 shape 的填滿量（slashed 仍保留斜線） */
+  /** Progress from 0 to 1, drawn as a sector; takes priority over the fill amount of shape (slashed keeps its slash) */
   progress?: number;
-  /** 進行中：圓點外一圈安靜的外擴環。只給還在跑的狀態（處理中、建置中） */
+  /** In progress: a quiet expanding ring around the dot. Only for states that are still running (processing, building) */
   live?: boolean;
-  /** 狀態發生的時間，顯示成「· 2 小時前」 */
+  /** When the status happened, shown as "· 2 hours ago" */
   since?: Date | number | string;
-  /** 相對時間的語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** Language of the relative time: en, zh-TW, zh-CN, ja; tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else uses English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -88,7 +88,7 @@ function relative(ms: number, locale: SunLocale) {
   return fmt.format(0, "second");
 }
 
-/** 每 30 秒重畫一次相對時間；沒有 since 就不開計時器 */
+/** Redraw the relative time every 30 seconds; with no since, no timer is started */
 function useNow(active: boolean) {
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -113,7 +113,7 @@ function Glyph({ shape, fill, live, reduce }: { shape: StatusShape; fill: number
       )}
       <svg viewBox="0 0 10 10" className="size-full overflow-visible">
         {!isDot && <circle cx={5} cy={5} r={4.25} fill="none" stroke="currentColor" strokeWidth={1.5} />}
-        {/* 扇形：r=2.5、線寬 5 的圓，pathLength 就是填滿量；從 12 點鐘方向順時針 */}
+        {/* Sector: a circle with r=2.5 and stroke width 5, so pathLength is the fill amount; clockwise from 12 o'clock */}
         <motion.circle
           cx={5}
           cy={5}
@@ -144,8 +144,8 @@ function Glyph({ shape, fill, live, reduce }: { shape: StatusShape; fill: number
 }
 
 /**
- * 全站統一的狀態標示：小圓點加文字。
- * 顏色只放在圓點上，文字維持一般字色，一整排狀態不會變成彩虹。
+ * Site-wide status indicator: a small dot plus text.
+ * Color is only on the dot and the text keeps the normal text color, so a whole row of statuses does not turn into a rainbow.
  */
 export function StatusDot({ tone, children, className, shape, progress, live = false, since, locale = "en" }: StatusDotProps) {
   const reduce = !!useReducedMotion();
@@ -154,12 +154,12 @@ export function StatusDot({ tone, children, className, shape, progress, live = f
   const key =
     typeof children === "string" || typeof children === "number" ? `l:${children}` : `s:${tone}:${s}:${fill}`;
 
-  // 滾動方向跟著進度走：前進往上、倒退往下
+  // Roll direction follows progress: forward goes up, backward goes down
   const [track, setTrack] = useState({ key, fill, dir: 1 });
   const dir = track.key === key ? track.dir : fill >= track.fill ? 1 : -1;
   if (track.key !== key) setTrack({ key, fill, dir });
 
-  // 寬度：量隱形的副本，外框用 gentle 彈簧跟上
+  // Width: measure an invisible copy, and the frame follows with a gentle spring
   const measure = useRef<HTMLSpanElement>(null);
   const [width, setWidth] = useState<number | "auto">("auto");
   useIsoLayoutEffect(() => {

@@ -14,7 +14,7 @@ const copy = {
   ja: { undo: "削除を取り消す", sand: "サンド", subtotal: "小計" },
 };
 
-/** 型錄卡片：一列購物車品項，加減或長按步進器，數字滾動、小計跟著變。 */
+/** Catalog card: a row of cart items with a plus/minus or press-and-hold stepper, the number rolls and the subtotal changes with it. */
 export default function QuantityStepperCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

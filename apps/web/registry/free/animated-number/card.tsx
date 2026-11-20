@@ -13,7 +13,7 @@ const copy = {
   ja: { total: "合計", quantity: "数量", dec: "数量を減らす", inc: "数量を増やす" },
 };
 
-/** 型錄卡片：調整數量，總額的每一位數像機械計數器一樣滾動。 */
+/** Catalog card: adjust the quantity and each digit of the total rolls like a mechanical counter. */
 export default function AnimatedNumberCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

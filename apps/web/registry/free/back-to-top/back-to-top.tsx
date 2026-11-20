@@ -11,19 +11,19 @@ const springs = {
 } as const;
 
 export interface BackToTopProps {
-  /** 在可捲動容器裡使用時傳入；預設跟著視窗 */
+  /** Pass this when used inside a scrollable container. Defaults to the window */
   container?: RefObject<HTMLElement | null>;
-  /** 捲過多少 px 才出現 */
+  /** How many px must be scrolled before it appears */
   threshold?: number;
-  /** 外圈顯示閱讀進度 */
+  /** Shows reading progress on the outer ring */
   showProgress?: boolean;
-  /** fixed：貼在視窗角落；contained：貼在最近的 relative 容器角落（可捲動容器請用 sticky 包一層） */
+  /** fixed: pinned to a window corner. contained: pinned to the corner of the nearest relative container (for a scrollable container, wrap it in sticky) */
   position?: "fixed" | "contained";
   label?: string;
   className?: string;
 }
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent color: follows the theme's --primary by default, and buyers can set --sunui-spot to use their own brand color. Used only for selected, deal and current-progress states */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 
 const R = 21;

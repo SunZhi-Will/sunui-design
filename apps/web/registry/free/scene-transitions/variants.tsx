@@ -5,10 +5,10 @@ import { sceneTransitions, type SceneTransitionName } from "./scene-transitions"
 
 export const variants = sceneTransitions;
 
-// 首頁預設只放這一種當代表：形狀明顯，縮圖也看得出是轉場
+// The home page shows only this one as the representative: its shape is distinct, so even the thumbnail reads as a transition
 export const featured = "circle-reveal";
 
-/** 首頁型錄：一種轉場一張卡，進入畫面就自動輪播。 */
+/** Home catalog: one card per transition, autoplaying once on screen. */
 export default function SceneTransitionsVariant({ variant }: { variant: string }) {
   return (
     <div className="w-80">

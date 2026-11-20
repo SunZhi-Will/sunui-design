@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode 
 
 import { cn } from "@/lib/utils";
 
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在選中、優惠、目前進度 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 const springs = {
@@ -17,17 +17,17 @@ export type LoadingButtonState = "idle" | "loading" | "success" | "error";
 
 export interface LoadingButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "children" | "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd"> {
   children: ReactNode;
-  /** 回傳 Promise 時自動切換 loading → success（resolve）或 error（reject） */
+  /** When it returns a Promise, switches loading → success (resolve) or error (reject) automatically */
   onClick?: () => unknown;
-  /** 受控狀態；給了就不再自己管理 */
+  /** Controlled state; when given, the component stops managing it itself */
   state?: LoadingButtonState;
   successLabel?: ReactNode;
   errorLabel?: ReactNode;
-  /** 螢幕閱讀器在 loading 時讀到的字 */
+  /** Text screen readers read while loading */
   loadingLabel?: string;
-  /** shrink：載入時縮成圓形；inline：保持寬度，轉圈出現在文字前 */
+  /** shrink: shrinks to a circle while loading; inline: keeps its width and the spinner appears before the text */
   loadingStyle?: "shrink" | "inline";
-  /** 成功或失敗後多久回到 idle（毫秒），0 表示停在結果 */
+  /** Milliseconds before returning to idle after success or failure; 0 stays on the result */
   resetAfter?: number;
   variant?: "primary" | "paper";
 }

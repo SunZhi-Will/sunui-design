@@ -4,18 +4,18 @@ import { useEffect, useState, type CSSProperties, type MouseEventHandler, type R
 
 import { cn } from "@/lib/utils";
 
-// 額度用量：百分比加上預計還能產生幾張。今天還沒簽到時，第二行改成簽到提醒。
-// 只顯示張數與百分比，不使用「點數」字眼。
+// Quota usage: a percentage plus the estimated number of images left. If today's check-in is not done yet, the second line becomes a check-in reminder.
+// Shows only image counts and percentages, never the word "points".
 
-/** 預設的全域事件名稱，checkin-streak 簽到成功時會送出 */
+/** Default global event name, sent when checkin-streak succeeds */
 export const REWARDS_EVENT = "sunui:rewards";
 
 export type QuotaUsage = ({ unlimited: true } | { unlimited: false; pct: number; left: number }) & {
-  /** 今天還沒簽到時，可以領的張數 */
+  /** Number of images available to claim when today's check-in is not done */
   checkin?: number;
 };
 
-/** 免費額度與方案額度合在一起算：剩下的張數除以全部的張數 */
+/** Free quota and plan quota are counted together: remaining images divided by all images */
 export function toQuotaUsage(a: { enforced: boolean; total: number; left: number; checkin?: number }): QuotaUsage {
   if (!a.enforced) return { unlimited: true, checkin: a.checkin };
   const pct = a.total > 0 ? Math.max(0, Math.min(100, Math.round((a.left * 100) / a.total))) : 0;
@@ -23,8 +23,8 @@ export function toQuotaUsage(a: { enforced: boolean; total: number; left: number
 }
 
 /**
- * 讀取額度：進站、refreshKey 改變（換頁、進行中的任務數變少）、
- * 簽到事件與回到分頁（focus）時重新讀取。
+ * Loads the quota: on mount, when refreshKey changes (page change, fewer running tasks),
+ * on the check-in event, and when the tab regains focus.
  */
 export function useQuotaUsage(
   load: () => Promise<QuotaUsage>,
@@ -45,30 +45,30 @@ export function useQuotaUsage(
       window.removeEventListener("focus", run);
       if (event) window.removeEventListener(event, run);
     };
-    // load 通常是行內函式，只跟著 refreshKey 與事件名稱重新綁定
+    // load is usually an inline function, so rebind only on refreshKey and the event name
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshKey, event]);
   return usage;
 }
 
 export interface QuotaMeterLabels {
-  /** card 版的預設標題 */
+  /** Default title of the card variant */
   title?: string;
   unlimitedHead?: string;
   unlimitedSub?: string;
-  /** card 版不限量時的說明 */
+  /** Description of the card variant when the quota is unlimited */
   unlimitedBody?: string;
   head?: (pct: number) => string;
   sub?: (left: string) => string;
   checkin?: (n: number) => string;
-  /** card 版：底部的簽到提醒條 */
+  /** Card variant: the check-in reminder bar at the bottom */
   nudge?: (n: number) => ReactNode;
   separator?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -125,34 +125,34 @@ const MESSAGES: Record<SunLocale, Required<QuotaMeterLabels>> = {
 
 export interface QuotaMeterProps {
   usage: QuotaUsage | null;
-  /** sidebar：側邊欄底部的圓環；sheet：手機面板裡的長條；card：方案頁的額度卡 */
+  /** sidebar: a ring at the bottom of the sidebar; sheet: a bar in the mobile panel; card: a quota card on the plans page */
   variant?: "sidebar" | "sheet" | "card";
-  /** sidebar 版收合時只剩圓環，滑過或聚焦顯示說明 */
+  /** When the sidebar variant is collapsed only the ring remains; hover or focus shows the description */
   collapsed?: boolean;
-  /** 點下去前往的方案頁 */
+  /** Plans page to go to on click */
   href?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
-  /** 目前就在方案頁 */
+  /** Currently on the plans page */
   current?: boolean;
-  /** card 版的標題與附註；不給時用 labels.title */
+  /** Title and note of the card variant; falls back to labels.title when omitted */
   title?: ReactNode;
   hint?: ReactNode;
-  /** card 版簽到提醒條的連結 */
+  /** Link of the check-in reminder bar in the card variant */
   nudgeHref?: string;
-  /** 低於或等於這個百分比轉成警示色 */
+  /** Turns to the warning color at or below this percentage */
   lowAt?: number;
-  /** 換掉簽到獎勵的禮物圖示，例如 <Coins />；任何 SVG 都會縮到原本的 12 或 16px */
+  /** Replaces the gift icon of the check-in reward, for example <Coins />; any SVG is scaled to the original 12 or 16px */
   rewardIcon?: ReactNode;
-  /** 強調色（簽到提醒），預設跟隨主題的 primary */
+  /** Accent color (check-in reminder), follows the theme's primary by default */
   accent?: string;
-  /** 介面語言與數字格式：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language and number format: en, zh-TW, zh-CN, ja. Tags like zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides built-in strings, takes precedence over locale */
   labels?: QuotaMeterLabels;
   className?: string;
 }
 
-// 原專案（Yumecanvas）的 zinc 色票，亮暗兩套
+// zinc palette from the original project (Yumecanvas), light and dark
 const tokens =
   "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-sidebar:#FAFAFA] [--yc-ring:#71717A] [--yc-brand-default:var(--primary,#18181B)] [--yc-destructive:#DC2626] [--yc-success:#15803D] " +
   "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-sidebar:#09090B] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--primary,#FAFAFA)] dark:[--yc-destructive:#F87171] dark:[--yc-success:#4ADE80]";
@@ -170,7 +170,7 @@ function GiftIcon({ className }: { className?: string }) {
   );
 }
 
-/** 有傳 rewardIcon 就用它，否則用內建禮物 */
+/** Uses rewardIcon if provided, otherwise the built-in gift */
 function RewardIcon({ icon, className }: { icon?: ReactNode; className?: string }) {
   if (!icon) return <GiftIcon className={className} />;
   return (
@@ -192,7 +192,7 @@ function texts(usage: QuotaUsage, lowAt: number, t: Required<QuotaMeterLabels>, 
   const base = usage.unlimited
     ? { pct: 100, low: false, head: t.unlimitedHead, sub: t.unlimitedSub }
     : { pct: usage.pct, low: usage.pct <= lowAt, head: t.head(usage.pct), sub: t.sub(usage.left.toLocaleString(locale)) };
-  // 還沒簽到時，第二行改成提醒，點進方案頁就能簽到
+  // When not checked in yet, the second line becomes a reminder; clicking through to the plans page lets you check in
   return usage.checkin ? { ...base, sub: t.checkin(usage.checkin), gift: true } : { ...base, gift: false };
 }
 
@@ -308,7 +308,7 @@ export function QuotaMeter({
     );
   }
 
-  // 側邊欄版本：收合時只剩一個小圓環，滑過顯示說明
+  // Sidebar variant: when collapsed only a small ring remains; hover shows the description
   const ring = 2 * Math.PI * 9;
   return (
     <span style={style} className={cn(root, "relative block", className)} onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>

@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { SpineShelf, type SpineItem } from "./spine-shelf";
 
-// 和完整 demo 同一組配色，只取六本，卡片寬度剛好放得下一整排
+// Same palette as the full demo, taking only six books; the card width fits a whole row
 const plates: [string, string, string][] = [
   ["#2f3e46", "#cad2c5", "#84a98c"],
   ["#7f5539", "#ede0d4", "#b08968"],
@@ -82,7 +82,7 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
   },
 };
 
-/** 型錄卡片：一排六本書脊，滑過會傾出、點一本就抽出來轉成封面，箭頭也能換書。 */
+/** Catalog card: a row of six book spines that tilt out on hover; click one to pull it out and turn it into a cover, and the arrows also switch books. */
 export default function SpineShelfCard() {
   const t = useDemoText(copy);
   const items: SpineItem[] = t.books.map((book, i) => ({

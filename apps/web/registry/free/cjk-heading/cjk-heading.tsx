@@ -5,33 +5,33 @@ import { Fragment, useMemo, type ElementType, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export interface CjkHeadingProps {
-  /** 標題文字，可中英混排；用 \n 指定斷行位置 */
+  /** Heading text, may mix Chinese and English; use \n to set the line break position */
   text: string;
   as?: ElementType;
-  /** 直排（writing-mode: vertical-rl） */
+  /** Vertical writing (writing-mode: vertical-rl) */
   vertical?: boolean;
   /**
-   * 標點擠壓：auto 優先使用 text-spacing-trim（行首與相鄰標點擠壓），不支援時退回 halt；
-   * palt 為比例字寬，halt 只壓縮標點，none 不處理
+   * Punctuation squeezing: auto prefers text-spacing-trim (squeezes at line start and between adjacent punctuation) and falls back to halt when unsupported;
+   * palt uses proportional widths, halt only compresses punctuation, none does nothing
    */
   compress?: "auto" | "palt" | "halt" | "none";
-  /** 在中日文與英數之間自動插入細空格 */
+  /** Automatically insert thin spaces between CJK text and Latin letters or digits */
   autoSpace?: boolean;
-  /** 直排時把一到兩位數字橫向置中（縱中橫） */
+  /** In vertical writing, center one- or two-digit numbers horizontally (tate-chu-yoko) */
   tateChuYoko?: boolean;
-  /** 以朱紅印章樣式標出的關鍵字；一個標題建議只標一處 */
+  /** Keyword marked in a vermilion seal style; one per heading is recommended */
   highlight?: string[];
   highlightClassName?: string;
-  /** 介面語言：zh-TW、zh-CN、ja 時預設 lang 為 zh-Hant、zh-Hans、ja；en 或未給時沿用 zh-Hant */
+  /** UI language: with zh-TW, zh-CN, ja the default lang is zh-Hant, zh-Hans, ja; with en or when not given it stays zh-Hant */
   locale?: string;
-  /** 明確指定 lang，優先於 locale */
+  /** Set lang explicitly, takes priority over locale */
   lang?: string;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -39,22 +39,22 @@ function resolveLocale(tag?: string): SunLocale {
   return "en";
 }
 
-// 本元件沒有內建字串，locale 只決定 lang（字形與標點規則）；英文介面裡的標題內容仍是中日文
+// This component has no built-in strings: locale only decides lang (glyph shapes and punctuation rules); heading content in the English UI is still Chinese or Japanese
 const LANG: Record<SunLocale, string> = { en: "zh-Hant", "zh-TW": "zh-Hant", "zh-CN": "zh-Hans", ja: "ja" };
 
 const CJK_CLASS = "\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Hangul}";
-// 中日文後接英數、或英數後接中日文之處插入細空格
+// Insert a thin space where CJK is followed by Latin or digits, or Latin or digits are followed by CJK
 const SPACE_A = new RegExp(`([${CJK_CLASS}])([A-Za-z0-9\\u00C0-\\u024F])`, "gu");
 const SPACE_B = new RegExp(`([A-Za-z0-9\\u00C0-\\u024F%])([${CJK_CLASS}])`, "gu");
 const THIN = " ";
-// 前後不接其他英數的一到兩位數字，直排時做縱中橫
+// One- or two-digit numbers not adjacent to other Latin or digits get tate-chu-yoko in vertical writing
 const TCY_RE = /(?<![\dA-Za-z])\d{1,2}(?![\dA-Za-z])/g;
 
 export function addCjkSpacing(text: string) {
   return text.replace(SPACE_A, `$1${THIN}$2`).replace(SPACE_B, `$1${THIN}$2`);
 }
 
-// 設計語言（DESIGN.md）：朱紅只用在印章關鍵字
+// Design language (DESIGN.md): vermilion is used only for the seal keyword
 const seal =
   "whitespace-nowrap rounded-[2px] bg-foreground [margin-inline:0.04em] [padding-inline:0.14em] text-background [box-decoration-break:clone] [-webkit-box-decoration-break:clone]";
 
@@ -79,7 +79,7 @@ export function CjkHeading({
   const parts = useMemo(() => {
     const display = autoSpace ? addCjkSpacing(text) : text;
     const words = highlightKey.split("\u0000").filter(Boolean);
-    // 依關鍵字切段；關鍵字內不插細空格的版本也要比對得到
+    // Split by keyword; the version of the text without thin spaces inside the keyword must also match
     const out: { text: string; sealed: boolean }[] = [];
     let rest = display;
     while (rest) {
@@ -101,7 +101,7 @@ export function CjkHeading({
     return out;
   }, [text, autoSpace, highlightKey]);
 
-  // 換行符號 \n 視為設計好的斷行點，標題斷在詞與詞之間
+  // The \n line break is treated as a designed break point, so the heading breaks between words
   const renderRun = (run: string): ReactNode =>
     run.split("\n").map((line, i) => (
       <Fragment key={i}>
@@ -116,7 +116,7 @@ export function CjkHeading({
     let last = 0;
     for (const m of run.matchAll(TCY_RE)) {
       const at = m.index ?? 0;
-      // 數字前後的細空格在直排裡多餘，一併去掉
+      // Thin spaces around digits are redundant in vertical writing, so remove them too
       nodes.push(run.slice(last, at).replace(/ $/, ""));
       nodes.push(
         <span key={at} className="[text-combine-upright:all]">

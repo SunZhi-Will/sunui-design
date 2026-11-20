@@ -33,7 +33,7 @@ const copy = {
   },
 };
 
-/** 型錄卡片：已選 4 星的狀態，下方長出「喜歡哪裡」的理由標籤；改成 3 星以下會換成「哪裡不好」。 */
+/** Catalog card: the state with 4 stars chosen, where reason tags grow below for "What did you like"; changing to 3 stars or fewer swaps them for "What went wrong". */
 export default function StarRatingCard() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);

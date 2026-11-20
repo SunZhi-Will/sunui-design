@@ -11,35 +11,35 @@ export type AddToCartState = "idle" | "adding" | "added";
 export type FlyCorner = "top-right" | "top-left" | "bottom-right" | "bottom-left";
 
 export interface AddToCartButtonProps {
-  /** 印在飛行吊牌上的商品小圖 */
+  /** Small product image printed on the flying tag */
   thumbnail?: ReactNode;
-  /** 吊牌上的文字，通常是價格 */
+  /** Text on the tag, usually the price */
   tag?: ReactNode;
-  /** 目標購物車元素；沒給時飛向 fallbackCorner */
+  /** Target cart element. When omitted, the tag flies to fallbackCorner */
   cartRef?: RefObject<HTMLElement | null>;
-  /** 沒有 cartRef 時的飛行終點 */
+  /** Where the tag lands when there is no cartRef */
   fallbackCorner?: FlyCorner;
-  /** 點擊後呼叫，可回傳 Promise；完成後才進入 added 狀態 */
+  /** Called on click. May return a Promise; the added state starts once it resolves */
   onAdd?: () => void | Promise<void>;
-  /** 吊牌抵達購物車的那一刻呼叫（減少動態時立即呼叫），適合在此更新數量 */
+  /** Called the moment the tag reaches the cart (immediately under reduced motion). A good place to update the count */
   onLand?: () => void;
-  /** 飛行秒數 */
+  /** Flight duration in seconds */
   flightDuration?: number;
-  /** 弧線高度（px），越大拋得越高 */
+  /** Arc height in px. Larger values throw the tag higher */
   arcHeight?: number;
-  /** added 狀態維持多久後回到 idle（ms） */
+  /** How long the added state lasts before returning to idle (ms) */
   resetAfter?: number;
   disabled?: boolean;
-  /** 換掉按鈕上的購物袋圖示（idle、adding 時顯示；added 仍是勾），任何 SVG 都會縮到 16px */
+  /** Replaces the shopping bag icon on the button (shown in idle and adding; added keeps the check). Any SVG is scaled to 16px */
   icon?: ReactNode;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: {
     idle?: ReactNode;
     adding?: ReactNode;
     added?: ReactNode;
-    /** 給螢幕閱讀器的通知 */
+    /** Announcement for screen readers */
     announce?: string;
   };
   className?: string;
@@ -50,14 +50,14 @@ export interface AddToCartLabels {
   adding: ReactNode;
   added: ReactNode;
   announce: string;
-  /** CartIcon 的名稱與數量描述 */
+  /** Name and item count description for CartIcon */
   cart: string;
   items: (count: number) => string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -100,11 +100,11 @@ const MESSAGES: Record<SunLocale, AddToCartLabels> = {
   },
 };
 
-// 設計語言（DESIGN.md「質感」）：凸起的按鈕有頂邊高光與底邊厚度，飛出去的是一張浮起的小商品卡
+// Design language (DESIGN.md, craft quality): the raised button has a top-edge highlight and bottom-edge thickness, and what flies out is a floating mini product card
 const raised = "shadow-[inset_0_1px_0_rgb(255_255_255/0.16),inset_0_-1px_0_rgb(0_0_0/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.10),0_2px_6px_-2px_rgb(0_0_0/0.08)]";
 const e1 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 const e2 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.10)]";
-/** 品牌專色：預設跟著主題的 --primary，買家設 --sunui-spot 就換成自己的品牌色。只用在主要按鈕、數量徽章 */
+/** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only on the primary button and the count badge */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const spotInk = "bg-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
@@ -186,7 +186,7 @@ export function AddToCartButton({
   }
 
   const label = { idle: t.idle, adding: t.adding, added: t.added };
-  // 舊內容 100ms 退場往上，新內容從下方以 gentle 進場；減少動態時直接切換
+  // Old content exits upward over 100ms, new content enters from below with gentle. Under reduced motion it swaps instantly
   const swap = reduceMotion
     ? { initial: false as const, animate: { opacity: 1 }, exit: { opacity: 0, transition: { duration: 0 } } }
     : {
@@ -209,19 +209,19 @@ export function AddToCartButton({
           spotFill,
           raised,
           "group relative isolate inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-md px-4 text-sm font-medium",
-          // 模擬頂光：由上而下 3% 以內的明度差
+          // Simulates top light: at most a 3% lightness difference from top to bottom
           "bg-[linear-gradient(to_bottom,rgb(255_255_255/0.07),transparent_60%)]",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
           className,
         )}
       >
-        {/* hover 覆層：進 0ms、退 150ms；用前景色，深淺主題都成立 */}
+        {/* Hover overlay: 0ms in, 150ms out. Uses the foreground colour so it works in both light and dark themes */}
         <span
           aria-hidden="true"
           className={cn(spotInk, "pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-150 group-hover:opacity-[0.08] group-hover:duration-0 group-disabled:hidden")}
         />
-        {/* 三種狀態的整排疊在同一格：寬度取最長那排，切換時不跳；看得見的那排整排置中 */}
+        {/* All three states are stacked in one grid cell: width follows the longest row so switching never jumps, and the visible row is centred */}
         <span className="grid place-items-center whitespace-nowrap">
           {(["idle", "adding", "added"] as const).map((s) => (
             <span key={s} aria-hidden="true" className="invisible col-start-1 row-start-1 flex items-center gap-2">
@@ -230,7 +230,7 @@ export function AddToCartButton({
             </span>
           ))}
           <span className="col-start-1 row-start-1 flex items-center gap-2">
-            {/* 圖示是錨點：文字變短變長時，它順著滑到新位置而不是跳過去 */}
+            {/* The icon is the anchor: when the text gets shorter or longer it slides to its new position instead of jumping */}
             <motion.span layout={reduceMotion ? false : "position"} transition={springs.gentle} aria-hidden="true" className="grid size-4 shrink-0 place-items-center">
               <AnimatePresence initial={false} mode="popLayout">
                 <motion.span
@@ -291,7 +291,7 @@ function BagIcon() {
   );
 }
 
-/** 載入中的短弧，唯一允許的循環 */
+/** Short loading arc, the only loop allowed */
 function Spinner({ spin }: { spin: boolean }) {
   return (
     <motion.svg {...svgProps} animate={spin ? { rotate: 360 } : undefined} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}>
@@ -301,7 +301,7 @@ function Spinner({ spin }: { spin: boolean }) {
   );
 }
 
-/** 勾線描出 */
+/** The check stroke draws in */
 function Check({ animate }: { animate: boolean }) {
   return (
     <svg {...svgProps} strokeWidth={1.75}>
@@ -318,7 +318,7 @@ function Check({ animate }: { animate: boolean }) {
 const CARD_W = 48;
 const CARD_H = 62;
 
-/** 沿二次貝茲曲線飛向購物車的小商品卡：先從按鈕浮起，途中順著速度方向傾斜，進購物車前縮小淡出 */
+/** Mini product card flying to the cart along a quadratic Bezier curve: it lifts off the button first, tilts along its velocity on the way, then shrinks and fades before entering the cart */
 function FlyingCard({
   flight,
   duration,
@@ -353,11 +353,11 @@ function FlyingCard({
       ease: [0.45, 0, 0.55, 1],
       onUpdate: (p) => {
         const u = 1 - p;
-        // 前 12% 從按鈕浮起，之後才進入弧線
+        // First 12%: lift off the button, then follow the arc
         const lift = Math.min(p / 0.12, 1);
         x.set(u * u * sx + 2 * u * p * cx + p * p * ex);
         y.set(u * u * sy + 2 * u * p * cy + p * p * ey + (1 - lift) * 12);
-        // 切線方向決定傾斜：水平速度越大傾得越多，最多 14 度
+        // The tangent direction sets the tilt: more horizontal speed tilts it more, up to 14 degrees
         const vx = 2 * u * (cx - sx) + 2 * p * (ex - cx);
         const vy = 2 * u * (cy - sy) + 2 * p * (ey - cy);
         const len = Math.hypot(vx, vy) || 1;
@@ -389,24 +389,24 @@ function FlyingCard({
 }
 
 export interface CartIconProps {
-  /** 購物車內數量；變動時徽章像蓋章一樣壓一下 */
+  /** Item count in the cart. When it changes, the badge presses down like a stamp */
   count: number;
-  /** 超過時顯示 99+ */
+  /** Shows 99+ above this */
   max?: number;
-  /** 購物車名稱，覆寫 labels.cart */
+  /** Cart name, overrides labels.cart */
   label?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<Pick<AddToCartLabels, "cart" | "items">>;
-  /** 換掉預設的購物袋圖示，與 AddToCartButton 的 icon 用同一個；任何 SVG 都會縮到 18px */
+  /** Replaces the default shopping bag icon. Uses the same icon as AddToCartButton; any SVG is scaled to 18px */
   icon?: ReactNode;
   ref?: Ref<HTMLButtonElement>;
   onClick?: () => void;
   className?: string;
 }
 
-/** 購物袋，按鈕與 CartIcon 共用 */
+/** Shopping bag, shared by the button and CartIcon */
 function BagPaths() {
   return (
     <>
@@ -416,7 +416,7 @@ function BagPaths() {
   );
 }
 
-/** 搭配 AddToCartButton 的購物車目標：數量增加時整顆往下沉一下再彈回，像接住了東西 */
+/** Cart target to pair with AddToCartButton: when the count goes up the whole thing dips and springs back, as if it caught something */
 export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, ref, onClick, className }: CartIconProps) {
   const reduceMotion = useReducedMotion();
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
@@ -458,7 +458,7 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, 
       </motion.span>
       <AnimatePresence initial={false}>
         {count > 0 && (
-          // 以 count 當 key 重新掛載，每次加入都重新落定一次
+          // Remount keyed on count so it settles again on every add
           <motion.span
             key={count}
             aria-hidden="true"

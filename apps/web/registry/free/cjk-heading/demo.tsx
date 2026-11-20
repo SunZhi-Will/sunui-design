@@ -11,7 +11,7 @@ const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
 
-// 這個 block 專為中日文標題而做，英文介面沿用繁中範例
+// This block is made for Chinese and Japanese headings, and the English UI reuses the Traditional Chinese sample
 const copy = {
   "zh-TW": {
     lang: "zh-Hant",
@@ -71,7 +71,7 @@ export default function CjkHeadingDemo() {
   const t = useDemoText({ en: copy["zh-TW"], ...copy });
   return (
     <section lang={t.lang} className={cn("grid w-full max-w-4xl gap-4 md:grid-cols-[1fr_auto]", ink)}>
-      {/* 橫排：活動頁主視覺 */}
+      {/* Horizontal: campaign page hero */}
       <div className={cn("flex flex-col justify-between gap-8 rounded-xl border p-6 sm:p-9", surface, edge)}>
         <div className="space-y-5">
           <p className={cn("text-xs font-medium tracking-[0.2em]", inkMuted)}>{t.eyebrow}</p>
@@ -105,7 +105,7 @@ export default function CjkHeadingDemo() {
         </dl>
       </div>
 
-      {/* 直排：櫥窗直式海報 */}
+      {/* Vertical: display-window vertical poster */}
       <div className={cn("flex flex-row-reverse justify-center gap-5 rounded-xl border px-8 py-8", surface, edge)}>
         <CjkHeading
           as="h3"

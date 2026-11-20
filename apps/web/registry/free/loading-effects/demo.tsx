@@ -128,7 +128,7 @@ export const smallBtn =
 
 export default function LoadingEffectsDemo() {
   const t = useDemoText(copy);
-  // 確定進度的效果共用一個自動前進的數值
+  // Effects with determinate progress share one auto-advancing value
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [run, setRun] = useState(0);

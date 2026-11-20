@@ -6,44 +6,44 @@ import { useEffect, useMemo, useRef, useState, type ElementType, type ReactNode 
 import { cn } from "@/lib/utils";
 
 export interface TypewriterProps {
-  /** 依序打出的句子；預設打完一輪後停在最後一句 */
+  /** Phrases typed out in order; by default stops on the last one after one pass */
   phrases: string[];
-  /** 固定在前面的文字，例如「我們打造」 */
+  /** Text fixed in front, e.g. "We build" */
   prefix?: ReactNode;
   as?: ElementType;
-  /** 每個字元的打字毫秒數 */
+  /** Milliseconds per character when typing */
   typeSpeed?: number;
-  /** 每個字元的刪除毫秒數 */
+  /** Milliseconds per character when deleting */
   deleteSpeed?: number;
-  /** 每句打完後停留的毫秒數 */
+  /** Milliseconds to hold after each phrase is typed */
   pause?: number;
-  /** 中日韓字元的速度倍率；一個漢字資訊量較大，預設打得慢一些 */
+  /** Speed multiplier for CJK characters; a single Han character carries more information, so by default they type slower */
   cjkFactor?: number;
-  /** 打完最後一句後回到第一句重來；預設關閉 */
+  /** After the last phrase, return to the first and start again; off by default */
   loop?: boolean;
-  /** 文字色細游標；停在最後一句時自動收起 */
+  /** Thin cursor in the text colour; hides automatically when resting on the last phrase */
   caret?: boolean;
-  /** 進入畫面才開始打字 */
+  /** Start typing only once it enters the viewport */
   startOnView?: boolean;
-  /** 給螢幕閱讀器的完整文字；預設把所有句子串起來 */
+  /** Full text for screen readers; by default all phrases joined together */
   srText?: string;
   phraseClassName?: string;
   lang?: string;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤；影響字素切分與預設朗讀文字的分隔 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted; affects grapheme splitting and the separator in the default spoken text */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Overrides the built-in strings. Takes priority over locale */
   labels?: Partial<TypewriterLabels>;
   className?: string;
 }
 
 export interface TypewriterLabels {
-  /** 預設 srText 串接各句時的分隔 */
+  /** Separator used when the default srText joins the phrases */
   separator: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Maps any language tag to one of the four built-in languages, falling back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -90,7 +90,7 @@ export function Typewriter({
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  // 以內容當 key，父層每次傳新陣列也不會重置打字進度
+  // Keyed on content, so a new array from the parent on every render does not reset typing progress
   const phraseKey = phrases.join("\u0000");
   const split = useMemo(() => phraseKey.split("\u0000").map((p) => graphemes(p, locale)), [phraseKey, locale]);
   const [index, setIndex] = useState(0);
@@ -116,7 +116,7 @@ export function Typewriter({
   const current = split[index] ?? [];
   const isLast = index === last;
 
-  // 減少動態：不逐字打。不循環時直接顯示最後一句，循環時整句切換
+  // Reduced motion: no per-character typing. Without looping it shows the last phrase directly; with looping it switches whole phrases
   useEffect(() => {
     if (!reduceMotion || !loop || !active || split.length < 2) return;
     const t = window.setTimeout(() => setIndex((i) => (i + 1) % split.length), pause + 1200);
@@ -131,7 +131,7 @@ export function Typewriter({
     if (!deleting && count < current.length) {
       const ch = current[count];
       const base = typeSpeed * (CJK_RE.test(ch) ? cjkFactor : 1);
-      // 以位置產生固定的節奏變化，避免 render 中使用亂數
+  // Derive a fixed rhythm variation from position, avoiding random numbers during render
       const jitter = ((count * 37) % 5) * 0.08 * typeSpeed;
       const prev = current[count - 1];
       delay = base + jitter + (prev && PUNCT_RE.test(prev) ? typeSpeed * 3 : 0);
@@ -158,7 +158,7 @@ export function Typewriter({
   const shown = reduceMotion
     ? (loop ? current : (split[last] ?? [])).join("")
     : current.slice(0, count).join("");
-  // 停在最後一句：游標收起，畫面安靜下來
+  // Resting on the last phrase: the cursor hides and the screen goes quiet
   const resting = !loop && (reduceMotion || (isLast && count >= current.length && active));
   const fullText = srText ?? [typeof prefix === "string" ? prefix : "", phrases.join(t.separator)].filter(Boolean).join(" ");
 
@@ -170,7 +170,7 @@ export function Typewriter({
       className={cn("grid text-3xl font-semibold tracking-tight text-foreground", className)}
     >
       <span className="sr-only">{fullText}</span>
-      {/* 以最長的句子先撐出高度，打字時下方版面不會跳動 */}
+      {/* The longest phrase reserves the height first, so the layout below does not jump while typing */}
       <span aria-hidden="true" className="invisible [grid-area:1/1]">
         {prefix != null && <>{prefix} </>}
         <span className={cn("whitespace-pre-wrap", phraseClassName)}>{longest}</span>

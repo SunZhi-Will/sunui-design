@@ -8,46 +8,46 @@ import { cn } from "@/lib/utils";
 export type ConfirmButtonVariant = "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
 export type ConfirmButtonSize = "default" | "xs" | "sm" | "lg";
 
-/** 跟 usermeld 的 ActionResult 同型：ok 與給人看的訊息 */
+/** Same shape as usermeld's ActionResult: ok plus a human-readable message */
 export type ConfirmResult = { ok: boolean; message?: string } | void;
 
 export interface ConfirmButtonLabels {
-  /** 第一次按下後的提示，{label} 會換成 confirmLabel */
+  /** Hint after the first press; {label} is replaced with confirmLabel */
   armedNotice?: string;
-  /** 成功但 action 沒給訊息時 */
+  /** On success when the action gave no message */
   done?: string;
-  /** action 拋錯時 */
+  /** When the action throws */
   failed?: string;
 }
 
 export interface ConfirmButtonProps {
-  /** 平常的按鈕文字，寫動作本身，例如「移除」 */
+  /** Normal button text; name the action itself, e.g. "Remove" */
   children: ReactNode;
-  /** 待確認時的按鈕文字，用結果命名，例如「移除登記」，不要用「確定」 */
+  /** Button text while awaiting confirmation; name it by the outcome, e.g. "Remove registration", not "OK" */
   confirmLabel: string;
-  /** 第二下的期限（ms），原作快讀是 2.5 秒 */
+  /** Time limit for the second press (ms); the original's quick read is 2.5 seconds */
   armMs?: number;
-  /** 提示停留多久（ms），原作是 1.8 秒 */
+  /** How long the hint stays (ms); the original is 1.8 seconds */
   noticeMs?: number;
-  /** 第二下按到時呼叫；回 { ok: false, message } 或拋錯都算失敗 */
+  /** Called on the second press; returning { ok: false, message } or throwing both count as failure */
   action: () => Promise<ConfirmResult> | ConfirmResult;
-  /** 設定後按下只顯示這句、不會進入待確認（例如還沒有可讀的快速存檔） */
+  /** When set, a press shows only this line and never enters the pending state (e.g. there is no readable quick save yet) */
   unavailableMessage?: string;
   variant?: ConfirmButtonVariant;
-  /** 待確認時換成的樣式，預設 destructive */
+  /** Style swapped in while pending; defaults to destructive */
   armedVariant?: ConfirmButtonVariant;
   size?: ConfirmButtonSize;
   disabled?: boolean;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are accepted too */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override the built-in strings; takes priority over locale */
   labels?: ConfirmButtonLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -62,7 +62,7 @@ const MESSAGES: Record<SunLocale, Required<ConfirmButtonLabels>> = {
   ja: { armedNotice: "もう一度押すと{label}", done: "完了しました", failed: "うまくいきませんでした。もう一度お試しください。" },
 };
 
-// usermeld components/ui/button.tsx 的 buttonVariants
+// buttonVariants from usermeld's components/ui/button.tsx
 const base =
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
@@ -86,7 +86,7 @@ const sizes: Record<ConfirmButtonSize, string> = {
 
 type Notice = { text: string; tone: "info" | "success" | "error" };
 
-// product 系列的動態：expo-out 緩動，時長走 120 / 180ms 階梯
+// Motion of the product series: expo-out easing, durations on the 120 / 180ms steps
 const ease = [0.23, 1, 0.32, 1] as const;
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
@@ -149,7 +149,7 @@ export function ConfirmButton({
     }
   }
 
-  // 第一下只換來一行提示，armMs 內按第二下才真的執行
+  // The first press only earns a hint line; a second press within armMs actually runs the action
   function press() {
     if (pending) return;
     if (unavailableMessage) {
@@ -177,7 +177,7 @@ export function ConfirmButton({
 
   return (
     <span className={cn("relative inline-flex flex-col items-end gap-1", className)}>
-      {/* 同一顆按鈕變寬變色，不換成另一顆：寬度用 layout 補間，文字上下換行，提示行跟著換 */}
+      {/* The same button widens and changes colour instead of swapping for another: width uses a layout tween, text wraps up and down, and the hint line follows */}
       <motion.button
         type="button"
         data-slot="button"

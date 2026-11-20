@@ -4,7 +4,7 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import { SpineShelf, type SpineItem } from "./spine-shelf";
 
-// 示範封面：SVG data URI，平面色塊與幾何圖樣，不讀外部圖片
+// Demo covers: SVG data URIs with flat colour blocks and geometric patterns, no external images
 const plates: [string, string, string][] = [
   ["#2f3e46", "#cad2c5", "#84a98c"],
   ["#7f5539", "#ede0d4", "#b08968"],

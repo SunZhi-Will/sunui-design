@@ -13,14 +13,14 @@ const copy = {
   ja: { nav: "アプリ", items: ["作成", "マイ画像", "キャラクター", "プラン"], generating: "1 枚を生成中", done: "生成が完了しました" },
 };
 
-// 側邊欄底部的額度：一張圖生成完（進行中的任務變少）就重新讀取
+// Quota at the bottom of the sidebar: reloads once an image finishes generating (fewer running tasks)
 export default function QuotaMeterDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   const left = useRef(18);
   const [active, setActive] = useState(1);
 
-  // 模擬正在跑的一次生成，幾秒後完成並用掉一張
+  // Simulates a generation in progress; it finishes after a few seconds and uses up one image
   useEffect(() => {
     if (!active) return;
     const id = setTimeout(() => {

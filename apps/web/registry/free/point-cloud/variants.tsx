@@ -5,10 +5,10 @@ import { pointCloudShapes, type PointCloudShape } from "./point-cloud";
 
 export const variants = pointCloudShapes;
 
-// 首頁預設只放這一種當代表：會自己轉動，輪廓最清楚
+// The home page shows only this one as the representative: it turns by itself and has the clearest outline
 export const featured = "sphere";
 
-/** 首頁型錄：一種點雲形狀一張卡。 */
+/** Home catalog: one card per point-cloud shape. */
 export default function PointCloudVariant({ variant }: { variant: string }) {
   return (
     <div className="w-72">

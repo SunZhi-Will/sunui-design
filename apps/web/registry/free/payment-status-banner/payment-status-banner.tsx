@@ -17,39 +17,39 @@ export interface PaymentStatusBannerLabels {
 }
 
 export interface PaymentStatusBannerProps {
-  /** 付款頁導回時帶的結果（原本來自網址 ?checkout=），沒有就不顯示 */
+  /** Result carried back from the payment page (originally from the ?checkout= URL); nothing is shown when absent */
   status: CheckoutResult | string | null;
-  /** 目前是否已開通。pending 期間它一變 true，banner 就切成 success */
+  /** Whether access is currently unlocked. While pending, once it becomes true the banner switches to success */
   unlocked: boolean;
-  /** pending 時每次輪詢呼叫，負責重新抓資料並更新 unlocked（原本是 router.refresh） */
+  /** Called on each poll while pending; re-fetches data and updates unlocked (originally router.refresh) */
   onRefresh?: () => void;
-  /** pending 轉 success 時呼叫一次，例如重抓已購清單 */
+  /** Called once when pending turns into success, for example to re-fetch the purchased list */
   onUnlocked?: () => void;
-  /** 掛載時若為 pending，先立刻同步一次付款結果，不等第一個輪詢間隔 */
+  /** If pending on mount, sync the payment result immediately instead of waiting for the first poll interval */
   syncOnMount?: boolean;
-  /** 輪詢間隔，預設 3000 毫秒 */
+  /** Poll interval in milliseconds, default 3000 */
   interval?: number;
-  /** 最多輪詢次數，預設 8 次（共 24 秒） */
+  /** Maximum number of polls, default 8 (24 seconds in total) */
   maxAttempts?: number;
-  /** failed、error 自動消失的毫秒數，預設 8000 */
+  /** Milliseconds before failed and error dismiss themselves, default 8000 */
   dismissAfter?: number;
-  /** 成功時「前往課程」的連結，沒給就不顯示按鈕 */
+  /** Link for "Go to course" on success; no button is shown when omitted */
   successHref?: string;
   onDismiss?: () => void;
-  /** 固定在視窗頂端（頁首下方）；false 時跟著版面流動 */
+  /** Fixed to the top of the viewport (below the header); when false it flows with the layout */
   fixed?: boolean;
-  /** fixed 時距離視窗頂端的距離，預設 56（頁首高度） */
+  /** Distance from the top of the viewport when fixed, default 56 (header height) */
   top?: number;
-  /** 介面語言：en、zh-TW、zh-CN、ja，也接受 zh-Hant-HK、ja-JP 這類標籤 */
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;
-  /** 覆寫內建字串，優先於 locale */
+  /** Override built-in strings; takes precedence over locale */
   labels?: PaymentStatusBannerLabels;
   className?: string;
 }
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
-/** 任意語言標籤歸到內建的四種語言之一，其他一律用英文 */
+/** Map any language tag to one of the four built-in languages; everything else falls back to English */
 function resolveLocale(tag?: string): SunLocale {
   const t = (tag ?? "en").toLowerCase();
   if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
@@ -92,17 +92,17 @@ const MESSAGES: Record<SunLocale, Required<PaymentStatusBannerLabels>> = {
   },
 };
 
-// 狀態色只上在 6px 的點上，其餘全部是中性 token
+// The status colour appears only on the 6px dot; everything else uses neutral tokens
 const DOT = {
   success: "bg-emerald-500",
   failed: "bg-destructive",
   error: "bg-amber-500",
 } as const;
 
-// product 系列的動態：expo-out 緩動，時長走 120 / 180 / 240ms 階梯
+// Motion of the product series: expo-out easing, durations on a 120 / 180 / 240ms ladder
 const ease = [0.23, 1, 0.32, 1] as const;
 
-// lucide 圖示（16px）
+// lucide icons (16px)
 const iconProps = {
   width: 16,
   height: 16,
@@ -133,10 +133,10 @@ function XIcon() {
 }
 
 /**
- * 付款結果通知 banner。
- * pending：開通是非同步的，落地時資料可能還沒寫完，不代表付款有問題，所以輪詢重抓，
- * unlocked 一變 true 就自動切成 success。success 不自動消失（讓使用者有時間點「前往課程」），
- * failed、error 8 秒後自動消失。
+ * Payment result notification banner.
+ * pending: unlocking is asynchronous and the data may not be written yet when the user lands, which does not mean the payment failed, so it polls and re-fetches;
+ * as soon as unlocked becomes true it switches to success. success does not dismiss itself (so the user has time to click "Go to course");
+ * failed and error dismiss themselves after 8 seconds.
  */
 export function PaymentStatusBanner({
   status,
@@ -165,7 +165,7 @@ export function PaymentStatusBanner({
   const dismissRef = useRef(onDismiss);
   dismissRef.current = onDismiss;
 
-  // 從付款頁回來時先查一次，不必等第一個輪詢間隔
+  // On returning from the payment page, check once now instead of waiting for the first poll interval
   useEffect(() => {
     if (!syncOnMount || status !== "pending" || unlocked) return;
     const id = setTimeout(() => refreshRef.current?.(), 0);
@@ -203,7 +203,7 @@ export function PaymentStatusBanner({
   const leave = reduce ? { duration: 0 } : { duration: 0.12, ease };
   const message = banner === "success" ? t.success : banner === "pending" ? t.pending : banner === "failed" ? t.failed : t.error;
 
-  // 內容換行時高度跟著變，量測內層後補間，不讓外框跳
+  // When the content wraps, the height changes with it; measure the inner element and tween it so the frame does not jump
   const innerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | "auto">("auto");
   const visible = !!banner;
@@ -217,8 +217,8 @@ export function PaymentStatusBanner({
     return () => ro.disconnect();
   }, [visible]);
 
-  // 連續性：同一條 banner 從頭到尾不換。左側圖示格固定是錨點，只換圖形；文字上下換行；
-  // 固定在頂端時從頁首下方滑出，跟著版面流動時改用高度補間，下方內容滑動而不是跳動。
+  // Continuity: the same banner stays throughout. The icon cell on the left is a fixed anchor and only the glyph changes; text wraps up and down;
+  // when fixed to the top it slides out from below the header, and when flowing with the layout it uses a height tween so content below slides instead of jumping.
   const enter = fixed ? { opacity: 0, y: reduce ? 0 : -8 } : { opacity: 0, height: reduce ? "auto" : 0 };
   const shown = fixed ? { opacity: 1, y: 0, height } : { opacity: 1, height };
   const gone = fixed ? { opacity: 0, y: reduce ? 0 : -8, transition: leave } : { opacity: 0, height: reduce ? "auto" : 0, transition: reduce ? leave : { duration: 0.18, ease } };

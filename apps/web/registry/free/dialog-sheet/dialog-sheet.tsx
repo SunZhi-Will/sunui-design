@@ -14,24 +14,24 @@ const springs = {
 export type DialogSheetVariant = "center" | "sheet" | "auto";
 
 export interface DialogSheetProps {
-  /** 受控開關；不傳時用 defaultOpen 與 trigger 自己管理 */
+  /** Controlled open state; when omitted, defaultOpen and trigger manage it themselves */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** 點了會打開的元素，例如一個按鈕 */
+  /** Element that opens it when clicked, e.g. a button */
   trigger?: ReactNode;
-  /** center：置中視窗；sheet：底部面板；auto：桌面置中、窄螢幕（< 640px）變底部面板 */
+  /** center: centered window; sheet: bottom panel; auto: centered on desktop, bottom panel on narrow screens (< 640px) */
   variant?: DialogSheetVariant;
   title: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
-  /** 放在底部的動作列 */
+  /** Action row at the bottom */
   footer?: ReactNode;
-  /** 底部面板可以往下拖曳關閉 */
+  /** The bottom sheet can be dragged down to close */
   draggable?: boolean;
-  /** 點遮罩或按 Escape 是否關閉 */
+  /** Whether clicking the backdrop or pressing Escape closes it */
   dismissible?: boolean;
-  /** fixed：蓋住整個視窗（portal 到 body）；contained：只蓋住最近的 relative 容器 */
+  /** fixed: covers the whole viewport (portaled to body); contained: covers only the nearest relative container */
   position?: "fixed" | "contained";
   closeLabel?: string;
   className?: string;
@@ -50,8 +50,8 @@ function useNarrow(query = "(max-width: 639px)") {
 }
 
 /**
- * 離開意圖：滑鼠往視窗上緣移出時呼叫 onIntent（只在桌面、每個 session 預設一次）。
- * 用法：useExitIntent(() => setOpen(true), { storageKey: "exit-offer" })
+ * Exit intent: calls onIntent when the mouse leaves through the top edge of the window (desktop only, once per session by default).
+ * Usage: useExitIntent(() => setOpen(true), { storageKey: "exit-offer" })
  */
 export function useExitIntent(onIntent: () => void, { enabled = true, delay = 3000, storageKey }: { enabled?: boolean; delay?: number; storageKey?: string } = {}) {
   const fired = useRef(false);
@@ -62,7 +62,7 @@ export function useExitIntent(onIntent: () => void, { enabled = true, delay = 30
     try {
       if (storageKey && sessionStorage.getItem(storageKey)) return;
     } catch {
-      // 無痕模式等情況讀不到 sessionStorage，照常觸發
+      // sessionStorage can be unreadable (e.g. private browsing); fire as usual
     }
     let armed = false;
     const timer = window.setTimeout(() => (armed = true), delay);
@@ -72,7 +72,7 @@ export function useExitIntent(onIntent: () => void, { enabled = true, delay = 30
       try {
         if (storageKey) sessionStorage.setItem(storageKey, "1");
       } catch {
-        // 寫不進去也沒關係，只是同一個分頁可能再觸發一次
+        // A failed write is fine; the same tab may just trigger once more
       }
       cb.current();
     };

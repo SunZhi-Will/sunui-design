@@ -7,12 +7,12 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { JobPanel, JobRow, JobStatusDot, JobTile } from "./job-views";
 import { JobsTray, isActive, toBackgroundJob, useBackgroundJobs, type Job } from "./jobs-tray";
 
-// 生圖工作室的控制台：右側是正在看的那一張（JobPanel），左側是佇列（JobRow）與最近的格子（JobTile），
-// 匯出與同步在背景跑，收在右下角的工作匣（JobsTray）。所有版面吃同一個 Job 型別。
+// A console for an image-generation studio: the right side shows the one being viewed (JobPanel), the left has the queue (JobRow) and recent tiles (JobTile),
+// and exports and syncs run in the background, collected in the jobs tray at the bottom right (JobsTray). Every layout takes the same Job type.
 
 type Frame = Pick<Job, "status" | "step" | "total" | "queuePosition" | "etaSeconds">;
 
-// 排隊、理解描述、載入模型、取樣 28 步、輸出、檢查、完成
+// Queued, reading the prompt, loading the model, 28 sampling steps, output, checking, done
 const timeline: Frame[] = [
   { status: "queued", queuePosition: 3, etaSeconds: 48 },
   { status: "queued", queuePosition: 2, etaSeconds: 40 },
@@ -24,13 +24,13 @@ const timeline: Frame[] = [
   { status: "checking", etaSeconds: 1 },
   { status: "done" },
 ];
-// 完成後停留 4 拍再從頭跑
+// After done it holds for 4 beats, then restarts
 const LOOP = timeline.length + 4;
 const frameAt = (n: number) => timeline[Math.min(((n % LOOP) + LOOP) % LOOP, timeline.length - 1)];
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// 示範照片（AI 生成），放在 public/blocks/jobs-tray：
-// reference 是使用者上傳的參考照（雨中火車窗邊、人背對鏡頭）；preview 是生成中的低解析度即時預覽；result 是完成後的成品
+// Demo photos (AI generated) in public/blocks/jobs-tray:
+// reference is the photo the user uploaded (a train window in the rain, a person with their back to the camera); preview is the low-resolution live preview while generating; result is the finished image
 const reference = "/blocks/jobs-tray/reference.webp";
 const preview = "/blocks/jobs-tray/preview.webp";
 const result = "/blocks/jobs-tray/result.webp";
@@ -110,7 +110,7 @@ const copy = {
   },
 };
 
-/** 只在畫面內、分頁可見時前進一拍（1.4 秒） */
+/** Advances one beat (1.4 s) only while on screen and the tab is visible */
 function useTick() {
   const ref = useRef<HTMLDivElement>(null);
   const [tick, setTick] = useState(0);
@@ -137,7 +137,7 @@ export default function JobsTrayDemo() {
   const t = useDemoText(copy);
   const { ref, tick } = useTick();
 
-  // 右側面板：可取消，取消後可重跑
+  // Right panel: cancelable, and can be rerun after canceling
   const [panelStart, setPanelStart] = useState(0);
   const [panelCanceled, setPanelCanceled] = useState(false);
   const panelFrame = frameAt(tick - panelStart);
@@ -146,7 +146,7 @@ export default function JobsTrayDemo() {
     ? { id: "job_8f2a", prompt: t.panel, status: "canceled", durationSeconds: 6, meta: t.meta }
     : { id: "job_8f2a", prompt: t.panel, ...panelFrame, durationSeconds: panelDone ? 52 : null, images: panelDone ? 2 : 0, meta: t.meta };
 
-  // 格子：生成中那一格可取消，取消後移除紀錄就重新送出
+  // Tiles: the one being generated can be canceled; after canceling, removing its record resubmits it
   const [tileStart, setTileStart] = useState(-5);
   const [tileCanceled, setTileCanceled] = useState(false);
   const [errorRemoved, setErrorRemoved] = useState(false);
@@ -161,7 +161,7 @@ export default function JobsTrayDemo() {
   const runningCount = [panelJob, tileJob, ...rows].filter(isActive).length;
   const failedCount = rows.filter((r) => r.status === "error").length + (errorRemoved ? 0 : 1);
 
-  // 工作匣：背景放大（可取消）與一個失敗的同步（留到使用者關閉），再加上右側那張生成
+  // Jobs tray: a background upscale (cancelable) and one failed sync (stays until the user dismisses it), plus the generation on the right
   const { jobs, startJob, updateJob, finishJob, dismissJob, cancelJob } = useBackgroundJobs();
   useEffect(() => {
     let p = 0;
@@ -274,7 +274,7 @@ export default function JobsTrayDemo() {
         </aside>
       </div>
 
-      {/* 工作匣在這一條裡定位；真實產品用預設的 fixed 貼在視窗右下 */}
+      {/* The tray is positioned inside this strip; a real product uses the default fixed position at the bottom right of the viewport */}
       <div className="relative h-40 border-t border-border bg-muted/40">
         <p className="px-4 pt-3 text-xs text-muted-foreground">{t.exports}</p>
         <JobsTray fixed={false} locale={locale} jobs={trayJobs} onDismiss={dismissJob} />
