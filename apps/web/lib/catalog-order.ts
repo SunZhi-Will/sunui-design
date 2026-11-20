@@ -15,9 +15,18 @@ import { seriesOf } from "@/lib/series";
 
 /** A：整頁與檔期場景，B：免費沒有對應的招牌互動 */
 const proLead = [
+  // 開頭先放縮成卡片還好看的（有照片、插畫或大塊明暗）：型錄的第一個畫面是首頁主按鈕的目的地，
+  // 不能是一排黑底灰字的小控制項。名單來自 reports/首頁從零重做深度分析-2026-11-20.md
+  "day-night-hero",
+  "lookbook-expand-hero",
+  "glass-cube-hero",
+  "lamp-dimmer-scene",
+  "kelvin-switch",
+  "holiday-calendar",
+  "sky-time-switch",
+  "specimen-scan",
   // A
   "campaign-landing",
-  "day-night-hero",
   "black-friday-weekend",
   "checkout-flow",
   "lunar-new-year",
@@ -99,20 +108,25 @@ const proTail = [
 
 const proOrder = [...proLead, ...Object.keys(proSiblings), ...proTail];
 
-/** 免費精選：紙感電商的招牌在前，穿插最有記憶點的 story 與 showcase */
+/** 免費精選：開頭先放縮成卡片還好看的，再接商店的招牌元件。理由同 proLead 開頭的註解 */
 const freeLead = [
-  "coupon-wallet",
-  "add-to-cart-button",
+  "depth-hero",
+  "compare-slider",
   "book-3d",
-  "copy-code-button",
   "cloth-curtain",
+  "orbit-gallery",
   "hero-billboard-carousel",
+  "hotspots",
+  "add-to-cart-button",
+  "spine-shelf",
+  "variant-picker",
+  "product-media",
+  "coupon-wallet",
+  "copy-code-button",
   "addon-checklist",
   "animated-number",
   "shipping-options",
-  "spine-shelf",
   "toast-stack",
-  "hotspots",
   "morph-menu",
   "terms-consent",
   "tier-progress",

@@ -102,7 +102,8 @@ export function FitStage({ children, mode = "card" }: { children: ReactNode; mod
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       data-fit-stage=""
-      className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-clip bg-card transition-colors duration-300"
+      // 淺色的舞台是淺灰，不是白：白色的元件放在白舞台上只剩一條邊線，一排卡片看起來是空的（首頁的格子同一個顏色）
+      className="fixed inset-0 flex cursor-zoom-in items-center justify-center overflow-clip bg-[#f4f4f4] transition-colors duration-300 dark:bg-card"
       style={surface ? { backgroundColor: surface } : undefined}
       // 點到元件以外的空白處（舞台或滿版的外框本身），請外層型錄展開成面板
       onClick={(event) => {

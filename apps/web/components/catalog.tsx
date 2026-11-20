@@ -43,6 +43,7 @@ type BlockSet = CollectionSlug | "saved";
 export function Catalog({ items, locale, messages }: { items: CatalogItem[]; locale: Locale; messages: CatalogMessages }) {
   const { catalog: t, collections: collectionText, interactions: interactionLabels, series: seriesText, tier: tierLabels } = messages;
   const [interaction, setInteraction] = useState<Interaction | "all">("all");
+  const [showAll, setShowAll] = useState(false);
   const [tier, setTier] = useState<Tier | "all">("all");
   const [series, setSeries] = useState<Series | "all">("all");
   const [query, setQuery] = useState("");
@@ -215,7 +216,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
       {/* 篩選收成一列：搜尋、三個下拉（整頁合輯、系列、互動）、方案、收藏。原本四排共二十幾顆 chip，佔掉第一個畫面 */}
       <div className="mb-6 grid gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+        {/* min-w-0：格線的子項預設不會縮到比內容窄，手機那一排橫向捲的篩選會把整列撐到七百多 px */}
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <label className="relative min-w-0 basis-full sm:basis-64 sm:grow lg:max-w-xs">
             <span className="sr-only">{t.searchLabel}</span>
             <svg
@@ -246,6 +248,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
             </kbd>
           </label>
 
+          {/* 手機：其餘的篩選收成一排可以橫向捲，不往下疊（原本疊成三排，第一張卡被擠到第一個畫面外）。sm 以上照原樣排 */}
+          <div className="flex min-w-0 basis-full items-center gap-2 overflow-x-auto [scrollbar-width:none] max-sm:-mx-4 max-sm:px-4 sm:contents [&::-webkit-scrollbar]:hidden">
           <FilterSelect
             label={t.setsLabel}
             active={blockSet !== null && blockSet !== "saved"}
@@ -321,6 +325,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
             {t.saved}
             <span className="text-xs tabular-nums opacity-70">{setNames.get("saved")?.length ?? 0}</span>
           </button>
+          </div>
         </div>
         {series !== "all" && <p className="text-sm text-pretty text-subtle">{seriesText.descriptions[series]}</p>}
       </div>
@@ -340,7 +345,8 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
         )}
       </div>
 
-      <ul className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      {/* 手機一欄排兩百張卡是六萬多 px，而且每張都是一個 iframe：先顯示前 24 張，按了才全部展開。sm 以上不受影響 */}
+      <ul className={cn("grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3", !showAll && "max-sm:[&>li:nth-child(n+25)]:hidden")}>
         {visible.map((item, i) => (
           <BlockCard
             spot={spotFor(visible, i)}
@@ -357,6 +363,15 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
           />
         ))}
       </ul>
+      {!showAll && visible.length > 24 && (
+        <button
+          type="button"
+          onClick={() => setShowAll(true)}
+          className="mt-8 flex h-11 w-full items-center justify-center rounded-lg text-[15px] font-medium btn-secondary sm:hidden"
+        >
+          {format(t.showAll, { n: visible.length })}
+        </button>
+      )}
 
       {visible.length === 0 && (
         <div className="rounded-lg border border-dashed border-line p-10 text-center text-sm text-subtle">
