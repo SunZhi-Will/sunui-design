@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
+  gentle: { type: "spring", stiffness: 240, damping: 30 },
+  pop: { type: "spring", stiffness: 620, damping: 20, mass: 0.8 },
 } as const;
 
 /** 回傳字串代表錯誤訊息；回傳 true 或 undefined 代表通過 */
@@ -15,7 +17,25 @@ export type FieldValidator = (value: string) => string | true | undefined | null
 export interface FloatingFieldLabels {
   /** 建議修正的句子，s 是可點的建議值 */
   didYouMean: (s: ReactNode) => ReactNode;
+  /** strength 模式：強度 0 到 4 的狀態字（0 是空白） */
+  strength: [string, string, string, string, string];
+  /** 螢幕閱讀器播報強度時的前綴 */
+  strengthPrefix: string;
+  met: string;
+  unmet: string;
+  /** 內建四條密碼規則的文字 */
+  rules: { length: string; case: string; number: string; symbol: string };
 }
+
+export interface PasswordRule {
+  id: string;
+  label: ReactNode;
+  /** 回傳 true 代表符合 */
+  test: (value: string) => boolean;
+}
+
+/** 0：空白；1：弱；2：普通；3：良好；4：強（所有規則都符合） */
+export type PasswordStrength = 0 | 1 | 2 | 3 | 4;
 
 type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
 
@@ -27,11 +47,53 @@ function resolveLocale(tag?: string): SunLocale {
 }
 
 const MESSAGES: Record<SunLocale, FloatingFieldLabels> = {
-  en: { didYouMean: (s) => <>Did you mean {s}?</> },
-  "zh-TW": { didYouMean: (s) => <>是不是 {s}？</> },
-  "zh-CN": { didYouMean: (s) => <>是不是 {s}？</> },
-  ja: { didYouMean: (s) => <>{s} ではありませんか？</> },
+  en: {
+    didYouMean: (s) => <>Did you mean {s}?</>,
+    strength: ["", "Weak", "Fair", "Good", "Strong"],
+    strengthPrefix: "Password strength",
+    met: "met",
+    unmet: "not met",
+    rules: { length: "At least 8 characters", case: "Upper and lowercase", number: "A number", symbol: "A symbol" },
+  },
+  "zh-TW": {
+    didYouMean: (s) => <>是不是 {s}？</>,
+    strength: ["", "弱", "普通", "良好", "強"],
+    strengthPrefix: "密碼強度",
+    met: "已符合",
+    unmet: "未符合",
+    rules: { length: "至少 8 個字元", case: "大小寫字母", number: "包含數字", symbol: "包含符號" },
+  },
+  "zh-CN": {
+    didYouMean: (s) => <>是不是 {s}？</>,
+    strength: ["", "弱", "一般", "良好", "强"],
+    strengthPrefix: "密码强度",
+    met: "已符合",
+    unmet: "未符合",
+    rules: { length: "至少 8 个字符", case: "大小写字母", number: "包含数字", symbol: "包含符号" },
+  },
+  ja: {
+    didYouMean: (s) => <>{s} ではありませんか？</>,
+    strength: ["", "弱い", "普通", "良い", "強い"],
+    strengthPrefix: "パスワードの強度",
+    met: "達成",
+    unmet: "未達成",
+    rules: { length: "8 文字以上", case: "大文字と小文字", number: "数字を含む", symbol: "記号を含む" },
+  },
 };
+
+/** 內建的四條密碼規則，文字跟著 locale */
+export function passwordRules(locale?: string): PasswordRule[] {
+  const r = MESSAGES[resolveLocale(locale)].rules;
+  return [
+    { id: "length", label: r.length, test: (v) => v.length >= 8 },
+    { id: "case", label: r.case, test: (v) => /[a-z]/.test(v) && /[A-Z]/.test(v) },
+    { id: "number", label: r.number, test: (v) => /\d/.test(v) },
+    { id: "symbol", label: r.symbol, test: (v) => /[^A-Za-z0-9\s]/.test(v) },
+  ];
+}
+
+/** 強度條填色：前三級是前景色的深淺，全部符合才用品牌專色 */
+const FILL = ["", "bg-foreground/30", "bg-foreground/50", "bg-foreground/70", "bg-[color:var(--sunui-spot,var(--primary))]"];
 
 export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement & HTMLTextAreaElement>, "value" | "defaultValue" | "onChange" | "size"> {
   label: ReactNode;
@@ -60,6 +122,12 @@ export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
   locale?: string;
   /** 覆寫內建字串，優先於 locale */
   labels?: Partial<FloatingFieldLabels>;
+  /** 密碼強度模式：欄位下方顯示四段強度條與即時條件清單。顯示密碼按鈕照舊放在 trailing */
+  strength?: boolean;
+  /** strength 模式的規則，預設為 passwordRules(locale) */
+  rules?: PasswordRule[];
+  /** 強度等級改變時觸發，allPassed 代表所有規則都符合 */
+  onStrengthChange?: (strength: PasswordStrength, allPassed: boolean) => void;
 }
 
 const SLOT: Record<string, RegExp> = { "9": /\d/, A: /[a-z]/i, "*": /\S/ };
@@ -142,6 +210,9 @@ export function FloatingField({
   suggest,
   locale,
   labels,
+  strength: strengthMode = false,
+  rules: rulesProp,
+  onStrengthChange,
   className,
   id: idProp,
   onBlur,
@@ -155,6 +226,7 @@ export function FloatingField({
   const autoId = useId();
   const id = idProp ?? autoId;
   const msgId = `${id}-msg`;
+  const meterId = `${id}-meter`;
   const [inner, setInner] = useState(defaultValue);
   const value = valueProp ?? inner;
   const [focused, setFocused] = useState(false);
@@ -182,6 +254,18 @@ export function FloatingField({
   const floated = focused || value.length > 0;
   const ghost = mask && floated ? mask.slice(value.length).replace(/[9A*]/g, (m) => GHOST[m]) : "";
   const count = maxLength && maxLength > 0 ? value.length : null;
+
+  const rules = strengthMode ? (rulesProp ?? passwordRules(locale)) : [];
+  const checks = rules.map((r) => ({ ...r, passed: r.test(value) }));
+  const passed = checks.filter((c) => c.passed).length;
+  const allPassed = rules.length > 0 && passed === rules.length;
+  // 有輸入但一條都沒符合時仍算 1，讓使用者看到回饋
+  const level = (value && rules.length ? Math.max(1, Math.round((passed / rules.length) * 4)) : 0) as PasswordStrength;
+  const strengthCb = useRef(onStrengthChange);
+  strengthCb.current = onStrengthChange;
+  useEffect(() => {
+    if (strengthMode) strengthCb.current?.(level, allPassed);
+  }, [strengthMode, level, allPassed]);
 
   const set = (next: string) => {
     if (valueProp === undefined) setInner(next);
@@ -215,7 +299,8 @@ export function FloatingField({
     maxLength,
     value,
     "aria-invalid": error ? true : undefined,
-    "aria-describedby": error || offer || hint || (valid && successMessage) ? msgId : undefined,
+    "aria-describedby":
+      [error || offer || hint || (valid && successMessage) ? msgId : null, strengthMode ? meterId : null].filter(Boolean).join(" ") || undefined,
     onFocus: (e: FocusEvent<HTMLInputElement & HTMLTextAreaElement>) => {
       setFocused(true);
       onFocus?.(e);
@@ -325,6 +410,62 @@ export function FloatingField({
           {trailing}
         </div>
       </div>
+      {strengthMode && (
+        <div id={meterId} className="px-1 pt-2">
+          <div className="flex items-center gap-3">
+            <div aria-hidden="true" className="flex flex-1 gap-1">
+              {[1, 2, 3, 4].map((seg) => (
+                <span key={seg} className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]">
+                  <motion.span
+                    className={cn("absolute inset-0 origin-left rounded-full transition-colors duration-200", FILL[level])}
+                    initial={false}
+                    animate={{ scaleX: level >= seg ? 1 : 0 }}
+                    transition={reduce ? { duration: 0 } : { ...springs.gentle, delay: (level >= seg ? seg - 1 : 4 - seg) * 0.04 }}
+                  />
+                </span>
+              ))}
+            </div>
+            <span aria-hidden="true" className={cn("min-w-10 text-right text-xs font-medium", level === 4 ? "text-[color:var(--sunui-spot,var(--primary))]" : level ? "text-foreground" : "text-muted-foreground")}>
+              {t.strength[level]}
+            </span>
+          </div>
+          {/* 只有等級改變時文字才變，不會每打一個字就播報 */}
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            {level ? `${t.strengthPrefix}: ${t.strength[level]}` : ""}
+          </p>
+          <ul className="grid gap-x-3 gap-y-1 pt-2 text-xs sm:grid-cols-2">
+            {checks.map((c) => (
+              <li key={c.id} className={cn("flex items-center gap-1.5 transition-colors", c.passed ? "text-foreground" : "text-muted-foreground")}>
+                <motion.span
+                  aria-hidden="true"
+                  initial={false}
+                  animate={{ scale: c.passed && !reduce ? [0.7, 1] : 1 }}
+                  transition={springs.pop}
+                  className={cn(
+                    "grid size-3.5 shrink-0 place-items-center rounded-full transition-colors",
+                    c.passed
+                      ? "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]"
+                      : "bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)]",
+                  )}
+                >
+                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="size-2.5">
+                    <motion.path
+                      d="M3 6.2l2 2L9 4"
+                      initial={false}
+                      animate={{ pathLength: c.passed ? 1 : 0, opacity: c.passed ? 1 : 0 }}
+                      transition={{ duration: reduce ? 0 : 0.2, ease: "easeOut" }}
+                    />
+                  </svg>
+                </motion.span>
+                <span>
+                  {c.label}
+                  <span className="sr-only">, {c.passed ? t.met : t.unmet}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="min-h-5 px-1 pt-1">
         <AnimatePresence mode="wait" initial={false}>
           {messageKey && (

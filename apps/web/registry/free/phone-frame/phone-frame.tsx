@@ -1,4 +1,7 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -216,5 +219,154 @@ export function PhoneFrame({
         </div>
       </div>
     </figure>
+  );
+}
+
+/* ───────── 兩支交疊的手機（原 tilted-phone-pair） ───────── */
+
+/** gentle 彈簧：狀態切換、跟手的位移 */
+const GENTLE = { stiffness: 240, damping: 30 };
+/** 舞台的設計尺寸；容器較窄時整組等比縮小，不換版 */
+const STAGE_W = 400;
+const STAGE_H = 500;
+
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+type PairFrameProps = Omit<PhoneFrameProps, "children" | "width" | "height" | "scheme" | "locale">;
+
+export interface PhonePairProps {
+  /** 後方較大的手機畫面 */
+  back: ReactNode;
+  /** 前方較小的手機畫面 */
+  front: ReactNode;
+  /** 傳給後方 PhoneFrame 的其他設定，例如 url、time、badge */
+  backFrame?: PairFrameProps;
+  /** 傳給前方 PhoneFrame 的其他設定 */
+  frontFrame?: PairFrameProps;
+  scheme?: PhoneFrameScheme;
+  locale?: string;
+  /** 游標視差，預設開啟；只在滑鼠這類精準指標上作用，偏好減少動態時固定不動 */
+  parallax?: boolean;
+  /** 整組的無障礙名稱 */
+  label?: string;
+  className?: string;
+}
+
+/** 一支傾斜的手機：靜止角度加上游標偏移乘以跟隨倍率 */
+function TiltedPhone({
+  px,
+  py,
+  pose,
+  follow,
+  children,
+}: {
+  px: MotionValue<number>;
+  py: MotionValue<number>;
+  pose: { x: number; y: number; z: number };
+  follow: number;
+  children: ReactNode;
+}) {
+  const rotateY = useTransform(px, (v) => pose.y + v * 14 * follow);
+  const rotateX = useTransform(py, (v) => pose.x - v * 10 * follow);
+  return (
+    <motion.div style={{ rotateX, rotateY, rotateZ: pose.z, transformPerspective: 1400 }}>{children}</motion.div>
+  );
+}
+
+/**
+ * 兩支交疊、在 3D 裡傾斜的 PhoneFrame。游標移動時兩支一起跟著轉，
+ * 前方手機跟得比後方多，做出前後景深。觸控裝置與減少動態時維持靜止角度。
+ */
+export function PhonePair({
+  back,
+  front,
+  backFrame,
+  frontFrame,
+  scheme = "auto",
+  locale = "en",
+  parallax = true,
+  label,
+  className,
+}: PhonePairProps) {
+  const reduce = useReducedMotion() ?? false;
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [fine, setFine] = useState(false);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const px = useSpring(x, GENTLE);
+  const py = useSpring(y, GENTLE);
+  const on = parallax && fine && !reduce;
+
+  useIsoLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => setScale(Math.min(1, el.clientWidth / STAGE_W));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const apply = () => setFine(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  // 關掉視差時回到靜止角度；減少動態時直接跳回，不播彈簧
+  useEffect(() => {
+    if (on) return;
+    x.set(0);
+    y.set(0);
+    if (reduce) {
+      px.jump(0);
+      py.jump(0);
+    }
+  }, [on, reduce, x, y, px, py]);
+
+  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (!on || e.pointerType === "touch") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    x.set((e.clientX - r.left) / r.width - 0.5);
+    y.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onPointerLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <div
+      ref={wrapRef}
+      role="group"
+      aria-label={label}
+      className={cn("relative w-full min-w-0", className)}
+      style={{ height: STAGE_H * scale, maxWidth: STAGE_W }}
+    >
+      <div
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
+        className="absolute top-0 left-1/2 origin-top"
+        style={{ width: STAGE_W, height: STAGE_H, transform: `translateX(-50%) scale(${scale})` }}
+      >
+        <div className="absolute top-0 left-1" style={{ width: 236 }}>
+          <TiltedPhone px={px} py={py} pose={{ x: 10, y: -16, z: 4 }} follow={0.55}>
+            <PhoneFrame {...backFrame} width={236} height={448} scheme={scheme} locale={locale}>
+              {back}
+            </PhoneFrame>
+          </TiltedPhone>
+        </div>
+        <div className="absolute top-[118px] left-[176px]" style={{ width: 196 }}>
+          <TiltedPhone px={px} py={py} pose={{ x: 8, y: -20, z: 7 }} follow={1}>
+            <PhoneFrame {...frontFrame} width={196} height={368} scheme={scheme} locale={locale}>
+              {front}
+            </PhoneFrame>
+          </TiltedPhone>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,7 +2,53 @@
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
-import { TestimonialMarquee, type Testimonial, type TestimonialTagTone } from "./testimonial-marquee";
+import { productPhoto, type ProductKind } from "@/registry/_demo/product-art";
+
+import {
+  CoverMarquee,
+  TestimonialMarquee,
+  type Testimonial,
+  type TestimonialTagTone,
+} from "./testimonial-marquee";
+
+// 封面牆模式：共用的灰底商品照當 16:9 封面
+const coverKinds: ProductKind[] = [
+  "jacket",
+  "mug",
+  "tote",
+  "watch",
+  "lamp",
+  "bottle",
+  "sneaker",
+  "headphones",
+];
+const covers = coverKinds.map((kind) => ({
+  key: kind,
+  src: productPhoto(kind),
+}));
+
+const heroCopy = {
+  en: {
+    heading: "The autumn edit is here",
+    body: "Forty new pieces for colder days, picked and photographed by the studio.",
+    cta: "Shop the edit",
+  },
+  "zh-TW": {
+    heading: "秋季選品上架了",
+    body: "四十件為轉涼準備的新品，由工作室親自挑選與拍攝。",
+    cta: "逛秋季選品",
+  },
+  "zh-CN": {
+    heading: "秋季选品上架了",
+    body: "四十件为降温准备的新品，由工作室亲自挑选与拍摄。",
+    cta: "逛秋季选品",
+  },
+  ja: {
+    heading: "秋のセレクションが届きました",
+    body: "寒くなる季節に向けた新作 40 点。スタジオが選び、撮影しました。",
+    cta: "セレクションを見る",
+  },
+};
 
 type Copy = {
   eyebrow: string;
@@ -27,7 +73,13 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
     recommend: "Highly recommend",
     purchased: "Purchased",
     people: ["Mia Chen", "Daniel Wu", "Ivy Lin", "Kevin Huang"],
-    courses: ["Wheel Throwing Basics", "Glaze Chemistry", "Bookbinding Weekend", "Lettering for Signage", "Sourdough at Home"],
+    courses: [
+      "Wheel Throwing Basics",
+      "Glaze Chemistry",
+      "Bookbinding Weekend",
+      "Lettering for Signage",
+      "Sourdough at Home",
+    ],
     quotes: [
       "I centred clay on my own by the second hour. Took home two bowls that are now on our kitchen shelf.",
       "Clear pacing, real recipes, and the test tile notes are worth keeping. The cone 6 section alone paid for the ticket.",
@@ -44,7 +96,13 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
     recommend: "強力推薦",
     purchased: "已購買",
     people: ["陳怡安", "吳大年", "林依依", "黃凱文"],
-    courses: ["拉坯入門", "釉藥化學", "週末手工裝幀", "招牌手寫字", "在家做酸種麵包"],
+    courses: [
+      "拉坯入門",
+      "釉藥化學",
+      "週末手工裝幀",
+      "招牌手寫字",
+      "在家做酸種麵包",
+    ],
     quotes: [
       "第二個小時我就能自己定中心了。帶回家的兩個碗現在就擺在廚房架上。",
       "節奏清楚、配方實在，試片筆記也值得留著。光是六號錐那一段就值回票價。",
@@ -61,7 +119,13 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
     recommend: "强烈推荐",
     purchased: "已购买",
     people: ["陈怡安", "吴大年", "林依依", "黄凯文"],
-    courses: ["拉坯入门", "釉料化学", "周末手工装帧", "招牌手写字", "在家做酸种面包"],
+    courses: [
+      "拉坯入门",
+      "釉料化学",
+      "周末手工装帧",
+      "招牌手写字",
+      "在家做酸种面包",
+    ],
     quotes: [
       "第二个小时我就能自己定中心了。带回家的两个碗现在就摆在厨房架上。",
       "节奏清晰、配方实在，试片笔记也值得保存。光是六号锥那一部分就值回票价。",
@@ -78,7 +142,13 @@ const copy: Record<"en" | "zh-TW" | "zh-CN" | "ja", Copy> = {
     recommend: "強くおすすめ",
     purchased: "購入済み",
     people: ["佐藤美亜", "鈴木大介", "林あい", "高橋健"],
-    courses: ["ろくろ入門", "釉薬の化学", "週末の製本教室", "看板のレタリング", "おうちでサワードウ"],
+    courses: [
+      "ろくろ入門",
+      "釉薬の化学",
+      "週末の製本教室",
+      "看板のレタリング",
+      "おうちでサワードウ",
+    ],
     quotes: [
       "2時間目には自分で土を芯出しできるようになりました。持ち帰った2つの鉢は今も台所の棚にあります。",
       "テンポがよく、配合も実践的で、テストピースのメモはずっと手元に置いておきたい内容です。6番コーンの章だけでも元が取れました。",
@@ -96,24 +166,95 @@ function buildTestimonials(c: Copy): Testimonial[] {
   ];
   const tag = (label: string, tone: TestimonialTagTone) => ({ label, tone });
   return [
-    { id: "1", author: { name: c.people[0] }, rating: 5, quote: c.quotes[0], ratingBreakdown: breakdown(5, 5, 5), meta: [{ label: c.course, value: c.courses[0] }], tag: tag(c.recommend, "free") },
-    { id: "2", author: { name: c.people[1] }, rating: 4.5, quote: c.quotes[1], ratingBreakdown: breakdown(5, 4, 5), meta: [{ label: c.course, value: c.courses[1] }], tag: tag(c.purchased, "info") },
-    { id: "3", author: { name: c.people[2] }, rating: 5, quote: "", meta: [{ label: c.course, value: c.courses[2] }] },
-    { id: "4", author: { name: c.people[3] }, rating: 4, quote: c.quotes[2], ratingBreakdown: breakdown(4, 4, 4), meta: [{ label: c.course, value: c.courses[3] }, { label: c.role, value: "Illustrator" }] },
-    { id: "5", author: { name: null }, rating: 5, quote: c.quotes[3], meta: [{ label: c.course, value: c.courses[4] }], tag: tag(c.purchased, "info") },
+    {
+      id: "1",
+      author: { name: c.people[0] },
+      rating: 5,
+      quote: c.quotes[0],
+      ratingBreakdown: breakdown(5, 5, 5),
+      meta: [{ label: c.course, value: c.courses[0] }],
+      tag: tag(c.recommend, "free"),
+    },
+    {
+      id: "2",
+      author: { name: c.people[1] },
+      rating: 4.5,
+      quote: c.quotes[1],
+      ratingBreakdown: breakdown(5, 4, 5),
+      meta: [{ label: c.course, value: c.courses[1] }],
+      tag: tag(c.purchased, "info"),
+    },
+    {
+      id: "3",
+      author: { name: c.people[2] },
+      rating: 5,
+      quote: "",
+      meta: [{ label: c.course, value: c.courses[2] }],
+    },
+    {
+      id: "4",
+      author: { name: c.people[3] },
+      rating: 4,
+      quote: c.quotes[2],
+      ratingBreakdown: breakdown(4, 4, 4),
+      meta: [
+        { label: c.course, value: c.courses[3] },
+        { label: c.role, value: "Illustrator" },
+      ],
+    },
+    {
+      id: "5",
+      author: { name: null },
+      rating: 5,
+      quote: c.quotes[3],
+      meta: [{ label: c.course, value: c.courses[4] }],
+      tag: tag(c.purchased, "info"),
+    },
   ];
 }
 
 export default function TestimonialMarqueeDemo() {
   const locale = useDemoLocale();
   const c = useDemoText(copy);
+  const h = useDemoText(heroCopy);
   return (
-    <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-[#0a0a0a] py-12">
-      <div className="mb-6 px-6 text-center">
-        <p className="mb-2 text-[12px] font-semibold tracking-[0.2em] text-[#d4a24c] uppercase">{c.eyebrow}</p>
-        <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-[#f5f5f5] sm:text-[30px]">{c.heading}</h2>
-      </div>
-      <TestimonialMarquee testimonials={buildTestimonials(c)} rows={2} fixed={false} locale={locale} />
-    </section>
+    <div className="flex w-full min-w-0 flex-col gap-6">
+      <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-[#0a0a0a] py-12">
+        <div className="mb-6 px-6 text-center">
+          <p className="mb-2 text-[12px] font-semibold tracking-[0.2em] text-[#d4a24c] uppercase">
+            {c.eyebrow}
+          </p>
+          <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-[#f5f5f5] sm:text-[30px]">
+            {c.heading}
+          </h2>
+        </div>
+        <TestimonialMarquee
+          testimonials={buildTestimonials(c)}
+          rows={2}
+          fixed={false}
+          locale={locale}
+        />
+      </section>
+      {/* 封面牆模式：傾斜的封面列在 hero 背後交錯流動，文字放在一層壓暗的底上 */}
+      <section className="relative isolate w-full min-w-0 overflow-hidden rounded-2xl bg-background">
+        <CoverMarquee covers={covers} tileWidth={240} />
+        <div aria-hidden className="absolute inset-0 bg-background/75" />
+        <div className="relative mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            {h.heading}
+          </h2>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            {h.body}
+          </p>
+          <a
+            href="#"
+            onClick={(e) => e.preventDefault()}
+            className="mt-6 inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] outline-none transition-[scale,opacity] duration-150 hover:opacity-90 hover:duration-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:active:scale-[0.97]"
+          >
+            {h.cta}
+          </a>
+        </div>
+      </section>
+    </div>
   );
 }

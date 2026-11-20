@@ -38,7 +38,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
     const wide = variant === "bar" || variant === "indeterminate-bar";
     return (
       <div className={wide ? "w-56" : undefined}>
-        <Loader variant={variant} size="lg" value={VALUES[step]} label={t.loading} className={wide ? "w-full" : undefined} />
+        <Loader variant={variant} size="lg" value={VALUES[step]} done={VALUES[step] === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full" : undefined} />
       </div>
     );
   }

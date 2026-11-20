@@ -15,7 +15,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, typ
 import { cn } from "@/lib/utils";
 
 /** 單張卡片效果，用 EffectCard 的 effect prop 切換 */
-export const cardEffects = ["hover-lift", "spotlight", "tilt-3d", "glare", "flip", "info-slide-up", "wobble", "curl"] as const;
+export const cardEffects = ["hover-lift", "spotlight", "tilt-3d", "glare", "flip", "info-slide-up", "wobble", "curl", "border-beam"] as const;
 export type CardEffect = (typeof cardEffects)[number];
 
 /** 卡片群組效果，各自是獨立元件（吃 items 陣列） */
@@ -27,6 +27,8 @@ export interface EffectCardProps {
   /** 卡片上方的圖片區，通常放一個 <img>，會自動填滿 */
   media?: ReactNode;
   title?: ReactNode;
+  /** 標題右側的價格或數字，tabular-nums；tilt-3d 時浮在最上層 */
+  price?: ReactNode;
   /** 內文；info-slide-up 時是滑上來的資訊面板 */
   children?: ReactNode;
   /** flip 的背面內容 */
@@ -39,6 +41,10 @@ export interface EffectCardProps {
   intensity?: number;
   /** curl 捲角的大小（px） */
   curlSize?: number;
+  /** tilt-3d 的圖層深度（px）：圖片、標題、價格依序浮出，數字越大分得越開 */
+  depth?: number;
+  /** border-beam：為真時（處理中、已選取）細線以品牌專色持續繞行；否則只在滑過或聚焦時繞一圈 */
+  active?: boolean;
   className?: string;
 }
 
@@ -72,21 +78,41 @@ function Media({ children, className }: { children: ReactNode; className?: strin
   );
 }
 
-function Body({ title, children, className }: { title?: ReactNode; children?: ReactNode; className?: string }) {
-  if (!title && !children) return null;
+interface BodyProps {
+  title?: ReactNode;
+  price?: ReactNode;
+  children?: ReactNode;
+  /** 價格相對內文再浮出的距離（px），只有 tilt-3d 用 */
+  lift?: number;
+  className?: string;
+}
+
+function Body({ title, price, children, lift, className }: BodyProps) {
+  if (!title && !price && !children) return null;
+  const heading = title && <h3 className="min-w-0 font-semibold tracking-tight">{title}</h3>;
+  const layered = lift ? { transformStyle: "preserve-3d" as const } : undefined;
   return (
-    <div className={cn("p-4", className)}>
-      {title && <h3 className="font-semibold tracking-tight">{title}</h3>}
+    <div className={cn("p-4", className)} style={layered}>
+      {price ? (
+        <div className="flex items-baseline justify-between gap-3" style={layered}>
+          {heading}
+          <span className="shrink-0 text-sm font-semibold tabular-nums" style={lift ? { transform: `translateZ(${lift}px)` } : undefined}>
+            {price}
+          </span>
+        </div>
+      ) : (
+        heading
+      )}
       {children && <div className="mt-1 text-sm text-muted-foreground">{children}</div>}
     </div>
   );
 }
 
-function Front({ media, title, children }: Pick<EffectCardProps, "media" | "title" | "children">) {
+function Front({ media, title, price, children }: Pick<EffectCardProps, "media" | "title" | "price" | "children">) {
   return (
     <>
       {media && <Media>{media}</Media>}
-      <Body title={title}>{children}</Body>
+      <Body title={title} price={price}>{children}</Body>
     </>
   );
 }
@@ -111,11 +137,13 @@ export function EffectCard(props: EffectCardProps) {
       return <Wobble {...props} />;
     case "curl":
       return <Curl {...props} />;
+    case "border-beam":
+      return <BorderBeam {...props} />;
   }
 }
 
 // reduced motion：不位移不旋轉，只保留邊框顏色變化；翻面與資訊面板直接顯示，不遺失內容
-function ReducedCard({ effect = "hover-lift", media, title, children, back, flipOn = "hover", className }: EffectCardProps) {
+function ReducedCard({ effect = "hover-lift", media, title, price, children, back, flipOn = "hover", active, className }: EffectCardProps) {
   const [flipped, setFlipped] = useState(false);
   if (effect === "flip") {
     const hover = flipOn === "hover";
@@ -132,7 +160,7 @@ function ReducedCard({ effect = "hover-lift", media, title, children, back, flip
         onKeyDown={hover ? undefined : (e) => toggleKey(e, () => setFlipped((f) => !f))}
         className={cn(shell, "overflow-hidden transition-colors hover:border-primary", className)}
       >
-        {flipped ? back : <Front media={media} title={title}>{children}</Front>}
+        {flipped ? back : <Front media={media} title={title} price={price}>{children}</Front>}
       </div>
     );
   }
@@ -140,13 +168,18 @@ function ReducedCard({ effect = "hover-lift", media, title, children, back, flip
     return (
       <div className={cn(shell, "flex flex-col overflow-hidden transition-colors hover:border-primary", className)}>
         {media && <Media>{media}</Media>}
-        <Body title={title}>{children}</Body>
+        <Body title={title} price={price}>{children}</Body>
       </div>
     );
   }
+  // border-beam 的 active 不繞行，改成整圈品牌色邊框，狀態不遺失
+  const on = effect === "border-beam" && active;
   return (
-    <div className={cn(shell, "overflow-hidden transition-colors hover:border-primary", className)}>
-      <Front media={media} title={title}>{children}</Front>
+    <div
+      aria-busy={on || undefined}
+      className={cn(shell, "overflow-hidden transition-colors hover:border-primary", on && "border-[var(--sunui-spot,var(--primary))]", className)}
+    >
+      <Front media={media} title={title} price={price}>{children}</Front>
     </div>
   );
 }
@@ -165,7 +198,7 @@ const liftCard: Variants = {
 };
 const liftMedia: Variants = { rest: { scale: 1 }, hover: { scale: 1.08 } };
 
-function HoverLift({ media, title, children, className }: EffectCardProps) {
+function HoverLift({ media, title, price, children, className }: EffectCardProps) {
   return (
     <motion.div
       initial="rest"
@@ -184,13 +217,13 @@ function HoverLift({ media, title, children, className }: EffectCardProps) {
           </motion.div>
         </Media>
       )}
-      <Body title={title}>{children}</Body>
+      <Body title={title} price={price}>{children}</Body>
     </motion.div>
   );
 }
 
 /* spotlight：一束光跟著指標在卡片內移動，並把附近的邊框點亮 */
-function Spotlight({ media, title, children, colors, className }: EffectCardProps) {
+function Spotlight({ media, title, price, children, colors, className }: EffectCardProps) {
   const glow = colors?.[0] ?? "var(--primary)";
   const { px, py, onPointerMove } = usePointer();
   const x = usePercent(px);
@@ -207,7 +240,7 @@ function Spotlight({ media, title, children, colors, className }: EffectCardProp
     >
       <motion.div aria-hidden className="absolute inset-0 rounded-xl" style={{ background: edge }} animate={{ opacity: on ? 1 : 0 }} />
       <div className="relative h-full overflow-hidden rounded-[11px] bg-card text-card-foreground">
-        <Front media={media} title={title}>{children}</Front>
+        <Front media={media} title={title} price={price}>{children}</Front>
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -219,8 +252,8 @@ function Spotlight({ media, title, children, colors, className }: EffectCardProp
   );
 }
 
-/* tilt-3d：卡片朝指標方向立體傾斜，圖片與標題分層浮出 */
-function Tilt3d({ media, title, children, intensity = 12, className }: EffectCardProps) {
+/* tilt-3d：卡片朝指標方向立體傾斜，圖片、標題、價格分層浮出 */
+function Tilt3d({ media, title, price, children, intensity = 12, depth = 48, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const rotateX = useSpring(useTransform(py, [0, 1], [intensity, -intensity]), tiltSpring);
   const rotateY = useSpring(useTransform(px, [0, 1], [-intensity, intensity]), tiltSpring);
@@ -228,12 +261,14 @@ function Tilt3d({ media, title, children, intensity = 12, className }: EffectCar
     <div onPointerMove={onPointerMove} onPointerLeave={reset} className={cn("[perspective:900px]", className)}>
       <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }} className={cn(shell, "h-full")}>
         {media && (
-          <div style={{ transform: "translateZ(28px)" }} className="p-3 pb-0">
+          <div style={{ transform: `translateZ(${Math.round(depth * 0.58)}px)` }} className="p-3 pb-0">
             <Media className="rounded-lg shadow-lg">{media}</Media>
           </div>
         )}
-        <div style={{ transform: "translateZ(48px)" }}>
-          <Body title={title}>{children}</Body>
+        <div style={{ transform: `translateZ(${depth}px)`, transformStyle: "preserve-3d" }}>
+          <Body title={title} price={price} lift={Math.round(depth / 3)}>
+            {children}
+          </Body>
         </div>
       </motion.div>
     </div>
@@ -241,7 +276,7 @@ function Tilt3d({ media, title, children, intensity = 12, className }: EffectCar
 }
 
 /* glare：全像箔光與反光隨指標角度流動，卡片同時輕微傾斜 */
-function Glare({ media, title, children, colors, intensity = 10, className }: EffectCardProps) {
+function Glare({ media, title, price, children, colors, intensity = 10, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const [on, setOn] = useState(false);
   const rotateX = useSpring(useTransform(py, [0, 1], [intensity, -intensity]), tiltSpring);
@@ -266,7 +301,7 @@ function Glare({ media, title, children, colors, intensity = 10, className }: Ef
       className={cn("[perspective:900px]", className)}
     >
       <motion.div style={{ rotateX, rotateY }} className={cn(shell, "h-full overflow-hidden")}>
-        <Front media={media} title={title}>{children}</Front>
+        <Front media={media} title={title} price={price}>{children}</Front>
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0 mix-blend-overlay"
@@ -285,7 +320,7 @@ function Glare({ media, title, children, colors, intensity = 10, className }: Ef
 }
 
 /* flip：滑過或點擊時 3D 翻到背面 */
-function Flip({ media, title, children, back, flipOn = "hover", className }: EffectCardProps) {
+function Flip({ media, title, price, children, back, flipOn = "hover", className }: EffectCardProps) {
   const [flipped, setFlipped] = useState(false);
   const hover = flipOn === "hover";
   const face = cn(shell, "overflow-hidden [backface-visibility:hidden] [grid-area:1/1]");
@@ -309,7 +344,7 @@ function Flip({ media, title, children, back, flipOn = "hover", className }: Eff
         transition={{ type: "spring", stiffness: 180, damping: 22 }}
       >
         <div className={face} aria-hidden={flipped}>
-          <Front media={media} title={title}>{children}</Front>
+          <Front media={media} title={title} price={price}>{children}</Front>
         </div>
         <div className={cn(face, "[transform:rotateY(180deg)]")} aria-hidden={!flipped}>
           {back}
@@ -358,7 +393,7 @@ function InfoSlideUp({ media, title, children, className }: EffectCardProps) {
 }
 
 /* wobble：卡片跟著指標輕微晃動，離開時像果凍般彈回 */
-function Wobble({ media, title, children, className }: EffectCardProps) {
+function Wobble({ media, title, price, children, className }: EffectCardProps) {
   const { px, py, onPointerMove, reset } = usePointer();
   const jelly = { stiffness: 170, damping: 7, mass: 0.7 };
   const x = useSpring(useTransform(px, [0, 1], [-6, 6]), jelly);
@@ -368,14 +403,14 @@ function Wobble({ media, title, children, className }: EffectCardProps) {
   return (
     <div onPointerMove={onPointerMove} onPointerLeave={reset} className={className}>
       <motion.div style={{ x, y, rotate, skewX }} className={cn(shell, "h-full overflow-hidden")}>
-        <Front media={media} title={title}>{children}</Front>
+        <Front media={media} title={title} price={price}>{children}</Front>
       </motion.div>
     </div>
   );
 }
 
 /* curl：滑過時右下角像紙一樣捲起 */
-function Curl({ media, title, children, curlSize = 56, className }: EffectCardProps) {
+function Curl({ media, title, price, children, curlSize = 56, className }: EffectCardProps) {
   const c = useSpring(0, { stiffness: 260, damping: 22 });
   const clip = useMotionTemplate`polygon(0 0, 100% 0, 100% calc(100% - ${c}px), calc(100% - ${c}px) 100%, 0 100%)`;
   return (
@@ -385,7 +420,7 @@ function Curl({ media, title, children, curlSize = 56, className }: EffectCardPr
       className={cn("relative rounded-xl", className)}
     >
       <motion.div style={{ clipPath: clip }} className={cn(shell, "h-full overflow-hidden")}>
-        <Front media={media} title={title}>{children}</Front>
+        <Front media={media} title={title} price={price}>{children}</Front>
       </motion.div>
       {/* 捲起的紙背：角落方塊的左上半三角，靠近摺線處最亮 */}
       <motion.div
@@ -398,6 +433,62 @@ function Curl({ media, title, children, curlSize = 56, className }: EffectCardPr
             "linear-gradient(135deg, color-mix(in oklch, var(--foreground) 10%, var(--muted)) 0%, var(--muted) 30%, var(--card) 48%, transparent 50%)",
         }}
       />
+    </div>
+  );
+}
+
+/* border-beam：滑過或聚焦時，一段細線沿邊框繞一圈後收起，是回應不是裝飾循環。
+   active 為真（處理中、已選取）時改用品牌專色持續繞行，屬於「載入中」的例外。不加光暈、不用多色漸層。 */
+const e1 =
+  "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
+// 線段長度與間距合計為 1，繞行時首尾相接不跳
+const beamPath = { pathLength: 0.22, pathSpacing: 0.78 };
+
+function BorderBeam({ media, title, price, children, active = false, className }: EffectCardProps) {
+  const [lap, setLap] = useState(0);
+  const run = () => {
+    if (!active) setLap((n) => n + 1);
+  };
+  const rect = { rx: 12.25, fill: "none", strokeWidth: 1.5, style: { width: "calc(100% - 1.5px)", height: "calc(100% - 1.5px)" } };
+  return (
+    <div
+      tabIndex={0}
+      aria-busy={active || undefined}
+      onPointerEnter={run}
+      onFocus={run}
+      className={cn(
+        "relative rounded-xl bg-card text-card-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        e1,
+        className,
+      )}
+    >
+      <div className="h-full overflow-hidden rounded-[inherit]">
+        <Front media={media} title={title} price={price}>{children}</Front>
+      </div>
+      {/* 線段壓在 1px 外框上：SVG 往外擴 1px，描邊中心再內縮半個線寬 */}
+      <svg aria-hidden className="pointer-events-none absolute -left-px -top-px size-[calc(100%+2px)] overflow-visible">
+        <g transform="translate(0.75 0.75)">
+          {active ? (
+            <motion.rect
+              key="loop"
+              {...rect}
+              className="stroke-[var(--sunui-spot,var(--primary))]"
+              initial={{ ...beamPath, pathOffset: 0 }}
+              animate={{ ...beamPath, pathOffset: 1 }}
+              transition={{ duration: 1.6, ease: "linear", repeat: Infinity }}
+            />
+          ) : lap > 0 ? (
+            <motion.rect
+              key={lap}
+              {...rect}
+              className="stroke-foreground"
+              initial={{ ...beamPath, pathOffset: 0, opacity: 1 }}
+              animate={{ ...beamPath, pathOffset: 1, opacity: 0 }}
+              transition={{ pathOffset: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }, opacity: { duration: 0.12, delay: 0.3 } }}
+            />
+          ) : null}
+        </g>
+      </svg>
     </div>
   );
 }

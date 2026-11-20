@@ -22,9 +22,14 @@ export type RibbonCarouselProps = {
   cardHeight?: number;
   /** Gap between cards along the curve, in px. */
   gap?: number;
-  /** Cards shown on each side of the active one. */
+  /** Cards shown on each side of the active one (in a stack: cards shown behind the top one). */
   visible?: number;
-  /** convex: the ribbon bends away from you; concave: it wraps around you. */
+  /**
+   * ribbon: cards on a curve. stack: a deck where deeper cards step back,
+   * tilt slightly and dim; the top card swings to the back on drag, flick or arrow keys.
+   */
+  layout?: "ribbon" | "stack";
+  /** convex: the ribbon bends away from you; concave: it wraps around you. Ribbon only. */
   curve?: "convex" | "concave";
   /** Wrap around from the last card to the first. */
   loop?: boolean;
@@ -52,6 +57,7 @@ export function RibbonCarousel({
   cardHeight = 320,
   gap = 20,
   visible = 3,
+  layout = "ribbon",
   curve = "convex",
   loop = true,
   autoplay = false,
@@ -64,6 +70,11 @@ export function RibbonCarousel({
   const n = items.length;
   const root = useRef<HTMLDivElement>(null);
   const cards = useRef<(HTMLDivElement | null)[]>([]);
+  const dims = useRef<(HTMLSpanElement | null)[]>([]);
+  const stack = layout === "stack";
+  // The stack needs room beside it for the card that swings to the back, and above it for the peeking edges.
+  const widthFactor = stack ? 2.2 : 1.55;
+  const stageHeight = stack ? cardHeight * 1.3 : cardHeight;
   const inView = useInView(root, { amount: 0.3 });
   const pos = useMotionValue(0);
   const anim = useRef<AnimationPlaybackControls | null>(null);
@@ -82,16 +93,53 @@ export function RibbonCarousel({
   useIsoLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
-    const fit = (w: number) => setScale(Math.min(1, w / (cardWidth * 1.55)));
+    const fit = (w: number) => setScale(Math.min(1, w / (cardWidth * widthFactor)));
     fit(el.clientWidth);
     const ro = new ResizeObserver(([entry]) => fit(entry.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
-  }, [cardWidth]);
+  }, [cardWidth, widthFactor]);
 
   // Write card transforms straight to the DOM on every position change.
   useIsoLayoutEffect(() => {
     if (reduce) return;
+    const paintStack = (p: number) => {
+      const deep = Math.min(visible, n - 1);
+      cards.current.forEach((el, i) => {
+        if (!el) return;
+        // rel: how far below the top card this one sits. In a loop the card in (n - 1, n) is
+        // the one travelling between the top and the back, so the deck never jumps.
+        const rel = loop ? (((i - p) % n) + n) % n : i - p;
+        let depth = rel;
+        let x = 0;
+        let swing = 0;
+        let front = false;
+        let fade = 1;
+        if (loop && rel > n - 1) {
+          const t = n - rel;
+          depth = t * Math.min(n - 1, deep + 1);
+          x = -Math.sin(Math.PI * t) * cardWidth * 0.55;
+          swing = -Math.sin(Math.PI * t) * 8;
+          front = t < 0.5;
+        } else if (rel < 0) {
+          // Without a loop, cards already seen slide off to the side.
+          depth = 0;
+          x = rel * cardWidth * 0.6;
+          swing = rel * 6;
+          front = true;
+          fade = Math.max(0, 1 + rel);
+        }
+        const opacity = fade * (depth <= deep ? 1 : Math.max(0, deep + 1 - depth));
+        el.style.transform = `translate3d(${x}px,${-depth * cardHeight * 0.075}px,${-depth * 60}px) rotateZ(${Math.min(depth, deep + 1) * 1.5 + swing}deg)`;
+        el.style.opacity = String(opacity);
+        el.style.visibility = opacity <= 0.01 ? "hidden" : "visible";
+        el.style.zIndex = String(front ? 200 : 100 - Math.round(depth * 10));
+        const dim = dims.current[i];
+        if (dim) dim.style.opacity = String(Math.min(depth, deep) * 0.12);
+      });
+      const next = indexOf(p);
+      setActive((prev) => (prev === next ? prev : next));
+    };
     const paint = (p: number) => {
       const sign = curve === "convex" ? 1 : -1;
       cards.current.forEach((el, i) => {
@@ -109,8 +157,9 @@ export function RibbonCarousel({
       const next = indexOf(p);
       setActive((prev) => (prev === next ? prev : next));
     };
-    paint(pos.get());
-    return pos.on("change", paint);
+    const draw = stack ? paintStack : paint;
+    draw(pos.get());
+    return pos.on("change", draw);
   });
 
   const firstChange = useRef(true);
@@ -225,7 +274,7 @@ export function RibbonCarousel({
         <div
           aria-hidden
           className="pointer-events-none mx-auto my-4 w-full"
-          style={{ maxWidth: cardWidth * 1.55, aspectRatio: `${cardWidth * 1.55} / ${cardHeight}` }}
+          style={{ maxWidth: cardWidth * widthFactor, aspectRatio: `${cardWidth * widthFactor} / ${stageHeight}` }}
         />
         <div
           className="absolute left-1/2 top-1/2"
@@ -233,9 +282,10 @@ export function RibbonCarousel({
             width: cardWidth,
             height: cardHeight,
             marginLeft: -cardWidth / 2,
-            marginTop: -cardHeight / 2,
+            // In a stack the peeking edges sit above the top card, so the deck is set a little lower.
+            marginTop: -cardHeight / 2 + (stack ? cardHeight * 0.1 * scale : 0),
             transform: `scale(${scale})`,
-            perspective: radius * 2.2,
+            perspective: stack ? 1200 : radius * 2.2,
             transformStyle: "preserve-3d",
           }}
         >
@@ -251,11 +301,24 @@ export function RibbonCarousel({
               aria-hidden={i !== active}
               onClick={() => i !== active && settle(Math.round(pos.get() + wrapDist(i - pos.get())))}
               className={cn(
-                "absolute inset-0 overflow-hidden rounded-lg border border-border bg-muted will-change-transform",
+                "absolute inset-0 overflow-hidden bg-muted will-change-transform",
+                stack
+                  ? "rounded-xl shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]"
+                  : "rounded-lg border border-border",
                 i !== active && "cursor-pointer",
               )}
             >
               <img src={item.src} alt={item.alt} draggable={false} className="pointer-events-none h-full w-full object-cover" />
+              {/* Deeper cards dim instead of turning see-through, so no card ghosts through another. */}
+              {stack && (
+                <span
+                  ref={(node) => {
+                    dims.current[i] = node;
+                  }}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-black opacity-0"
+                />
+              )}
             </div>
           ))}
         </div>

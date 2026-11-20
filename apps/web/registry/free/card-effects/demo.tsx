@@ -27,6 +27,8 @@ export const copy = {
   en: {
     hover: "Hover",
     click: "Click",
+    active: "Syncing",
+    price: "From $48",
     cards: [
       { title: "Coastal trail", body: "12 km loop with tide pools." },
       { title: "Desert dunes", body: "Sunrise walk, sand boards included." },
@@ -41,6 +43,8 @@ export const copy = {
   "zh-TW": {
     hover: "滑過",
     click: "點擊",
+    active: "同步中",
+    price: "NT$1,480 起",
     cards: [
       { title: "海岸步道", body: "12 公里環線，沿途有潮池。" },
       { title: "沙漠沙丘", body: "日出健行，附滑沙板。" },
@@ -55,6 +59,8 @@ export const copy = {
   "zh-CN": {
     hover: "悬停",
     click: "点击",
+    active: "同步中",
+    price: "¥320 起",
     cards: [
       { title: "海岸步道", body: "12 公里环线，沿途有潮池。" },
       { title: "沙漠沙丘", body: "日出徒步，附滑沙板。" },
@@ -69,6 +75,8 @@ export const copy = {
   ja: {
     hover: "ホバー",
     click: "クリック",
+    active: "同期中",
+    price: "¥6,800〜",
     cards: [
       { title: "海岸トレイル", body: "潮だまりを巡る 12 km の周回路。" },
       { title: "砂丘", body: "日の出ウォーク、サンドボード付き。" },
@@ -102,11 +110,13 @@ export default function CardEffectsDemo() {
     description: c.body,
     media: <img src={demoArt(i)} alt="" />,
   }));
-  const single = (effect: CardEffect, i: number) => {
+  const single = (effect: CardEffect, i: number, active?: boolean) => {
     const c = t.cards[i % t.cards.length];
     return (
       <EffectCard
         effect={effect}
+        active={active}
+        price={effect === "tilt-3d" ? t.price : undefined}
         media={<img src={demoArt(i)} alt="" />}
         title={c.title}
         flipOn={effect === "flip" ? "click" : undefined}
@@ -129,6 +139,9 @@ export default function CardEffectsDemo() {
           {single(effect, i)}
         </Tile>
       ))}
+      <Tile name="border-beam active" hint={t.active}>
+        {single("border-beam", cardEffects.length, true)}
+      </Tile>
       <Tile name="stack-fan" hint={t.hover}>
         <StackFan items={items.slice(0, 4)} cardWidth={110} />
       </Tile>

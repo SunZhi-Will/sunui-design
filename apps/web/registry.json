@@ -475,8 +475,10 @@
       "name": "browser-frame",
       "type": "registry:block",
       "title": "Browser Frame",
-      "description": "Device chrome mockups that share one set of traffic lights, tone rings (danger, success, brand) and colour schemes: BrowserFrame has a tab title and a pill address bar with lock icon, WindowFrame is a macOS window with a centered title, optional icon, right slot and menu row, and Stage is a dotted backdrop to set them on. BrowserFrame renders as a figure labelled with the URL, the chrome and menu row are hidden from assistive tech, and nothing animates, so reduced motion needs no handling.",
-      "dependencies": [],
+      "description": "Device chrome mockups that share one set of traffic lights, tone rings (danger, success, brand) and colour schemes: BrowserFrame has a tab title and a pill address bar with lock icon, WindowFrame is a macOS window with a centered title, optional icon, right slot and menu row, and Stage is a dotted backdrop to set them on. BrowserFrame renders as a figure labelled with the URL, the chrome and menu row are hidden from assistive tech, and a single frame does not animate. BrowserStack tilts a BrowserFrame in 3D with two quieter windows stacked behind and crossfades through image or ReactNode slides while the URL changes per slide, moving only on arrows, dots, arrow keys or an opt-in autoplay that pauses off screen and in hidden tabs, with instant swaps under reduced motion.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -503,7 +505,11 @@
             "browser mockup",
             "browser window",
             "website frame",
-            "safari mockup"
+            "safari mockup",
+            "browser showcase 3d",
+            "browser carousel",
+            "3d browser mockup",
+            "stacked browser windows"
           ]
         }
       },
@@ -671,7 +677,7 @@
       "name": "card-effects",
       "type": "registry:block",
       "title": "Card Effects",
-      "description": "A library of 13 hover effects for cards: 8 single-card effects switched with the effect prop on EffectCard (lift, spotlight, 3D tilt, glare, flip, info slide-up, wobble, curl) plus 5 group components (FocusGrid, StackFan, SpotlightGrid, ExpandingPanels, BentoExpand) that take an items array. With reduced motion the cards stay still, only colors change, and flip backs and info panels remain reachable.",
+      "description": "A library of 14 hover effects for cards: 9 single-card effects switched with the effect prop on EffectCard (lift, spotlight, 3D tilt, glare, flip, info slide-up, wobble, curl, border beam) plus 5 group components (FocusGrid, StackFan, SpotlightGrid, ExpandingPanels, BentoExpand) that take an items array. border-beam sends a thin segment once around the border on hover or focus and keeps it travelling in the brand colour while active (processing or selected), and passing a price makes tilt-3d split image, title and price into three depth layers (depth sets the spacing). With reduced motion the cards stay still, only colors change, flip backs and info panels remain reachable, and active shows as a full brand-colour border.",
       "dependencies": [
         "framer-motion"
       ],
@@ -708,7 +714,11 @@
             "expanding cards",
             "bento grid",
             "card stack",
-            "page curl"
+            "page curl",
+            "border beam",
+            "border trail",
+            "processing card",
+            "product tilt card"
           ]
         }
       },
@@ -1664,7 +1674,7 @@
       "name": "floating-field",
       "type": "registry:block",
       "title": "Floating Field",
-      "description": "A text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in muted text and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
+      "description": "A text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in muted text and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. With strength it becomes a password field with a four-segment concave meter that fills by level (the spot colour only when every rule passes) and a live checklist of configurable rules; the show/hide button still goes in the trailing slot. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -1698,7 +1708,11 @@
             "input with label",
             "input mask",
             "email typo",
-            "did you mean"
+            "did you mean",
+            "password strength",
+            "password strength input",
+            "password meter",
+            "password checklist"
           ]
         }
       },
@@ -2196,7 +2210,7 @@
       "name": "loading-effects",
       "type": "registry:block",
       "title": "Loading Effects",
-      "description": "Thirteen loading indicators: a Loader with ten variants (bouncing dots, equalizer, ring spinner, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader and Skeleton. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
+      "description": "Fourteen loading indicators: a Loader with eleven variants (bouncing dots, equalizer, ring spinner, spinner to check, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader and Skeleton. The spinner-check variant closes its arc when done is true, then a disc settles once and a check is drawn. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2233,7 +2247,11 @@
             "typing indicator",
             "skeleton",
             "shimmer",
-            "multi step loader"
+            "multi step loader",
+            "loader set",
+            "spinner to check",
+            "loading success",
+            "spinner checkmark"
           ]
         }
       },
@@ -2293,7 +2311,7 @@
       "name": "micro-interactions",
       "type": "registry:block",
       "title": "Micro Interactions",
-      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain.",
+      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. The toggle's knob squashes and stretches toward its target while pressed and settles with a spring on release. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2674,8 +2692,10 @@
       "name": "phone-frame",
       "type": "registry:block",
       "title": "Phone Frame",
-      "description": "A phone mockup with a dynamic island, status bar (time, signal, wifi, battery), an optional browser URL bar and a home indicator, with a compact layout below 240px width. It renders as a labelled figure with the decorative chrome hidden from assistive tech, and nothing animates, so reduced motion needs no handling.",
-      "dependencies": [],
+      "description": "A phone mockup with a dynamic island, status bar (time, signal, wifi, battery), an optional browser URL bar and a home indicator, with a compact layout below 240px width. It renders as a labelled figure with the decorative chrome hidden from assistive tech, and a single frame does not animate. The PhonePair named export overlaps two PhoneFrames tilted in 3D with screens passed as ReactNode, where the front phone follows the cursor more than the back one (springs, fine pointers only) and reduced motion keeps the resting pose.",
+      "dependencies": [
+        "framer-motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
@@ -2702,7 +2722,10 @@
             "phone mockup",
             "iphone frame",
             "mobile device frame",
-            "smartphone mockup"
+            "smartphone mockup",
+            "tilted phone pair",
+            "phone pair",
+            "two phone mockup"
           ]
         }
       },
@@ -3240,7 +3263,7 @@
       "name": "ribbon-carousel",
       "type": "registry:block",
       "title": "Ribbon Carousel",
-      "description": "Cards on a curved ribbon in CSS 3D. Drag or flick sideways and it snaps to the nearest card with a spring, use the arrow keys or buttons, or click a side card to bring it to the middle. It loops by default, can bend away from you (convex) or wrap around you (concave), and only draws the cards near the middle. Optional autoplay runs only while on screen and pauses on hover, focus and hidden tabs, and announcements are turned off while it plays. With reduced motion it becomes a flat scroll-snap row.",
+      "description": "Cards on a curved ribbon in CSS 3D. Drag or flick sideways and it snaps to the nearest card with a spring, use the arrow keys or buttons, or click a side card to bring it to the middle. It loops by default, can bend away from you (convex) or wrap around you (concave), and only draws the cards near the middle. Optional autoplay runs only while on screen and pauses on hover, focus and hidden tabs, and announcements are turned off while it plays. With reduced motion it becomes a flat scroll-snap row. With layout=\"stack\" the cards become a deck where deeper cards step back, tilt slightly and dim, and the top card swings to the back on drag, flick or arrow keys.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3280,7 +3303,11 @@
             "coverflow",
             "curved slider",
             "lookbook carousel",
-            "3d slider"
+            "3d slider",
+            "stacked carousel",
+            "card stack",
+            "stacked preview carousel",
+            "deck carousel"
           ]
         }
       },
@@ -3753,7 +3780,7 @@
       "name": "sliding-tabs",
       "type": "registry:block",
       "title": "Sliding Tabs",
-      "description": "One choice control in three shapes: underline tabs with content panels, a segmented control and filter chips, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label.",
+      "description": "One choice control in four shapes: underline tabs with content panels, a segmented control, filter chips and browser-style folder tabs where the active tab is a raised surface joined to the panel below, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label, as plain numbers or as small badges with countStyle=\"badge\" (the default for folder).",
       "dependencies": [
         "framer-motion"
       ],
@@ -3786,7 +3813,11 @@
             "toggle group",
             "pill tabs",
             "chip filter",
-            "tab bar"
+            "tab bar",
+            "animated tabs",
+            "folder tabs",
+            "browser tabs",
+            "tabs with badges"
           ]
         }
       },
@@ -4295,7 +4326,7 @@
       "name": "testimonial-marquee",
       "type": "registry:block",
       "title": "Testimonial Marquee",
-      "description": "Rows of review cards that scroll in opposite directions, with faded edges, 3D tilt on hover, and a pause on hover or keyboard focus. Clicking a card opens a detail dialog with a focus trap, Escape to close, and a rating breakdown. On narrow screens or with reduced motion, each row becomes a static horizontal scroller.",
+      "description": "Rows of review cards that scroll in opposite directions, with faded edges, 3D tilt on hover, and a pause on hover or keyboard focus. Clicking a card opens a detail dialog with a focus trap, Escape to close, and a rating breakdown. On narrow screens or with reduced motion, each row becomes a static horizontal scroller. A CoverMarquee export turns the same loop into a covers wall: rows of 16:9 image covers tilted about -8 degrees, moving in alternating directions behind a hero; it is aria-hidden, pauses off screen and in hidden tabs, and stays still with reduced motion.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -4325,7 +4356,11 @@
             "scrolling reviews",
             "quote carousel",
             "marquee",
-            "infinite card wall"
+            "infinite card wall",
+            "tilted marquee background",
+            "cover wall",
+            "image marquee background",
+            "hero background marquee"
           ]
         }
       },
@@ -5087,7 +5122,7 @@
       "name": "morph-menu",
       "type": "registry:block",
       "title": "Morph Menu",
-      "description": "An action menu that grows out of its own trigger: the round button stretches from its corner into the full menu, so the eye never loses where it came from. It picks the corner with room inside the viewport and any clipping parent (drawers, scroll lists), shrinks back into the button on close, has full menu keyboard support, and reduced motion swaps the morph for an instant switch.",
+      "description": "An action menu that grows out of its own trigger: the round button stretches from its corner into the full menu, so the eye never loses where it came from. It picks the corner with room inside the viewport and any clipping parent (drawers, scroll lists), shrinks back into the button on close, has full menu keyboard support, and reduced motion swaps the morph for an instant switch. With layout=\"radial\" it becomes a corner floating action button whose actions fan out from its centre along an arc toward the inside of the screen, set by corner.",
       "dependencies": [
         "framer-motion"
       ],
@@ -5122,7 +5157,11 @@
             "more actions",
             "action menu",
             "popover menu",
-            "morphing popover"
+            "morphing popover",
+            "floating action menu",
+            "fab menu",
+            "speed dial",
+            "radial menu"
           ]
         }
       },

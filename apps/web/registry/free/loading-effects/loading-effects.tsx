@@ -20,6 +20,7 @@ export const loadingEffects = [
   "bouncing-dots",
   "equalizer",
   "ring-spinner",
+  "spinner-check",
   "orbit",
   "pulse-dot",
   "progress-ring",
@@ -38,6 +39,7 @@ export const loaderVariants = [
   "bouncing-dots",
   "equalizer",
   "ring-spinner",
+  "spinner-check",
   "orbit",
   "pulse-dot",
   "progress-ring",
@@ -52,6 +54,8 @@ export type LoaderSize = "sm" | "md" | "lg";
 const SIZES: Record<LoaderSize, number> = { sm: 20, md: 36, lg: 56 };
 
 const spring = { type: "spring", stiffness: 140, damping: 22 } as const;
+// 和 sunui-motion 的 pop 相同：結果圓片落定一次的回彈
+const pop = { type: "spring", stiffness: 620, damping: 20, mass: 0.8 } as const;
 const loop = (t: Transition): Transition => ({ repeat: Infinity, ease: "easeInOut", ...t });
 const clampPct = (v: number) => Math.min(100, Math.max(0, v));
 const track = "color-mix(in oklab, currentColor 18%, transparent)";
@@ -78,10 +82,14 @@ export interface LoaderProps {
   value?: number;
   /** 主色，預設 var(--primary) */
   color?: string;
+  /** spinner-check：為 true 時弧線補滿，圓片落定並畫出勾 */
+  done?: boolean;
+  /** spinner-check 完成後讀屏念出的文字 */
+  doneLabel?: string;
   className?: string;
 }
 
-export function Loader({ variant = "ring-spinner", size = "md", label = "Loading", value = 0, color, className }: LoaderProps) {
+export function Loader({ variant = "ring-spinner", size = "md", label = "Loading", value = 0, color, done = false, doneLabel = "Done", className }: LoaderProps) {
   const { ref, active, reduce } = useActive<HTMLSpanElement>();
   const s = SIZES[size];
   const determinate = variant === "progress-ring" || variant === "bar" || variant === "liquid";
@@ -96,11 +104,12 @@ export function Loader({ variant = "ring-spinner", size = "md", label = "Loading
       className={cn(isBar ? "flex w-full" : "inline-flex", "items-center justify-center", className)}
       style={style}
     >
-      <SrOnly>{determinate ? `${label} ${Math.round(pct)}%` : label}</SrOnly>
+      <SrOnly>{determinate ? `${label} ${Math.round(pct)}%` : variant === "spinner-check" && done ? doneLabel : label}</SrOnly>
       <span aria-hidden className={cn(isBar ? "flex w-full" : "inline-flex", "items-center justify-center")}>
         {variant === "bouncing-dots" && <BouncingDots s={s} active={active} />}
         {variant === "equalizer" && <Equalizer s={s} active={active} />}
         {variant === "ring-spinner" && <RingSpinner s={s} active={active} />}
+        {variant === "spinner-check" && <SpinnerCheck s={s} active={active} done={done} reduce={reduce} />}
         {variant === "orbit" && <Orbit s={s} active={active} />}
         {variant === "pulse-dot" && <PulseDot s={s} active={active} />}
         {variant === "progress-ring" && <ProgressRing s={s} pct={pct} reduce={reduce} />}
@@ -172,6 +181,52 @@ function RingSpinner({ s, active }: { s: number; active: boolean }) {
       <circle cx={s / 2} cy={s / 2} r={r} stroke={track} strokeWidth={sw} />
       <circle cx={s / 2} cy={s / 2} r={r} stroke="currentColor" strokeWidth={sw} strokeLinecap="round" pathLength={100} strokeDasharray="28 72" />
     </motion.svg>
+  );
+}
+
+/** 轉圈的弧線在完成時補滿成圓，接著圓片用 pop 落定一次、勾線描出，和 Result 同一種手感 */
+function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean; done: boolean; reduce: boolean }) {
+  const sw = Math.max(2.5, s * 0.1);
+  const r = (s - sw) / 2;
+  const rot = useMotionValue(0);
+  useEffect(() => {
+    if (!active || done) return;
+    // 從目前角度接著轉；完成時停在原地，弧線補滿後角度就看不出來
+    const c = animate(rot, rot.get() + 360, { repeat: Infinity, ease: "linear", duration: 0.9 });
+    return () => c.stop();
+  }, [active, done, rot]);
+  const t = (o: Transition): Transition => (reduce ? { duration: 0 } : o);
+  return (
+    <span className="relative inline-grid place-items-center" style={{ width: s, height: s }}>
+      <motion.svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} fill="none" className="absolute inset-0" style={{ rotate: rot }}>
+        <circle cx={s / 2} cy={s / 2} r={r} stroke={track} strokeWidth={sw} />
+        <motion.circle
+          cx={s / 2}
+          cy={s / 2}
+          r={r}
+          stroke="currentColor"
+          strokeWidth={sw}
+          strokeLinecap="round"
+          initial={false}
+          animate={{ pathLength: done ? 1 : 0.28 }}
+          transition={t({ duration: 0.22, ease: "easeOut" })}
+        />
+      </motion.svg>
+      <motion.span
+        className="absolute inset-0 rounded-full bg-current shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]"
+        initial={false}
+        animate={done ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
+        transition={done ? t({ ...pop, delay: 0.18 }) : t({ duration: 0.15 })}
+      />
+      <svg viewBox="0 0 24 24" className="relative" style={{ width: s * 0.5, height: s * 0.5 }} fill="none" stroke="var(--background)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+        <motion.path
+          d="M5 12.5l4.5 4.5L19 7.5"
+          initial={false}
+          animate={{ pathLength: done ? 1 : 0, opacity: done ? 1 : 0 }}
+          transition={done ? t({ duration: 0.2, ease: "easeOut", delay: 0.28 }) : t({ duration: 0.1 })}
+        />
+      </svg>
+    </span>
   );
 }
 

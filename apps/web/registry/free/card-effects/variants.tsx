@@ -41,6 +41,7 @@ export default function CardEffectsVariant({ variant }: { variant: string }) {
       <div className="w-64">
         <EffectCard
           effect={effect}
+          price={effect === "tilt-3d" ? t.price : undefined}
           media={<img src={demoArt(single)} alt="" />}
           title={c.title}
           flipOn={effect === "flip" ? "click" : undefined}

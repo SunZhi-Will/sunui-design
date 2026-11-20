@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, useReducedMotion } from "framer-motion";
+import { AnimatePresence, animate, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { springs } from "@/lib/sunui-motion";
@@ -35,7 +35,16 @@ export interface MorphMenuProps {
   locale?: string;
   className?: string;
   menuClassName?: string;
+  /**
+   * list（預設）：觸發鈕撐開成整張選單。
+   * radial：角落的浮動動作鈕，動作從觸發鈕中心沿弧線散開；separator 與 hint 不顯示，label 在懸停與聚焦時出現
+   */
+  layout?: "list" | "radial";
+  /** radial 時觸發鈕所在的角，弧線往畫面內側展開；位置本身用 className 定，例如 fixed bottom-6 right-6 */
+  corner?: RadialCorner;
 }
+
+export type RadialCorner = "bottom-right" | "bottom-left" | "top-right" | "top-left";
 
 /** 觸發鈕落在選單的哪個角；選單從這個角長出來 */
 type Corner = { x: "left" | "right"; y: "top" | "bottom" };
@@ -90,6 +99,33 @@ function clipAt(start: Inset, p: number) {
   return `inset(${t}px ${r}px ${b}px ${l}px round ${Math.max(0, rad)}px)`;
 }
 
+/** 弧線起訖角度（螢幕座標，y 向下），一律朝畫面內側的四分之一圓 */
+const ARC: Record<RadialCorner, [number, number]> = {
+  "bottom-right": [180, 270],
+  "bottom-left": [0, -90],
+  "top-right": [180, 90],
+  "top-left": [0, 90],
+};
+
+/** 項目 40px、間隔至少 8px：依數量算出半徑，弦長不小於 48px */
+function radialOffsets(count: number, corner: RadialCorner) {
+  const [from, to] = ARC[corner];
+  const step = count > 1 ? Math.abs(to - from) / (count - 1) : 90;
+  const r = Math.max(68, 48 / (2 * Math.sin((step * Math.PI) / 360)));
+  return Array.from({ length: count }, (_, i) => {
+    const a = ((count > 1 ? from + ((to - from) * i) / (count - 1) : (from + to) / 2) * Math.PI) / 180;
+    return { x: Math.round(Math.cos(a) * r), y: Math.round(Math.sin(a) * r) };
+  });
+}
+
+function Plus() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+      <path d="M8 3v10M3 8h10" />
+    </svg>
+  );
+}
+
 function Dots() {
   return (
     <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden="true">
@@ -100,7 +136,8 @@ function Dots() {
   );
 }
 
-export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed, locale, className, menuClassName }: MorphMenuProps) {
+export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed, locale, className, menuClassName, layout = "list", corner = "bottom-right" }: MorphMenuProps) {
+  const radial = layout === "radial";
   const reduce = useReducedMotion() ?? false;
   const id = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -127,6 +164,11 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     const menu = menuRef.current;
     const trigger = triggerRef.current;
     if (!mounted || !menu || !trigger) return;
+    // radial 由 AnimatePresence 負責進出場，這裡只把焦點交給第一項
+    if (radial) {
+      if (open) enabled()[0]?.focus({ preventScroll: true });
+      return;
+    }
     running.current.forEach((a) => a.stop());
     running.current = [];
     const content = menu.querySelector<HTMLElement>("[data-content]")!;
@@ -174,7 +216,7 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     void shrink.then(() => {
       if (running.current.includes(shrink)) done();
     });
-  }, [open, mounted, reduce]);
+  }, [open, mounted, reduce, radial]);
 
   const wasMounted = useRef(false);
   useEffect(() => {
@@ -202,8 +244,8 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
     const list = enabled();
     const i = list.indexOf(document.activeElement as HTMLElement);
     const go = (n: number) => list[(n + list.length) % list.length]?.focus();
-    if (e.key === "ArrowDown") go(i + 1);
-    else if (e.key === "ArrowUp") go(i - 1);
+    if (e.key === "ArrowDown" || (radial && e.key === "ArrowRight")) go(i + 1);
+    else if (e.key === "ArrowUp" || (radial && e.key === "ArrowLeft")) go(i - 1);
     else if (e.key === "Home") go(0);
     else if (e.key === "End") go(list.length - 1);
     else if (e.key === "Escape") setOpenState(false, true);
@@ -220,6 +262,84 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
   }
 
   const name = label ?? defaultLabel(locale);
+
+  if (radial) {
+    const offsets = radialOffsets(items.length, corner);
+    const tipLeft = corner.endsWith("right");
+    const n = items.length;
+    return (
+      <div className={cn("relative inline-flex", className)}>
+        <AnimatePresence onExitComplete={() => setMounted(false)}>
+          {open && (
+            <div ref={menuRef} id={id} role="menu" aria-label={name} onKeyDown={onMenuKey} className={cn("absolute inset-0", menuClassName)}>
+              {items.map((item, i) => {
+                const { x, y } = offsets[i];
+                // 從觸發鈕中心出發，0.96 起跳，依序錯開 30ms；收合時反向回到中心
+                const fly = reduce ? { duration: 0 } : { ...springs.snappy, delay: i * 0.03, opacity: { duration: 0.12, delay: i * 0.03 } };
+                const back = reduce ? { duration: 0 } : { ...springs.snappy, delay: (n - 1 - i) * 0.02, opacity: { duration: 0.1, delay: (n - 1 - i) * 0.02 } };
+                return (
+                  <motion.button
+                    key={item.id}
+                    type="button"
+                    role="menuitem"
+                    tabIndex={-1}
+                    aria-label={typeof item.label === "string" ? item.label : undefined}
+                    aria-disabled={item.disabled || undefined}
+                    onClick={() => choose(item)}
+                    initial={{ x: 0, y: 0, scale: 0.96, opacity: 0 }}
+                    animate={{ x, y, scale: 1, opacity: 1, transition: fly }}
+                    exit={{ x: 0, y: 0, scale: 0.96, opacity: 0, transition: back }}
+                    whileTap={reduce || item.disabled ? undefined : { scale: 0.97, transition: springs.snappy }}
+                    className={cn(
+                      "group absolute left-1/2 top-1/2 -ml-5 -mt-5 flex size-10 items-center justify-center rounded-full bg-card outline-none transition-colors duration-150 hover:bg-muted hover:duration-0 focus-visible:ring-2 focus-visible:ring-ring",
+                      "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] dark:bg-muted dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]",
+                      item.danger ? "text-destructive" : "text-card-foreground",
+                      item.disabled && "pointer-events-none opacity-50",
+                    )}
+                  >
+                    <span aria-hidden="true" className="flex size-4 items-center justify-center [&>svg]:size-4">{item.icon}</span>
+                    <span
+                      aria-hidden={typeof item.label === "string" || undefined}
+                      className={cn(
+                        "pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-card px-2 py-1 text-xs font-medium text-card-foreground opacity-0 transition-opacity duration-150",
+                        "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]",
+                        "group-hover:opacity-100 group-hover:duration-0 group-focus-visible:opacity-100 group-focus-visible:duration-0",
+                        tipLeft ? "right-[calc(100%+0.5rem)]" : "left-[calc(100%+0.5rem)]",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          )}
+        </AnimatePresence>
+        <motion.button
+          ref={triggerRef}
+          type="button"
+          aria-label={name}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-controls={mounted ? id : undefined}
+          onClick={() => setOpenState(!open)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              setOpenState(true);
+            }
+          }}
+          whileTap={reduce ? undefined : { scale: 0.97, transition: springs.snappy }}
+          className="relative inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground outline-none shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5"
+        >
+          {/* 預設的加號轉成叉，同一個圖示說明「再按一次收起」 */}
+          <motion.span className="flex" animate={{ rotate: open && !icon ? 45 : 0 }} transition={reduce ? { duration: 0 } : springs.snappy}>
+            {icon ?? <Plus />}
+          </motion.span>
+        </motion.button>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("relative inline-flex", className)}>

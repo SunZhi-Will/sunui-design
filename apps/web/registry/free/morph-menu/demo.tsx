@@ -22,6 +22,11 @@ function Sketch({ d }: { d: string }) {
 
 const copy = {
   en: {
+    subtotal: "Subtotal",
+    listActions: "List actions",
+    moveAll: "Move all to cart",
+    sort: "Sort by price",
+    shareList: "Share list",
     heading: "Saved for later",
     count: "3 items",
     moveToCart: "Move to cart",
@@ -36,6 +41,11 @@ const copy = {
     ],
   },
   "zh-TW": {
+    subtotal: "小計",
+    listActions: "清單動作",
+    moveAll: "全部移到購物車",
+    sort: "依價格排序",
+    shareList: "分享清單",
     heading: "稍後購買",
     count: "3 件",
     moveToCart: "移到購物車",
@@ -50,6 +60,11 @@ const copy = {
     ],
   },
   "zh-CN": {
+    subtotal: "小计",
+    listActions: "清单操作",
+    moveAll: "全部移到购物车",
+    sort: "按价格排序",
+    shareList: "分享清单",
     heading: "稍后购买",
     count: "3 件",
     moveToCart: "移到购物车",
@@ -64,6 +79,11 @@ const copy = {
     ],
   },
   ja: {
+    subtotal: "小計",
+    listActions: "リストの操作",
+    moveAll: "すべてカートに移動",
+    sort: "価格順に並べ替え",
+    shareList: "リストを共有",
     heading: "あとで買う",
     count: "3点",
     moveToCart: "カートに移動",
@@ -100,7 +120,7 @@ export default function MorphMenuDemo() {
   ];
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border bg-card p-4 text-sm text-card-foreground sm:p-5">
+    <div className="relative w-full max-w-md rounded-md border border-border bg-card p-4 text-sm text-card-foreground sm:p-5">
       <div className="flex items-baseline justify-between">
         <p className="font-semibold tracking-tight">{t.heading}</p>
         <span className="text-xs text-muted-foreground tabular-nums">{t.count}</span>
@@ -118,6 +138,23 @@ export default function MorphMenuDemo() {
           </li>
         ))}
       </ul>
+      {/* 清單層級的動作：角落的浮動鈕，動作沿弧線往上方內側散開 */}
+      <div className="flex items-center justify-between border-t border-border pt-3">
+        <p className="text-muted-foreground">
+          {t.subtotal} <span className="font-medium text-card-foreground tabular-nums">{price(64)}</span>
+        </p>
+        <MorphMenu
+          layout="radial"
+          corner="bottom-right"
+          locale={locale}
+          label={t.listActions}
+          items={[
+            { id: "move-all", label: t.moveAll, icon: <Icon d="M2 3h2l1.5 7h7L14 5H5" /> },
+            { id: "sort", label: t.sort, icon: <Icon d="M5 3v10M5 13l-2-2M5 13l2-2M11 13V3M11 3l-2 2M11 3l2 2" /> },
+            { id: "share-list", label: t.shareList, icon: <Icon d="M8 2v8M5 5l3-3 3 3M3 9v4h10V9" /> },
+          ]}
+        />
+      </div>
     </div>
   );
 }

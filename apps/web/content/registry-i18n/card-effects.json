@@ -1,7 +1,7 @@
 {
   "zh-TW": {
     "title": "卡片效果",
-    "description": "13 種卡片滑過效果：EffectCard 用 effect prop 切換 8 種單卡效果（上浮、聚光、3D 傾斜、箔光、翻面、資訊上滑、晃動、捲角），另有 5 個吃 items 陣列的群組元件（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）。開啟減少動態時卡片不移動，只保留顏色變化，翻面背面與資訊面板仍可取得。",
+    "description": "14 種卡片效果：EffectCard 用 effect prop 切換 9 種單卡效果（上浮、聚光、3D 傾斜、箔光、翻面、資訊上滑、晃動、捲角、邊框光束），另有 5 個吃 items 陣列的群組元件（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）。border-beam 在滑過或聚焦時讓一段細線沿邊框繞一圈，active 為真（處理中、已選取）時以品牌色持續繞行；傳入 price 時 tilt-3d 會把圖片、標題、價格分成三層景深，depth 調整層距。開啟減少動態時卡片不移動，只保留顏色變化，翻面背面與資訊面板仍可取得，active 改為整圈品牌色邊框。",
     "whenToUse": [
       "需要滑過回饋的商品、文章或目的地網格",
       "要讓某張卡片突出的功能展示與圖庫"
@@ -13,7 +13,7 @@
   },
   "zh-CN": {
     "title": "卡片效果",
-    "description": "13 种卡片悬停效果：EffectCard 用 effect prop 切换 8 种单卡效果（上浮、聚光、3D 倾斜、箔光、翻转、信息上滑、晃动、卷角），另有 5 个接收 items 数组的组合组件（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）。开启减少动态效果时卡片不移动，只保留颜色变化，翻转背面与信息面板仍可访问。",
+    "description": "14 种卡片效果：EffectCard 用 effect prop 切换 9 种单卡效果（上浮、聚光、3D 倾斜、箔光、翻转、信息上滑、晃动、卷角、边框光束），另有 5 个接收 items 数组的组合组件（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）。border-beam 在悬停或聚焦时让一段细线沿边框绕一圈，active 为真（处理中、已选中）时以品牌色持续绕行；传入 price 时 tilt-3d 会把图片、标题、价格分成三层景深，depth 调整层距。开启减少动态效果时卡片不移动，只保留颜色变化，翻转背面与信息面板仍可访问，active 改为整圈品牌色边框。",
     "whenToUse": [
       "需要悬停反馈的商品、文章或目的地网格",
       "要让某张卡片突出的功能展示与图库"
@@ -25,7 +25,7 @@
   },
   "ja": {
     "title": "カードエフェクト",
-    "description": "13 種類のカード用ホバーエフェクト。EffectCard の effect prop で 8 種類の単体エフェクト（リフト、スポットライト、3D チルト、グレア、フリップ、情報スライドアップ、ウォブル、カール）を切り替え、items 配列を受け取る 5 つのグループコンポーネント（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）も含みます。視差効果を減らす設定ではカードは動かず色だけが変わり、フリップの裏面や情報パネルにも引き続きアクセスできます。",
+    "description": "14 種類のカードエフェクト。EffectCard の effect prop で 9 種類の単体エフェクト（リフト、スポットライト、3D チルト、グレア、フリップ、情報スライドアップ、ウォブル、カール、ボーダービーム）を切り替え、items 配列を受け取る 5 つのグループコンポーネント（FocusGrid、StackFan、SpotlightGrid、ExpandingPanels、BentoExpand）も含みます。border-beam はホバーやフォーカスで細い線が枠を一周し、active が真（処理中、選択中）の間はブランドカラーで回り続けます。price を渡すと tilt-3d は画像、タイトル、価格を三層の奥行きに分け、depth で層の間隔を調整できます。視差効果を減らす設定ではカードは動かず色だけが変わり、フリップの裏面や情報パネルにも引き続きアクセスでき、active は枠全体のブランドカラーになります。",
     "whenToUse": [
       "ホバー時の反応が欲しい商品、記事、旅行先のグリッド",
       "特定のカードを目立たせたい機能紹介やギャラリー"

@@ -667,6 +667,105 @@ function ExpandedDialog({
   return fixed ? createPortal(node, document.body) : node;
 }
 
+/* ───────── 封面牆模式（CoverMarquee） ───────── */
+
+export type CoverMarqueeItem = {
+  key: string;
+  /** 封面圖片網址，以 object-cover 填滿 16:9 */
+  src?: string;
+  /** 沒有圖片時改畫自訂內容 */
+  content?: ReactNode;
+};
+
+export interface CoverMarqueeProps {
+  covers: CoverMarqueeItem[];
+  /** 列數，預設 3 */
+  rows?: number;
+  /** 整面牆的傾斜角度（度），預設 -8 */
+  angle?: number;
+  /** 單張封面寬度（px），預設 280 */
+  tileWidth?: number;
+  /** 第一列跑完一圈的秒數，之後每列多 8 秒，預設 60 */
+  duration?: number;
+  className?: string;
+}
+
+/**
+ * 傾斜的封面牆，放在 hero 背後當內容型的背景：16:9 封面排成數列，列與列方向交錯，
+ * 沿用留言跑馬燈同一組 -50% 無縫循環。整面 aria-hidden、不吃滑鼠；離開畫面或分頁隱藏時暫停，
+ * reduced motion 下靜止。父層需要 relative 與 overflow-hidden。
+ */
+export function CoverMarquee({ covers, rows = 3, angle = -8, tileWidth = 280, duration = 60, className }: CoverMarqueeProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [reduce, setReduce] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onMotion = () => setReduce(mq.matches);
+    const onVisibility = () => setTabVisible(document.visibilityState === "visible");
+    onMotion();
+    onVisibility();
+    mq.addEventListener("change", onMotion);
+    document.addEventListener("visibilitychange", onVisibility);
+    const el = rootRef.current;
+    const io = el ? new IntersectionObserver(([entry]) => setInView(entry.isIntersecting)) : null;
+    if (el) io?.observe(el);
+    return () => {
+      mq.removeEventListener("change", onMotion);
+      document.removeEventListener("visibilitychange", onVisibility);
+      io?.disconnect();
+    };
+  }, []);
+
+  if (!covers.length) return null;
+
+  // 每列錯開起點，補到足夠蓋過傾斜後變寬的畫面，再重複一份給 -50% 循環
+  const perRow = Math.max(8, covers.length);
+  const lines = Array.from({ length: rows }, (_, r) => {
+    const off = (r * 3) % covers.length;
+    return padCards([...covers.slice(off), ...covers.slice(0, off)], perRow);
+  });
+  const running = inView && tabVisible;
+
+  return (
+    <div ref={rootRef} aria-hidden="true" className={cn("pointer-events-none absolute inset-0 select-none overflow-hidden", className)}>
+      <style>{KEYFRAMES}</style>
+      <div className="absolute flex flex-col justify-center gap-4" style={{ inset: "-30% -20%", transform: `rotate(${angle}deg)` }}>
+        {lines.map((line, r) => (
+          <div
+            key={r}
+            className="tm-track"
+            style={{
+              gap: 16,
+              // reduced motion：靜止，單數列往左錯半張，牆面不會排成整齊的格子
+              transform: reduce ? `translateX(${r % 2 ? -tileWidth / 2 : 0}px)` : undefined,
+              animation: reduce ? "none" : `${r % 2 === 0 ? "tm-marquee-left" : "tm-marquee-right"} ${duration + r * 8}s linear infinite`,
+              animationPlayState: running ? "running" : "paused",
+            }}
+          >
+            {[...line, ...line].map((c, i) => (
+              <div
+                key={`${c.key}-${i}`}
+                className="relative shrink-0 overflow-hidden rounded-xl bg-muted shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]"
+                style={{ width: tileWidth, aspectRatio: "16 / 9" }}
+              >
+                {c.src ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.src} alt="" draggable={false} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  c.content
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ───────── 主元件 ───────── */
 
 /**

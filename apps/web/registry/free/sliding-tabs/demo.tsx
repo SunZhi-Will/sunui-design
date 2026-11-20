@@ -31,6 +31,13 @@ const copy = {
       { name: "Wool beanie", price: "$18", tags: ["new", "sale", "free"] },
       { name: "Denim jacket", price: "$96", tags: ["free"] },
     ] as Product[],
+    ordersLabel: "Orders",
+    orders: [
+      { value: "open", label: "To ship", count: 3, content: "3 orders are packed and leave the warehouse today." },
+      { value: "transit", label: "On the way", count: 2, content: "2 parcels are with the courier, arriving Thursday." },
+      { value: "done", label: "Delivered", count: 18, content: "18 orders delivered this year. Reviews are open for 30 days." },
+      { value: "returns", label: "Returns", count: 0, content: "No open returns. You have 30 days to send an item back." },
+    ],
     sales: "Sales",
     filterLabel: "Filter products",
     empty: "Nothing matches every filter.",
@@ -57,6 +64,13 @@ const copy = {
       { name: "羊毛毛帽", price: "NT$520", tags: ["new", "sale", "free"] },
       { name: "丹寧外套", price: "NT$2,880", tags: ["free"] },
     ] as Product[],
+    ordersLabel: "訂單",
+    orders: [
+      { value: "open", label: "待出貨", count: 3, content: "3 筆訂單已包好，今天從倉庫出貨。" },
+      { value: "transit", label: "配送中", count: 2, content: "2 個包裹在物流手上，預計週四送達。" },
+      { value: "done", label: "已送達", count: 18, content: "今年已送達 18 筆，收貨後 30 天內可以評價。" },
+      { value: "returns", label: "退貨", count: 0, content: "沒有進行中的退貨，收貨 30 天內可申請。" },
+    ],
     sales: "銷售額",
     filterLabel: "篩選商品",
     empty: "沒有同時符合所有條件的商品。",
@@ -83,6 +97,13 @@ const copy = {
       { name: "羊毛针织帽", price: "¥128", tags: ["new", "sale", "free"] },
       { name: "牛仔外套", price: "¥668", tags: ["free"] },
     ] as Product[],
+    ordersLabel: "订单",
+    orders: [
+      { value: "open", label: "待发货", count: 3, content: "3 笔订单已打包，今天从仓库发出。" },
+      { value: "transit", label: "运输中", count: 2, content: "2 个包裹在快递手上，预计周四送达。" },
+      { value: "done", label: "已签收", count: 18, content: "今年已签收 18 笔，签收后 30 天内可以评价。" },
+      { value: "returns", label: "退货", count: 0, content: "没有进行中的退货，签收 30 天内可申请。" },
+    ],
     sales: "销售额",
     filterLabel: "筛选商品",
     empty: "没有同时符合所有条件的商品。",
@@ -109,6 +130,13 @@ const copy = {
       { name: "ウールビーニー", price: "¥2,600", tags: ["new", "sale", "free"] },
       { name: "デニムジャケット", price: "¥13,800", tags: ["free"] },
     ] as Product[],
+    ordersLabel: "注文",
+    orders: [
+      { value: "open", label: "発送待ち", count: 3, content: "3 件の注文は梱包済みで、本日倉庫から発送します。" },
+      { value: "transit", label: "配送中", count: 2, content: "2 個の荷物は配送業者に渡り、木曜日に届く予定です。" },
+      { value: "done", label: "配達済み", count: 18, content: "今年は 18 件配達済み。受け取りから 30 日間レビューできます。" },
+      { value: "returns", label: "返品", count: 0, content: "進行中の返品はありません。受け取りから 30 日以内に申請できます。" },
+    ],
     sales: "売上",
     filterLabel: "商品を絞り込む",
     empty: "すべての条件に合う商品はありません。",
@@ -145,6 +173,14 @@ export default function SlidingTabsDemo() {
           ))}
         </div>
       </div>
+
+      <SlidingTabs
+        variant="folder"
+        aria-label={t.ordersLabel}
+        className="md:col-span-2"
+        items={t.orders.map((o) => ({ ...o, content: <p className="text-sm leading-relaxed text-muted-foreground">{o.content}</p> }))}
+        contentClassName="min-h-20 p-4"
+      />
 
       <div className="md:col-span-2">
         <SlidingTabs

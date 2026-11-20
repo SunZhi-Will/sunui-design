@@ -45,6 +45,7 @@ export type MicroInteractionId = (typeof microInteractions)[number];
 
 const pop = { type: "spring", stiffness: 520, damping: 18 } as const;
 const gentle = { type: "spring", stiffness: 300, damping: 28 } as const;
+const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
 // 預設粒子色：全部從主題 token 推出，主題換了就跟著換
 const themeColors = [
@@ -358,26 +359,15 @@ export interface ToggleSwitchProps {
 export function ToggleSwitch({ checked, defaultChecked = false, onChange, label, showLabel = true, disabled, className }: ToggleSwitchProps) {
   const reduce = useReducedMotion() ?? false;
   const [on, setOn] = useToggle(checked, defaultChecked, onChange);
-  const [knob, animateKnob] = useAnimate<HTMLSpanElement>();
-  const first = useRef(true);
+  const [pressed, setPressed] = useState(false);
   const id = useId();
 
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (reduce) {
-      void animateKnob(knob.current, { x: on ? 20 : 0 }, { duration: 0 });
-      return;
-    }
-    // 滑動途中把旋鈕拉長，像橡皮一樣被拖過去
-    void animateKnob(
-      knob.current,
-      { x: on ? [0, 4, 20] : [20, 8, 0], width: [20, 28, 20] },
-      { duration: 0.38, ease: [0.3, 0.7, 0.4, 1] },
-    );
-  }, [on, reduce, animateKnob, knob]);
+  // 按住時旋鈕壓扁拉長，往要去的那一側延伸；放開後切換，用彈簧落定到新位置
+  const squash = pressed && !reduce && !disabled;
+  const width = squash ? 26 : 20;
+  const press = (e: KeyboardEvent<HTMLButtonElement>, down: boolean) => {
+    if ((e.key === " " || e.key === "Enter") && !e.repeat) setPressed(down);
+  };
 
   return (
     <span className={cn("inline-flex items-center gap-3 text-sm", className)}>
@@ -389,15 +379,25 @@ export function ToggleSwitch({ checked, defaultChecked = false, onChange, label,
         aria-labelledby={showLabel ? id : undefined}
         disabled={disabled}
         onClick={() => setOn(!on)}
+        onPointerDown={(e) => e.button === 0 && setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        onPointerCancel={() => setPressed(false)}
+        onBlur={() => setPressed(false)}
+        onKeyDown={(e) => press(e, true)}
+        onKeyUp={(e) => press(e, false)}
         className={cn(
           "relative h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50",
-          on ? "bg-primary" : "bg-muted ring-1 ring-inset ring-border",
+          on
+            ? "bg-[color:var(--sunui-spot,var(--primary))] shadow-[inset_0_1px_2px_rgb(0_0_0/0.14)]"
+            : "bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] hover:bg-foreground/10 dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.3)]",
         )}
       >
         <motion.span
-          ref={knob}
-          initial={{ x: on ? 20 : 0 }}
-          className="block h-5 w-5 rounded-full bg-background shadow-sm"
+          initial={false}
+          animate={{ x: on ? 40 - width : 0, width, scaleY: squash ? 0.9 : 1 }}
+          transition={reduce ? { duration: 0 } : snappy}
+          className="block h-5 rounded-full bg-background shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_0_0_1px_rgb(255_255_255/0.08)]"
           style={{ width: 20 }}
         />
       </button>

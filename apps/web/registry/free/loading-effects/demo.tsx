@@ -14,10 +14,12 @@ export const copy = {
     finish: "Finish",
     page: "Page content",
     steps: ["Uploading files", "Checking format", "Generating preview", "Publishing"],
+    done: "Done",
     names: {
       "bouncing-dots": "Bouncing dots",
       equalizer: "Equalizer",
       "ring-spinner": "Ring spinner",
+      "spinner-check": "Spinner to check",
       orbit: "Orbit",
       "pulse-dot": "Pulse dot",
       "progress-ring": "Progress ring",
@@ -37,10 +39,12 @@ export const copy = {
     finish: "完成",
     page: "頁面內容",
     steps: ["上傳檔案", "檢查格式", "產生預覽", "發佈"],
+    done: "已完成",
     names: {
       "bouncing-dots": "跳動圓點",
       equalizer: "等化器",
       "ring-spinner": "缺口圓環",
+      "spinner-check": "轉圈到打勾",
       orbit: "軌道",
       "pulse-dot": "脈衝圓點",
       "progress-ring": "進度圓環",
@@ -60,10 +64,12 @@ export const copy = {
     finish: "完成",
     page: "页面内容",
     steps: ["上传文件", "检查格式", "生成预览", "发布"],
+    done: "已完成",
     names: {
       "bouncing-dots": "跳动圆点",
       equalizer: "均衡器",
       "ring-spinner": "缺口圆环",
+      "spinner-check": "转圈到打勾",
       orbit: "轨道",
       "pulse-dot": "脉冲圆点",
       "progress-ring": "进度圆环",
@@ -83,10 +89,12 @@ export const copy = {
     finish: "完了",
     page: "ページの内容",
     steps: ["ファイルをアップロード", "形式をチェック", "プレビューを生成", "公開"],
+    done: "完了しました",
     names: {
       "bouncing-dots": "バウンスドット",
       equalizer: "イコライザー",
       "ring-spinner": "リングスピナー",
+      "spinner-check": "スピナーからチェック",
       orbit: "オービット",
       "pulse-dot": "パルスドット",
       "progress-ring": "プログレスリング",
@@ -137,7 +145,7 @@ export default function LoadingEffectsDemo() {
         const wide = v === "bar" || v === "indeterminate-bar";
         return (
           <Tile key={v} name={t.names[v]}>
-            <Loader variant={v} size="lg" value={value} label={t.loading} className={wide ? "w-full max-w-56" : undefined} />
+            <Loader variant={v} size="lg" value={value} done={value === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full max-w-56" : undefined} />
           </Tile>
         );
       })}

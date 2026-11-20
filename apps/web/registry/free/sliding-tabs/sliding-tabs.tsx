@@ -15,6 +15,37 @@ const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotOn = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
+/* folder：選中的分頁是一塊凸起的面，和下方面板接成同一個外形。
+   外框只靠 1px 的 e1 邊線（--tab-edge），面板的上邊線被選中分頁蓋住，兩側用內凹圓角接到面板 */
+const edge = "[--tab-edge:rgb(0_0_0/0.06)] dark:[--tab-edge:rgb(255_255_255/0.08)]";
+const folderPanel = "rounded-xl bg-card text-card-foreground shadow-[0_0_0_1px_var(--tab-edge),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[0_0_0_1px_var(--tab-edge)]";
+// 內凹圓角：圓心在角落方塊的上角，圓外填面板色，圓周畫一條邊線
+const flare = (at: string) =>
+  `radial-gradient(circle at ${at}, transparent 7.5px, var(--tab-edge) 7.5px, var(--tab-edge) 8.5px, var(--card) 8.5px)`;
+
+/** 徽章樣式與 notify-badge 一致：圓角膠囊、tabular-nums，超過 99 顯示 99+ */
+const badgeTones = {
+  muted: "bg-foreground/[0.07] text-muted-foreground",
+  spot: cn(spotBg, spotOn),
+  // 已經在品牌色上（選中的篩選籤）：淡一階的底，字跟著篩選籤
+  onSpot: "bg-background/25",
+};
+
+function CountBadge({ count, tone }: { count: number; tone: keyof typeof badgeTones }) {
+  return (
+    <span
+      className={cn(
+        "relative flex h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full px-1 text-[0.68rem] font-semibold leading-none tabular-nums transition-colors",
+        badgeTones[tone],
+      )}
+    >
+      <span className="sr-only">(</span>
+      {count > 99 ? "99+" : count}
+      <span className="sr-only">)</span>
+    </span>
+  );
+}
+
 export interface SlidingTabItem {
   value: string;
   label: ReactNode;
@@ -30,8 +61,10 @@ type Multi = { multiple: true; value?: string[]; defaultValue?: string[]; onValu
 
 export type SlidingTabsProps = (Single | Multi) & {
   items: SlidingTabItem[];
-  /** underline：分頁底線；segment：分段控制；chips：篩選籤（可配 multiple） */
-  variant?: "underline" | "segment" | "chips";
+  /** underline：分頁底線；segment：分段控制；chips：篩選籤（可配 multiple）；folder：瀏覽器式資料夾分頁，選中的分頁和內容面板接在一起 */
+  variant?: "underline" | "segment" | "chips" | "folder";
+  /** count 的樣式：inline 是標籤旁的淡色數字；badge 是小膠囊徽章，選中時用品牌專色。folder 預設 badge，其他預設 inline */
+  countStyle?: "inline" | "badge";
   /** 分段控制撐滿寬度 */
   fullWidth?: boolean;
   size?: "sm" | "md";
@@ -43,6 +76,8 @@ export type SlidingTabsProps = (Single | Multi) & {
 
 export function SlidingTabs(props: SlidingTabsProps) {
   const { items, variant = "underline", fullWidth = false, size = "md", className, contentClassName } = props;
+  const folder = variant === "folder";
+  const countStyle = props.countStyle ?? (folder ? "badge" : "inline");
   const reduce = useReducedMotion();
   const group = useId();
   const listRef = useRef<HTMLDivElement>(null);
@@ -88,7 +123,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
   const pad = size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm";
 
   return (
-    <div className={className}>
+    <div className={cn(folder && edge, className)}>
       <LayoutGroup id={group}>
         <div
           ref={listRef}
@@ -99,6 +134,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
             variant === "underline" && "gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-foreground/10",
             variant === "segment" && cn("rounded-xl border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
+            folder && "z-10 items-end gap-1 overflow-x-auto overflow-y-hidden px-3 pt-1 [scrollbar-width:none]",
           )}
         >
           {items.map((item, index) => {
@@ -122,7 +158,8 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   "relative inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap font-medium outline-offset-2 transition-[color,background-color,border-color,opacity,scale] focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-40 motion-safe:active:scale-[0.97]",
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
-                  variant === "chips" ? "rounded-full border" : "rounded-md",
+                  variant === "chips" ? "rounded-full border" : folder ? "rounded-t-lg" : "rounded-md",
+                  folder && !on && "hover:bg-foreground/[0.04]",
                   variant === "chips" && (on ? spotBorder : "border-foreground/10 hover:border-foreground/40"),
                   on ? (variant === "chips" ? spotOn : "text-foreground") : "text-muted-foreground hover:text-foreground",
                 )}
@@ -136,6 +173,18 @@ export function SlidingTabs(props: SlidingTabsProps) {
                     transition={t}
                     className="absolute inset-0 rounded-[5px] border border-foreground/10 bg-background shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]"
                   />
+                )}
+                {on && folder && (
+                  // 凸起的面：上方圓角，下緣裁掉邊線好和面板接起來，兩側各一個內凹圓角
+                  <motion.span
+                    layoutId="ind"
+                    transition={t}
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-t-lg bg-card shadow-[0_0_0_1px_var(--tab-edge)] [clip-path:inset(-2px_-12px_0_-12px)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_var(--tab-edge)]"
+                  >
+                    <motion.span layout className="absolute -left-2 bottom-0 size-2" style={{ background: flare("0 0") }} />
+                    <motion.span layout className="absolute -right-2 bottom-0 size-2" style={{ background: flare("100% 0") }} />
+                  </motion.span>
                 )}
                 {variant === "chips" && (
                   <motion.span
@@ -166,14 +215,19 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   )}
                 </AnimatePresence>
                 <span className="relative">{item.label}</span>
-                {item.count !== undefined && <span className="relative tabular-nums opacity-60">{item.count}</span>}
+                {item.count !== undefined &&
+                  (countStyle === "badge" ? (
+                    <CountBadge count={item.count} tone={!on ? "muted" : variant === "chips" ? "onSpot" : "spot"} />
+                  ) : (
+                    <span className="relative tabular-nums opacity-60">{item.count}</span>
+                  ))}
               </button>
             );
           })}
         </div>
       </LayoutGroup>
       {hasContent && (
-        <div id={`${group}-panel`} role="tabpanel" tabIndex={0} className={cn("relative overflow-hidden outline-none", contentClassName)}>
+        <div id={`${group}-panel`} role="tabpanel" tabIndex={0} className={cn("relative overflow-hidden outline-none", folder && folderPanel, contentClassName)}>
           <AnimatePresence mode="popLayout" initial={false} custom={dir}>
             <motion.div
               key={active?.value}
