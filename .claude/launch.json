@@ -150,6 +150,32 @@
         "CRON_SECRET": "local-cron",
         "GOOGLE_CLIENT_ID": "385022749974-54lnlukhs3f0024argdkhah4t046cice.apps.googleusercontent.com"
       }
+    },
+    {
+      "name": "compare",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "3120",
+        "--directory",
+        ".compare"
+      ],
+      "port": 3120,
+      "autoPort": false
+    },
+    {
+      "name": "compare-before",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd .compare/before/apps/web && node scripts/generate-previews.mjs && npx next dev --turbopack -p 3122"
+      ],
+      "port": 3122,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-before"
+      }
     }
   ]
 }
