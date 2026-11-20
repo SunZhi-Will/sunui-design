@@ -10,6 +10,7 @@ import { getItems } from "@/lib/registry";
 import { seriesOf } from "@/lib/series";
 import { checkoutCopy } from "@/lib/checkout-copy";
 import { anyCheckoutReady, paymentOptions } from "@/lib/payments";
+import { shoplineRecurringReady } from "@/lib/shopline";
 import {
   foundingState,
   foundingWindow,
@@ -50,6 +51,8 @@ export default async function PricingPage() {
   // SHOPLINE 設定好才開放結帳；否則按鈕導到 waitlist
   const canBuy = anyCheckoutReady();
   const pay = paymentOptions();
+  // 訂閱要能綁卡自動扣款：新台幣要有 SHOPLINE_CLIENT_KEY（內嵌式 SDK），美金要有 Polar；都沒有時訂閱按鈕導到候補，不要點了才被擋
+  const canSubscribe = (pay.twd && shoplineRecurringReady()) || pay.usd;
   const proCount = getItems("pro").length;
   const freeItems = getItems("free");
   // 動效庫一組含十幾種效果，和一般 block 分開列（見 reports/免費與付費切分規劃-2026-11-05.md）
@@ -109,7 +112,7 @@ export default async function PricingPage() {
       secondary: monthly.secondary,
       note: sub.monthlyNote,
       features: subscriptionFeatures,
-      cta: canBuy ? { label: sub.cta, href: "/go/checkout/monthly" } : waitlistCta,
+      cta: canSubscribe ? { label: sub.cta, href: "/go/checkout/monthly" } : waitlistCta,
     },
     {
       name: planName.yearly,
@@ -120,7 +123,7 @@ export default async function PricingPage() {
       badge: sub.yearlySave(yearlySave),
       highlight: true,
       features: subscriptionFeatures,
-      cta: canBuy ? { label: sub.cta, href: "/go/checkout/yearly" } : waitlistCta,
+      cta: canSubscribe ? { label: sub.cta, href: "/go/checkout/yearly" } : waitlistCta,
     },
   ];
 
