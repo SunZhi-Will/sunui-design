@@ -128,6 +128,8 @@ export interface FloatingFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
   rules?: PasswordRule[];
   /** Fires when the strength level changes; allPassed means every rule is met */
   onStrengthChange?: (strength: PasswordStrength, allPassed: boolean) => void;
+  /** How the maxLength count is shown: number is "12/280"; ring is a small ring that fills as you type and shows the characters left once a tenth remains, as on post and comment boxes */
+  counter?: "number" | "ring";
 }
 
 const SLOT: Record<string, RegExp> = { "9": /\d/, A: /[a-z]/i, "*": /\S/ };
@@ -193,6 +195,57 @@ function diff(a: string, b: string) {
   return [b.slice(0, p), b.slice(p, b.length - s), b.slice(b.length - s)] as const;
 }
 
+/** Ring counter: the arc fills with the share used; in the last tenth the characters left appear beside it and the arc turns to text colour, at the limit to the destructive colour */
+function CountRing({ count, max, reduce }: { count: number; max: number; reduce: boolean }) {
+  const used = Math.min(count / max, 1);
+  const left = max - count;
+  const near = left <= Math.ceil(max * 0.1);
+  const full = left <= 0;
+  const R = 7;
+  const C = 2 * Math.PI * R;
+  return (
+    <span aria-hidden="true" className="pointer-events-none absolute top-1.5 right-2.5 flex items-center gap-1.5">
+      <AnimatePresence initial={false}>
+        {near && (
+          <motion.span
+            key="left"
+            initial={reduce ? false : { opacity: 0, x: 4 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, x: 4 }}
+            transition={reduce ? { duration: 0 } : springs.snappy}
+            className={cn("text-[11px] tabular-nums", full ? "text-destructive" : "text-foreground")}
+          >
+            {left}
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <motion.svg
+        viewBox="0 0 18 18"
+        className="size-4 -rotate-90"
+        initial={false}
+        animate={{ scale: near && !reduce ? 1.15 : 1 }}
+        transition={reduce ? { duration: 0 } : springs.snappy}
+      >
+        <circle cx="9" cy="9" r={R} fill="none" strokeWidth="2" className="stroke-foreground/10" />
+        <circle
+          cx="9"
+          cy="9"
+          r={R}
+          fill="none"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray={C}
+          strokeDashoffset={C * (1 - used)}
+          className={cn(
+            "transition-[stroke-dashoffset,stroke] duration-150 ease-out motion-reduce:transition-none",
+            count === 0 ? "stroke-transparent" : full ? "stroke-destructive" : near ? "stroke-foreground" : "stroke-foreground/45",
+          )}
+        />
+      </motion.svg>
+    </span>
+  );
+}
+
 export function FloatingField({
   label,
   value: valueProp,
@@ -213,6 +266,7 @@ export function FloatingField({
   strength: strengthMode = false,
   rules: rulesProp,
   onStrengthChange,
+  counter = "number",
   className,
   id: idProp,
   onBlur,
@@ -373,7 +427,7 @@ export function FloatingField({
         </motion.label>
 
         {/* Character count: typing is high frequency, so the number does not scroll; turns to text colour when a tenth remains */}
-        {count !== null && floated && (
+        {count !== null && floated && counter === "number" && (
           <span
             aria-hidden="true"
             className={cn(
@@ -384,6 +438,7 @@ export function FloatingField({
             {count}/{maxLength}
           </span>
         )}
+        {count !== null && counter === "ring" && <CountRing count={count} max={maxLength!} reduce={!!reduce} />}
 
         <div className={cn("absolute right-2 flex items-center gap-1", multiline ? "bottom-2" : "top-[1.05rem]")}>
           <AnimatePresence initial={false}>

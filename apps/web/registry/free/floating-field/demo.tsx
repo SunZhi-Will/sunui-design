@@ -78,7 +78,7 @@ export default function FloatingFieldDemo() {
             </button>
           }
         />
-        <FloatingField label={t.note} name="note" multiline maxLength={40} hint={t.noteHint} />
+        <FloatingField label={t.note} name="note" multiline maxLength={40} counter="ring" hint={t.noteHint} />
       </div>
       {cursor}
     </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
@@ -40,6 +40,13 @@ const copy = {
     ],
     sales: "Sales",
     filterLabel: "Filter products",
+    dock: [
+      { value: "home", label: "Home" },
+      { value: "search", label: "Search" },
+      { value: "saved", label: "Saved" },
+      { value: "profile", label: "Profile" },
+    ],
+    dockLabel: "App navigation",
     empty: "Nothing matches every filter.",
   },
   "zh-TW": {
@@ -73,6 +80,13 @@ const copy = {
     ],
     sales: "銷售額",
     filterLabel: "篩選商品",
+    dock: [
+      { value: "home", label: "首頁" },
+      { value: "search", label: "搜尋" },
+      { value: "saved", label: "收藏" },
+      { value: "profile", label: "我的" },
+    ],
+    dockLabel: "App 導覽",
     empty: "沒有同時符合所有條件的商品。",
   },
   "zh-CN": {
@@ -106,6 +120,13 @@ const copy = {
     ],
     sales: "销售额",
     filterLabel: "筛选商品",
+    dock: [
+      { value: "home", label: "首页" },
+      { value: "search", label: "搜索" },
+      { value: "saved", label: "收藏" },
+      { value: "profile", label: "我的" },
+    ],
+    dockLabel: "App 导航",
     empty: "没有同时符合所有条件的商品。",
   },
   ja: {
@@ -139,6 +160,13 @@ const copy = {
     ],
     sales: "売上",
     filterLabel: "商品を絞り込む",
+    dock: [
+      { value: "home", label: "ホーム" },
+      { value: "search", label: "検索" },
+      { value: "saved", label: "保存済み" },
+      { value: "profile", label: "プロフィール" },
+    ],
+    dockLabel: "アプリのナビゲーション",
     empty: "すべての条件に合う商品はありません。",
   },
 };
@@ -148,6 +176,32 @@ const bars: Record<string, number[]> = {
   w: [55, 62, 48, 75, 80, 68, 90],
   m: [40, 58, 72, 66, 84, 92, 78],
 };
+
+/** Dock icons: 24 grid, 1.5 stroke, same as the SunUI line icons */
+const dockIcons: Record<string, ReactNode> = {
+  home: <path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="6" />
+      <path d="m20 20-4.2-4.2" />
+    </>
+  ),
+  saved: <path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-3.8L6 20V5.5a1 1 0 0 1 1-1z" />,
+  profile: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 19.5c1.2-3.2 3.8-5 7-5s5.8 1.8 7 5" />
+    </>
+  ),
+};
+
+function DockIcon({ name }: { name: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      {dockIcons[name]}
+    </svg>
+  );
+}
 
 export default function SlidingTabsDemo() {
   const t = useDemoText(copy);
@@ -181,6 +235,10 @@ export default function SlidingTabsDemo() {
         items={t.orders.map((o) => ({ ...o, content: <p className="text-sm leading-relaxed text-muted-foreground">{o.content}</p> }))}
         contentClassName="min-h-20 p-4"
       />
+
+      <div className="flex justify-center md:col-span-2">
+        <SlidingTabs variant="dock" aria-label={t.dockLabel} items={t.dock.map((d) => ({ ...d, icon: <DockIcon name={d.value} /> }))} />
+      </div>
 
       <div className="md:col-span-2">
         <SlidingTabs

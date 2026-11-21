@@ -54,6 +54,8 @@ export interface SlidingTabItem {
   disabled?: boolean;
   /** When given, becomes the tab content; omit when used only as a selector */
   content?: ReactNode;
+  /** Icon before the label. Required for dock, where only the selected tab shows its label */
+  icon?: ReactNode;
 }
 
 type Single = { multiple?: false; value?: string; defaultValue?: string; onValueChange?: (value: string) => void };
@@ -61,8 +63,8 @@ type Multi = { multiple: true; value?: string[]; defaultValue?: string[]; onValu
 
 export type SlidingTabsProps = (Single | Multi) & {
   items: SlidingTabItem[];
-  /** underline: underlined tabs; segment: segmented control; chips: filter chips (works with multiple); folder: browser-style folder tabs, the selected tab joins the content panel */
-  variant?: "underline" | "segment" | "chips" | "folder";
+  /** underline: underlined tabs; segment: segmented control; chips: filter chips (works with multiple); folder: browser-style folder tabs, the selected tab joins the content panel; dock: icon-only pill bar where the selected tab grows to show its label, for app tab bars and toolbars */
+  variant?: "underline" | "segment" | "chips" | "folder" | "dock";
   /** Style of count: inline is a muted number beside the label; badge is a small pill, brand spot colour when selected. folder defaults to badge, others to inline */
   countStyle?: "inline" | "badge";
   /** Segmented control fills the width */
@@ -77,6 +79,7 @@ export type SlidingTabsProps = (Single | Multi) & {
 export function SlidingTabs(props: SlidingTabsProps) {
   const { items, variant = "underline", fullWidth = false, size = "md", className, contentClassName } = props;
   const folder = variant === "folder";
+  const dock = variant === "dock";
   const countStyle = props.countStyle ?? (folder ? "badge" : "inline");
   const reduce = useReducedMotion();
   const group = useId();
@@ -120,7 +123,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
   };
 
   const active = items.find((i) => i.value === selected[0]);
-  const pad = size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm";
+  const pad = dock ? (size === "sm" ? "h-8 px-2 text-xs" : "h-10 px-3 text-sm") : size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm";
 
   return (
     <div className={cn(folder && edge, className)}>
@@ -135,6 +138,7 @@ export function SlidingTabs(props: SlidingTabsProps) {
             variant === "segment" && cn("rounded-xl border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]", fullWidth ? "w-full" : "w-fit"),
             variant === "chips" && "flex-wrap gap-2",
             folder && "z-10 items-end gap-1 overflow-x-auto overflow-y-hidden px-3 pt-1 [scrollbar-width:none]",
+            dock && "w-fit gap-0.5 rounded-full border border-foreground/10 bg-card p-1 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_8px_24px_-12px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
           )}
         >
           {items.map((item, index) => {
@@ -158,7 +162,8 @@ export function SlidingTabs(props: SlidingTabsProps) {
                   "relative inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap font-medium outline-offset-2 transition-[color,background-color,border-color,opacity,scale] focus-visible:outline-2 disabled:pointer-events-none disabled:opacity-40 motion-safe:active:scale-[0.97]",
                   pad,
                   variant === "segment" && fullWidth && "flex-1",
-                  variant === "chips" ? "rounded-full border" : folder ? "rounded-t-lg" : "rounded-md",
+                  variant === "chips" || dock ? cn("rounded-full", variant === "chips" && "border") : folder ? "rounded-t-lg" : "rounded-md",
+                  dock && "gap-0",
                   folder && !on && "hover:bg-foreground/[0.04]",
                   variant === "chips" && (on ? spotBorder : "border-foreground/10 hover:border-foreground/40"),
                   on ? (variant === "chips" ? spotOn : "text-foreground") : "text-muted-foreground hover:text-foreground",
@@ -185,6 +190,9 @@ export function SlidingTabs(props: SlidingTabsProps) {
                     <motion.span layout className="absolute -left-2 bottom-0 size-2" style={{ background: flare("0 0") }} />
                     <motion.span layout className="absolute -right-2 bottom-0 size-2" style={{ background: flare("100% 0") }} />
                   </motion.span>
+                )}
+                {on && dock && (
+                  <motion.span layoutId="ind" transition={t} aria-hidden="true" className="absolute inset-0 rounded-full bg-foreground/[0.07] dark:bg-foreground/[0.1]" />
                 )}
                 {variant === "chips" && (
                   <motion.span
@@ -214,7 +222,34 @@ export function SlidingTabs(props: SlidingTabsProps) {
                     </motion.svg>
                   )}
                 </AnimatePresence>
-                <span className="relative">{item.label}</span>
+                {item.icon && (
+                  <span aria-hidden="true" className="relative inline-flex size-5 shrink-0 items-center justify-center [&_svg]:size-[18px]">
+                    {item.icon}
+                  </span>
+                )}
+                {dock ? (
+                  // Only the selected tab shows its label; the others keep it for screen readers. The width animates so the pill grows instead of jumping
+                  <>
+                    <AnimatePresence initial={false}>
+                      {on && (
+                        <motion.span
+                          key="label"
+                          aria-hidden="true"
+                          initial={reduce ? false : { width: 0, opacity: 0 }}
+                          animate={{ width: "auto", opacity: 1 }}
+                          exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { width: 0, opacity: 0 }}
+                          transition={t}
+                          className="relative overflow-hidden"
+                        >
+                          <span className="block pl-1.5 pr-1">{item.label}</span>
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                    <span className="sr-only">{item.label}</span>
+                  </>
+                ) : (
+                  <span className="relative">{item.label}</span>
+                )}
                 {item.count !== undefined &&
                   (countStyle === "badge" ? (
                     <CountBadge count={item.count} tone={!on ? "muted" : variant === "chips" ? "onSpot" : "spot"} />

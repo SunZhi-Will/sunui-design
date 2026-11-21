@@ -1674,7 +1674,7 @@
       "name": "floating-field",
       "type": "registry:block",
       "title": "Floating Field",
-      "description": "A text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in muted text and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line. With strength it becomes a password field with a four-segment concave meter that fills by level (the spot colour only when every rule passes) and a live checklist of configurable rules; the show/hide button still goes in the trailing slot. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
+      "description": "A text field that tells you what is left and fixes the obvious: with mask (for example 999-9999) typed characters are followed by the remaining slots in muted text and separators are added for you; with suggest (suggestEmail is exported) it offers a fix for common email domain typos after you leave the field, such as gmial.com to gmail.com, and accepting swaps only the wrong letters in place; with maxLength a character count sits on the label line, or with counter=\"ring\" a small ring fills as you type and shows the characters left in the last tenth. With strength it becomes a password field with a four-segment concave meter that fills by level (the spot colour only when every rule passes) and a live checklist of configurable rules; the show/hide button still goes in the trailing slot. The floated label stays readable at 12px, and validation, hints, server errors, textarea and the trailing slot work as before. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3780,7 +3780,7 @@
       "name": "sliding-tabs",
       "type": "registry:block",
       "title": "Sliding Tabs",
-      "description": "One choice control in four shapes: underline tabs with content panels, a segmented control, filter chips and browser-style folder tabs where the active tab is a raised surface joined to the panel below, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label, as plain numbers or as small badges with countStyle=\"badge\" (the default for folder).",
+      "description": "One choice control in five shapes: underline tabs with content panels, a segmented control, filter chips and browser-style folder tabs where the active tab is a raised surface joined to the panel below, and an icon-only dock where the selected tab grows to show its label, all with an indicator that slides between options. Chips switch to multi select with a check that grows in. Arrow keys, Home and End move focus, roles change to tablist, radiogroup or toggle buttons to match, and counts can sit beside each label, as plain numbers or as small badges with countStyle=\"badge\" (the default for folder).",
       "dependencies": [
         "framer-motion"
       ],
