@@ -84,7 +84,7 @@ export function LivePreview({
 
   return (
     <div ref={frameRef} className="absolute inset-0">
-      {/* 載入前的佔位：深色是分享圖，淺色是靜態的淺底（不脈動，一整面卡片同時閃很吵）。
+      {/* 載入前的佔位：深淺色各用自己主題截的分享圖，底下墊一層靜態的淺底（不脈動，一整面卡片同時閃很吵）。
           iframe 先花 300ms 淡入蓋上，佔位等它蓋滿才退場，中間不會露出空白或疊影（SITE-MOTION.md §4） */}
       <div
         aria-hidden="true"
@@ -95,7 +95,11 @@ export function LivePreview({
       >
         <div className="absolute inset-0 bg-stage/60" />
         {poster && (
-          <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="hidden object-cover dark:block" />
+          <>
+            {/* 淺色主題用 public/og/blocks-light 的淺色截圖（2026-11-22 起兩套都截），深色用 public/og/blocks */}
+            <Image src={poster.replace("/og/blocks/", "/og/blocks-light/")} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="object-cover dark:hidden" />
+            <Image src={poster} alt="" fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" className="hidden object-cover dark:block" />
+          </>
         )}
       </div>
       {near && (

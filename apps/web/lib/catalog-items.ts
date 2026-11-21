@@ -25,7 +25,8 @@ export function buildCatalogItems(all: RegistryItem[], locale: Locale) {
       en: { title: item.title, description: item.description },
       spot: usesSpot(item) || undefined,
       // 有分享圖的區塊，卡片在 iframe 載入前先顯示它，捲動時才不會一片空白
-      poster: existsSync(path.join(process.cwd(), "public/og/blocks", `${item.name}.jpg`)) || undefined,
+      // 深淺兩套截圖都要有才當底圖，不然淺色主題會出現破圖
+      poster: (existsSync(path.join(process.cwd(), "public/og/blocks", `${item.name}.jpg`)) && existsSync(path.join(process.cwd(), "public/og/blocks-light", `${item.name}.jpg`))) || undefined,
     };
     // 效果庫一種樣式一張卡，避免好幾種效果擠在同一個預覽裡看不清楚；型錄預設會收合成一張
     const variants = variantIds[name];
