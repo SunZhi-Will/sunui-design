@@ -595,6 +595,15 @@ const en = {
     animatedBody:
       "`AnimatedIcon` uses the same shapes. Hover icons play when their parent button is hovered or focused, so the whole control is the trigger. Toggle icons follow `active`, and loading icons loop only while it is true. Under reduced motion every icon jumps straight to its end state.",
   },
+  iconWall: {
+    title: "Every animated icon, on one screen",
+    note: "{n} icons playing at once. In the gallery below, each one plays when you hover it.",
+    styleLabel: "Wall style",
+    line: "Line",
+    pixel: "Pixel",
+    pause: "Pause",
+    play: "Play",
+  },
   iconGallery: {
     styleLabel: "Icon style",
     static: "Static",
@@ -1224,6 +1233,15 @@ const zhTW: Messages = {
     animatedBody:
       "`AnimatedIcon` 使用相同的圖形。懸停類圖示會在外層按鈕被懸停或聚焦時播放，整個控制項都是觸發範圍。切換類圖示跟隨 `active`，載入類圖示只在它為 true 時循環。開啟減少動態時，每個圖示都直接跳到結束狀態。",
   },
+  iconWall: {
+    title: "所有動態圖示，同一個畫面",
+    note: "{n} 個圖示同時播放。下方圖庫裡，滑過哪一個就播哪一個。",
+    styleLabel: "牆的風格",
+    line: "線條",
+    pixel: "像素",
+    pause: "暫停",
+    play: "播放",
+  },
   iconGallery: {
     styleLabel: "圖示樣式",
     static: "靜態",
@@ -1843,6 +1861,15 @@ const zhCN: Messages = {
     animatedTitle: "动效图标",
     animatedBody:
       "`AnimatedIcon` 使用相同的图形。悬停类图标会在外层按钮被悬停或聚焦时播放，整个控件都是触发区域。切换类图标跟随 `active`，加载类图标只在它为 true 时循环。开启减弱动态效果时，每个图标都直接跳到结束状态。",
+  },
+  iconWall: {
+    title: "所有动态图标，同一个画面",
+    note: "{n} 个图标同时播放。下方图库里，划过哪一个就播放哪一个。",
+    styleLabel: "墙的风格",
+    line: "线条",
+    pixel: "像素",
+    pause: "暂停",
+    play: "播放",
   },
   iconGallery: {
     styleLabel: "图标样式",
@@ -2478,6 +2505,15 @@ const ja: Messages = {
     animatedTitle: "アニメーションアイコン",
     animatedBody:
       "`AnimatedIcon` は同じ図形を使います。ホバー型は親のボタンがホバーまたはフォーカスされると再生され、コントロール全体がトリガーになります。トグル型は `active` に従い、ローディング型は true の間だけループします。視差効果を減らす設定では、どのアイコンも最終状態にすぐ切り替わります。",
+  },
+  iconWall: {
+    title: "すべてのアニメーションアイコンを一画面で",
+    note: "{n} 個のアイコンが同時に動きます。下のギャラリーでは、ホバーしたアイコンだけが再生されます。",
+    styleLabel: "表示スタイル",
+    line: "線",
+    pixel: "ピクセル",
+    pause: "一時停止",
+    play: "再生",
   },
   iconGallery: {
     styleLabel: "アイコンのスタイル",

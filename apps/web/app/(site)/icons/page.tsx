@@ -4,6 +4,7 @@ import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { CommandTabs } from "@/components/command-tabs";
 import { IconGallery } from "@/components/icon-gallery";
+import { IconWall } from "@/components/icon-wall";
 import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
@@ -42,6 +43,8 @@ export default async function IconsPage() {
         </CommandTabs>
         </div>
       </section>
+
+      <IconWall messages={m.iconWall} />
 
       <ul className="mb-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {rules.map((rule) => (
