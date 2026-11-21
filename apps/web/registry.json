@@ -5496,6 +5496,150 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "social-button",
+      "type": "registry:ui",
+      "title": "Social Button",
+      "description": "Solid, platform-coloured round buttons for GitHub, X, LinkedIn, Instagram, Facebook, YouTube, email and a website, or any brand with your own glyph and colour. A titled tooltip with an arrow on any side, shown on hover and focus, kept visible as a label, or left to screen readers. Lifts 2px on hover and presses to 0.97 on a snappy spring. SocialButtons lays them out in a row, a column or a grid. Restored from the classic SunUI SocialButton.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "button",
+        "navigation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "hover",
+        "addedAt": "2026-11-22",
+        "usage": {
+          "whenToUse": [
+            "Colourful follow buttons on a studio, creator or event page",
+            "A labelled grid of channels in a contact or press section",
+            "The buttons inside a floating social menu (floating-social uses this)"
+          ],
+          "watchOut": [
+            "Profile links, not share buttons: to share the current page use the system share sheet or a copy-link button",
+            "Brand colours are loud; one row per page is usually enough. For a quiet footer use social-links instead",
+            "Icon-only buttons need the tooltip or nearby text that names the accounts"
+          ],
+          "aliases": [
+            "social buttons",
+            "coloured social icons",
+            "brand social buttons",
+            "follow buttons",
+            "social media buttons",
+            "SocialButton"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/social-button/social-button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "floating-social",
+      "type": "registry:block",
+      "title": "Floating Social",
+      "description": "A corner button that fans out platform-coloured social buttons. Three layouts from the classic SunUI FloatingButton: petal (quarter-circle rings of 3, then 5), column and grid. Buttons spring out with a short stagger and fold back in reverse; the menu icon's three lines fold into a cross. Pins to the viewport or to a positioned parent, any of four corners. Escape closes and returns focus, a press outside closes, aria-expanded on the main button. The main button takes the brand spot colour.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@sunui/social-button"
+      ],
+      "categories": [
+        "button",
+        "navigation",
+        "marketing"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "click",
+        "addedAt": "2026-11-22",
+        "usage": {
+          "whenToUse": [
+            "A floating follow or contact menu on a portfolio, landing page or small shop site",
+            "Keeping social links reachable on long pages without a footer trip"
+          ],
+          "watchOut": [
+            "One floating button per page, and keep clear of chat widgets and cookie banners in the same corner",
+            "Five to eight links read well in petal; more than eight pushes the second ring far out, use grid",
+            "On small screens keep it closed by default so it does not cover content"
+          ],
+          "aliases": [
+            "floating action button",
+            "FAB",
+            "speed dial",
+            "floating social menu",
+            "radial social menu",
+            "FloatingButton"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/floating-social/floating-social.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "skill-grid",
+      "type": "registry:block",
+      "title": "Skill Grid",
+      "description": "A wall of logo tiles in hexagons, circles or squares, each lightly tinted with its own logo colour and a little more on hover. Category chips above re-flow the wall with shared layout springs: tiles that stay slide to their new place, the rest scale out. The active chip is a pill in the brand spot colour that slides between chips. Tiles can be pressable. Restored from the classic SunUI FilterGrid.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "marketing",
+        "grid"
+      ],
+      "meta": {
+        "tier": "free",
+        "interaction": "click",
+        "addedAt": "2026-11-22",
+        "usage": {
+          "whenToUse": [
+            "The skills or stack section of a developer or designer portfolio",
+            "An integrations or tech partners wall with a category filter",
+            "A tools-we-use section on an agency or studio page"
+          ],
+          "watchOut": [
+            "Built for up to about 30 tiles; for a long catalog use a real list with search",
+            "Pass logo colours that read on light and dark; near-black logos tint grey",
+            "Loading logos from a CDN adds requests: ship your own files or inline SVGs in production"
+          ],
+          "aliases": [
+            "skills grid",
+            "tech stack",
+            "logo wall",
+            "hexagon grid",
+            "honeycomb",
+            "integrations grid",
+            "FilterGrid"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/skill-grid/skill-grid.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

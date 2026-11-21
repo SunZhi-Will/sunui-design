@@ -176,6 +176,20 @@
       "env": {
         "NEXT_DIST_DIR": ".next-before"
       }
+    },
+    {
+      "name": "storybook-legacy",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "storybook",
+        "dev",
+        "-p",
+        "6006",
+        "--ci",
+        "--no-open"
+      ],
+      "port": 6006,
+      "autoPort": false
     }
   ]
 }
