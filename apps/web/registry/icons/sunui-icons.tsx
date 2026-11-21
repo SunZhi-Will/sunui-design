@@ -11,7 +11,15 @@ import type { SVGProps } from "react";
  * - 紙品類圖示帶實體細節：票券有半圓缺口與打孔線、收據有鋸齒底、印章微微傾斜。
  */
 
-type Shape = { accent?: boolean; fill?: boolean; dash?: string };
+type Shape = {
+  accent?: boolean;
+  fill?: boolean;
+  dash?: string;
+  /** 雙色的面（sunui-twotone-icons 用）：body 淺色主體、mid 中間色。填色並以同色細描邊修圓角 */
+  tone?: "body" | "mid";
+  /** 這個部位自己的線寬（雙色細節用 1.8 到 2），不受 strokeWidth 影響 */
+  sw?: number;
+};
 export type IconNode =
   | string
   | (Shape & { d: string })
@@ -315,14 +323,31 @@ export function Glyph({ nodes, size = 24, strokeWidth = 1.5, title, ...rest }: G
   );
 }
 
+/**
+ * 雙色面的顏色與透明度。預設主體 = currentColor 20%、中間色 = 45%；
+ * 設定 --sunui-icon-body / --sunui-icon-mid（加上 --sunui-icon-body-opacity / --sunui-icon-mid-opacity: 1）可換成別的顏色。
+ * 透明度放在整個元素上，描邊與填色重疊處才不會出現較深的邊；所以主體之間不要重疊。
+ */
+export function toneStyle(tone: "body" | "mid") {
+  return {
+    fill: `var(--sunui-icon-${tone}, currentColor)`,
+    stroke: `var(--sunui-icon-${tone}, currentColor)`,
+    opacity: `var(--sunui-icon-${tone}-opacity, ${tone === "body" ? 0.2 : 0.45})`,
+    strokeWidth: 1.2,
+  };
+}
+
 function renderNode(node: IconNode, key: number) {
   if (typeof node === "string") return <path key={key} d={node} />;
   const paint = node.accent ? ACCENT : "currentColor";
-  const props = {
-    stroke: node.fill ? "none" : node.accent ? paint : undefined,
-    fill: node.fill ? paint : undefined,
-    strokeDasharray: node.dash,
-  };
+  const props = node.tone
+    ? { style: toneStyle(node.tone) }
+    : {
+        stroke: node.fill ? "none" : node.accent ? paint : undefined,
+        fill: node.fill ? paint : undefined,
+        strokeDasharray: node.dash,
+        strokeWidth: node.sw,
+      };
   if ("d" in node) return <path key={key} {...props} d={node.d} />;
   if ("c" in node) return <circle key={key} {...props} cx={node.c[0]} cy={node.c[1]} r={node.c[2]} />;
   const [x, y, width, height, rx] = node.r;

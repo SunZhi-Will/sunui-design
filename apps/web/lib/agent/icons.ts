@@ -208,7 +208,10 @@ function lineBody(nodes: readonly IconNode[], accent: string, jsx: boolean) {
     .map((node) => {
       if (typeof node === "string") return `<path d="${node}"/>`;
       const paint = node.accent ? accent : "currentColor";
-      const common = `${attr("stroke", node.fill ? "none" : node.accent ? paint : undefined)}${attr("fill", node.fill ? paint : undefined)}${attr("stroke-dasharray", node.dash)}`;
+      // 雙色的面：currentColor 加透明度，獨立 SVG 不需要 CSS 變數
+      const common = node.tone
+        ? `${attr("fill", "currentColor")}${attr("stroke", "currentColor")}${attr("stroke-width", 1.2)}${attr("opacity", node.tone === "body" ? 0.2 : 0.45)}`
+        : `${attr("stroke", node.fill ? "none" : node.accent ? paint : undefined)}${attr("fill", node.fill ? paint : undefined)}${attr("stroke-dasharray", node.dash)}${attr("stroke-width", node.sw)}`;
       if ("d" in node) return `<path${common} d="${node.d}"/>`;
       if ("c" in node) return `<circle${common} cx="${node.c[0]}" cy="${node.c[1]}" r="${node.c[2]}"/>`;
       const [x, y, w, h, rx] = node.r;

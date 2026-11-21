@@ -1,11 +1,11 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { useStaggerPlay } from "@/components/use-stagger-play";
 import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
-import { lineIconColor } from "@/lib/line-icon-colors";
+import { lineIconTone } from "@/lib/line-icon-colors";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
@@ -21,21 +21,33 @@ import {
   type AnimatedIconName,
   type MotionKind,
 } from "@/registry/icons/sunui-animated-icons";
+import {
+  AnimatedTwoToneIcon,
+  animatedTwoToneIconNames,
+  twoToneMotionKindOf,
+  type AnimatedTwoToneIconName,
+} from "@/registry/icons/sunui-animated-twotone-icons";
 import { Icon, icons, type IconName } from "@/registry/icons/sunui-icons";
+import { TwoToneIcon, twoToneIconNames, twoToneIcons, type TwoToneIconName } from "@/registry/icons/sunui-twotone-icons";
 import { PixelIcon, pixelIconNames, pixelIcons, type PixelIconName } from "@/registry/icons/sunui-pixel-icons";
 
 const sizes = [16, 20, 24, 32] as const;
+const strokes = [1.25, 1.5, 1.75] as const;
 // 像素圖示只在 16 的整數倍下銳利
 const pixelSizes = [16, 32, 48] as const;
-const strokes = [1.25, 1.5, 1.75] as const;
-type Style = "line" | "pixel";
+// 2026-11-22：三套。像素優先，雙色是新的一套（先做 24 個常用），線條保留
+type Style = "pixel" | "twotone" | "line";
 type Motion = "static" | "animated";
 
 const animatedSet = new Set<string>(animatedIconNames);
+const twoToneSet = new Set<string>(twoToneIconNames);
+const animatedTwoToneSet = new Set<string>(animatedTwoToneIconNames);
+const sources: Record<Style, Record<string, unknown>> = { pixel: pixelIcons, twotone: twoToneIcons, line: icons };
 const animatedPixelSet = new Set<string>(animatedPixelIconNames);
 const extraKeywords: Record<string, string> = { theme: "dark light mode toggle sun moon 深色 主題" };
 const counts: Record<Style, Record<Motion, number>> = {
   line: { static: iconGroups.reduce((sum, group) => sum + group.icons.length, 0), animated: animatedIconNames.length },
+  twotone: { static: twoToneIconNames.length, animated: animatedTwoToneIconNames.length },
   pixel: { static: pixelIconNames.length, animated: animatedPixelIconNames.length },
 };
 
@@ -62,7 +74,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isPixel = style === "pixel";
-  const motionSet = isPixel ? animatedPixelSet : animatedSet;
+  const isTwoTone = style === "twotone";
+  const motionSet = isPixel ? animatedPixelSet : isTwoTone ? animatedTwoToneSet : animatedSet;
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -71,7 +84,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     const base = source.map((group) => ({
       ...group,
       ...t.groups[group.id],
-      icons: group.icons as string[],
+      // 雙色共用線條的分組，只列已經畫好的
+      icons: (group.icons as string[]).filter((name) => !isTwoTone || twoToneSet.has(name)),
     }));
     return base
       .map((group) => ({
@@ -85,7 +99,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           : group.icons,
       }))
       .filter((group) => group.icons.length > 0);
-  }, [query, isPixel, t]);
+  }, [query, isPixel, isTwoTone, t]);
 
   // 網址帶 ?icon=coupon（像素，預設）或 ?icon=coupon&style=line 可直接打開某個圖示（參考 iconmcp.com 的分享方式）
   const [linked, setLinked] = useState(false);
@@ -93,8 +107,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     const params = new URLSearchParams(window.location.search);
     const s = params.get("style");
     const name = params.get("icon");
-    if (s === "pixel" || s === "line") setStyle(s);
-    if (name && name in (s === "line" ? icons : pixelIcons)) setSelected(name);
+    if (s === "pixel" || s === "line" || s === "twotone") setStyle(s);
+    if (name && name in sources[s === "line" || s === "twotone" ? s : "pixel"]) setSelected(name);
     setLinked(true);
   }, []);
   useEffect(() => {
@@ -103,9 +117,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     url.searchParams.set("icon", selected);
     // 預設是像素，所以線條才寫進網址
     if (isPixel) url.searchParams.delete("style");
-    else url.searchParams.set("style", "line");
+    else url.searchParams.set("style", style);
     window.history.replaceState(null, "", url);
-  }, [linked, selected, isPixel]);
+  }, [linked, selected, isPixel, style]);
 
   const shown = category === "all" ? groups : groups.filter((group) => group.id === category);
   const visible = useMemo(() => [...new Set(shown.flatMap((group) => group.icons))], [shown]);
@@ -127,27 +141,35 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       ? null
       : isPixel
         ? pixelMotionKindOf(name as AnimatedPixelIconName)
-        : motionKindOf(name as AnimatedIconName);
+        : isTwoTone
+          ? twoToneMotionKindOf(name as AnimatedTwoToneIconName)
+          : motionKindOf(name as AnimatedIconName);
   const kind = kindOf(selected);
   const isAnimated = kind !== null;
   const size = isPixel ? pixelSize : strokeSize;
   const sizeOptions = isPixel ? pixelSizes : sizes;
   const activeProp = kind && kind !== "hover" ? ` active={${kind === "loop" ? "loading" : "on"}}` : "";
-  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}${pigment ? ` color="${lineIconColor(selected)}"` : ""}`;
+  // 線條上色只要 color；雙色另外要主體色的 CSS 變數
+  const tintProp = !pigment ? "" : isTwoTone ? ` style={${JSON.stringify(lineIconTone(selected))}}` : ` color="${lineIconTone(selected).color}"`;
+  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${!isTwoTone && stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}${tintProp}`;
   const pixelProps = `${pixelSize !== 16 ? ` size={${pixelSize}}` : ""}${pigment ? ` tone="pigment"` : ""}`;
-  const component = isPixel ? (isAnimated ? "AnimatedPixelIcon" : "PixelIcon") : isAnimated ? "AnimatedIcon" : "Icon";
+  const component = isPixel
+    ? isAnimated ? "AnimatedPixelIcon" : "PixelIcon"
+    : isTwoTone
+      ? isAnimated ? "AnimatedTwoToneIcon" : "TwoToneIcon"
+      : isAnimated ? "AnimatedIcon" : "Icon";
   const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
 
   const tone = pigment ? "pigment" : "ink";
   const tags = `${iconKeywords[selected as IconName | PixelIconName] ?? ""}`.split(/\s+/).filter(Boolean);
   const related = (groups.find((group) => group.icons.includes(selected))?.icons ?? []).filter((name) => name !== selected).slice(0, 8);
 
-  // 彩色模式下線條圖示用自己的本色（SVG 的 color 屬性，currentColor 會跟著它）
-  const lineTint = (name: string) => (pigment ? lineIconColor(name) : undefined);
+  // 彩色模式下雙色圖示用自己的本色：細節是 color，主體是同色相的淺色
+  const lineTint = (name: string) => (pigment ? (lineIconTone(name) as CSSProperties) : undefined);
 
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
-    if (!(name in (isPixel ? pixelIcons : icons)) && !motionSet.has(name)) return null;
+    if (!(name in sources[style]) && !motionSet.has(name)) return null;
     const k = kindOf(name);
     const active = k && k !== "hover" ? Boolean(toggled[name]) : undefined;
     // key 用名稱：換圖示時重新掛載，不沿用上一個圖示的影格
@@ -158,10 +180,17 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
         <PixelIcon key={name} name={name as PixelIconName} size={px} tone={tone} />
       );
     }
+    if (isTwoTone) {
+      return k ? (
+        <AnimatedTwoToneIcon key={name} name={name as AnimatedTwoToneIconName} size={px} active={active} style={lineTint(name)} />
+      ) : (
+        <TwoToneIcon key={name} name={name as TwoToneIconName} size={px} style={lineTint(name)} />
+      );
+    }
     return k ? (
-      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} color={lineTint(name)} />
+      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} style={lineTint(name)} />
     ) : (
-      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} color={lineTint(name)} />
+      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} style={lineTint(name)} />
     );
   }
 
@@ -172,7 +201,11 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     return svg.outerHTML
       .replaceAll("var(--sunui-icon-accent, currentColor)", accent && (isPixel || !pigment) ? "#171717" : "currentColor")
       .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
-      .replaceAll("currentColor", !isPixel && pigment ? lineIconColor(selected) : "currentColor")
+      .replace(/var\(--sunui-icon-(body|mid), currentColor\)/g, (_, k: "body" | "mid") =>
+        !isPixel && pigment ? lineIconTone(selected)[`--sunui-icon-${k}`] : "currentColor",
+      )
+      .replace(/var\(--sunui-icon-(?:body|mid)-opacity, ([\d.]+)\)/g, (_, v: string) => (!isPixel && pigment ? "1" : v))
+      .replaceAll("currentColor", !isPixel && pigment ? lineIconTone(selected).color : "currentColor")
       .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
       .replace(/ width="[^"]*" height="[^"]*"/, ` width="${size}" height="${size}"`)
       .replace(/ data-icon="[^"]*"/, "")
@@ -183,7 +216,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     const value = standaloneSvg();
     if (!value) return;
     const url = URL.createObjectURL(new Blob([value], { type: "image/svg+xml" }));
-    const link = Object.assign(document.createElement("a"), { href: url, download: `${selected}${isPixel ? "-pixel" : ""}.svg` });
+    const link = Object.assign(document.createElement("a"), { href: url, download: `${selected}${isPixel ? "-pixel" : isTwoTone ? "-twotone" : ""}.svg` });
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -202,6 +235,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
 
   const styleIcon: Record<Style, ReactNode> = {
     line: <Icon name="coupon" size={16} />,
+    twotone: <TwoToneIcon name="heart" size={16} />,
     pixel: <PixelIcon name="heart" size={16} />,
   };
 
@@ -222,7 +256,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           </label>
           <Tabs
             label={t.styleLabel}
-            options={["pixel", "line"] as const}
+            options={["pixel", "twotone", "line"] as const}
             value={style}
             onChange={(next) => {
               setStyle(next);
@@ -231,7 +265,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             render={(s) => (
               <>
                 {styleIcon[s]}
-                {s === "line" ? t.line : t.pixel}
+                {s === "line" ? t.line : s === "twotone" ? t.twoTone : t.pixel}
                 <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s].static}</span>
               </>
             )}
@@ -282,7 +316,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
                 <CanvasCell
                   key={`${style}-${name}`}
                   name={name}
-                  pixel={isPixel}
+                  variant={style}
                   animated={motionSet.has(name)}
                   color={pigment}
                   on={Boolean(playing[name])}
@@ -349,7 +383,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             value={size}
             onChange={isPixel ? setPixelSize : setStrokeSize}
           />
-          {!isPixel && <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />}
+          {style === "line" && <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />}
           {motionSet.has(selected) && (
             <button
               type="button"
@@ -544,7 +578,7 @@ function Segmented<T extends number>({
 /** 畫布上的一格：沒有文字，名稱放在 title 與 aria-label；有動態版就由外部的 on 驅動播放 */
 const CanvasCell = memo(function CanvasCell({
   name,
-  pixel,
+  variant,
   animated,
   color,
   on,
@@ -552,7 +586,7 @@ const CanvasCell = memo(function CanvasCell({
   onSelect,
 }: {
   name: string;
-  pixel: boolean;
+  variant: Style;
   animated: boolean;
   color: boolean;
   on: boolean;
@@ -560,7 +594,8 @@ const CanvasCell = memo(function CanvasCell({
   onSelect: (name: string) => void;
 }) {
   const tone = color ? "pigment" : "ink";
-  const tint = color && !pixel ? lineIconColor(name) : undefined;
+  const pixel = variant === "pixel";
+  const tint = color && !pixel ? (lineIconTone(name) as CSSProperties) : undefined;
   return (
     <li>
       <button
@@ -580,10 +615,16 @@ const CanvasCell = memo(function CanvasCell({
           ) : (
             <PixelIcon name={name as PixelIconName} size={32} tone={tone} />
           )
+        ) : variant === "twotone" ? (
+          animated ? (
+            <AnimatedTwoToneIcon name={name as AnimatedTwoToneIconName} size={24} active={on} style={tint} />
+          ) : (
+            <TwoToneIcon name={name as TwoToneIconName} size={24} style={tint} />
+          )
         ) : animated ? (
-          <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} color={tint} />
+          <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} style={tint} />
         ) : (
-          <Icon name={name as IconName} size={24} color={tint} />
+          <Icon name={name as IconName} size={24} style={tint} />
         )}
       </button>
     </li>

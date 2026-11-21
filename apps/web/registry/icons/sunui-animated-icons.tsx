@@ -3,7 +3,7 @@
 import { motion, useReducedMotion, type TargetAndTransition, type Transition, type Variants } from "framer-motion";
 import { useEffect, useRef, useState, type SVGProps } from "react";
 
-import { icons, type IconName, type IconNode } from "./sunui-icons";
+import { icons, toneStyle, type IconName, type IconNode } from "./sunui-icons";
 
 /**
  * SunUI Animated Icons
@@ -309,12 +309,14 @@ export function AnimatedGlyph({
 function renderNode(node: IconNode, key: number, part: IconPart | undefined, kind: MotionKind, reduce: boolean) {
   const n = typeof node === "string" ? { d: node } : node;
   const paint = n.accent ? ACCENT : "currentColor";
+  const tone = n.tone ? toneStyle(n.tone) : undefined;
   const props = {
-    stroke: n.fill ? "none" : n.accent ? paint : undefined,
-    fill: n.fill ? paint : undefined,
+    stroke: tone ? undefined : n.fill ? "none" : n.accent ? paint : undefined,
+    fill: tone ? undefined : n.fill ? paint : undefined,
     strokeDasharray: n.dash,
+    strokeWidth: tone ? undefined : n.sw,
     variants: part ? variants(part, kind, reduce) : undefined,
-    style: part ? origin(part.origin) : undefined,
+    style: part || tone ? { ...tone, ...(part ? origin(part.origin) : {}) } : undefined,
   };
   if ("d" in n) return <motion.path key={key} {...props} d={n.d} />;
   if ("c" in n) return <motion.circle key={key} {...props} cx={n.c[0]} cy={n.c[1]} r={n.c[2]} />;

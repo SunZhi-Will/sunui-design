@@ -2,7 +2,7 @@
 // 圖示自檢：用無頭 Chrome 截下 /preview/icons 的每一頁，給人或 agent 對照 ICONS.md 檢查。
 // 不需要任何 npm 套件，只要本機有 Chrome 系的瀏覽器，以及正在跑的網站（npm run web:dev）。
 //
-//   node apps/web/scripts/check-icons.mjs [--set line|pixel|all] [--only a,b] [--with c,d]
+//   node apps/web/scripts/check-icons.mjs [--set line|twotone|pixel|all] [--only a,b] [--with c,d]
 //                                         [--theme light|dark|both] [--no-accent] [--scale 3]
 //                                         [--base http://localhost:3100] [--out dir]
 //
@@ -40,9 +40,9 @@ const scale = Math.max(1, Number(opt("--scale", 2)) || 2);
 const base = opt("--base", process.env.SUNUI_BASE || "http://localhost:3100").replace(/\/$/, "");
 const out = path.resolve(opt("--out", path.join(root, "check-out", "icons")));
 
-if (!["line", "pixel", "all"].includes(setArg)) fail("--set takes line, pixel or all.");
+if (!["line", "twotone", "pixel", "all"].includes(setArg)) fail("--set takes line, twotone, pixel or all.");
 if (!["light", "dark", "both"].includes(themeArg)) fail("--theme takes light, dark or both.");
-const sets = setArg === "all" ? ["line", "pixel"] : [setArg];
+const sets = setArg === "all" ? ["line", "twotone", "pixel"] : [setArg];
 const themes = themeArg === "both" ? ["light", "dark"] : [themeArg];
 
 const found = findChrome();

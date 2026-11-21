@@ -25,6 +25,24 @@ const items = {
     dependencies: ["framer-motion"],
     registryDependencies: ["sunui-icons"],
   },
+  "sunui-twotone-icons": {
+    title: "SunUI Two-tone Icons",
+    description:
+      "SunUI's two-tone icons on the same 24px grid as the line set: a solid light body plus currentColor details, no gradients or shadows. Mono by default (the body is currentColor at 20%); set color for the details and --sunui-icon-body (with --sunui-icon-body-opacity: 1) for a coloured body. Same names as the line set.",
+    source: "registry/icons/sunui-twotone-icons.tsx",
+    target: "components/ui/sunui-twotone-icons.tsx",
+    dependencies: [] as string[],
+    registryDependencies: ["sunui-icons"],
+  },
+  "sunui-animated-twotone-icons": {
+    title: "SunUI Animated Two-tone Icons",
+    description:
+      "Animated versions of SunUI two-tone icons on the same geometry and motion rules as the animated line set: hover icons play when their button is hovered or focused, toggle icons switch with an active prop. Respects reduced motion.",
+    source: "registry/icons/sunui-animated-twotone-icons.tsx",
+    target: "components/ui/sunui-animated-twotone-icons.tsx",
+    dependencies: ["framer-motion"],
+    registryDependencies: ["sunui-animated-icons", "sunui-twotone-icons"],
+  },
   "sunui-pixel-icons": {
     title: "SunUI Pixel Icons",
     description:

@@ -3,8 +3,10 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 import { recipes, type AnimatedIconName } from "@/registry/icons/sunui-animated-icons";
+import { twoToneRecipes, type AnimatedTwoToneIconName } from "@/registry/icons/sunui-animated-twotone-icons";
 import { pixelRecipes, type AnimatedPixelIconName } from "@/registry/icons/sunui-animated-pixel-icons";
-import { Icon, iconNames, icons, type IconName, type IconNode } from "@/registry/icons/sunui-icons";
+import { Icon, iconNames, icons, toneStyle, type IconName, type IconNode } from "@/registry/icons/sunui-icons";
+import { TwoToneIcon, twoToneIconNames, twoToneIcons, type TwoToneIconName } from "@/registry/icons/sunui-twotone-icons";
 import {
   PixelIcon,
   pixelIconNames,
@@ -22,7 +24,7 @@ import {
  * 參考框：線條版虛線是 3 到 21 的內容區；像素版實線是 16 格邊界，影格畫出框外的部分會露在外面。
  */
 
-export type CheckSet = "line" | "pixel";
+export type CheckSet = "line" | "pixel" | "twotone";
 export type CheckSheet = "sizes" | "frames";
 export type CheckTheme = "light" | "dark";
 
@@ -52,8 +54,8 @@ export function IconCheckSheet({ set, sheet, theme, only, refs, accent, page, pe
   const ref = useRef<HTMLDivElement>(null);
   const palette = themes[theme];
 
-  const all: readonly string[] = set === "line" ? iconNames : pixelIconNames;
-  const animated: readonly string[] = set === "line" ? Object.keys(recipes) : Object.keys(pixelRecipes);
+  const all: readonly string[] = set === "line" ? iconNames : set === "twotone" ? twoToneIconNames : pixelIconNames;
+  const animated: readonly string[] = Object.keys(set === "line" ? recipes : set === "twotone" ? twoToneRecipes : pixelRecipes);
   const requested = [...refs, ...only];
   const unknown = requested.filter((name) => !all.includes(name));
   const base = sheet === "frames" ? animated : all;
@@ -116,7 +118,7 @@ function Label({ name, isRef, palette, extra }: { name: string; isRef: boolean; 
 }
 
 function SizesSheet({ set, names, refSet, palette }: { set: CheckSet; names: string[]; refSet: Set<string>; palette: Palette }) {
-  const sizes = set === "line" ? LINE_SIZES : PIXEL_SIZES;
+  const sizes = set === "pixel" ? PIXEL_SIZES : LINE_SIZES;
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 168px)", gap: 8 }}>
       {names.map((name) => (
@@ -126,6 +128,8 @@ function SizesSheet({ set, names, refSet, palette }: { set: CheckSet; names: str
             {sizes.map((size) =>
               set === "line" ? (
                 <Icon key={size} name={name as IconName} size={size} strokeWidth={size >= 32 ? 1.25 : 1.5} />
+              ) : set === "twotone" ? (
+                <TwoToneIcon key={size} name={name as TwoToneIconName} size={size} />
               ) : (
                 <PixelIcon key={size} name={name as PixelIconName} size={size} />
               ),
@@ -152,7 +156,7 @@ function FramesSheet({
 }) {
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      {set === "line" && (
+      {set !== "pixel" && (
         <Row label={<span style={{ color: palette.muted }}>progress</span>}>
           {["rest", ...PROGRESS.map((t) => `${t * 100}%`)].map((head) => (
             <span key={head} style={{ width: FRAME_SIZE + 16, color: palette.muted, textAlign: "center" }}>
@@ -169,6 +173,8 @@ function FramesSheet({
               <Cell palette={palette} set={set}>
                 {set === "line" ? (
                   <Icon name={name as IconName} size={FRAME_SIZE} strokeWidth={1.25} />
+                ) : set === "twotone" ? (
+                  <TwoToneIcon name={name as TwoToneIconName} size={FRAME_SIZE} />
                 ) : (
                   <PixelIcon name={name as PixelIconName} size={FRAME_SIZE} />
                 )}
@@ -176,16 +182,20 @@ function FramesSheet({
             </Row>
           );
         }
-        if (set === "line") {
-          const recipe = recipes[name as AnimatedIconName] as unknown as LineRecipe;
+        if (set !== "pixel") {
+          const recipe = (
+            set === "twotone" ? twoToneRecipes[name as AnimatedTwoToneIconName] : recipes[name as AnimatedIconName]
+          ) as unknown as LineRecipe;
+          const nodes: readonly IconNode[] =
+            recipe.nodes ?? (set === "twotone" ? twoToneIcons[name as TwoToneIconName] : icons[name as IconName]);
           return (
             <Row key={name} label={<Label name={name} isRef={isRef} palette={palette} extra={recipe.kind} />}>
               <Cell palette={palette} set={set}>
-                <LinePose name={name as AnimatedIconName} at={null} />
+                <LinePose recipe={recipe} nodes={nodes} at={null} />
               </Cell>
               {PROGRESS.map((t) => (
                 <Cell key={t} palette={palette} set={set}>
-                  <LinePose name={name as AnimatedIconName} at={t} />
+                  <LinePose recipe={recipe} nodes={nodes} at={t} />
                 </Cell>
               ))}
             </Row>
@@ -224,9 +234,9 @@ function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
 
 /** 一格：框住 48px 的圖示，畫出參考框 */
 function Cell({ children, palette, set, caption }: { children: ReactNode; palette: Palette; set: CheckSet; caption?: string }) {
-  const unit = FRAME_SIZE / (set === "line" ? 24 : 16);
+  const unit = FRAME_SIZE / (set === "pixel" ? 16 : 24);
   const guide: CSSProperties =
-    set === "line"
+    set !== "pixel"
       ? { inset: 3 * unit, border: `1px dashed ${palette.guide}` }
       : { inset: 0, border: `1px solid ${palette.guide}` };
   return (
@@ -329,9 +339,7 @@ function transformOf(pose: Values, origin: [number, number] = [12, 12]) {
   return parts.join(" ");
 }
 
-function LinePose({ name, at }: { name: AnimatedIconName; at: number | null }) {
-  const recipe = recipes[name] as unknown as LineRecipe;
-  const nodes: readonly IconNode[] = recipe.nodes ?? icons[name as IconName];
+function LinePose({ recipe, nodes, at }: { recipe: LineRecipe; nodes: readonly IconNode[]; at: number | null }) {
   const children = nodes.map((node, i) => {
     const part = recipe.parts?.[i];
     const pose = part ? poseOf(part, at) : {};
@@ -367,8 +375,11 @@ function PoseNode({ node, pose, origin }: { node: IconNode; pose: Values; origin
   const paint = n.accent ? ACCENT : "currentColor";
   const length = typeof pose.pathLength === "number" ? Math.max(0, Math.min(1, pose.pathLength)) : 1;
   const props = {
-    stroke: n.fill ? "none" : n.accent ? paint : undefined,
-    fill: n.fill ? paint : undefined,
+    stroke: n.tone ? undefined : n.fill ? "none" : n.accent ? paint : undefined,
+    fill: n.tone ? undefined : n.fill ? paint : undefined,
+    strokeWidth: n.tone ? undefined : n.sw,
+    // 雙色的面：與圖示庫同一套填色與透明度
+    style: n.tone ? toneStyle(n.tone) : undefined,
     transform: transformOf(pose, origin),
     opacity: typeof pose.opacity === "number" ? pose.opacity : undefined,
     ...(length < 1 ? { pathLength: 1, strokeDasharray: `${length} 2` } : { strokeDasharray: n.dash }),

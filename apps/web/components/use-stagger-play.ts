@@ -5,17 +5,18 @@ import { useEffect, useState, type RefObject } from "react";
 
 import { pixelRecipes, type AnimatedPixelIconName } from "@/registry/icons/sunui-animated-pixel-icons";
 import { motionKindOf, type AnimatedIconName } from "@/registry/icons/sunui-animated-icons";
+import { twoToneMotionKindOf, type AnimatedTwoToneIconName } from "@/registry/icons/sunui-animated-twotone-icons";
 
 // /icons 畫布的自動播放：所有有動態版的圖示一起錯開播放。
 // 圖示庫本身不變（hover 類仍是滑過才播），這裡只從外部定時切換 active。
 // 規劃：reports/150 動態圖示同屏深度分析-2026-11-22.md 第 5 節。
 
-export type PlayStyle = "line" | "pixel";
+export type PlayStyle = "line" | "pixel" | "twotone";
 
 // 每格播放多久（毫秒）：hover 播完一次，toggle 留時間看到兩種狀態，loop 轉幾圈
 function playMs(style: PlayStyle, name: string): number {
-  if (style === "line") {
-    const kind = motionKindOf(name as AnimatedIconName);
+  if (style !== "pixel") {
+    const kind = style === "twotone" ? twoToneMotionKindOf(name as AnimatedTwoToneIconName) : motionKindOf(name as AnimatedIconName);
     return kind === "toggle" ? 1400 : kind === "loop" ? 2200 : 900;
   }
   const recipe = pixelRecipes[name as AnimatedPixelIconName];

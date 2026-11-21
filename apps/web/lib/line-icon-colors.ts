@@ -114,3 +114,21 @@ export function lineIconColor(name: string): string {
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
   return pigments[vivid[hash % vivid.length]];
 }
+
+/**
+ * 雙色彩色模式：細節用本色（color），主體用同色相的淺色。
+ * 回傳 CSS 屬性，直接放在圖示或外層的 style 上。
+ */
+export function lineIconTone(name: string): Record<string, string> {
+  const ink = lineIconColor(name);
+  const hue = ink.match(/oklch\([\d.]+ [\d.]+ ([\d.]+)\)/)?.[1] ?? "250";
+  const body = `oklch(0.86 0.085 ${hue})`;
+  return {
+    color: ink,
+    "--sunui-icon-body": body,
+    "--sunui-icon-body-opacity": "1",
+    "--sunui-icon-mid": `color-mix(in oklab, ${ink} 55%, ${body})`,
+    "--sunui-icon-mid-opacity": "1",
+    "--sunui-icon-accent": ink,
+  };
+}

@@ -28,11 +28,11 @@ const errorProbe = `(() => {
 
 /**
  * 圖示自檢頁：只給 scripts/check-icons.mjs 截圖用，不進網站導覽。
- * /preview/icons?set=line|pixel&sheet=sizes|frames&theme=light|dark&only=a,b&with=c,d&accent=off&page=1&per=24
+ * /preview/icons?set=line|pixel|twotone&sheet=sizes|frames&theme=light|dark&only=a,b&with=c,d&accent=off&page=1&per=24
  */
 export default async function IconCheckPage({ searchParams }: Props) {
   const params = await searchParams;
-  const set: CheckSet = one(params.set) === "pixel" ? "pixel" : "line";
+  const set: CheckSet = one(params.set) === "pixel" ? "pixel" : one(params.set) === "twotone" ? "twotone" : "line";
   const sheet: CheckSheet = one(params.sheet) === "frames" ? "frames" : "sizes";
   const theme: CheckTheme = one(params.theme) === "dark" ? "dark" : "light";
   return (

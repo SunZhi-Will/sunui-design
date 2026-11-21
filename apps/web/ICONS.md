@@ -4,7 +4,9 @@
 > 動態：`registry/icons/sunui-animated-icons.tsx`（`<site>/r/icons/sunui-animated-icons.json`，依賴 framer-motion 與靜態版）
 > 像素：`registry/icons/sunui-pixel-icons.tsx`（`<site>/r/icons/sunui-pixel-icons.json`，無依賴）
 > 像素動態：`registry/icons/sunui-animated-pixel-icons.tsx`（`<site>/r/icons/sunui-animated-pixel-icons.json`，依賴像素靜態版）
-> 展示頁：`/icons`，兩組切換：線條 / 像素 × 靜態 / 動態。
+> 雙色：`registry/icons/sunui-twotone-icons.tsx`（`<site>/r/icons/sunui-twotone-icons.json`，依賴線條靜態版的 Glyph）
+> 雙色動態：`registry/icons/sunui-animated-twotone-icons.tsx`（`<site>/r/icons/sunui-animated-twotone-icons.json`，依賴線條動態版與雙色靜態版）
+> 展示頁：`/icons`，一張畫布，三套切換：像素（預設）/ 雙色 / 線條；有動態版的自動錯開播放，點選後在右側面板複製靜態或動態版。
 > Pro 檔期圖示組：`registry/pro/icons/`（私有 repo），索引在 `lib/pro-icons.ts`，憑授權從 `<site>/r/pro/<name>.json` 安裝。見文末「Pro 檔期圖示組」。
 
 ## 為什麼要做
@@ -60,6 +62,18 @@
 3. 旋轉中心一律用 24 網格座標（`origin: [x, y]`），內部轉成 `transform-box: view-box`，不同形狀才能共用同一個軸心。
 4. `useReducedMotion()` 為真：所有轉場改為 0 秒，直接顯示結果；loop 不播放。
 5. 顏色只出現在 accent 部位（例如填滿後的愛心、集點卡新蓋的一格），沒設 `--sunui-icon-accent` 時就是墨色。
+
+## 雙色圖示
+
+2026-11-22 加入（使用者核准的凍結例外）。先做 24 個常用物件（電商與介面），開賣後補完；線條版保留不變。
+
+1. **網格與名稱**：與線條版同一套 24 網格，內容 3 到 21，名稱與線條版相同（`<TwoToneIcon name="cart" />`），換風格只要換元件。
+2. **兩種面**：實心淺色主體（節點加 `tone: "body"`），必要時一處中間色（`tone: "mid"`，例如紙箱頂面、錢包蓋）；其餘是 currentColor 的細節，線寬 1.7 到 2.6（節點的 `sw`）或實心（`fill: true`）。
+3. **顏色**：預設黑白，主體是 currentColor 20%、中間色 45%，跟著文字顏色走。上色時設 `color`（細節）與 `--sunui-icon-body`（主體，並把 `--sunui-icon-body-opacity` 設成 1）；`/icons` 的彩色模式用 `lib/line-icon-colors.ts` 的 `lineIconTone()` 產生這組值（主體是同色相 `oklch(0.86 0.085 H)`）。
+4. **主體不重疊**：透明度放在整個元素上（避免描邊與填色重疊處變深），所以兩塊主體疊在一起會變深。主體之間留到剛好相接，細節畫在主體上面。
+5. **不用漸層、陰影、光暈**（DESIGN.md）。層次只靠主體與細節兩層。
+6. **動態**：規則與線條動態版相同（hover / toggle / loop）。toggle 類（heart、star、bookmark）在主體上蓋一層實心的強調色。parts 編號對應 `twoToneIcons` 裡部位的順序。
+7. **自檢**：`node apps/web/scripts/check-icons.mjs --set twotone`。16px 下細節（購物車格線、檔案文字線）會開始糊，新圖示要看 16px 那一格。
 
 ## 像素圖示
 
