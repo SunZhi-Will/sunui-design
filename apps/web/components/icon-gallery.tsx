@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+import { useStaggerPlay } from "@/components/use-stagger-play";
 import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
 import { lineIconColor } from "@/lib/line-icon-colors";
@@ -42,12 +43,15 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const kindLabel: Record<MotionKind, string> = t.kindLabel;
   const kindHint: Record<MotionKind, string> = t.kindHint;
   const [style, setStyle] = useState<Style>("line");
-  const [motion, setMotion] = useState<Motion>("static");
+  // 2026-11-22：畫布模式。所有圖示排在一張畫布上，有動態版的自動錯開播放；右側面板決定複製靜態或動態版
+  const [animatedOn, setAnimatedOn] = useState(true);
+  const [category, setCategory] = useState<string>("all");
+  const [paused, setPaused] = useState(false);
   const [query, setQuery] = useState("");
   const [strokeSize, setStrokeSize] = useState<number>(24);
   const [pixelSize, setPixelSize] = useState<number>(32);
   const [stroke, setStroke] = useState<number>(1.5);
-  const [accent, setAccent] = useState(true);
+  const accent = true;
   // 2026-11-22：/icons 頁預設彩色，黑白改為切換選項
   const [pigment, setPigment] = useState(true);
   const [selected, setSelected] = useState<string>("coupon");
@@ -57,7 +61,6 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isPixel = style === "pixel";
-  const isMotion = motion === "animated";
   const motionSet = isPixel ? animatedPixelSet : animatedSet;
 
   const groups = useMemo(() => {
@@ -67,13 +70,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     const base = source.map((group) => ({
       ...group,
       ...t.groups[group.id],
-      icons: (group.icons as string[]).filter((name) => !isMotion || motionSet.has(name)),
+      icons: group.icons as string[],
     }));
-    if (isMotion && !isPixel) {
-      const grouped = new Set(iconGroups.flatMap((group) => group.icons as string[]));
-      const rest = animatedIconNames.filter((name) => !grouped.has(name));
-      if (rest.length) base.push({ id: "toggles", ...t.groups.toggles, icons: rest });
-    }
     return base
       .map((group) => ({
         ...group,
@@ -86,7 +84,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           : group.icons,
       }))
       .filter((group) => group.icons.length > 0);
-  }, [query, isPixel, isMotion, motionSet, t]);
+  }, [query, isPixel, t]);
 
   // 網址帶 ?icon=coupon&style=pixel 可直接打開某個圖示（參考 iconmcp.com 的分享方式）
   const [linked, setLinked] = useState(false);
@@ -107,15 +105,23 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     window.history.replaceState(null, "", url);
   }, [linked, selected, isPixel]);
 
-  const total = groups.reduce((sum, group) => sum + group.icons.length, 0);
-  const visible = groups.flatMap((group) => group.icons);
+  const shown = category === "all" ? groups : groups.filter((group) => group.id === category);
+  const visible = useMemo(() => [...new Set(shown.flatMap((group) => group.icons))], [shown]);
+  const total = counts[style].static;
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const playing = useStaggerPlay(
+    useMemo(() => visible.filter((name) => motionSet.has(name)), [visible, motionSet]),
+    style,
+    canvasRef,
+    paused,
+  );
   // 切換模式後，選取的圖示若不在清單裡，改選第一個
   useEffect(() => {
     if (visible.length && !visible.includes(selected)) setSelected(visible[0]);
   }, [visible, selected]);
 
   const kindOf = (name: string): MotionKind | null =>
-    !isMotion || !motionSet.has(name)
+    !animatedOn || !motionSet.has(name)
       ? null
       : isPixel
         ? pixelMotionKindOf(name as AnimatedPixelIconName)
@@ -196,44 +202,11 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     line: <Icon name="coupon" size={16} />,
     pixel: <PixelIcon name="heart" size={16} />,
   };
-  const motionIcon: Record<Motion, ReactNode> = {
-    static: <Icon name="grid" size={16} />,
-    animated: <AnimatedIcon name="activity" size={16} />,
-  };
 
   return (
     <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]", !isPixel && pigment && "[--sunui-icon-accent:currentColor]")}>
       <div className="min-w-0">
-        <div className="mb-4 flex flex-wrap gap-2">
-          <Tabs
-            label={t.styleLabel}
-            options={["line", "pixel"] as const}
-            value={style}
-            onChange={setStyle}
-            render={(s) => (
-              <>
-                {styleIcon[s]}
-                {s === "line" ? t.line : t.pixel}
-                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s][motion]}</span>
-              </>
-            )}
-          />
-          <Tabs
-            label={t.motionLabel}
-            options={["static", "animated"] as const}
-            value={motion}
-            onChange={setMotion}
-            render={(m) => (
-              <>
-                {motionIcon[m]}
-                {t[m]}
-                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[style][m]}</span>
-              </>
-            )}
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-0 flex-1 basis-56">
             <span className="sr-only">{t.searchLabel}</span>
             <Icon name="search" size={16} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-subtle" />
@@ -245,97 +218,79 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
               className="h-9 w-full rounded-md border border-line bg-card pr-3 pl-9 text-sm outline-none placeholder:text-subtle focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
-          <Segmented
-            label={t.size}
-            options={sizeOptions as readonly number[]}
-            value={size}
-            onChange={isPixel ? setPixelSize : setStrokeSize}
+          <Tabs
+            label={t.styleLabel}
+            options={["line", "pixel"] as const}
+            value={style}
+            onChange={(next) => {
+              setStyle(next);
+              setCategory("all");
+            }}
+            render={(s) => (
+              <>
+                {styleIcon[s]}
+                {s === "line" ? t.line : t.pixel}
+                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s].static}</span>
+              </>
+            )}
           />
-          {!isPixel && <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />}
-          {/* 線條彩色模式下 accent 跟著圖示本色，開關沒有作用，先收起來 */}
-          {(isPixel || !pigment) && (
-            <button
-              type="button"
-              aria-pressed={accent}
-              onClick={() => setAccent((on) => !on)}
-              className={cn(
-                "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
-                accent ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
-              )}
-            >
-              <span className={cn("size-2 rounded-full", accent ? "bg-accent" : "bg-line")} />
-              {t.accent}
-            </button>
-          )}
+          <Choice
+            label={t.colorLabel}
+            options={[
+              { value: true, label: t.color },
+              { value: false, label: t.mono },
+            ]}
+            value={pigment}
+            onChange={setPigment}
+          />
           <button
             type="button"
-            aria-pressed={pigment}
-            onClick={() => setPigment((on) => !on)}
-            className={cn(
-              "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
-              pigment ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
-            )}
+            aria-pressed={paused}
+            onClick={() => setPaused((p) => !p)}
+            className="flex h-9 items-center rounded-md border border-line bg-card px-3 text-xs font-medium text-subtle transition-colors hover:text-fg motion-reduce:hidden"
           >
-            {isPixel ? (
-              <PixelIcon name="potion" size={16} tone={pigment ? "pigment" : "ink"} />
-            ) : (
-              <Icon name="heart" size={16} color={pigment ? lineIconColor("heart") : undefined} />
-            )}
-            {t.pigment}
+            {paused ? t.play : t.pause}
           </button>
         </div>
 
-        {(isPixel || isMotion) && (
-          <p className="mt-4 text-xs text-subtle">
-            {[isPixel ? t.pixelHint : null, isMotion ? t.animatedHint : null].filter(Boolean).join(" ")}
-          </p>
-        )}
+        <div role="tablist" aria-label={t.categoryLabel} className="mt-3 flex gap-1 overflow-x-auto pb-1">
+          {[{ id: "all", title: t.all }, ...groups].map((group) => (
+            <button
+              key={group.id}
+              type="button"
+              role="tab"
+              aria-selected={category === group.id}
+              onClick={() => setCategory(group.id)}
+              className={cn(
+                "h-8 shrink-0 rounded-full px-3 text-xs font-medium transition-colors",
+                category === group.id ? "bg-fg text-bg" : "text-subtle hover:bg-stage hover:text-fg",
+              )}
+            >
+              {group.title}
+            </button>
+          ))}
+        </div>
 
-        {groups.length === 0 && (
-          <p className="mt-10 rounded-md border border-dashed border-line p-8 text-center text-sm text-subtle">
-            {format(t.noMatch, { q: query })}
-          </p>
-        )}
-
-        {groups.map((group) => (
-          <section key={group.id} aria-labelledby={`icons-${group.id}`} className="mt-8">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h2 id={`icons-${group.id}`} className="text-sm font-semibold">
-                {group.title}
-              </h2>
-              <p className="text-xs text-subtle">{group.note}</p>
-            </div>
-            <ul className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2">
-              {group.icons.map((name) => {
-                const k = kindOf(name);
-                return (
-                  <li key={name}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelected(name);
-                        if (k && k !== "hover") toggle(name);
-                      }}
-                      aria-pressed={selected === name}
-                      className={cn(
-                        "relative flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-md border bg-card px-1 transition-colors",
-                        selected === name ? "border-fg text-fg" : "border-line text-fg/85 hover:border-subtle",
-                      )}
-                    >
-                      {renderIcon(name, size)}
-                      <span className="max-w-full truncate font-mono text-[10px] text-subtle">{name}</span>
-                      {k && k !== "hover" && (
-                        <span className="absolute top-1.5 right-1.5 font-mono text-[9px] tracking-wide text-subtle uppercase">
-                          {kindLabel[k]}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
+        <div ref={canvasRef} className="mt-3 rounded-lg border border-line bg-card p-2 sm:p-3">
+          {visible.length === 0 ? (
+            <p className="p-8 text-center text-sm text-subtle">{format(t.noMatch, { q: query })}</p>
+          ) : (
+            <ul className="grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))]">
+              {visible.map((name) => (
+                <CanvasCell
+                  key={`${style}-${name}`}
+                  name={name}
+                  pixel={isPixel}
+                  animated={motionSet.has(name)}
+                  color={pigment}
+                  on={Boolean(playing[name])}
+                  selected={selected === name}
+                  onSelect={setSelected}
+                />
+              ))}
             </ul>
-          </section>
-        ))}
+          )}
+        </div>
       </div>
 
       <aside className="rounded-md border border-foreground/10 bg-card p-5 text-foreground lg:sticky lg:top-20">
@@ -385,6 +340,29 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             ))}
           </div>
         )}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Segmented
+            label={t.size}
+            options={sizeOptions as readonly number[]}
+            value={size}
+            onChange={isPixel ? setPixelSize : setStrokeSize}
+          />
+          {!isPixel && <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />}
+          {motionSet.has(selected) && (
+            <button
+              type="button"
+              aria-pressed={animatedOn}
+              onClick={() => setAnimatedOn((on) => !on)}
+              className={cn(
+                "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
+                animatedOn ? "bg-stage text-fg" : "bg-card text-subtle hover:text-fg",
+              )}
+            >
+              <AnimatedIcon name="activity" size={14} />
+              {t.animated}
+            </button>
+          )}
+        </div>
         <p className="mt-5 font-mono text-sm tracking-[0.04em]">{selected}</p>
         <pre className="mt-2 overflow-x-auto rounded-sm bg-foreground/5 px-3 py-2 font-mono text-[12px]">
           {jsx}
@@ -555,6 +533,87 @@ function Segmented<T extends number>({
           )}
         >
           {option}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** 畫布上的一格：沒有文字，名稱放在 title 與 aria-label；有動態版就由外部的 on 驅動播放 */
+const CanvasCell = memo(function CanvasCell({
+  name,
+  pixel,
+  animated,
+  color,
+  on,
+  selected,
+  onSelect,
+}: {
+  name: string;
+  pixel: boolean;
+  animated: boolean;
+  color: boolean;
+  on: boolean;
+  selected: boolean;
+  onSelect: (name: string) => void;
+}) {
+  const tone = color ? "pigment" : "ink";
+  const tint = color && !pixel ? lineIconColor(name) : undefined;
+  return (
+    <li>
+      <button
+        type="button"
+        title={name}
+        aria-label={name}
+        aria-pressed={selected}
+        onClick={() => onSelect(name)}
+        className={cn(
+          "grid h-14 w-full place-items-center rounded-md text-fg/85 transition-colors",
+          selected ? "bg-stage ring-1 ring-fg" : "hover:bg-stage",
+        )}
+      >
+        {pixel ? (
+          animated ? (
+            <AnimatedPixelIcon name={name as AnimatedPixelIconName} size={32} active={on} tone={tone} />
+          ) : (
+            <PixelIcon name={name as PixelIconName} size={32} tone={tone} />
+          )
+        ) : animated ? (
+          <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} color={tint} />
+        ) : (
+          <Icon name={name as IconName} size={24} color={tint} />
+        )}
+      </button>
+    </li>
+  );
+});
+
+function Choice<T extends string | boolean>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: readonly { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex h-9 items-center rounded-md border border-line bg-card p-0.5">
+      {options.map((option) => (
+        <button
+          key={String(option.value)}
+          type="button"
+          role="radio"
+          aria-checked={value === option.value}
+          onClick={() => onChange(option.value)}
+          className={cn(
+            "h-full rounded-[5px] px-3 text-xs font-medium transition-colors",
+            value === option.value ? "bg-stage text-fg" : "text-subtle hover:text-fg",
+          )}
+        >
+          {option.label}
         </button>
       ))}
     </div>

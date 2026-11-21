@@ -4,7 +4,6 @@ import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { CommandTabs } from "@/components/command-tabs";
 import { IconGallery } from "@/components/icon-gallery";
-import { IconWall } from "@/components/icon-wall";
 import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
@@ -44,9 +43,9 @@ export default async function IconsPage() {
         </div>
       </section>
 
-      <IconWall messages={m.iconWall} />
+      <IconGallery messages={m.iconGallery} />
 
-      <ul className="mb-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <ul className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {rules.map((rule) => (
           <li key={rule.title} className="rounded-md border border-line bg-card p-4">
             <Icon name={rule.icon} size={20} className="text-accent" />
@@ -55,8 +54,6 @@ export default async function IconsPage() {
           </li>
         ))}
       </ul>
-
-      <IconGallery messages={m.iconGallery} />
 
       {proIconSets.map((set) => (
         <ProIconShowcase
