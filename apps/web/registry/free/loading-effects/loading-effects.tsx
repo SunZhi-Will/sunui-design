@@ -767,6 +767,9 @@ function gradientAt(i: number, t: number, result: boolean) {
   return 0.5 + 0.5 * Math.sin(Math.PI * ((x + y) / (2 * (N - 1)) - 0.5 + t * 0.35));
 }
 
+/** Cell shape: round dot, square pixel, diamond, outline ring that fills when lit, or a tall bar */
+export type DotMatrixShape = "dot" | "square" | "diamond" | "ring" | "bar";
+
 export interface DotMatrixLoaderProps {
   /** Loop shape while loading, and fill order for progress */
   pattern?: DotMatrixPattern;
@@ -777,6 +780,12 @@ export interface DotMatrixLoaderProps {
   size?: LoaderSize;
   /** Colour scheme, see dotMatrixPalettes. Default spot */
   palette?: DotMatrixPalette;
+  /** Cell shape, default dot */
+  shape?: DotMatrixShape;
+  /** Lit cells glow in their own colour, like LEDs. Best on dark surfaces */
+  glow?: boolean;
+  /** fade: off cells stay full size and dim (default). scale: off cells shrink to specks, lit cells grow */
+  emphasis?: "fade" | "scale";
   /** Dot colour for the spot palette, default the brand spot colour (falls back to --primary) */
   color?: string;
   label?: string;
@@ -791,6 +800,9 @@ export function DotMatrixLoader({
   value = 0,
   size = "md",
   palette = "spot",
+  shape = "dot",
+  glow = false,
+  emphasis = "fade",
   color,
   label = "Loading",
   doneLabel = "Done",
@@ -825,12 +837,19 @@ export function DotMatrixLoader({
       if (grad) {
         // Results hold still; only the loop drifts
         const g = gradientAt(i, state === "loading" && !reduce ? now / 1000 : 0, state === "success");
-        el.style.backgroundColor = `oklch(${grad.l} ${grad.c} ${grad.from + (grad.to - grad.from) * g})`;
-      } else if (el.style.backgroundColor) {
-        el.style.backgroundColor = "";
+        el.style.color = `oklch(${grad.l} ${grad.c} ${grad.from + (grad.to - grad.from) * g})`;
+      } else if (el.style.color) {
+        el.style.color = "";
       }
-      el.style.opacity = String(DOT_BASE + (1 - DOT_BASE) * v);
-      el.style.transform = `scale(${0.72 + 0.28 * v})`;
+      const scaleMode = emphasis === "scale";
+      el.style.opacity = String(scaleMode ? 0.3 + 0.7 * v : DOT_BASE + (1 - DOT_BASE) * v);
+      const k = scaleMode ? 0.32 + 0.68 * v : 0.72 + 0.28 * v;
+      el.style.transform =
+        shape === "diamond" ? `rotate(45deg) scale(${k})` : shape === "bar" ? `scale(${0.85 + 0.15 * v}, ${scaleMode ? k : 0.45 + 0.55 * v})` : `scale(${k})`;
+      const shadows: string[] = [];
+      if (shape === "ring") shadows.push(`inset 0 0 0 ${((dot / 2) * v).toFixed(2)}px currentColor`);
+      if (glow && v > 0.01) shadows.push(`0 0 ${(dot * 1.6 * v).toFixed(2)}px ${(dot * 0.15 * v).toFixed(2)}px currentColor`);
+      el.style.boxShadow = shadows.join(", ");
     };
 
     if (reduce || !active) {
@@ -866,7 +885,7 @@ export function DotMatrixLoader({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [state, pattern, pct, active, reduce, palette]);
+  }, [state, pattern, pct, active, reduce, palette, shape, glow, emphasis, dot]);
 
   const text =
     state === "success" ? doneLabel : state === "error" ? errorLabel : state === "progress" ? `${label} ${Math.round(pct)}%` : label;
@@ -890,7 +909,7 @@ export function DotMatrixLoader({
         ref={gridRef}
         aria-hidden
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${N}, ${dot}px)`, gap }}
+        style={{ gridTemplateColumns: `repeat(${N}, ${dot}px)`, gap, rowGap: shape === "bar" ? gap * 0.6 : gap }}
       >
         {Array.from({ length: CELLS }, (_, i) => (
           <span
@@ -898,8 +917,19 @@ export function DotMatrixLoader({
             ref={(el) => {
               dots.current[i] = el;
             }}
-            className="rounded-full bg-current transition-[background-color] duration-200"
-            style={{ width: dot, height: dot, opacity: DOT_BASE, transform: "scale(0.72)" }}
+            className={cn(
+              "transition-[color] duration-200",
+              shape === "ring" ? "rounded-full border-current" : "bg-current",
+              (shape === "dot" || shape === "bar") && "rounded-full",
+              (shape === "square" || shape === "diamond") && "rounded-[1px]",
+            )}
+            style={{
+              width: dot,
+              height: shape === "bar" ? dot * 2.4 : dot,
+              borderWidth: shape === "ring" ? Math.max(1, dot * 0.18) : undefined,
+              opacity: DOT_BASE,
+              transform: "scale(0.72)",
+            }}
           />
         ))}
       </span>

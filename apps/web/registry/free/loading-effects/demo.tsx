@@ -13,6 +13,7 @@ import {
   dotMatrixPalettes,
   dotMatrixPatterns,
   loaderVariants,
+  type DotMatrixLoaderProps,
   type DotMatrixPalette,
   type DotMatrixPattern,
   type DotMatrixState,
@@ -49,6 +50,8 @@ export const copy = {
     waiting: "Waiting",
     uploaded: "Uploaded",
     states: { loading: "Loading", progress: "Progress", success: "Success", error: "Error" } satisfies Record<DotMatrixState, string>,
+    style: "Style",
+    styles: { classic: "Classic", pixel: "Pixel", diamond: "Diamond", ring: "Ring", neon: "Neon LED", grain: "Grain", bars: "Bars", amber: "Amber panel" } satisfies Record<StyleKey, string>,
     colour: "Colour",
     palettes: { spot: "Theme", status: "Status", aurora: "Aurora", sunset: "Sunset", lagoon: "Lagoon", prism: "Prism" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "Wave", spiral: "Spiral", rain: "Rain", ripple: "Ripple", snake: "Snake", scan: "Scan" } satisfies Record<DotMatrixPattern, string>,
@@ -82,6 +85,8 @@ export const copy = {
     waiting: "等待中",
     uploaded: "已上傳",
     states: { loading: "載入", progress: "進度", success: "成功", error: "錯誤" } satisfies Record<DotMatrixState, string>,
+    style: "樣式",
+    styles: { classic: "原版", pixel: "像素方格", diamond: "菱形", ring: "空心環", neon: "霓虹 LED", grain: "縮放顆粒", bars: "直條", amber: "琥珀面板" } satisfies Record<StyleKey, string>,
     colour: "顏色",
     palettes: { spot: "主題色", status: "狀態色", aurora: "極光", sunset: "夕陽", lagoon: "潟湖", prism: "稜鏡" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "漣漪", snake: "蛇行", scan: "掃描" } satisfies Record<DotMatrixPattern, string>,
@@ -115,6 +120,8 @@ export const copy = {
     waiting: "等待中",
     uploaded: "已上传",
     states: { loading: "加载", progress: "进度", success: "成功", error: "错误" } satisfies Record<DotMatrixState, string>,
+    style: "样式",
+    styles: { classic: "原版", pixel: "像素方格", diamond: "菱形", ring: "空心环", neon: "霓虹 LED", grain: "缩放颗粒", bars: "直条", amber: "琥珀面板" } satisfies Record<StyleKey, string>,
     colour: "颜色",
     palettes: { spot: "主题色", status: "状态色", aurora: "极光", sunset: "夕阳", lagoon: "潟湖", prism: "棱镜" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "涟漪", snake: "蛇行", scan: "扫描" } satisfies Record<DotMatrixPattern, string>,
@@ -148,6 +155,8 @@ export const copy = {
     waiting: "待機中",
     uploaded: "アップロード完了",
     states: { loading: "読み込み", progress: "進捗", success: "成功", error: "エラー" } satisfies Record<DotMatrixState, string>,
+    style: "スタイル",
+    styles: { classic: "クラシック", pixel: "ピクセル", diamond: "ダイヤ", ring: "リング", neon: "ネオン LED", grain: "グレイン", bars: "バー", amber: "アンバーパネル" } satisfies Record<StyleKey, string>,
     colour: "カラー",
     palettes: { spot: "テーマ", status: "ステータス", aurora: "オーロラ", sunset: "サンセット", lagoon: "ラグーン", prism: "プリズム" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "ウェーブ", spiral: "スパイラル", rain: "レイン", ripple: "リップル", snake: "スネーク", scan: "スキャン" } satisfies Record<DotMatrixPattern, string>,
@@ -181,8 +190,23 @@ const SWATCH: Record<DotMatrixPalette, string> = {
   lagoon: "linear-gradient(135deg, oklch(0.7 0.14 150), oklch(0.7 0.14 245))",
   prism: "linear-gradient(135deg, oklch(0.7 0.17 0), oklch(0.7 0.17 110), oklch(0.7 0.17 220), oklch(0.7 0.17 330))",
 };
-/** The catalog card moves to the next gradient on every pass */
-const CARD_PALETTES: DotMatrixPalette[] = ["aurora", "sunset", "lagoon", "prism"];
+/**
+ * Eight looks built from the same loader by shape, glow, emphasis and palette.
+ * Dark ones sit on a dark panel because glow only reads against a dark surface.
+ */
+const STYLE_KEYS = ["classic", "pixel", "diamond", "ring", "neon", "grain", "bars", "amber"] as const;
+type StyleKey = (typeof STYLE_KEYS)[number];
+type Style = Pick<DotMatrixLoaderProps, "shape" | "glow" | "emphasis" | "color"> & { palette: DotMatrixPalette; dark?: boolean };
+const STYLES: Record<StyleKey, Style> = {
+  classic: { shape: "dot", palette: "aurora" },
+  pixel: { shape: "square", palette: "sunset" },
+  diamond: { shape: "diamond", palette: "lagoon" },
+  ring: { shape: "ring", palette: "status" },
+  neon: { shape: "dot", glow: true, palette: "prism", dark: true },
+  grain: { shape: "dot", emphasis: "scale", palette: "aurora" },
+  bars: { shape: "bar", palette: "sunset" },
+  amber: { shape: "square", glow: true, palette: "spot", color: "oklch(0.8 0.16 75)", dark: true },
+};
 
 /**
  * Dot matrix: the six patterns side by side under one state switch.
@@ -193,7 +217,13 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
   const [state, setState] = useState<DotMatrixState>(auto ? "progress" : "loading");
   const [value, setValue] = useState(0);
   const [run, setRun] = useState(0);
+  const [style, setStyle] = useState<StyleKey>("classic");
   const [palette, setPalette] = useState<DotMatrixPalette>("aurora");
+  const look = STYLES[style];
+  const pickStyle = (k: StyleKey) => {
+    setStyle(k);
+    setPalette(STYLES[k].palette);
+  };
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Progress: about three seconds from 0 to 100 in uneven steps (real uploads are uneven), then success
@@ -214,11 +244,15 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
   useEffect(() => {
     if (!auto || state === "progress") return;
     const id = setTimeout(() => {
-      if (state !== "loading") setPalette((p) => CARD_PALETTES[(CARD_PALETTES.indexOf(p) + 1) % CARD_PALETTES.length]);
+      if (state !== "loading") {
+        const next = STYLE_KEYS[(STYLE_KEYS.indexOf(style) + 1) % STYLE_KEYS.length];
+        setStyle(next);
+        setPalette(STYLES[next].palette);
+      }
       setState(state === "loading" ? "progress" : "loading");
     }, state === "loading" ? 2400 : 1800);
     return () => clearTimeout(id);
-  }, [auto, state]);
+  }, [auto, state, style]);
 
   const status =
     state === "loading" ? t.waiting : state === "progress" ? `${value}%` : state === "success" ? t.uploaded : t.failed;
@@ -261,6 +295,25 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
         </div>
       )}
       {!compact && (
+        <div role="radiogroup" aria-label={t.style} className="flex flex-wrap justify-center gap-1">
+          {STYLE_KEYS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="radio"
+              aria-checked={style === k}
+              onClick={() => pickStyle(k)}
+              className={
+                "rounded-full border px-2.5 py-0.5 text-[11px] transition-colors " +
+                (style === k ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground")
+              }
+            >
+              {t.styles[k]}
+            </button>
+          ))}
+        </div>
+      )}
+      {!compact && (
         <div role="radiogroup" aria-label={t.colour} className="flex items-center justify-center gap-1.5">
           {dotMatrixPalettes.map((p) => (
             <button
@@ -281,13 +334,23 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
           ))}
         </div>
       )}
-      <div className={compact ? "grid grid-cols-3 gap-6" : "grid grid-cols-3 gap-x-4 gap-y-5"}>
+      <div
+        className={
+          (compact ? "grid grid-cols-3 gap-6" : "grid grid-cols-3 gap-x-4 gap-y-5") +
+          " rounded-xl transition-colors duration-300 " +
+          (look.dark ? "bg-neutral-950 p-4 text-neutral-400" : "p-4")
+        }
+      >
         {patterns.map((p) => (
           <div key={p} className="flex flex-col items-center gap-2">
             <DotMatrixLoader
               key={`${p}-${run}`}
               pattern={p}
               palette={palette}
+              shape={look.shape}
+              glow={look.glow}
+              emphasis={look.emphasis}
+              color={palette === "spot" ? look.color : undefined}
               state={state}
               value={value}
               size="lg"
@@ -295,7 +358,9 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
               doneLabel={t.done}
               errorLabel={t.failed}
             />
-            {!compact && <span className="text-[11px] text-muted-foreground">{t.patterns[p as DotMatrixPattern]}</span>}
+            {!compact && (
+              <span className={"text-[11px] " + (look.dark ? "text-neutral-400" : "text-muted-foreground")}>{t.patterns[p as DotMatrixPattern]}</span>
+            )}
           </div>
         ))}
       </div>
