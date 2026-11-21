@@ -5,6 +5,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 import { format } from "@/lib/i18n";
 import { iconGroups, pixelIconGroups } from "@/lib/icon-groups";
+import { lineIconColor } from "@/lib/line-icon-colors";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
@@ -66,6 +67,8 @@ const restMs = () => 1600 + Math.random() * 2400;
 export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
   const [style, setStyle] = useState<Style>("pixel");
   const [paused, setPaused] = useState(false);
+  // 2026-11-22：預設彩色，黑白是切換選項
+  const [color, setColor] = useState(true);
   const [visible, setVisible] = useState(false);
   const [pageShown, setPageShown] = useState(true);
   const [active, setActive] = useState<boolean[]>([]);
@@ -152,6 +155,27 @@ export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
               </button>
             ))}
           </div>
+          <div
+            role="radiogroup"
+            aria-label={t.colorLabel}
+            className="flex h-9 items-center rounded-md border border-line bg-card p-0.5"
+          >
+            {([true, false] as const).map((option) => (
+              <button
+                key={String(option)}
+                type="button"
+                role="radio"
+                aria-checked={color === option}
+                onClick={() => setColor(option)}
+                className={cn(
+                  "h-full rounded-[5px] px-3 text-xs font-medium transition-colors",
+                  color === option ? "bg-stage text-fg" : "text-subtle hover:text-fg",
+                )}
+              >
+                {option ? t.color : t.mono}
+              </button>
+            ))}
+          </div>
           {!reduce && (
             <button
               type="button"
@@ -168,7 +192,7 @@ export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
       <div ref={ref} className="[--sunui-icon-accent:currentColor] rounded-lg border border-line bg-card p-3 sm:px-5 sm:py-4">
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(44px,1fr))] gap-y-1 sm:grid-cols-[repeat(auto-fill,minmax(40px,1fr))]">
           {names.map((name, i) => (
-            <Cell key={`${style}-${name}`} style={style} name={name} active={Boolean(active[i])} />
+            <Cell key={`${style}-${name}`} style={style} name={name} color={color} active={Boolean(active[i])} />
           ))}
         </ul>
       </div>
@@ -176,13 +200,23 @@ export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
   );
 }
 
-const Cell = memo(function Cell({ style, name, active }: { style: Style; name: string; active: boolean }) {
+const Cell = memo(function Cell({
+  style,
+  name,
+  color,
+  active,
+}: {
+  style: Style;
+  name: string;
+  color: boolean;
+  active: boolean;
+}) {
   return (
     <li title={name} className="flex h-11 items-center justify-center text-fg/85 sm:h-10">
       {style === "line" ? (
-        <AnimatedIcon name={name as AnimatedIconName} size={20} active={active} />
+        <AnimatedIcon name={name as AnimatedIconName} size={20} active={active} color={color ? lineIconColor(name) : undefined} />
       ) : (
-        <AnimatedPixelIcon name={name as AnimatedPixelIconName} size={16} active={active} />
+        <AnimatedPixelIcon name={name as AnimatedPixelIconName} size={16} active={active} tone={color ? "pigment" : "ink"} />
       )}
     </li>
   );

@@ -620,6 +620,9 @@ const en = {
     pixel: "Pixel",
     pause: "Pause",
     play: "Play",
+    color: "Color",
+    mono: "Mono",
+    colorLabel: "Color mode",
   },
   iconGallery: {
     styleLabel: "Icon style",
@@ -1275,6 +1278,9 @@ const zhTW: Messages = {
     pixel: "像素",
     pause: "暫停",
     play: "播放",
+    color: "彩色",
+    mono: "黑白",
+    colorLabel: "顏色模式",
   },
   iconGallery: {
     styleLabel: "圖示樣式",
@@ -1921,6 +1927,9 @@ const zhCN: Messages = {
     pixel: "像素",
     pause: "暂停",
     play: "播放",
+    color: "彩色",
+    mono: "黑白",
+    colorLabel: "颜色模式",
   },
   iconGallery: {
     styleLabel: "图标样式",
@@ -2582,6 +2591,9 @@ const ja: Messages = {
     pixel: "ピクセル",
     pause: "一時停止",
     play: "再生",
+    color: "カラー",
+    mono: "モノクロ",
+    colorLabel: "カラーモード",
   },
   iconGallery: {
     styleLabel: "アイコンのスタイル",

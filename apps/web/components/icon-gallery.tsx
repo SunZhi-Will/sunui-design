@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
+import { lineIconColor } from "@/lib/line-icon-colors";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
@@ -47,7 +48,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const [pixelSize, setPixelSize] = useState<number>(32);
   const [stroke, setStroke] = useState<number>(1.5);
   const [accent, setAccent] = useState(true);
-  const [pigment, setPigment] = useState(false);
+  // 2026-11-22：/icons 頁預設彩色，黑白改為切換選項
+  const [pigment, setPigment] = useState(true);
   const [selected, setSelected] = useState<string>("coupon");
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
   const [copied, setCopied] = useState<string | null>(null);
@@ -123,7 +125,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const size = isPixel ? pixelSize : strokeSize;
   const sizeOptions = isPixel ? pixelSizes : sizes;
   const activeProp = kind && kind !== "hover" ? ` active={${kind === "loop" ? "loading" : "on"}}` : "";
-  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}`;
+  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}${pigment ? ` color="${lineIconColor(selected)}"` : ""}`;
   const pixelProps = `${pixelSize !== 16 ? ` size={${pixelSize}}` : ""}${pigment ? ` tone="pigment"` : ""}`;
   const component = isPixel ? (isAnimated ? "AnimatedPixelIcon" : "PixelIcon") : isAnimated ? "AnimatedIcon" : "Icon";
   const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
@@ -131,6 +133,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const tone = pigment ? "pigment" : "ink";
   const tags = `${iconKeywords[selected as IconName | PixelIconName] ?? ""}`.split(/\s+/).filter(Boolean);
   const related = (groups.find((group) => group.icons.includes(selected))?.icons ?? []).filter((name) => name !== selected).slice(0, 8);
+
+  // 彩色模式下線條圖示用自己的本色（SVG 的 color 屬性，currentColor 會跟著它）
+  const lineTint = (name: string) => (pigment ? lineIconColor(name) : undefined);
 
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
@@ -146,9 +151,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       );
     }
     return k ? (
-      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} />
+      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} color={lineTint(name)} />
     ) : (
-      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} />
+      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} color={lineTint(name)} />
     );
   }
 
@@ -157,8 +162,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     if (!svg) return null;
     // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor，尺寸改成目前選的大小
     return svg.outerHTML
-      .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
+      .replaceAll("var(--sunui-icon-accent, currentColor)", accent && (isPixel || !pigment) ? "#171717" : "currentColor")
       .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
+      .replaceAll("currentColor", !isPixel && pigment ? lineIconColor(selected) : "currentColor")
       .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
       .replace(/ width="[^"]*" height="[^"]*"/, ` width="${size}" height="${size}"`)
       .replace(/ data-icon="[^"]*"/, "")
@@ -196,7 +202,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   };
 
   return (
-    <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]")}>
+    <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]", !isPixel && pigment && "[--sunui-icon-accent:currentColor]")}>
       <div className="min-w-0">
         <div className="mb-4 flex flex-wrap gap-2">
           <Tabs
@@ -246,32 +252,37 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             onChange={isPixel ? setPixelSize : setStrokeSize}
           />
           {!isPixel && <Segmented label={t.stroke} options={strokes} value={stroke} onChange={setStroke} />}
-          <button
-            type="button"
-            aria-pressed={accent}
-            onClick={() => setAccent((on) => !on)}
-            className={cn(
-              "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
-              accent ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
-            )}
-          >
-            <span className={cn("size-2 rounded-full", accent ? "bg-accent" : "bg-line")} />
-            {t.accent}
-          </button>
-          {isPixel && (
+          {/* 線條彩色模式下 accent 跟著圖示本色，開關沒有作用，先收起來 */}
+          {(isPixel || !pigment) && (
             <button
               type="button"
-              aria-pressed={pigment}
-              onClick={() => setPigment((on) => !on)}
+              aria-pressed={accent}
+              onClick={() => setAccent((on) => !on)}
               className={cn(
                 "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
-                pigment ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
+                accent ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
               )}
             >
-              <PixelIcon name="potion" size={16} tone={pigment ? "pigment" : "ink"} />
-              {t.pigment}
+              <span className={cn("size-2 rounded-full", accent ? "bg-accent" : "bg-line")} />
+              {t.accent}
             </button>
           )}
+          <button
+            type="button"
+            aria-pressed={pigment}
+            onClick={() => setPigment((on) => !on)}
+            className={cn(
+              "flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs font-medium transition-colors",
+              pigment ? "bg-accent-soft text-accent" : "bg-card text-subtle hover:text-fg",
+            )}
+          >
+            {isPixel ? (
+              <PixelIcon name="potion" size={16} tone={pigment ? "pigment" : "ink"} />
+            ) : (
+              <Icon name="heart" size={16} color={pigment ? lineIconColor("heart") : undefined} />
+            )}
+            {t.pigment}
+          </button>
         </div>
 
         {(isPixel || isMotion) && (
