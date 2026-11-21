@@ -14,7 +14,6 @@ const en = {
   nav: {
     blocks: "Blocks",
     icons: "Icons",
-    interactions: "Interactions",
     docs: "Docs",
     pricing: "Pricing",
     github: "GitHub",
@@ -50,11 +49,8 @@ const en = {
     section: "Section",
   } as Record<Interaction, string>,
   wall: {
-    metaTitle: "Interactions, all at once",
-    metaDescription: "Twenty free SunUI blocks on one screen, each one doing what people do with it: typing, sending, switching, holding.",
-    eyebrow: "Interaction wall",
     title: "Twenty interactions, all at once",
-    lead: "Every tile is a real free block, the same one you install. Each plays a short loop; point at a tile to take it over.",
+    lead: "What moves in each tile is a real free block, the same one you install. Each plays a short loop; point at a tile to take it over.",
     pause: "Pause",
     play: "Play",
     label: "Interaction wall",
@@ -709,7 +705,7 @@ const zhTW: Messages = {
     siteDescription:
       "精緻的細節與克制的動態，適用 React 與 Tailwind：優惠券、購物車，還有首屏、圖表、選單與主題切換。無障礙，用 shadcn CLI 一行安裝。",
   },
-  nav: { blocks: "區塊", icons: "圖示", interactions: "微互動", docs: "文件", pricing: "價格", github: "GitHub", language: "語言", theme: "主題", themeSystem: "跟隨系統", themeLight: "淺色", themeDark: "深色", themeHint: "區塊預覽也會一起切換。" },
+  nav: { blocks: "區塊", icons: "圖示", docs: "文件", pricing: "價格", github: "GitHub", language: "語言", theme: "主題", themeSystem: "跟隨系統", themeLight: "淺色", themeDark: "深色", themeHint: "區塊預覽也會一起切換。" },
   footer: { tagline: "SunUI，由 Sun 製作。免費區塊採 MIT 授權。", changelog: "更新紀錄", license: "授權條款", account: "管理訂閱" },
   common: {
     copy: "複製",
@@ -730,11 +726,8 @@ const zhTW: Messages = {
     section: "整段區塊",
   },
   wall: {
-    metaTitle: "同屏微互動",
-    metaDescription: "二十個 SunUI 免費區塊排在同一個畫面，每一個都在做人會對它做的事：輸入、送出、切換、按住。",
-    eyebrow: "微互動牆",
     title: "二十個微互動，一次看完",
-    lead: "每一格都是真的免費區塊，就是你會安裝的那一個。各自重複一小段動作，滑鼠移到哪一格，那一格就交給你。",
+    lead: "每一格裡在動的都是真的免費區塊，就是你會安裝的那一個。各自重複一小段動作，滑鼠移到哪一格，那一格就交給你。",
     pause: "暫停",
     play: "播放",
     label: "微互動牆",
@@ -1365,7 +1358,7 @@ const zhCN: Messages = {
     siteDescription:
       "精致的细节与克制的动效，适用于 React 与 Tailwind：优惠券、购物车，还有首屏、图表、菜单与主题切换。无障碍，用 shadcn CLI 一行安装。",
   },
-  nav: { blocks: "区块", icons: "图标", interactions: "微交互", docs: "文档", pricing: "价格", github: "GitHub", language: "语言", theme: "主题", themeSystem: "跟随系统", themeLight: "浅色", themeDark: "深色", themeHint: "区块预览也会一起切换。" },
+  nav: { blocks: "区块", icons: "图标", docs: "文档", pricing: "价格", github: "GitHub", language: "语言", theme: "主题", themeSystem: "跟随系统", themeLight: "浅色", themeDark: "深色", themeHint: "区块预览也会一起切换。" },
   footer: { tagline: "SunUI，由 Sun 制作。免费区块采用 MIT 许可。", changelog: "更新日志", license: "许可协议", account: "管理订阅" },
   common: {
     copy: "复制",
@@ -1386,11 +1379,8 @@ const zhCN: Messages = {
     section: "整段区块",
   },
   wall: {
-    metaTitle: "同屏微交互",
-    metaDescription: "二十个 SunUI 免费区块排在同一个画面，每一个都在做人会对它做的事：输入、发送、切换、按住。",
-    eyebrow: "微交互墙",
     title: "二十个微交互，一次看完",
-    lead: "每一格都是真的免费区块，就是你会安装的那一个。各自重复一小段动作，鼠标移到哪一格，那一格就交给你。",
+    lead: "每一格里在动的都是真的免费区块，就是你会安装的那一个。各自重复一小段动作，鼠标移到哪一格，那一格就交给你。",
     pause: "暂停",
     play: "播放",
     label: "微交互墙",
@@ -2014,7 +2004,7 @@ const ja: Messages = {
     siteDescription:
       "精緻なディテールと控えめなモーションを React と Tailwind で。クーポン、カートから、ヒーロー、チャート、メニュー、テーマ切り替えまで。アクセシブルで、shadcn CLI でインストール。",
   },
-  nav: { blocks: "ブロック", icons: "アイコン", interactions: "インタラクション", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語", theme: "テーマ", themeSystem: "システム", themeLight: "ライト", themeDark: "ダーク", themeHint: "ブロックのプレビューも一緒に切り替わります。" },
+  nav: { blocks: "ブロック", icons: "アイコン", docs: "ドキュメント", pricing: "料金", github: "GitHub", language: "言語", theme: "テーマ", themeSystem: "システム", themeLight: "ライト", themeDark: "ダーク", themeHint: "ブロックのプレビューも一緒に切り替わります。" },
   footer: { tagline: "SunUI by Sun。無料ブロックは MIT ライセンスです。", changelog: "更新履歴", license: "ライセンス", account: "サブスク管理" },
   common: {
     copy: "コピー",
@@ -2035,11 +2025,8 @@ const ja: Messages = {
     section: "セクション",
   },
   wall: {
-    metaTitle: "インタラクションを一画面で",
-    metaDescription: "SunUI の無料ブロック二十個を一画面に。それぞれが人が実際にする操作をしています：入力、送信、切り替え、長押し。",
-    eyebrow: "インタラクションウォール",
     title: "二十のインタラクションを一度に",
-    lead: "どのタイルもインストールできる本物の無料ブロックです。短い動きを繰り返し、ポインタを乗せたタイルはあなたが操作できます。",
+    lead: "各タイルで動いているのは、インストールできる本物の無料ブロックです。短い動きを繰り返し、ポインタを乗せたタイルはあなたが操作できます。",
     pause: "一時停止",
     play: "再生",
     label: "インタラクションウォール",

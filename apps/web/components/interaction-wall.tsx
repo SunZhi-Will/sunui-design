@@ -990,7 +990,11 @@ function Cell({
       onFocus={hold}
       onBlur={release}
       style={def.style}
-      className="group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#161616] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]"
+      className={cn("group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#161616] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]",
+        // 首頁上：手機只放前 6 格，平板 3 欄放 18 格，4 欄以上才放滿 20 格，免得頁面太長
+        index >= 6 && "hidden md:flex",
+        index >= 18 && "md:hidden lg:flex",
+      )}
     >
       <div
         className={cn(
@@ -1032,18 +1036,6 @@ export function InteractionWall({
   return (
     <MotionConfig reducedMotion="user">
       <div>
-        {!reduce && (
-          <div className="mb-4 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setPaused((p) => !p)}
-              aria-pressed={paused}
-              className="btn-secondary h-9 px-4 text-sm"
-            >
-              {paused ? copy.play : copy.pause}
-            </button>
-          </div>
-        )}
         <div
           ref={ref}
           role="region"
@@ -1061,6 +1053,18 @@ export function InteractionWall({
             />
           ))}
         </div>
+        {!reduce && (
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              aria-pressed={paused}
+              className="h-8 rounded-md px-3 text-[13px] text-subtle transition-colors duration-150 hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              {paused ? copy.play : copy.pause}
+            </button>
+          </div>
+        )}
       </div>
     </MotionConfig>
   );

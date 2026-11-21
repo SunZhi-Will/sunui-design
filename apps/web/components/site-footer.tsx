@@ -13,9 +13,6 @@ export async function SiteFooter() {
           <Link href="/icons" className="hover:text-fg">
             {m.nav.icons}
           </Link>
-          <Link href="/interactions" className="hover:text-fg">
-            {m.nav.interactions}
-          </Link>
           <Link href="/docs" className="hover:text-fg">
             {m.nav.docs}
           </Link>

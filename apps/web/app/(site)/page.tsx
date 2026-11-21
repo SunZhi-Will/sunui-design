@@ -6,6 +6,7 @@ import { permanentRedirect } from "next/navigation";
 import { AgentSteps } from "@/components/agent-steps";
 import { Command } from "@/components/command";
 import { HeroCompare } from "@/components/hero-compare";
+import { InteractionWall } from "@/components/interaction-wall";
 import { HeroCloud } from "@/components/home/hero-cloud";
 import { ClosingCloud, CountUp, MotionBento } from "@/components/home/motion-bento";
 import { SceneMarquee, type MarqueeItem } from "@/components/home/scene-marquee";
@@ -166,6 +167,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           note={m.tier.free}
           copy={{ prefix: s.motionPrefix, words: s.motionWords, buttons: s.motionButtons, chart: m.home.hero.wall.chart.title, days: m.home.hero.wall.chart.days }}
         />
+      </section>
+
+      {/* 微互動牆：二十個免費區塊各自在跑，每格是一個小情境。規劃見 reports/微互動同屏牆深度分析-2026-11-22.md */}
+      <section aria-labelledby="wall-title" className={SECTION}>
+        <SectionHead id="wall-title" title={m.wall.title} sub={m.wall.lead} />
+        <div className="mt-10">
+          <InteractionWall copy={m.wall} locale={locale} />
+        </div>
       </section>
 
       {/* 在這裡直接試：真的區塊在跑。上排一大一小，下排三張 */}

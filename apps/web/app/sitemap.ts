@@ -5,7 +5,7 @@ import { siteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();
-  const pages = ["", "/blocks", "/icons", "/interactions", "/pricing", "/license", "/docs", "/docs/installation", "/docs/pro", "/docs/ai-agents", "/docs/motion", "/docs/changelog"];
+  const pages = ["", "/blocks", "/icons", "/pricing", "/license", "/docs", "/docs/installation", "/docs/pro", "/docs/ai-agents", "/docs/motion", "/docs/changelog"];
   return [
     ...pages.map((path) => ({ url: `${base}${path}`, changeFrequency: "weekly" as const, priority: path ? 0.6 : 1 })),
     ...getItems().map((item) => ({
