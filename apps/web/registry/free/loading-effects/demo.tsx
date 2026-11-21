@@ -1,10 +1,21 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
-import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, type LoadingEffectId } from "./loading-effects";
+import {
+  DotMatrixLoader,
+  Loader,
+  MultiStepLoader,
+  Skeleton,
+  TopLoadingBar,
+  dotMatrixPatterns,
+  loaderVariants,
+  type DotMatrixPattern,
+  type DotMatrixState,
+  type LoadingEffectId,
+} from "./loading-effects";
 
 export const copy = {
   en: {
@@ -30,7 +41,13 @@ export const copy = {
       "top-loading-bar": "Top loading bar",
       "multi-step": "Multi-step",
       "skeleton-shimmer": "Skeleton shimmer",
+      "dot-matrix": "Dot matrix",
     } satisfies Record<LoadingEffectId, string>,
+    failed: "Failed",
+    waiting: "Waiting",
+    uploaded: "Uploaded",
+    states: { loading: "Loading", progress: "Progress", success: "Success", error: "Error" } satisfies Record<DotMatrixState, string>,
+    patterns: { wave: "Wave", spiral: "Spiral", rain: "Rain", ripple: "Ripple", snake: "Snake", scan: "Scan" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-TW": {
     loading: "載入中",
@@ -55,7 +72,13 @@ export const copy = {
       "top-loading-bar": "頂部載入條",
       "multi-step": "多步驟",
       "skeleton-shimmer": "骨架閃光",
+      "dot-matrix": "點陣",
     } satisfies Record<LoadingEffectId, string>,
+    failed: "失敗",
+    waiting: "等待中",
+    uploaded: "已上傳",
+    states: { loading: "載入", progress: "進度", success: "成功", error: "錯誤" } satisfies Record<DotMatrixState, string>,
+    patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "漣漪", snake: "蛇行", scan: "掃描" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-CN": {
     loading: "加载中",
@@ -80,7 +103,13 @@ export const copy = {
       "top-loading-bar": "顶部加载条",
       "multi-step": "多步骤",
       "skeleton-shimmer": "骨架闪光",
+      "dot-matrix": "点阵",
     } satisfies Record<LoadingEffectId, string>,
+    failed: "失败",
+    waiting: "等待中",
+    uploaded: "已上传",
+    states: { loading: "加载", progress: "进度", success: "成功", error: "错误" } satisfies Record<DotMatrixState, string>,
+    patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "涟漪", snake: "蛇行", scan: "扫描" } satisfies Record<DotMatrixPattern, string>,
   },
   ja: {
     loading: "読み込み中",
@@ -105,7 +134,13 @@ export const copy = {
       "top-loading-bar": "トップローディングバー",
       "multi-step": "マルチステップ",
       "skeleton-shimmer": "スケルトン",
+      "dot-matrix": "ドットマトリクス",
     } satisfies Record<LoadingEffectId, string>,
+    failed: "失敗しました",
+    waiting: "待機中",
+    uploaded: "アップロード完了",
+    states: { loading: "読み込み", progress: "進捗", success: "成功", error: "エラー" } satisfies Record<DotMatrixState, string>,
+    patterns: { wave: "ウェーブ", spiral: "スパイラル", rain: "レイン", ripple: "リップル", snake: "スネーク", scan: "スキャン" } satisfies Record<DotMatrixPattern, string>,
   },
 };
 
@@ -125,6 +160,105 @@ function Tile({ name, action, children }: { name: string; action?: ReactNode; ch
 
 export const smallBtn =
   "rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
+
+const STATES: DotMatrixState[] = ["loading", "progress", "success", "error"];
+
+/**
+ * Dot matrix: the six patterns side by side under one state switch.
+ * Progress counts up by itself and turns into success at 100, so one click shows the whole upload.
+ */
+export function DotMatrixShowcase({ compact = false, auto = false }: { compact?: boolean; auto?: boolean }) {
+  const t = useDemoText(copy);
+  const [state, setState] = useState<DotMatrixState>(auto ? "progress" : "loading");
+  const [value, setValue] = useState(0);
+  const [run, setRun] = useState(0);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Progress: about three seconds from 0 to 100 in uneven steps (real uploads are uneven), then success
+  useEffect(() => {
+    if (state !== "progress") return;
+    setValue(0);
+    let v = 0;
+    const step = () => {
+      v = Math.min(100, v + 4 + Math.round(Math.random() * 9));
+      setValue(v);
+      timer.current = setTimeout(v >= 100 ? () => setState("success") : step, v >= 100 ? 350 : 160 + Math.random() * 120);
+    };
+    timer.current = setTimeout(step, 400);
+    return () => clearTimeout(timer.current);
+  }, [state, run]);
+
+  // Card mode: loops loading, progress, success on its own
+  useEffect(() => {
+    if (!auto || state === "progress") return;
+    const id = setTimeout(() => setState(state === "loading" ? "progress" : "loading"), state === "loading" ? 2400 : 1800);
+    return () => clearTimeout(id);
+  }, [auto, state]);
+
+  const status =
+    state === "loading" ? t.waiting : state === "progress" ? `${value}%` : state === "success" ? t.uploaded : t.failed;
+  const patterns = compact ? dotMatrixPatterns.slice(0, 3) : dotMatrixPatterns;
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {!compact && (
+        <div className="flex items-center justify-between gap-2">
+          <div role="radiogroup" className="flex rounded-lg border border-border bg-muted/50 p-0.5">
+            {STATES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                role="radio"
+                aria-checked={state === s}
+                onClick={() => {
+                  setState(s);
+                  setRun((r) => r + 1);
+                }}
+                className={
+                  "rounded-md px-2.5 py-1 text-xs transition-colors " +
+                  (state === s ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {t.states[s]}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={smallBtn}
+            onClick={() => {
+              if (state === "success") setState("progress");
+              setRun((r) => r + 1);
+            }}
+          >
+            {t.replay}
+          </button>
+        </div>
+      )}
+      <div className={compact ? "grid grid-cols-3 gap-6" : "grid grid-cols-3 gap-x-4 gap-y-5"}>
+        {patterns.map((p) => (
+          <div key={p} className="flex flex-col items-center gap-2">
+            <DotMatrixLoader
+              key={`${p}-${run}`}
+              pattern={p}
+              state={state}
+              value={value}
+              size="lg"
+              label={t.loading}
+              doneLabel={t.done}
+              errorLabel={t.failed}
+            />
+            {!compact && <span className="text-[11px] text-muted-foreground">{t.patterns[p as DotMatrixPattern]}</span>}
+          </div>
+        ))}
+      </div>
+      <p aria-hidden className="flex items-center justify-center gap-1.5 text-[11px] tabular-nums text-muted-foreground">
+        <span className="size-1.5 rounded-full bg-current" />
+        {status}
+      </p>
+    </div>
+  );
+}
 
 export default function LoadingEffectsDemo() {
   const t = useDemoText(copy);
@@ -187,6 +321,14 @@ export default function LoadingEffectsDemo() {
       <Tile name={t.names["skeleton-shimmer"]}>
         <Skeleton media lines={2} label={t.loading} className="max-w-60" />
       </Tile>
+
+      <div className="sm:col-span-2 lg:col-span-3">
+        <Tile name={t.names["dot-matrix"]}>
+          <div className="w-full max-w-md">
+            <DotMatrixShowcase />
+          </div>
+        </Tile>
+      </div>
     </div>
   );
 }

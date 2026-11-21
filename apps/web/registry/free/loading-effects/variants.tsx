@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useDemoText } from "@/lib/demo-locale";
 
 import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, loadingEffects, type LoaderVariant } from "./loading-effects";
-import { copy, smallBtn, VALUES } from "./demo";
+import { copy, DotMatrixShowcase, smallBtn, VALUES } from "./demo";
 
 // loaderVariants is a subset of loadingEffects (the Loader variants); the other three are standalone components, together giving one card per effect
 export const variants = loadingEffects;
@@ -64,6 +64,10 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
         </button>
       </div>
     );
+  }
+
+  if (variant === "dot-matrix") {
+    return <DotMatrixShowcase compact auto />;
   }
 
   if (variant === "multi-step") {

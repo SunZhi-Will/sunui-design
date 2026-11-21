@@ -2210,7 +2210,7 @@
       "name": "loading-effects",
       "type": "registry:block",
       "title": "Loading Effects",
-      "description": "Fourteen loading indicators: a Loader with eleven variants (bouncing dots, equalizer, ring spinner, spinner to check, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader and Skeleton. The spinner-check variant closes its arc when done is true, then a disc settles once and a check is drawn. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
+      "description": "Fifteen loading indicators: a Loader with eleven variants (bouncing dots, equalizer, ring spinner, spinner to check, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader, Skeleton and DotMatrixLoader. DotMatrixLoader is a 7 by 7 dot grid with six patterns (wave, spiral, rain, ripple, snake, scan) and four states: loading loops the pattern, progress fills dots by value in the order of that pattern, success and error light every dot once and then keep only a check or a cross. The spinner-check variant closes its arc when done is true, then a disc settles once and a check is drawn. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2229,7 +2229,8 @@
         "usage": {
           "whenToUse": [
             "Waiting states for fetches, uploads and route changes, from inline spinners to a top page bar",
-            "Long jobs with known stages or percentages, shown with the multi-step list, progress ring or liquid fill"
+            "Long jobs with known stages or percentages, shown with the multi-step list, progress ring or liquid fill",
+            "One indicator that carries an upload from waiting to percent to done or failed without swapping components: DotMatrixLoader with the state prop"
           ],
           "watchOut": [
             "Prefer skeletons or determinate progress when the wait is longer than a second or two",
@@ -2251,7 +2252,11 @@
             "loader set",
             "spinner to check",
             "loading success",
-            "spinner checkmark"
+            "spinner checkmark",
+            "dot matrix loader",
+            "pixel loader",
+            "grid loader",
+            "upload progress"
           ]
         }
       },

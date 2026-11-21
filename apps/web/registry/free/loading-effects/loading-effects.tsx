@@ -31,6 +31,7 @@ export const loadingEffects = [
   "top-loading-bar",
   "multi-step",
   "skeleton-shimmer",
+  "dot-matrix",
 ] as const;
 export type LoadingEffectId = (typeof loadingEffects)[number];
 
@@ -619,5 +620,241 @@ export function Skeleton({ lines = 3, avatar = true, media = false, label = "Loa
         <SkeletonBlock key={i} className="h-3" style={{ width: i === lines - 1 ? "60%" : "100%" }} />
       ))}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* dot-matrix: a 7 by 7 grid of dots. While loading, one of six patterns
+   loops. With a value, the same pattern decides the order the dots fill in.
+   On success or error every dot lights once, then only the dots that draw a
+   check or a cross stay on. */
+/* ------------------------------------------------------------------ */
+
+export const dotMatrixPatterns = ["wave", "spiral", "rain", "ripple", "snake", "scan"] as const;
+export type DotMatrixPattern = (typeof dotMatrixPatterns)[number];
+export type DotMatrixState = "loading" | "progress" | "success" | "error";
+
+const N = 7;
+const CELLS = N * N;
+const MID = (N - 1) / 2;
+const DOT_SIZES: Record<LoaderSize, { dot: number; gap: number }> = {
+  sm: { dot: 3, gap: 2 },
+  md: { dot: 4, gap: 2.5 },
+  lg: { dot: 6, gap: 3 },
+};
+/** Opacity of a dot that is off, so the grid always reads as a grid */
+const DOT_BASE = 0.16;
+
+const cell = (x: number, y: number) => y * N + x;
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+/** 1 at the head of a moving line, fading to 0 over len cells behind it */
+const trail = (d: number, len: number) => (d < 0 || d > len ? 0 : 1 - d / len);
+
+/** Clockwise path from the outer ring to the centre */
+const SPIRAL_IN: number[] = (() => {
+  const out: number[] = [];
+  let top = 0, bottom = N - 1, left = 0, right = N - 1;
+  while (top <= bottom && left <= right) {
+    for (let x = left; x <= right; x++) out.push(cell(x, top));
+    top++;
+    for (let y = top; y <= bottom; y++) out.push(cell(right, y));
+    right--;
+    if (top <= bottom) for (let x = right; x >= left; x--) out.push(cell(x, bottom));
+    bottom--;
+    if (left <= right) for (let y = bottom; y >= top; y--) out.push(cell(left, y));
+    left++;
+  }
+  return out;
+})();
+/** Rows left to right, then right to left */
+const SNAKE_PATH: number[] = Array.from({ length: CELLS }, (_, i) => {
+  const y = Math.floor(i / N);
+  const k = i % N;
+  return cell(y % 2 ? N - 1 - k : k, y);
+});
+const DIST = Array.from({ length: CELLS }, (_, i) => Math.hypot((i % N) - MID, Math.floor(i / N) - MID));
+
+/** order[k] = the cell that lights k-th; returns rank[cell] */
+const toRank = (order: number[]) => {
+  const rank = new Array<number>(CELLS);
+  order.forEach((c, k) => (rank[c] = k));
+  return rank;
+};
+const byIndex = (key: (x: number, y: number) => number) =>
+  toRank(Array.from({ length: CELLS }, (_, i) => i).sort((a, b) => key(a % N, Math.floor(a / N)) - key(b % N, Math.floor(b / N))));
+
+const SPIRAL_RANK = toRank(SPIRAL_IN);
+const SNAKE_RANK = toRank(SNAKE_PATH);
+/** Fill order for the progress state, one per pattern, chosen to echo its loop */
+const FILL_RANK: Record<DotMatrixPattern, number[]> = {
+  wave: byIndex((x, y) => x * N + y),
+  spiral: toRank([...SPIRAL_IN].reverse()),
+  rain: byIndex((x, y) => (N - 1 - y) * N + x),
+  ripple: byIndex((x, y) => DIST[cell(x, y)] * 100 + Math.atan2(y - MID, x - MID)),
+  snake: SPIRAL_RANK,
+  scan: byIndex((x, y) => y * N + x),
+};
+/** Rain: each column falls at its own phase and speed */
+const RAIN_PHASE = [0.1, 0.62, 0.33, 0.86, 0.2, 0.71, 0.45];
+const RAIN_SPEED = [7, 9, 8, 10, 7.5, 9.5, 8.5];
+
+/** Brightness 0..1 of one dot at time t (seconds) while loading */
+function loopFrame(p: DotMatrixPattern, i: number, t: number) {
+  const x = i % N;
+  const y = Math.floor(i / N);
+  switch (p) {
+    case "wave":
+      return clamp01(1 - Math.abs(y - (MID + 2.4 * Math.sin(x * 0.85 - t * 4.2))) / 1.1);
+    case "spiral":
+      return trail((((t * 22) % CELLS) - SPIRAL_RANK[i] + CELLS) % CELLS, 9);
+    case "rain":
+      return trail(((t * RAIN_SPEED[x] + RAIN_PHASE[x] * 11) % (N + 4)) - y, 3);
+    case "ripple": {
+      const front = (t * 3.2) % 5.5;
+      return clamp01(1 - Math.abs(DIST[i] - front) / 0.9) * (1 - front / 7);
+    }
+    case "snake":
+      return trail((((t * 20) % CELLS) - SNAKE_RANK[i] + CELLS) % CELLS, 8);
+    case "scan": {
+      const s = (t * 5) % (2 * (N - 1));
+      return clamp01(1 - Math.abs(y - (s < N - 1 ? s : 2 * (N - 1) - s)) / 1.2);
+    }
+  }
+}
+
+/** Dots that stay on in the result, in the order they light */
+const CHECK = [[0, 3], [1, 4], [2, 5], [3, 4], [4, 3], [5, 2], [6, 1]].map(([x, y]) => cell(x, y));
+const CROSS = [
+  ...Array.from({ length: N }, (_, i) => cell(i, i)),
+  ...Array.from({ length: N }, (_, i) => cell(N - 1 - i, i)).filter((c) => c !== cell(MID, MID)),
+];
+const FLOOD = 0.16; // seconds every dot stays lit before the result shape gathers
+const STAGGER = 0.035;
+
+function resultFrame(shape: number[], i: number, s: number) {
+  if (s < FLOOD) return 1;
+  const k = shape.indexOf(i);
+  return k >= 0 && s >= FLOOD + k * STAGGER ? 1 : 0;
+}
+
+export interface DotMatrixLoaderProps {
+  /** Loop shape while loading, and fill order for progress */
+  pattern?: DotMatrixPattern;
+  /** loading loops; progress fills by value; success draws a check; error draws a cross */
+  state?: DotMatrixState;
+  /** 0 to 100, used when state is progress */
+  value?: number;
+  size?: LoaderSize;
+  /** Dot colour, default the brand spot colour (falls back to --primary). Error always uses --destructive */
+  color?: string;
+  label?: string;
+  doneLabel?: string;
+  errorLabel?: string;
+  className?: string;
+}
+
+export function DotMatrixLoader({
+  pattern = "wave",
+  state = "loading",
+  value = 0,
+  size = "md",
+  color,
+  label = "Loading",
+  doneLabel = "Done",
+  errorLabel = "Failed",
+  className,
+}: DotMatrixLoaderProps) {
+  const { ref, active, reduce } = useActive<HTMLSpanElement>();
+  const gridRef = useRef<HTMLSpanElement>(null);
+  const dots = useRef<(HTMLSpanElement | null)[]>([]);
+  const cur = useRef<number[]>(new Array(CELLS).fill(0));
+  const stateAt = useRef(0);
+  const pct = clampPct(value);
+  const { dot, gap } = DOT_SIZES[size];
+
+  useEffect(() => {
+    stateAt.current = performance.now();
+  }, [state]);
+
+  useEffect(() => {
+    const target = (i: number, now: number) => {
+      const s = (now - stateAt.current) / 1000;
+      if (state === "progress") return clamp01((pct / 100) * CELLS - FILL_RANK[pattern][i]);
+      if (state === "success") return resultFrame(CHECK, i, reduce ? 9 : s);
+      if (state === "error") return resultFrame(CROSS, i, reduce ? 9 : s);
+      // Reduced motion: a still frame of the pattern, the status text says it is loading
+      return loopFrame(pattern, i, reduce ? 0.35 : now / 1000);
+    };
+    const paint = (i: number, v: number) => {
+      const el = dots.current[i];
+      if (!el) return;
+      el.style.opacity = String(DOT_BASE + (1 - DOT_BASE) * v);
+      el.style.transform = `scale(${0.72 + 0.28 * v})`;
+    };
+
+    if (reduce || !active) {
+      const now = performance.now();
+      for (let i = 0; i < CELLS; i++) {
+        if (reduce) cur.current[i] = target(i, now);
+        paint(i, cur.current[i]);
+      }
+      if (gridRef.current) gridRef.current.style.transform = "";
+      return;
+    }
+
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const k = 1 - Math.exp(-dt / (state === "loading" ? 0.06 : 0.09));
+      let moving = false;
+      for (let i = 0; i < CELLS; i++) {
+        const goal = target(i, now);
+        const next = cur.current[i] + (goal - cur.current[i]) * k;
+        if (Math.abs(goal - next) > 0.002) moving = true;
+        cur.current[i] = next;
+        paint(i, next);
+      }
+      // Error: one short shake, then still
+      const s = (now - stateAt.current) / 1000;
+      const shake = state === "error" && s < 0.36;
+      if (gridRef.current) gridRef.current.style.transform = shake ? `translateX(${Math.sin(s * 42) * 2 * (1 - s / 0.36)}px)` : "";
+      const settling = state !== "loading" && s < FLOOD + CELLS * STAGGER;
+      if (state === "loading" || moving || shake || settling) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [state, pattern, pct, active, reduce]);
+
+  const text =
+    state === "success" ? doneLabel : state === "error" ? errorLabel : state === "progress" ? `${label} ${Math.round(pct)}%` : label;
+
+  return (
+    <span
+      ref={ref}
+      role="status"
+      className={cn("inline-flex items-center justify-center transition-colors duration-200", className)}
+      style={{ color: state === "error" ? "var(--destructive)" : (color ?? "var(--sunui-spot, var(--primary))") }}
+    >
+      <SrOnly>{text}</SrOnly>
+      <span
+        ref={gridRef}
+        aria-hidden
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${N}, ${dot}px)`, gap }}
+      >
+        {Array.from({ length: CELLS }, (_, i) => (
+          <span
+            key={i}
+            ref={(el) => {
+              dots.current[i] = el;
+            }}
+            className="rounded-full bg-current"
+            style={{ width: dot, height: dot, opacity: DOT_BASE, transform: "scale(0.72)" }}
+          />
+        ))}
+      </span>
+    </span>
   );
 }
