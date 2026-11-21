@@ -291,7 +291,7 @@
       "name": "avatar-stack",
       "type": "registry:block",
       "title": "Avatar Stack",
-      "description": "Social proof avatar stack: overlapping initial discs, a +N count and hover or focus tooltips. Use it for team members, recent sign-ups or recent buyers, next to the action they vouch for.",
+      "description": "Social proof avatar stack: overlapping initial discs (or, with fallback=\"gradient\", a stable two-tone gradient per person), a +N count and hover or focus tooltips; a newly added person slides into the stack. Use it for team members, recent sign-ups or recent buyers, next to the action they vouch for.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2316,7 +2316,7 @@
       "name": "micro-interactions",
       "type": "registry:block",
       "title": "Micro Interactions",
-      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. The toggle's knob squashes and stretches toward its target while pressed and settles with a spring on release. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain.",
+      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. The toggle's knob squashes and stretches toward its target while pressed and settles with a spring on release. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain. Accent parts read --sunui-spot like the other blocks, falling back to --primary.",
       "dependencies": [
         "framer-motion"
       ],

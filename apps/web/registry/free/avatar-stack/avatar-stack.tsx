@@ -30,6 +30,8 @@ export interface AvatarStackProps {
   locale?: string;
   /** Override the built-in strings, takes priority over locale */
   labels?: Partial<AvatarStackLabels>;
+  /** What people without a photo show: initials on the card surface (default), or a soft two-tone gradient picked from their id, the same on every render, for invite lists and team rows that should feel alive without photos */
+  fallback?: "initials" | "gradient";
   className?: string;
 }
 
@@ -87,7 +89,28 @@ const inkOutline = "border-foreground/70";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
+  pop: { type: "spring", stiffness: 460, damping: 26 },
 } as const;
+
+/** Two-tone pairs for fallback="gradient": soft, equal-weight hues that read on light and dark */
+const GRADIENTS = [
+  ["#ff9a76", "#f4436c"],
+  ["#5fb3ff", "#2f5bea"],
+  ["#ffc078", "#ff6f61"],
+  ["#c79bff", "#6d5dfc"],
+  ["#67e8c9", "#1f9d6b"],
+  ["#ffd36e", "#f08a24"],
+  ["#8fd3ff", "#5b6cff"],
+  ["#ff9ed2", "#c2459a"],
+] as const;
+
+/** Stable index from the id, so a person keeps the same gradient everywhere */
+function gradientOf(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  const [a, b] = GRADIENTS[h % GRADIENTS.length];
+  return `linear-gradient(135deg, ${a}, ${b})`;
+}
 
 const sizes = {
   sm: { box: 28, text: "text-[10px]", overlap: -7 },
@@ -105,7 +128,7 @@ function compact(n: number, locale: string) {
   return new Intl.NumberFormat(locale, n >= 1_000 ? { notation: "compact", maximumFractionDigits: 1 } : {}).format(n);
 }
 
-export function AvatarStack({ people, total, max = 4, size = "md", label, onOverflowClick, locale = "en-US", labels, className }: AvatarStackProps) {
+export function AvatarStack({ people, total, max = 4, size = "md", label, onOverflowClick, locale = "en-US", labels, fallback = "initials", className }: AvatarStackProps) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...(label !== undefined ? { label } : null), ...labels };
   const reduce = useReducedMotion() ?? false;
   const s = sizes[size];
@@ -126,14 +149,21 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
             key={p.id}
             className="relative"
             style={{ marginLeft: i === 0 ? 0 : s.overlap, zIndex: visible.length - i + 1 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={reduce ? { duration: 0 } : { duration: 0.15 }}
+            // A new person slides in from the stack and settles; leaving just fades
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.6, x: -8 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            transition={reduce ? { duration: 0 } : springs.pop}
           >
             <Lift title={p.name} note={p.note} reduce={reduce}>
-              <span role="img" tabIndex={0} aria-label={p.note ? `${p.name}, ${p.note}` : p.name} className={cn(disc, "overflow-hidden")} style={{ width: s.box, height: s.box }}>
-                <Face person={p} />
+              <span
+                role="img"
+                tabIndex={0}
+                aria-label={p.note ? `${p.name}, ${p.note}` : p.name}
+                className={cn(disc, "overflow-hidden", fallback === "gradient" && !p.src && "border-2 border-card")}
+                style={{ width: s.box, height: s.box, ...(fallback === "gradient" && !p.src ? { backgroundImage: gradientOf(p.id) } : null) }}
+              >
+                <Face person={p} gradient={fallback === "gradient"} />
               </span>
             </Lift>
           </motion.li>
@@ -186,10 +216,12 @@ function Lift({ title, note, reduce, children }: { title: string; note?: string;
   );
 }
 
-function Face({ person }: { person: AvatarStackPerson }) {
+function Face({ person, gradient }: { person: AvatarStackPerson; gradient: boolean }) {
   const [failed, setFailed] = useState(false);
   if (person.src && !failed) {
     return <img src={person.src} alt="" onError={() => setFailed(true)} className="size-full object-cover" />;
   }
+  // The gradient disc carries no letters; the name is already in aria-label and the tooltip
+  if (gradient && !person.src) return null;
   return <span aria-hidden="true">{initialsOf(person.name)}</span>;
 }

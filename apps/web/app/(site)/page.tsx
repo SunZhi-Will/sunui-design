@@ -173,7 +173,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <section aria-labelledby="wall-title" className={SECTION}>
         <SectionHead id="wall-title" title={m.wall.title} sub={m.wall.lead} />
         <div className="mt-10">
-          <InteractionWall copy={m.wall} locale={locale} />
+          <InteractionWall copy={m.wall} locale={locale} proNames={all.filter((i) => i.meta.tier === "pro").map((i) => i.name)} />
         </div>
       </section>
 

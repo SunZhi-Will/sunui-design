@@ -113,7 +113,7 @@ export default function AvatarStackDemo() {
                 <p className="truncate text-sm font-medium">{productNames[r.kind]}</p>
                 <p className="text-sm tracking-tight tabular-nums">{r.price}</p>
               </div>
-              <AvatarStack people={buyers.slice(r.kind === "mug" ? 1 : 3, r.kind === "mug" ? 4 : 5)} total={r.buyers} max={2} size="sm" locale={locale} label={t.buyersOf(productNames[r.kind])} />
+              <AvatarStack people={buyers.slice(r.kind === "mug" ? 1 : 3, r.kind === "mug" ? 4 : 5)} total={r.buyers} max={2} size="sm" fallback="gradient" locale={locale} label={t.buyersOf(productNames[r.kind])} />
             </li>
           ))}
         </ul>

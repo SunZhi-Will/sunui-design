@@ -49,10 +49,10 @@ const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
 // Default particle colours: all derived from theme tokens, so they follow the theme
 const themeColors = [
-  "var(--primary)",
-  "color-mix(in oklch, var(--primary) 55%, var(--background))",
+  "var(--sunui-spot, var(--primary))",
+  "color-mix(in oklch, var(--sunui-spot, var(--primary)) 55%, var(--background))",
   "var(--foreground)",
-  "color-mix(in oklch, var(--primary) 60%, var(--foreground))",
+  "color-mix(in oklch, var(--sunui-spot, var(--primary)) 60%, var(--foreground))",
   "var(--muted-foreground)",
 ];
 
@@ -78,7 +78,7 @@ export interface LikeBurstProps {
   defaultLiked?: boolean;
   onChange?: (liked: boolean) => void;
   label?: string;
-  /** Particle colours, default follows --primary */
+  /** Particle colours, default follows --sunui-spot (falls back to --primary) */
   colors?: string[];
   className?: string;
 }
@@ -99,7 +99,7 @@ export function LikeBurst({ liked, defaultLiked = false, onChange, label = "Like
       }}
       className={cn(
         "relative grid size-12 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        on && "text-primary hover:text-primary",
+        on && "text-[color:var(--sunui-spot,var(--primary))] hover:text-[color:var(--sunui-spot,var(--primary))]",
         className,
       )}
     >
@@ -202,7 +202,7 @@ export function ConfettiBurst({ children = "Celebrate", count = 36, colors = the
         type="button"
         onClick={fire}
         whileTap={reduce ? undefined : { scale: 0.94 }}
-        className="relative z-10 inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="relative z-10 inline-flex h-10 items-center rounded-md bg-[color:var(--sunui-spot,var(--primary))] px-5 text-sm font-medium text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         {children}
       </motion.button>
@@ -249,7 +249,7 @@ export function SuccessCheck({ message = "Payment complete", size = 64, delay = 
   const reduce = useReducedMotion() ?? false;
   const initial = reduce ? "shown" : "hidden";
   return (
-    <div role="status" className={cn("flex flex-col items-center gap-3 text-primary", className)}>
+    <div role="status" className={cn("flex flex-col items-center gap-3 text-[color:var(--sunui-spot,var(--primary))]", className)}>
       <motion.svg
         viewBox="0 0 52 52"
         width={size}
@@ -314,7 +314,7 @@ export function AnimatedCheckbox({ checked, defaultChecked = false, onChange, la
         aria-hidden="true"
         className={cn(
           "grid size-5 shrink-0 place-items-center rounded-[5px] border-2 transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring",
-          on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background",
+          on ? "border-[color:var(--sunui-spot,var(--primary))] bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]" : "border-border bg-background",
         )}
       >
         <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -473,7 +473,7 @@ export function CopyFeedback({ text, label = "Copy", copiedLabel = "Copied", res
             <motion.svg
               key="check"
               viewBox="0 0 16 16"
-              className="size-4 text-primary"
+              className="size-4 text-[color:var(--sunui-spot,var(--primary))]"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -572,7 +572,7 @@ export function NotificationBadge({ count, max = 99, label = "Notifications", ch
             {ping > 0 && !reduce && (
               <motion.span
                 key={ping}
-                className="absolute inset-0 rounded-full bg-primary"
+                className="absolute inset-0 rounded-full bg-[color:var(--sunui-spot,var(--primary))]"
                 initial={{ scale: 1, opacity: 0.6 }}
                 animate={{ scale: 2.2, opacity: 0 }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
@@ -580,7 +580,7 @@ export function NotificationBadge({ count, max = 99, label = "Notifications", ch
             )}
             <motion.span
               key={bump}
-              className="relative grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-[11px] font-semibold tabular-nums text-primary-foreground ring-2 ring-background"
+              className="relative grid h-5 min-w-5 place-items-center rounded-full bg-[color:var(--sunui-spot,var(--primary))] px-1.5 text-[11px] font-semibold tabular-nums text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] ring-2 ring-background"
               initial={bump > 0 && !reduce ? { scale: 1 } : false}
               animate={bump > 0 && !reduce ? { scale: [1, 1.35, 0.9, 1.06, 1], y: [0, -4, 0, -1, 0] } : undefined}
               transition={{ duration: 0.5 }}
@@ -646,7 +646,7 @@ export function FloatingLabelInput({ label, value, defaultValue = "", onChange, 
       </motion.label>
       <motion.span
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-0.5 origin-center bg-primary"
+        className="absolute inset-x-0 bottom-0 h-0.5 origin-center bg-[color:var(--sunui-spot,var(--primary))]"
         initial={false}
         animate={{ scaleX: focused ? 1 : 0 }}
         transition={reduce ? { duration: 0 } : { duration: 0.3, ease: "easeOut" }}
@@ -725,7 +725,7 @@ export function SlideToConfirm({ label = "Slide to confirm", confirmedLabel = "C
       ref={track}
       className={cn("relative h-12 w-full max-w-xs select-none overflow-hidden rounded-full bg-muted ring-1 ring-inset ring-border", className)}
     >
-      <motion.div aria-hidden="true" className="absolute inset-y-0 left-0 rounded-full bg-primary/20" style={{ width: fill }} />
+      <motion.div aria-hidden="true" className="absolute inset-y-0 left-0 rounded-full bg-[color:color-mix(in_oklch,var(--sunui-spot,var(--primary))_20%,transparent)]" style={{ width: fill }} />
       <motion.span
         aria-hidden="true"
         className="absolute inset-0 grid place-items-center pl-10 text-sm font-medium text-muted-foreground"
@@ -759,7 +759,7 @@ export function SlideToConfirm({ label = "Slide to confirm", confirmedLabel = "C
         onDragEnd={onDragEnd}
         onKeyDown={onKeyDown}
         style={{ x, width: KNOB, height: KNOB, top: PAD, left: PAD }}
-        className="absolute grid cursor-grab touch-none place-items-center rounded-full bg-primary text-primary-foreground shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:cursor-grabbing"
+        className="absolute grid cursor-grab touch-none place-items-center rounded-full bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:cursor-grabbing"
       >
         <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d={done ? "M3 8.5l3 3 7-7" : "M6 3.5 10.5 8 6 12.5"} />
@@ -966,7 +966,7 @@ export function SendPlaneButton({ label = "Send", sentLabel = "Sent", onSend, re
         setPhase(reduce ? "sent" : "flying");
       }}
       className={cn(
-        "relative inline-flex h-10 min-w-28 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default",
+        "relative inline-flex h-10 min-w-28 items-center justify-center gap-2 rounded-md bg-[color:var(--sunui-spot,var(--primary))] px-5 text-sm font-medium text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default",
         className,
       )}
     >

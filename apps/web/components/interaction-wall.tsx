@@ -121,7 +121,8 @@ type TileProps = { auto: boolean; offset: number; t: WallCopy; locale: string };
 
 /**
  * 牆上的顏色：參考影片是白卡加少量彩色（藍色的狀態、紅色愛心、彩色頭像）。外殼仍是黑白灰，
- * 顏色只透過區塊自己的 --sunui-spot（micro-interactions 與 button-effects 讀 --primary）注入，跟首頁預覽一樣只出現在區塊身上。
+ * 顏色只透過區塊自己的 --sunui-spot 注入（每個區塊讀最近一層祖先的值，所以每格可以不同色），跟首頁預覽一樣只出現在區塊身上。
+ * 牆下方的切換可以拿掉這些設定，看到區塊在主題預設下的樣子。
  */
 const BLUE = "#3b6cf6";
 /** 漸層頭像（參考影片的彩色圓），用 SVG data URI 當 src，不需要外部圖片 */
@@ -130,19 +131,8 @@ const gradient = (a: string, b: string) =>
 /** 卡片裡的字級：跟參考一樣小，標題 15px、說明 11px */
 const TITLE = "text-[15px] font-semibold tracking-tight";
 const SUB = "text-[11px] leading-snug text-muted-foreground";
-const tone = (spot: string, fg = "#ffffff", primary = false): CSSProperties =>
-  ({
-    "--sunui-spot": spot,
-    "--sunui-spot-foreground": fg,
-    ...(primary
-      ? {
-          "--primary": spot,
-          "--color-primary": spot,
-          "--primary-foreground": fg,
-          "--color-primary-foreground": fg,
-        }
-      : {}),
-  }) as CSSProperties;
+const tone = (spot: string, fg = "#ffffff"): CSSProperties =>
+  ({ "--sunui-spot": spot, "--sunui-spot-foreground": fg }) as CSSProperties;
 
 /* ------------------------------------------------------------------ */
 /* 二十格 */
@@ -174,7 +164,7 @@ function PricingTile({ auto, offset, t }: TileProps) {
           <span
             aria-hidden={!yearly}
             className={cn(
-              "rounded-full bg-[#3b6cf6]/12 px-2 py-0.5 text-[10px] font-medium text-[#3b6cf6] transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none",
+              "rounded-full bg-[color:color-mix(in_oklch,var(--sunui-spot,var(--primary))_12%,transparent)] px-2 py-0.5 text-[10px] font-medium text-[color:var(--sunui-spot,var(--primary))] transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none",
               yearly ? "scale-100 opacity-100" : "scale-90 opacity-0",
             )}
           >
@@ -209,7 +199,7 @@ function PricingTile({ auto, offset, t }: TileProps) {
               className={cn(
                 "grid size-3.5 place-items-center rounded-full",
                 i === 2
-                  ? "bg-[#3b6cf6] text-white"
+                  ? "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]"
                   : "bg-foreground/[0.08] text-foreground/60",
               )}
             >
@@ -343,11 +333,11 @@ function ToggleTile({ auto, offset, t }: TileProps) {
 }
 
 const PEOPLE = [
-  { id: "a", name: "Mina P.", src: gradient("#ff8a65", "#f4436c") },
-  { id: "b", name: "Leo K.", src: gradient("#4facfe", "#2f5bea") },
-  { id: "c", name: "Ava S.", src: gradient("#ffb36b", "#ff6f61") },
-  { id: "d", name: "Noah T.", src: gradient("#c084fc", "#6d5dfc") },
-  { id: "e", name: "Iris W.", src: gradient("#5eead4", "#22a06b") },
+  { id: "mina", name: "Mina P." },
+  { id: "leo", name: "Leo K." },
+  { id: "ava", name: "Ava S." },
+  { id: "noah", name: "Noah T." },
+  { id: "iris", name: "Iris W." },
 ];
 
 function AvatarTile({ auto, offset, t, locale }: TileProps) {
@@ -374,7 +364,7 @@ function AvatarTile({ auto, offset, t, locale }: TileProps) {
         <p className={TITLE}>{t.shareTitle}</p>
         <p className={SUB}>{format(t.people, { n })}</p>
       </div>
-      <AvatarStack people={PEOPLE.slice(0, n)} max={5} locale={locale} />
+      <AvatarStack people={PEOPLE.slice(0, n)} max={5} fallback="gradient" locale={locale} />
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -903,6 +893,8 @@ function CheckTile({ auto, offset, t }: TileProps) {
 
 type TileDef = {
   block: string;
+  /** 這格的完整情境是哪一個 Pro 區塊；Pro 資料夾在時名稱改連到它並標 Pro */
+  pro?: string;
   Tile: (p: TileProps) => ReactNode;
   fill?: boolean;
   style?: CSSProperties;
@@ -910,14 +902,14 @@ type TileDef = {
 
 /** 順序就是版面順序（5 欄 × 4 列）。block 是型錄裡的區塊名稱 */
 const TILES: TileDef[] = [
-  { block: "sliding-tabs", Tile: PricingTile, style: tone(BLUE) },
+  { block: "sliding-tabs", pro: "pricing-cards", Tile: PricingTile, style: tone(BLUE) },
   {
     block: "micro-interactions",
     Tile: ToggleTile,
-    style: tone(BLUE, "#ffffff", true),
+    style: tone(BLUE),
   },
-  { block: "avatar-stack", Tile: AvatarTile },
-  { block: "star-rating", Tile: RatingTile, style: tone("#f5a524") },
+  { block: "avatar-stack", pro: "team-invite", Tile: AvatarTile },
+  { block: "star-rating", pro: "review-request", Tile: RatingTile, style: tone("#f5a524") },
   { block: "loading-button", Tile: LoadingTile, style: tone(BLUE) },
   { block: "favorite-button", Tile: FavoriteTile, style: tone("#f43f5e") },
   { block: "quantity-stepper", Tile: StepperTile },
@@ -926,7 +918,7 @@ const TILES: TileDef[] = [
   {
     block: "micro-interactions",
     Tile: TodoTile,
-    style: tone(BLUE, "#ffffff", true),
+    style: tone(BLUE),
   },
   { block: "command-palette", Tile: CommandTile, style: tone(BLUE) },
   { block: "floating-field", Tile: PasswordTile, style: tone(BLUE) },
@@ -935,7 +927,7 @@ const TILES: TileDef[] = [
   {
     block: "micro-interactions",
     Tile: HoldTile,
-    style: tone(BLUE, "#ffffff", true),
+    style: tone(BLUE),
   },
   {
     block: "range-slider",
@@ -946,13 +938,13 @@ const TILES: TileDef[] = [
   {
     block: "micro-interactions",
     Tile: SendTile,
-    style: tone(BLUE, "#ffffff", true),
+    style: tone(BLUE),
   },
   { block: "toast-stack", Tile: ToastTile, fill: true, style: tone("#22a06b") },
   {
     block: "micro-interactions",
     Tile: CheckTile,
-    style: tone("#22a06b", "#ffffff", true),
+    style: tone("#22a06b"),
   },
 ];
 
@@ -962,12 +954,16 @@ function Cell({
   wallOn,
   t,
   locale,
+  brand,
+  proNames,
 }: {
   def: TileDef;
   index: number;
   wallOn: boolean;
   t: WallCopy;
   locale: string;
+  brand: boolean;
+  proNames: string[];
 }) {
   const [held, setHeld] = useState(false);
   const timer = useRef<number | undefined>(undefined);
@@ -981,6 +977,9 @@ function Cell({
     timer.current = window.setTimeout(() => setHeld(false), RESUME_MS);
   };
   const { Tile } = def;
+  // 有完整 Pro 版的格子，名稱連到 Pro 區塊；公開 repo 沒有 Pro 資料夾時退回免費區塊
+  const isPro = !!def.pro && proNames.includes(def.pro);
+  const name = isPro ? def.pro! : def.block;
   return (
     <div
       role="group"
@@ -989,7 +988,7 @@ function Cell({
       onPointerLeave={release}
       onFocus={hold}
       onBlur={release}
-      style={def.style}
+      style={brand ? def.style : undefined}
       className={cn("group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#161616] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]",
         // 首頁上：手機只放前 6 格，平板 3 欄放 18 格，4 欄以上才放滿 20 格，免得頁面太長
         index >= 6 && "hidden md:flex",
@@ -1010,11 +1009,12 @@ function Cell({
         />
       </div>
       <Link
-        href={`/blocks/${def.block}`}
-        aria-label={format(t.open, { name: def.block })}
-        className="absolute bottom-2.5 left-3.5 z-10 rounded-md px-1.5 py-0.5 font-mono text-[11px] text-subtle opacity-0 transition-opacity duration-150 group-hover/cell:opacity-100 hover:text-fg focus-visible:opacity-100 focus-visible:text-fg"
+        href={`/blocks/${name}`}
+        aria-label={format(t.open, { name })}
+        className="absolute bottom-2.5 left-3.5 z-10 inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 font-mono text-[11px] text-subtle opacity-0 transition-opacity duration-150 group-hover/cell:opacity-100 hover:text-fg focus-visible:opacity-100 focus-visible:text-fg"
       >
-        {def.block}
+        {name}
+        {isPro && <span className="rounded-sm bg-foreground/[0.07] px-1 font-sans text-[10px] font-medium text-fg">Pro</span>}
       </Link>
     </div>
   );
@@ -1023,14 +1023,18 @@ function Cell({
 export function InteractionWall({
   copy,
   locale,
+  proNames = [],
 }: {
   copy: WallCopy;
   locale: string;
+  /** 目前有的 Pro 區塊名稱（Pro 資料夾不在時是空的） */
+  proNames?: string[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const onScreen = useOnScreen(ref as RefObject<HTMLElement | null>);
   const reduce = useReducedMotion();
   const [paused, setPaused] = useState(false);
+  const [brand, setBrand] = useState(true);
   const wallOn = onScreen && !paused && !reduce;
 
   return (
@@ -1050,11 +1054,45 @@ export function InteractionWall({
               wallOn={wallOn}
               t={copy}
               locale={locale}
+              brand={brand}
+              proNames={proNames}
             />
           ))}
         </div>
-        {!reduce && (
-          <div className="mt-3 flex justify-end">
+        {/* 顏色切換：品牌色是每格設一個 --sunui-spot；主題預設就是拿掉它，區塊回到主題的主色 */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <div role="radiogroup" aria-label={copy.colorLabel} className="inline-flex rounded-lg bg-foreground/[0.05] p-0.5 text-[13px]">
+              {[
+                { on: false, label: copy.themeDefault },
+                { on: true, label: copy.brandColor },
+              ].map((o) => (
+                <button
+                  key={String(o.on)}
+                  type="button"
+                  role="radio"
+                  aria-checked={brand === o.on}
+                  onClick={() => setBrand(o.on)}
+                  className={cn(
+                    "h-7 rounded-md px-3 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-accent",
+                    brand === o.on ? "bg-bg font-medium text-fg shadow-[0_1px_2px_rgb(0_0_0/0.06)]" : "text-subtle hover:text-fg",
+                  )}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[13px] text-subtle">
+              {brand ? (
+                <>
+                  {copy.colorNote} <code className="rounded bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[12px] text-fg">--sunui-spot: #3b6cf6</code>
+                </>
+              ) : (
+                copy.themeNote
+              )}
+            </p>
+          </div>
+          {!reduce && (
             <button
               type="button"
               onClick={() => setPaused((p) => !p)}
@@ -1063,8 +1101,8 @@ export function InteractionWall({
             >
               {paused ? copy.play : copy.pause}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </MotionConfig>
   );
