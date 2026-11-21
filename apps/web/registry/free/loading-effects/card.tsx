@@ -30,13 +30,13 @@ export default function LoadingEffectsCard() {
   return (
     <div className="grid w-full max-w-sm grid-cols-2 gap-2">
       <div className={tile}>
-        <Loader variant="bouncing-dots" size="lg" label={t.loading} />
+        <Loader variant="bouncing-dots" size="lg" palette="sunset" label={t.loading} />
       </div>
       <div className={tile}>
-        <Loader variant="liquid" size="lg" value={VALUES[i]} label={t.loading} />
+        <Loader variant="liquid" size="lg" palette="lagoon" value={VALUES[i]} label={t.loading} />
       </div>
       <div className={tile}>
-        <Loader variant="equalizer" size="lg" label={t.loading} />
+        <Loader variant="equalizer" size="lg" palette="aurora" label={t.loading} />
       </div>
       <div className={`${tile} px-4`}>
         <Skeleton lines={1} label={t.loading} />

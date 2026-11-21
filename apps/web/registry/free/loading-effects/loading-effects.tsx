@@ -61,6 +61,61 @@ const loop = (t: Transition): Transition => ({ repeat: Infinity, ease: "easeInOu
 const clampPct = (v: number) => Math.min(100, Math.max(0, v));
 const track = "color-mix(in oklab, currentColor 18%, transparent)";
 
+/**
+ * Colour for one loader, resolved from its palette.
+ * solid: one colour for single-colour parts. at(t): a colour along the gradient, 0..1, for loaders made of
+ * several pieces (dots, bars). css(angle): a CSS background for single shapes. gradient: set when the palette
+ * is a gradient, so SVG strokes can use <InkGradient>.
+ */
+type Ink = {
+  solid: string;
+  at: (t: number) => string;
+  css: (angle?: number) => string;
+  gradient: boolean;
+  /** Text and strokes drawn on top of a filled shape */
+  on: string;
+};
+
+const SPOT = "var(--sunui-spot, var(--primary))";
+const SPOT_ON = "var(--sunui-spot-foreground, var(--primary-foreground))";
+
+/** `success` turns the status palette green; loaders other than the dot matrix have no error state */
+function makeInk(palette: LoaderPalette, color: string | undefined, success = false): Ink {
+  const g = GRADIENTS[palette];
+  if (g) {
+    const at = (t: number) => `oklch(${g.l} ${g.c} ${g.from + (g.to - g.from) * Math.min(1, Math.max(0, t))})`;
+    return {
+      solid: at(0.5),
+      at,
+      css: (angle = 90) => `linear-gradient(${angle}deg, ${at(0)}, ${at(0.5)}, ${at(1)})`,
+      gradient: true,
+      on: "#ffffff",
+    };
+  }
+  const solid = palette === "status" && success ? SUCCESS : (color ?? SPOT);
+  const on = palette === "status" && success ? "#ffffff" : color ? "#ffffff" : SPOT_ON;
+  return { solid, at: () => solid, css: () => solid, gradient: false, on };
+}
+
+/** SVG linear gradient for strokes and fills; render inside the <svg> and use stroke={`url(#${id})`} */
+function InkGradient({ id, ink, vertical = false }: { id: string; ink: Ink; vertical?: boolean }) {
+  return (
+    <defs>
+      <linearGradient id={id} x1="0" y1="0" x2={vertical ? "0" : "1"} y2="1">
+        <stop offset="0%" stopColor={ink.at(0)} />
+        <stop offset="50%" stopColor={ink.at(0.5)} />
+        <stop offset="100%" stopColor={ink.at(1)} />
+      </linearGradient>
+    </defs>
+  );
+}
+
+/** Stroke or fill for an SVG part: a gradient reference, or the solid colour */
+function useStroke(ink: Ink, vertical = false) {
+  const id = useId().replace(/:/g, "");
+  return { id, paint: ink.gradient ? `url(#${id})` : ink.solid, defs: ink.gradient ? <InkGradient id={id} ink={ink} vertical={vertical} /> : null };
+}
+
 /** Hidden text for screen readers */
 function SrOnly({ children }: { children: ReactNode }) {
   return <span className="sr-only">{children}</span>;
@@ -81,7 +136,9 @@ export interface LoaderProps {
   label?: string;
   /** 0 to 100, used by progress-ring, bar and liquid */
   value?: number;
-  /** Main color, default var(--primary) */
+  /** Colour scheme shared with DotMatrixLoader: spot (default), status, aurora, sunset, lagoon, prism */
+  palette?: LoaderPalette;
+  /** Main colour for the spot palette, default the brand spot colour (falls back to --primary) */
   color?: string;
   /** spinner-check: when true the arc completes, the disc settles and the check draws */
   done?: boolean;
@@ -90,12 +147,24 @@ export interface LoaderProps {
   className?: string;
 }
 
-export function Loader({ variant = "ring-spinner", size = "md", label = "Loading", value = 0, color, done = false, doneLabel = "Done", className }: LoaderProps) {
+export function Loader({
+  variant = "ring-spinner",
+  size = "md",
+  label = "Loading",
+  value = 0,
+  palette = "spot",
+  color,
+  done = false,
+  doneLabel = "Done",
+  className,
+}: LoaderProps) {
   const { ref, active, reduce } = useActive<HTMLSpanElement>();
   const s = SIZES[size];
   const determinate = variant === "progress-ring" || variant === "bar" || variant === "liquid";
   const pct = clampPct(value);
-  const style: CSSProperties = { color: color ?? "var(--primary)" };
+  // Status palette turns green when the work is finished: spinner-check is done, or a determinate loader reached 100
+  const ink = makeInk(palette, color, (variant === "spinner-check" && done) || (determinate && pct >= 100));
+  const style: CSSProperties = { color: ink.solid };
   const isBar = variant === "bar" || variant === "indeterminate-bar";
 
   return (
@@ -107,17 +176,17 @@ export function Loader({ variant = "ring-spinner", size = "md", label = "Loading
     >
       <SrOnly>{determinate ? `${label} ${Math.round(pct)}%` : variant === "spinner-check" && done ? doneLabel : label}</SrOnly>
       <span aria-hidden className={cn(isBar ? "flex w-full" : "inline-flex", "items-center justify-center")}>
-        {variant === "bouncing-dots" && <BouncingDots s={s} active={active} />}
-        {variant === "equalizer" && <Equalizer s={s} active={active} />}
-        {variant === "ring-spinner" && <RingSpinner s={s} active={active} />}
-        {variant === "spinner-check" && <SpinnerCheck s={s} active={active} done={done} reduce={reduce} />}
-        {variant === "orbit" && <Orbit s={s} active={active} />}
-        {variant === "pulse-dot" && <PulseDot s={s} active={active} />}
-        {variant === "progress-ring" && <ProgressRing s={s} pct={pct} reduce={reduce} />}
-        {variant === "bar" && <ProgressBar s={s} pct={pct} reduce={reduce} />}
-        {variant === "indeterminate-bar" && <IndeterminateBar s={s} active={active} />}
-        {variant === "typing-indicator" && <TypingIndicator s={s} active={active} />}
-        {variant === "liquid" && <Liquid s={s} pct={pct} active={active} reduce={reduce} />}
+        {variant === "bouncing-dots" && <BouncingDots s={s} active={active} ink={ink} />}
+        {variant === "equalizer" && <Equalizer s={s} active={active} ink={ink} />}
+        {variant === "ring-spinner" && <RingSpinner s={s} active={active} ink={ink} />}
+        {variant === "spinner-check" && <SpinnerCheck s={s} active={active} done={done} reduce={reduce} ink={ink} />}
+        {variant === "orbit" && <Orbit s={s} active={active} ink={ink} />}
+        {variant === "pulse-dot" && <PulseDot s={s} active={active} ink={ink} />}
+        {variant === "progress-ring" && <ProgressRing s={s} pct={pct} reduce={reduce} ink={ink} />}
+        {variant === "bar" && <ProgressBar s={s} pct={pct} reduce={reduce} ink={ink} />}
+        {variant === "indeterminate-bar" && <IndeterminateBar s={s} active={active} ink={ink} />}
+        {variant === "typing-indicator" && <TypingIndicator s={s} active={active} ink={palette === "spot" && !color ? null : ink} />}
+        {variant === "liquid" && <Liquid s={s} pct={pct} active={active} reduce={reduce} ink={ink} />}
       </span>
     </span>
   );
@@ -125,15 +194,15 @@ export function Loader({ variant = "ring-spinner", size = "md", label = "Loading
 
 /* ---- Indeterminate ---- */
 
-function BouncingDots({ s, active }: { s: number; active: boolean }) {
+function BouncingDots({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const d = Math.max(4, s * 0.22);
   return (
     <span className="inline-flex items-end" style={{ gap: d * 0.6, height: s, paddingBottom: s * 0.15 }}>
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className="rounded-full bg-current"
-          style={{ width: d, height: d }}
+          className="rounded-full"
+          style={{ width: d, height: d, background: ink.at(i / 2) }}
           animate={active ? { y: [0, -s * 0.4, 0] } : { y: 0 }}
           transition={active ? loop({ duration: 0.6, delay: i * 0.12, repeatDelay: 0.3 }) : { duration: 0.2 }}
         />
@@ -149,15 +218,15 @@ const EQ = [
   [1, 0.45, 0.7, 0.4, 1],
 ];
 
-function Equalizer({ s, active }: { s: number; active: boolean }) {
+function Equalizer({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const w = Math.max(3, s * 0.14);
   return (
     <span className="inline-flex items-end" style={{ height: s, gap: w * 0.6 }}>
       {EQ.map((frames, i) => (
         <motion.span
           key={i}
-          className="h-full origin-bottom rounded-sm bg-current"
-          style={{ width: w }}
+          className="h-full origin-bottom rounded-sm"
+          style={{ width: w, background: ink.at(i / (EQ.length - 1)) }}
           initial={{ scaleY: frames[0] }}
           animate={{ scaleY: active ? frames : frames[0] }}
           transition={active ? loop({ duration: 1.1 + i * 0.08, ease: "easeInOut" }) : { duration: 0.2 }}
@@ -167,9 +236,10 @@ function Equalizer({ s, active }: { s: number; active: boolean }) {
   );
 }
 
-function RingSpinner({ s, active }: { s: number; active: boolean }) {
+function RingSpinner({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const sw = Math.max(2.5, s * 0.1);
   const r = (s - sw) / 2;
+  const stroke = useStroke(ink);
   return (
     <motion.svg
       width={s}
@@ -179,16 +249,18 @@ function RingSpinner({ s, active }: { s: number; active: boolean }) {
       animate={{ rotate: active ? 360 : 0 }}
       transition={active ? { repeat: Infinity, ease: "linear", duration: 0.9 } : { duration: 0 }}
     >
+      {stroke.defs}
       <circle cx={s / 2} cy={s / 2} r={r} stroke={track} strokeWidth={sw} />
-      <circle cx={s / 2} cy={s / 2} r={r} stroke="currentColor" strokeWidth={sw} strokeLinecap="round" pathLength={100} strokeDasharray="28 72" />
+      <circle cx={s / 2} cy={s / 2} r={r} stroke={stroke.paint} strokeWidth={sw} strokeLinecap="round" pathLength={100} strokeDasharray="28 72" />
     </motion.svg>
   );
 }
 
 /** The spinning arc closes into a circle on completion, then the disc settles once with pop and the check strokes in, same feel as Result */
-function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean; done: boolean; reduce: boolean }) {
+function SpinnerCheck({ s, active, done, reduce, ink }: { s: number; active: boolean; done: boolean; reduce: boolean; ink: Ink }) {
   const sw = Math.max(2.5, s * 0.1);
   const r = (s - sw) / 2;
+  const stroke = useStroke(ink);
   const rot = useMotionValue(0);
   useEffect(() => {
     if (!active || done) return;
@@ -200,12 +272,13 @@ function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean;
   return (
     <span className="relative inline-grid place-items-center" style={{ width: s, height: s }}>
       <motion.svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} fill="none" className="absolute inset-0" style={{ rotate: rot }}>
+        {stroke.defs}
         <circle cx={s / 2} cy={s / 2} r={r} stroke={track} strokeWidth={sw} />
         <motion.circle
           cx={s / 2}
           cy={s / 2}
           r={r}
-          stroke="currentColor"
+          stroke={stroke.paint}
           strokeWidth={sw}
           strokeLinecap="round"
           initial={false}
@@ -214,12 +287,13 @@ function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean;
         />
       </motion.svg>
       <motion.span
-        className="absolute inset-0 rounded-full bg-current shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]"
+        className="absolute inset-0 rounded-full shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]"
+        style={{ background: ink.css(135) }}
         initial={false}
         animate={done ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
         transition={done ? t({ ...pop, delay: 0.18 }) : t({ duration: 0.15 })}
       />
-      <svg viewBox="0 0 24 24" className="relative" style={{ width: s * 0.5, height: s * 0.5 }} fill="none" stroke="var(--background)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" className="relative" style={{ width: s * 0.5, height: s * 0.5 }} fill="none" stroke={ink.on} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
         <motion.path
           d="M5 12.5l4.5 4.5L19 7.5"
           initial={false}
@@ -231,11 +305,11 @@ function SpinnerCheck({ s, active, done, reduce }: { s: number; active: boolean;
   );
 }
 
-function Orbit({ s, active }: { s: number; active: boolean }) {
+function Orbit({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const d = Math.max(4, s * 0.18);
   return (
     <span className="relative inline-block" style={{ width: s, height: s }}>
-      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current opacity-30" style={{ width: d, height: d }} />
+      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30" style={{ width: d, height: d, background: ink.at(0.5) }} />
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
@@ -245,8 +319,8 @@ function Orbit({ s, active }: { s: number; active: boolean }) {
           transition={active ? { repeat: Infinity, ease: "linear", duration: 1.4 + i * 0.35 } : { duration: 0 }}
         >
           <span
-            className="absolute left-1/2 top-0 -translate-x-1/2 rounded-full bg-current"
-            style={{ width: d * (1 - i * 0.2), height: d * (1 - i * 0.2), opacity: 1 - i * 0.2 }}
+            className="absolute left-1/2 top-0 -translate-x-1/2 rounded-full"
+            style={{ width: d * (1 - i * 0.2), height: d * (1 - i * 0.2), opacity: 1 - i * 0.2, background: ink.at(i / 2) }}
           />
         </motion.span>
       ))}
@@ -254,7 +328,7 @@ function Orbit({ s, active }: { s: number; active: boolean }) {
   );
 }
 
-function PulseDot({ s, active }: { s: number; active: boolean }) {
+function PulseDot({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const d = s * 0.36;
   return (
     <span className="relative inline-grid place-items-center" style={{ width: s, height: s }}>
@@ -262,24 +336,25 @@ function PulseDot({ s, active }: { s: number; active: boolean }) {
         [0, 1].map((i) => (
           <motion.span
             key={i}
-            className="absolute rounded-full bg-current"
-            style={{ width: d, height: d }}
+            className="absolute rounded-full"
+            style={{ width: d, height: d, background: ink.at(i ? 1 : 0) }}
             initial={{ scale: 1, opacity: 0.5 }}
             animate={{ scale: 2.8, opacity: 0 }}
             transition={{ repeat: Infinity, duration: 1.6, ease: "easeOut", delay: i * 0.8 }}
           />
         ))}
-      <span className="relative rounded-full bg-current" style={{ width: d, height: d }} />
+      <span className="relative rounded-full" style={{ width: d, height: d, background: ink.css(135) }} />
     </span>
   );
 }
 
-function IndeterminateBar({ s, active }: { s: number; active: boolean }) {
+function IndeterminateBar({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
   const h = Math.max(3, s * 0.12);
   return (
     <span className="relative block w-full overflow-hidden rounded-full" style={{ height: h, background: track }}>
       <motion.span
-        className="absolute inset-y-0 left-0 w-2/5 rounded-full bg-current"
+        className="absolute inset-y-0 left-0 w-2/5 rounded-full"
+        style={{ background: ink.css() }}
         initial={{ x: active ? "-100%" : "75%" }}
         animate={{ x: active ? "250%" : "75%" }}
         transition={active ? { repeat: Infinity, duration: 1.3, ease: [0.45, 0, 0.2, 1] } : { duration: 0 }}
@@ -297,7 +372,8 @@ const typingDot: Variants = {
   }),
 };
 
-function TypingIndicator({ s, active }: { s: number; active: boolean }) {
+/** Neutral grey by default, like a chat bubble; any palette other than plain spot colours the dots */
+function TypingIndicator({ s, active, ink }: { s: number; active: boolean; ink: Ink | null }) {
   const d = Math.max(4, s * 0.18);
   return (
     <span
@@ -311,8 +387,8 @@ function TypingIndicator({ s, active }: { s: number; active: boolean }) {
           variants={typingDot}
           initial="rest"
           animate={active ? "run" : "rest"}
-          className="rounded-full bg-muted-foreground"
-          style={{ width: d, height: d }}
+          className={cn("rounded-full", !ink && "bg-muted-foreground")}
+          style={{ width: d, height: d, background: ink?.at(i / 2) }}
         />
       ))}
     </span>
@@ -321,8 +397,9 @@ function TypingIndicator({ s, active }: { s: number; active: boolean }) {
 
 /* ---- Determinate ---- */
 
-function ProgressRing({ s, pct, reduce }: { s: number; pct: number; reduce: boolean }) {
+function ProgressRing({ s, pct, reduce, ink }: { s: number; pct: number; reduce: boolean; ink: Ink }) {
   const size = Math.max(s, 28);
+  const stroke = useStroke(ink);
   const sw = Math.max(3, size * 0.1);
   const r = (size - sw) / 2;
   const v = useSpring(pct / 100, spring);
@@ -334,8 +411,9 @@ function ProgressRing({ s, pct, reduce }: { s: number; pct: number; reduce: bool
   return (
     <span className="relative inline-grid place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" className="-rotate-90">
+        {stroke.defs}
         <circle cx={size / 2} cy={size / 2} r={r} stroke={track} strokeWidth={sw} />
-        <motion.circle cx={size / 2} cy={size / 2} r={r} stroke="currentColor" strokeWidth={sw} strokeLinecap="round" style={{ pathLength: v }} />
+        <motion.circle cx={size / 2} cy={size / 2} r={r} stroke={stroke.paint} strokeWidth={sw} strokeLinecap="round" style={{ pathLength: v }} />
       </svg>
       {size >= 36 && (
         <motion.span className="absolute font-medium tabular-nums text-foreground" style={{ fontSize: size * 0.26 }}>
@@ -346,7 +424,7 @@ function ProgressRing({ s, pct, reduce }: { s: number; pct: number; reduce: bool
   );
 }
 
-function ProgressBar({ s, pct, reduce }: { s: number; pct: number; reduce: boolean }) {
+function ProgressBar({ s, pct, reduce, ink }: { s: number; pct: number; reduce: boolean; ink: Ink }) {
   const h = Math.max(4, s * 0.16);
   const v = useSpring(pct / 100, spring);
   useEffect(() => {
@@ -355,13 +433,14 @@ function ProgressBar({ s, pct, reduce }: { s: number; pct: number; reduce: boole
   }, [pct, reduce, v]);
   return (
     <span className="relative block w-full overflow-hidden rounded-full" style={{ height: h, background: track }}>
-      <motion.span className="absolute inset-0 origin-left rounded-full bg-current" style={{ scaleX: v }} />
+      <motion.span className="absolute inset-0 origin-left rounded-full" style={{ scaleX: v, background: ink.css() }} />
     </span>
   );
 }
 
-function Liquid({ s, pct, active, reduce }: { s: number; pct: number; active: boolean; reduce: boolean }) {
+function Liquid({ s, pct, active, reduce, ink }: { s: number; pct: number; active: boolean; reduce: boolean; ink: Ink }) {
   const size = Math.max(s, 32);
+  const fill = useStroke(ink, true);
   const level = useSpring(pct, spring);
   useEffect(() => {
     if (reduce) level.jump(pct);
@@ -378,16 +457,17 @@ function Liquid({ s, pct, active, reduce }: { s: number; pct: number; active: bo
     >
       <motion.span className="absolute inset-x-0 -bottom-[6%] h-[112%]" style={{ y }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full">
+          {fill.defs}
           <motion.path
             d={wave}
-            fill="currentColor"
+            fill={fill.paint}
             opacity={0.35}
             animate={{ x: active ? [-100, 0] : -50 }}
             transition={active ? { repeat: Infinity, ease: "linear", duration: 2.6 } : { duration: 0 }}
           />
           <motion.path
             d={wave}
-            fill="currentColor"
+            fill={fill.paint}
             animate={{ x: active ? [0, -100] : 0 }}
             transition={active ? { repeat: Infinity, ease: "linear", duration: 1.8 } : { duration: 0 }}
           />
@@ -408,11 +488,14 @@ export interface TopLoadingBarProps {
   position?: "fixed" | "absolute";
   /** Height (px) */
   height?: number;
+  /** Colour scheme, same as Loader */
+  palette?: LoaderPalette;
   color?: string;
   className?: string;
 }
 
-export function TopLoadingBar({ loading, label = "Loading", position = "fixed", height = 3, color, className }: TopLoadingBarProps) {
+export function TopLoadingBar({ loading, label = "Loading", position = "fixed", height = 3, palette = "spot", color, className }: TopLoadingBarProps) {
+  const ink = makeInk(palette, color);
   const reduce = useReducedMotion() ?? false;
   const scale = useMotionValue(0);
   const opacity = useMotionValue(0);
@@ -456,14 +539,14 @@ export function TopLoadingBar({ loading, label = "Loading", position = "fixed", 
   return (
     <div
       className={cn(position, "inset-x-0 top-0 z-50 overflow-hidden", className)}
-      style={{ height, color: color ?? "var(--primary)" }}
+      style={{ height, color: ink.solid }}
       role="status"
     >
       {loading && <SrOnly>{label}</SrOnly>}
       <motion.div
         aria-hidden
-        className="h-full origin-left bg-current shadow-[0_0_8px_currentColor]"
-        style={{ scaleX: scale, opacity }}
+        className="h-full origin-left shadow-[0_0_8px_currentColor]"
+        style={{ scaleX: scale, opacity, background: ink.css() }}
       />
     </div>
   );
@@ -482,10 +565,13 @@ export interface MultiStepLoaderProps {
   /** Whether to restart after finishing when uncontrolled */
   loop?: boolean;
   label?: string;
+  /** Colour scheme, same as Loader. Gradients give each step its own hue; status turns finished steps green */
+  palette?: LoaderPalette;
+  color?: string;
   className?: string;
 }
 
-export function MultiStepLoader({ steps, current, interval = 1400, loop = false, label = "Loading", className }: MultiStepLoaderProps) {
+export function MultiStepLoader({ steps, current, interval = 1400, loop = false, label = "Loading", palette = "spot", color, className }: MultiStepLoaderProps) {
   const { ref, active, reduce } = useActive<HTMLDivElement>();
   const highlightId = useId();
   const [auto, setAuto] = useState(0);
@@ -509,6 +595,8 @@ export function MultiStepLoader({ steps, current, interval = 1400, loop = false,
       <ol aria-hidden className="relative flex flex-col gap-1">
         {steps.map((step, i) => {
           const state = i < index ? "done" : i === index ? "current" : "pending";
+          const stepInk = makeInk(palette, color, state === "done");
+          const hue = stepInk.at(steps.length > 1 ? i / (steps.length - 1) : 0.5);
           return (
             <li key={step + i} className="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm">
               {state === "current" && (
@@ -520,9 +608,11 @@ export function MultiStepLoader({ steps, current, interval = 1400, loop = false,
               )}
               <span className="relative grid size-5 shrink-0 place-items-center">
                 {state === "done" && (
+                  // Colour lives on a plain wrapper: motion.svg keeps its first style value after mount
+                  <span className="contents" style={{ color: hue }}>
                   <motion.svg
                     viewBox="0 0 20 20"
-                    className="size-5 text-primary"
+                    className="size-5"
                     initial={reduce ? false : { scale: 0.6, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                   >
@@ -530,7 +620,7 @@ export function MultiStepLoader({ steps, current, interval = 1400, loop = false,
                     <motion.path
                       d="M6 10.5l2.6 2.5L14 7.5"
                       fill="none"
-                      stroke="var(--primary-foreground)"
+                      stroke={stepInk.on}
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -539,10 +629,11 @@ export function MultiStepLoader({ steps, current, interval = 1400, loop = false,
                       transition={{ duration: 0.3, delay: 0.1 }}
                     />
                   </motion.svg>
+                  </span>
                 )}
                 {state === "current" && (
-                  <span className="text-primary">
-                    <RingSpinner s={18} active={active} />
+                  <span>
+                    <RingSpinner s={18} active={active} ink={{ ...stepInk, solid: hue, at: () => hue, gradient: false }} />
                   </span>
                 )}
                 {state === "pending" && <span className="size-4 rounded-full border-2 border-border" />}
@@ -745,6 +836,9 @@ function resultFrame(shape: number[], i: number, s: number) {
  */
 export const dotMatrixPalettes = ["spot", "status", "aurora", "sunset", "lagoon", "prism"] as const;
 export type DotMatrixPalette = (typeof dotMatrixPalettes)[number];
+/** Every loader in this file takes the same palettes */
+export const loaderPalettes = dotMatrixPalettes;
+export type LoaderPalette = DotMatrixPalette;
 
 /** Gradient palettes as an oklch hue range; lightness and chroma stay fixed so every hue reads at the same weight */
 const GRADIENTS: Partial<Record<DotMatrixPalette, { from: number; to: number; l: number; c: number }>> = {

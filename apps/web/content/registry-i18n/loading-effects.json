@@ -1,7 +1,7 @@
 {
   "zh-TW": {
     "title": "載入效果",
-    "description": "十五種載入指示：Loader 有十一種 variant（跳動圓點、等化器、缺口圓環、轉圈到打勾、軌道、脈衝圓點、進度圓環、進度條、不定進度條、輸入中提示、液體填充），用 variant prop 切換；spinner-check 在 done 為 true 時弧線補滿，圓片落定一次並畫出勾。另外附 TopLoadingBar、MultiStepLoader、Skeleton 與 DotMatrixLoader。DotMatrixLoader 是 7 乘 7 的點陣，有六種樣式（波浪、螺旋、雨滴、漣漪、蛇行、掃描）與四種狀態：載入時循環播放樣式，進度時依該樣式的順序按數值點亮，成功與失敗時全部點亮一次，再只留下勾或叉。palette prop 決定顏色：spot（品牌專色，預設）、status（成功時轉綠）或會緩慢流動的 oklch 漸層（aurora 極光、sunset 夕陽、lagoon 潟湖、prism 稜鏡）；錯誤一律是紅色。shape（圓點、方格、菱形、空心環、直條）、glow（深色底的 LED 發光）與 emphasis（淡出或縮放）改變外觀，示範裡有八種組合。每個載入元件都有 role status 與隱藏標籤；偏好減少動態時循環停止，進度數值仍然看得到。",
+    "description": "十五種載入指示：Loader 有十一種 variant（跳動圓點、等化器、缺口圓環、轉圈到打勾、軌道、脈衝圓點、進度圓環、進度條、不定進度條、輸入中提示、液體填充），用 variant prop 切換；spinner-check 在 done 為 true 時弧線補滿，圓片落定一次並畫出勾。另外附 TopLoadingBar、MultiStepLoader、Skeleton 與 DotMatrixLoader。DotMatrixLoader 是 7 乘 7 的點陣，有六種樣式（波浪、螺旋、雨滴、漣漪、蛇行、掃描）與四種狀態：載入時循環播放樣式，進度時依該樣式的順序按數值點亮，成功與失敗時全部點亮一次，再只留下勾或叉。palette prop 決定顏色：spot（品牌專色，預設）、status（成功時轉綠）或會緩慢流動的 oklch 漸層（aurora 極光、sunset 夕陽、lagoon 潟湖、prism 稜鏡）；錯誤一律是紅色。shape（圓點、方格、菱形、空心環、直條）、glow（深色底的 LED 發光）與 emphasis（淡出或縮放）改變外觀，示範裡有八種組合。Loader、TopLoadingBar 與 MultiStepLoader 也接受同一個 palette prop（預設 spot，改讀 --sunui-spot，沒設時退回 --primary；status 完成時轉綠；漸層會讓每顆點、每根條、每個步驟各取一段色相）。Skeleton 維持中性灰。每個載入元件都有 role status 與隱藏標籤；偏好減少動態時循環停止，進度數值仍然看得到。",
     "whenToUse": [
       "資料讀取、上傳與換頁時的等待狀態，從行內小轉圈到頁面頂部載入條",
       "已知階段或百分比的長時間工作，用多步驟清單、進度圓環或液體填充呈現",
@@ -14,7 +14,7 @@
   },
   "zh-CN": {
     "title": "加载效果",
-    "description": "十五种加载指示：Loader 有十一种 variant（跳动圆点、均衡器、缺口圆环、转圈到打勾、轨道、脉冲圆点、进度圆环、进度条、不定进度条、输入中提示、液体填充），用 variant prop 切换；spinner-check 在 done 为 true 时弧线补满，圆片落定一次并画出勾。另外附带 TopLoadingBar、MultiStepLoader、Skeleton 与 DotMatrixLoader。DotMatrixLoader 是 7 乘 7 的点阵，有六种样式（波浪、螺旋、雨滴、涟漪、蛇行、扫描）与四种状态：加载时循环播放样式，进度时按该样式的顺序依数值点亮，成功与失败时全部点亮一次，再只留下勾或叉。palette prop 决定颜色：spot（品牌专色，默认）、status（成功时转绿）或会缓慢流动的 oklch 渐变（aurora 极光、sunset 夕阳、lagoon 潟湖、prism 棱镜）；错误一律为红色。shape（圆点、方格、菱形、空心环、直条）、glow（深色底的 LED 发光）与 emphasis（淡出或缩放）改变外观，示例中有八种组合。每个加载组件都有 role status 与隐藏标签；偏好减少动态时循环停止，进度数值仍然可见。",
+    "description": "十五种加载指示：Loader 有十一种 variant（跳动圆点、均衡器、缺口圆环、转圈到打勾、轨道、脉冲圆点、进度圆环、进度条、不定进度条、输入中提示、液体填充），用 variant prop 切换；spinner-check 在 done 为 true 时弧线补满，圆片落定一次并画出勾。另外附带 TopLoadingBar、MultiStepLoader、Skeleton 与 DotMatrixLoader。DotMatrixLoader 是 7 乘 7 的点阵，有六种样式（波浪、螺旋、雨滴、涟漪、蛇行、扫描）与四种状态：加载时循环播放样式，进度时按该样式的顺序依数值点亮，成功与失败时全部点亮一次，再只留下勾或叉。palette prop 决定颜色：spot（品牌专色，默认）、status（成功时转绿）或会缓慢流动的 oklch 渐变（aurora 极光、sunset 夕阳、lagoon 潟湖、prism 棱镜）；错误一律为红色。shape（圆点、方格、菱形、空心环、直条）、glow（深色底的 LED 发光）与 emphasis（淡出或缩放）改变外观，示例中有八种组合。Loader、TopLoadingBar 与 MultiStepLoader 也接受同一个 palette prop（默认 spot，改读 --sunui-spot，未设置时退回 --primary；status 完成时转绿；渐变会让每颗点、每根条、每个步骤各取一段色相）。Skeleton 保持中性灰。每个加载组件都有 role status 与隐藏标签；偏好减少动态时循环停止，进度数值仍然可见。",
     "whenToUse": [
       "数据请求、上传与切换页面时的等待状态，从行内小转圈到页面顶部加载条",
       "已知阶段或百分比的长时间任务，用多步骤列表、进度圆环或液体填充呈现",
@@ -27,7 +27,7 @@
   },
   "ja": {
     "title": "ローディングエフェクト",
-    "description": "15 種類のローディング表示：Loader は 11 種類の variant（バウンスドット、イコライザー、リングスピナー、スピナーからチェック、オービット、パルスドット、プログレスリング、プログレスバー、不確定バー、入力中インジケーター、リキッド）を variant prop で切り替えられ（spinner-check は done が true になると弧が閉じ、円が一度だけ弾んで収まりチェックが描かれます）、さらに TopLoadingBar、MultiStepLoader、Skeleton、DotMatrixLoader を収録。DotMatrixLoader は 7×7 のドットグリッドで、6 つのパターン（ウェーブ、スパイラル、レイン、リップル、スネーク、スキャン）と 4 つの状態を持ちます。読み込み中はパターンがループし、進捗では値に応じてパターンの順にドットが点灯し、成功と失敗では一度すべて点灯してからチェックかバツだけが残ります。palette prop で色を選べます：spot（ブランドのスポットカラー、既定）、status（成功時に緑）、ゆっくり流れる oklch グラデーション（aurora、sunset、lagoon、prism）。エラーは常に赤です。shape（ドット、スクエア、ダイヤ、リング、バー）、glow（暗い面向けの LED 発光）、emphasis（フェードまたはスケール）で見た目を変えられ、デモでは 8 通りの組み合わせを紹介しています。すべてに role status と非表示ラベルがあり、動きを減らす設定ではループが止まり、進捗の値は表示されたままです。",
+    "description": "15 種類のローディング表示：Loader は 11 種類の variant（バウンスドット、イコライザー、リングスピナー、スピナーからチェック、オービット、パルスドット、プログレスリング、プログレスバー、不確定バー、入力中インジケーター、リキッド）を variant prop で切り替えられ（spinner-check は done が true になると弧が閉じ、円が一度だけ弾んで収まりチェックが描かれます）、さらに TopLoadingBar、MultiStepLoader、Skeleton、DotMatrixLoader を収録。DotMatrixLoader は 7×7 のドットグリッドで、6 つのパターン（ウェーブ、スパイラル、レイン、リップル、スネーク、スキャン）と 4 つの状態を持ちます。読み込み中はパターンがループし、進捗では値に応じてパターンの順にドットが点灯し、成功と失敗では一度すべて点灯してからチェックかバツだけが残ります。palette prop で色を選べます：spot（ブランドのスポットカラー、既定）、status（成功時に緑）、ゆっくり流れる oklch グラデーション（aurora、sunset、lagoon、prism）。エラーは常に赤です。shape（ドット、スクエア、ダイヤ、リング、バー）、glow（暗い面向けの LED 発光）、emphasis（フェードまたはスケール）で見た目を変えられ、デモでは 8 通りの組み合わせを紹介しています。Loader、TopLoadingBar、MultiStepLoader も同じ palette prop を受け取ります（既定は spot で --sunui-spot を読み、未設定なら --primary。status は完了時に緑。グラデーションではドット、バー、ステップごとに色相が変わります）。Skeleton はニュートラルなグレーのままです。すべてに role status と非表示ラベルがあり、動きを減らす設定ではループが止まり、進捗の値は表示されたままです。",
     "whenToUse": [
       "データ取得、アップロード、ページ遷移の待ち状態（インラインのスピナーからページ上部のバーまで）",
       "段階や割合がわかる長い処理を、マルチステップ、プログレスリング、リキッドで見せる",

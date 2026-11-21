@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
-import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, loadingEffects, type LoaderVariant } from "./loading-effects";
+import { Loader, MultiStepLoader, Skeleton, TopLoadingBar, loaderVariants, loadingEffects, type LoaderPalette, type LoaderVariant } from "./loading-effects";
 import { copy, DotMatrixShowcase, smallBtn, VALUES } from "./demo";
 
 // loaderVariants is a subset of loadingEffects (the Loader variants); the other three are standalone components, together giving one card per effect
@@ -12,6 +12,10 @@ export const variants = loadingEffects;
 
 // Only this one is shown on the home page as the representative, chosen because it moves by itself, so the card needs no hover to show the effect
 export const featured = "equalizer";
+
+// Catalog cards: each effect gets its own gradient so the wall of cards is not one colour
+const CARD_PALETTES: LoaderPalette[] = ["aurora", "sunset", "lagoon", "prism"];
+const paletteFor = (v: string) => CARD_PALETTES[Math.max(0, (loadingEffects as readonly string[]).indexOf(v)) % CARD_PALETTES.length];
 
 const isLoader = (v: string): v is LoaderVariant => (loaderVariants as readonly string[]).includes(v);
 
@@ -38,7 +42,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
     const wide = variant === "bar" || variant === "indeterminate-bar";
     return (
       <div className={wide ? "w-56" : undefined}>
-        <Loader variant={variant} size="lg" value={VALUES[step]} done={VALUES[step] === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full" : undefined} />
+        <Loader variant={variant} size="lg" palette={paletteFor(variant)} value={VALUES[step]} done={VALUES[step] === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full" : undefined} />
       </div>
     );
   }
@@ -47,7 +51,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
     return (
       <div className="flex w-64 flex-col items-center gap-3">
         <div className="relative w-full overflow-hidden rounded-lg border border-border bg-background">
-          <TopLoadingBar loading={loading} position="absolute" label={t.loading} />
+          <TopLoadingBar loading={loading} position="absolute" label={t.loading} palette={paletteFor(variant)} />
           <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
             {[0, 1, 2].map((i) => (
               <span key={i} className="size-2 rounded-full bg-muted" />
@@ -72,7 +76,7 @@ export default function LoadingEffectsVariant({ variant }: { variant: string }) 
 
   if (variant === "multi-step") {
     // The card has no replay button, so it restarts automatically when it finishes
-    return <MultiStepLoader steps={t.steps} label={t.loading} interval={1100} loop className="w-64" />;
+    return <MultiStepLoader steps={t.steps} label={t.loading} interval={1100} loop palette={paletteFor(variant)} className="w-64" />;
   }
 
   return <Skeleton media lines={2} label={t.loading} className="w-60" />;

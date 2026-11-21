@@ -190,6 +190,32 @@ const SWATCH: Record<DotMatrixPalette, string> = {
   lagoon: "linear-gradient(135deg, oklch(0.7 0.14 150), oklch(0.7 0.14 245))",
   prism: "linear-gradient(135deg, oklch(0.7 0.17 0), oklch(0.7 0.17 110), oklch(0.7 0.17 220), oklch(0.7 0.17 330))",
 };
+/** One row of colour swatches, used once at the top of the demo for every loader */
+export function PaletteSwatches({ value, onChange, label }: { value: DotMatrixPalette; onChange: (p: DotMatrixPalette) => void; label: string }) {
+  const t = useDemoText(copy);
+  return (
+    <div role="radiogroup" aria-label={label} className="flex items-center justify-center gap-1.5">
+      {dotMatrixPalettes.map((p) => (
+        <button
+          key={p}
+          type="button"
+          role="radio"
+          aria-checked={value === p}
+          aria-label={t.palettes[p]}
+          title={t.palettes[p]}
+          onClick={() => onChange(p)}
+          className={
+            "grid size-6 place-items-center rounded-full transition-shadow " +
+            (value === p ? "ring-2 ring-foreground ring-offset-2 ring-offset-card" : "hover:ring-1 hover:ring-border")
+          }
+        >
+          <span className="size-4 rounded-full" style={{ background: SWATCH[p] }} />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /**
  * Eight looks built from the same loader by shape, glow, emphasis and palette.
  * Dark ones sit on a dark panel because glow only reads against a dark surface.
@@ -212,13 +238,26 @@ const STYLES: Record<StyleKey, Style> = {
  * Dot matrix: the six patterns side by side under one state switch.
  * Progress counts up by itself and turns into success at 100, so one click shows the whole upload.
  */
-export function DotMatrixShowcase({ compact = false, auto = false }: { compact?: boolean; auto?: boolean }) {
+export function DotMatrixShowcase({
+  compact = false,
+  auto = false,
+  palette: controlled,
+  onPalette,
+}: {
+  compact?: boolean;
+  auto?: boolean;
+  /** When the demo page owns the colour, the tile follows it and hides its own swatches */
+  palette?: DotMatrixPalette;
+  onPalette?: (p: DotMatrixPalette) => void;
+}) {
   const t = useDemoText(copy);
   const [state, setState] = useState<DotMatrixState>(auto ? "progress" : "loading");
   const [value, setValue] = useState(0);
   const [run, setRun] = useState(0);
   const [style, setStyle] = useState<StyleKey>("classic");
-  const [palette, setPalette] = useState<DotMatrixPalette>("aurora");
+  const [own, setOwn] = useState<DotMatrixPalette>("aurora");
+  const palette = controlled ?? own;
+  const setPalette = (p: DotMatrixPalette) => (onPalette ? onPalette(p) : setOwn(p));
   const look = STYLES[style];
   const pickStyle = (k: StyleKey) => {
     setStyle(k);
@@ -247,7 +286,8 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
       if (state !== "loading") {
         const next = STYLE_KEYS[(STYLE_KEYS.indexOf(style) + 1) % STYLE_KEYS.length];
         setStyle(next);
-        setPalette(STYLES[next].palette);
+        // Card mode is never controlled, so it writes its own palette
+        setOwn(STYLES[next].palette);
       }
       setState(state === "loading" ? "progress" : "loading");
     }, state === "loading" ? 2400 : 1800);
@@ -313,27 +353,7 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
           ))}
         </div>
       )}
-      {!compact && (
-        <div role="radiogroup" aria-label={t.colour} className="flex items-center justify-center gap-1.5">
-          {dotMatrixPalettes.map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="radio"
-              aria-checked={palette === p}
-              aria-label={t.palettes[p]}
-              title={t.palettes[p]}
-              onClick={() => setPalette(p)}
-              className={
-                "grid size-6 place-items-center rounded-full transition-shadow " +
-                (palette === p ? "ring-2 ring-foreground ring-offset-2 ring-offset-card" : "hover:ring-1 hover:ring-border")
-              }
-            >
-              <span className="size-4 rounded-full" style={{ background: SWATCH[p] }} />
-            </button>
-          ))}
-        </div>
-      )}
+      {!compact && !controlled && <PaletteSwatches value={palette} onChange={setPalette} label={t.colour} />}
       <div
         className={
           (compact ? "grid grid-cols-3 gap-6" : "grid grid-cols-3 gap-x-4 gap-y-5") +
@@ -378,6 +398,7 @@ export default function LoadingEffectsDemo() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [run, setRun] = useState(0);
+  const [palette, setPalette] = useState<DotMatrixPalette>("aurora");
 
   useEffect(() => {
     const id = setInterval(() => setStep((s) => (s + 1) % VALUES.length), 1500);
@@ -387,11 +408,15 @@ export default function LoadingEffectsDemo() {
 
   return (
     <div className="grid w-full max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="flex items-center justify-center gap-3 sm:col-span-2 lg:col-span-3">
+        <span className="text-xs text-muted-foreground">{t.colour}</span>
+        <PaletteSwatches value={palette} onChange={setPalette} label={t.colour} />
+      </div>
       {loaderVariants.map((v) => {
         const wide = v === "bar" || v === "indeterminate-bar";
         return (
           <Tile key={v} name={t.names[v]}>
-            <Loader variant={v} size="lg" value={value} done={value === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full max-w-56" : undefined} />
+            <Loader variant={v} size="lg" palette={palette} value={value} done={value === 100} label={t.loading} doneLabel={t.done} className={wide ? "w-full max-w-56" : undefined} />
           </Tile>
         );
       })}
@@ -405,7 +430,7 @@ export default function LoadingEffectsDemo() {
         }
       >
         <div className="relative w-full overflow-hidden rounded-lg border border-border bg-background">
-          <TopLoadingBar loading={loading} position="absolute" label={t.loading} />
+          <TopLoadingBar loading={loading} position="absolute" label={t.loading} palette={palette} />
           <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
             {[0, 1, 2].map((i) => (
               <span key={i} className="size-2 rounded-full bg-muted" />
@@ -427,7 +452,7 @@ export default function LoadingEffectsDemo() {
           </button>
         }
       >
-        <MultiStepLoader key={run} steps={t.steps} label={t.loading} interval={1100} />
+        <MultiStepLoader key={run} steps={t.steps} label={t.loading} interval={1100} palette={palette} />
       </Tile>
 
       <Tile name={t.names["skeleton-shimmer"]}>
@@ -437,7 +462,7 @@ export default function LoadingEffectsDemo() {
       <div className="sm:col-span-2 lg:col-span-3">
         <Tile name={t.names["dot-matrix"]}>
           <div className="w-full max-w-md">
-            <DotMatrixShowcase />
+            <DotMatrixShowcase palette={palette} onPalette={setPalette} />
           </div>
         </Tile>
       </div>
