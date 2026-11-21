@@ -19,7 +19,7 @@ export function RichText({ text, codeClassName }: { text: string; codeClassName?
     } else {
       const href = match[3];
       parts.push(
-        href.startsWith("/") && !href.startsWith("//") && !href.endsWith(".txt") ? (
+        href.startsWith("/") && !href.startsWith("//") && !/\.(txt|css)$/.test(href) ? (
           <Link key={index} href={href}>
             {match[2]}
           </Link>

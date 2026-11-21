@@ -26,6 +26,7 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 - **Site chrome motion** (header, catalog, panels, home hero, docs pages, not blocks): follow `apps/web/SITE-MOTION.md`. Durations and the easing curve come from `lib/motion.ts` and the `@theme` block in `app/globals.css`.
 - **Changing a design doc**: update `apps/web/lib/agent/guidelines.ts` too. It is the English copy that the MCP server, the skill and `llms-full.txt` serve.
 - **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check.
+- **Keep shadcn coupling thin (2026-11-22)**: shadcn is only the delivery format and CLI. Blocks must not depend on shadcn/ui components, Radix, Base UI or `shadcn/tailwind.css`; import `cn` from `@/lib/utils`, not the `cn` package; `registryDependencies` may only be `utils` and SunUI's own items. Colour classes stay on the standard shadcn token names; `apps/web/public/sunui-theme.css` supplies them for projects without shadcn, so keep it in step when a block needs a new token. If the shadcn CLI or format ever turns against us, the fallback is a small `npx sunui add` that reads the same `/r/*.json`; do not build it before then. Reasoning: `reports/shadcn綁定與非shadcn用戶最佳方案-2026-11-22.md`.
 - **Copy**: user-facing copy lives in `apps/web/lib/messages.ts` in four locales (en, zh-TW, zh-CN, ja). Change all four.
 - Do not use em dashes in any copy or docs.
 
