@@ -158,7 +158,7 @@ const springs = {
 /** Status is expressed with a small icon only, with no background fill */
 const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
-  success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]" />,
+  success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]" />,
   error: (
     <g className="text-foreground">
       <path d="M10.3 4.6L3.4 17a2 2 0 0 0 1.7 3h13.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z" />

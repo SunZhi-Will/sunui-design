@@ -108,7 +108,7 @@ const ink = "text-foreground";
 /** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 /** Semantic rating colour: filled stars are amber like on every review site, not the brand spot. Buyers can set --sunui-rating */
-const rating = "text-[color:var(--sunui-rating,#f5a524)]";
+const rating = "text-[color:var(--sunui-rating,#e8a020)] dark:text-[color:var(--sunui-rating,#f5b84a)]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;

@@ -60,15 +60,15 @@ SunUI dropped its old "paper" look on 2026-11-19: no paper or ink hex colours, n
 | Text | \`text-foreground\`, \`text-muted-foreground\` | theme |
 | Primary action | \`bg-primary text-primary-foreground\` | theme |
 | Brand spot | \`text-[color:var(--sunui-spot,var(--primary))]\` | theme primary |
-| Like (semantic) | \`text-[color:var(--sunui-like,#e5484d)]\` | red |
-| Rating (semantic) | \`text-[color:var(--sunui-rating,#f5a524)]\` | amber |
-| Success (semantic) | \`text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]\` | green |
+| Like (semantic) | \`text-[color:var(--sunui-like,#dc3d43)] dark:text-[color:var(--sunui-like,#ff6b70)]\` | red |
+| Rating (semantic) | \`text-[color:var(--sunui-rating,#e8a020)] dark:text-[color:var(--sunui-rating,#f5b84a)]\` | amber |
+| Success (semantic) | \`text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]\` | green |
 | Danger (semantic) | \`text-destructive\` | theme |
 
 - Grays are neutral with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
 - Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress and the main button read \`var(--sunui-spot, var(--primary))\` (on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and hairlines never use it. Do not pick an accent colour per block.
-- Semantic colours: meanings everyone recognises do not follow the brand spot and ship in the right colour: a saved heart is red (\`--sunui-like\`), filled stars are amber (\`--sunui-rating\`), done and verified states are green (\`--sunui-success\`, one step lighter in dark mode), errors use the theme \`--destructive\`. Buyers can override each variable. Use them only for these meanings, never as decoration.
-- Content colours: blocks may carry colour at rest, but only on content: avatars without a photo (a soft tint with initials in the same hue), category tags and dots, chart series. Use one fixed set of eight hues at equal lightness and low chroma (OKLCH \`0.62 0.08\`, hues 255, 150, 85, 35, 190, 225, 120, 60, the person-chip set), picked by hashing an id or name so a person keeps the same hue. The first chart series uses the brand spot, the rest the palette, all behind shadcn \`--chart-1\` to \`--chart-5\` so buyers can override. Never use the palette to decorate buttons, backgrounds or headings.
+- Semantic colours, three only: meanings everyone recognises do not follow the brand spot and ship in the right colour: a saved heart is red (shared with danger, #dc3d43, dark #ff6b70) (\`--sunui-like\`), filled stars are amber (\`--sunui-rating\`, #e8a020, dark #f5b84a), done and verified states are green (\`--sunui-success\`, #1f9d55, dark #4cd68a), errors use the theme \`--destructive\`. Buyers can override each variable. Use them only for these meanings, never as decoration.
+- Content colours: blocks may carry colour at rest, but only on content: avatars without a photo, category tags and dots, chart series. Always use shades of the brand spot (\`color-mix(in oklch, var(--sunui-spot, var(--primary)) N%, transparent)\`; avatars hash a name to 12, 20 or 28%, charts use five shades), never a separate palette, so a buyer's brand colour recolours them too. Gradient avatars stay within that one hue. The only exception is person-chip, whose job is telling people apart on a roster, so it keeps eight hues. Never use spot shades to decorate buttons, backgrounds or headings.
 - Full-page templates (registry \`categories\` include \`template\`) may have one fixed dark section (\`bg-[#111111] text-[#ededed]\`, dark in both modes), usually the hero. Do not fill sections with the spot colour.
 - Light comes from straight above, one source per page. Elevation levels, each already including the hairline (do not add a border on top):
   - e1 (cards, coupons, inputs, secondary buttons): \`shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)]\`

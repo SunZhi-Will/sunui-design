@@ -25,11 +25,13 @@ import { cn } from "@/lib/utils";
  * 價格頁的金額色調（2026-11-20）。blue：靛藍到青色（使用中）；gold：金色（淺色模式試過不好看，2026-11-20 切回 blue）。改這一行就能切換。
  * 淺色模式用較深的色階，白底上才讀得清楚；深色模式用較亮的色階。
  */
-const PRICE_TONE: keyof typeof PRICE_TONES = "blue";
+const PRICE_TONE: keyof typeof PRICE_TONES = "cobalt";
 const PRICE_TONES = {
   // 金色在白底上偏暗就變成土褐色，所以淺色模式用飽和的黃金、由上往下的金箔漸層，卡片底光只留極淡一層
   gold: "[--price-angle:180deg] [--price-a:#e0a91b] [--price-b:#b8820a] [--tone:#d4a020] [--tone-fg:#3d2a02] [--tone-glow:rgb(224_169_27/0.07)] [--save:#059669] dark:[--price-a:#f5d78e] dark:[--price-b:#c8a050] dark:[--tone:#d9b25f] dark:[--tone-fg:#0a0a0a] dark:[--tone-glow:rgb(245_215_142/0.1)] dark:[--save:#34d399]",
   blue: "[--price-angle:135deg] [--price-a:#4f46e5] [--price-b:#0284c7] [--tone:#4f46e5] [--tone-fg:#ffffff] [--tone-glow:rgb(79_70_229/0.08)] [--save:#059669] dark:[--price-a:#a5b4fc] dark:[--price-b:#67e8f9] dark:[--tone:#a5b4fc] dark:[--tone-fg:#0a0a0a] dark:[--tone-glow:rgb(165_180_252/0.12)] dark:[--save:#34d399]",
+  // 2026-11-22 色系統一：網站鈷藍由深到淺（同一個色相），省下的錢用統一的成功綠
+  cobalt: "[--price-angle:135deg] [--price-a:#1f4fd6] [--price-b:#4d86ff] [--tone:#2f6bff] [--tone-fg:#ffffff] [--tone-glow:rgb(47_107_255/0.08)] [--save:#1f9d55] dark:[--price-a:#7aa2ff] dark:[--price-b:#b3caff] dark:[--tone:#7aa2ff] dark:[--tone-fg:#0a0a0a] dark:[--tone-glow:rgb(122_162_255/0.12)] dark:[--save:#4cd68a]",
 } as const;
 
 export async function generateMetadata(): Promise<Metadata> {

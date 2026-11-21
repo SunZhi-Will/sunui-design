@@ -58,9 +58,9 @@ const themeColors = [
 
 /** Like burst particles: shades of the semantic like colour (--sunui-like, red by default) */
 const likeColors = [
-  "var(--sunui-like, #e5484d)",
-  "color-mix(in oklch, var(--sunui-like, #e5484d) 55%, var(--background))",
-  "color-mix(in oklch, var(--sunui-like, #e5484d) 70%, #ffb020)",
+  "var(--sunui-like, #dc3d43)",
+  "color-mix(in oklch, var(--sunui-like, #dc3d43) 55%, var(--background))",
+  "color-mix(in oklch, var(--sunui-like, #dc3d43) 70%, var(--foreground))",
   "var(--muted-foreground)",
 ];
 
@@ -107,7 +107,7 @@ export function LikeBurst({ liked, defaultLiked = false, onChange, label = "Like
       }}
       className={cn(
         "relative grid size-12 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        on && "text-[color:var(--sunui-like,#e5484d)] hover:text-[color:var(--sunui-like,#e5484d)]",
+        on && "text-[color:var(--sunui-like,#dc3d43)] dark:text-[color:var(--sunui-like,#ff6b70)] hover:text-[color:var(--sunui-like,#dc3d43)] dark:hover:text-[color:var(--sunui-like,#ff6b70)]",
         className,
       )}
     >
@@ -257,7 +257,7 @@ export function SuccessCheck({ message = "Payment complete", size = 64, delay = 
   const reduce = useReducedMotion() ?? false;
   const initial = reduce ? "shown" : "hidden";
   return (
-    <div role="status" className={cn("flex flex-col items-center gap-3 text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]", className)}>
+    <div role="status" className={cn("flex flex-col items-center gap-3 text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]", className)}>
       <motion.svg
         viewBox="0 0 52 52"
         width={size}

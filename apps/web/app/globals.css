@@ -38,6 +38,10 @@
   /* 網站上所有區塊預覽的品牌專色；買家自己的專案不受影響 */
   --sunui-spot: #2f6bff;
   --sunui-spot-foreground: #ffffff;
+  /* 語意色統一值（reports/色系統一深度分析-2026-11-22.md）：網站和區塊同一組，愛心與危險同一個紅 */
+  --sunui-like: #dc3d43;
+  --sunui-rating: #e8a020;
+  --sunui-success: #1f9d55;
   color-scheme: light;
 
   /* shadcn/ui 相容 tokens：block 一律用這組，安裝到使用者專案時會吃對方的主題 */
@@ -50,7 +54,7 @@
   --primary-foreground: #ffffff;
   --border: #e4e4e4; /* block 用實色，維持型錄原樣；網站外殼用 --line */
   --ring: #0a0a0a;
-  --destructive: #b42318;
+  --destructive: #dc3d43;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -73,13 +77,16 @@
     --accent-fg: #0a0a0a;
     --sunui-spot: #7aa2ff;
     --sunui-spot-foreground: #0a0a0a;
+  --sunui-like: #ff6b70;
+  --sunui-rating: #f5b84a;
+  --sunui-success: #4cd68a;
     color-scheme: dark;
     --muted: #1c1c1c;
     --muted-foreground: #8f8f8f;
     --primary: #ededed;
     --primary-foreground: #0a0a0a;
     --ring: #ededed;
-    --destructive: #f97066;
+    --destructive: #ff6b70;
     --border: #262626;
   }
 }
@@ -104,13 +111,16 @@
   --accent-fg: #0a0a0a;
   --sunui-spot: #7aa2ff;
   --sunui-spot-foreground: #0a0a0a;
+  --sunui-like: #ff6b70;
+  --sunui-rating: #f5b84a;
+  --sunui-success: #4cd68a;
   color-scheme: dark;
   --muted: #1c1c1c;
   --muted-foreground: #8f8f8f;
   --primary: #ededed;
   --primary-foreground: #0a0a0a;
   --ring: #ededed;
-  --destructive: #f97066;
+  --destructive: #ff6b70;
   --background: var(--bg);
   --foreground: var(--fg);
   --card-foreground: var(--fg);
@@ -137,13 +147,17 @@
   /* 網站上所有區塊預覽的品牌專色；買家自己的專案不受影響 */
   --sunui-spot: #2f6bff;
   --sunui-spot-foreground: #ffffff;
+  /* 語意色統一值（reports/色系統一深度分析-2026-11-22.md）：網站和區塊同一組，愛心與危險同一個紅 */
+  --sunui-like: #dc3d43;
+  --sunui-rating: #e8a020;
+  --sunui-success: #1f9d55;
   color-scheme: light;
   --muted: #f4f4f4;
   --muted-foreground: #6b6b6b;
   --primary: #0a0a0a;
   --primary-foreground: #ffffff;
   --ring: #0a0a0a;
-  --destructive: #b42318;
+  --destructive: #dc3d43;
   --background: var(--bg);
   --foreground: var(--fg);
   --card-foreground: var(--fg);

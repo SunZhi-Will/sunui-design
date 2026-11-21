@@ -30,7 +30,7 @@ export interface AvatarStackProps {
   locale?: string;
   /** Override the built-in strings, takes priority over locale */
   labels?: Partial<AvatarStackLabels>;
-  /** What people without a photo show: initials on a soft tint of their own content colour (default), or a soft two-tone gradient picked from their id, the same on every render, for invite lists and team rows that should feel alive without photos */
+  /** What people without a photo show: initials on a soft tint of their own content colour (default), or a soft gradient of the brand spot picked from their id, the same on every render, for invite lists and team rows that should feel alive without photos */
   fallback?: "initials" | "gradient";
   className?: string;
 }
@@ -92,33 +92,30 @@ const springs = {
   pop: { type: "spring", stiffness: 460, damping: 26 },
 } as const;
 
-/** Content colours: eight hues at the same lightness and low chroma (OKLCH), the same set as person-chip, so none shouts. A person keeps the same hue everywhere */
-const CONTENT_HUES = [255, 150, 85, 35, 190, 225, 120, 60] as const;
+/** Content colours: shades of the brand spot, picked by hashing a name, so avatars and tags follow the buyer's brand instead of a palette of their own (reports/色系統一深度分析-2026-11-22.md) */
+const CONTENT_SHADES = [12, 20, 28] as const;
 function contentTone(key: string) {
   let h = 0;
   for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-  const hue = CONTENT_HUES[h % CONTENT_HUES.length];
-  return { backgroundColor: `oklch(0.62 0.08 ${hue} / 0.16)`, color: `oklch(0.5 0.1 ${hue})`, borderColor: `oklch(0.62 0.08 ${hue} / 0.35)` };
+  const mix = CONTENT_SHADES[h % CONTENT_SHADES.length];
+  return { backgroundColor: `color-mix(in oklch, var(--sunui-spot, var(--primary)) ${mix}%, transparent)`, color: "var(--sunui-spot, var(--primary))", borderColor: `color-mix(in oklch, var(--sunui-spot, var(--primary)) 30%, transparent)` };
 }
 
-/** Two-tone pairs for fallback="gradient": soft, equal-weight hues that read on light and dark */
+/** Gradient discs for fallback="gradient": the brand spot from a light tint to full or slightly deeper, one hue only, picked by hashing the id */
 const GRADIENTS = [
-  ["#ff9a76", "#f4436c"],
-  ["#5fb3ff", "#2f5bea"],
-  ["#ffc078", "#ff6f61"],
-  ["#c79bff", "#6d5dfc"],
-  ["#67e8c9", "#1f9d6b"],
-  ["#ffd36e", "#f08a24"],
-  ["#8fd3ff", "#5b6cff"],
-  ["#ff9ed2", "#c2459a"],
+  [40, 0],
+  [55, 15],
+  [28, 8],
+  [65, 22],
+  [48, 4],
 ] as const;
 
 /** Stable index from the id, so a person keeps the same gradient everywhere */
 function gradientOf(id: string) {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  const [a, b] = GRADIENTS[h % GRADIENTS.length];
-  return `linear-gradient(135deg, ${a}, ${b})`;
+  const [tint, deep] = GRADIENTS[h % GRADIENTS.length];
+  return `linear-gradient(135deg, color-mix(in oklch, var(--sunui-spot, var(--primary)) ${tint}%, white), color-mix(in oklch, var(--sunui-spot, var(--primary)), black ${deep}%))`;
 }
 
 const sizes = {

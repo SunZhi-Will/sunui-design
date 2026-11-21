@@ -486,8 +486,11 @@ function FilterSelect({
  * 型錄牆的品牌色示範：支援專色的卡片預設是網站的鈷藍，每三張有一張換成其他示範品牌色，依序輪流。
  * 固定分配不隨機，篩選後也照可見順序重排。說明見 reports/網站灰階單調診斷-2026-11-08.md。
  */
+const ROTATE_DEMO_SPOTS: boolean = false;
+
 function spotFor(items: CatalogItem[], index: number): SpotKey | undefined {
-  if (!items[index].spot) return undefined;
+  // 2026-11-22 起型錄整面都是網站的鈷藍，不再輪流換示範色（大雜燴，見 reports/色系統一深度分析-2026-11-22.md）。示範色留在區塊頁工具列，要自己點
+  if (ROTATE_DEMO_SPOTS === false || !items[index].spot) return undefined;
   const k = items.slice(0, index).filter((item) => item.spot).length;
   if (k % 3 !== 1) return undefined;
   const colors = spotKeys.filter((key) => key !== "ink" && key !== "cobalt");

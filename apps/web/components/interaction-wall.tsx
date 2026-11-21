@@ -124,7 +124,6 @@ type TileProps = { auto: boolean; offset: number; t: WallCopy; locale: string };
  * 顏色只透過區塊自己的 --sunui-spot 注入（每個區塊讀最近一層祖先的值，所以每格可以不同色），跟首頁預覽一樣只出現在區塊身上。
  * 牆下方的切換可以拿掉這些設定，看到區塊在主題預設下的樣子。
  */
-const BLUE = "#3b6cf6";
 /** 漸層頭像（參考影片的彩色圓），用 SVG data URI 當 src，不需要外部圖片 */
 const gradient = (a: string, b: string) =>
   `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="40" height="40" fill="url(#g)"/></svg>`)}`;
@@ -229,11 +228,8 @@ function PricingTile({ auto, offset, t }: TileProps) {
   );
 }
 
-const NOTE_COLORS = [
-  gradient("#7c83ff", "#3b6cf6"),
-  gradient("#ffb36b", "#ff6f61"),
-  gradient("#5eead4", "#22a06b"),
-];
+// 通知頭像：鈷藍的三個深淺（2026-11-22 色系統一，原本是紫藍、橘紅、綠三組漸層）
+const NOTE_COLORS = [gradient("#9db8ff", "#2f6bff"), gradient("#c7d6ff", "#5c8bff"), gradient("#7aa2ff", "#1f4fd6")];
 
 function ToggleTile({ auto, offset, t }: TileProps) {
   const [on, setOn] = useState(false);
@@ -406,7 +402,7 @@ function RatingTile({ auto, offset, t, locale }: TileProps) {
       <div className="flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={gradient("#efe6d8", "#d6c3a5")}
+          src={gradient("#e6e6e6", "#cfcfcf")}
           alt=""
           className="size-11 shrink-0 rounded-lg"
         />
@@ -904,43 +900,38 @@ type TileDef = {
 
 /** 順序就是版面順序（5 欄 × 4 列）。block 是型錄裡的區塊名稱 */
 const TILES: TileDef[] = [
-  { block: "sliding-tabs", pro: "pricing-cards", Tile: PricingTile, style: tone(BLUE) },
+  { block: "sliding-tabs", pro: "pricing-cards", Tile: PricingTile },
   {
     block: "micro-interactions",
     Tile: ToggleTile,
-    style: tone(BLUE),
   },
   { block: "avatar-stack", pro: "team-invite", Tile: AvatarTile },
   { block: "star-rating", pro: "review-request", Tile: RatingTile },
-  { block: "loading-button", Tile: LoadingTile, style: tone(BLUE) },
+  { block: "loading-button", Tile: LoadingTile },
   { block: "favorite-button", Tile: FavoriteTile },
   { block: "quantity-stepper", Tile: StepperTile },
-  { block: "otp-input", Tile: OtpTile, style: tone(BLUE) },
-  { block: "floating-field", Tile: PostTile, style: tone("#f97316") },
+  { block: "otp-input", Tile: OtpTile },
+  { block: "floating-field", Tile: PostTile },
   {
     block: "micro-interactions",
     Tile: TodoTile,
-    style: tone(BLUE),
   },
-  { block: "command-palette", Tile: CommandTile, style: tone(BLUE) },
-  { block: "floating-field", Tile: PasswordTile, style: tone(BLUE) },
-  { block: "sliding-tabs", Tile: DockTile, style: tone(BLUE) },
+  { block: "command-palette", Tile: CommandTile },
+  { block: "floating-field", Tile: PasswordTile },
+  { block: "sliding-tabs", Tile: DockTile },
   { block: "button-effects", Tile: ArrowTile },
   {
     block: "micro-interactions",
     Tile: HoldTile,
-    style: tone(BLUE),
   },
   {
     block: "range-slider",
     Tile: SliderTile,
-    style: tone("var(--foreground)", "var(--background)"),
   },
-  { block: "notify-badge", Tile: BadgeTile, style: tone("#f43f5e") },
+  { block: "notify-badge", Tile: BadgeTile, style: tone("var(--destructive)") },
   {
     block: "micro-interactions",
     Tile: SendTile,
-    style: tone(BLUE),
   },
   { block: "toast-stack", Tile: ToastTile, fill: true },
   {
@@ -1086,7 +1077,7 @@ export function InteractionWall({
             <p className="text-[13px] text-subtle">
               {brand ? (
                 <>
-                  {copy.colorNote} <code className="rounded bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[12px] text-fg">--sunui-spot: #3b6cf6</code>
+                  {copy.colorNote} <code className="rounded bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[12px] text-fg">--sunui-spot: #2f6bff</code>
                 </>
               ) : (
                 copy.themeNote

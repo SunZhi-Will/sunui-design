@@ -377,7 +377,7 @@ export function FloatingField({
         ref={scope}
         className={cn(
           "relative rounded-xl border bg-card transition-colors shadow-[0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
-          error ? "border-destructive" : valid ? "border-[color:color-mix(in_oklch,var(--sunui-success,#15803d)_60%,transparent)] dark:border-[color:color-mix(in_oklch,var(--sunui-success,#4ade80)_60%,transparent)]" : focused ? spotBorder : "border-foreground/10",
+          error ? "border-destructive" : valid ? "border-[color:color-mix(in_oklch,var(--sunui-success,#1f9d55)_60%,transparent)] dark:border-[color:color-mix(in_oklch,var(--sunui-success,#4cd68a)_60%,transparent)]" : focused ? spotBorder : "border-foreground/10",
         )}
       >
         {multiline ? <textarea rows={rows} {...common} /> : <input {...common} />}
@@ -451,7 +451,7 @@ export function FloatingField({
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="size-5 text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]"
+                className="size-5 text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]"
                 aria-hidden="true"
                 initial={{ scale: reduce ? 1 : 0.6, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

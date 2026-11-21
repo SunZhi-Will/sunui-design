@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
  * Color is only on the dot (8px or smaller), the text keeps the normal text color; in black and white the shape alone is still readable.
  */
 
-// Status colors shared by the neutral-palette apps (Schedary, usermeld, spliteat, ComfyUI), one set each for light and dark
+// Status colors: the SunUI semantic set (success, rating/warning, like/danger) and the brand spot for info, so a status dot matches every other block (reports/色系統一深度分析-2026-11-22.md)
 const STATUS_TOKENS =
-  "[--db-success:#15803D] [--db-warning:#B45309] [--db-danger:#DC2626] [--db-info:#4F46E5] dark:[--db-success:#4ADE80] dark:[--db-warning:#FBBF24] dark:[--db-danger:#F87171] dark:[--db-info:#818CF8]";
+  "[--db-success:var(--sunui-success,#1f9d55)] [--db-warning:var(--sunui-rating,#c98a12)] [--db-danger:var(--destructive,#dc3d43)] [--db-info:var(--sunui-spot,var(--primary))] dark:[--db-success:var(--sunui-success,#4cd68a)] dark:[--db-warning:var(--sunui-rating,#f5b84a)] dark:[--db-danger:var(--destructive,#ff6b70)]";
 
 export type StatusTone = "success" | "warning" | "destructive" | "muted" | "info";
 export type StatusShape = "dot" | "ring" | "half" | "full" | "slashed";

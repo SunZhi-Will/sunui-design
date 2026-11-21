@@ -360,13 +360,13 @@ function Row({ item, now, locale, unreadLabel, reduce, onClick }: {
   );
 }
 
-/** Content colours: eight hues at the same lightness and low chroma (OKLCH), the same set as person-chip, so none shouts. A person keeps the same hue everywhere */
-const CONTENT_HUES = [255, 150, 85, 35, 190, 225, 120, 60] as const;
+/** Content colours: shades of the brand spot, picked by hashing a name, so avatars and tags follow the buyer's brand instead of a palette of their own (reports/色系統一深度分析-2026-11-22.md) */
+const CONTENT_SHADES = [12, 20, 28] as const;
 function contentTone(key: string) {
   let h = 0;
   for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-  const hue = CONTENT_HUES[h % CONTENT_HUES.length];
-  return { backgroundColor: `oklch(0.62 0.08 ${hue} / 0.16)`, color: `oklch(0.5 0.1 ${hue})`, borderColor: `oklch(0.62 0.08 ${hue} / 0.35)` };
+  const mix = CONTENT_SHADES[h % CONTENT_SHADES.length];
+  return { backgroundColor: `color-mix(in oklch, var(--sunui-spot, var(--primary)) ${mix}%, transparent)`, color: "var(--sunui-spot, var(--primary))", borderColor: `color-mix(in oklch, var(--sunui-spot, var(--primary)) 30%, transparent)` };
 }
 
 function Avatar({ actor }: { actor?: NotificationItem["actor"] }) {
