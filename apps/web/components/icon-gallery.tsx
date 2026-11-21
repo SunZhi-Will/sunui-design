@@ -274,7 +274,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
           {visible.length === 0 ? (
             <p className="p-8 text-center text-sm text-subtle">{format(t.noMatch, { q: query })}</p>
           ) : (
-            <ul className="grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))]">
+            <ul className="grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-1">
               {visible.map((name) => (
                 <CanvasCell
                   key={`${style}-${name}`}
@@ -567,7 +567,7 @@ const CanvasCell = memo(function CanvasCell({
         onClick={() => onSelect(name)}
         className={cn(
           "grid h-14 w-full place-items-center rounded-md text-fg/85 transition-colors",
-          selected ? "bg-stage ring-1 ring-fg" : "hover:bg-stage",
+          selected ? "bg-stage ring-1 ring-fg ring-inset" : "hover:bg-stage",
         )}
       >
         {pixel ? (
