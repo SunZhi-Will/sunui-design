@@ -131,6 +131,8 @@ const gradient = (a: string, b: string) =>
 /** 卡片裡的字級：跟參考一樣小，標題 15px、說明 11px */
 const TITLE = "text-[15px] font-semibold tracking-tight";
 const SUB = "text-[11px] leading-snug text-muted-foreground";
+/** 「主題預設」：網站本身設了鈷藍，這裡把專色退回主題主色，才是買家沒設 --sunui-spot 時看到的樣子 */
+const THEME_DEFAULT = { "--sunui-spot": "var(--primary)", "--sunui-spot-foreground": "var(--primary-foreground)" } as CSSProperties;
 const tone = (spot: string, fg = "#ffffff"): CSSProperties =>
   ({ "--sunui-spot": spot, "--sunui-spot-foreground": fg }) as CSSProperties;
 
@@ -988,7 +990,7 @@ function Cell({
       onPointerLeave={release}
       onFocus={hold}
       onBlur={release}
-      style={brand ? def.style : undefined}
+      style={brand ? def.style : THEME_DEFAULT}
       className={cn("group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#1e1e1e] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
         // 首頁上：手機只放前 6 格，平板 3 欄放 18 格，4 欄以上才放滿 20 格，免得頁面太長
         index >= 6 && "hidden md:flex",

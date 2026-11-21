@@ -18,10 +18,11 @@ type CompareMessages = Messages["home"]["compare"];
  */
 export function HeroCompare({ m }: { m: CompareMessages }) {
   const [pos, setPos] = useState(50);
-  const [spot, setSpot] = useState<SpotKey>("ink");
+  const [spot, setSpot] = useState<SpotKey>("cobalt");
+  // ink：退回主題主色，等於買家沒設專色；其他色票（含預設的鈷藍）淺色白字、深色近黑字
   const spotStyle =
     spot === "ink"
-      ? undefined
+      ? ({ "--sunui-spot": "var(--primary)", "--sunui-spot-foreground": "var(--primary-foreground)" } as CSSProperties)
       : ({ "--sunui-spot": spotSwatches[spot].light, "--spot-dark": spotSwatches[spot].dark, "--sunui-spot-foreground": "#ffffff" } as CSSProperties);
 
   return (
@@ -32,7 +33,7 @@ export function HeroCompare({ m }: { m: CompareMessages }) {
           style={spotStyle}
           className={cn(
             "absolute inset-0 flex items-center justify-center p-6",
-            spotStyle && "dark:[--sunui-spot-foreground:#0a0a0a] dark:[--sunui-spot:var(--spot-dark)]",
+            spot !== "ink" && "dark:[--sunui-spot-foreground:#0a0a0a] dark:[--sunui-spot:var(--spot-dark)]",
           )}
         >
           <CraftCoupon m={m} />

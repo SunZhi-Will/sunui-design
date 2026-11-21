@@ -33,7 +33,7 @@ export function PreviewFrame({
   const [viewport, setViewport] = useState<(typeof viewports)[number]["key"]>("desktop");
   const [run, setRun] = useState(0);
   const [height, setHeight] = useState(MIN_HEIGHT);
-  const [spot, setSpot] = useState<SpotKey>("ink");
+  const [spot, setSpot] = useState<SpotKey>("cobalt");
   // 拖曳把手給的自訂寬度（px）；按任一個尺寸按鈕就清掉，回到預設寬度
   const [custom, setCustom] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);

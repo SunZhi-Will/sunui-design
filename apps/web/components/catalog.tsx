@@ -483,13 +483,13 @@ function FilterSelect({
 }
 
 /**
- * 型錄牆的品牌色示範：支援專色的卡片每三張有一張換成示範品牌色，依序輪流，其餘維持墨色。
+ * 型錄牆的品牌色示範：支援專色的卡片預設是網站的鈷藍，每三張有一張換成其他示範品牌色，依序輪流。
  * 固定分配不隨機，篩選後也照可見順序重排。說明見 reports/網站灰階單調診斷-2026-11-08.md。
  */
 function spotFor(items: CatalogItem[], index: number): SpotKey | undefined {
   if (!items[index].spot) return undefined;
   const k = items.slice(0, index).filter((item) => item.spot).length;
   if (k % 3 !== 1) return undefined;
-  const colors = spotKeys.filter((key) => key !== "ink");
+  const colors = spotKeys.filter((key) => key !== "ink" && key !== "cobalt");
   return colors[Math.floor(k / 3) % colors.length];
 }
