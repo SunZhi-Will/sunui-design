@@ -51,7 +51,7 @@ npx shadcn@latest add @sunui-pro/<name>
 
 | 項目 | 環境變數 | 狀態 |
 |---|---|---|
-| 正式網域 | `NEXT_PUBLIC_SITE_URL` | 待買網域 |
+| 正式網域 | `NEXT_PUBLIC_SITE_URL` | `https://sunui.synvize.com`，2026-11-22 定案不換（registry 網址會登記到 shadcn 官方索引，公開後不宜再改） |
 | SHOPLINE Payments | `SHOPLINE_MERCHANT_ID`、`SHOPLINE_API_KEY`、`SHOPLINE_SIGN_KEY`、`SHOPLINE_ENV` | 商家帳號沿用作者其他產品；未設定時定價頁顯示 waitlist |
 | 訂單與授權碼 | Upstash Redis（`KV_REST_API_URL`、`KV_REST_API_TOKEN`） | 結帳與 Pro 驗證都需要 |
 | Waitlist | `RESEND_API_KEY`、`RESEND_WAITLIST_SEGMENT_ID` | 未設定時本機寫到 `.data/waitlist.jsonl`，正式環境回 503 |
