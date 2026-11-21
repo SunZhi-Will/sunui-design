@@ -989,7 +989,7 @@ function Cell({
       onFocus={hold}
       onBlur={release}
       style={brand ? def.style : undefined}
-      className={cn("group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#161616] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]",
+      className={cn("group/cell relative flex h-[17rem] flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] dark:bg-[#1e1e1e] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]",
         // 首頁上：手機只放前 6 格，平板 3 欄放 18 格，4 欄以上才放滿 20 格，免得頁面太長
         index >= 6 && "hidden md:flex",
         index >= 18 && "md:hidden lg:flex",
@@ -1044,7 +1044,7 @@ export function InteractionWall({
           ref={ref}
           role="region"
           aria-label={copy.label}
-          className="grid grid-cols-1 gap-2.5 rounded-[28px] bg-[#ececec] p-2.5 min-[480px]:grid-cols-2 sm:gap-3 sm:p-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:bg-[#0b0b0b] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.06)]"
+          className="grid grid-cols-1 gap-2.5 rounded-[28px] bg-[#ececec] p-2.5 min-[480px]:grid-cols-2 sm:gap-3 sm:p-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:bg-[#141414] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.06)]"
         >
           {TILES.map((def, i) => (
             <Cell
