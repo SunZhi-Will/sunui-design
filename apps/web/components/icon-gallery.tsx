@@ -5,6 +5,7 @@ import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "reac
 import { useStaggerPlay } from "@/components/use-stagger-play";
 import { format } from "@/lib/i18n";
 import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
+import { lineIconColor } from "@/lib/line-icon-colors";
 import type { Messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 import {
@@ -41,7 +42,7 @@ const counts: Record<Style, Record<Motion, number>> = {
 export function IconGallery({ messages: t }: { messages: Messages["iconGallery"] }) {
   const kindLabel: Record<MotionKind, string> = t.kindLabel;
   const kindHint: Record<MotionKind, string> = t.kindHint;
-  // 2026-11-22：像素優先（兩個參考並排後，像素是唯一有辨識度的一套）；線條維持黑白，給區塊用
+  // 2026-11-22：像素優先；線條與像素都預設彩色，黑白是切換選項
   const [style, setStyle] = useState<Style>("pixel");
   // 2026-11-22：畫布模式。所有圖示排在一張畫布上，有動態版的自動錯開播放；右側面板決定複製靜態或動態版
   const [animatedOn, setAnimatedOn] = useState(true);
@@ -132,7 +133,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const size = isPixel ? pixelSize : strokeSize;
   const sizeOptions = isPixel ? pixelSizes : sizes;
   const activeProp = kind && kind !== "hover" ? ` active={${kind === "loop" ? "loading" : "on"}}` : "";
-  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}`;
+  const lineProps = `${strokeSize !== 24 ? ` size={${strokeSize}}` : ""}${stroke !== 1.5 ? ` strokeWidth={${stroke}}` : ""}${pigment ? ` color="${lineIconColor(selected)}"` : ""}`;
   const pixelProps = `${pixelSize !== 16 ? ` size={${pixelSize}}` : ""}${pigment ? ` tone="pigment"` : ""}`;
   const component = isPixel ? (isAnimated ? "AnimatedPixelIcon" : "PixelIcon") : isAnimated ? "AnimatedIcon" : "Icon";
   const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
@@ -140,6 +141,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const tone = pigment ? "pigment" : "ink";
   const tags = `${iconKeywords[selected as IconName | PixelIconName] ?? ""}`.split(/\s+/).filter(Boolean);
   const related = (groups.find((group) => group.icons.includes(selected))?.icons ?? []).filter((name) => name !== selected).slice(0, 8);
+
+  // 彩色模式下線條圖示用自己的本色（SVG 的 color 屬性，currentColor 會跟著它）
+  const lineTint = (name: string) => (pigment ? lineIconColor(name) : undefined);
 
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
@@ -155,9 +159,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
       );
     }
     return k ? (
-      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} />
+      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} color={lineTint(name)} />
     ) : (
-      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} />
+      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} color={lineTint(name)} />
     );
   }
 
@@ -166,8 +170,9 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     if (!svg) return null;
     // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor，尺寸改成目前選的大小
     return svg.outerHTML
-      .replaceAll("var(--sunui-icon-accent, currentColor)", accent ? "#171717" : "currentColor")
+      .replaceAll("var(--sunui-icon-accent, currentColor)", accent && (isPixel || !pigment) ? "#171717" : "currentColor")
       .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
+      .replaceAll("currentColor", !isPixel && pigment ? lineIconColor(selected) : "currentColor")
       .replace(/var\(--sunui-pigment-[a-z]+, (oklch\([^)]*\))\)/g, "$1")
       .replace(/ width="[^"]*" height="[^"]*"/, ` width="${size}" height="${size}"`)
       .replace(/ data-icon="[^"]*"/, "")
@@ -201,7 +206,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   };
 
   return (
-    <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]")}>
+    <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]", !isPixel && pigment && "[--sunui-icon-accent:currentColor]")}>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-0 flex-1 basis-56">
@@ -231,17 +236,15 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
               </>
             )}
           />
-          {isPixel && (
-            <Choice
-              label={t.colorLabel}
-              options={[
-                { value: true, label: t.color },
-                { value: false, label: t.mono },
-              ]}
-              value={pigment}
-              onChange={setPigment}
-            />
-          )}
+          <Choice
+            label={t.colorLabel}
+            options={[
+              { value: true, label: t.color },
+              { value: false, label: t.mono },
+            ]}
+            value={pigment}
+            onChange={setPigment}
+          />
           <button
             type="button"
             aria-pressed={paused}
@@ -557,6 +560,7 @@ const CanvasCell = memo(function CanvasCell({
   onSelect: (name: string) => void;
 }) {
   const tone = color ? "pigment" : "ink";
+  const tint = color && !pixel ? lineIconColor(name) : undefined;
   return (
     <li>
       <button
@@ -577,9 +581,9 @@ const CanvasCell = memo(function CanvasCell({
             <PixelIcon name={name as PixelIconName} size={32} tone={tone} />
           )
         ) : animated ? (
-          <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} />
+          <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} color={tint} />
         ) : (
-          <Icon name={name as IconName} size={24} />
+          <Icon name={name as IconName} size={24} color={tint} />
         )}
       </button>
     </li>
