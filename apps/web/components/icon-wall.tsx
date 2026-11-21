@@ -165,8 +165,8 @@ export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
         </div>
       </div>
 
-      <div ref={ref} className="[--sunui-icon-accent:currentColor] rounded-lg border border-line bg-card p-3 sm:p-5">
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(44px,1fr))] gap-y-1 sm:grid-cols-[repeat(auto-fill,minmax(52px,1fr))]">
+      <div ref={ref} className="[--sunui-icon-accent:currentColor] rounded-lg border border-line bg-card p-3 sm:px-5 sm:py-4">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(44px,1fr))] gap-y-1 sm:grid-cols-[repeat(auto-fill,minmax(40px,1fr))]">
           {names.map((name, i) => (
             <Cell key={`${style}-${name}`} style={style} name={name} active={Boolean(active[i])} />
           ))}
@@ -178,7 +178,7 @@ export function IconWall({ messages: t }: { messages: Messages["iconWall"] }) {
 
 const Cell = memo(function Cell({ style, name, active }: { style: Style; name: string; active: boolean }) {
   return (
-    <li title={name} className="flex h-11 items-center justify-center text-fg/85 sm:h-12">
+    <li title={name} className="flex h-11 items-center justify-center text-fg/85 sm:h-10">
       {style === "line" ? (
         <AnimatedIcon name={name as AnimatedIconName} size={20} active={active} />
       ) : (
