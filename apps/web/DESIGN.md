@@ -129,6 +129,7 @@ const springs = {
 
 - 單一檔案，目標 250 行以內；只暴露真正會調的 props。
 - 只依賴 `framer-motion` 與 `cn`；圖示用 inline SVG，線寬 1.5，跟隨 `currentColor`。
+- **跟 shadcn 只保持薄耦合**（2026-11-22）：不依賴 shadcn/ui 的元件、Radix、Base UI 或 `shadcn/tailwind.css`；`cn` 從 `@/lib/utils` 匯入，不改用 `cn` 套件；`registryDependencies` 只能是 `utils` 與 SunUI 自己的項目。顏色只用 shadcn 標準 token 名稱，沒用 shadcn 的專案靠 `public/sunui-theme.css` 補齊，需要新 token 時同步更新那份檔案。理由見 `reports/shadcn綁定與非shadcn用戶最佳方案-2026-11-22.md`。
 
 ## 要避開的 AI 樣貌（和紙無關，照舊禁止）
 
@@ -151,3 +152,4 @@ const springs = {
 - [ ] 總覽層安靜好比較，較重的表現只在點開後的深入層，且深入層有精確讀法
 - [ ] 預覽區沒有測試按鈕
 - [ ] 換成中文文案版面仍正常
+- [ ] 沒有依賴 shadcn 元件、Radix、Base UI；用到的顏色 token 都在 `public/sunui-theme.css` 裡

@@ -49,10 +49,40 @@ export default async function InstallationPage() {
         <Command value="npx shadcn@latest add @sunui/countdown-banner" />
       </div>
 
-      <h2>{t.manualTitle}</h2>
+      <h2 id="without-shadcn">{t.manualTitle}</h2>
       <p>
         <RichText text={t.manualBody} />
+      </p>
+      <p>{t.manualStep1}</p>
+      <div className="block-gap">
+        <Command value="npm install framer-motion clsx tailwind-merge" />
+      </div>
+      <p>
+        <RichText text={t.manualStep2} />
+      </p>
+      <div className="block-gap">
+        <CodeBlock lang="ts" title="lib/utils.ts" code={utilsSource} />
+      </div>
+      <p>
+        <RichText text={t.manualStep3} />
+      </p>
+      <div className="block-gap">
+        <CodeBlock lang="css" title="app/globals.css" code={globalsSource} />
+      </div>
+      <p>
+        <RichText text={t.manualNote} />
       </p>
     </>
   );
 }
+
+const utilsSource = `import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}`;
+
+// sunui-theme.css lives in public/; it defines the shadcn colour tokens that blocks read
+const globalsSource = `@import "tailwindcss";
+@import "./sunui-theme.css";`;

@@ -314,7 +314,7 @@ const en = {
     cliBody: "Uses the shadcn CLI. The source is copied into your project, so you own every line.",
     manualTitle: "Or install manually",
     manualStep1: "1. Install the dependencies.",
-    manualStep2: "2. Add a `cn` helper at `lib/utils.ts` if you do not have one, then copy the component.",
+    manualStep2: "2. Add a `cn` helper at `lib/utils.ts` if you do not have one. Not using shadcn/ui? Also add [sunui-theme.css](/sunui-theme.css) for the colour tokens ([how](/docs/installation#without-shadcn)). Then copy the component.",
     proTitle: "This is a Pro block",
     proBody: "One license unlocks every Pro block, now and in the future.",
     proTerms: (price: number) =>
@@ -397,7 +397,7 @@ const en = {
   docsInstall: {
     metaDescription: "Install SunUI blocks with the shadcn CLI.",
     title: "Installation",
-    lead: "SunUI works in any React project with Tailwind CSS v4 and the shadcn CLI, including Next.js, Vite and Remix.",
+    lead: "SunUI works in any React project with Tailwind CSS v4, including Next.js, Vite and Remix. The shadcn CLI installs a block in one command; you can also add blocks by hand without shadcn.",
     step1Title: "1. Set up shadcn",
     step1Body:
       "If your project does not have a `components.json` yet, initialize shadcn. It adds the theme tokens and the `cn` helper that SunUI blocks use.",
@@ -406,9 +406,14 @@ const en = {
     step2After: "The CLI copies the source into `components/` and installs `framer-motion` if needed.",
     step3Title: "3. Optional: use the @sunui namespace",
     step3Body: "Register the free registry once, then install blocks by name.",
-    manualTitle: "Manual install",
-    manualBody:
-      "Prefer copy and paste? Install `framer-motion clsx tailwind-merge`, add a `cn` helper at `lib/utils.ts`, then copy the source shown on any free block page.",
+    manualTitle: "Install without shadcn",
+    manualBody: "Using Tailwind CSS v4 without shadcn/ui, or prefer copy and paste? Do these three steps once, then copy the source from any free block page.",
+    manualStep1: "1. Install the dependencies.",
+    manualStep2: "2. Add a `cn` helper at `lib/utils.ts`.",
+    manualStep3:
+      "3. Add the theme variables. Blocks use colour tokens such as `bg-card` and `text-muted-foreground`; without them they render with no surfaces and no text colour. Download [sunui-theme.css](/sunui-theme.css), save it next to your global CSS and import it after Tailwind.",
+    manualNote:
+      "Skip step 3 if you already ran `npx shadcn init`: your project has these variables. The file sets common names such as `--primary` and `--border` on `:root`, so check they do not clash with your own. For your brand colour on selected states and results, set `--sunui-spot` and `--sunui-spot-foreground`.",
   },
   docsPro: {
     metaDescription: "Install SunUI Pro blocks with your license key.",
@@ -1010,7 +1015,7 @@ const zhTW: Messages = {
     cliBody: "使用 shadcn CLI。原始碼會複製到你的專案裡，每一行都由你掌握。",
     manualTitle: "或手動安裝",
     manualStep1: "1. 安裝相依套件。",
-    manualStep2: "2. 如果還沒有，在 `lib/utils.ts` 加上 `cn` 輔助函式，再複製元件程式碼。",
+    manualStep2: "2. 如果還沒有，在 `lib/utils.ts` 加上 `cn` 輔助函式。沒有用 shadcn/ui？再加上 [sunui-theme.css](/sunui-theme.css) 提供顏色變數（[做法](/docs/installation#without-shadcn)）。然後複製元件程式碼。",
     proTitle: "這是 Pro 區塊",
     proBody: "一份授權即可解鎖所有 Pro 區塊，包含日後新增的。",
     proTerms: (price) => `一次付費 $${price} 買斷，也可以月訂或年訂（自動續扣，隨時可以取消）。自己的專案與客戶案子都能用，數量不限。`,
@@ -1101,9 +1106,14 @@ const zhTW: Messages = {
     step2After: "CLI 會把原始碼複製到 `components/`，必要時也會安裝 `framer-motion`。",
     step3Title: "3. 選用：使用 @sunui 命名空間",
     step3Body: "註冊一次免費 registry，之後就能直接用名稱安裝區塊。",
-    manualTitle: "手動安裝",
-    manualBody:
-      "想直接複製貼上？先安裝 `framer-motion clsx tailwind-merge`，在 `lib/utils.ts` 加上 `cn` 輔助函式，再複製任一免費區塊頁上的原始碼。",
+    manualTitle: "不用 shadcn 安裝",
+    manualBody: "用 Tailwind CSS v4 但沒有用 shadcn/ui，或想直接複製貼上？先做一次下面三步，之後複製任一免費區塊頁上的原始碼即可。",
+    manualStep1: "1. 安裝相依套件。",
+    manualStep2: "2. 在 `lib/utils.ts` 加上 `cn` 輔助函式。",
+    manualStep3:
+      "3. 加入主題變數。區塊使用 `bg-card`、`text-muted-foreground` 這類顏色 token，少了它們會沒有底色與文字色。下載 [sunui-theme.css](/sunui-theme.css)，放在全域 CSS 旁邊，接在 Tailwind 後面 import。",
+    manualNote:
+      "已經跑過 `npx shadcn init` 的專案不用做第 3 步，這些變數已經有了。這份檔案會在 `:root` 定義 `--primary`、`--border` 這類常見名稱，請確認沒有和你自己的變數撞名。要讓選中狀態與結果顯示你的品牌色，設定 `--sunui-spot` 與 `--sunui-spot-foreground`。",
   },
   docsPro: {
     metaDescription: "用你的授權金鑰安裝 SunUI Pro 區塊。",
@@ -1683,7 +1693,7 @@ const zhCN: Messages = {
     cliBody: "使用 shadcn CLI。源码会复制到你的项目中，每一行都由你掌控。",
     manualTitle: "或手动安装",
     manualStep1: "1. 安装依赖。",
-    manualStep2: "2. 如果还没有，在 `lib/utils.ts` 添加 `cn` 辅助函数，然后复制组件代码。",
+    manualStep2: "2. 如果还没有，在 `lib/utils.ts` 添加 `cn` 辅助函数。没有用 shadcn/ui？再加上 [sunui-theme.css](/sunui-theme.css) 提供颜色变量（[做法](/docs/installation#without-shadcn)）。然后复制组件代码。",
     proTitle: "这是 Pro 区块",
     proBody: "一份许可即可解锁所有 Pro 区块，包括以后新增的。",
     proTerms: (price) => `一次付费 $${price} 买断，也可以按月或按年订阅（自动续费，随时可以取消）。自己的项目和客户项目都能用，数量不限。`,
@@ -1773,9 +1783,14 @@ const zhCN: Messages = {
     step2After: "CLI 会把源码复制到 `components/`，必要时还会安装 `framer-motion`。",
     step3Title: "3. 可选：使用 @sunui 命名空间",
     step3Body: "注册一次免费 registry，之后就能直接按名称安装区块。",
-    manualTitle: "手动安装",
-    manualBody:
-      "想直接复制粘贴？先安装 `framer-motion clsx tailwind-merge`，在 `lib/utils.ts` 添加 `cn` 辅助函数，然后复制任一免费区块页面上的源码。",
+    manualTitle: "不用 shadcn 安装",
+    manualBody: "用 Tailwind CSS v4 但没有用 shadcn/ui，或想直接复制粘贴？先做一次下面三步，之后复制任一免费区块页面上的源码即可。",
+    manualStep1: "1. 安装依赖。",
+    manualStep2: "2. 在 `lib/utils.ts` 添加 `cn` 辅助函数。",
+    manualStep3:
+      "3. 加入主题变量。区块使用 `bg-card`、`text-muted-foreground` 这类颜色 token，少了它们会没有底色与文字色。下载 [sunui-theme.css](/sunui-theme.css)，放在全局 CSS 旁边，在 Tailwind 之后 import。",
+    manualNote:
+      "已经运行过 `npx shadcn init` 的项目不用做第 3 步，这些变量已经有了。这份文件会在 `:root` 定义 `--primary`、`--border` 这类常见名称，请确认没有和你自己的变量重名。要让选中状态与结果显示你的品牌色，设置 `--sunui-spot` 与 `--sunui-spot-foreground`。",
   },
   docsPro: {
     metaDescription: "用你的许可密钥安装 SunUI Pro 区块。",
@@ -2349,7 +2364,7 @@ const ja: Messages = {
     cliBody: "shadcn CLI を使います。ソースはプロジェクトにコピーされるので、すべての行があなたのものです。",
     manualTitle: "手動でインストール",
     manualStep1: "1. 依存パッケージをインストールします。",
-    manualStep2: "2. `cn` ヘルパーがなければ `lib/utils.ts` に追加し、コンポーネントをコピーします。",
+    manualStep2: "2. `cn` ヘルパーがなければ `lib/utils.ts` に追加します。shadcn/ui を使っていない場合は、色のトークン用に [sunui-theme.css](/sunui-theme.css) も追加します（[手順](/docs/installation#without-shadcn)）。そのあとコンポーネントをコピーします。",
     proTitle: "これは Pro ブロックです",
     proBody: "ひとつのライセンスで、今後追加されるものも含めてすべての Pro ブロックが使えます。",
     proTerms: (price) => `$${price} の買い切り、または自動更新の月額・年額プラン（いつでも停止可能）。自分の案件にもクライアント案件にも、数の制限なく使えます。`,
@@ -2440,9 +2455,14 @@ const ja: Messages = {
     step2After: "CLI はソースを `components/` にコピーし、必要なら `framer-motion` もインストールします。",
     step3Title: "3. 任意：@sunui 名前空間を使う",
     step3Body: "無料の registry を一度登録すれば、あとは名前でブロックをインストールできます。",
-    manualTitle: "手動インストール",
-    manualBody:
-      "コピー＆ペーストがお好みなら、`framer-motion clsx tailwind-merge` をインストールし、`lib/utils.ts` に `cn` ヘルパーを追加してから、無料ブロックのページにあるソースをコピーしてください。",
+    manualTitle: "shadcn なしでインストール",
+    manualBody: "Tailwind CSS v4 を使っていて shadcn/ui は使っていない、またはコピー＆ペーストがお好みなら、次の三つを一度だけ行い、あとは無料ブロックのページにあるソースをコピーしてください。",
+    manualStep1: "1. 依存パッケージをインストールします。",
+    manualStep2: "2. `lib/utils.ts` に `cn` ヘルパーを追加します。",
+    manualStep3:
+      "3. テーマ変数を追加します。ブロックは `bg-card` や `text-muted-foreground` などの色トークンを使うため、これがないと背景色も文字色も付きません。[sunui-theme.css](/sunui-theme.css) をダウンロードしてグローバル CSS の隣に置き、Tailwind のあとで import してください。",
+    manualNote:
+      "すでに `npx shadcn init` を実行したプロジェクトでは手順 3 は不要です。変数はもうあります。このファイルは `:root` に `--primary` や `--border` などのよくある名前を定義するので、ご自身の変数と重ならないか確認してください。選択状態や結果にブランドカラーを使うには `--sunui-spot` と `--sunui-spot-foreground` を設定します。",
   },
   docsPro: {
     metaDescription: "ライセンスキーで SunUI Pro ブロックをインストールします。",
