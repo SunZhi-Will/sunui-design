@@ -10,8 +10,10 @@ import {
   MultiStepLoader,
   Skeleton,
   TopLoadingBar,
+  dotMatrixPalettes,
   dotMatrixPatterns,
   loaderVariants,
+  type DotMatrixPalette,
   type DotMatrixPattern,
   type DotMatrixState,
   type LoadingEffectId,
@@ -47,6 +49,8 @@ export const copy = {
     waiting: "Waiting",
     uploaded: "Uploaded",
     states: { loading: "Loading", progress: "Progress", success: "Success", error: "Error" } satisfies Record<DotMatrixState, string>,
+    colour: "Colour",
+    palettes: { spot: "Theme", status: "Status", aurora: "Aurora", sunset: "Sunset", lagoon: "Lagoon", prism: "Prism" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "Wave", spiral: "Spiral", rain: "Rain", ripple: "Ripple", snake: "Snake", scan: "Scan" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-TW": {
@@ -78,6 +82,8 @@ export const copy = {
     waiting: "等待中",
     uploaded: "已上傳",
     states: { loading: "載入", progress: "進度", success: "成功", error: "錯誤" } satisfies Record<DotMatrixState, string>,
+    colour: "顏色",
+    palettes: { spot: "主題色", status: "狀態色", aurora: "極光", sunset: "夕陽", lagoon: "潟湖", prism: "稜鏡" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "漣漪", snake: "蛇行", scan: "掃描" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-CN": {
@@ -109,6 +115,8 @@ export const copy = {
     waiting: "等待中",
     uploaded: "已上传",
     states: { loading: "加载", progress: "进度", success: "成功", error: "错误" } satisfies Record<DotMatrixState, string>,
+    colour: "颜色",
+    palettes: { spot: "主题色", status: "状态色", aurora: "极光", sunset: "夕阳", lagoon: "潟湖", prism: "棱镜" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "涟漪", snake: "蛇行", scan: "扫描" } satisfies Record<DotMatrixPattern, string>,
   },
   ja: {
@@ -140,6 +148,8 @@ export const copy = {
     waiting: "待機中",
     uploaded: "アップロード完了",
     states: { loading: "読み込み", progress: "進捗", success: "成功", error: "エラー" } satisfies Record<DotMatrixState, string>,
+    colour: "カラー",
+    palettes: { spot: "テーマ", status: "ステータス", aurora: "オーロラ", sunset: "サンセット", lagoon: "ラグーン", prism: "プリズム" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "ウェーブ", spiral: "スパイラル", rain: "レイン", ripple: "リップル", snake: "スネーク", scan: "スキャン" } satisfies Record<DotMatrixPattern, string>,
   },
 };
@@ -162,6 +172,17 @@ export const smallBtn =
   "rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
 const STATES: DotMatrixState[] = ["loading", "progress", "success", "error"];
+/** Swatch for each palette, drawn with the same hues the dots use */
+const SWATCH: Record<DotMatrixPalette, string> = {
+  spot: "var(--sunui-spot, var(--primary))",
+  status: "linear-gradient(135deg, var(--sunui-spot, var(--primary)) 50%, oklch(0.7 0.16 155) 50%)",
+  aurora: "linear-gradient(135deg, oklch(0.72 0.15 165), oklch(0.72 0.15 130), oklch(0.72 0.15 95))",
+  sunset: "linear-gradient(135deg, oklch(0.72 0.17 75), oklch(0.72 0.17 30), oklch(0.72 0.17 345))",
+  lagoon: "linear-gradient(135deg, oklch(0.7 0.14 150), oklch(0.7 0.14 245))",
+  prism: "linear-gradient(135deg, oklch(0.7 0.17 0), oklch(0.7 0.17 110), oklch(0.7 0.17 220), oklch(0.7 0.17 330))",
+};
+/** The catalog card moves to the next gradient on every pass */
+const CARD_PALETTES: DotMatrixPalette[] = ["aurora", "sunset", "lagoon", "prism"];
 
 /**
  * Dot matrix: the six patterns side by side under one state switch.
@@ -172,6 +193,7 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
   const [state, setState] = useState<DotMatrixState>(auto ? "progress" : "loading");
   const [value, setValue] = useState(0);
   const [run, setRun] = useState(0);
+  const [palette, setPalette] = useState<DotMatrixPalette>("aurora");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Progress: about three seconds from 0 to 100 in uneven steps (real uploads are uneven), then success
@@ -191,7 +213,10 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
   // Card mode: loops loading, progress, success on its own
   useEffect(() => {
     if (!auto || state === "progress") return;
-    const id = setTimeout(() => setState(state === "loading" ? "progress" : "loading"), state === "loading" ? 2400 : 1800);
+    const id = setTimeout(() => {
+      if (state !== "loading") setPalette((p) => CARD_PALETTES[(CARD_PALETTES.indexOf(p) + 1) % CARD_PALETTES.length]);
+      setState(state === "loading" ? "progress" : "loading");
+    }, state === "loading" ? 2400 : 1800);
     return () => clearTimeout(id);
   }, [auto, state]);
 
@@ -235,12 +260,34 @@ export function DotMatrixShowcase({ compact = false, auto = false }: { compact?:
           </button>
         </div>
       )}
+      {!compact && (
+        <div role="radiogroup" aria-label={t.colour} className="flex items-center justify-center gap-1.5">
+          {dotMatrixPalettes.map((p) => (
+            <button
+              key={p}
+              type="button"
+              role="radio"
+              aria-checked={palette === p}
+              aria-label={t.palettes[p]}
+              title={t.palettes[p]}
+              onClick={() => setPalette(p)}
+              className={
+                "grid size-6 place-items-center rounded-full transition-shadow " +
+                (palette === p ? "ring-2 ring-foreground ring-offset-2 ring-offset-card" : "hover:ring-1 hover:ring-border")
+              }
+            >
+              <span className="size-4 rounded-full" style={{ background: SWATCH[p] }} />
+            </button>
+          ))}
+        </div>
+      )}
       <div className={compact ? "grid grid-cols-3 gap-6" : "grid grid-cols-3 gap-x-4 gap-y-5"}>
         {patterns.map((p) => (
           <div key={p} className="flex flex-col items-center gap-2">
             <DotMatrixLoader
               key={`${p}-${run}`}
               pattern={p}
+              palette={palette}
               state={state}
               value={value}
               size="lg"

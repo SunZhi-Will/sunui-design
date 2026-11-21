@@ -737,6 +737,36 @@ function resultFrame(shape: number[], i: number, s: number) {
   return k >= 0 && s >= FLOOD + k * STAGGER ? 1 : 0;
 }
 
+/**
+ * spot: one colour, the brand spot colour (default).
+ * status: spot while waiting, green on success, red on error.
+ * aurora, sunset, lagoon, prism: a gradient across the grid that drifts slowly while loading.
+ * Error is always red, whatever the palette, so failure never reads as decoration.
+ */
+export const dotMatrixPalettes = ["spot", "status", "aurora", "sunset", "lagoon", "prism"] as const;
+export type DotMatrixPalette = (typeof dotMatrixPalettes)[number];
+
+/** Gradient palettes as an oklch hue range; lightness and chroma stay fixed so every hue reads at the same weight */
+const GRADIENTS: Partial<Record<DotMatrixPalette, { from: number; to: number; l: number; c: number }>> = {
+  aurora: { from: 165, to: 95, l: 0.72, c: 0.15 },
+  sunset: { from: 75, to: -15, l: 0.72, c: 0.17 },
+  lagoon: { from: 150, to: 245, l: 0.7, c: 0.14 },
+  prism: { from: 0, to: 330, l: 0.7, c: 0.17 },
+};
+const SUCCESS = "var(--sunui-success, oklch(0.7 0.16 155))";
+const ERROR = "var(--destructive)";
+
+/**
+ * Where a dot sits on the gradient, 0..1. Loading and progress run it along the diagonal and drift it with time;
+ * the check and cross run it left to right so the few dots they keep still carry the whole gradient.
+ */
+function gradientAt(i: number, t: number, result: boolean) {
+  const x = i % N;
+  const y = Math.floor(i / N);
+  if (result) return x / (N - 1);
+  return 0.5 + 0.5 * Math.sin(Math.PI * ((x + y) / (2 * (N - 1)) - 0.5 + t * 0.35));
+}
+
 export interface DotMatrixLoaderProps {
   /** Loop shape while loading, and fill order for progress */
   pattern?: DotMatrixPattern;
@@ -745,7 +775,9 @@ export interface DotMatrixLoaderProps {
   /** 0 to 100, used when state is progress */
   value?: number;
   size?: LoaderSize;
-  /** Dot colour, default the brand spot colour (falls back to --primary). Error always uses --destructive */
+  /** Colour scheme, see dotMatrixPalettes. Default spot */
+  palette?: DotMatrixPalette;
+  /** Dot colour for the spot palette, default the brand spot colour (falls back to --primary) */
   color?: string;
   label?: string;
   doneLabel?: string;
@@ -758,6 +790,7 @@ export function DotMatrixLoader({
   state = "loading",
   value = 0,
   size = "md",
+  palette = "spot",
   color,
   label = "Loading",
   doneLabel = "Done",
@@ -785,9 +818,17 @@ export function DotMatrixLoader({
       // Reduced motion: a still frame of the pattern, the status text says it is loading
       return loopFrame(pattern, i, reduce ? 0.35 : now / 1000);
     };
-    const paint = (i: number, v: number) => {
+    const grad = state === "error" ? undefined : GRADIENTS[palette];
+    const paint = (i: number, v: number, now = 0) => {
       const el = dots.current[i];
       if (!el) return;
+      if (grad) {
+        // Results hold still; only the loop drifts
+        const g = gradientAt(i, state === "loading" && !reduce ? now / 1000 : 0, state === "success");
+        el.style.backgroundColor = `oklch(${grad.l} ${grad.c} ${grad.from + (grad.to - grad.from) * g})`;
+      } else if (el.style.backgroundColor) {
+        el.style.backgroundColor = "";
+      }
       el.style.opacity = String(DOT_BASE + (1 - DOT_BASE) * v);
       el.style.transform = `scale(${0.72 + 0.28 * v})`;
     };
@@ -796,7 +837,7 @@ export function DotMatrixLoader({
       const now = performance.now();
       for (let i = 0; i < CELLS; i++) {
         if (reduce) cur.current[i] = target(i, now);
-        paint(i, cur.current[i]);
+        paint(i, cur.current[i], now);
       }
       if (gridRef.current) gridRef.current.style.transform = "";
       return;
@@ -814,7 +855,7 @@ export function DotMatrixLoader({
         const next = cur.current[i] + (goal - cur.current[i]) * k;
         if (Math.abs(goal - next) > 0.002) moving = true;
         cur.current[i] = next;
-        paint(i, next);
+        paint(i, next, now);
       }
       // Error: one short shake, then still
       const s = (now - stateAt.current) / 1000;
@@ -825,7 +866,7 @@ export function DotMatrixLoader({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [state, pattern, pct, active, reduce]);
+  }, [state, pattern, pct, active, reduce, palette]);
 
   const text =
     state === "success" ? doneLabel : state === "error" ? errorLabel : state === "progress" ? `${label} ${Math.round(pct)}%` : label;
@@ -835,7 +876,14 @@ export function DotMatrixLoader({
       ref={ref}
       role="status"
       className={cn("inline-flex items-center justify-center transition-colors duration-200", className)}
-      style={{ color: state === "error" ? "var(--destructive)" : (color ?? "var(--sunui-spot, var(--primary))") }}
+      style={{
+        color:
+          state === "error"
+            ? ERROR
+            : palette === "status" && state === "success"
+              ? SUCCESS
+              : (color ?? "var(--sunui-spot, var(--primary))"),
+      }}
     >
       <SrOnly>{text}</SrOnly>
       <span
@@ -850,7 +898,7 @@ export function DotMatrixLoader({
             ref={(el) => {
               dots.current[i] = el;
             }}
-            className="rounded-full bg-current"
+            className="rounded-full bg-current transition-[background-color] duration-200"
             style={{ width: dot, height: dot, opacity: DOT_BASE, transform: "scale(0.72)" }}
           />
         ))}
