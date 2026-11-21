@@ -2,12 +2,16 @@ name: Release
 
 # 用 npm Trusted Publishing（OIDC）發佈，不需要 NPM_TOKEN。
 # 每個套件都要先在 npmjs.com 的 Settings > Trusted Publisher 設定此 repo 與 release.yml。
-# 觸發方式：推送 v* tag，或在 Actions 頁面手動執行。只會發佈 npm 上還沒有的版本。
+# 2026-11-22 停用自動發佈：packages/* 是舊版 npm 套件，已停止開發（見 README 的 Legacy 一節）。
+# 推送 v* tag 不再觸發。真的要發佈時，到 Actions 頁面手動執行，並在 confirm 欄位輸入 publish-legacy。
+# 只會發佈 npm 上還沒有的版本。
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: '輸入 publish-legacy 才會發佈舊版 npm 套件'
+        required: true
+        default: ''
 
 permissions:
   contents: read
@@ -15,6 +19,7 @@ permissions:
 
 jobs:
   release:
+    if: github.event.inputs.confirm == 'publish-legacy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
