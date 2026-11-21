@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "sunui",
-  "homepage": "https://github.com/SunZhi-Will/sunui-design",
+  "homepage": "https://sunui.synvize.com",
   "items": [
     {
       "name": "add-to-cart-button",
