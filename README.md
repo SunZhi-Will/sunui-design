@@ -1,265 +1,99 @@
-
 <div align="center">
-  <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
-  <p align="center">
-    <h1> Sun UI Design</h1>
-    <a href="README.zh.md">中文</a> | <a href="README.md">English</a>
-  </p>
-  <p align="center">
-    <b>A modern React UI component library with beautiful animations</b>
-    <br />
-    <i>Built with React, TailwindCSS, and TypeScript</i>
-  </p>
-  <p align="center">
-    <a href="https://www.npmjs.com/package/@sunui-design/react">
-      <img src="https://img.shields.io/npm/v/@sunui-design/react.svg?style=flat-square" alt="npm version" />
-    </a>
-    <a href="https://www.npmjs.com/package/@sunui-design/react">
-      <img src="https://img.shields.io/npm/dm/@sunui-design/react.svg?style=flat-square" alt="npm downloads" />
-    </a>
-    <a href="https://github.com/SunZhi-Will/sunui-design/blob/master/LICENSE">
-      <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license" />
-    </a>
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
-  </p>
-  <p align="center">
-    <a href="#features">Features</a> •
-    <a href="#components">Components</a> •
-    <a href="#installation">Installation</a> •
-    <a href="#documentation">Documentation</a>
-  </p>
-  <br />
+
+# SunUI
+
+**Animated React blocks with real craft. One command to install.**
+
+[Website](https://sunui.synvize.com) · [Browse blocks](https://sunui.synvize.com/blocks) · [Docs](https://sunui.synvize.com/docs/installation) · [Pro](https://sunui.synvize.com/pricing) · [中文](README.zh.md)
+
 </div>
 
-A modern React UI component library featuring beautiful animations and customizable components. Built with React, TailwindCSS, and TypeScript, it's perfect for any React project.
+SunUI is a [shadcn](https://ui.shadcn.com) registry of refined, animated React and Tailwind blocks. You do not install a package. You copy the source into your project with the shadcn CLI, and from then on it is your code to change.
 
-## Features
+- **Craft first.** Springs instead of linear fades, a pressed state on everything you can press, layered shadows and restrained colour.
+- **Built on your theme.** Blocks use shadcn tokens (`bg-card`, `text-muted-foreground`, `bg-primary`), so they pick up your colours and dark mode.
+- **Free blocks and motion libraries.** Over 100 items under MIT: product page parts, feedback, navigation, backgrounds, text, charts, scroll and SVG effects.
+- **Pro scenes.** Whole screens already composed (heroes, checkout, cart, campaign pages), installed the same way with a license key.
+- **Ready for agents.** An MCP server, `llms.txt` and a SunUI skill let coding agents search the catalog and draft an install plan.
 
-- 🎨 Modern and beautiful UI components
-- 📱 Fully responsive design
-- 🌈 Built with TailwindCSS
-- 🎯 TypeScript support
-- ⚡ Lightweight and performant
-- 🔧 Easy to customize
-- 📦 Tree-shakeable exports
-- 🎁 Available as individual packages or all-in-one bundle
-- 🔌 Works with any React project (Next.js, Create React App, Vite, etc.)
+## Install a block
 
-## Components
-
-Sun UI Design provides a collection of modern and customizable components. Each component is available as a separate package and can be used independently.
-
-### Available Components
-
-- [Card](packages/card/README.md) - A simple and elegant card component
-- [FileUpload](packages/file-upload/README.md) - A modern file upload component with drag and drop support
-- [FilterGrid](packages/filter-grid/README.md) - A grid component for displaying categorized content
-- [FloatingButton](packages/floating-button/README.md) - A floating button component with expandable options
-- [GradientBackground](packages/gradient-background/README.md) - An animated gradient background component
-- [SidePanel](packages/side-panel/README.md) - A side panel component for displaying side content
-- [SocialButton](packages/social-button/README.md) - A button component for social media links
-- [CountdownBanner](packages/countdown-banner/README.md) - A countdown timer banner with beautiful animations for time-sensitive offers
-
-## Installation
-
-### All-in-one Package
+Set up shadcn in your project once:
 
 ```bash
-npm install @sunui-design/react
-# or
-yarn add @sunui-design/react
-# or
-pnpm add @sunui-design/react
+npx shadcn@latest init
 ```
 
-### Individual Packages
+Then add any block by its URL:
 
 ```bash
-# Core styles and utilities
-npm install @sunui-design/core
-
-# Individual components
-npm install @sunui-design/card
-npm install @sunui-design/file-upload
-npm install @sunui-design/filter
-npm install @sunui-design/floating
-npm install @sunui-design/gradient
-npm install @sunui-design/side-panel
-npm install @sunui-design/social
-npm install @sunui-design/countdown-banner
+npx shadcn@latest add https://sunui.synvize.com/r/countdown-banner.json
 ```
 
-## Development Setup
+Or register SunUI as a namespace in `components.json`:
 
-### Development Environment Setup
-
-1. Clone the project:
-```bash
-git clone https://github.com/SunZhi-Will/sunui-design.git
-cd sunui-design
-```
-
-2. Install all dependencies:
-```bash
-npm install
-# or
-npx lerna bootstrap
-```
-
-3. Build all packages:
-```bash
-npm run build:packages
-```
-
-4. Start development server:
-```bash
-npm run dev
-```
-
-5. Start Storybook:
-```bash
-npm run storybook
-```
-
-### Development Workflow
-
-1. Create a new package:
-```bash
-cd packages
-mkdir your-package-name
-cd your-package-name
-npm init
-```
-
-2. Develop the package:
-```bash
-npm run dev
-```
-
-3. Build the package:
-```bash
-npm run build
-```
-
-4. Pack the package:
-```bash
-npm run pack
-```
-
-5. Release (bump all packages, then push the tag; GitHub Actions publishes to npm via Trusted Publishing):
-```bash
-npx lerna version 0.0.56 --exact --force-publish --no-push --yes
-git push origin master v0.0.56
-```
-
-### Common Commands
-
-- `npm run dev` - Start development server
-- `npm run build` - Build project
-- `npm run build:packages` - Build all packages
-- `npm run storybook` - Start Storybook
-- `npm run build-storybook` - Build Storybook
-- `npm run pack:all` - Pack all packages
-- `npm run clean` - Clean build files
-- `npm run lint` - Run linting
-
-### Troubleshooting
-
-If you encounter module not found errors:
-
-1. Clean and reinstall dependencies:
-```bash
-npm run clean
-npm install
-```
-
-2. Rebuild packages:
-```bash
-npm run build:packages
-```
-
-3. If issues persist, check package versions:
-```bash
-npm ls @sunui-design/core
-npm ls @sunui-design/social
-```
-
-## Basic Usage
-
-```tsx
-import '@sunui-design/core/styles/base.css';
-import {
-  Card,
-  FileUpload,
-  FilterGrid,
-  FloatingButton,
-  GradientBackground,
-  SidePanel,
-  SocialButton,
-  CountdownBanner
-} from '@sunui-design/react';
-
-export default function App() {
-  return (
-    <div>
-      <GradientBackground>
-        <Card>
-          <FilterGrid>
-            {/* Your content */}
-          </FilterGrid>
-        </Card>
-        <FloatingButton />
-        <SocialButton href="https://github.com" />
-        <CountdownBanner 
-          title="Limited Time Offer"
-          endDate={new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()}
-        />
-      </GradientBackground>
-    </div>
-  );
+```json
+{
+  "registries": {
+    "@sunui": "https://sunui.synvize.com/r/{name}.json"
+  }
 }
 ```
 
-## Documentation
-
-Each component comes with comprehensive documentation, including examples and property descriptions. To view the documentation, check the individual package READMEs or run Storybook to see live examples:
-
 ```bash
-npm run storybook
-# or
-yarn storybook
-# or
-pnpm storybook
+npx shadcn@latest add @sunui/countdown-banner
 ```
 
-## Contributing
+Every block page on the website shows a live demo, its props and the exact command.
 
-Issues and Pull Requests are welcome! Please read our contributing guidelines before submitting a PR.
+## Use it with an AI agent
+
+| Endpoint | What |
+|---|---|
+| `https://sunui.synvize.com/mcp` | MCP server (Streamable HTTP, read-only): search blocks, read usage notes, get install commands |
+| `https://sunui.synvize.com/llms.txt` | Short plain-text index of the catalog |
+| `https://sunui.synvize.com/llms-full.txt` | Full catalog with design rules |
+
+Setup for Claude Code, Cursor and others: [AI agents docs](https://sunui.synvize.com/docs/ai-agents).
+
+## Pro
+
+Pro scenes are served from `@sunui-pro` behind a license key. See [pricing](https://sunui.synvize.com/pricing) and the [Pro docs](https://sunui.synvize.com/docs/pro).
+
+## Repository layout
+
+| Path | What |
+|---|---|
+| `apps/web` | The website and the registry endpoints (Next.js) |
+| `apps/web/registry/free` | Free block source |
+| `packages/*` | Legacy npm packages, no longer developed (see below) |
+
+Run the site locally:
+
+```bash
+npm install
+npm run web:dev   # http://localhost:3100
+```
+
+How to add or edit a block: [`apps/web/README.md`](apps/web/README.md).
+
+## Legacy npm packages
+
+Earlier versions of SunUI shipped as npm packages (`@sunui-design/react` and eight component packages, last version 0.0.55). They are no longer developed and do not follow the current design. Each one has a successor in the registry:
+
+| Old package | Use instead |
+|---|---|
+| `@sunui-design/card` | `card-effects`, `skeleton-set` |
+| `@sunui-design/countdown-banner` | `countdown-banner` |
+| `@sunui-design/side-panel` | `side-panel` |
+| `@sunui-design/floating` | `morph-menu` (radial layout) |
+| `@sunui-design/social` | `social-links` |
+| `@sunui-design/gradient` | `gradient-backdrop` |
+| `@sunui-design/file-upload` | `file-dropzone` (Pro) |
+| `@sunui-design/filter` | No direct successor |
+
+Their source stays in `packages/` for existing users.
 
 ## License
 
-MIT License
-
-Copyright (c) 2024 Sun UI Design
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
-
-
+Free blocks and this repository are [MIT](LICENSE). Pro scenes are covered by the SunUI Pro license.

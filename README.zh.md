@@ -1,257 +1,99 @@
-
-
 <div align="center">
 
-  <img src="/public/sunui-title-logo.png" alt="Sun UI Design" width="500" style="margin: 20px 0" />
-  <p align="center">
-      <h1> Sun UI Design</h1>
-      <a href="README.zh.md">中文</a> | <a href="README.md">English</a>
-    </p>
-  <p align="center">
-    <b>一個具有精美動畫效果的現代 React UI 組件庫</b>
-    <br />
-    <i>使用 React、TailwindCSS 和 TypeScript 構建</i>
-  </p>
-  <p align="center">
-    <a href="https://www.npmjs.com/package/@sunui-design/react">
-      <img src="https://img.shields.io/npm/v/@sunui-design/react.svg?style=flat-square" alt="npm 版本" />
-    </a>
-    <a href="https://www.npmjs.com/package/@sunui-design/react">
-      <img src="https://img.shields.io/npm/dm/@sunui-design/react.svg?style=flat-square" alt="npm 下載量" />
-    </a>
-    <a href="https://github.com/SunZhi-Will/sunui-design/blob/master/LICENSE">
-      <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="授權" />
-    </a>
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="歡迎 PR" />
-  </p>
-  <p align="center">
-    <a href="#特點">特點</a> •
-    <a href="#組件">組件</a> •
-    <a href="#安裝">安裝</a> •
-    <a href="#文檔">文檔</a>
-  </p>
-  <br />
+# SunUI
+
+**有質感的 React 動態區塊，一行指令安裝。**
+
+[網站](https://sunui.synvize.com) · [瀏覽區塊](https://sunui.synvize.com/blocks) · [文件](https://sunui.synvize.com/docs/installation) · [Pro](https://sunui.synvize.com/pricing) · [English](README.md)
+
 </div>
 
-# Sun UI Design
+SunUI 是一個 [shadcn](https://ui.shadcn.com) registry，收錄精緻、帶動效的 React 與 Tailwind 區塊。不需要安裝套件：用 shadcn CLI 把原始碼複製進你的專案，之後就是你自己的程式碼，想怎麼改都可以。
 
-一個具有精美動畫效果和可自定義組件的現代 React UI 組件庫。使用 React、TailwindCSS 和 TypeScript 構建，完美適配任何 React 項目。
+- **質感優先。** 用彈簧取代線性淡入，每個可按的東西都有按下狀態，分層陰影，節制的用色。
+- **吃你的主題。** 區塊使用 shadcn tokens（`bg-card`、`text-muted-foreground`、`bg-primary`），會自動套用你的顏色與深色模式。
+- **免費區塊與動效庫。** 超過 100 個 MIT 授權項目：商品頁元件、回饋、導覽、背景、文字、圖表、捲動與 SVG 效果。
+- **Pro 場景。** 已經組好的整個畫面（主視覺、結帳、購物車、檔期活動頁），用授權碼以同樣方式安裝。
+- **給 AI agent 用。** 提供 MCP server、`llms.txt` 與 SunUI skill，讓寫程式的 agent 能搜尋型錄並擬好安裝計畫。
 
-## 特點
+## 安裝區塊
 
-- 🎨 現代化且精美的 UI 組件
-- 📱 完全響應式設計
-- 🌈 基於 TailwindCSS 構建
-- 🎯 TypeScript 支持
-- ⚡ 輕量且高性能
-- 🔧 易於自定義
-- 📦 支持 Tree-shaking 導出
-- 🎁 提供獨立包或整體打包
-- 🔌 適用於任何 React 項目（Next.js、Create React App、Vite 等）
-
-## 組件
-
-Sun UI Design 提供了一系列現代化且可自定義的組件。每個組件都可以作為獨立包使用。
-
-### 可用組件
-
-- [Card](packages/card/README.md) - 簡潔優雅的卡片組件
-- [FileUpload](packages/file-upload/README.md) - 支持拖放的現代文件上傳組件
-- [FilterGrid](packages/filter-grid/README.md) - 用於顯示分類內容的網格組件
-- [FloatingButton](packages/floating-button/README.md) - 可展開選項的浮動按鈕組件
-- [GradientBackground](packages/gradient-background/README.md) - 動畫漸變背景組件
-- [SidePanel](packages/side-panel/README.md) - 側邊面板組件
-- [SocialButton](packages/social-button/README.md) - 社交媒體按鈕組件
-- [CountdownBanner](packages/countdown-banner/README.md) - 具有精美動畫效果的倒數計時橫幅，用於展示限時優惠
-
-## 安裝
-
-### 整體包安裝
+先在專案裡初始化 shadcn（只需一次）：
 
 ```bash
-npm install @sunui-design/react
-# 或
-yarn add @sunui-design/react
-# 或
-pnpm add @sunui-design/react
+npx shadcn@latest init
 ```
 
-### 獨立包安裝
+再用網址加入任一區塊：
 
 ```bash
-# 核心樣式和工具
-npm install @sunui-design/core
-
-# 獨立組件
-npm install @sunui-design/card
-npm install @sunui-design/file-upload
-npm install @sunui-design/filter
-npm install @sunui-design/floating
-npm install @sunui-design/gradient
-npm install @sunui-design/side-panel
-npm install @sunui-design/social
-npm install @sunui-design/countdown-banner
+npx shadcn@latest add https://sunui.synvize.com/r/countdown-banner.json
 ```
 
-## 開發設置
+或在 `components.json` 註冊 SunUI 命名空間：
 
-### 開發環境設置
-
-1. 克隆項目：
-```bash
-git clone https://github.com/SunZhi-Will/sunui-design.git
-cd sunui-design
-```
-
-2. 安裝依賴：
-```bash
-npm install
-# 或
-npx lerna bootstrap
-```
-
-3. 構建所有包：
-```bash
-npm run build:packages
-```
-
-4. 啟動開發服務器：
-```bash
-npm run dev
-```
-
-5. 啟動 Storybook：
-```bash
-npm run storybook
-```
-
-### 開發工作流程
-
-1. 創建新包：
-```bash
-cd packages
-mkdir your-package-name
-cd your-package-name
-npm init
-```
-
-2. 開發包：
-```bash
-npm run dev
-```
-
-3. 構建包：
-```bash
-npm run build
-```
-
-4. 打包：
-```bash
-npm run pack
-```
-
-5. 發版（升版所有套件後推送 tag，GitHub Actions 會透過 Trusted Publishing 發佈到 npm）：
-```bash
-npx lerna version 0.0.56 --exact --force-publish --no-push --yes
-git push origin master v0.0.56
-```
-
-### 常用命令
-
-- `npm run dev` - 啟動開發服務器
-- `npm run build` - 構建項目
-- `npm run build:packages` - 構建所有包
-- `npm run storybook` - 啟動 Storybook
-- `npm run build-storybook` - 構建 Storybook
-- `npm run pack:all` - 打包所有包
-- `npm run clean` - 清理構建文件
-- `npm run lint` - 運行代碼檢查
-
-### 故障排除
-
-如果遇到模塊未找到錯誤：
-
-1. 清理並重新安裝依賴：
-```bash
-npm run clean
-npm install
-```
-
-2. 重新構建包：
-```bash
-npm run build:packages
-```
-
-3. 如果問題持續，檢查包版本：
-```bash
-npm ls @sunui-design/core
-npm ls @sunui-design/social
-```
-
-## 基本用法
-
-```tsx
-import '@sunui-design/core/styles/base.css';
-import {
-  Card,
-  FileUpload,
-  FilterGrid,
-  FloatingButton,
-  GradientBackground,
-  SidePanel,
-  SocialButton,
-  CountdownBanner
-} from '@sunui-design/react';
-
-export default function App() {
-  return (
-    <div>
-      <GradientBackground>
-        <Card>
-          <FilterGrid>
-            {/* 您的內容 */}
-          </FilterGrid>
-        </Card>
-        <FloatingButton />
-        <SocialButton href="https://github.com" />
-        <CountdownBanner 
-          title="限時優惠活動"
-          endDate={new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()}
-        />
-      </GradientBackground>
-    </div>
-  );
+```json
+{
+  "registries": {
+    "@sunui": "https://sunui.synvize.com/r/{name}.json"
+  }
 }
 ```
 
-## 文檔
-
-每個組件都附帶全面的文檔，包括示例和屬性說明。要查看文檔，請查看各個包的 README 或運行 Storybook 以查看實時示例：
-
 ```bash
-npm run storybook
-# 或
-yarn storybook
-# 或
-pnpm storybook
+npx shadcn@latest add @sunui/countdown-banner
 ```
 
-## 貢獻
+網站上每個區塊頁都有即時示範、props 說明與完整指令。
 
-歡迎提交 Issue 和 Pull Request！提交 PR 前請閱讀我們的貢獻指南。
+## 搭配 AI agent
+
+| 端點 | 用途 |
+|---|---|
+| `https://sunui.synvize.com/mcp` | MCP server（Streamable HTTP，唯讀）：搜尋區塊、讀取使用說明、取得安裝指令 |
+| `https://sunui.synvize.com/llms.txt` | 型錄的精簡純文字索引 |
+| `https://sunui.synvize.com/llms-full.txt` | 完整型錄與設計規則 |
+
+Claude Code、Cursor 等工具的設定方式：[AI agents 文件](https://sunui.synvize.com/docs/ai-agents)。
+
+## Pro
+
+Pro 場景由 `@sunui-pro` 提供，需要授權碼。請見[定價](https://sunui.synvize.com/pricing)與 [Pro 文件](https://sunui.synvize.com/docs/pro)。
+
+## Repo 結構
+
+| 路徑 | 內容 |
+|---|---|
+| `apps/web` | 網站與 registry 端點（Next.js） |
+| `apps/web/registry/free` | 免費區塊原始碼 |
+| `packages/*` | 舊版 npm 套件，已停止開發（見下方） |
+
+本機執行網站：
+
+```bash
+npm install
+npm run web:dev   # http://localhost:3100
+```
+
+新增或修改區塊的步驟：[`apps/web/README.md`](apps/web/README.md)。
+
+## 舊版 npm 套件
+
+SunUI 早期以 npm 套件發佈（`@sunui-design/react` 與 8 個元件套件，最後版本 0.0.55）。這些套件已停止開發，也不符合現在的設計。每一個在 registry 都有接班人：
+
+| 舊套件 | 改用 |
+|---|---|
+| `@sunui-design/card` | `card-effects`、`skeleton-set` |
+| `@sunui-design/countdown-banner` | `countdown-banner` |
+| `@sunui-design/side-panel` | `side-panel` |
+| `@sunui-design/floating` | `morph-menu`（放射狀排法） |
+| `@sunui-design/social` | `social-links` |
+| `@sunui-design/gradient` | `gradient-backdrop` |
+| `@sunui-design/file-upload` | `file-dropzone`（Pro） |
+| `@sunui-design/filter` | 沒有直接對應 |
+
+原始碼保留在 `packages/`，供現有使用者參考。
 
 ## 授權
 
-MIT 授權
-
-Copyright (c) 2024 Sun UI Design
-
-特此免費授予任何獲得本軟件副本和相關文檔文件（下稱"軟件"）的人不受限制地處理本軟件的權利，
-包括不受限制地使用、複製、修改、合併、發布、分發、再授權和/或出售本軟件副本，
-以及再授權被配發了本軟件的人如上的權利，須在下列條件下：
-
-上述版權聲明和本許可聲明應包含在本軟件的所有副本或實質成分中。
-
-本軟件是"按原樣"提供的，不做任何明示或暗示的保證，包括但不限於對適銷性、特定用途適用性和非侵權性的保證。
-在任何情況下，作者或版權持有人都不對任何索賠、損害或其他責任負責，無論這些追責來自合同、侵權或其它行為中，
-還是產生於、源於或有關於本軟件以及本軟件的使用或其它處置。 
+免費區塊與本 repo 採 [MIT](LICENSE) 授權。Pro 場景適用 SunUI Pro 授權條款。
