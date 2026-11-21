@@ -1,0 +1,25 @@
+{
+  "_note": "首頁兩段帶狀型錄的卡片。crop 是 [cx, cy, wf]：在淺色分享圖（public/og/blocks-light/<name>.jpg，1000x859）上取景的中心與寬度比例，裁成 16:10。改完跑 node apps/web/scripts/crop-cards.mjs 重產 public/cards/。kind 對應 messages.ts 的 home.bands.kinds。",
+  "pro": [
+    { "name": "lamp-dimmer-scene", "kind": "product", "crop": [0.5, 0.45, 0.92] },
+    { "name": "day-night-hero", "kind": "hero", "crop": [0.5, 0.42, 0.92] },
+    { "name": "black-friday-weekend", "kind": "campaign", "crop": [0.5, 0.37, 0.9] },
+    { "name": "shoppable-lookbook", "kind": "store", "crop": [0.5, 0.52, 0.92] },
+    { "name": "lookbook-expand-hero", "kind": "store", "crop": [0.5, 0.47, 0.92] },
+    { "name": "catalog-flipbook", "kind": "store", "crop": [0.5, 0.46, 0.72] },
+    { "name": "drop-release-hero", "kind": "hero", "crop": [0.5, 0.5, 0.94] },
+    { "name": "lunar-new-year", "kind": "campaign", "crop": [0.5, 0.8, 0.94] },
+    { "name": "tear-pack-reveal", "kind": "member", "crop": [0.5, 0.47, 0.6] }
+  ],
+  "free": [
+    { "name": "depth-hero", "kind": "hero", "crop": [0.5, 0.5, 0.96] },
+    { "name": "compare-slider", "kind": "media", "crop": [0.5, 0.48, 0.76] },
+    { "name": "cloth-curtain", "kind": "transition", "crop": [0.5, 0.47, 0.86] },
+    { "name": "orbit-gallery", "kind": "hero", "crop": [0.5, 0.5, 0.66] },
+    { "name": "photo-looks", "kind": "media", "crop": [0.5, 0.42, 0.82] },
+    { "name": "hotspots", "kind": "product", "crop": [0.38, 0.5, 0.7] },
+    { "name": "variant-picker", "kind": "product", "crop": [0.5, 0.3, 0.78] },
+    { "name": "spine-shelf", "kind": "product", "crop": [0.5, 0.48, 0.7] },
+    { "name": "phone-frame", "kind": "media", "crop": [0.5, 0.56, 0.9] }
+  ]
+}

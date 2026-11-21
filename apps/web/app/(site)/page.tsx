@@ -9,10 +9,11 @@ import { HeroCompare } from "@/components/hero-compare";
 import { InteractionWall } from "@/components/interaction-wall";
 import { HeroCloud } from "@/components/home/hero-cloud";
 import { ClosingCloud, CountUp, MotionBento } from "@/components/home/motion-bento";
-import { SceneMarquee, type MarqueeItem } from "@/components/home/scene-marquee";
+import { CatalogBand, type BandCard } from "@/components/home/catalog-band";
 import { LivePreview } from "@/components/live-preview";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { buildCatalogItems } from "@/lib/catalog-items";
+import homeCards from "@/content/home-cards.json";
 import { getI18n } from "@/lib/i18n-server";
 import { format, type Locale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
@@ -26,20 +27,19 @@ import { cn } from "@/lib/utils";
  * 展示的都是真的區塊，而且是挑過的：縮到卡片大小還好看的那些。
  */
 
-// 跑馬燈兩排：有照片、插畫或大塊明暗的區塊。Pro 資料夾不在時那幾個自動略過
-const MARQUEE_A = ["depth-hero", "day-night-hero", "compare-slider", "campaign-landing", "card-effects", "lamp-dimmer-scene", "hero-billboard-carousel", "holiday-calendar", "shoppable-lookbook", "cloth-curtain", "sky-time-switch", "specimen-scan", "variant-picker", "glass-cube-hero"];
-const MARQUEE_B = ["lookbook-expand-hero", "kelvin-switch", "image-effects", "catalog-flipbook", "loop-shader-hero", "collection-accordion", "book-3d", "gradient-backdrop", "photo-looks", "product-media", "spine-shelf", "curve-rail-hero", "sticker-board", "theme-reveal"];
 // 「在這裡直接試」：第一張佔兩格寬，其餘四張等寬
 const PLAY = ["depth-hero", "orbit-gallery", "compare-slider", "book-3d", "hotspots"];
 // 動效庫格子用到的五套免費動效庫
 const MOTION = ["background-effects", "text-effects", "chart-effects", "button-effects", "svg-effects"];
-// Pro 場景：每個佔一整排，捲動時一張疊一張。Pro 資料夾不在時整段不出現
-const PRO = ["launch-stage-hero", "day-night-hero", "glass-cube-hero", "lookbook-expand-hero"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
   return { title: { absolute: m.home.metaTitle }, description: m.meta.siteDescription };
 }
+
+// 漸層字：一個畫面一處、兩個相鄰色相（天藍到網站的鈷藍），沒有 background-clip 支援時退回實色鈷藍。規則見 DESIGN.md 第 2 節
+const GRADIENT_WORD =
+  "text-accent supports-[background-clip:text]:bg-[linear-gradient(100deg,#0ea5e9,#2f6bff)] dark:supports-[background-clip:text]:bg-[linear-gradient(100deg,#7dd3fc,#7aa2ff)] supports-[background-clip:text]:bg-clip-text supports-[background-clip:text]:text-transparent";
 
 // 型錄搬到 /blocks 之前，篩選與合輯的網址是掛在首頁上的：舊連結帶著這些參數時轉過去
 const CATALOG_PARAMS = ["q", "series", "tier", "collection", "saved"];
@@ -57,10 +57,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const all = getItems();
   const items = buildCatalogItems(all, locale);
   const pick = (names: string[]) => names.flatMap((name) => items.filter((item) => item.name === name && !("variant" in item)).slice(0, 1));
-  const toMarquee = (names: string[]): MarqueeItem[] =>
-    pick(names)
-      .filter((item) => item.poster)
-      .map((item) => ({ name: item.name, title: item.title, pro: item.meta.tier === "pro" }));
+  // 帶狀型錄的卡片：名單與取景在 content/home-cards.json，Pro 資料夾不在時 Pro 那段整段不出現
+  const toCards = (list: { name: string; kind: string }[]): BandCard[] =>
+    list.flatMap(({ name, kind }) => {
+      const item = items.find((entry) => entry.name === name && !("variant" in entry));
+      return item ? [{ name, kind, title: item.title, pro: item.meta.tier === "pro" }] : [];
+    });
+  const proCards = toCards(homeCards.pro);
+  const freeCards = toCards(homeCards.free);
 
   const proCount = all.filter((item) => item.meta.tier === "pro").length;
   const motionCount = all.filter((item) => item.meta.series === "motion").length;
@@ -73,12 +77,14 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       return item ? [[name, { name, title: String("libraryTitle" in item ? item.libraryTitle : item.title) }]] : [];
     }),
   );
-  const [proLead, ...proRest] = pick(PRO);
   const stats = [all.length, motionCount, proCount, 4];
   const t = m.home.sections;
   const s = m.home.hero.showcase;
   const browseLabel = format(m.home.hero.browse, { n: all.length });
   const previewLabel = (title: string) => format(m.catalog.livePreview, { title });
+  const b = m.home.bands;
+  const freeCount = all.length - proCount;
+  const bandCopy = { all: b.all, preview: b.preview, pro: m.tier.pro, free: m.tier.free, filter: b.filter };
   const founding = foundingState();
   const day = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", day: "numeric", timeZone: "Asia/Taipei" });
   const chip =
@@ -154,6 +160,53 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </dl>
       </section>
 
+      {/* 帶狀型錄：Pro 一段、免費一段，同一個公式（眉標、標題、篩選、三欄卡片、看全部）。見 components/home/catalog-band.tsx */}
+      {proCards.length > 0 && (
+        <CatalogBand
+          id="pro-band-title"
+          eyebrow={format(b.proEyebrow, { n: proCount })}
+          title={
+            <>
+              {b.proTitle}
+              <span className={GRADIENT_WORD}>{b.proTitleAccent}</span>
+            </>
+          }
+          sub={b.proSub}
+          cards={proCards}
+          kinds={b.kinds}
+          copy={bandCopy}
+          more={{ href: "/blocks?tier=pro", label: format(b.proMore, { n: proCount }) }}
+          extra={
+            chip && (
+              <Link
+                href={chip.href}
+                className="group/card flex aspect-[16/10] flex-col justify-between rounded-xl bg-card p-6 shadow-e1 transition-shadow duration-200 hover:shadow-e2"
+              >
+                <span className="font-mono text-[11px] tracking-[0.14em] text-subtle uppercase">{chip.text}</span>
+                <span>
+                  <span className="block text-xl font-semibold tracking-[-0.02em] text-balance text-fg">{b.foundingTitle}</span>
+                  <span className="mt-2 block text-sm text-subtle">{b.foundingSub}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-fg">
+                  {m.common.seePricing}
+                  <Arrow className="size-3.5 transition-transform duration-300 ease-site group-hover/card:translate-x-0.5" />
+                </span>
+              </Link>
+            )
+          }
+        />
+      )}
+      <CatalogBand
+        id="free-band-title"
+        eyebrow={format(b.freeEyebrow, { n: freeCount })}
+        title={b.freeTitle}
+        sub={b.freeSub}
+        cards={freeCards}
+        kinds={b.kinds}
+        copy={bandCopy}
+        more={{ href: "/blocks?tier=free", label: format(b.freeMore, { n: freeCount }) }}
+      />
+
       {/* 動效庫：每一格是一套免費動效庫正在跑，直接引入元件 */}
       <section aria-labelledby="motion-title" className={SECTION}>
         <SectionHead id="motion-title" title={s.motionTitle} sub={s.motionSub}>
@@ -204,40 +257,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </section>
       )}
 
-      {/* Pro 場景：一個大框放一整頁的場景，下面三張 */}
-      {proLead && (
-        <section aria-labelledby="pro-scenes-title" className={SECTION}>
-          <SectionHead id="pro-scenes-title" title={t.pro} sub={s.proSub}>
-            <Link href="/pricing" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-semibold btn-primary">
-              {t.proCta}
-              <Arrow className="size-3.5" />
-            </Link>
-          </SectionHead>
-          {/* 每個場景佔一整排，sticky 在頁首下面，下一張往上捲時疊在它上面，露出上一張的標題列 */}
-          <ol className="mt-10 space-y-6">
-            {[proLead, ...proRest].map((item, i) => (
-              <li key={item.name} className={cn("sticky", i > 2 && "hidden md:block")} style={{ top: `calc(4.75rem + ${i * 3.25}rem)` }}>
-                <div className="overflow-hidden rounded-2xl bg-card shadow-e2 dark:bg-[#131313]">
-                  <div className="flex h-13 items-center justify-between gap-4 border-b border-line px-5 text-sm">
-                    <span className="flex items-center gap-3 font-medium">
-                      <span className="font-mono text-xs text-subtle tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-                      {item.title}
-                    </span>
-                    <Link href={`/blocks/${item.name}`} className="inline-flex items-center gap-1.5 text-subtle transition-colors hover:text-fg">
-                      {t.open}
-                      <Arrow className="size-3.5" />
-                    </Link>
-                  </div>
-                  <div className="relative h-[min(72svh,660px)]">
-                    <LivePreview name={item.name} mode="sheet" title={previewLabel(item.title)} locale={locale} />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
       {/* 差在哪裡：左邊三句話，右邊對照示範 */}
       <section aria-labelledby="compare-title" className={cn(SECTION, "grid items-center gap-x-16 gap-y-10 lg:grid-cols-[1fr_1.1fr]")}>
         <div>
@@ -264,23 +283,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       {/* 交給 agent：現成的三步示範（自己帶標題） */}
       <div className="mt-4 sm:mt-16">
         <AgentSteps m={m.home.agent} />
-      </div>
-
-      {/* 型錄裡還有更多：兩排真的區塊，往相反方向慢慢走，鋪到螢幕兩邊。
-          預覽圖只有深色版，所以這一段固定深色：淺色主題時是一條滿寬的深色帶，深色主題時和頁面同色看不出邊界 */}
-      <div className={cn("dark mx-[calc(50%-50vw)] bg-bg text-fg [.light_&]:py-20 sm:[.light_&]:py-24", SECTION)}>
-        <section aria-labelledby="catalog-title" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-          <SectionHead id="catalog-title" title={s.catalogTitle}>
-            <Link href="/blocks" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
-              {format(t.catalog.cta, { n: all.length })}
-              <Arrow className="size-3.5" />
-            </Link>
-          </SectionHead>
-        </section>
-        <section aria-label={s.marquee} className="mt-10 space-y-6">
-          <SceneMarquee items={toMarquee(MARQUEE_A)} proLabel={m.tier.pro} />
-          <SceneMarquee items={toMarquee(MARQUEE_B)} proLabel={m.tier.pro} reverse />
-        </section>
       </div>
 
       {/* 價格與創始會員 */}

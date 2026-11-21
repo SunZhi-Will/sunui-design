@@ -25,7 +25,7 @@
 下列都是「一看就是模板／AI 生成」的訊號，移植時一律拿掉：
 
 - 紫、靛、紫紅、粉的漸層或底色（`violet` `purple` `indigo` `fuchsia` `pink` 家族、`#8b5cf6` `#a855f7` `#6366f1` `#7c3aed` 這類）
-- 漸層文字（`bg-clip-text text-transparent`）、彩虹或多色漸層按鈕
+- 整句或整段的漸層文字、彩虹或多色漸層按鈕（2026-11-22 起，一個畫面一處、標題裡一個詞的漸層字可以留，見 `DESIGN.md` 第 2 節）
 - 彩色光暈：`box-shadow: 0 0 Npx <彩色>`、`drop-shadow` 發光、`blur-3xl` 光斑、背景模糊光球
 - 毛玻璃當裝飾（`backdrop-blur` 只留給真的疊在內容上的浮動 HUD，且底色不透明度 85% 以上）
 - 常駐的上下漂浮、呼吸、脈動（`animate-pulse` 只留給「錄影中」「處理中」這種真實狀態的小點）
@@ -70,7 +70,7 @@
 
 ## 檢查表
 
-- [ ] 3.1 禁止清單全部清掉（可以用 `grep -E "violet|purple|indigo|fuchsia|pink-|bg-clip-text|0 0 [0-9]+px|blur-3xl|animate-pulse"` 自查）
+- [ ] 3.1 禁止清單全部清掉（可以用 `grep -E "violet|purple|indigo|fuchsia|pink-|0 0 [0-9]+px|blur-3xl|animate-pulse"` 自查）
 - [ ] 一個元件只有一種強調色，且可用 `accent` prop 或 CSS 變數換掉
 - [ ] 行為、時序、鍵盤操作與修改前完全相同
 - [ ] Light 與 Dark（若適用）、375px 都看過

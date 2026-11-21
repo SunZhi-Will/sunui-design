@@ -10,6 +10,7 @@
 // --only 只截這些 block；--missing 只截還沒有圖的；--jobs 同時開幾個瀏覽器。
 // --theme light|dark 指定預覽主題（寫進 localStorage 的 sunui-theme）；省略時照網站預設。
 // 型錄縮圖要整批同一個主題，只重截一部分時記得指定，免得和舊圖混色。
+// --out <資料夾> 存到別處（相對 apps/web），例如試另一種主題時不要蓋掉正式的分享圖。
 // Pro block 也截（registry/pro 存在時）：分享圖只有畫面，沒有原始碼。
 // 裁切：取 block 內容的外框，四周留白，再補成 OG 右側畫框的比例（640 : 550）；太高的 block 取上半部。
 // macOS 另用 sips 縮到 1000 寬，其他系統保留原尺寸。
@@ -38,7 +39,7 @@ const missingOnly = args.includes("--missing");
 const jobs = Math.max(1, Number(opt("--jobs", 4)) || 4);
 const theme = opt("--theme", "");
 if (theme && theme !== "light" && theme !== "dark") fail("--theme 只能是 light 或 dark");
-const out = path.join(root, "public", "og", "blocks");
+const out = path.resolve(root, opt("--out", path.join("public", "og", "blocks")));
 
 const VIEWPORT = { width: 1280, height: 900 };
 const ASPECT = 640 / 550; // OG 右側畫框
