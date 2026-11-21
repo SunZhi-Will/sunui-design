@@ -2,7 +2,7 @@
 
 import { useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 
 import { useOnScreen } from "@/components/home/live-wall";
 import { format } from "@/lib/i18n";
@@ -86,6 +86,18 @@ function setNativeValue(el: HTMLInputElement, value: string) {
 
 type TileProps = { auto: boolean; offset: number; t: WallCopy; locale: string };
 
+/**
+ * 牆上的顏色：參考影片是白卡加少量彩色（藍色的狀態、紅色愛心、彩色頭像）。外殼仍是黑白灰，
+ * 顏色只透過區塊自己的 --sunui-spot（micro-interactions 與 button-effects 讀 --primary）注入，跟首頁預覽一樣只出現在區塊身上。
+ */
+const BLUE = "#3b6cf6";
+const tone = (spot: string, fg = "#ffffff", primary = false): CSSProperties =>
+  ({
+    "--sunui-spot": spot,
+    "--sunui-spot-foreground": fg,
+    ...(primary ? { "--primary": spot, "--color-primary": spot, "--primary-foreground": fg, "--color-primary-foreground": fg } : {}),
+  }) as CSSProperties;
+
 /* ------------------------------------------------------------------ */
 /* 二十格 */
 
@@ -108,10 +120,21 @@ function PricingTile({ auto, offset, t }: TileProps) {
         value={period}
         onValueChange={setPeriod}
       />
-      <p className="flex items-baseline gap-1 text-3xl font-semibold tracking-tight">
-        <AnimatedNumber value={period === "m" ? 20 : 16} currency="USD" formatOptions={{ maximumFractionDigits: 0 }} />
-        <span className="text-sm font-normal text-muted-foreground">{t.perMonth}</span>
-      </p>
+      <div className="flex items-center gap-2">
+        <p className="flex items-baseline gap-1 text-3xl font-semibold tracking-tight">
+          <AnimatedNumber value={period === "m" ? 20 : 16} currency="USD" formatOptions={{ maximumFractionDigits: 0 }} />
+          <span className="text-sm font-normal text-muted-foreground">{t.perMonth}</span>
+        </p>
+        <span
+          aria-hidden={period !== "y"}
+          className={cn(
+            "rounded-full bg-[#3b6cf6]/12 px-2 py-0.5 text-[11px] font-medium text-[#3b6cf6] transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none",
+            period === "y" ? "scale-100 opacity-100" : "scale-90 opacity-0",
+          )}
+        >
+          {t.save}
+        </span>
+      </div>
     </div>
   );
 }
@@ -125,12 +148,15 @@ function ToggleTile({ auto, offset, t }: TileProps) {
   return <ToggleSwitch label={t.focus} checked={on} onChange={setOn} />;
 }
 
+/** 漸層頭像（參考影片的彩色圓），用 SVG data URI 當 src，不需要外部圖片 */
+const gradient = (a: string, b: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="40" height="40" fill="url(#g)"/></svg>`)}`;
 const PEOPLE = [
-  { id: "a", name: "Mina P." },
-  { id: "b", name: "Leo K." },
-  { id: "c", name: "Ava S." },
-  { id: "d", name: "Noah T." },
-  { id: "e", name: "Iris W." },
+  { id: "a", name: "Mina P.", src: gradient("#ff8a65", "#f4436c") },
+  { id: "b", name: "Leo K.", src: gradient("#4facfe", "#2f5bea") },
+  { id: "c", name: "Ava S.", src: gradient("#ffb36b", "#ff6f61") },
+  { id: "d", name: "Noah T.", src: gradient("#c084fc", "#6d5dfc") },
+  { id: "e", name: "Iris W.", src: gradient("#5eead4", "#22a06b") },
 ];
 
 function AvatarTile({ auto, offset, locale }: TileProps) {
@@ -408,7 +434,7 @@ function BadgeTile({ auto, offset, t }: TileProps) {
     setN((x) => (x >= 7 ? 2 : x + 1));
   });
   return (
-    <NotifyBadge count={n} tone="ink" label={(c) => `${t.inbox}: ${c}`}>
+    <NotifyBadge count={n} tone="accent" label={(c) => `${t.inbox}: ${c}`}>
       <span className="grid size-11 place-items-center rounded-full border border-foreground/10 bg-background">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="size-5" aria-hidden="true">
           <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0" />
@@ -458,30 +484,30 @@ function CheckTile({ auto, offset, t }: TileProps) {
 
 /* ------------------------------------------------------------------ */
 
-type TileDef = { block: string; Tile: (p: TileProps) => ReactNode; fill?: boolean };
+type TileDef = { block: string; Tile: (p: TileProps) => ReactNode; fill?: boolean; style?: CSSProperties };
 
 /** 順序就是版面順序（5 欄 × 4 列）。block 是型錄裡的區塊名稱 */
 const TILES: TileDef[] = [
-  { block: "sliding-tabs", Tile: PricingTile },
-  { block: "micro-interactions", Tile: ToggleTile },
+  { block: "sliding-tabs", Tile: PricingTile, style: tone(BLUE) },
+  { block: "micro-interactions", Tile: ToggleTile, style: tone(BLUE, "#ffffff", true) },
   { block: "avatar-stack", Tile: AvatarTile },
-  { block: "star-rating", Tile: RatingTile },
-  { block: "loading-button", Tile: LoadingTile },
-  { block: "favorite-button", Tile: FavoriteTile },
+  { block: "star-rating", Tile: RatingTile, style: tone("#f5a524") },
+  { block: "loading-button", Tile: LoadingTile, style: tone(BLUE) },
+  { block: "favorite-button", Tile: FavoriteTile, style: tone("#f43f5e") },
   { block: "quantity-stepper", Tile: StepperTile },
-  { block: "otp-input", Tile: OtpTile },
-  { block: "floating-field", Tile: PostTile },
-  { block: "micro-interactions", Tile: TodoTile },
-  { block: "command-palette", Tile: CommandTile },
-  { block: "floating-field", Tile: PasswordTile },
-  { block: "sliding-tabs", Tile: DockTile },
+  { block: "otp-input", Tile: OtpTile, style: tone(BLUE) },
+  { block: "floating-field", Tile: PostTile, style: tone("#f97316") },
+  { block: "micro-interactions", Tile: TodoTile, style: tone(BLUE, "#ffffff", true) },
+  { block: "command-palette", Tile: CommandTile, style: tone(BLUE) },
+  { block: "floating-field", Tile: PasswordTile, style: tone(BLUE) },
+  { block: "sliding-tabs", Tile: DockTile, style: tone(BLUE) },
   { block: "button-effects", Tile: ArrowTile },
-  { block: "micro-interactions", Tile: HoldTile },
-  { block: "range-slider", Tile: SliderTile },
-  { block: "notify-badge", Tile: BadgeTile },
-  { block: "micro-interactions", Tile: SendTile },
-  { block: "toast-stack", Tile: ToastTile, fill: true },
-  { block: "micro-interactions", Tile: CheckTile },
+  { block: "micro-interactions", Tile: HoldTile, style: tone(BLUE, "#ffffff", true) },
+  { block: "range-slider", Tile: SliderTile, style: tone("var(--foreground)", "var(--background)") },
+  { block: "notify-badge", Tile: BadgeTile, style: tone("#f43f5e") },
+  { block: "micro-interactions", Tile: SendTile, style: tone(BLUE, "#ffffff", true) },
+  { block: "toast-stack", Tile: ToastTile, fill: true, style: tone("#22a06b") },
+  { block: "micro-interactions", Tile: CheckTile, style: tone("#22a06b", "#ffffff", true) },
 ];
 
 function Cell({ def, index, wallOn, t, locale }: { def: TileDef; index: number; wallOn: boolean; t: WallCopy; locale: string }) {
@@ -505,15 +531,16 @@ function Cell({ def, index, wallOn, t, locale }: { def: TileDef; index: number; 
       onPointerLeave={release}
       onFocus={hold}
       onBlur={release}
-      className="group/cell relative flex h-52 flex-col sm:h-64 overflow-hidden rounded-2xl bg-[#f4f4f4] shadow-e1 transition-shadow duration-200 hover:shadow-e2 dark:bg-[#151515]"
+      style={def.style}
+      className="group/cell relative flex h-52 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_0_0_1px_rgb(0_0_0/0.025)] sm:h-60 dark:bg-[#161616] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]"
     >
-      <div className={cn("flex min-h-0 flex-1 items-center justify-center", def.fill ? "p-0" : "px-5 pt-5")}>
+      <div className={cn("flex min-h-0 flex-1 items-center justify-center", def.fill ? "p-0" : "p-5")}>
         <Tile auto={wallOn && !held} offset={index * 180} t={t} locale={locale} />
       </div>
       <Link
         href={`/blocks/${def.block}`}
         aria-label={format(t.open, { name: def.block })}
-        className="relative z-10 shrink-0 px-5 pt-2 pb-3.5 font-mono text-[11px] text-subtle transition-colors duration-150 hover:text-fg focus-visible:text-fg"
+        className="absolute bottom-2.5 left-3.5 z-10 rounded-md px-1.5 py-0.5 font-mono text-[11px] text-subtle opacity-0 transition-opacity duration-150 group-hover/cell:opacity-100 hover:text-fg focus-visible:opacity-100 focus-visible:text-fg"
       >
         {def.block}
       </Link>
@@ -537,7 +564,12 @@ export function InteractionWall({ copy, locale }: { copy: WallCopy; locale: stri
           </button>
         </div>
       )}
-      <div ref={ref} role="region" aria-label={copy.label} className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div
+        ref={ref}
+        role="region"
+        aria-label={copy.label}
+        className="grid grid-cols-1 gap-2.5 rounded-[28px] bg-[#ececec] p-2.5 min-[480px]:grid-cols-2 sm:gap-3 sm:p-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:bg-[#0b0b0b] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.06)]"
+      >
         {TILES.map((def, i) => (
           <Cell key={i} def={def} index={i} wallOn={wallOn} t={copy} locale={locale} />
         ))}

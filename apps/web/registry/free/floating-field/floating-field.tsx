@@ -195,7 +195,7 @@ function diff(a: string, b: string) {
   return [b.slice(0, p), b.slice(p, b.length - s), b.slice(b.length - s)] as const;
 }
 
-/** Ring counter: the arc fills with the share used; in the last tenth the characters left appear beside it and the arc turns to text colour, at the limit to the destructive colour */
+/** Ring counter: the arc fills with the share used in the brand spot colour (it is current progress); in the last tenth the characters left appear beside it and the ring grows a little, at the limit it turns to the destructive colour */
 function CountRing({ count, max, reduce }: { count: number; max: number; reduce: boolean }) {
   const used = Math.min(count / max, 1);
   const left = max - count;
@@ -238,7 +238,7 @@ function CountRing({ count, max, reduce }: { count: number; max: number; reduce:
           strokeDashoffset={C * (1 - used)}
           className={cn(
             "transition-[stroke-dashoffset,stroke] duration-150 ease-out motion-reduce:transition-none",
-            count === 0 ? "stroke-transparent" : full ? "stroke-destructive" : near ? "stroke-foreground" : "stroke-foreground/45",
+            count === 0 ? "stroke-transparent" : full ? "stroke-destructive" : "stroke-[color:var(--sunui-spot,var(--primary))]",
           )}
         />
       </motion.svg>

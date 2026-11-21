@@ -7,12 +7,14 @@ type Item = { href: string; label: string; match: (path: string) => boolean; cla
 
 /** 頁首主導覽：依目前路徑標示 aria-current，並給連結一致的 hover 與鍵盤焦點樣式。
  * 日文的導覽字最長（ドキュメント），400px 以下字級與內距再縮一階，四個連結才放得下。 */
-export function SiteNavLinks({ labels }: { labels: { blocks: string; icons: string; docs: string; pricing: string } }) {
+export function SiteNavLinks({ labels }: { labels: { blocks: string; icons: string; interactions: string; docs: string; pricing: string } }) {
   const pathname = usePathname() ?? "/";
   const items: Item[] = [
     { href: "/blocks", label: labels.blocks, match: (p) => p.startsWith("/blocks") },
     // 360px 以上（幾乎所有現役手機）都顯示；更窄的舊機型放不下，才收起，靠頁尾連結進入
     { href: "/icons", label: labels.icons, match: (p) => p.startsWith("/icons"), className: "hidden min-[360px]:inline-flex" },
+    // 手機寬度放不下第五個連結，640px 以上才出現；手機從頁尾進入
+    { href: "/interactions", label: labels.interactions, match: (p) => p.startsWith("/interactions"), className: "hidden sm:inline-flex" },
     { href: "/docs", label: labels.docs, match: (p) => p.startsWith("/docs") },
     { href: "/pricing", label: labels.pricing, match: (p) => p.startsWith("/pricing") },
   ];
