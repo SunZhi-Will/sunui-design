@@ -911,9 +911,9 @@ const TILES: TileDef[] = [
     style: tone(BLUE),
   },
   { block: "avatar-stack", pro: "team-invite", Tile: AvatarTile },
-  { block: "star-rating", pro: "review-request", Tile: RatingTile, style: tone("#f5a524") },
+  { block: "star-rating", pro: "review-request", Tile: RatingTile },
   { block: "loading-button", Tile: LoadingTile, style: tone(BLUE) },
-  { block: "favorite-button", Tile: FavoriteTile, style: tone("#f43f5e") },
+  { block: "favorite-button", Tile: FavoriteTile },
   { block: "quantity-stepper", Tile: StepperTile },
   { block: "otp-input", Tile: OtpTile, style: tone(BLUE) },
   { block: "floating-field", Tile: PostTile, style: tone("#f97316") },
@@ -942,11 +942,10 @@ const TILES: TileDef[] = [
     Tile: SendTile,
     style: tone(BLUE),
   },
-  { block: "toast-stack", Tile: ToastTile, fill: true, style: tone("#22a06b") },
+  { block: "toast-stack", Tile: ToastTile, fill: true },
   {
     block: "micro-interactions",
     Tile: CheckTile,
-    style: tone("#22a06b"),
   },
 ];
 

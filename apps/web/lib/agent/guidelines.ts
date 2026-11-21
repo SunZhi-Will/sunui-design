@@ -59,9 +59,14 @@ SunUI dropped its old "paper" look on 2026-11-19: no paper or ink hex colours, n
 | Text | \`text-foreground\`, \`text-muted-foreground\` | theme |
 | Primary action | \`bg-primary text-primary-foreground\` | theme |
 | Brand spot | \`text-[color:var(--sunui-spot,var(--primary))]\` | theme primary |
+| Like (semantic) | \`text-[color:var(--sunui-like,#e5484d)]\` | red |
+| Rating (semantic) | \`text-[color:var(--sunui-rating,#f5a524)]\` | amber |
+| Success (semantic) | \`text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]\` | green |
+| Danger (semantic) | \`text-destructive\` | theme |
 
 - Grays are neutral with no warm or cool cast. Do not use cream, beige, warm gray or the Tailwind stone scale.
-- Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress, the main button and positive results read \`var(--sunui-spot, var(--primary))\` (on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and hairlines never use it. Do not pick an accent colour per block.
+- Brand spot colour: SunUI picks no colour of its own. Selection, discount values, current progress and the main button read \`var(--sunui-spot, var(--primary))\` (on a filled spot background use \`--sunui-spot-foreground\`, falling back to \`--primary-foreground\`). Set \`--sunui-spot\` on \`:root\` and \`.dark\` to use the store brand colour. Body text, headings and hairlines never use it. Do not pick an accent colour per block.
+- Semantic colours: meanings everyone recognises do not follow the brand spot and ship in the right colour: a saved heart is red (\`--sunui-like\`), filled stars are amber (\`--sunui-rating\`), done and verified states are green (\`--sunui-success\`, one step lighter in dark mode), errors use the theme \`--destructive\`. Buyers can override each variable. Use them only for these meanings, never as decoration.
 - Full-page templates (registry \`categories\` include \`template\`) may have one fixed dark section (\`bg-[#111111] text-[#ededed]\`, dark in both modes), usually the hero. Do not fill sections with the spot colour.
 - Light comes from straight above, one source per page. Elevation levels, each already including the hairline (do not add a border on top):
   - e1 (cards, coupons, inputs, secondary buttons): \`shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)]\`

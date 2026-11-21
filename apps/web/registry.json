@@ -1628,7 +1628,7 @@
       "name": "favorite-button",
       "type": "registry:block",
       "title": "Favorite Button",
-      "description": "Favorite heart outline that fills with the brand spot colour on a short press when saved, for bookmarks, likes or a wishlist. aria-pressed toggle with optional count.",
+      "description": "Favorite heart outline that fills red on a short press when saved (the semantic --sunui-like colour, not the brand spot), for bookmarks, likes or a wishlist. aria-pressed toggle with optional count.",
       "dependencies": [
         "framer-motion"
       ],
@@ -3998,7 +3998,7 @@
       "name": "star-rating",
       "type": "registry:block",
       "title": "Star Rating",
-      "description": "Star rating in the brand spot colour that asks why: after a score is chosen, the same frame grows reason chips (what went wrong at or below the threshold, what they liked above it) that swap in place when the score crosses it, plus an optional \"same as N% of buyers\" line from a distribution; the level label rolls in the direction of change. Half stars, keyboard roving focus, optional clear, hidden form input, and a read-only mode for review summaries. Reduced motion switches instantly.",
+      "description": "Star rating with amber stars (the semantic --sunui-rating colour) that asks why: after a score is chosen, the same frame grows reason chips (what went wrong at or below the threshold, what they liked above it) that swap in place when the score crosses it, plus an optional \"same as N% of buyers\" line from a distribution; the level label rolls in the direction of change. Half stars, keyboard roving focus, optional clear, hidden form input, and a read-only mode for review summaries. Reduced motion switches instantly.",
       "dependencies": [
         "framer-motion"
       ],

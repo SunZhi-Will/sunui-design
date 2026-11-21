@@ -44,8 +44,8 @@ const MESSAGES: Record<SunLocale, FavoriteButtonLabels> = {
 
 // Design language (DESIGN.md): an outline in the text color, filled with the brand accent once favorited
 const ink = "text-foreground";
-/** Brand accent color: follows the theme's --primary by default, and buyers can set --sunui-spot to use their own brand color. Used only for selected, deal and current-progress states */
-const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+/** Semantic like colour: a saved heart is red everywhere people shop, so it does not follow the brand spot. Buyers can set --sunui-like to change it */
+const spot = "text-[color:var(--sunui-like,#e5484d)]";
 
 const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },

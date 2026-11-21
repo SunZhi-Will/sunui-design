@@ -107,6 +107,8 @@ const MESSAGES: Record<SunLocale, StarRatingLabels> = {
 const ink = "text-foreground";
 /** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
 const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+/** Semantic rating colour: filled stars are amber like on every review site, not the brand spot. Buyers can set --sunui-rating */
+const rating = "text-[color:var(--sunui-rating,#f5a524)]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
@@ -209,7 +211,7 @@ export function StarRating({
     return (
       <div role="img" aria-label={t.rated(fixed, max)} className={cn("inline-flex items-center gap-0.5", ink, className)}>
         {Array.from({ length: max }, (_, i) => (
-          <Star key={i} fill={fillOf(i)} className={starSize[size]} />
+          <Star key={i} fill={fillOf(i)} className={starSize[size]} fillClassName={rating} />
         ))}
       </div>
     );
@@ -284,7 +286,7 @@ export function StarRating({
               <span key={i} className={cn("relative block", starSize[size])}>
                 {/* On press, squash lightly and return, no stamp-style rebound */}
                 <motion.span className="absolute inset-0 block" animate={{ scale: pressed === i && !reduce ? 0.92 : 1 }} transition={snappy}>
-                  <Star fill={fillOf(i)} className={starSize[size]} fillClassName={spot} />
+                  <Star fill={fillOf(i)} className={starSize[size]} fillClassName={rating} />
                 </motion.span>
                 {hits.map((v, k) => (
                   <span

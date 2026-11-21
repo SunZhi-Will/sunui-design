@@ -56,6 +56,14 @@ const themeColors = [
   "var(--muted-foreground)",
 ];
 
+/** Like burst particles: shades of the semantic like colour (--sunui-like, red by default) */
+const likeColors = [
+  "var(--sunui-like, #e5484d)",
+  "color-mix(in oklch, var(--sunui-like, #e5484d) 55%, var(--background))",
+  "color-mix(in oklch, var(--sunui-like, #e5484d) 70%, #ffb020)",
+  "var(--muted-foreground)",
+];
+
 /** Boolean state shared by controlled and uncontrolled use */
 function useToggle(value: boolean | undefined, defaultValue: boolean, onChange?: (next: boolean) => void) {
   const [inner, setInner] = useState(defaultValue);
@@ -83,7 +91,7 @@ export interface LikeBurstProps {
   className?: string;
 }
 
-export function LikeBurst({ liked, defaultLiked = false, onChange, label = "Like", colors = themeColors, className }: LikeBurstProps) {
+export function LikeBurst({ liked, defaultLiked = false, onChange, label = "Like", colors = likeColors, className }: LikeBurstProps) {
   const reduce = useReducedMotion() ?? false;
   const [on, setOn] = useToggle(liked, defaultLiked, onChange);
   const [burst, setBurst] = useState(0);
@@ -99,7 +107,7 @@ export function LikeBurst({ liked, defaultLiked = false, onChange, label = "Like
       }}
       className={cn(
         "relative grid size-12 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        on && "text-[color:var(--sunui-spot,var(--primary))] hover:text-[color:var(--sunui-spot,var(--primary))]",
+        on && "text-[color:var(--sunui-like,#e5484d)] hover:text-[color:var(--sunui-like,#e5484d)]",
         className,
       )}
     >
@@ -249,7 +257,7 @@ export function SuccessCheck({ message = "Payment complete", size = 64, delay = 
   const reduce = useReducedMotion() ?? false;
   const initial = reduce ? "shown" : "hidden";
   return (
-    <div role="status" className={cn("flex flex-col items-center gap-3 text-[color:var(--sunui-spot,var(--primary))]", className)}>
+    <div role="status" className={cn("flex flex-col items-center gap-3 text-[color:var(--sunui-success,#15803d)] dark:text-[color:var(--sunui-success,#4ade80)]", className)}>
       <motion.svg
         viewBox="0 0 52 52"
         width={size}
