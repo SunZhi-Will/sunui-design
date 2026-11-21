@@ -360,6 +360,15 @@ function Row({ item, now, locale, unreadLabel, reduce, onClick }: {
   );
 }
 
+/** Content colours: eight hues at the same lightness and low chroma (OKLCH), the same set as person-chip, so none shouts. A person keeps the same hue everywhere */
+const CONTENT_HUES = [255, 150, 85, 35, 190, 225, 120, 60] as const;
+function contentTone(key: string) {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  const hue = CONTENT_HUES[h % CONTENT_HUES.length];
+  return { backgroundColor: `oklch(0.62 0.08 ${hue} / 0.16)`, color: `oklch(0.5 0.1 ${hue})`, borderColor: `oklch(0.62 0.08 ${hue} / 0.35)` };
+}
+
 function Avatar({ actor }: { actor?: NotificationItem["actor"] }) {
   const [failed, setFailed] = useState(false);
   const base = "grid size-9 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground shadow-[0_0_0_1px_rgb(0_0_0/0.04)] dark:shadow-[0_0_0_1px_rgb(255_255_255/0.06)]";
@@ -374,7 +383,7 @@ function Avatar({ actor }: { actor?: NotificationItem["actor"] }) {
     return <img src={actor.avatarUrl} alt="" onError={() => setFailed(true)} className={cn(base, "object-cover")} />;
   }
   return (
-    <span aria-hidden="true" className={cn(base, "text-xs font-semibold text-foreground")}>
+    <span aria-hidden="true" className={cn(base, "border text-xs font-semibold")} style={contentTone(actor.name)}>
       {initialsOf(actor.name)}
     </span>
   );

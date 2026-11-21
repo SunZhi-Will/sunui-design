@@ -60,13 +60,13 @@ export interface ChartEffectProps {
   className?: string;
 }
 
-// Default colors: use the shadcn chart tokens when present, otherwise tell series apart by different strengths of primary
+// Default colors: the shadcn chart tokens when present; otherwise the brand spot first, then content colours (same lightness, low chroma, see DESIGN.md)
 const defaultColors = [
-  "var(--chart-1, var(--primary))",
-  "var(--chart-2, color-mix(in oklch, var(--primary) 70%, transparent))",
-  "var(--chart-3, color-mix(in oklch, var(--primary) 48%, transparent))",
-  "var(--chart-4, color-mix(in oklch, var(--primary) 30%, transparent))",
-  "var(--chart-5, color-mix(in oklch, var(--primary) 16%, transparent))",
+  "var(--chart-1, var(--sunui-spot, var(--primary)))",
+  "var(--chart-2, oklch(0.68 0.11 190))",
+  "var(--chart-3, oklch(0.74 0.11 85))",
+  "var(--chart-4, oklch(0.66 0.11 35))",
+  "var(--chart-5, oklch(0.66 0.1 150))",
 ];
 
 const defaultData: ChartDatum[] = [

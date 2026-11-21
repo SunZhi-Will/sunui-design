@@ -30,7 +30,7 @@ export interface AvatarStackProps {
   locale?: string;
   /** Override the built-in strings, takes priority over locale */
   labels?: Partial<AvatarStackLabels>;
-  /** What people without a photo show: initials on the card surface (default), or a soft two-tone gradient picked from their id, the same on every render, for invite lists and team rows that should feel alive without photos */
+  /** What people without a photo show: initials on a soft tint of their own content colour (default), or a soft two-tone gradient picked from their id, the same on every render, for invite lists and team rows that should feel alive without photos */
   fallback?: "initials" | "gradient";
   className?: string;
 }
@@ -91,6 +91,15 @@ const springs = {
   snappy: { type: "spring", stiffness: 520, damping: 34 },
   pop: { type: "spring", stiffness: 460, damping: 26 },
 } as const;
+
+/** Content colours: eight hues at the same lightness and low chroma (OKLCH), the same set as person-chip, so none shouts. A person keeps the same hue everywhere */
+const CONTENT_HUES = [255, 150, 85, 35, 190, 225, 120, 60] as const;
+function contentTone(key: string) {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  const hue = CONTENT_HUES[h % CONTENT_HUES.length];
+  return { backgroundColor: `oklch(0.62 0.08 ${hue} / 0.16)`, color: `oklch(0.5 0.1 ${hue})`, borderColor: `oklch(0.62 0.08 ${hue} / 0.35)` };
+}
 
 /** Two-tone pairs for fallback="gradient": soft, equal-weight hues that read on light and dark */
 const GRADIENTS = [
@@ -161,7 +170,7 @@ export function AvatarStack({ people, total, max = 4, size = "md", label, onOver
                 tabIndex={0}
                 aria-label={p.note ? `${p.name}, ${p.note}` : p.name}
                 className={cn(disc, "overflow-hidden", fallback === "gradient" && !p.src && "border-2 border-card")}
-                style={{ width: s.box, height: s.box, ...(fallback === "gradient" && !p.src ? { backgroundImage: gradientOf(p.id) } : null) }}
+                style={{ width: s.box, height: s.box, ...(p.src ? null : fallback === "gradient" ? { backgroundImage: gradientOf(p.id) } : contentTone(p.id)) }}
               >
                 <Face person={p} gradient={fallback === "gradient"} />
               </span>

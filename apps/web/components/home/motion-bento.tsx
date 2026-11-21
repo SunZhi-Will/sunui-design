@@ -17,7 +17,8 @@ import { cn } from "@/lib/utils";
  * 首頁用到的 SunUI 動效庫：全部直接引入免費區塊的元件，不是截圖也不是 iframe。規範見 SITE-MOTION.md §6。
  * 外殼只有黑白灰，所以每個效果都傳一組由前景色混出來的灰階，不用它們預設的主題色。
  */
-const MONO = ["var(--fg)", "color-mix(in oklch, var(--fg) 58%, var(--bg))", "color-mix(in oklch, var(--fg) 28%, var(--bg))"];
+// 網站鈷藍的三階（2026-11-22 起不再只用灰）：同一個色相深淺，不做多色漸層
+const MONO = ["var(--accent)", "color-mix(in oklch, var(--accent) 58%, var(--bg))", "color-mix(in oklch, var(--accent) 30%, var(--bg))"];
 
 export type MotionLib = { name: string; title: string };
 type Copy = { prefix: string; words: string[]; buttons: string[]; chart: string; days: string[] };
@@ -117,5 +118,5 @@ export function ClosingCloud({ label }: { label: string }) {
   useEffect(() => {
     if (window.matchMedia("(max-width: 639px)").matches) setCount(1800);
   }, []);
-  return <PointCloud shape="text" text="SunUI" count={count} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-fg" />;
+  return <PointCloud shape="text" text="SunUI" count={count} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-accent" />;
 }
