@@ -14,7 +14,7 @@ import { LivePreview } from "@/components/live-preview";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { buildCatalogItems } from "@/lib/catalog-items";
 import homeCards from "@/content/home-cards.json";
-import homeCardsMedia from "@/content/home-cards-media.json";
+import homeCardsMedia from "@/content/cards-media.json";
 import { getI18n } from "@/lib/i18n-server";
 import { format, type Locale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";

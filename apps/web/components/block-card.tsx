@@ -1,9 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { CardVideo } from "@/components/card-video";
 import { LivePreview } from "@/components/live-preview";
+import cardsMedia from "@/content/cards-media.json";
 import { format, type Locale } from "@/lib/i18n";
 import type { Tier } from "@/lib/registry";
 import { useSaved } from "@/lib/saved";
@@ -13,9 +16,12 @@ import { cn } from "@/lib/utils";
 /** save 有給才顯示書籤，例如「收藏 {title}」 */
 export type BlockCardLabels = { livePreview: string; expand: string; pro: string; save?: string };
 
+const media = cardsMedia as Record<string, { av1?: boolean }>;
+
 /**
- * 型錄卡片：元件以原尺寸即時跑、可以直接操作；點空白處或右上角展開成面板。
- * 首頁型錄與區塊頁的相似區塊共用。
+ * 型錄卡片：/blocks 型錄與區塊頁的相似區塊共用。
+ * 錄好預覽影片的（content/cards-media.json 有，scripts/record-cards.mjs --catalog 錄的）放靜態圖加影片，點整張卡展開成面板，
+ * 和首頁的卡片一樣（2026-11-22 起）；效果庫拆開的單一樣式沒有影片，仍是即時跑的 iframe，可以直接操作。
  */
 export function BlockCard({
   name,
@@ -51,19 +57,34 @@ export function BlockCard({
   const router = useRouter();
   const path = `/blocks/${name}`;
   const href = variant ? `${path}?style=${encodeURIComponent(variant)}` : path;
+  const video = variant ? undefined : media[name];
 
   return (
     <li className={cn("group", className)}>
-      <div className="relative aspect-[5/4] overflow-hidden rounded-xl bg-card shadow-e1 transition-shadow duration-200 group-hover:shadow-e2">
-        <LivePreview
-          name={name}
-          variant={variant ?? preview}
-          spot={spot}
-          poster={poster ? `/og/blocks/${name}.jpg` : undefined}
-          title={format(labels.livePreview, { title })}
-          locale={locale}
-          onExpand={() => router.push(href, { scroll: false })}
-        />
+      <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-card shadow-e1 transition-shadow duration-200 group-hover:shadow-e2">
+        {video ? (
+          // 影片只是畫面，鍵盤使用者用下面標題的連結：這裡不重複進 tab 順序
+          <Link href={href} scroll={false} aria-hidden="true" tabIndex={-1} className="absolute inset-0 block">
+            <Image
+              src={`/cards/${name}.jpg`}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-700 ease-site group-hover:scale-[1.04] motion-reduce:transition-none"
+            />
+            <CardVideo name={name} av1={video.av1} className="group-hover:scale-[1.04]" />
+          </Link>
+        ) : (
+          <LivePreview
+            name={name}
+            variant={variant ?? preview}
+            spot={spot}
+            poster={poster ? `/og/blocks/${name}.jpg` : undefined}
+            title={format(labels.livePreview, { title })}
+            locale={locale}
+            onExpand={() => router.push(href, { scroll: false })}
+          />
+        )}
         {tier === "pro" && (
           <span className="pointer-events-none absolute top-3 left-3 rounded-md bg-fg px-2 py-0.5 text-[11px] font-medium text-bg shadow-btn">
             {labels.pro}

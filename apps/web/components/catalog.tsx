@@ -345,7 +345,7 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
         )}
       </div>
 
-      {/* 手機一欄排兩百張卡是六萬多 px，而且每張都是一個 iframe：先顯示前 24 張，按了才全部展開。sm 以上不受影響 */}
+      {/* 手機一欄排兩百張卡很長（卡片是靜態圖加影片，效果庫單一樣式是 iframe）：先顯示前 24 張，按了才全部展開。sm 以上不受影響 */}
       <ul className={cn("grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3", !showAll && "max-sm:[&>li:nth-child(n+25)]:hidden")}>
         {visible.map((item, i) => (
           <BlockCard

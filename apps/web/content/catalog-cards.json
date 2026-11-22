@@ -1,0 +1,45 @@
+{
+  "_note": "/blocks 型錄卡片影片的補充設定（node apps/web/scripts/record-cards.mjs --catalog）。名單自動取自 registry，這裡只寫要人操作才會動的 block：demos.<name> 可以有 demo、seconds、crf，格式和 home-cards.json 一樣，座標是卡片畫面的比例。首頁 home-cards.json 已有的 block 共用首頁那支，不在這裡錄。",
+  "demos": {
+    "micro-interactions": {
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "drag": [
+            0.215,
+            0.5,
+            0.86,
+            0.5
+          ],
+          "ms": 1100
+        },
+        {
+          "wait": 2600
+        }
+      ],
+      "seconds": 6
+    },
+    "tear-pack-reveal": {
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "drag": [
+            0.39,
+            0.22,
+            0.61,
+            0.22
+          ],
+          "ms": 1000
+        },
+        {
+          "wait": 4000
+        }
+      ],
+      "seconds": 7
+    }
+  }
+}

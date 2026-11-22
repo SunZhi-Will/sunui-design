@@ -15,7 +15,10 @@
 //
 //   node apps/web/scripts/record-cards.mjs [--only a,b] [--base http://localhost:3100] [--idle]
 //
-// --manifest 只重寫 content/home-cards-media.json（並刪掉比 H.264 大的 AV1 檔），不錄影。
+// --catalog 錄 /blocks 型錄的卡片（2026-11-22）：每個 block 一支，錄的是型錄卡片 iframe 那一頁（/preview/<name>/card，
+//   效果庫錄代表樣式 /preview/<name>/v/<featured>），整個畫面就是卡片，不另外取景。首頁已經錄過（home-cards.json 有）的跳過，
+//   兩邊共用同一支。要操作才會動的 block 把 demo 寫在 content/catalog-cards.json 的 demos（格式同上）。沒有靜態圖的順便輸出 <name>.jpg。
+// --manifest 只重寫 content/cards-media.json（並刪掉比 H.264 大的 AV1 檔），不錄影。
 // --idle 不跑 demo，只錄 block 自己會不會動（拿來判斷哪些需要寫 demo），並印出畫面變化量。
 // 需要 ffmpeg（brew install ffmpeg）與正在跑的網站。
 import { execFileSync, spawn } from "node:child_process";
@@ -35,11 +38,37 @@ const only = opt("--only", "").split(",").map((s) => s.trim()).filter(Boolean);
 const idle = args.includes("--idle");
 // --config 換一份名單（試候選時用），--out 換輸出資料夾
 const config = JSON.parse(fs.readFileSync(path.resolve(root, opt("--config", path.join("content", "home-cards.json"))), "utf8"));
-const cards = [...config.pro, ...config.free].filter((c) => !only.length || only.includes(c.name));
+const catalog = args.includes("--catalog");
+const homeNames = new Set([...config.pro, ...config.free].map((c) => c.name));
+
+/** 型錄模式的名單：免費與 Pro 的 registry，效果庫用 variants.tsx 的代表樣式 */
+function catalogCards() {
+  const read = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")).items : []);
+  const items = [...read(path.join(root, "registry.json")), ...read(path.join(root, "registry", "pro", "registry.json"))];
+  const generated = fs.readFileSync(path.join(root, "registry", "__generated__", "variants.ts"), "utf8");
+  const featured = Object.fromEntries(
+    [...(generated.split("variantFeatured")[1] ?? "").matchAll(/"([^"]+)":\s*"([^"]+)"/g)].map((m) => [m[1], m[2]]),
+  );
+  const extra = fs.existsSync(path.join(root, "content", "catalog-cards.json"))
+    ? JSON.parse(fs.readFileSync(path.join(root, "content", "catalog-cards.json"), "utf8")).demos ?? {}
+    : {};
+  return items
+    .filter((item) => !homeNames.has(item.name))
+    .map((item) => ({
+      name: item.name,
+      interaction: item.meta?.interaction,
+      full: featured[item.name] ? `/preview/${item.name}/v/${encodeURIComponent(featured[item.name])}` : `/preview/${item.name}/card`,
+      ...extra[item.name],
+    }));
+}
+
+const cards = (catalog ? catalogCards() : [...config.pro, ...config.free]).filter((c) => !only.length || only.includes(c.name));
 const out = path.resolve(root, opt("--out", path.join("public", "cards")));
 fs.mkdirSync(out, { recursive: true });
 
-const VIEWPORT = { width: 1280, height: 900 };
+// 型錄模式的視窗就是一張卡片：約等於桌機三欄時卡片的 CSS 寬，16:10，2.5 倍像素剛好 960x600
+const VIEWPORT = catalog ? { width: 384, height: 240 } : { width: 1280, height: 900 };
+const DPR = catalog ? 2.5 : 1.5;
 const ASPECT = 640 / 550;
 const PAD = 48;
 const MIN_WIDTH = 520;
@@ -96,8 +125,12 @@ async function openBrowser() {
   const { sessionId } = await send("Target.attachToTarget", { targetId, flatten: true });
   const page = (m, p) => send(m, p, sessionId);
   await page("Page.enable");
-  await page("Emulation.setDeviceMetricsOverride", { ...VIEWPORT, deviceScaleFactor: 1.5, mobile: false });
+  await page("Emulation.setDeviceMetricsOverride", { ...VIEWPORT, deviceScaleFactor: DPR, mobile: false });
   await page("Page.addScriptToEvaluateOnNewDocument", { source: `try{localStorage.setItem("sunui-theme","light")}catch(e){}` });
+  // 自動 demo 會點到連結和送出鈕：擋掉換頁，元件自己的 onClick 照跑
+  await page("Page.addScriptToEvaluateOnNewDocument", {
+    source: `addEventListener("click",(e)=>{if(e.target.closest&&e.target.closest("a[href]"))e.preventDefault()},true);addEventListener("submit",(e)=>e.preventDefault(),true);`,
+  });
   await page("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
   return {
     page,
@@ -179,24 +212,78 @@ function cardRect(clip, [cx, cy, wf]) {
   return { x, y, w, h };
 }
 
+/**
+ * 自動 demo 的目標：卡片裡看得到、點得到的控制項，最多五個，彼此隔開一點，由上而下、由左而右。
+ * 文字欄位會打字，滑桿和 range 會拖，其他點一下。
+ */
+const findTargets = `(() => {
+  const root = document.querySelector("[data-fit-stage] > div");
+  if (!root) return [];
+  const sel = 'button, [role=button], [role=tab], [role=switch], [role=checkbox], [role=radio], [role=slider], [role=option], input, textarea, select, summary, a[href], [draggable=true], label';
+  const out = [];
+  for (const el of root.querySelectorAll(sel)) {
+    if (el.disabled || el.getAttribute("aria-disabled") === "true" || el.closest("[aria-hidden=true]")) continue;
+    if (el.type === "hidden" || el.type === "file") continue;
+    // 關閉、移除、刪除、登出這類按下去畫面就沒了：跳過，不然影片大半是空的
+    const label = [el.getAttribute("aria-label"), el.getAttribute("title"), el.textContent].join(" ").trim().toLowerCase();
+    if (/close|dismiss|remove|delete|clear|cancel|sign out|log out|reset|關閉|移除|刪除|清除|取消|閉じる|削除|关闭|删除/.test(label) || /^[×✕x]$/.test(label)) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 6 || r.height < 6) continue;
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (x < 4 || y < 4 || x > innerWidth - 4 || y > innerHeight - 4) continue;
+    const hit = document.elementFromPoint(x, y);
+    if (!hit || !(hit === el || el.contains(hit) || hit.contains(el))) continue;
+    if (out.some((o) => Math.hypot(o.x - x, o.y - y) < 28)) continue;
+    const tag = el.tagName.toLowerCase();
+    const slider = el.getAttribute("role") === "slider" || el.type === "range";
+    const typing = (tag === "input" && !["checkbox", "radio", "range", "button", "submit", "color"].includes(el.type)) || tag === "textarea";
+    // 欄位要猜一下該打什麼：看 type、name、placeholder 與標籤；已經有字的欄位只點不打（不然會接在後面）
+    const hint = [el.type, el.name, el.placeholder, el.getAttribute("aria-label"), el.labels?.[0]?.textContent, el.closest("label")?.textContent].join(" ").toLowerCase();
+    const text = el.type === "email" || /mail/.test(hint) ? "mia@studio.com"
+      : el.type === "number" || el.inputMode === "numeric" || /qty|quantity|amount|數量/.test(hint) ? "2"
+      : /code|coupon|promo|折扣|優惠/.test(hint) ? "SPRING20"
+      : /name|姓名|名字/.test(hint) ? "Mia Chen"
+      : /search|find|搜尋/.test(hint) || el.type === "search" ? "linen"
+      : /phone|tel|電話/.test(hint) || el.type === "tel" ? "0912 345 678"
+      : "Linen shirt";
+    out.push(slider ? { x, y, kind: "drag", dx: Math.min(80, Math.max(30, r.width * 0.3)) } : typing && !el.value ? { x, y, kind: "type", text } : { x, y, kind: "click", label });
+  }
+  out.sort((a, b) => a.y - b.y || a.x - b.x);
+  // 數量加減：先按加再按減，不然第一下就減到零被移除
+  const minus = /^(−|-|–|decrease|minus|減少|减少)/;
+  out.sort((a, b) => (a.y === b.y ? (minus.test(a.label) ? 1 : 0) - (minus.test(b.label) ? 1 : 0) : 0));
+  return out.slice(0, 5);
+})()`;
+
+/** 型錄卡片頁：FitStage 量好尺寸、裡面有東西才算畫好 */
+const stageReady = `(() => { const r = document.querySelector("[data-fit-stage] > div")?.getBoundingClientRect(); return !!r && r.width > 2 && r.height > 2; })()`;
+
 async function record(browser, card) {
   const seconds = card.seconds ?? 6;
-  await browser.page("Page.navigate", { url: `${base}/preview/${card.name}` });
+  await browser.page("Page.navigate", { url: `${base}${card.full ?? `/preview/${card.name}`}` });
   const deadline = Date.now() + 60_000;
-  while (!(await browser.evaluate(measure))) {
+  while (!(await browser.evaluate(card.full ? stageReady : measure))) {
     if (Date.now() > deadline) throw new Error("demo 沒有渲染出來");
     await sleep(300);
   }
   await sleep(SETTLE);
-  const box = await browser.evaluate(measure);
-  const rect = cardRect(clipFor(box), card.crop);
-  // 卡片要整塊在視窗裡：捲到它上面一點
-  const scroll = Math.max(0, rect.y - 40);
-  await browser.evaluate(`window.scrollTo(0, ${scroll}); 1`);
-  await sleep(400);
-  // 頁面不夠長時捲不動：用實際捲到的位置
-  const vy = rect.y - (await browser.evaluate("scrollY"));
-  if (vy + rect.h > VIEWPORT.height) throw new Error("卡片比視窗高，調 VIEWPORT");
+  let rect;
+  let vy;
+  if (card.full) {
+    // 整個視窗就是卡片
+    rect = { x: 0, y: 0, w: VIEWPORT.width, h: VIEWPORT.height };
+    vy = 0;
+  } else {
+    const box = await browser.evaluate(measure);
+    rect = cardRect(clipFor(box), card.crop);
+    // 卡片要整塊在視窗裡：捲到它上面一點
+    const scroll = Math.max(0, rect.y - 40);
+    await browser.evaluate(`window.scrollTo(0, ${scroll}); 1`);
+    await sleep(400);
+    // 頁面不夠長時捲不動：用實際捲到的位置
+    vy = rect.y - (await browser.evaluate("scrollY"));
+    if (vy + rect.h > VIEWPORT.height) throw new Error("卡片比視窗高，調 VIEWPORT");
+  }
 
   const dir = fs.mkdtempSync(path.join(work, `${card.name}-`));
   const frames = [];
@@ -236,7 +323,64 @@ async function record(browser, card) {
   };
   const start = Date.now();
   const demo = idle ? [] : card.demo ?? [];
+  // 型錄模式沒寫 demo 的卡：自動找卡片裡能操作的東西，滑過去、點、打字、拖（--catalog 時預設開，--no-auto 關）
+  const auto = card.full && !idle && !card.demo && !args.includes("--no-auto") ? await browser.evaluate(findTargets) : [];
+  if (process.env.REC_DEBUG) console.log("    auto", JSON.stringify(auto));
   while (Date.now() - start < seconds * 1000) {
+    if (auto.length) {
+      // 先從左到右掃過一次（hover 類的效果），再逐一操作
+      await glide({ x: VIEWPORT.width * 0.2, y: VIEWPORT.height * 0.5 }, 350);
+      await glide({ x: VIEWPORT.width * 0.8, y: VIEWPORT.height * 0.45 }, 900);
+      for (const t of auto) {
+        if (Date.now() - start >= seconds * 1000) break;
+        await glide(t, 450);
+        await sleep(250);
+        if (t.kind === "drag") {
+          await mouse("mousePressed", pos, { clickCount: 1 });
+          await glide({ x: t.x + t.dx, y: t.y }, 800, true);
+          await mouse("mouseReleased", pos, { clickCount: 1 });
+          await sleep(500);
+          continue;
+        }
+        await mouse("mousePressed", pos, { clickCount: 1 });
+        await sleep(60);
+        await mouse("mouseReleased", pos, { clickCount: 1 });
+        if (t.kind === "type") {
+          await sleep(200);
+          for (const ch of t.text) {
+            await browser.page("Input.insertText", { text: ch });
+            await sleep(70);
+          }
+          await sleep(700);
+        } else await sleep(1100);
+      }
+      continue;
+    }
+    // 找不到控制項：照 registry 的 interaction 動一下（hover 繞圈、drag 從左拖到右、scroll 捲動滾輪）
+    if (card.full && !idle && !card.demo && !args.includes("--no-auto") && ["hover", "drag", "scroll"].includes(card.interaction)) {
+      const W = VIEWPORT.width;
+      const H = VIEWPORT.height;
+      if (card.interaction === "hover") {
+        for (let i = 0; i <= 24 && Date.now() - start < seconds * 1000; i++) {
+          const a = (i / 24) * Math.PI * 2;
+          await glide({ x: W / 2 + Math.sin(a) * W * 0.3, y: H / 2 + Math.sin(a * 2) * H * 0.22 }, 160);
+        }
+      } else if (card.interaction === "drag") {
+        await glide({ x: W * 0.3, y: H * 0.5 }, 400);
+        await mouse("mousePressed", pos, { clickCount: 1 });
+        await glide({ x: W * 0.72, y: H * 0.45 }, 1200, true);
+        await mouse("mouseReleased", pos, { clickCount: 1 });
+        await sleep(900);
+      } else {
+        await glide({ x: W / 2, y: H / 2 }, 300);
+        for (let i = 0; i < 12; i++) {
+          await mouse("mouseWheel", pos, { deltaX: 0, deltaY: i < 6 ? 60 : -60 });
+          await sleep(180);
+        }
+        await sleep(500);
+      }
+      continue;
+    }
     if (!demo.length) {
       await sleep(100);
       continue;
@@ -309,20 +453,29 @@ async function record(browser, card) {
     ], { stdio: ["ignore", "ignore", "pipe"] });
     sizes[v.suffix] = Math.round(fs.statSync(file).size / 1024);
   }
-  const file = path.join(out, `${card.name}.mp4`);
+  // 型錄模式：沒有靜態圖（首頁那批是從分享圖裁的，不覆蓋）就拿第一幀當卡片的靜態圖
+  const poster = path.join(out, `${card.name}.jpg`);
+  if (card.full && !fs.existsSync(poster)) {
+    execFileSync("ffmpeg", [
+      "-y", "-loglevel", "error", "-i", firstFile,
+      "-vf", `scale=${Math.round(VIEWPORT.width * s)}:-2,${crop},scale=960:600:flags=lanczos`, "-q:v", "3", poster,
+    ], { stdio: ["ignore", "ignore", "pipe"] });
+  }
   // 畫面變化量：0 表示完全沒動
   return { kb: sizes[".mp4"], sizes, frames: moving, changed: new Set(frames.map((f) => f.data.length)).size };
 }
 
 /**
  * AV1 不一定比較小（畫面幾乎不動的卡，H.264 已經很省）：AV1 沒有比 H.264 小就刪掉 AV1 檔。
- * 哪些卡有 AV1 寫到 content/home-cards-media.json，頁面照它決定要不要給 AV1 來源，免得去要不存在的檔。
+ * 哪些卡有影片、有沒有 AV1 寫到 content/cards-media.json（首頁與 /blocks 型錄共用），
+ * 頁面照它決定要不要放影片與 AV1 來源，免得去要不存在的檔。
  */
 function writeManifest() {
-  const all = [...config.pro, ...config.free];
+  const names = new Set([...config.pro, ...config.free, ...catalogCards()].map((c) => c.name));
   const size = (f) => (fs.existsSync(f) ? fs.statSync(f).size : Infinity);
   const media = {};
-  for (const { name } of all) {
+  for (const name of names) {
+    if (!fs.existsSync(path.join(out, `${name}.mp4`))) continue;
     const h264 = size(path.join(out, `${name}.mp4`));
     const av1 = size(path.join(out, `${name}.av1.mp4`));
     const keep = av1 < h264;
@@ -330,7 +483,7 @@ function writeManifest() {
     media[name] = { av1: keep };
   }
   if (out === path.join(root, "public", "cards")) {
-    fs.writeFileSync(path.join(root, "content", "home-cards-media.json"), JSON.stringify(media, null, 2) + "\n");
+    fs.writeFileSync(path.join(root, "content", "cards-media.json"), JSON.stringify(media, null, 2) + "\n");
   }
   return media;
 }

@@ -1,0 +1,638 @@
+{
+  "lamp-dimmer-scene": {
+    "av1": true
+  },
+  "day-night-hero": {
+    "av1": true
+  },
+  "campaign-landing": {
+    "av1": true
+  },
+  "shoppable-lookbook": {
+    "av1": true
+  },
+  "lookbook-expand-hero": {
+    "av1": true
+  },
+  "catalog-flipbook": {
+    "av1": true
+  },
+  "collection-accordion": {
+    "av1": true
+  },
+  "gift-guide-fan": {
+    "av1": true
+  },
+  "sky-time-switch": {
+    "av1": true
+  },
+  "glow-dock": {
+    "av1": true
+  },
+  "depth-hero": {
+    "av1": true
+  },
+  "compare-slider": {
+    "av1": true
+  },
+  "cloth-curtain": {
+    "av1": true
+  },
+  "orbit-gallery": {
+    "av1": true
+  },
+  "theme-picker": {
+    "av1": true
+  },
+  "hero-billboard-carousel": {
+    "av1": true
+  },
+  "book-3d": {
+    "av1": true
+  },
+  "spine-shelf": {
+    "av1": true
+  },
+  "point-cloud": {
+    "av1": true
+  },
+  "add-to-cart-button": {
+    "av1": true
+  },
+  "addon-checklist": {
+    "av1": true
+  },
+  "animate-presets": {
+    "av1": true
+  },
+  "animated-number": {
+    "av1": true
+  },
+  "announcement-strip": {
+    "av1": false
+  },
+  "app-shell": {
+    "av1": false
+  },
+  "avatar-stack": {
+    "av1": true
+  },
+  "back-to-top": {
+    "av1": true
+  },
+  "background-effects": {
+    "av1": true
+  },
+  "browser-frame": {
+    "av1": false
+  },
+  "brush-reveal": {
+    "av1": true
+  },
+  "button-effects": {
+    "av1": false
+  },
+  "capsule-nav": {
+    "av1": true
+  },
+  "card-effects": {
+    "av1": true
+  },
+  "chart-effects": {
+    "av1": true
+  },
+  "checkin-streak": {
+    "av1": true
+  },
+  "checkout-steps": {
+    "av1": true
+  },
+  "cjk-heading": {
+    "av1": false
+  },
+  "confirm-button": {
+    "av1": true
+  },
+  "content-gate": {
+    "av1": false
+  },
+  "cookie-consent": {
+    "av1": false
+  },
+  "copy-code-button": {
+    "av1": true
+  },
+  "countdown-banner": {
+    "av1": false
+  },
+  "coupon-wallet": {
+    "av1": true
+  },
+  "cursor-effects": {
+    "av1": true
+  },
+  "dial-scrubber": {
+    "av1": true
+  },
+  "dialog-sheet": {
+    "av1": true
+  },
+  "empty-state": {
+    "av1": true
+  },
+  "error-state": {
+    "av1": true
+  },
+  "expanding-search": {
+    "av1": true
+  },
+  "favorite-button": {
+    "av1": false
+  },
+  "floating-field": {
+    "av1": true
+  },
+  "gradient-backdrop": {
+    "av1": true
+  },
+  "hotspots": {
+    "av1": true
+  },
+  "hover-card": {
+    "av1": true
+  },
+  "hover-motion": {
+    "av1": true
+  },
+  "image-effects": {
+    "av1": true
+  },
+  "infinite-canvas": {
+    "av1": true
+  },
+  "jobs-tray": {
+    "av1": false
+  },
+  "lightbox": {
+    "av1": true
+  },
+  "loading-button": {
+    "av1": false
+  },
+  "loading-effects": {
+    "av1": true
+  },
+  "low-stock-indicator": {
+    "av1": false
+  },
+  "micro-interactions": {
+    "av1": true
+  },
+  "notify-badge": {
+    "av1": false
+  },
+  "order-history": {
+    "av1": true
+  },
+  "otp-input": {
+    "av1": true
+  },
+  "pagination": {
+    "av1": true
+  },
+  "payment-status-banner": {
+    "av1": true
+  },
+  "person-chip": {
+    "av1": true
+  },
+  "phone-frame": {
+    "av1": false
+  },
+  "pixel-fx": {
+    "av1": true
+  },
+  "plush-portrait": {
+    "av1": false
+  },
+  "product-media": {
+    "av1": true
+  },
+  "quantity-stepper": {
+    "av1": true
+  },
+  "quota-meter": {
+    "av1": false
+  },
+  "range-slider": {
+    "av1": true
+  },
+  "raster-image": {
+    "av1": false
+  },
+  "redeem-key-input": {
+    "av1": false
+  },
+  "reservation-timer": {
+    "av1": false
+  },
+  "ribbon-carousel": {
+    "av1": true
+  },
+  "scripted-demo": {
+    "av1": true
+  },
+  "scroll-effects": {
+    "av1": true
+  },
+  "scroll-progress": {
+    "av1": true
+  },
+  "scroll-reveal-text": {
+    "av1": true
+  },
+  "scroll-story": {
+    "av1": false
+  },
+  "scroll-tilt-stage": {
+    "av1": true
+  },
+  "scroll-timeline": {
+    "av1": true
+  },
+  "shipping-options": {
+    "av1": true
+  },
+  "side-panel": {
+    "av1": true
+  },
+  "skeleton-set": {
+    "av1": true
+  },
+  "sliding-tabs": {
+    "av1": true
+  },
+  "spring-rig": {
+    "av1": true
+  },
+  "stamp": {
+    "av1": false
+  },
+  "star-rating": {
+    "av1": true
+  },
+  "status-dot": {
+    "av1": false
+  },
+  "step-demo": {
+    "av1": true
+  },
+  "store-header": {
+    "av1": true
+  },
+  "story-player": {
+    "av1": true
+  },
+  "svg-effects": {
+    "av1": true
+  },
+  "terms-consent": {
+    "av1": true
+  },
+  "testimonial-marquee": {
+    "av1": true
+  },
+  "text-effects": {
+    "av1": true
+  },
+  "tier-progress": {
+    "av1": false
+  },
+  "tiny-chart": {
+    "av1": true
+  },
+  "toast-stack": {
+    "av1": true
+  },
+  "toc-scrollspy": {
+    "av1": true
+  },
+  "typewriter": {
+    "av1": false
+  },
+  "variant-picker": {
+    "av1": true
+  },
+  "scene-transitions": {
+    "av1": true
+  },
+  "camera-moves": {
+    "av1": true
+  },
+  "photo-looks": {
+    "av1": true
+  },
+  "motion-principles": {
+    "av1": true
+  },
+  "type-motion": {
+    "av1": true
+  },
+  "morph-menu": {
+    "av1": true
+  },
+  "command-palette": {
+    "av1": true
+  },
+  "notification-bell": {
+    "av1": true
+  },
+  "logo-marquee": {
+    "av1": true
+  },
+  "live-bento": {
+    "av1": false
+  },
+  "link-preview-card": {
+    "av1": false
+  },
+  "social-links": {
+    "av1": true
+  },
+  "chapter-seekbar": {
+    "av1": true
+  },
+  "social-button": {
+    "av1": true
+  },
+  "floating-social": {
+    "av1": false
+  },
+  "skill-grid": {
+    "av1": true
+  },
+  "cart-drawer": {
+    "av1": true
+  },
+  "checkout-button": {
+    "av1": true
+  },
+  "coupon-claim-card": {
+    "av1": false
+  },
+  "faq-accordion": {
+    "av1": true
+  },
+  "festival-banner": {
+    "av1": false
+  },
+  "file-dropzone": {
+    "av1": true
+  },
+  "flash-sale-hero": {
+    "av1": false
+  },
+  "flash-sale-product-card": {
+    "av1": false
+  },
+  "fold-invite-card": {
+    "av1": true
+  },
+  "free-shipping-progress": {
+    "av1": false
+  },
+  "gift-box-reveal": {
+    "av1": true
+  },
+  "launch-countdown-wall": {
+    "av1": true
+  },
+  "newsletter-signup": {
+    "av1": false
+  },
+  "order-tracker": {
+    "av1": true
+  },
+  "order-island": {
+    "av1": true
+  },
+  "peel-sticker-coupon": {
+    "av1": true
+  },
+  "plan-comparison": {
+    "av1": true
+  },
+  "pricing-cards": {
+    "av1": false
+  },
+  "prize-wheel": {
+    "av1": true
+  },
+  "product-filter-grid": {
+    "av1": false
+  },
+  "product-gallery": {
+    "av1": true
+  },
+  "scratch-card": {
+    "av1": true
+  },
+  "scrub-stat-card": {
+    "av1": true
+  },
+  "specimen-scan": {
+    "av1": true
+  },
+  "stamp-card": {
+    "av1": false
+  },
+  "testimonial-wall": {
+    "av1": false
+  },
+  "upgrade-modal": {
+    "av1": true
+  },
+  "upsell-drawer": {
+    "av1": true
+  },
+  "drop-release-hero": {
+    "av1": true
+  },
+  "shader-campaign-banner": {
+    "av1": true
+  },
+  "loop-shader-hero": {
+    "av1": true
+  },
+  "showcase-mosaic": {
+    "av1": true
+  },
+  "launch-stage-hero": {
+    "av1": true
+  },
+  "physics-cart-jar": {
+    "av1": false
+  },
+  "bundle-node-builder": {
+    "av1": false
+  },
+  "self-building-page": {
+    "av1": true
+  },
+  "black-friday-weekend": {
+    "av1": false
+  },
+  "checkout-flow": {
+    "av1": true
+  },
+  "lunar-new-year": {
+    "av1": false
+  },
+  "gift-card-designer": {
+    "av1": true
+  },
+  "price-history": {
+    "av1": true
+  },
+  "receipt-printer": {
+    "av1": true
+  },
+  "store-help-widget": {
+    "av1": true
+  },
+  "hoop-upload": {
+    "av1": true
+  },
+  "ink-filter-bar": {
+    "av1": true
+  },
+  "vote-terrain": {
+    "av1": true
+  },
+  "pixel-build-progress": {
+    "av1": true
+  },
+  "pixel-check-in": {
+    "av1": true
+  },
+  "cutaway-spec": {
+    "av1": false
+  },
+  "ask-to-shop": {
+    "av1": true
+  },
+  "recipe-glass": {
+    "av1": true
+  },
+  "pixel-preregister": {
+    "av1": true
+  },
+  "pixel-gacha": {
+    "av1": true
+  },
+  "pixel-boss-sale": {
+    "av1": true
+  },
+  "pixel-level-track": {
+    "av1": true
+  },
+  "curve-rail-hero": {
+    "av1": true
+  },
+  "glass-cube-hero": {
+    "av1": true
+  },
+  "lineup-shelf": {
+    "av1": true
+  },
+  "sticker-board": {
+    "av1": true
+  },
+  "redline-reveal": {
+    "av1": true
+  },
+  "count-chart": {
+    "av1": true
+  },
+  "card-dock": {
+    "av1": true
+  },
+  "product-finder": {
+    "av1": true
+  },
+  "restock-notify": {
+    "av1": true
+  },
+  "size-finder": {
+    "av1": false
+  },
+  "pickup-ticket": {
+    "av1": true
+  },
+  "holiday-cutoff": {
+    "av1": false
+  },
+  "subscription-manager": {
+    "av1": false
+  },
+  "volume-tiers": {
+    "av1": true
+  },
+  "review-request": {
+    "av1": true
+  },
+  "referral-queue": {
+    "av1": false
+  },
+  "shoppable-story": {
+    "av1": true
+  },
+  "swipe-shortlist": {
+    "av1": true
+  },
+  "theme-reveal": {
+    "av1": true
+  },
+  "kelvin-switch": {
+    "av1": true
+  },
+  "glass-lens-hero": {
+    "av1": true
+  },
+  "ask-ai-halo": {
+    "av1": false
+  },
+  "tear-pack-reveal": {
+    "av1": true
+  },
+  "storage-meter": {
+    "av1": true
+  },
+  "holiday-calendar": {
+    "av1": true
+  },
+  "live-activity-wall": {
+    "av1": true
+  },
+  "liquid-glass-nav": {
+    "av1": false
+  },
+  "team-invite": {
+    "av1": true
+  },
+  "wave-confirm": {
+    "av1": true
+  },
+  "coupon-apply": {
+    "av1": true
+  },
+  "pixel-grove": {
+    "av1": true
+  },
+  "voice-note": {
+    "av1": true
+  },
+  "workspace-tabs": {
+    "av1": true
+  }
+}

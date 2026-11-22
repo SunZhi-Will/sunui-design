@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 
+import { CardVideo } from "@/components/card-video";
 import { EASE_SITE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -107,66 +108,6 @@ export function CatalogBand({
   );
 }
 
-/**
- * 卡片影片（public/cards/<name>.mp4，scripts/record-cards.mjs 錄的）：疊在靜態圖上，捲進畫面才載入與播放，
- * 離開畫面、分頁在背景時暫停。reduced motion 時不放影片，只留靜態圖。影片還沒開始播之前是透明的，看到的是靜態圖。
- */
-function CardVideo({ name, av1 }: { name: string; av1?: boolean }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const reduce = useReducedMotion();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const video = ref.current;
-    if (!video || reduce) return;
-    // 選檔：手機（視窗 640 以下）或開了省流量用 480 寬的版本，省約六成流量，會動的畫面糊一點看不太出來；
-    // 桌機三欄和手機一欄的卡片 CSS 寬度差不多（約 360px），所以用視窗寬判斷，不用卡片寬。支援 AV1 就用 AV1（同畫質小三到四成）
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    const small = saveData || window.matchMedia("(max-width: 639px)").matches;
-    const useAv1 = av1 && video.canPlayType('video/mp4; codecs="av01.0.05M.08"') !== "";
-    const src = `/cards/${name}${small ? "-480" : ""}${useAv1 ? ".av1" : ""}.mp4`;
-    if (video.getAttribute("src") !== src) video.setAttribute("src", src);
-    let visible = false;
-    let retry = 0;
-    const sync = () => {
-      window.clearTimeout(retry);
-      if (visible && !document.hidden) {
-        if (video.preload !== "auto") video.preload = "auto";
-        // 瀏覽器有時會拒絕播放（例如分頁剛從背景切回來）：還在畫面裡就一秒後再試
-        video.play().catch(() => {
-          retry = window.setTimeout(sync, 1000);
-        });
-      } else video.pause();
-    };
-    const io = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      sync();
-    }, { rootMargin: "120px" });
-    io.observe(video);
-    document.addEventListener("visibilitychange", sync);
-    return () => {
-      window.clearTimeout(retry);
-      io.disconnect();
-      document.removeEventListener("visibilitychange", sync);
-    };
-  }, [reduce, name, av1]);
-  if (reduce) return null;
-  return (
-    <video
-      ref={ref}
-      muted
-      loop
-      playsInline
-      preload="none"
-      aria-hidden="true"
-      onPlaying={() => setReady(true)}
-      className={cn(
-        "absolute inset-0 size-full object-cover transition-[opacity,scale] duration-700 ease-site group-hover/card:scale-[1.04] motion-reduce:transition-none",
-        ready ? "opacity-100" : "opacity-0",
-      )}
-    />
-  );
-}
-
 function Card({ card, kindLabel, copy }: { card: BandCard; kindLabel?: string; copy: { preview: string; pro: string; free: string } }) {
   return (
     <Link href={`/blocks/${card.name}`} className="group/card block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
@@ -178,7 +119,7 @@ function Card({ card, kindLabel, copy }: { card: BandCard; kindLabel?: string; c
           sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-700 ease-site group-hover/card:scale-[1.04] motion-reduce:transition-none"
         />
-        <CardVideo name={card.name} av1={card.av1} />
+        <CardVideo name={card.name} av1={card.av1} className="group-hover/card:scale-[1.04]" />
         <span className="absolute bottom-3 left-3 inline-flex h-8 translate-y-1 items-center gap-1.5 rounded-full bg-black/75 px-3 text-[13px] font-medium text-white opacity-0 transition-[opacity,translate] duration-300 ease-site group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-visible/card:translate-y-0 group-focus-visible/card:opacity-100">
           {copy.preview}
           <Arrow className="size-3.5" />
