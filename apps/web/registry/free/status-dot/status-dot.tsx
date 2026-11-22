@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * Color is only on the dot (8px or smaller), the text keeps the normal text color; in black and white the shape alone is still readable.
  */
 
-// Status colors: the SunUI semantic set (success, rating/warning, like/danger) and the brand spot for info, so a status dot matches every other block (reports/色系統一深度分析-2026-11-22.md)
+// Status colors: the SunUI semantic set (success, rating/warning, like/danger) and the brand spot for info, so a status dot matches every other block (see the 2026-11-22 colour unification report in reports/)
 const STATUS_TOKENS =
   "[--db-success:var(--sunui-success,#1f9d55)] [--db-warning:var(--sunui-rating,#c98a12)] [--db-danger:var(--destructive,#dc3d43)] [--db-info:var(--sunui-spot,var(--primary))] dark:[--db-success:var(--sunui-success,#4cd68a)] dark:[--db-warning:var(--sunui-rating,#f5b84a)] dark:[--db-danger:var(--destructive,#ff6b70)]";
 

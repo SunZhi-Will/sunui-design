@@ -360,7 +360,7 @@ function Row({ item, now, locale, unreadLabel, reduce, onClick }: {
   );
 }
 
-/** Content colours: shades of the brand spot, picked by hashing a name, so avatars and tags follow the buyer's brand instead of a palette of their own (reports/色系統一深度分析-2026-11-22.md) */
+/** Content colours: shades of the brand spot, picked by hashing a name, so avatars and tags follow the buyer's brand instead of a palette of their own (see the 2026-11-22 colour unification report in reports/) */
 const CONTENT_SHADES = [12, 20, 28] as const;
 function contentTone(key: string) {
   let h = 0;
