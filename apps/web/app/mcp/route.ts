@@ -151,7 +151,10 @@ const handler = createMcpHandler(
           "Find a SunUI icon by meaning, described in plain words the way you would to a designer: 'claimed coupon', 'free shipping', 'loyalty stamp card', 'dark mode'. English, Chinese or Japanese. Tolerates plurals and one typo, and ranks the base icon above its variants (stamp above stamp-check). Pass a returned name to get_icon. weak: true means nothing matched well: try other words, or call with no query to browse a group. Results marked [Pro] come from SunUI Pro seasonal packs (Lunar New Year and later seasons): they install with a license key, so pass tier: 'free' when the user has none. Use these icons instead of drawing new SVG so blocks keep one look.",
         inputSchema: z.object({
           query: z.string().max(200).optional().describe("What the icon should mean, e.g. 'redeem voucher'. Omit to list a group."),
-          style: z.enum(["line", "pixel"]).optional().describe("line: 24px stroke icons (default look). pixel: 16px sprites for retro or game-style screens. One style per screen."),
+          style: z
+            .enum(["line", "twotone", "pixel"])
+            .optional()
+            .describe("line: 24px stroke icons (default look, what blocks use). twotone: same grid and names, solid light body plus details, for app UI and pages (fewer icons so far). pixel: 16px sprites for retro or game-style screens. One style per screen."),
           group: z.string().optional().describe("Group id from the list returned with no query, e.g. 'paper', 'commerce', 'pixel-gear', 'pro-lunar-new-year'."),
           tier: z.enum(["free", "pro", "any"]).default("any").describe("free: only icons anyone can paste. pro: SunUI Pro seasonal packs (need a license). any: both, free ranked first."),
           limit: z.number().int().min(1).max(50).default(10),
@@ -188,20 +191,21 @@ const handler = createMcpHandler(
           "One SunUI icon as ready-to-paste code: a standalone SVG string or a typed React (TSX) component, plus how to install the whole icon set when you need several. Use an exact name from search_icons. Colors follow currentColor; the one accent part follows --sunui-icon-accent unless you pass accent. SunUI Pro icons ([Pro] in search_icons) return install steps instead of code.",
         inputSchema: z.object({
           name: z.string().min(1).max(60).describe("Exact icon name, kebab-case, e.g. 'stamp-check'."),
-          style: z.enum(["line", "pixel"]).default("line"),
+          style: z.enum(["line", "twotone", "pixel"]).default("line"),
           format: z.enum(["svg", "tsx"]).default("svg").describe("svg: an <svg> string. tsx: an exported React component."),
-          size: z.number().int().min(12).max(512).optional().describe("px. Default 24 for line, 16 for pixel (use multiples of 16 for pixel)."),
+          size: z.number().int().min(12).max(512).optional().describe("px. Default 24 for line and twotone, 16 for pixel (use multiples of 16 for pixel)."),
           stroke: z.number().min(1).max(2.5).default(1.5).describe("Line only. 1.5 is the house stroke; 1.25 above 32px."),
           color: z.string().max(64).optional().describe("CSS color. Omit to inherit currentColor."),
           accent: z.string().max(64).optional().describe("CSS color for the single accent part. Omit to follow --sunui-icon-accent (ink when unset)."),
           tone: z.enum(["ink", "pigment"]).default("ink").describe("Pixel only. pigment gives objects with a real color (potion, coin, gem) a muted hue."),
+          body: z.string().max(64).optional().describe("Twotone only. CSS color for the solid body. Omit for currentColor at 20%."),
         }),
         annotations: readOnly,
       },
-      async ({ name, style, format, size, stroke, color, accent, tone }) => {
+      async ({ name, style, format, size, stroke, color, accent, tone, body }) => {
         const entry = findIcon(name, style);
         if (!entry) {
-          const other = findIcon(name, style === "line" ? "pixel" : "line");
+          const other = (["line", "twotone", "pixel"] as const).filter((s) => s !== style).map((s) => findIcon(name, s)).find(Boolean);
           const close = suggestIcons(name, style);
           return {
             ...text(
@@ -211,7 +215,7 @@ const handler = createMcpHandler(
           };
         }
         if (entry.tier === "pro") return text(proIconUsage(entry));
-        const code = renderIcon(entry, { format, size: size ?? (style === "pixel" ? 16 : 24), stroke, color, accent, tone });
+        const code = renderIcon(entry, { format, size: size ?? (style === "pixel" ? 16 : 24), stroke, color, accent, tone, body });
         return text(`\`\`\`${format === "tsx" ? "tsx" : "svg"}\n${code}\n\`\`\`\n\n${iconLibraryUsage(entry)}`);
       },
     );

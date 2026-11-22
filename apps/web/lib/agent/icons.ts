@@ -2,6 +2,7 @@ import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
 import { proIconSets, type ProIconSet } from "@/lib/pro-icons";
 import { siteUrl } from "@/lib/site";
 import { icons, type IconName, type IconNode } from "@/registry/icons/sunui-icons";
+import { twoToneIcons, type TwoToneIconName } from "@/registry/icons/sunui-twotone-icons";
 import {
   pixelIcons,
   pixelPaths,
@@ -14,7 +15,8 @@ import {
 // 參考 iconmcp.com 的 search_icons / get_icon（見 reports/iconmcp 參考分析-2026-11-07.md），
 // 只讀取 registry/icons 的幾何，不另存一份。
 
-export type IconStyle = "line" | "pixel";
+/** twotone：與線條同網格、同名稱的雙色版（實心淺色主體 + 細節），2026-11-22 起分批補齊 */
+export type IconStyle = "line" | "pixel" | "twotone";
 /** tier pro：SunUI Pro 檔期圖示組。只給名稱與安裝方式，不輸出幾何（幾何只在私有 repo，憑授權安裝） */
 export type IconEntry = {
   name: string;
@@ -37,6 +39,10 @@ export const iconIndex: IconEntry[] = [
   ...(Object.keys(icons) as IconName[]).map((name) => {
     const group = lineGroupOf.get(name);
     return { name, style: "line" as const, group: group?.id ?? "other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name), tier: "free" as const };
+  }),
+  ...(Object.keys(twoToneIcons) as TwoToneIconName[]).map((name) => {
+    const group = lineGroupOf.get(name);
+    return { name, style: "twotone" as const, group: group?.id ?? "other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name), tier: "free" as const };
   }),
   ...(Object.keys(pixelIcons) as PixelIconName[]).map((name) => {
     const group = pixelExtraGroups.get(name);
@@ -170,6 +176,7 @@ export function searchIcons({
     score -= (entry.name.split("-").length - 1) * 0.5;
     // 同名時線條版優先，除非指定 pixel
     if (!style && entry.style === "pixel") score -= 0.25;
+    if (!style && entry.style === "twotone") score -= 0.15;
     // 免費與 Pro 都符合時，免費的排前面：沒有授權的人也能直接用
     if (entry.tier === "pro" && tier === "any") score -= 0.5;
     hits.push({ ...entry, score: Math.round(score * 100) / 100, matchedAllWords: scores.every((s) => s > 0), styles: [entry.style] });
@@ -197,19 +204,24 @@ export type RenderOptions = {
   accent?: string;
   /** 像素版：ink 或 pigment */
   tone?: "ink" | "pigment";
+  /** 雙色版主體顏色；省略時是 currentColor 20% */
+  body?: string;
 };
 
 const safeColor = (value: string | undefined) =>
   value && /^[#a-z0-9(),.%\s/-]{1,64}$/i.test(value) && !/url\(|expression/i.test(value) ? value : undefined;
 
-function lineBody(nodes: readonly IconNode[], accent: string, jsx: boolean) {
+function lineBody(nodes: readonly IconNode[], accent: string, jsx: boolean, body?: string) {
   const attr = (k: string, v: string | number | undefined) => (v === undefined ? "" : ` ${jsx ? camel(k) : k}="${v}"`);
   return nodes
     .map((node) => {
       if (typeof node === "string") return `<path d="${node}"/>`;
       const paint = node.accent ? accent : "currentColor";
       // 雙色的面：currentColor 加透明度，獨立 SVG 不需要 CSS 變數
-      const common = node.tone
+      const common =
+        node.tone === "body" && body
+          ? `${attr("fill", body)}${attr("stroke", body)}${attr("stroke-width", 1.2)}`
+          : node.tone
         ? `${attr("fill", "currentColor")}${attr("stroke", "currentColor")}${attr("stroke-width", 1.2)}${attr("opacity", node.tone === "body" ? 0.2 : 0.45)}`
         : `${attr("stroke", node.fill ? "none" : node.accent ? paint : undefined)}${attr("fill", node.fill ? paint : undefined)}${attr("stroke-dasharray", node.dash)}${attr("stroke-width", node.sw)}`;
       if ("d" in node) return `<path${common} d="${node.d}"/>`;
@@ -262,13 +274,15 @@ export function renderIcon(entry: IconEntry, options: RenderOptions) {
       ];
   const body = isPixel
     ? pixelBody(entry.name as PixelIconName, options.tone ?? "ink", accent, jsx)
-    : lineBody(icons[entry.name as IconName], accent, jsx);
+    : entry.style === "twotone"
+      ? lineBody(twoToneIcons[entry.name as TwoToneIconName], accent, jsx, safeColor(options.body))
+      : lineBody(icons[entry.name as IconName], accent, jsx);
   const colorAttr = color ? (jsx ? ` style={{ color: "${color}" }}` : ` style="color:${color}"`) : "";
 
   if (!jsx) {
     return `<svg xmlns="http://www.w3.org/2000/svg" width=${size} height=${size} ${svgAttrs.join(" ")}${colorAttr} aria-hidden="true">\n    ${body}\n</svg>`;
   }
-  const fn = `${pascal(entry.name)}${isPixel ? "PixelIcon" : "Icon"}`;
+  const fn = `${pascal(entry.name)}${isPixel ? "PixelIcon" : entry.style === "twotone" ? "TwoToneIcon" : "Icon"}`;
   return [
     `export function ${fn}({ size = ${options.size}, ...props }: React.SVGProps<SVGSVGElement> & { size?: number | string }) {`,
     `  return (`,
@@ -283,28 +297,39 @@ export function renderIcon(entry: IconEntry, options: RenderOptions) {
 /** 裝整套圖示庫的方式；用多個圖示時比逐一貼 SVG 好 */
 export function iconLibraryUsage(entry: IconEntry) {
   const base = siteUrl();
-  const lib = entry.style === "pixel" ? "sunui-pixel-icons" : "sunui-icons";
-  const component = entry.style === "pixel" ? "PixelIcon" : "Icon";
+  const lib = entry.style === "pixel" ? "sunui-pixel-icons" : entry.style === "twotone" ? "sunui-twotone-icons" : "sunui-icons";
+  const component = entry.style === "pixel" ? "PixelIcon" : entry.style === "twotone" ? "TwoToneIcon" : "Icon";
   return [
     `Install the whole set once: \`npx shadcn@latest add ${base}/r/icons/${lib}.json\``,
     `Then: \`import { ${component} } from "@/components/ui/${lib}"\` and \`<${component} name="${entry.name}" />\``,
     entry.style === "line"
       ? "Animated versions (hover, toggle, loading) of many icons: " + `${base}/r/icons/sunui-animated-icons.json`
-      : "Frame-by-frame animated versions: " + `${base}/r/icons/sunui-animated-pixel-icons.json`,
+      : entry.style === "twotone"
+        ? "Animated versions of every two-tone icon: " + `${base}/r/icons/sunui-animated-twotone-icons.json` +
+          ". Colour: set color (details) and --sunui-icon-body with --sunui-icon-body-opacity: 1 (body)."
+        : "Frame-by-frame animated versions: " + `${base}/r/icons/sunui-animated-pixel-icons.json`,
   ].join("\n");
 }
 
 export function iconSetsSummary() {
   const line = iconGroups.map((g) => `- line/${g.id} (${g.icons.length}): ${g.title}. ${g.note}`);
   const pixel = pixelIconGroups.map((g) => `- pixel/${g.id} (${g.icons.length}): ${g.title}. ${g.note}`);
+  const twoToneNames = new Set(Object.keys(twoToneIcons));
+  const twoTone = iconGroups
+    .map((g) => ({ g, names: (g.icons as string[]).filter((n) => twoToneNames.has(n)) }))
+    .filter(({ names }) => names.length)
+    .map(({ g, names }) => `- twotone/${g.id} (${names.length}): ${names.join(", ")}`);
   const pro = proIconSets.map(
     (set) => `- pro-${set.id} (${set.icons.length}, line + pixel): ${set.title}. Needs a Pro license; get_icon returns install steps, not code.`,
   );
   return [
-    `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen.`,
+    `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke), ${Object.keys(twoToneIcons).length} two-tone icons (same grid and names as line: solid light body plus details, more being added) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen; blocks use line.`,
     "",
     "Line groups:",
     ...line,
+    "",
+    "Two-tone groups (same group ids as line):",
+    ...twoTone,
     "",
     "Pixel groups:",
     ...pixel,
