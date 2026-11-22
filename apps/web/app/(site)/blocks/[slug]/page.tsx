@@ -14,7 +14,7 @@ import { propsSignature } from "@/lib/agent/props";
 import { getI18n } from "@/lib/i18n-server";
 import type { Locale } from "@/lib/i18n";
 import type { Messages } from "@/lib/messages";
-import { fileLang, getItem, getItems, installCommand, proRegistryConfig, readRegistryFile, usesSpot } from "@/lib/registry";
+import { fileLang, getItem, getItems, installCommand, isInteraction, proRegistryConfig, readRegistryFile, usesSpot } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
 import { seriesOf } from "@/lib/series";
 import { prices } from "@/lib/site";
@@ -83,9 +83,11 @@ export default async function BlockPage({ params }: Props) {
               {m.series.labels[seriesOf(item)]}
             </Link>
           )}
-          <span className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
-            {m.interactions[item.meta.interaction]}
-          </span>
+          {isInteraction(item.meta.interaction) && (
+            <span className="rounded-sm border border-line px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-subtle">
+              {m.interactions[item.meta.interaction]}
+            </span>
+          )}
         </div>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{item.title}</h1>
         <p className="mt-3 text-lg text-pretty text-fg/85">{lede}</p>

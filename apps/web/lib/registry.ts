@@ -57,6 +57,19 @@ export type RegistryItem = {
 
 type Manifest = { name: string; items: RegistryItem[] };
 
+const INTERACTIONS: readonly Interaction[] = ["press", "hover", "drag", "type", "loading", "scroll", "section"];
+
+/** Pro 清單有人寫成 click 或 tap：都是點按。其他未知值保留原樣，頁面上沒有對應文字的標籤會直接不顯示。 */
+function parseInteraction(raw: string): Interaction {
+  if (raw === "click" || raw === "tap") return "press";
+  return raw as Interaction;
+}
+
+/** 是否為網站認得的互動類型（有對應的標籤文字） */
+export function isInteraction(value: string): value is Interaction {
+  return (INTERACTIONS as readonly string[]).includes(value);
+}
+
 // Pro 清單來自私有 repo（registry/pro），公開 repo 的 clone 沒有它也要能建置
 const proManifestPath = path.join(process.cwd(), "registry", "pro", "registry.json");
 
@@ -67,11 +80,13 @@ function loadProManifest(): Manifest | null {
   for (const item of manifest.items) {
     const raw = item.meta.series as string | undefined;
     if (raw !== undefined) item.meta.series = parseSeries(raw);
+    item.meta.interaction = parseInteraction(item.meta.interaction as string);
   }
   return manifest;
 }
 
 export const freeManifest = freeRegistry as Manifest;
+for (const item of freeManifest.items) item.meta.interaction = parseInteraction(item.meta.interaction as string);
 
 // 這個檔案是用 fs 讀的，bundler 不會監看它：dev 時每次重讀，否則 dev server 執行中新增的 Pro block 會一直 404
 const cachedProManifest = loadProManifest();
