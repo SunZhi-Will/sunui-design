@@ -127,7 +127,7 @@ export interface TestimonialMarqueeProps {
   rows?: 1 | 2 | 3;
   /** Click to open the detail dialog, plus 3D tilt on hover; default true */
   expandable?: boolean;
-  /** The single accent colour (stars, rating bars, hover border). Must be a hex colour (an alpha suffix is appended internally); default amber gold #d4a24c */
+  /** The single accent colour (stars, rating bars, hover border). Must be a hex colour (an alpha suffix is appended internally); default the SunUI rating amber #e8a020 */
   accentColor?: string;
   cardWidth?: number;
   /** Pad cards up to this count so a short loop does not look like it is spinning in place */
@@ -159,20 +159,20 @@ const THEME = {
   "--tm-border-hover": "rgb(255 255 255 / 0.16)",
   "--tm-dropdown-bg": "#141414",
   "--tm-backdrop": "rgba(12,10,9,0.82)",
-  "--tm-gold": "#d4a24c",
+  "--tm-gold": "#e8a020",
 } as CSSProperties;
 
 /** Badges are always neutral pills; status colour goes only on the 6px dot. refunded, info and neutral are uncoloured */
 const TONE_DOT: Record<TestimonialTagTone, string | null> = {
   neutral: null,
-  free: "#34d399",
-  danger: "#f87171",
+  free: "#4cd68a",
+  danger: "#ff6b70",
   discount: "var(--tm-gold)",
   refunded: null,
   info: null,
 };
 
-const DEFAULT_ACCENT = "#d4a24c";
+const DEFAULT_ACCENT = "#e8a020";
 
 /** Low-chroma warm grey background hashed from the name; avatars do not use the accent colour */
 function avatarTone(name?: string | null) {

@@ -486,7 +486,7 @@ function Keylines({ pixel, size }: { pixel: boolean; size: number }) {
       viewBox={`0 0 ${n} ${n}`}
       width={size}
       height={size}
-      className="pointer-events-none absolute inset-0 text-sky-600 dark:text-sky-400"
+      className="pointer-events-none absolute inset-0 text-accent"
       fill="none"
       stroke="currentColor"
       strokeWidth={1}

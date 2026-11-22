@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export interface ScrollTiltStageProps {
   children: ReactNode;
-  /** Color of the thin ground line (the only accent color), defaults to amber gold #d4a24c */
+  /** Color of the thin ground line (the only accent color), defaults to the SunUI cobalt (dark) #7aa2ff */
   accent?: string;
   /** Pass it when used inside a scrollable container; by default it follows the whole window scroll */
   scrollContainer?: RefObject<HTMLElement | null>;
@@ -19,7 +19,7 @@ const clamp = (x: number) => Math.min(1, Math.max(0, x));
  * 3D entrance stage: while still below the viewport it leans back, slowly stands up as it scrolls in, and faces straight on at the middle of the screen.
  * Below it sit a soft black drop shadow and a thin ground line. With reduced motion preferred it simply faces front.
  */
-export function ScrollTiltStage({ children, accent = "#d4a24c", scrollContainer, className }: ScrollTiltStageProps) {
+export function ScrollTiltStage({ children, accent = "#7aa2ff", scrollContainer, className }: ScrollTiltStageProps) {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
 

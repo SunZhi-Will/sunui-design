@@ -66,7 +66,7 @@ export default function ScrollTiltStageCard() {
   return (
     <div ref={scroller} className="h-[250px] w-[340px] overflow-y-auto rounded-xl bg-[#0a0a0a] text-[#f5f5f5]">
       <header className="flex min-h-[200px] flex-col justify-center px-5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#d4a24c]">{t.eyebrow}</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#7aa2ff]">{t.eyebrow}</p>
         <h2 className="mt-2 max-w-[14em] font-serif text-xl font-normal tracking-tight text-balance">{t.heading}</h2>
       </header>
 
@@ -76,7 +76,7 @@ export default function ScrollTiltStageCard() {
             <div className="flex items-center gap-2 border-b border-white/[0.08] px-3 py-2">
               <span className="size-1.5 rounded-full bg-[#a3a3a3]" />
               <span className="text-xs font-semibold">Video Aligner</span>
-              <span className="ml-auto rounded-full bg-[rgba(212,162,76,0.12)] px-1.5 py-0.5 font-mono text-[9px] tabular-nums text-[#d4a24c]">+1.42s</span>
+              <span className="ml-auto rounded-full bg-[rgba(122,162,255,0.14)] px-1.5 py-0.5 font-mono text-[9px] tabular-nums text-[#7aa2ff]">+1.42s</span>
             </div>
             <div className="grid grid-cols-2 gap-2 p-3">
               {[0, 1].map((i) => (
@@ -89,7 +89,7 @@ export default function ScrollTiltStageCard() {
             </div>
             <div className="px-3 pb-3">
               <div className="relative h-6 rounded bg-[#0a0a0a]">
-                <span className="absolute left-[6%] top-1 h-[7px] w-[52%] rounded-sm bg-[#d4a24c]/70" />
+                <span className="absolute left-[6%] top-1 h-[7px] w-[52%] rounded-sm bg-[#7aa2ff]/70" />
                 <span className="absolute bottom-1 left-[12%] h-[7px] w-[44%] rounded-sm bg-white/20" />
                 <span className="absolute inset-y-0 left-[38%] w-px bg-[#f5f5f5]" />
               </div>

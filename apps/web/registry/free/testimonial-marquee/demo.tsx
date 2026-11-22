@@ -221,7 +221,7 @@ export default function TestimonialMarqueeDemo() {
     <div className="flex w-full min-w-0 flex-col gap-6">
       <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-[#0a0a0a] py-12">
         <div className="mb-6 px-6 text-center">
-          <p className="mb-2 text-[12px] font-semibold tracking-[0.2em] text-[#d4a24c] uppercase">
+          <p className="mb-2 text-[12px] font-semibold tracking-[0.2em] text-[#7aa2ff] uppercase">
             {c.eyebrow}
           </p>
           <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-[#f5f5f5] sm:text-[30px]">

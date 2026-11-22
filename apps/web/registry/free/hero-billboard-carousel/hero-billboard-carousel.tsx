@@ -60,7 +60,7 @@ export interface HeroBillboardCarouselProps {
   slideMs?: number;
   /** The original project defaulted to dark; light theme is kept as well */
   theme?: "dark" | "light";
-  /** The single accent colour (badge, category text, progress bar, focus ring); defaults to dark #d4a24c, light #a8741f */
+  /** The single accent colour (badge, category text, progress bar, focus ring); defaults to the SunUI cobalt, dark #7aa2ff, light #2f6bff */
   accent?: string;
   /** Called when a card without href is clicked */
   onSelect?: (slide: HeroBillboardSlide, index: number) => void;
@@ -439,7 +439,7 @@ const BILLBOARD_CSS = `
   --card: #141414;
   --card-raised: #1a1a1a;
   --border: rgb(255 255 255 / 0.08);
-  --accent-gold: #d4a24c;
+  --accent-gold: #7aa2ff;
   --hero-bg: #0a0a0a;
   --gap: 28px;
   --side-scale: 0.86;
@@ -461,7 +461,7 @@ const BILLBOARD_CSS = `
   --card: #ffffff;
   --card-raised: #f5f5f5;
   --border: rgba(28, 25, 23, 0.08);
-  --accent-gold: #a8741f;
+  --accent-gold: #2f6bff;
   --hero-bg: #fafafa;
   --side-dim: saturate(0.7) opacity(0.55);
   --side-dim-hover: saturate(0.9) opacity(0.8);

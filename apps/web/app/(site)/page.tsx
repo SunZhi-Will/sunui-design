@@ -37,9 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: { absolute: m.home.metaTitle }, description: m.meta.siteDescription };
 }
 
-// 漸層字：一個畫面一處、兩個相鄰色相（天藍到網站的鈷藍），沒有 background-clip 支援時退回實色鈷藍。規則見 DESIGN.md 第 2 節
+// 漸層字：一個畫面一處，鈷藍由深到淺（同一個色相，和價格頁一致，見 reports/色系全面優化深度分析-2026-11-22.md），沒有 background-clip 支援時退回實色鈷藍。規則見 DESIGN.md 第 2 節
 const GRADIENT_WORD =
-  "text-accent supports-[background-clip:text]:bg-[linear-gradient(100deg,#0ea5e9,#2f6bff)] dark:supports-[background-clip:text]:bg-[linear-gradient(100deg,#7dd3fc,#7aa2ff)] supports-[background-clip:text]:bg-clip-text supports-[background-clip:text]:text-transparent";
+  "text-accent supports-[background-clip:text]:bg-[linear-gradient(100deg,#1f4fd6,#4d86ff)] dark:supports-[background-clip:text]:bg-[linear-gradient(100deg,#7aa2ff,#b3caff)] supports-[background-clip:text]:bg-clip-text supports-[background-clip:text]:text-transparent";
 
 // 型錄搬到 /blocks 之前，篩選與合輯的網址是掛在首頁上的：舊連結帶著這些參數時轉過去
 const CATALOG_PARAMS = ["q", "series", "tier", "collection", "saved"];

@@ -69,7 +69,7 @@ export function CheckoutForm({
           />
           {fromGoogle ? (
             <span className="flex items-center gap-2 text-xs text-subtle">
-              <span className="text-emerald-700 dark:text-emerald-400">✓ {t.google.filled}</span>
+              <span className="text-[color:var(--sunui-success)]">✓ {t.google.filled}</span>
               <button
                 type="button"
                 onClick={() => {

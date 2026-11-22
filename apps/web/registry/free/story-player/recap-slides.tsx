@@ -19,7 +19,7 @@ export const recapPalette = {
   text: "#f5f5f5",
   soft: "#d4d4d4",
   muted: "#a3a3a3",
-  accent: "#d4a24c",
+  accent: "#7aa2ff",
 } as const;
 
 const EASE = [0.23, 1, 0.32, 1] as const;
@@ -87,7 +87,7 @@ function FooterLine({ children, tone = recapPalette.soft }: { children: ReactNod
 
 /** Shared props: accent colour, language, class */
 interface RecapBaseProps {
-  /** The single accent colour, default amber gold #d4a24c */
+  /** The single accent colour, default the SunUI cobalt (dark) #7aa2ff */
   accent?: string;
   /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK or ja-JP are also accepted */
   locale?: string;

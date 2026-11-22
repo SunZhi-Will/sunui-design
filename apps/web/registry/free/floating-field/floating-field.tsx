@@ -532,7 +532,7 @@ export function FloatingField({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: reduce ? 0 : 0.14 }}
-              className={cn("text-xs", error ? "text-destructive" : valid && successMessage && !offer ? "text-emerald-700 dark:text-emerald-400" : offer ? "text-foreground" : "text-muted-foreground")}
+              className={cn("text-xs", error ? "text-destructive" : valid && successMessage && !offer ? "text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]" : offer ? "text-foreground" : "text-muted-foreground")}
             >
               {error ??
                 (offer

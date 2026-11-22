@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 /* ---------- Animation styles (the ww-* keyframes from the original welcome.css) ---------- */
 
 const CSS = `
-.sd-root{--sd-success:var(--success,#15803D);--sd-warning:var(--warning,#B45309);--sd-popover:var(--popover,var(--card))}
-@media (prefers-color-scheme: dark){.sd-root{--sd-success:var(--success,#4ADE80);--sd-warning:var(--warning,#FBBF24)}}
+.sd-root{--sd-success:var(--sunui-success,var(--success,#1f9d55));--sd-warning:var(--sunui-rating,var(--warning,#c98a12));--sd-popover:var(--popover,var(--card))}
+@media (prefers-color-scheme: dark){.sd-root{--sd-success:var(--sunui-success,var(--success,#4cd68a));--sd-warning:var(--sunui-rating,var(--warning,#f5b84a))}}
 @keyframes sd-pop{0%{opacity:0;transform:translateY(6px) scale(.85)}70%{opacity:1;transform:translateY(-1px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes sd-fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sd-slide-in-right{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}

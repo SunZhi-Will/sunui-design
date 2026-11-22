@@ -49,7 +49,7 @@ export default function TestimonialMarqueeCard() {
 
   return (
     <section className="relative w-80 overflow-hidden rounded-2xl bg-[#0a0a0a] py-5">
-      <p className="mb-3 text-center text-[11px] font-semibold tracking-[0.2em] text-[#d4a24c] uppercase">{c.eyebrow}</p>
+      <p className="mb-3 text-center text-[11px] font-semibold tracking-[0.2em] text-[#7aa2ff] uppercase">{c.eyebrow}</p>
       <TestimonialMarquee testimonials={testimonials} rows={1} cardWidth={240} minCardsPerRow={3} fadeWidth={32} fixed={false} locale={locale} />
     </section>
   );

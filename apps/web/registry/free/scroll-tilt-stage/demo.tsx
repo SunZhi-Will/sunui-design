@@ -20,7 +20,7 @@ export default function ScrollTiltStageDemo() {
   return (
     <div ref={scroller} className="h-[520px] w-full max-w-4xl overflow-y-auto rounded-xl bg-[#0a0a0a] text-[#f5f5f5]">
       <header className="flex min-h-[420px] flex-col justify-center px-6 md:px-10">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#d4a24c]">{t.eyebrow}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#7aa2ff]">{t.eyebrow}</p>
         <h2 className="mt-3 max-w-[16em] font-serif text-3xl font-normal tracking-tight text-balance">{t.heading}</h2>
         <p className="mt-3 text-sm text-[#a3a3a3]">{t.hint}</p>
       </header>
@@ -32,7 +32,7 @@ export default function ScrollTiltStageDemo() {
             <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2.5">
               <span className="size-1.5 rounded-full bg-[#a3a3a3]" />
               <span className="text-sm font-semibold">Video Aligner</span>
-              <span className="ml-auto rounded-full bg-[rgba(212,162,76,0.12)] px-2 py-0.5 font-mono text-[10px] tabular-nums text-[#d4a24c]">+1.42s</span>
+              <span className="ml-auto rounded-full bg-[rgba(122,162,255,0.14)] px-2 py-0.5 font-mono text-[10px] tabular-nums text-[#7aa2ff]">+1.42s</span>
             </div>
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
               {[0, 1].map((i) => (
@@ -46,7 +46,7 @@ export default function ScrollTiltStageDemo() {
             </div>
             <div className="px-4 pb-4">
               <div className="relative h-8 rounded-md bg-[#0a0a0a]">
-                <span className="absolute left-[6%] top-1 h-[11px] w-[52%] rounded-sm bg-[#d4a24c]/70" />
+                <span className="absolute left-[6%] top-1 h-[11px] w-[52%] rounded-sm bg-[#7aa2ff]/70" />
                 <span className="absolute bottom-1 left-[12%] h-[11px] w-[44%] rounded-sm bg-white/20" />
                 <span className="absolute inset-y-0 left-[38%] w-px bg-[#f5f5f5]" />
               </div>
