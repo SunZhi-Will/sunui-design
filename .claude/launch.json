@@ -190,6 +190,24 @@
       ],
       "port": 6006,
       "autoPort": false
+    },
+    {
+      "name": "web-colour",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "@sunui-design/web",
+        "--",
+        "-p",
+        "3103"
+      ],
+      "port": 3103,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-colour"
+      }
     }
   ]
 }

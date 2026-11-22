@@ -243,30 +243,26 @@
       "kind": "app",
       "crop": [
         0.496,
-        0.284,
-        0.69
+        0.2,
+        0.5
       ],
       "demo": [
         {
-          "wait": 1400
+          "wait": 400
         },
         {
-          "click": [
-            0.08,
-            0.86
-          ]
+          "sel": "button",
+          "nth": 0
         },
         {
-          "wait": 1300
+          "wait": 800
         },
         {
-          "click": [
-            0.5,
-            0.11
-          ]
+          "sel": "button",
+          "nth": 0
         },
         {
-          "wait": 2000
+          "wait": 800
         }
       ],
       "seconds": 6

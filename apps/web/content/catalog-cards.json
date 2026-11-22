@@ -40,6 +40,62 @@
         }
       ],
       "seconds": 7
+    },
+    "workspace-tabs": {
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 2,
+          "ms": 500
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 1,
+          "ms": 450
+        },
+        {
+          "wait": 800
+        },
+        {
+          "hover": "[role=tab]",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 300
+        },
+        {
+          "sel": "[data-on] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "button[title]",
+          "nth": 0,
+          "ms": 500
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 0,
+          "ms": 500
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "seconds": 9
     }
   }
 }

@@ -34,6 +34,7 @@
     "**/*.tsx",
     ".next-admin/types/**/*.ts",
     ".next-alt/types/**/*.ts",
+    ".next-checkout/types/**/*.ts",
     ".next-deploycheck/types/**/*.ts",
     ".next-motion/types/**/*.ts",
     ".next-mp/types/**/*.ts",
@@ -41,7 +42,7 @@
     ".next-protest/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-checkout/types/**/*.ts"
+    ".next-colour/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

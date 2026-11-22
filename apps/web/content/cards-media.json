@@ -57,7 +57,7 @@
     "av1": true
   },
   "add-to-cart-button": {
-    "av1": true
+    "av1": false
   },
   "addon-checklist": {
     "av1": true
@@ -150,7 +150,7 @@
     "av1": false
   },
   "floating-field": {
-    "av1": true
+    "av1": false
   },
   "gradient-backdrop": {
     "av1": true
@@ -483,7 +483,7 @@
     "av1": false
   },
   "checkout-flow": {
-    "av1": true
+    "av1": false
   },
   "lunar-new-year": {
     "av1": false
