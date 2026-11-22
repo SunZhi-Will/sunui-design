@@ -1,26 +1,411 @@
 {
-  "_note": "首頁兩段帶狀型錄的卡片。crop 是 [cx, cy, wf]：在淺色分享圖（public/og/blocks-light/<name>.jpg，1000x859）上取景的中心與寬度比例，裁成 16:10。改完跑 node apps/web/scripts/crop-cards.mjs 重產 public/cards/。kind 對應 messages.ts 的 home.bands.kinds。",
+  "_note": "首頁兩段帶狀型錄的卡片。crop 是 [cx, cy, wf]：在淺色分享圖（public/og/blocks-light/<name>.jpg，1000x859）上取景的中心與寬度比例，裁成 16:10。改完跑 node apps/web/scripts/crop-cards.mjs 重產 public/cards/。kind 對應 messages.ts 的 home.bands.kinds。 demo 是錄影片時的滑鼠腳本（座標是卡片畫面的比例），見 scripts/record-cards.mjs。",
   "pro": [
-    { "name": "lamp-dimmer-scene", "kind": "product", "crop": [0.5, 0.45, 0.92] },
-    { "name": "day-night-hero", "kind": "hero", "crop": [0.5, 0.42, 0.92] },
-    { "name": "black-friday-weekend", "kind": "campaign", "crop": [0.5, 0.37, 0.9] },
-    { "name": "shoppable-lookbook", "kind": "store", "crop": [0.5, 0.52, 0.92] },
-    { "name": "lookbook-expand-hero", "kind": "store", "crop": [0.5, 0.47, 0.92] },
-    { "name": "catalog-flipbook", "kind": "store", "crop": [0.5, 0.46, 0.72] },
-    { "name": "drop-release-hero", "kind": "hero", "crop": [0.5, 0.5, 0.94] },
-    { "name": "lunar-new-year", "kind": "campaign", "crop": [0.5, 0.8, 0.94] },
-    { "name": "tear-pack-reveal", "kind": "member", "crop": [0.5, 0.47, 0.6] },
-    { "name": "glow-dock", "kind": "app", "crop": [0.496, 0.284, 0.69], "demo": [{ "wait": 1400 }, { "click": [0.08, 0.86] }, { "wait": 1300 }, { "click": [0.5, 0.11] }, { "wait": 2000 }], "seconds": 6 }
+    {
+      "name": "lamp-dimmer-scene",
+      "kind": "product",
+      "crop": [
+        0.5,
+        0.45,
+        0.92
+      ],
+      "demo": [
+        {
+          "drag": [
+            0.855,
+            0.11,
+            0.2,
+            0.11
+          ],
+          "ms": 1500
+        },
+        {
+          "wait": 700
+        },
+        {
+          "drag": [
+            0.2,
+            0.11,
+            0.855,
+            0.11
+          ],
+          "ms": 1500
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "day-night-hero",
+      "kind": "hero",
+      "crop": [
+        0.5,
+        0.42,
+        0.92
+      ],
+      "demo": [
+        {
+          "wait": 400
+        },
+        {
+          "click": [
+            0.92,
+            0.76
+          ]
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "click": [
+            0.84,
+            0.76
+          ]
+        },
+        {
+          "wait": 1800
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "campaign-landing",
+      "kind": "campaign",
+      "crop": [
+        0.5,
+        0.42,
+        0.95
+      ]
+    },
+    {
+      "name": "shoppable-lookbook",
+      "kind": "store",
+      "crop": [
+        0.5,
+        0.52,
+        0.92
+      ]
+    },
+    {
+      "name": "lookbook-expand-hero",
+      "kind": "store",
+      "crop": [
+        0.5,
+        0.47,
+        0.92
+      ]
+    },
+    {
+      "name": "catalog-flipbook",
+      "kind": "store",
+      "crop": [
+        0.5,
+        0.46,
+        0.72
+      ]
+    },
+    {
+      "name": "collection-accordion",
+      "kind": "store",
+      "crop": [
+        0.5,
+        0.43,
+        0.98
+      ]
+    },
+    {
+      "name": "gift-guide-fan",
+      "kind": "campaign",
+      "crop": [
+        0.5,
+        0.4,
+        0.75
+      ]
+    },
+    {
+      "name": "sky-time-switch",
+      "kind": "hero",
+      "crop": [
+        0.5,
+        0.45,
+        0.9
+      ],
+      "demo": [
+        {
+          "wait": 300
+        },
+        {
+          "drag": [
+            0.75,
+            0.5,
+            0.25,
+            0.5
+          ],
+          "ms": 1800
+        },
+        {
+          "wait": 600
+        },
+        {
+          "drag": [
+            0.25,
+            0.5,
+            0.75,
+            0.5
+          ],
+          "ms": 1800
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "seconds": 6
+    }
   ],
   "free": [
-    { "name": "depth-hero", "kind": "hero", "crop": [0.5, 0.5, 0.96] },
-    { "name": "compare-slider", "kind": "media", "crop": [0.5, 0.48, 0.76] },
-    { "name": "cloth-curtain", "kind": "transition", "crop": [0.5, 0.47, 0.86] },
-    { "name": "orbit-gallery", "kind": "hero", "crop": [0.5, 0.5, 0.66] },
-    { "name": "photo-looks", "kind": "media", "crop": [0.5, 0.42, 0.82] },
-    { "name": "hotspots", "kind": "product", "crop": [0.38, 0.5, 0.7] },
-    { "name": "variant-picker", "kind": "product", "crop": [0.5, 0.3, 0.78] },
-    { "name": "spine-shelf", "kind": "product", "crop": [0.5, 0.48, 0.7] },
-    { "name": "phone-frame", "kind": "media", "crop": [0.5, 0.56, 0.9] }
+    {
+      "name": "depth-hero",
+      "kind": "hero",
+      "crop": [
+        0.5,
+        0.5,
+        0.96
+      ],
+      "demo": [
+        {
+          "move": [
+            0.3,
+            0.35
+          ],
+          "ms": 900
+        },
+        {
+          "move": [
+            0.75,
+            0.6
+          ],
+          "ms": 1200
+        },
+        {
+          "move": [
+            0.45,
+            0.75
+          ],
+          "ms": 1000
+        },
+        {
+          "move": [
+            0.65,
+            0.3
+          ],
+          "ms": 1000
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "compare-slider",
+      "kind": "media",
+      "crop": [
+        0.5,
+        0.48,
+        0.76
+      ],
+      "demo": [
+        {
+          "drag": [
+            0.5,
+            0.5,
+            0.15,
+            0.5
+          ],
+          "ms": 1300
+        },
+        {
+          "wait": 300
+        },
+        {
+          "drag": [
+            0.15,
+            0.5,
+            0.85,
+            0.5
+          ],
+          "ms": 1800
+        },
+        {
+          "wait": 300
+        },
+        {
+          "drag": [
+            0.85,
+            0.5,
+            0.5,
+            0.5
+          ],
+          "ms": 1100
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "cloth-curtain",
+      "kind": "transition",
+      "crop": [
+        0.5,
+        0.47,
+        0.86
+      ]
+    },
+    {
+      "name": "orbit-gallery",
+      "kind": "hero",
+      "crop": [
+        0.5,
+        0.5,
+        0.66
+      ]
+    },
+    {
+      "name": "photo-looks",
+      "kind": "media",
+      "crop": [
+        0.5,
+        0.42,
+        0.82
+      ],
+      "demo": [
+        {
+          "move": [
+            0.17,
+            0.15
+          ],
+          "ms": 500
+        },
+        {
+          "wait": 450
+        },
+        {
+          "move": [
+            0.5,
+            0.15
+          ],
+          "ms": 450
+        },
+        {
+          "wait": 450
+        },
+        {
+          "move": [
+            0.82,
+            0.15
+          ],
+          "ms": 450
+        },
+        {
+          "wait": 450
+        },
+        {
+          "move": [
+            0.17,
+            0.62
+          ],
+          "ms": 500
+        },
+        {
+          "wait": 450
+        },
+        {
+          "move": [
+            0.5,
+            0.62
+          ],
+          "ms": 450
+        },
+        {
+          "wait": 450
+        },
+        {
+          "move": [
+            0.82,
+            0.62
+          ],
+          "ms": 450
+        },
+        {
+          "wait": 450
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "hero-billboard-carousel",
+      "kind": "hero",
+      "crop": [
+        0.5,
+        0.5,
+        0.98
+      ]
+    },
+    {
+      "name": "variant-picker",
+      "kind": "product",
+      "crop": [
+        0.5,
+        0.3,
+        0.78
+      ]
+    },
+    {
+      "name": "spine-shelf",
+      "kind": "product",
+      "crop": [
+        0.5,
+        0.48,
+        0.7
+      ],
+      "demo": [
+        {
+          "click": [
+            0.17,
+            0.55
+          ]
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "click": [
+            0.57,
+            0.55
+          ]
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "click": [
+            0.82,
+            0.55
+          ]
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "seconds": 6
+    },
+    {
+      "name": "point-cloud",
+      "kind": "media",
+      "crop": [
+        0.73,
+        0.31,
+        0.56
+      ],
+      "crf": 35
+    }
   ]
 }

@@ -1,0 +1,56 @@
+{
+  "lamp-dimmer-scene": {
+    "av1": true
+  },
+  "day-night-hero": {
+    "av1": true
+  },
+  "campaign-landing": {
+    "av1": true
+  },
+  "shoppable-lookbook": {
+    "av1": false
+  },
+  "lookbook-expand-hero": {
+    "av1": true
+  },
+  "catalog-flipbook": {
+    "av1": true
+  },
+  "collection-accordion": {
+    "av1": true
+  },
+  "gift-guide-fan": {
+    "av1": true
+  },
+  "sky-time-switch": {
+    "av1": true
+  },
+  "depth-hero": {
+    "av1": true
+  },
+  "compare-slider": {
+    "av1": true
+  },
+  "cloth-curtain": {
+    "av1": true
+  },
+  "orbit-gallery": {
+    "av1": true
+  },
+  "photo-looks": {
+    "av1": false
+  },
+  "hero-billboard-carousel": {
+    "av1": true
+  },
+  "variant-picker": {
+    "av1": false
+  },
+  "spine-shelf": {
+    "av1": true
+  },
+  "point-cloud": {
+    "av1": true
+  }
+}

@@ -14,6 +14,7 @@ import { LivePreview } from "@/components/live-preview";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { buildCatalogItems } from "@/lib/catalog-items";
 import homeCards from "@/content/home-cards.json";
+import homeCardsMedia from "@/content/home-cards-media.json";
 import { getI18n } from "@/lib/i18n-server";
 import { format, type Locale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
@@ -60,8 +61,12 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   // 帶狀型錄的卡片：名單與取景在 content/home-cards.json，Pro 資料夾不在時 Pro 那段整段不出現
   const toCards = (list: { name: string; kind: string }[]): BandCard[] =>
     list.flatMap(({ name, kind }) => {
-      const item = items.find((entry) => entry.name === name && !("variant" in entry));
-      return item ? [{ name, kind, title: item.title, pro: item.meta.tier === "pro" }] : [];
+      // 效果庫在型錄裡一種樣式一張卡，這裡要整套的名稱（libraryTitle）
+      const item = items.find((entry) => entry.name === name);
+      if (!item) return [];
+      const title = String("libraryTitle" in item ? item.libraryTitle : item.title);
+      const media = (homeCardsMedia as Record<string, { av1?: boolean }>)[name];
+      return [{ name, kind, title, pro: item.meta.tier === "pro", av1: media?.av1 }];
     });
   const proCards = toCards(homeCards.pro);
   const freeCards = toCards(homeCards.free);
