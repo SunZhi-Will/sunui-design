@@ -9,7 +9,8 @@
     { "name": "catalog-flipbook", "kind": "store", "crop": [0.5, 0.46, 0.72] },
     { "name": "drop-release-hero", "kind": "hero", "crop": [0.5, 0.5, 0.94] },
     { "name": "lunar-new-year", "kind": "campaign", "crop": [0.5, 0.8, 0.94] },
-    { "name": "tear-pack-reveal", "kind": "member", "crop": [0.5, 0.47, 0.6] }
+    { "name": "tear-pack-reveal", "kind": "member", "crop": [0.5, 0.47, 0.6] },
+    { "name": "glow-dock", "kind": "app", "crop": [0.496, 0.284, 0.69], "demo": [{ "wait": 1400 }, { "click": [0.08, 0.86] }, { "wait": 1300 }, { "click": [0.5, 0.11] }, { "wait": 2000 }], "seconds": 6 }
   ],
   "free": [
     { "name": "depth-hero", "kind": "hero", "crop": [0.5, 0.5, 0.96] },
