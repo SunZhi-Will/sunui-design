@@ -59,6 +59,16 @@ function readProPreview(dir, name) {
     // 例外：Pro 檔期圖示組（registry/pro/icons/sunui-*）。圖示一畫到畫面上幾何就看得到，展示版直接沿用同一份，
     // 不在每個場景的 preview 裡各抄一份點陣。完整場景元件仍然不能 import。
     if (/^@\/registry\/pro\/icons\/sunui-[\w-]+$/.test(spec)) continue;
+    // 例外：同資料夾的 preview-*.ts 是給展示版用的預烘資料（例如 pixel-gacha 的 preview-frames），本來就會公開。
+    // 只允許純資料：那個檔案自己不能再 import 任何東西，否則等於繞道把 Pro 原始碼帶進公開 chunk。
+    if (/^\.\/preview-[\w-]+$/.test(spec)) {
+      const dataFile = ["ts", "tsx", "js"].map((ext) => path.join(dir, name, `${spec.slice(2)}.${ext}`)).find((f) => existsSync(f));
+      if (!dataFile) throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}", which does not exist.`);
+      if (/^\s*import\s[^;]*from\s*["']|^\s*import\s*["']/m.test(readFileSync(dataFile, "utf8"))) {
+        throw new Error(`[previews] pro/${name}/${path.basename(dataFile)} imports other files. Baked preview data must be plain data.`);
+      }
+      continue;
+    }
     if (otherPreview && !existsSync(path.join(dir, spec.split("/")[3], "preview.tsx"))) {
       throw new Error(`[previews] pro/${name}/preview.tsx imports "${spec}", which does not exist yet. Write that block's preview first.`);
     }
