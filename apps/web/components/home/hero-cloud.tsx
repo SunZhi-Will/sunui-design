@@ -31,5 +31,5 @@ export function HeroCloud({ label }: { label: string }) {
     return () => window.clearInterval(timer);
   }, [reduce]);
 
-  return <PointCloud shape={SHAPES[index]} count={count} pointSize={1.7} label={label} className="size-full text-accent" />;
+  return <PointCloud shape={SHAPES[index]} count={count} pointSize={1.7} label={label} className="size-full text-fg" />;
 }

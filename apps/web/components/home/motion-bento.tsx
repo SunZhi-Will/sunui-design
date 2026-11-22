@@ -118,5 +118,5 @@ export function ClosingCloud({ label }: { label: string }) {
   useEffect(() => {
     if (window.matchMedia("(max-width: 639px)").matches) setCount(1800);
   }, []);
-  return <PointCloud shape="text" text="SunUI" count={count} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-accent" />;
+  return <PointCloud shape="text" text="SunUI" count={count} pointSize={1.6} label={label} className="mx-auto aspect-[5/2] max-w-3xl text-fg" />;
 }
