@@ -268,7 +268,6 @@ function ToggleTile({ auto, offset, t }: TileProps) {
                   }}
                   className="flex items-center gap-2.5"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={NOTE_COLORS[i]}
                     alt=""
@@ -400,7 +399,6 @@ function RatingTile({ auto, offset, t, locale }: TileProps) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={gradient("#e6e6e6", "#cfcfcf")}
           alt=""
