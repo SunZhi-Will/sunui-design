@@ -51,6 +51,13 @@ export function DotMatrixStudy() {
   const [value, setValue] = useState(0);
   const auto = SEQUENCE[step % SEQUENCE.length];
   const state = mode === "auto" ? auto : mode;
+  // ?one=1..8 (and optionally &pattern=spiral) shows a single loader, enlarged, for recording a preview video
+  const [one, setOne] = useState<{ v: Variation; pattern: DotMatrixPattern } | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const n = Number(q.get("one"));
+    if (n >= 1 && n <= VARIATIONS.length) setOne({ v: VARIATIONS[n - 1], pattern: (q.get("pattern") as DotMatrixPattern) || "wave" });
+  }, []);
 
   useEffect(() => {
     if (mode !== "auto") return;
@@ -73,6 +80,28 @@ export function DotMatrixStudy() {
   useEffect(() => {
     if (mode === "progress") setValue(58);
   }, [mode]);
+
+  if (one) {
+    return (
+      <div
+        className={
+          "flex h-[400px] w-[640px] flex-col items-center justify-center gap-6 rounded-3xl border " +
+          (one.v.dark ? "border-neutral-800 bg-neutral-950 text-neutral-400" : "border-border bg-card text-muted-foreground")
+        }
+      >
+        {/* transform does not take layout space, so the scaled loader gets a real 200px slot */}
+        <div className="grid size-[200px] place-items-center">
+          <div className="scale-[3.2]">
+            <DotMatrixLoader pattern={one.pattern} state={state} value={value} size="lg" {...one.v.props} />
+          </div>
+        </div>
+        <p className="text-sm tabular-nums">
+          {STATE_LABEL[state]}
+          {state === "progress" ? ` ${value}%` : ""}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl p-6">
