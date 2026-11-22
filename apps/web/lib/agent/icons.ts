@@ -15,7 +15,7 @@ import {
 // 參考 iconmcp.com 的 search_icons / get_icon（見 reports/iconmcp 參考分析-2026-11-07.md），
 // 只讀取 registry/icons 的幾何，不另存一份。
 
-/** twotone：與線條同網格、同名稱的雙色版（實心淺色主體 + 細節），2026-11-22 起分批補齊 */
+/** twotone：與線條同網格、同名稱的雙色版（實心淺色主體 + 細節），2026-11-22 加入，與線條版一一對應 */
 export type IconStyle = "line" | "pixel" | "twotone";
 /** tier pro：SunUI Pro 檔期圖示組。只給名稱與安裝方式，不輸出幾何（幾何只在私有 repo，憑授權安裝） */
 export type IconEntry = {
@@ -323,7 +323,7 @@ export function iconSetsSummary() {
     (set) => `- pro-${set.id} (${set.icons.length}, line + pixel): ${set.title}. Needs a Pro license; get_icon returns install steps, not code.`,
   );
   return [
-    `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke), ${Object.keys(twoToneIcons).length} two-tone icons (same grid and names as line: solid light body plus details, more being added) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen; blocks use line.`,
+    `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke), ${Object.keys(twoToneIcons).length} two-tone icons (same grid and names as line: solid light body plus details, every one animated) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen; blocks use line.`,
     "",
     "Line groups:",
     ...line,

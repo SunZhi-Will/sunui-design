@@ -35,7 +35,7 @@ const sizes = [16, 20, 24, 32] as const;
 const strokes = [1.25, 1.5, 1.75] as const;
 // 像素圖示只在 16 的整數倍下銳利
 const pixelSizes = [16, 32, 48] as const;
-// 2026-11-22：三套。像素優先，雙色是新的一套（先做 24 個常用），線條保留
+// 2026-11-22：三套。像素優先，雙色與線條一一對應（99 個），線條保留
 type Style = "pixel" | "twotone" | "line";
 type Motion = "static" | "animated";
 
@@ -617,9 +617,9 @@ const CanvasCell = memo(function CanvasCell({
           )
         ) : variant === "twotone" ? (
           animated ? (
-            <AnimatedTwoToneIcon name={name as AnimatedTwoToneIconName} size={24} active={on} style={tint} />
+            <AnimatedTwoToneIcon name={name as AnimatedTwoToneIconName} size={28} active={on} style={tint} />
           ) : (
-            <TwoToneIcon name={name as TwoToneIconName} size={24} style={tint} />
+            <TwoToneIcon name={name as TwoToneIconName} size={28} style={tint} />
           )
         ) : animated ? (
           <AnimatedIcon name={name as AnimatedIconName} size={24} active={on} style={tint} />

@@ -65,15 +65,16 @@
 
 ## 雙色圖示
 
-2026-11-22 加入（使用者核准的凍結例外）。先做 24 個常用物件（電商與介面），開賣後補完；線條版保留不變。
+2026-11-22 加入（使用者核准的凍結例外），與線條版 99 個一一對應，每個都有動態版；線條版保留不變。
 
 1. **網格與名稱**：與線條版同一套 24 網格，內容 3 到 21，名稱與線條版相同（`<TwoToneIcon name="cart" />`），換風格只要換元件。
-2. **兩種面**：實心淺色主體（節點加 `tone: "body"`），必要時一處中間色（`tone: "mid"`，例如紙箱頂面、錢包蓋）；其餘是 currentColor 的細節，線寬 1.7 到 2.6（節點的 `sw`）或實心（`fill: true`）。
-3. **顏色**：預設黑白，主體是 currentColor 20%、中間色 45%，跟著文字顏色走。上色時設 `color`（細節）與 `--sunui-icon-body`（主體，並把 `--sunui-icon-body-opacity` 設成 1）；`/icons` 的彩色模式用 `lib/line-icon-colors.ts` 的 `lineIconTone()` 產生這組值（主體是同色相 `oklch(0.86 0.085 H)`）。
-4. **主體不重疊**：透明度放在整個元素上（避免描邊與填色重疊處變深），所以兩塊主體疊在一起會變深。主體之間留到剛好相接，細節畫在主體上面。
-5. **不用漸層、陰影、光暈**（DESIGN.md）。層次只靠主體與細節兩層。
-6. **動態**：規則與線條動態版相同（hover / toggle / loop）。toggle 類（heart、star、bookmark）在主體上蓋一層實心的強調色。parts 編號對應 `twoToneIcons` 裡部位的順序。
-7. **自檢**：`node apps/web/scripts/check-icons.mjs --set twotone`。16px 下細節（購物車格線、檔案文字線）會開始糊，新圖示要看 16px 那一格。
+2. **純符號沒有主體**：勾、叉、加減、箭頭、選單、連結這類只有線的符號，只用加粗的細節（線寬 2 到 2.2），不硬加底圓。
+3. **兩種面**：實心淺色主體（節點加 `tone: "body"`），必要時一處中間色（`tone: "mid"`，例如紙箱頂面、錢包蓋）；其餘是 currentColor 的細節，線寬 1.7 到 2.6（節點的 `sw`）或實心（`fill: true`）。
+4. **顏色**：預設黑白，主體是 currentColor 20%、中間色 45%，跟著文字顏色走。上色時設 `color`（細節）與 `--sunui-icon-body`（主體，並把 `--sunui-icon-body-opacity` 設成 1）；`/icons` 的彩色模式用 `lib/line-icon-colors.ts` 的 `lineIconTone()` 產生這組值（主體是同色相 `oklch(0.86 0.085 H)`）。
+5. **主體不重疊**：透明度放在整個元素上（避免描邊與填色重疊處變深），所以兩塊主體疊在一起會變深。主體之間留到剛好相接，細節畫在主體上面。
+6. **不用漸層、陰影、光暈**（DESIGN.md）。層次只靠主體與細節兩層。
+7. **動態**：規則與線條動態版相同（hover / toggle / loop）。toggle 類（heart、star、bookmark）在主體上蓋一層實心的強調色。parts 編號對應 `twoToneIcons` 裡部位的順序。
+8. **自檢**：`node apps/web/scripts/check-icons.mjs --set twotone`。16px 下細節（購物車格線、檔案文字線）會開始糊，新圖示要看 16px 那一格。
 
 ## 像素圖示
 

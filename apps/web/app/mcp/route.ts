@@ -154,7 +154,7 @@ const handler = createMcpHandler(
           style: z
             .enum(["line", "twotone", "pixel"])
             .optional()
-            .describe("line: 24px stroke icons (default look, what blocks use). twotone: same grid and names, solid light body plus details, for app UI and pages (fewer icons so far). pixel: 16px sprites for retro or game-style screens. One style per screen."),
+            .describe("line: 24px stroke icons (default look, what blocks use). twotone: same grid and names, solid light body plus details, for app UI and pages. pixel: 16px sprites for retro or game-style screens. One style per screen."),
           group: z.string().optional().describe("Group id from the list returned with no query, e.g. 'paper', 'commerce', 'pixel-gear', 'pro-lunar-new-year'."),
           tier: z.enum(["free", "pro", "any"]).default("any").describe("free: only icons anyone can paste. pro: SunUI Pro seasonal packs (need a license). any: both, free ranked first."),
           limit: z.number().int().min(1).max(50).default(10),

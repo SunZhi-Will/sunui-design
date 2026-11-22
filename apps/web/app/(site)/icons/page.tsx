@@ -34,11 +34,13 @@ export default async function IconsPage() {
           {t.lead}
         </p>
         <div className="mt-8 max-w-2xl">
-        <CommandTabs label={m.home.hero.install} tabs={[t.staticInstall, t.animatedInstall, t.pixelInstall, t.pixelAnimatedInstall]}>
-          <Command key="0" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
-          <Command key="1" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
-          <Command key="2" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
-          <Command key="3" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
+        <CommandTabs label={m.home.hero.install} tabs={[t.pixelInstall, t.pixelAnimatedInstall, t.twoToneInstall, t.twoToneAnimatedInstall, t.staticInstall, t.animatedInstall]}>
+          <Command key="0" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
+          <Command key="1" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
+          <Command key="2" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-twotone-icons.json`} />
+          <Command key="3" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-twotone-icons.json`} />
+          <Command key="4" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
+          <Command key="5" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
         </CommandTabs>
         </div>
       </section>
