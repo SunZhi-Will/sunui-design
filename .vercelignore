@@ -1,0 +1,11 @@
+# Local build output and recorder scratch: never upload (they made the deploy OOM)
+apps/web/.next*
+apps/web/check-out
+apps/web/x
+apps/web/tests
+.next
+storybook-static
+reports
+research_notes
+**/node_modules
+**/tsconfig.tsbuildinfo
