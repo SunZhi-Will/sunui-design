@@ -125,6 +125,17 @@ export interface AppShellProps {
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
+  /**
+   * rail (default): collapsing leaves a narrow column of icons with tooltips and flyouts.
+   * hidden: collapsing slides the whole sidebar away; the toggle stays where it was, over the content's top-left corner.
+   */
+  collapseMode?: "rail" | "hidden";
+  /**
+   * padded (default): desktop content gets page padding and a centred max width.
+   * flush: on desktop the content area shares the sidebar's background with no divider, and has no padding or max width,
+   * so it can draw its own surfaces (such as tabs joined to a panel). Phones keep the usual layout.
+   */
+  layout?: "padded" | "flush";
   /** Cmd/Ctrl + B toggles collapse; on by default */
   shortcut?: boolean;
   /** Second-level ids that start expanded; the section containing the current page expands automatically */
@@ -250,6 +261,8 @@ const BP = {
     mobile: "@3xl/shell:hidden",
     column: "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain",
     main: "min-w-0 flex-1 px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] @3xl/shell:px-10 @3xl/shell:py-10",
+    flushColumn: "@3xl/shell:bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]",
+    flushMain: "flex min-h-0 flex-col @3xl/shell:p-0",
     layer: "absolute",
   },
   viewport: {
@@ -258,6 +271,8 @@ const BP = {
     mobile: "md:hidden",
     column: "flex min-h-screen min-w-0 flex-1 flex-col",
     main: "min-w-0 flex-1 px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:px-10 md:py-10",
+    flushColumn: "md:bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]",
+    flushMain: "flex flex-col md:p-0",
     layer: "fixed",
   },
 } as const;
@@ -1057,6 +1072,8 @@ function Sidebar({
   sections,
   shortcut,
   bp,
+  collapseMode,
+  flush,
 }: {
   groups: AppShellNavGroup[];
   brand: AppShellProps["brand"];
@@ -1067,6 +1084,8 @@ function Sidebar({
   sections: ReturnType<typeof useSections>;
   shortcut: boolean;
   bp: (typeof BP)[keyof typeof BP];
+  collapseMode: "rail" | "hidden";
+  flush: boolean;
 }) {
   const { t, link, navigate } = useShell();
   // Do not play the collapse animation on first load (the collapsed state may have just been read back from storage)
@@ -1090,82 +1109,96 @@ function Sidebar({
   }, [toggle, shortcut]);
 
   const logo = brand.logo ?? <span className="text-xs font-semibold">{Array.from(brand.name)[0]}</span>;
+  const hidden = collapseMode === "hidden";
+  // In hidden mode the sidebar slides away whole, so nothing inside it switches to the icon rail
+  const rail = collapsed && !hidden;
 
   return (
-    // The outer layer reserves space; the expand button hangs off its right edge, landing at the top-left of the content area on the right
+    // The outer layer reserves the sidebar's space in the grid and holds the toggle, which is drawn above the sidebar
     <div className={cn(bp.desktop, !ready && "[&,&_*]:transition-none!")}>
-      <aside
-        data-collapsed={collapsed ? "true" : "false"}
-        className={cn(
-          "group/sidebar flex h-full flex-col overflow-hidden border-r border-border px-3 py-5 transition-[width] duration-300 motion-reduce:transition-none",
-          SIDEBAR_BG,
-          EASE,
-          collapsed ? "w-14" : "w-56",
-        )}
-      >
-        {/* Brand row: the logo sits on the same centre line as the nav icons, with the collapse button on the right */}
-        <div className="flex h-8 items-center gap-2.5">
-          {link({
-            href: brand.href ?? "/",
-            onClick: (e) => navigate(brand.href ?? "/", e),
-            "aria-label": t.home(brand.name),
-            className:
-              "ml-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-foreground text-background outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
-            children: logo,
-          })}
-          <span className={cn("min-w-0 flex-1 truncate text-sm font-semibold whitespace-nowrap text-foreground", FADE)}>
-            {brand.name}
-          </span>
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={t.collapse}
-            title={shortcut ? `${t.collapse} (⌘B)` : t.collapse}
-            aria-expanded
-            tabIndex={collapsed ? -1 : undefined}
-            aria-hidden={collapsed || undefined}
-            className={cn(
-              "flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50",
-              FADE,
-            )}
-          >
-            <PanelLeftClose className="size-4" />
-          </button>
-        </div>
-
-        {workspace ? (
-          <div className="mt-4">
-            <WorkspaceSwitcher workspace={workspace} collapsed={collapsed} size="sm" />
-          </div>
-        ) : null}
-
-        <div className="-mx-3 mt-4 flex-1 overflow-x-hidden overflow-y-auto px-3">
-          <NavList groups={groups} collapsed={collapsed} size="sm" sections={sections} inSidebar />
-        </div>
-
-        {account ? (
-          <div className="border-t border-border pt-3">
-            <SidebarAccount account={account} collapsed={collapsed} />
-          </div>
-        ) : null}
-      </aside>
-
-      {/* Expand button: after collapsing it appears at the top-left of the content area, at the same height as the collapse button; it fades in once the width has almost finished shrinking, and fades out immediately on expand */}
+      {/* One toggle for every state, pinned at the brand row's spacer (sidebar padding 12px + 2px, row top 20px + 2px).
+          It never moves, so a second press lands on it again. First in the DOM so it is also first in tab order. */}
       <button
         type="button"
         onClick={toggle}
-        aria-label={t.expand}
-        title={shortcut ? `${t.expand} (⌘B)` : t.expand}
-        aria-expanded={false}
-        tabIndex={collapsed ? undefined : -1}
-        aria-hidden={collapsed ? undefined : true}
+        aria-label={collapsed ? t.expand : t.collapse}
+        title={`${collapsed ? t.expand : t.collapse}${shortcut ? " (⌘B)" : ""}`}
+        aria-expanded={!collapsed}
+        className="absolute top-[22px] left-[14px] z-30 flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+      >
+        {/* The two icons cross-fade in place */}
+        <PanelLeftClose
+          className={cn(
+            "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
+            collapsed ? "opacity-0" : "opacity-100",
+          )}
+        />
+        <PanelLeftOpen
+          className={cn(
+            "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
+            collapsed ? "opacity-100" : "opacity-0",
+          )}
+        />
+      </button>
+      {/* hidden mode: this clip animates its width to 0 while the sidebar keeps its full width, so nothing reflows */}
+      <div
+        inert={hidden && collapsed}
         className={cn(
-          "absolute top-[1.375rem] left-full z-30 ml-2 flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-opacity hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50",
-          collapsed ? "opacity-100 delay-150 duration-200" : "pointer-events-none opacity-0 delay-0 duration-100",
+          "h-full",
+          hidden && "overflow-hidden transition-[width] duration-300 motion-reduce:transition-none",
+          hidden && EASE,
+          hidden && (collapsed ? "w-0" : "w-56"),
         )}
       >
-        <PanelLeftOpen className="size-4" />
-      </button>
+        <aside
+          data-collapsed={rail ? "true" : "false"}
+          className={cn(
+            "group/sidebar flex h-full flex-col overflow-hidden px-3 py-5 transition-[width] duration-300 motion-reduce:transition-none",
+            !flush && "border-r border-border",
+            SIDEBAR_BG,
+            EASE,
+            rail ? "w-14" : "w-56",
+          )}
+        >
+          {/* Brand row. The toggle is drawn outside the sidebar (below), over this spacer, on the same centre line as the nav
+              icons, so it stays at the same spot whether the sidebar is open, a rail or hidden. The brand follows it and fades
+              out with the other labels when the sidebar collapses. */}
+          <div className="flex h-8 items-center gap-2">
+            <span aria-hidden="true" className="ml-0.5 size-7 shrink-0" />
+            <div className={cn("flex min-w-0 flex-1 items-center gap-2.5", FADE)}>
+              {link({
+                href: brand.href ?? "/",
+                onClick: (e) => navigate(brand.href ?? "/", e),
+                "aria-label": t.home(brand.name),
+                tabIndex: rail ? -1 : undefined,
+                className:
+                  "flex size-7 shrink-0 items-center justify-center rounded-md bg-foreground text-background outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                children: logo,
+              })}
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold whitespace-nowrap text-foreground">
+                {brand.name}
+              </span>
+            </div>
+          </div>
+
+          {workspace ? (
+            <div className="mt-4">
+              <WorkspaceSwitcher workspace={workspace} collapsed={rail} size="sm" />
+            </div>
+          ) : null}
+
+          <div className="-mx-3 mt-4 flex-1 overflow-x-hidden overflow-y-auto px-3">
+            <NavList groups={groups} collapsed={rail} size="sm" sections={sections} inSidebar />
+          </div>
+
+          {account ? (
+            <div className="border-t border-border pt-3">
+              <SidebarAccount account={account} collapsed={rail} />
+            </div>
+          ) : null}
+        </aside>
+      </div>
+
     </div>
   );
 }
@@ -1478,6 +1511,8 @@ export function AppShell({
   shortcut = true,
   defaultOpenSections,
   breakpoint = "container",
+  collapseMode = "rail",
+  layout = "padded",
   locale,
   labels,
   className,
@@ -1597,8 +1632,10 @@ export function AppShell({
               sections={sections}
               shortcut={shortcut}
               bp={bp}
+              collapseMode={collapseMode}
+              flush={layout === "flush"}
             />
-            <div ref={columnRef} className={bp.column}>
+            <div ref={columnRef} className={cn(bp.column, layout === "flush" && bp.flushColumn)}>
               <MobileTopBar
                 title={pageTitle}
                 backHref={pageBack}
@@ -1607,8 +1644,15 @@ export function AppShell({
                 action={mobileAction}
                 bp={bp}
               />
-              <main className={bp.main}>
-                <div className={cn("mx-auto w-full max-w-6xl min-w-0", contentClassName)}>{children}</div>
+              <main className={cn(bp.main, layout === "flush" && bp.flushMain)}>
+                <div
+                  className={cn(
+                    layout === "flush" ? "flex min-h-0 w-full min-w-0 flex-1 flex-col" : "mx-auto w-full max-w-6xl min-w-0",
+                    contentClassName,
+                  )}
+                >
+                  {children}
+                </div>
               </main>
             </div>
             <MobileTabBar
