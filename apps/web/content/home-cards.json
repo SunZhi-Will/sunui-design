@@ -74,9 +74,9 @@
       "name": "campaign-landing",
       "kind": "campaign",
       "crop": [
-        0.5,
         0.42,
-        0.95
+        0.44,
+        0.72
       ]
     },
     {
@@ -86,7 +86,34 @@
         0.5,
         0.52,
         0.92
-      ]
+      ],
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 1
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 2
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[role=tab]",
+          "nth": 0
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "seconds": 6
     },
     {
       "name": "lookbook-expand-hero",
@@ -120,8 +147,8 @@
       "kind": "campaign",
       "crop": [
         0.5,
-        0.4,
-        0.75
+        0.36,
+        0.6
       ]
     },
     {
@@ -209,31 +236,31 @@
       "demo": [
         {
           "move": [
-            0.3,
-            0.35
+            0.06,
+            0.1
+          ],
+          "ms": 700
+        },
+        {
+          "move": [
+            0.94,
+            0.9
           ],
           "ms": 900
         },
         {
           "move": [
-            0.75,
-            0.6
+            0.06,
+            0.9
           ],
-          "ms": 1200
+          "ms": 700
         },
         {
           "move": [
-            0.45,
-            0.75
+            0.94,
+            0.1
           ],
-          "ms": 1000
-        },
-        {
-          "move": [
-            0.65,
-            0.3
-          ],
-          "ms": 1000
+          "ms": 900
         }
       ],
       "seconds": 6
@@ -380,16 +407,70 @@
         0.5,
         0.5,
         0.98
-      ]
+      ],
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "button",
+          "nth": 4
+        },
+        {
+          "wait": 1400
+        },
+        {
+          "sel": "button",
+          "nth": 4
+        },
+        {
+          "wait": 1400
+        }
+      ],
+      "seconds": 6
     },
     {
-      "name": "variant-picker",
-      "kind": "product",
+      "name": "book-3d",
+      "kind": "media",
       "crop": [
         0.5,
-        0.3,
-        0.78
-      ]
+        0.45,
+        0.9
+      ],
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "button",
+          "nth": 1
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "sel": "button",
+          "nth": 1
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "sel": "button",
+          "nth": 0
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "button",
+          "nth": 0
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "seconds": 6
     },
     {
       "name": "spine-shelf",
