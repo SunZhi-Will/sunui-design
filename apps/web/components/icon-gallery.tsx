@@ -64,7 +64,6 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   const [strokeSize, setStrokeSize] = useState<number>(24);
   const [pixelSize, setPixelSize] = useState<number>(32);
   const [stroke, setStroke] = useState<number>(1.5);
-  const accent = true;
   // 2026-11-22：/icons 頁預設彩色，黑白改為切換選項
   const [pigment, setPigment] = useState(true);
   const [selected, setSelected] = useState<string>("coupon");
@@ -167,6 +166,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   // 彩色模式下雙色圖示用自己的本色：細節是 color，主體是同色相的淺色
   const lineTint = (name: string) => (pigment ? (lineIconTone(name) as CSSProperties) : undefined);
 
+  // 換顏色模式時重新掛載：framer-motion 的 motion.svg 在 style 拿掉後不會清掉已寫入的顏色
   function renderIcon(name: string, px: number) {
     // 剛切換風格的那一次渲染，選取的名稱可能還是另一套的；不存在就先不畫
     if (!(name in sources[style]) && !motionSet.has(name)) return null;
@@ -182,15 +182,15 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     }
     if (isTwoTone) {
       return k ? (
-        <AnimatedTwoToneIcon key={name} name={name as AnimatedTwoToneIconName} size={px} active={active} style={lineTint(name)} />
+        <AnimatedTwoToneIcon key={`${name}-${tone}`} name={name as AnimatedTwoToneIconName} size={px} active={active} style={lineTint(name)} />
       ) : (
-        <TwoToneIcon key={name} name={name as TwoToneIconName} size={px} style={lineTint(name)} />
+        <TwoToneIcon key={`${name}-${tone}`} name={name as TwoToneIconName} size={px} style={lineTint(name)} />
       );
     }
     return k ? (
-      <AnimatedIcon key={name} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} style={lineTint(name)} />
+      <AnimatedIcon key={`${name}-${tone}`} name={name as AnimatedIconName} size={px} strokeWidth={stroke} active={active} style={lineTint(name)} />
     ) : (
-      <Icon key={name} name={name as IconName} size={px} strokeWidth={stroke} style={lineTint(name)} />
+      <Icon key={`${name}-${tone}`} name={name as IconName} size={px} strokeWidth={stroke} style={lineTint(name)} />
     );
   }
 
@@ -199,7 +199,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
     if (!svg) return null;
     // 複製出去的 SVG 要能獨立使用：把變數換成實際色值或 currentColor，尺寸改成目前選的大小
     return svg.outerHTML
-      .replaceAll("var(--sunui-icon-accent, currentColor)", accent && (isPixel || !pigment) ? "#171717" : "currentColor")
+      .replaceAll("var(--sunui-icon-accent, currentColor)", "currentColor")
       .replaceAll("var(--sunui-pixel-shine, #fff)", "#fff")
       .replace(/var\(--sunui-icon-(body|mid), currentColor\)/g, (_, k: "body" | "mid") =>
         !isPixel && pigment ? lineIconTone(selected)[`--sunui-icon-${k}`] : "currentColor",
@@ -240,7 +240,8 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
   };
 
   return (
-    <div className={cn("grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start", accent && "[--sunui-icon-accent:var(--accent)]", !isPixel && pigment && "[--sunui-icon-accent:currentColor]")}>
+    // accent 部位跟著文字顏色：黑白時全部黑白（網站的 --accent 是品牌藍，不能漏進圖示）；彩色時由各圖示的本色決定
+    <div className="grid gap-6 [--sunui-icon-accent:currentColor] lg:grid-cols-[1fr_300px] lg:items-start">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-0 flex-1 basis-56">
@@ -314,7 +315,7 @@ export function IconGallery({ messages: t }: { messages: Messages["iconGallery"]
             <ul className="grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-1">
               {visible.map((name) => (
                 <CanvasCell
-                  key={`${style}-${name}`}
+                  key={`${style}-${name}-${pigment}`}
                   name={name}
                   variant={style}
                   animated={motionSet.has(name)}

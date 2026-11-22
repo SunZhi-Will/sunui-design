@@ -116,7 +116,7 @@ export function ProIconShowcase({
           {!renderer && <p className="mt-4 text-xs text-subtle">{t.locked}</p>}
           {renderer && animated && <p className="mt-4 text-xs text-subtle">{t.animatedHint}</p>}
 
-          <ul className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2 [--sunui-icon-accent:var(--accent)]">
+          <ul className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2 [--sunui-icon-accent:currentColor]">
             {visible.map(({ name }) => {
               const kind = kindOf(name);
               return (
@@ -147,7 +147,7 @@ export function ProIconShowcase({
 
         <aside className="rounded-md border border-line bg-card p-5 lg:sticky lg:top-20">
           <p className="text-[11px] font-medium tracking-[0.14em] text-subtle uppercase">{t.selected}</p>
-          <div className="mt-4 grid place-items-center rounded-sm border border-dashed border-line py-8 [--sunui-icon-accent:var(--accent)]">
+          <div className="mt-4 grid place-items-center rounded-sm border border-dashed border-line py-8 [--sunui-icon-accent:currentColor]">
             {draw(selected, isPixel ? 96 : 96)}
           </div>
           <p className="mt-5 font-mono text-sm tracking-[0.04em]">{selected}</p>

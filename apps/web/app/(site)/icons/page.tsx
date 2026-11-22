@@ -33,14 +33,12 @@ export default async function IconsPage() {
         <p className="mt-5 max-w-2xl text-lg text-pretty text-subtle">
           {t.lead}
         </p>
-        <div className="mt-8 max-w-2xl">
-        <CommandTabs label={m.home.hero.install} tabs={[t.pixelInstall, t.pixelAnimatedInstall, t.twoToneInstall, t.twoToneAnimatedInstall, t.staticInstall, t.animatedInstall]}>
-          <Command key="0" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-pixel-icons.json`} />
-          <Command key="1" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
-          <Command key="2" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-twotone-icons.json`} />
-          <Command key="3" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-twotone-icons.json`} />
-          <Command key="4" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-icons.json`} />
-          <Command key="5" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
+        <div className="mt-8 max-w-3xl">
+        <CommandTabs label={m.home.hero.install} tabs={[t.pixelInstall, t.twoToneInstall, t.staticInstall]}>
+          {/* 裝動態版就會連同靜態版一起裝（registryDependencies），所以每套只給一行 */}
+          <Command key="0" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-pixel-icons.json`} />
+          <Command key="1" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-twotone-icons.json`} />
+          <Command key="2" value={`npx shadcn@latest add ${siteUrl()}/r/icons/sunui-animated-icons.json`} />
         </CommandTabs>
         </div>
       </section>
