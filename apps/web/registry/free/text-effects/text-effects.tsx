@@ -3,7 +3,6 @@
 import {
   AnimatePresence,
   motion,
-  useAnimationFrame,
   useInView,
   useMotionValue,
   useReducedMotion,
@@ -771,12 +770,35 @@ function KineticStack({ text, play, reduce, d, delay, stagger }: InnerProps) {
   );
 }
 
+/**
+ * A requestAnimationFrame loop that runs only while active. framer-motion's useAnimationFrame ticks every
+ * frame once mounted, even when the callback returns early, which keeps the whole page repainting.
+ */
+function useFrameWhile(active: boolean, callback: (delta: number) => void) {
+  const ref = useRef(callback);
+  useEffect(() => {
+    ref.current = callback;
+  });
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      ref.current(Math.min(now - last, 100));
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+}
+
 /** Text laid out on a ring that turns slowly; keeps the current angle while paused */
 function CircleText({ text, running, d }: InnerProps) {
   const rotate = useMotionValue(0);
   const transform = useTransform(rotate, (r) => `rotate(${r}deg)`);
-  useAnimationFrame((_, delta) => {
-    if (running) rotate.set((rotate.get() + (delta / 1000) * (360 / d)) % 360);
+  useFrameWhile(running, (delta) => {
+    rotate.set((rotate.get() + (delta / 1000) * (360 / d)) % 360);
   });
   const id = `sunui-circle-${useId().replace(/:/g, "")}`;
   const r = 38;

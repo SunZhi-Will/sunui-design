@@ -91,7 +91,7 @@ CSS 在 `app/globals.css` 的 `@theme`（`ease-site` 曲線，並把預設 trans
    - 卡片圖是 `public/cards/<name>.jpg`：先用 `capture-og.mjs --theme light --out public/og/blocks-light` 截淺色版，再用 `scripts/crop-cards.mjs` 依 `content/home-cards.json` 的 `crop` 逐張取景裁成 16:10，讓畫面填滿卡片。深色版分享圖縮到卡片大小幾乎一片黑，四周留白又讓它像「表單截圖」，這兩件事是 2026-11-22 並排比較後才改的。
    - **卡片會動**（2026-11-22，使用者：「你的預覽都沒有動畫啊」）：每張卡疊一支 6 秒循環影片 `public/cards/<name>.mp4`（960x600、H.264、無聲，18 支共約 3.5MB），由 `scripts/record-cards.mjs` 錄：同一個取景，靜態圖當底。大約一半的區塊要有人操作才會動，所以 `home-cards.json` 可以寫 `demo`（滑鼠移動、點擊、拖曳，座標是卡片畫面的比例；點按鈕最好用 `sel` 加 `nth` 指定第幾個元素，座標常常點到外層容器），錄影時照著跑；用 `--idle` 先看哪些自己會動。錄完要量動態：ffmpeg 每秒取 2 張、算前後張平均差（0 是完全不動），2026-11-22 定的門檻是 3 以上，低於 3 的卡在卡片大小看起來是靜止的（例如 variant-picker 換顏色只改選取狀態，照片不變，0.1，所以換成 book-3d）。影片捲進畫面才載入與播放，離開畫面或分頁在背景就暫停，開始播之前透明（看到的是靜態圖），reduced motion 時不放影片。
    - **每張卡四個檔**：960 與 480 寬，各有 H.264 與 AV1（AV1 的 crf 是 H.264 的 +20，並排看畫質差不多，平均小三到四成；畫面幾乎不動的卡 AV1 反而比較大，錄完會自動刪掉，`content/home-cards-media.json` 記哪些卡有 AV1）。卡片在瀏覽器裡選：視窗 640 以下或開了省流量用 480，支援 AV1（`canPlayType`）就用 AV1。播放被拒絕時一秒後重試（分頁剛從背景切回來時會發生）。
-   - **量過**（2026-11-22，`scripts/measure-home.mjs`，dev server、CPU 降速 4 倍，只拿來前後比）：整頁捲一次下載的影片，手機從 2966KB 降到 963KB（少 68%），桌機從 2966KB 降到 2292KB（少 23%）。捲動幀率前後一樣（手機約 31 fps），卡頓不是影片造成的；正式版的絕對數字要用 `web-prod` 重量。
+   - **量過**（2026-11-22，`scripts/measure-home.mjs`，dev server、只拿來前後比）：整頁捲一次下載的影片，手機從 2966KB 降到 963KB（少 68%），桌機從 2966KB 降到 2292KB（少 23%）。
    - 挑卡片：要亮、而且有照片、插畫或大塊顏色。只看亮度排出來的多半是白底表單，亮但不好看。
    - Hover：圖放大到 1.04，0.7 秒 `ease-site`；左下淡入「預覽 →」膠囊。
    - 這兩段取代了原本的「Pro 場景」堆疊（每個場景一整排的即時預覽）和底部的「型錄裡還有更多」跑馬燈。
@@ -131,7 +131,12 @@ CSS 在 `app/globals.css` 的 `@theme`（`ease-site` 曲線，並把預設 trans
 - 最大的卡頓來自捲動時掛載即時預覽的 iframe（每個是一份完整的 React，單次最長 280 到 430ms），不是點雲。所以手機上「直接試」只放前三張（`hidden md:block`）；帶狀型錄用靜態圖，就是為了不再多掛即時預覽。要在首頁再加即時預覽之前先想這一點。
 - 點雲在窄螢幕減量：開場 4200 顆降到 2200，收尾 3000 降到 1800（`matchMedia("(max-width: 639px)")`，掛載後才決定）。
 - 帶狀型錄的卡片圖不要加 `loading="eager"`：18 張共約 1MB，讓它照捲動載入。
-- 改動首頁後要重量：量測腳本的做法是 Playwright 加 `Emulation.setCPUThrottlingRate`，每一段停 3 秒數 `requestAnimationFrame` 的間隔，再整頁捲一次。
+- 改動首頁後要重量：`node apps/web/scripts/measure-home.mjs [--desktop] [--cpu 4] [--reduced]`，無頭 Chrome 用 `Input.synthesizeScrollGesture`（等同手指或滾輪）從頭捲到底，數 `requestAnimationFrame` 間隔，依畫面中央的段落分開統計，並列出下載量。
+- **量測陷阱**（2026-11-22）：不要用 `window.scrollBy` 捲。那不算使用者輸入，頁面上播過影片之後 Chrome 會把整頁降到影片的 30fps，量出來每一段都是 30fps、藏掉任何東西都不變，看起來像很卡，其實主執行緒 94% 閒著。用捲動手勢量才是真的。
+- **2026-11-22 全面最佳化的結果**（手機 390、CPU 降速 4 倍）：整頁 58 → 59 fps，慢於 33ms 的幀 1.4% → 0.7%，最長一幀 130 → 57ms；捲動中下載的 JS 3220 → 1014KB。桌機正常 CPU 每一段都是 60fps、0 慢幀。做了三件事：
+  - `text-effects` 的環形文字與 `button-effects` 的循環原本用 framer-motion 的 `useAnimationFrame`，掛上就每幀都跑，暫停或離開畫面時只是回呼裡 return，整頁還是每幀重畫。改成只在 active 時跑的 `useFrameWhile`。停在頁面中段時每 3 秒的動畫幀從 180 降到 0，主執行緒工作 649 → 88ms。
+  - `LivePreview`（「直接試」與型錄卡片）捲動中不掛載 iframe，等 250ms 沒有捲動才掛。iframe 啟動一次要 100ms 以上，原本捲到一半掛上去就是一次 130ms 的卡頓。
+  - `point-cloud` 的畫布像素上限約 400 萬：桌機開場的點雲是 1350px 見方乘 2 倍，超過 700 萬像素每幀全部清掉重畫，點太小看不出差別。
 
 試過而且被否決的，不要再做：
 

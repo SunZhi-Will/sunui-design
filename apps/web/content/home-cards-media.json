@@ -41,8 +41,8 @@
   "orbit-gallery": {
     "av1": true
   },
-  "photo-looks": {
-    "av1": false
+  "theme-picker": {
+    "av1": true
   },
   "hero-billboard-carousel": {
     "av1": true

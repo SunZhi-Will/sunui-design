@@ -10,6 +10,7 @@
 //   { "drag": [x1, y1, x2, y2], "ms": 900 } 按住拖過去
 //   { "wait": 800 }                      停一下
 //   { "sel": "[role=tab]", "nth": 1 }    點第 n 個符合選擇器的元素（比座標穩，按鈕順序不隨語言改變）
+//   { "hover": "img", "nth": 2 }         滑鼠移到第 n 個符合選擇器的元素上，不點
 // demo 會從頭到尾跑一次再重來，直到錄滿 seconds 秒（預設 6）。crf 是畫質（預設 28，越大越小檔；點很多的畫面用 34）。
 //
 //   node apps/web/scripts/record-cards.mjs [--only a,b] [--base http://localhost:3100] [--idle]
@@ -249,6 +250,11 @@ async function record(browser, card) {
         await mouse("mousePressed", pos, { clickCount: 1 });
         await sleep(60);
         await mouse("mouseReleased", pos, { clickCount: 1 });
+      }
+      if (step.hover) {
+        const target = await browser.evaluate(`(() => { const e = document.querySelectorAll(${JSON.stringify(step.hover)})[${step.nth ?? 0}]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
+        if (!target) throw new Error(`找不到 ${step.hover} 第 ${step.nth ?? 0} 個`);
+        await glide(target, step.ms ?? 450);
       }
       if (step.sel) {
         const target = await browser.evaluate(`(() => { const e = document.querySelectorAll(${JSON.stringify(step.sel)})[${step.nth ?? 0}]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);

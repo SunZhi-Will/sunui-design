@@ -310,9 +310,11 @@ export function PointCloud({
       paint();
     };
     const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
       w = root.clientWidth;
       h = root.clientHeight;
+      // Cap the backing store at about 4 million pixels: a full-bleed cloud at 2x is over 7 million, every frame
+      // is a full clear and redraw, and the dots are too small for the extra resolution to show.
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1, Math.sqrt(4_000_000 / Math.max(1, w * h))));
       canvas.width = Math.max(1, Math.round(w * dpr));
       canvas.height = Math.max(1, Math.round(h * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

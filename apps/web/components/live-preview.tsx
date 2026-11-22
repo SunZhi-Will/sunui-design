@@ -10,6 +10,10 @@ import { cn } from "@/lib/utils";
 
 // 卡片進入預載範圍後等多久才掛載 iframe（毫秒）
 const MOUNT_DELAY = 150;
+// 最後一次捲動的時間：全部預覽共用一個監聽
+const SCROLL_IDLE = 250;
+let lastScroll = 0;
+if (typeof window !== "undefined") window.addEventListener("scroll", () => (lastScroll = performance.now()), { passive: true, capture: true });
 
 /**
  * 型錄卡片的即時預覽：block 以原尺寸在 iframe 裡跑，可以直接操作。
@@ -57,7 +61,13 @@ export function LivePreview({
       ([entry]) => {
         window.clearTimeout(timer);
         if (entry.isIntersecting) {
-          timer = window.setTimeout(() => setNear(true), MOUNT_DELAY);
+          // 捲動中不掛載：iframe 啟動那一下要 100ms 以上，捲到一半掛上去就是一次明顯的卡頓。
+          // 等使用者停下來（250ms 沒有捲動）再掛（2026-11-22 量過：「直接試」那段從最長 130ms 的幀降下來）
+          const tryMount = () => {
+            if (performance.now() - lastScroll < SCROLL_IDLE) timer = window.setTimeout(tryMount, SCROLL_IDLE);
+            else setNear(true);
+          };
+          timer = window.setTimeout(tryMount, MOUNT_DELAY);
         } else {
           setNear(false);
           setLoadedLocale(null);

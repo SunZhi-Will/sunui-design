@@ -4,7 +4,6 @@ import {
   AnimatePresence,
   animate,
   motion,
-  useAnimationFrame,
   useInView,
   useMotionValue,
   useReducedMotion,
@@ -132,6 +131,29 @@ function useMergedRef<T>(local: RefObject<T | null>, forwarded: Ref<T>) {
   );
 }
 
+/**
+ * A requestAnimationFrame loop that runs only while active. framer-motion's useAnimationFrame ticks every
+ * frame once mounted, even when the callback returns early, which keeps the whole page repainting.
+ */
+function useFrameWhile(active: boolean, callback: (delta: number) => void) {
+  const ref = useRef(callback);
+  useEffect(() => {
+    ref.current = callback;
+  });
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      ref.current(Math.min(now - last, 100));
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+}
+
 /** Progress value looping from 0 to 1; stays in place when active is false, and speed can be raised on hover */
 function useLoop(active: boolean, period: number, speed = 1) {
   const progress = useMotionValue(0);
@@ -139,9 +161,8 @@ function useLoop(active: boolean, period: number, speed = 1) {
   useEffect(() => {
     state.current = { active, period, speed };
   }, [active, period, speed]);
-  useAnimationFrame((_, delta) => {
+  useFrameWhile(active, (delta) => {
     const s = state.current;
-    if (!s.active) return;
     progress.set((progress.get() + (delta / 1000 / s.period) * s.speed) % 1);
   });
   return progress;

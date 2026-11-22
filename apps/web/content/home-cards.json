@@ -147,9 +147,57 @@
       "kind": "campaign",
       "crop": [
         0.5,
-        0.36,
-        0.6
-      ]
+        0.32,
+        0.42
+      ],
+      "demo": [
+        {
+          "wait": 300
+        },
+        {
+          "sel": "button",
+          "nth": 10
+        },
+        {
+          "wait": 550
+        },
+        {
+          "sel": "button",
+          "nth": 9
+        },
+        {
+          "wait": 550
+        },
+        {
+          "sel": "button",
+          "nth": 10
+        },
+        {
+          "wait": 550
+        },
+        {
+          "sel": "button",
+          "nth": 1
+        },
+        {
+          "wait": 600
+        },
+        {
+          "sel": "button",
+          "nth": 9
+        },
+        {
+          "wait": 550
+        },
+        {
+          "sel": "button",
+          "nth": 2
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "seconds": 6
     },
     {
       "name": "sky-time-switch",
@@ -329,73 +377,37 @@
       ]
     },
     {
-      "name": "photo-looks",
-      "kind": "media",
+      "name": "theme-picker",
+      "kind": "app",
       "crop": [
         0.5,
-        0.42,
-        0.82
+        0.45,
+        0.8
       ],
       "demo": [
         {
-          "move": [
-            0.17,
-            0.15
-          ],
-          "ms": 500
+          "wait": 400
         },
         {
-          "wait": 450
+          "sel": "button",
+          "nth": 1
         },
         {
-          "move": [
-            0.5,
-            0.15
-          ],
-          "ms": 450
+          "wait": 1200
         },
         {
-          "wait": 450
+          "sel": "button",
+          "nth": 2
         },
         {
-          "move": [
-            0.82,
-            0.15
-          ],
-          "ms": 450
+          "wait": 1200
         },
         {
-          "wait": 450
+          "sel": "button",
+          "nth": 0
         },
         {
-          "move": [
-            0.17,
-            0.62
-          ],
-          "ms": 500
-        },
-        {
-          "wait": 450
-        },
-        {
-          "move": [
-            0.5,
-            0.62
-          ],
-          "ms": 450
-        },
-        {
-          "wait": 450
-        },
-        {
-          "move": [
-            0.82,
-            0.62
-          ],
-          "ms": 450
-        },
-        {
-          "wait": 450
+          "wait": 1200
         }
       ],
       "seconds": 6

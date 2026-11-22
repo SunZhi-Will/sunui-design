@@ -77,31 +77,48 @@ await page("Network.setCacheDisabled", { cacheDisabled: true });
 await page("Emulation.setDeviceMetricsOverride", desktop ? { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false } : { width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
 if (!desktop) await page("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
 await page("Page.addScriptToEvaluateOnNewDocument", { source: `try{localStorage.setItem("sunui-theme","dark")}catch(e){}` });
+// --reduced 模擬「減少動態效果」：拿來判斷卡頓是不是動畫迴圈造成的
+if (args.includes("--reduced")) await page("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
 
 await page("Page.navigate", { url: base + pagePath });
 await sleep(8000);
 await page("Emulation.setCPUThrottlingRate", { rate: cpu });
 
 // 等速捲：每幀往下 18px（約每秒 1000px），一路捲到底，同時記錄每一幀的間隔
-const result = await evaluate(`new Promise((resolve) => {
-  const gaps = [];
+// 每一幀同時記下畫面中央是哪一段（最近的 h2 或 h1），最後分段統計。
+// 捲動用 Input.synthesizeScrollGesture（等同使用者的手指或滾輪）：用 scrollBy 捲不算使用者輸入，
+// 頁面上有影片時 Chrome 會把整頁降到影片的 30fps，量出來的數字是假的（2026-11-22 查過）。
+await evaluate(`(() => {
+  window.__gaps = [];
+  window.__where = [];
+  window.__stop = false;
+  const heads = [...document.querySelectorAll("main h1, main h2")].map((h) => ({ y: h.getBoundingClientRect().top + scrollY, t: h.textContent.trim().slice(0, 14) }));
+  const section = () => {
+    const mid = scrollY + innerHeight / 2;
+    let cur = "(top)";
+    for (const h of heads) if (h.y - 120 <= mid) cur = h.t;
+    return cur;
+  };
   let last = performance.now();
-  const end = document.documentElement.scrollHeight - innerHeight;
   const step = () => {
     const now = performance.now();
-    gaps.push(now - last);
+    window.__gaps.push(now - last);
+    window.__where.push(section());
     last = now;
-    if (scrollY >= end - 2) return resolve(gaps);
-    window.scrollBy(0, 18);
-    requestAnimationFrame(step);
+    if (!window.__stop) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
-})`);
+  return 1;
+})()`);
+const distance = await evaluate(`document.documentElement.scrollHeight - innerHeight`);
+await page("Input.synthesizeScrollGesture", { x: desktop ? 700 : 195, y: desktop ? 450 : 420, yDistance: -distance, speed: 1000, gestureSourceType: desktop ? "mouse" : "touch", preventFling: true, repeatCount: 1 });
+const result = await evaluate(`(() => { window.__stop = true; return { gaps: window.__gaps, where: window.__where }; })()`);
 await sleep(2500);
 await page("Emulation.setCPUThrottlingRate", { rate: 1 });
 const videos = await evaluate(`[...document.querySelectorAll("video")].map((v) => (v.currentSrc || "").split("/").pop()).filter(Boolean)`);
 
-const gaps = result.slice(1);
+const gaps = result.gaps.slice(1);
+const where = result.where.slice(1);
 const total = gaps.reduce((a, b) => a + b, 0);
 const slow = gaps.filter((g) => g > 33.4).length;
 const sorted = [...gaps].sort((a, b) => a - b);
@@ -109,6 +126,18 @@ const kb = (n) => `${Math.round((n || 0) / 1024)} KB`;
 console.log(`${desktop ? "桌機 1440" : "手機 390"}，CPU 降速 ${cpu} 倍，${base}${pagePath}`);
 console.log(`  捲動 ${(total / 1000).toFixed(1)} 秒，平均 ${(1000 / (total / gaps.length)).toFixed(0)} fps，慢於 33ms 的幀 ${((slow / gaps.length) * 100).toFixed(1)}%，最長一幀 ${Math.round(sorted.at(-1))}ms，第 95 百分位 ${Math.round(sorted[Math.floor(sorted.length * 0.95)])}ms`);
 console.log(`  下載：影片 ${kb(bytes.video)}、圖片 ${kb(bytes.image)}、JS ${kb(bytes.js)}`);
+const per = new Map();
+gaps.forEach((g, i) => {
+  const k = where[i];
+  const e = per.get(k) || { n: 0, slow: 0, sum: 0, max: 0 };
+  e.n++;
+  e.sum += g;
+  e.max = Math.max(e.max, g);
+  if (g > 33.4) e.slow++;
+  per.set(k, e);
+});
+console.log("  分段（畫面中央的段落）：");
+for (const [k, e] of per) console.log(`    ${k.padEnd(16)} ${String(Math.round(1000 / (e.sum / e.n))).padStart(3)} fps  慢幀 ${String(Math.round((e.slow / e.n) * 100)).padStart(3)}%  最長 ${Math.round(e.max)}ms`);
 console.log(`  播過的影片檔：${[...new Set(videos)].join(" ") || "（無）"}`);
 
 ws.close();
