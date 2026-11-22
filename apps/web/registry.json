@@ -269,7 +269,8 @@
             "Keep tabLabel on four pages or fewer; everything else lands in More",
             "Container queries need Tailwind v4 (or the container-queries plugin on v3)",
             "Pass renderLink and call preventDefault in onNavigate to use your framework's router",
-            "layout=\"flush\" drops the desktop page padding and max width and gives the content the sidebar's background, for content that draws its own surfaces such as tabs joined to a panel"
+            "layout=\"flush\" drops the desktop page padding and max width and gives the content the sidebar's background, for content that draws its own surfaces such as tabs joined to a panel",
+            "pinBrand keeps the brand beside the toggle like a window title; content at the top must leave room for it while the sidebar is collapsed (its right edge is the element marked data-shell-brand)"
           ],
           "aliases": [
             "sidebar",

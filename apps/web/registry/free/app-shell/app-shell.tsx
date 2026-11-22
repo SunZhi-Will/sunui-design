@@ -136,6 +136,12 @@ export interface AppShellProps {
    * so it can draw its own surfaces (such as tabs joined to a panel). Phones keep the usual layout.
    */
   layout?: "padded" | "flush";
+  /**
+   * Desktop: keep the brand beside the toggle in every state, like a window title, instead of inside the sidebar
+   * where it fades out on collapse. Content that starts at the top (such as a tab row) should leave room for it while
+   * the sidebar is collapsed; its right edge is on the element marked data-shell-brand.
+   */
+  pinBrand?: boolean;
   /** Cmd/Ctrl + B toggles collapse; on by default */
   shortcut?: boolean;
   /** Second-level ids that start expanded; the section containing the current page expands automatically */
@@ -252,6 +258,8 @@ const ROW_BASE =
 const ROW_ACTIVE = "bg-background font-medium text-foreground shadow-[inset_0_0_0_1px_var(--border)]";
 const ROW_IDLE = "text-muted-foreground hover:bg-muted hover:text-foreground";
 const SIDEBAR_BG = "bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]";
+// layout="flush": one window colour for the sidebar and the content, a step below the panels that sit on it
+const FLUSH_BG = "bg-[color-mix(in_oklab,var(--muted)_80%,var(--background))] dark:bg-background";
 
 // Tailwind needs to see complete class strings to generate them, so write one copy for each breakpoint kind
 const BP = {
@@ -261,7 +269,7 @@ const BP = {
     mobile: "@3xl/shell:hidden",
     column: "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain",
     main: "min-w-0 flex-1 px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] @3xl/shell:px-10 @3xl/shell:py-10",
-    flushColumn: "@3xl/shell:bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]",
+    flushColumn: "@3xl/shell:bg-[color-mix(in_oklab,var(--muted)_80%,var(--background))] @3xl/shell:dark:bg-background",
     flushMain: "flex min-h-0 flex-col @3xl/shell:p-0",
     layer: "absolute",
   },
@@ -271,7 +279,7 @@ const BP = {
     mobile: "md:hidden",
     column: "flex min-h-screen min-w-0 flex-1 flex-col",
     main: "min-w-0 flex-1 px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:px-10 md:py-10",
-    flushColumn: "md:bg-[color-mix(in_oklab,var(--muted)_45%,var(--background))]",
+    flushColumn: "md:bg-[color-mix(in_oklab,var(--muted)_80%,var(--background))] md:dark:bg-background",
     flushMain: "flex flex-col md:p-0",
     layer: "fixed",
   },
@@ -1074,6 +1082,7 @@ function Sidebar({
   bp,
   collapseMode,
   flush,
+  pinBrand,
 }: {
   groups: AppShellNavGroup[];
   brand: AppShellProps["brand"];
@@ -1086,6 +1095,7 @@ function Sidebar({
   bp: (typeof BP)[keyof typeof BP];
   collapseMode: "rail" | "hidden";
   flush: boolean;
+  pinBrand: boolean;
 }) {
   const { t, link, navigate } = useShell();
   // Do not play the collapse animation on first load (the collapsed state may have just been read back from storage)
@@ -1118,28 +1128,46 @@ function Sidebar({
     <div className={cn(bp.desktop, !ready && "[&,&_*]:transition-none!")}>
       {/* One toggle for every state, pinned at the brand row's spacer (sidebar padding 12px + 2px, row top 20px + 2px).
           It never moves, so a second press lands on it again. First in the DOM so it is also first in tab order. */}
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label={collapsed ? t.expand : t.collapse}
-        title={`${collapsed ? t.expand : t.collapse}${shortcut ? " (⌘B)" : ""}`}
-        aria-expanded={!collapsed}
-        className="absolute top-[22px] left-[14px] z-30 flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
-      >
-        {/* The two icons cross-fade in place */}
-        <PanelLeftClose
-          className={cn(
-            "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
-            collapsed ? "opacity-0" : "opacity-100",
-          )}
-        />
-        <PanelLeftOpen
-          className={cn(
-            "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
-            collapsed ? "opacity-100" : "opacity-0",
-          )}
-        />
-      </button>
+      <div className="absolute top-[22px] left-[14px] z-30 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? t.expand : t.collapse}
+          title={`${collapsed ? t.expand : t.collapse}${shortcut ? " (⌘B)" : ""}`}
+          aria-expanded={!collapsed}
+          className="relative flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
+          {/* The two icons cross-fade in place */}
+          <PanelLeftClose
+            className={cn(
+              "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
+              collapsed ? "opacity-0" : "opacity-100",
+            )}
+          />
+          <PanelLeftOpen
+            className={cn(
+              "absolute size-4 transition-opacity duration-150 motion-reduce:transition-none",
+              collapsed ? "opacity-100" : "opacity-0",
+            )}
+          />
+        </button>
+        {pinBrand
+          ? link({
+              href: brand.href ?? "/",
+              onClick: (e) => navigate(brand.href ?? "/", e),
+              "aria-label": t.home(brand.name),
+              "data-shell-brand": "",
+              className:
+                "flex items-center gap-2.5 rounded-md pr-1.5 text-sm font-semibold whitespace-nowrap text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+              children: (
+                <>
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-foreground text-background">{logo}</span>
+                  {brand.name}
+                </>
+              ),
+            } as AppShellLinkProps)
+          : null}
+      </div>
       {/* hidden mode: this clip animates its width to 0 while the sidebar keeps its full width, so nothing reflows */}
       <div
         inert={hidden && collapsed}
@@ -1155,7 +1183,7 @@ function Sidebar({
           className={cn(
             "group/sidebar flex h-full flex-col overflow-hidden px-3 py-5 transition-[width] duration-300 motion-reduce:transition-none",
             !flush && "border-r border-border",
-            SIDEBAR_BG,
+            flush ? FLUSH_BG : SIDEBAR_BG,
             EASE,
             rail ? "w-14" : "w-56",
           )}
@@ -1165,7 +1193,7 @@ function Sidebar({
               out with the other labels when the sidebar collapses. */}
           <div className="flex h-8 items-center gap-2">
             <span aria-hidden="true" className="ml-0.5 size-7 shrink-0" />
-            <div className={cn("flex min-w-0 flex-1 items-center gap-2.5", FADE)}>
+            <div className={cn("flex min-w-0 flex-1 items-center gap-2.5", FADE, pinBrand && "invisible")}>
               {link({
                 href: brand.href ?? "/",
                 onClick: (e) => navigate(brand.href ?? "/", e),
@@ -1513,6 +1541,7 @@ export function AppShell({
   breakpoint = "container",
   collapseMode = "rail",
   layout = "padded",
+  pinBrand = false,
   locale,
   labels,
   className,
@@ -1634,6 +1663,7 @@ export function AppShell({
               bp={bp}
               collapseMode={collapseMode}
               flush={layout === "flush"}
+              pinBrand={pinBrand}
             />
             <div ref={columnRef} className={cn(bp.column, layout === "flush" && bp.flushColumn)}>
               <MobileTopBar
