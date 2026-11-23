@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export interface ScrollTiltStageProps {
   children: ReactNode;
-  /** Color of the thin ground line (the only accent color), defaults to the SunUI cobalt (dark) #7aa2ff */
+  /** Color of the plinth's lit top edge (the only accent color); defaults to the brand spot colour, var(--sunui-spot, var(--primary)) */
   accent?: string;
   /** Pass it when used inside a scrollable container; by default it follows the whole window scroll */
   scrollContainer?: RefObject<HTMLElement | null>;
@@ -17,9 +17,10 @@ const clamp = (x: number) => Math.min(1, Math.max(0, x));
 
 /**
  * 3D entrance stage: while still below the viewport it leans back, slowly stands up as it scrolls in, and faces straight on at the middle of the screen.
- * Below it sit a soft black drop shadow and a thin ground line. With reduced motion preferred it simply faces front.
+ * Below it sit a soft black drop shadow and a brushed-metal plinth whose top edge catches the light in the accent colour.
+ * The plinth mixes currentColor, so it reads on dark and light sections alike. With reduced motion preferred it simply faces front.
  */
-export function ScrollTiltStage({ children, accent = "#7aa2ff", scrollContainer, className }: ScrollTiltStageProps) {
+export function ScrollTiltStage({ children, accent = "var(--sunui-spot, var(--primary))", scrollContainer, className }: ScrollTiltStageProps) {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
 
@@ -69,19 +70,29 @@ export function ScrollTiltStage({ children, accent = "#7aa2ff", scrollContainer,
       {/* Drop shadow: solid black, no glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[6%] -bottom-10 h-20"
+        className="pointer-events-none absolute inset-x-[6%] -bottom-12 h-20"
         style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55), transparent 100%)" }}
       />
-      {/* Thin ground line: faded at both ends */}
+      {/* Plinth: a lit top edge in the accent colour, a pale top face, then a brushed-metal front face that darkens downward; faded at both ends */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[4%] -bottom-6 h-px"
+        className="pointer-events-none absolute inset-x-[4%] -bottom-9 flex h-[18px] flex-col"
         style={{
-          background: `color-mix(in srgb, ${accent} 45%, transparent)`,
-          maskImage: "linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent)",
-          WebkitMaskImage: "linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent)",
+          maskImage: "linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent)",
+          WebkitMaskImage: "linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent)",
         }}
-      />
+      >
+        <div className="h-px shrink-0" style={{ background: `color-mix(in srgb, ${accent} 80%, transparent)` }} />
+        <div className="h-[3px] shrink-0" style={{ background: "color-mix(in srgb, currentColor 34%, transparent)" }} />
+        <div
+          className="flex-1"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 3px), linear-gradient(180deg, color-mix(in srgb, currentColor 24%, transparent), color-mix(in srgb, currentColor 6%, transparent))",
+            boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.25)",
+          }}
+        />
+      </div>
       <div ref={inner} className="relative origin-[50%_85%] will-change-transform">
         {children}
       </div>

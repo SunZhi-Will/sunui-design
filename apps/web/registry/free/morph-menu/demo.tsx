@@ -14,7 +14,7 @@ function Icon({ d }: { d: string }) {
 
 function Sketch({ d }: { d: string }) {
   return (
-    <svg viewBox="0 0 48 48" className="size-12 shrink-0 rounded-md bg-[#ececec] text-[#171717]/45 dark:bg-[#272727] dark:text-[#ededed]/40" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <svg viewBox="0 0 48 48" className="size-12 shrink-0 rounded-md bg-muted text-foreground/40" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
       <path d={d} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );

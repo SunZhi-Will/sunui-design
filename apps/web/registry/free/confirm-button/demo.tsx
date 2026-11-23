@@ -27,8 +27,7 @@ export default function ConfirmButtonDemo() {
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{t.meta}</p>
       </div>
       <ConfirmButton
-        variant="ghost"
-        size="xs"
+        size="sm"
         locale={locale}
         confirmLabel={t.confirm}
         disabled={removed}

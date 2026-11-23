@@ -148,8 +148,14 @@ const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0
 const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
-/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for selected state, deals and current progress */
-const spot = "text-[color:var(--sunui-spot,var(--primary))]";
+/** Brand accent: follows the theme's --primary by default; set --sunui-spot to use your own brand colour. Used only for the action key and the remaining-time bar */
+const spotBg = "bg-[color:var(--sunui-spot,var(--primary))]";
+// Material (DESIGN.md section 7): the action is a small lacquered key in the brand colour, lit from straight above, with a darker
+// bottom edge for thickness; on press it travels 1px down. The rest of the notification stays a quiet surface
+const lacquerKey =
+  "bg-[color:var(--sunui-spot,var(--primary))] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--sunui-spot,var(--primary))_74%,white),var(--sunui-spot,var(--primary))_52%,color-mix(in_oklch,var(--sunui-spot,var(--primary))_82%,black))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_1px_2px_rgb(0_0_0/0.16)] " +
+  "active:translate-y-px active:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),inset_0_-1px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1)]";
 
 const springs = {
   gentle: { type: "spring", stiffness: 240, damping: 30 },
@@ -160,7 +166,7 @@ const toneIcons: Record<ToastTone, ReactNode> = {
   default: null,
   success: <path d="M5 12.5l4.5 4.5L19 7.5" className="text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]" />,
   error: (
-    <g className="text-foreground">
+    <g className="text-destructive">
       <path d="M10.3 4.6L3.4 17a2 2 0 0 0 1.7 3h13.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z" />
       <path d="M12 9.5v4" />
       <circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none" />
@@ -332,7 +338,7 @@ export function ToastStack({
                 {!reduceMotion && Number.isFinite(d) && d > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 h-px origin-left bg-current opacity-25"
+                    className={cn("absolute inset-x-0 bottom-0 h-0.5 origin-left opacity-80", spotBg)}
                     style={{ animation: `sunui-toast-timer ${d}ms linear forwards`, animationPlayState: paused ? "paused" : "running" }}
                   />
                 )}
@@ -400,7 +406,7 @@ function ToastBody({
             item.action?.onClick();
             onDismiss();
           }}
-          className={cn("mt-0.5 shrink-0 rounded-[3px] px-1.5 py-0.5 text-sm font-medium underline decoration-current/30 underline-offset-4 outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring motion-safe:active:scale-[0.97] transition-[color,background-color,border-color,opacity,scale]", spot)}
+          className={cn("mt-0.5 shrink-0 rounded-md px-2.5 py-1 text-[13px] leading-4 font-semibold outline-none hover:brightness-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-card motion-safe:active:scale-[0.97] transition-[filter,translate,box-shadow,scale]", lacquerKey)}
         >
           {item.action.label}
         </button>

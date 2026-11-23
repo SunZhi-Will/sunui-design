@@ -95,8 +95,14 @@ const springs = {
 // Elevation e3 (dialog) and e1 (key caps); with a shadow there is no border, dark mode uses a top-edge highlight
 const E3 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.08)]";
-const E1 =
-  "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
+// Material (DESIGN.md section 7): key caps are small steel keys, lit from straight above, with a darker 2px bottom edge for
+// thickness, so the palette reads as a keyboard instrument at rest. The active row's caps take the brand colour as lacquer
+const KEYCAP =
+  "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_1%,var(--card)),color-mix(in_oklch,var(--foreground)_9%,var(--card)))] dark:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_18%,var(--card)),color-mix(in_oklch,var(--foreground)_8%,var(--card)))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.85),inset_0_-2px_0_rgb(0_0_0/0.1),0_0_0_1px_rgb(0_0_0/0.13),0_1px_1px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-2px_0_rgb(0_0_0/0.45),0_0_0_1px_rgb(255_255_255/0.1)]";
+const KEYCAP_LIT =
+  "bg-[color:var(--sunui-spot,var(--primary))] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--sunui-spot,var(--primary))_74%,white),var(--sunui-spot,var(--primary))_52%,color-mix(in_oklch,var(--sunui-spot,var(--primary))_82%,black))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.1)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.3)]";
 
 // Approximate fuzzy match: find each character in order, with bonuses for consecutive and word-start hits
 export function fuzzyMatch(text: string, query: string): Match | null {
@@ -168,12 +174,12 @@ function Highlight({ text, indices }: { text: string; indices: number[] }) {
   );
 }
 
-export function Kbd({ children, className }: { children: ReactNode; className?: string }) {
+export function Kbd({ children, className, lit = false }: { children: ReactNode; className?: string; lit?: boolean }) {
   return (
     <kbd
       className={cn(
-        "inline-flex h-5 min-w-5 items-center justify-center rounded-[4px] bg-card px-1 font-sans text-[11px] font-medium text-muted-foreground tabular-nums",
-        E1,
+        "inline-flex h-5 min-w-5 items-center justify-center rounded-[4px] px-1 pb-px font-sans text-[11px] font-medium tabular-nums transition-colors duration-150",
+        lit ? KEYCAP_LIT : cn("text-muted-foreground", KEYCAP),
         className,
       )}
     >
@@ -511,7 +517,7 @@ export function CommandPalette({
                         aria-hidden="true"
                         className={cn(
                           "relative flex size-5 shrink-0 items-center justify-center transition-colors duration-150 [&>svg]:size-4",
-                          active ? "text-foreground duration-0" : "text-muted-foreground",
+                          active ? "text-[color:var(--sunui-spot,var(--primary))] duration-0" : "text-muted-foreground",
                         )}
                       >
                         {row.item.icon}
@@ -523,7 +529,9 @@ export function CommandPalette({
                     {row.item.shortcut && (
                       <span className="relative flex shrink-0 gap-1" aria-hidden="true">
                         {row.item.shortcut.map((k, i) => (
-                          <Kbd key={i}>{k}</Kbd>
+                          <Kbd key={i} lit={active}>
+                            {k}
+                          </Kbd>
                         ))}
                       </span>
                     )}

@@ -94,7 +94,7 @@ export default function AnimatedNumberDemo() {
         <div className="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-border pt-4">
           <div>
             <p className="text-xs text-muted-foreground">{t.total}</p>
-            <AnimatedNumber locale={locale} value={total} currency="USD" trendArrow announce className="text-3xl font-semibold tracking-tight" />
+            <AnimatedNumber locale={locale} value={total} currency="USD" trendArrow announce variant="odometer" className="text-3xl font-semibold tracking-tight" />
           </div>
           <div className="flex h-9 items-center rounded-md border border-border text-sm">
             <button

@@ -66,10 +66,19 @@ const MESSAGES: Record<SunLocale, Required<ConfirmButtonLabels>> = {
 const base =
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
+// Material (DESIGN.md section 7): outline is a steel keycap and default is a lacquered key in the brand colour.
+// Both are lit from straight above and have a darker bottom edge; on press the key travels 1px and the edge shrinks
 const variants: Record<ConfirmButtonVariant, string> = {
-  default: "bg-primary text-primary-foreground hover:bg-primary/80",
-  outline:
-    "border-border bg-background hover:bg-muted hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+  default:
+    "bg-[color:var(--sunui-spot,var(--primary))] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--sunui-spot,var(--primary))_74%,white),var(--sunui-spot,var(--primary))_52%,color-mix(in_oklch,var(--sunui-spot,var(--primary))_82%,black))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_1px_2px_rgb(0_0_0/0.14)] hover:brightness-105 active:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),inset_0_-1px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1)]",
+  outline: cn(
+    "text-foreground",
+    "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,var(--card)),color-mix(in_oklch,var(--foreground)_14%,var(--card)))]",
+    "dark:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_16%,var(--card)),color-mix(in_oklch,var(--foreground)_7%,var(--card)))]",
+    "shadow-[inset_0_1px_0_rgb(255_255_255/0.8),inset_0_-2px_0_rgb(0_0_0/0.12),0_0_0_1px_rgb(0_0_0/0.14),0_1px_2px_rgb(0_0_0/0.1)]",
+    "dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-2px_0_rgb(0_0_0/0.4),0_0_0_1px_rgb(255_255_255/0.1)]",
+    "hover:brightness-[1.02] active:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),inset_0_-1px_0_rgb(0_0_0/0.09),0_0_0_1px_rgb(0_0_0/0.13)] dark:active:shadow-[inset_0_1px_0_rgb(255_255_255/0.1),inset_0_-1px_0_rgb(0_0_0/0.4),0_0_0_1px_rgb(255_255_255/0.1)]",
+  ),
   secondary: "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]",
   ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
   destructive:
@@ -227,7 +236,7 @@ export function ConfirmButton({
         aria-live="polite"
         className={cn(
           "relative min-h-4 max-w-64 text-right text-xs leading-4",
-          notice?.tone === "error" ? "text-destructive" : notice?.tone === "success" ? "text-foreground" : "text-muted-foreground",
+          notice?.tone === "error" ? "text-destructive" : notice?.tone === "success" ? "text-[color:var(--sunui-success,#1f9d55)] dark:text-[color:var(--sunui-success,#4cd68a)]" : "text-muted-foreground",
         )}
       >
         <AnimatePresence mode="popLayout" initial={false}>

@@ -174,12 +174,31 @@ const TONE_DOT: Record<TestimonialTagTone, string | null> = {
 
 const DEFAULT_ACCENT = "#e8a020";
 
-/** Low-chroma warm grey background hashed from the name; avatars do not use the accent colour */
+/** Avatar background: a shade of the brand spot colour over the dark card, picked by a hash of the name, so avatars follow the buyer's brand */
 function avatarTone(name?: string | null) {
   const key = name?.trim() || "?";
   let h = 0;
   for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-  return `hsl(${h % 360} 14% 24%)`;
+  return `color-mix(in oklch, var(--sunui-spot, var(--primary)) ${[18, 26, 34][h % 3]}%, #1a1a1a)`;
+}
+
+/* Rating plate: the score sits on a small raised plate of brand-colour foil (light from above, a diagonal sheen, fine grain) */
+const FOIL: CSSProperties = {
+  backgroundColor: "var(--sunui-spot, var(--primary))",
+  backgroundImage:
+    "linear-gradient(180deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 45%, rgb(0 0 0 / 0.16)), linear-gradient(115deg, transparent 34%, rgb(255 255 255 / 0.3) 47%, transparent 60%), repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px)",
+  backgroundSize: "100% 100%, 260% 100%, auto",
+  backgroundPosition: "0 0, 70% 0, 0 0",
+  color: "var(--sunui-spot-foreground, var(--primary-foreground))",
+  boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -1px 0 rgb(0 0 0 / 0.18), 0 1px 2px rgb(0 0 0 / 0.3)",
+};
+
+function RatingPlate({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex h-5 items-center rounded-md px-1.5 text-[11px] leading-none font-semibold tracking-tight tabular-nums" style={FOIL}>
+      {children}
+    </span>
+  );
 }
 const ROW_DURATIONS_SEC = [26, 34, 30];
 const COMPACT_MAX = 767;
@@ -388,7 +407,8 @@ function TestimonialCard({
     transition: "transform 0.12s ease-out, border-color 0.2s ease, box-shadow 0.2s ease",
     transformStyle: "preserve-3d",
     willChange: expandable ? "transform" : undefined,
-    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+    // Top-edge highlight so the card reads as a raised object on the dark stage
+    boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06), 0 8px 20px rgba(0,0,0,0.2)",
     outlineColor: accentColor,
     ["--tw-ring-color" as string]: accentColor,
   };
@@ -397,10 +417,8 @@ function TestimonialCard({
     <>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
+          <RatingPlate>{formatRating(t.rating)}</RatingPlate>
           <StarRating value={t.rating} size={13} label={labels.stars(formatRating(t.rating))} />
-          <span className="text-[12px] font-semibold tabular-nums" style={{ color: "var(--tm-text-muted)" }}>
-            {formatRating(t.rating)}
-          </span>
         </div>
         {t.tag ? <TagBadge tag={t.tag} /> : null}
       </div>
@@ -609,10 +627,8 @@ function ExpandedDialog({
                 {name}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
+                <RatingPlate>{formatRating(t.rating)}</RatingPlate>
                 <StarRating value={t.rating} size={12} label={labels.stars(formatRating(t.rating))} />
-                <span className="text-[12px] font-semibold tabular-nums" style={{ color: "var(--tm-text-secondary)" }}>
-                  {formatRating(t.rating)}
-                </span>
                 {t.tag ? (
                   <>
                     <span className="text-[12px]" style={{ color: "var(--tm-text-dim)" }}>·</span>

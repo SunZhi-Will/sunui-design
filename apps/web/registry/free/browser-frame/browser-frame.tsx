@@ -24,14 +24,21 @@ export type WindowFrameScheme = BrowserFrameScheme;
  * Color tokens. auto reuses the blog's tokens.css (stone in light, zinc in dark),
  * dark / light reuse the fixed colors of the presentation device frames.
  */
+const BRAND = "[--wf-brand:color-mix(in_oklch,var(--sunui-spot,var(--primary))_70%,transparent)]";
+/* Brushed-metal chrome: --wf-metal-a (top) and --wf-metal-b (bottom) mix the scheme's foreground into its surface so the bar is
+   lit from straight above in every scheme; --wf-hi is the 1px top highlight */
+const metalLight =
+  "[--wf-metal-a:color-mix(in_oklch,var(--wf-fg)_2%,var(--wf-surface))] [--wf-metal-b:color-mix(in_oklch,var(--wf-fg)_13%,var(--wf-surface))] [--wf-hi:rgb(255_255_255/0.85)]";
+const metalDark =
+  "[--wf-metal-a:color-mix(in_oklch,var(--wf-fg)_15%,var(--wf-surface))] [--wf-metal-b:color-mix(in_oklch,var(--wf-fg)_5%,var(--wf-surface))] [--wf-hi:rgb(255_255_255/0.12)]";
 const lightVars =
-  "[--wf-surface:#ffffff] [--wf-raised:#f5f5f5] [--wf-sunken:#f3f1ed] [--wf-fg:#171717] [--wf-fg-body:#262626] [--wf-fg-muted:#525252] [--wf-line:rgba(28,25,23,0.1)] [--wf-line-strong:rgba(28,25,23,0.22)] [--wf-dot:rgba(28,25,23,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(217,119,6,0.7)] [--wf-shadow:0_1px_2px_rgba(28,25,23,0.05),0_4px_14px_-6px_rgba(28,25,23,0.08)]";
+  `[--wf-surface:#ffffff] [--wf-raised:#f5f5f5] [--wf-sunken:#f4f4f5] [--wf-fg:#171717] [--wf-fg-body:#262626] [--wf-fg-muted:#525252] [--wf-line:rgba(0,0,0,0.1)] [--wf-line-strong:rgba(0,0,0,0.2)] [--wf-dot:rgba(0,0,0,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] ${BRAND} [--wf-shadow:0_1px_2px_rgba(0,0,0,0.05),0_4px_14px_-6px_rgba(0,0,0,0.08)] ${metalLight}`;
 const darkAutoVars =
-  "dark:[--wf-surface:#111113] dark:[--wf-raised:#1a1a1d] dark:[--wf-sunken:#161619] dark:[--wf-fg:#fafafa] dark:[--wf-fg-body:#e4e4e7] dark:[--wf-fg-muted:#e4e4e7] dark:[--wf-line:rgba(255,255,255,0.1)] dark:[--wf-line-strong:rgba(255,255,255,0.22)] dark:[--wf-dot:rgba(250,250,250,0.08)] dark:[--wf-success:rgba(52,211,153,0.6)] dark:[--wf-danger:rgba(248,113,113,0.6)] dark:[--wf-brand:rgba(250,204,21,0.7)] dark:[--wf-shadow:none]";
+  "dark:[--wf-surface:#111113] dark:[--wf-raised:#1a1a1d] dark:[--wf-sunken:#161619] dark:[--wf-fg:#fafafa] dark:[--wf-fg-body:#e4e4e7] dark:[--wf-fg-muted:#e4e4e7] dark:[--wf-line:rgba(255,255,255,0.1)] dark:[--wf-line-strong:rgba(255,255,255,0.22)] dark:[--wf-dot:rgba(250,250,250,0.08)] dark:[--wf-success:rgba(52,211,153,0.6)] dark:[--wf-danger:rgba(248,113,113,0.6)] dark:[--wf-shadow:none] dark:[--wf-metal-a:color-mix(in_oklch,var(--wf-fg)_15%,var(--wf-surface))] dark:[--wf-metal-b:color-mix(in_oklch,var(--wf-fg)_5%,var(--wf-surface))] dark:[--wf-hi:rgb(255_255_255/0.12)]";
 const fixedDark =
-  "[--wf-surface:#151518] [--wf-raised:#1c1c20] [--wf-sunken:#1c1c20] [--wf-fg:#f4f4f4] [--wf-fg-body:#f4f4f4] [--wf-fg-muted:#bdb6a6] [--wf-line:#3a3a42] [--wf-line-strong:#3a3a42] [--wf-dot:rgba(246,241,230,0.08)] [--wf-success:rgba(52,211,153,0.6)] [--wf-danger:rgba(248,113,113,0.6)] [--wf-brand:rgba(232,184,74,0.7)] [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)]";
+  `[--wf-surface:#151518] [--wf-raised:#1c1c20] [--wf-sunken:#1c1c20] [--wf-fg:#f4f4f4] [--wf-fg-body:#f4f4f4] [--wf-fg-muted:#b4b4b8] [--wf-line:#3a3a42] [--wf-line-strong:#3a3a42] [--wf-dot:rgba(255,255,255,0.08)] [--wf-success:rgba(52,211,153,0.6)] [--wf-danger:rgba(248,113,113,0.6)] ${BRAND} [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)] ${metalDark}`;
 const fixedLight =
-  "[--wf-surface:#ffffff] [--wf-raised:#e8e0cf] [--wf-sunken:#f4efe4] [--wf-fg:#17140d] [--wf-fg-body:#17140d] [--wf-fg-muted:#58513f] [--wf-line:#cfc6ae] [--wf-line-strong:#cfc6ae] [--wf-dot:rgba(23,20,13,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] [--wf-brand:rgba(138,90,0,0.7)] [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)]";
+  `[--wf-surface:#ffffff] [--wf-raised:#ebebeb] [--wf-sunken:#f4f4f5] [--wf-fg:#141414] [--wf-fg-body:#141414] [--wf-fg-muted:#555555] [--wf-line:#d4d4d4] [--wf-line-strong:#d4d4d4] [--wf-dot:rgba(0,0,0,0.08)] [--wf-success:rgba(5,150,105,0.6)] [--wf-danger:rgba(220,38,38,0.6)] ${BRAND} [--wf-shadow:0_12px_30px_rgba(0,0,0,0.22)] ${metalLight}`;
 
 const schemeVars: Record<BrowserFrameScheme, string> = {
   auto: `${lightVars} ${darkAutoVars}`,
@@ -46,13 +53,25 @@ const toneRing: Record<BrowserFrameTone, string> = {
   brand: "border-[var(--wf-brand)]",
 };
 
+/** Traffic lights read as small domed lenses set into the metal: lit on top, a dark seat below */
+const lens =
+  "h-2.5 w-2.5 rounded-full bg-[image:linear-gradient(180deg,rgb(255_255_255/0.35),transparent_55%,rgb(0_0_0/0.12))] shadow-[inset_0_0_0_0.5px_rgb(0_0_0/0.18),0_1px_0_var(--wf-hi)]";
+
+/** Brushed-metal title bar shared by both frames: top-lit gradient, fine vertical grain, 1px top highlight */
+const metalBar: CSSProperties = {
+  backgroundColor: "var(--wf-raised)",
+  backgroundImage:
+    "repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, rgb(0 0 0 / 0.015) 1px 2px, transparent 2px 4px), linear-gradient(180deg, var(--wf-metal-a), var(--wf-metal-b))",
+  boxShadow: "inset 0 1px 0 var(--wf-hi), inset 0 -1px 0 rgb(0 0 0 / 0.06)",
+};
+
 /** macOS red, yellow and green traffic lights */
 export function TrafficLights({ className }: { className?: string }) {
   return (
     <span aria-hidden="true" className={cn("flex shrink-0 gap-1.5", className)}>
-      <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-      <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-      <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+      <span className={cn(lens, "bg-[#ff5f57]")} />
+      <span className={cn(lens, "bg-[#febc2e]")} />
+      <span className={cn(lens, "bg-[#28c840]")} />
     </span>
   );
 }
@@ -197,7 +216,8 @@ function BrowserChrome({
     >
       <div
         aria-hidden="true"
-        className="flex items-center gap-2.5 border-b border-[var(--wf-line-strong)] bg-[var(--wf-raised)] px-3 py-2 text-xs text-[var(--wf-fg-muted)]"
+        className="flex items-center gap-2.5 border-b border-[var(--wf-line-strong)] px-3 py-2 text-xs text-[var(--wf-fg-muted)]"
+        style={metalBar}
       >
         <TrafficLights />
         <span className="min-w-0 flex-1 truncate text-center">
@@ -207,7 +227,7 @@ function BrowserChrome({
         </span>
         {badge && <SimBadge>{badge}</SimBadge>}
       </div>
-      <div className="mx-3 my-2 flex items-center gap-2 rounded-full border border-[var(--wf-line-strong)] bg-[var(--wf-sunken)] px-3 py-1.5 text-[12.5px] text-[var(--wf-fg-muted)]">
+      <div className="mx-3 my-2 flex items-center gap-2 rounded-full border border-[var(--wf-line-strong)] bg-[var(--wf-sunken)] px-3 py-1.5 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] text-[12.5px] text-[var(--wf-fg-muted)]">
         <LockIcon size={12} />
         <span className="min-w-0 truncate text-[var(--wf-fg)]">
           <SwapText swapKey={swapKey} reduce={reduce}>
@@ -259,7 +279,7 @@ export function WindowFrame({
 }: WindowFrameProps) {
   return (
     <div className={frameShell(scheme, tone, cn("text-[var(--wf-fg-body)] shadow-[var(--wf-shadow)]", className))}>
-      <div className="flex h-9 items-center gap-2 border-b border-[var(--wf-line)] bg-[var(--wf-raised)] px-3">
+      <div className="flex h-9 items-center gap-2 border-b border-[var(--wf-line)] px-3" style={metalBar}>
         <TrafficLights />
         <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate font-mono text-[11px] font-semibold text-[var(--wf-fg-body)]">
           {icon && (
@@ -362,6 +382,11 @@ export interface BrowserStackProps {
 }
 
 const GENTLE = { stiffness: 240, damping: 30 };
+/** Current slide marker: a short bar of brand-colour lacquer, light from above */
+const lacquer: CSSProperties = {
+  backgroundImage:
+    "linear-gradient(180deg, color-mix(in oklch, var(--sunui-spot, var(--primary)) 62%, white), var(--sunui-spot, var(--primary)) 55%, color-mix(in oklch, var(--sunui-spot, var(--primary)) 78%, black))",
+};
 /** Control button: e1 shadow, hover fast in and slow out, 0.97 on press, focus-visible ring */
 const controlBtn =
   "grid size-8 place-items-center rounded-full bg-[var(--wf-surface)] text-[var(--wf-fg-muted)] shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] transition-[color,scale] duration-150 hover:text-[var(--wf-fg)] hover:duration-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wf-fg)] motion-safe:active:scale-[0.97] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
@@ -548,8 +573,9 @@ export function BrowserStack({
                 <span
                   className={cn(
                     "block h-1.5 rounded-full transition-[width,background-color] duration-150 motion-reduce:transition-none",
-                    i === index ? "w-5 bg-[var(--wf-fg)]" : "w-1.5 bg-[var(--wf-line-strong)] group-hover/dot:bg-[var(--wf-fg-muted)]",
+                    i === index ? "w-5 shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-1px_0_rgb(0_0_0/0.18)]" : "w-1.5 bg-[var(--wf-line-strong)] group-hover/dot:bg-[var(--wf-fg-muted)]",
                   )}
+                  style={i === index ? lacquer : undefined}
                 />
               </button>
             ))}

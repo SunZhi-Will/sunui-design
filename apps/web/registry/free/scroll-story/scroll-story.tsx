@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 /* ---------- Animation styles (the ww-* rules from the original welcome.css) ---------- */
 
 const CSS = `
-.ss-root{--ss-success:var(--success,#15803D);--ss-success-fg:var(--success-foreground,#FAFAFA);--ss-warning:var(--warning,#B45309)}
+.ss-root{--ss-spot:var(--sunui-spot,var(--primary));--ss-spot-fg:var(--sunui-spot-foreground,var(--primary-foreground));--ss-success:var(--success,#15803D);--ss-success-fg:var(--success-foreground,#FAFAFA);--ss-warning:var(--warning,#B45309)}
 @media (prefers-color-scheme: dark){.ss-root{--ss-success:var(--success,#4ADE80);--ss-success-fg:var(--success-foreground,#09090B);--ss-warning:var(--warning,#FBBF24)}}
 .ss-reveal{opacity:0;transform:translateY(18px);transition:opacity 800ms cubic-bezier(.23,1,.32,1),transform 800ms cubic-bezier(.23,1,.32,1);transition-delay:var(--ss-delay,0ms)}
 .ss-reveal[data-shown="true"]{opacity:1;transform:none;filter:none}
@@ -22,6 +22,9 @@ const CSS = `
 .ss-strike{transform:scaleX(0);animation:ss-strike 420ms cubic-bezier(.23,1,.32,1) forwards}
 .ss-press{transition:transform 160ms cubic-bezier(.23,1,.32,1),opacity 160ms,background-color 200ms,box-shadow 200ms}
 .ss-press:active{transform:scale(.97)}
+.ss-lacquer{background-image:linear-gradient(180deg,color-mix(in oklch,var(--ss-spot) 62%,white),var(--ss-spot) 55%,color-mix(in oklch,var(--ss-spot) 78%,black));box-shadow:inset 0 1px 0 rgb(255 255 255/.4),inset 0 -1px 0 rgb(0 0 0/.18),0 1px 2px rgb(0 0 0/.12)}
+.ss-key{background-image:linear-gradient(180deg,var(--card),color-mix(in oklch,var(--foreground) 6%,var(--card)));box-shadow:inset 0 1px 0 rgb(255 255 255/.7),0 0 0 1px rgb(0 0 0/.08),0 1px 2px rgb(0 0 0/.08)}
+.dark .ss-key{background-image:linear-gradient(180deg,color-mix(in oklch,var(--foreground) 12%,var(--card)),color-mix(in oklch,var(--foreground) 5%,var(--card)));box-shadow:inset 0 1px 0 rgb(255 255 255/.1),0 0 0 1px rgb(255 255 255/.08)}
 @media (prefers-reduced-motion: reduce){
 .ss-reveal,.ss-scene[data-active="true"]{opacity:1;transform:none;filter:none}
 .ss-reveal,.ss-scene{transition:none}
@@ -131,6 +134,19 @@ export function StoryPanel({ children, className }: { children: ReactNode; class
   );
 }
 
+/**
+ * Step marker: a small raised key with the step number. The current step's key is brand-colour lacquer;
+ * the lacquer layer cross-fades so the key itself never swaps out.
+ */
+function StepMarker({ n, current }: { n: number; current: boolean }) {
+  return (
+    <span aria-hidden className="ss-key relative grid size-6 shrink-0 place-items-center overflow-hidden rounded-md text-xs font-semibold tabular-nums">
+      <span className={cn("ss-lacquer absolute inset-0 rounded-md transition-opacity duration-300", current ? "opacity-100" : "opacity-0")} />
+      <span className={cn("relative transition-colors duration-300", current ? "text-(--ss-spot-fg)" : "text-muted-foreground")}>{n}</span>
+    </span>
+  );
+}
+
 /* ---------- Story body ---------- */
 
 export interface ScrollStoryStep {
@@ -178,11 +194,13 @@ function StepBlock({
   id,
   index,
   step,
+  current,
   onActive,
 }: {
   id: string;
   index: number;
   step: ScrollStoryStep;
+  current: boolean;
   onActive: (index: number) => void;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -207,7 +225,10 @@ function StepBlock({
   return (
     <div id={id} ref={ref} className="flex scroll-mt-28 flex-col justify-center py-10 lg:min-h-[78vh] lg:py-0">
       <Reveal>
-        <p className="text-sm font-medium text-muted-foreground">{step.tab}</p>
+        <p className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground">
+          <StepMarker n={index + 1} current={current} />
+          {step.tab}
+        </p>
         <h3 className="mt-3 text-2xl font-semibold tracking-tight text-balance sm:text-[2rem] sm:leading-tight">{step.title}</h3>
         {step.body ? <p className="mt-4 max-w-md text-pretty text-muted-foreground">{step.body}</p> : null}
       </Reveal>
@@ -241,13 +262,13 @@ export function ScrollStory({ steps, locale = "en", labels, className }: ScrollS
       <style>{CSS}</style>
       <div className="min-w-0">
         {steps.map((step, i) => (
-          <StepBlock key={step.key} id={anchor(step.key)} index={i} step={step} onActive={setActive} />
+          <StepBlock key={step.key} id={anchor(step.key)} index={i} step={step} current={active === i} onActive={setActive} />
         ))}
       </div>
 
       <div className="hidden lg:block">
         <div ref={panelRef} className="sticky top-[11vh] flex h-[78vh] flex-col">
-          <div aria-hidden className="relative flex-1 overflow-hidden rounded-xl border border-border bg-muted/50">
+          <div aria-hidden className="relative flex-1 overflow-hidden rounded-xl border border-border bg-muted/50 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]">
             {steps.map((step, i) => {
               const Visual = step.Visual;
               return (
@@ -265,7 +286,7 @@ export function ScrollStory({ steps, locale = "en", labels, className }: ScrollS
                 aria-current={active === i ? "step" : undefined}
                 className={cn(
                   "ss-press rounded-full px-3 py-1 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                  active === i ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                  active === i ? "ss-lacquer text-(--ss-spot-fg)" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {step.tab}

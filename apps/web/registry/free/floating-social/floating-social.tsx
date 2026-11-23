@@ -131,6 +131,15 @@ export function FloatingSocial({
         )}
       </AnimatePresence>
 
+      {/* Metal bezel the main key sits in: lit from above in both modes (the mix flips in dark), with a 1px top highlight; it stays put while the key is pressed */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-[3px] rounded-full [--fs-a:8%] [--fs-b:24%] [--fs-c:42%] dark:[--fs-a:34%] dark:[--fs-b:20%] dark:[--fs-c:8%] shadow-[inset_0_1px_0_rgb(255_255_255/0.6),0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.1),0_12px_20px_-8px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_0_0_1px_rgb(255_255_255/0.08)]"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, color-mix(in oklch, var(--foreground) var(--fs-a), var(--card)), color-mix(in oklch, var(--foreground) var(--fs-b), var(--card)) 50%, color-mix(in oklch, var(--foreground) var(--fs-c), var(--card)))",
+        }}
+      />
       <motion.button
         ref={mainRef}
         type="button"
@@ -143,8 +152,9 @@ export function FloatingSocial({
         className={cn(
           "relative grid size-12 place-items-center rounded-full outline-none",
           "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]",
-          "shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.12),0_12px_20px_-8px_rgb(0_0_0/0.14)]",
-          "dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_0_0_1px_rgb(255_255_255/0.12)]",
+          // Brand-colour lacquer key: lighter top, darker base, top highlight and a dark lower lip for thickness
+          "bg-[image:linear-gradient(180deg,color-mix(in_oklch,var(--sunui-spot,var(--primary))_62%,white),var(--sunui-spot,var(--primary))_55%,color-mix(in_oklch,var(--sunui-spot,var(--primary))_78%,black))]",
+          "shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-2px_0_rgb(0_0_0/0.2),0_1px_2px_rgb(0_0_0/0.2)]",
           "transition-[filter] duration-150 hover:brightness-110 hover:duration-0",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}

@@ -375,7 +375,7 @@
     "av1": true
   },
   "checkout-button": {
-    "av1": true
+    "av1": false
   },
   "coupon-claim-card": {
     "av1": false
@@ -444,7 +444,7 @@
     "av1": true
   },
   "stamp-card": {
-    "av1": true
+    "av1": false
   },
   "testimonial-wall": {
     "av1": true

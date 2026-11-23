@@ -8,6 +8,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -188,6 +189,21 @@ function useReduced() {
   );
 }
 
+/* ---------- Material: brushed-metal chrome and brand-colour lacquer, light from straight above ---------- */
+
+const spot = "var(--sunui-spot, var(--primary))";
+const lacquerImage = `linear-gradient(180deg, color-mix(in oklch, ${spot} 62%, white), ${spot} 55%, color-mix(in oklch, ${spot} 78%, black))`;
+/** Chrome bar: --stp-a (top) and --stp-b (bottom) mix the foreground into the card, flipped in dark mode so the top stays lit */
+const metalVars =
+  "[--stp-a:color-mix(in_oklch,var(--foreground)_2%,var(--card))] [--stp-b:color-mix(in_oklch,var(--foreground)_12%,var(--card))] [--stp-hi:rgb(255_255_255/0.85)] dark:[--stp-a:color-mix(in_oklch,var(--foreground)_14%,var(--card))] dark:[--stp-b:color-mix(in_oklch,var(--foreground)_5%,var(--card))] dark:[--stp-hi:rgb(255_255_255/0.1)]";
+const metalBar = {
+  backgroundImage:
+    "repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, rgb(0 0 0 / 0.015) 1px 2px, transparent 2px 4px), linear-gradient(180deg, var(--stp-a), var(--stp-b))",
+  boxShadow: "inset 0 1px 0 var(--stp-hi), inset 0 -1px 0 rgb(0 0 0 / 0.06)",
+} as const;
+const lens =
+  "size-2.5 rounded-full bg-[image:linear-gradient(180deg,rgb(255_255_255/0.35),transparent_55%,rgb(0_0_0/0.12))] shadow-[inset_0_0_0_0.5px_rgb(0_0_0/0.18)]";
+
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 /* ---------- Cursor: position computed from t, target measured from the DOM then divided by the scale ---------- */
@@ -210,6 +226,7 @@ function aimCenter(root: HTMLElement, name: string): [number, number] | null {
 function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number; stage: RefObject<HTMLDivElement | null>; size: readonly [number, number]; layout: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLSpanElement>(null);
+  const gid = useId().replace(/:/g, "");
   // Measure once per step and per layout change (scaling, font loading); targets that have not appeared yet are not cached, and are measured again on the next frame.
   const cache = useRef({ layout: "", points: new Map<string, [number, number]>() });
 
@@ -267,10 +284,18 @@ function Cursor({ keys, t, stage, size, layout }: { keys: CursorKey[]; t: number
   if (keys.length === 0) return null;
   return (
     <div ref={ref} aria-hidden className="absolute top-0 left-0 z-30" style={{ opacity: 0 }}>
-      <svg viewBox="0 0 24 24" strokeWidth={1.5} strokeLinejoin="round" className="relative size-8 fill-foreground stroke-background drop-shadow-md">
-        <path d="M4.04 4.69a.5.5 0 0 1 .65-.65l16 6.5a.5.5 0 0 1-.06.95l-6.13 1.58a2 2 0 0 0-1.43 1.43l-1.58 6.13a.5.5 0 0 1-.95.06z" />
+      {/* Cursor in brand-colour lacquer with a light outline */}
+      <svg viewBox="0 0 24 24" strokeWidth={1.5} strokeLinejoin="round" className="relative size-8 stroke-card drop-shadow-md">
+        <defs>
+          <linearGradient id={`${gid}-lacquer`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" style={{ stopColor: `color-mix(in oklch, ${spot} 62%, white)` }} />
+            <stop offset="0.55" style={{ stopColor: spot }} />
+            <stop offset="1" style={{ stopColor: `color-mix(in oklch, ${spot} 78%, black)` }} />
+          </linearGradient>
+        </defs>
+        <path fill={`url(#${gid}-lacquer)`} d="M4.04 4.69a.5.5 0 0 1 .65-.65l16 6.5a.5.5 0 0 1-.06.95l-6.13 1.58a2 2 0 0 0-1.43 1.43l-1.58 6.13a.5.5 0 0 1-.95.06z" />
       </svg>
-      <span ref={ring} className="absolute top-1 left-1 size-14 rounded-full bg-foreground" style={{ opacity: 0 }} />
+      <span ref={ring} className="absolute top-1 left-1 size-14 rounded-full bg-[color:var(--sunui-spot,var(--primary))]" style={{ opacity: 0 }} />
     </div>
   );
 }
@@ -378,12 +403,12 @@ export function StepDemo({
     <figure ref={rootRef} className={cn("m-0 w-full min-w-0", className)}>
       <div className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm">
         {chrome !== "none" ? (
-          <div aria-hidden className="flex items-center gap-2 border-b border-border bg-muted/50 px-3 py-2 sm:px-4">
-            <span className="size-2.5 rounded-full bg-[#FF5F57]" />
-            <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
-            <span className="size-2.5 rounded-full bg-[#28C840]" />
+          <div aria-hidden className={cn("flex items-center gap-2 border-b border-border bg-muted px-3 py-2 sm:px-4", metalVars)} style={metalBar}>
+            <span className={cn(lens, "bg-[#FF5F57]")} />
+            <span className={cn(lens, "bg-[#FEBC2E]")} />
+            <span className={cn(lens, "bg-[#28C840]")} />
             {chrome === "browser" && url ? (
-              <span className="mx-auto max-w-[60%] truncate rounded-md bg-background px-3 py-0.5 font-mono text-[11px] text-muted-foreground">{url}</span>
+              <span className="mx-auto max-w-[60%] truncate rounded-md bg-background px-3 py-0.5 font-mono text-[11px] text-muted-foreground shadow-[inset_0_1px_2px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]">{url}</span>
             ) : chrome === "window" && title ? (
               <span className="mx-auto truncate text-xs font-medium text-muted-foreground">{title}</span>
             ) : null}
@@ -412,7 +437,7 @@ export function StepDemo({
               type="button"
               onClick={() => (ended ? (setTime(0), setPlaying(true)) : setPlaying((p) => !p))}
               aria-label={ended ? msg.replay : playing ? msg.pause : msg.play}
-              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors duration-150 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition-[color,background-color,scale] duration-150 hover:bg-muted hover:duration-0 motion-safe:active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className="size-3.5">
                 {playing && !ended ? <path d="M7 4h3v16H7zM14 4h3v16h-3z" /> : <path d="M7 4.5v15l12-7.5z" />}
@@ -431,8 +456,14 @@ export function StepDemo({
                       aria-current={i === index ? "step" : undefined}
                       className="group block w-full rounded-sm text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                     >
-                      <span className="block h-1 overflow-hidden rounded-full bg-muted">
-                        <span className="block h-full origin-left bg-foreground" style={{ transform: `scaleX(${fill})` }} />
+                      {/* Recessed track; the filled part is a raised strip of brand-colour lacquer, and the current step's strip stands taller */}
+                      <span className="flex h-2 items-center">
+                        <span className={cn("block w-full overflow-hidden rounded-full bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.08)] transition-[height] duration-150", i === index ? "h-2" : "h-1")}>
+                          <span
+                            className="block h-full origin-left rounded-full shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-1px_0_rgb(0_0_0/0.18)]"
+                            style={{ transform: `scaleX(${fill})`, backgroundImage: lacquerImage }}
+                          />
+                        </span>
                       </span>
                       <span className={cn("mt-1.5 block truncate text-xs font-medium", i === index ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
                         {s.name}
@@ -453,7 +484,7 @@ export function StepDemo({
                   onChange={(e) => setTime(Number(e.target.value))}
                   aria-label={msg.timeline}
                   aria-valuetext={`${fmt(time)} / ${fmt(total)}`}
-                  className="h-4 min-w-0 flex-1 accent-foreground"
+                  className="h-4 min-w-0 flex-1 accent-[color:var(--sunui-spot,var(--primary))]"
                 />
                 <span className="shrink-0 font-mono text-[11px] text-muted-foreground tabular-nums">
                   {fmt(time)} / {fmt(total)}

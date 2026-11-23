@@ -52,6 +52,18 @@ type Corner = { x: "left" | "right"; y: "top" | "bottom" };
 type Inset = [number, number, number, number, number];
 
 const RADIUS = 10;
+
+// Material (DESIGN.md section 7): the radial trigger is a domed lacquer key in the brand colour, lit from straight above;
+// the list trigger is a small steel knob. The rim light stays fixed while the plus icon rotates
+const spot = "var(--sunui-spot, var(--primary))";
+const lacquerDome = {
+  backgroundColor: spot,
+  backgroundImage: `radial-gradient(120% 110% at 50% 0%, color-mix(in oklch, ${spot} 66%, white), ${spot} 55%, color-mix(in oklch, ${spot} 78%, black))`,
+};
+const steelKnob =
+  "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,var(--card)),color-mix(in_oklch,var(--foreground)_12%,var(--card)))] dark:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_18%,var(--card)),color-mix(in_oklch,var(--foreground)_7%,var(--card)))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.8),inset_0_-1.5px_0_rgb(0_0_0/0.1),0_0_0_1px_rgb(0_0_0/0.12),0_1px_2px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-1.5px_0_rgb(0_0_0/0.4),0_0_0_1px_rgb(255_255_255/0.1)] " +
+  "active:translate-y-px active:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),inset_0_-1px_0_rgb(0_0_0/0.1),0_0_0_1px_rgb(0_0_0/0.12)] dark:active:shadow-[inset_0_1px_0_rgb(255_255_255/0.1),inset_0_-1px_0_rgb(0_0_0/0.4),0_0_0_1px_rgb(255_255_255/0.1)]";
 const LABELS = { en: "More actions", "zh-TW": "更多動作", "zh-CN": "更多操作", ja: "その他の操作" } as const;
 
 function defaultLabel(tag?: string) {
@@ -329,8 +341,9 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
               setOpenState(true);
             }
           }}
-          whileTap={reduce ? undefined : { scale: 0.97, transition: springs.snappy }}
-          className="relative inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground outline-none shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5"
+          whileTap={reduce ? undefined : { scale: 0.97, y: 1, transition: springs.snappy }}
+          style={lacquerDome}
+          className="relative inline-flex size-12 items-center justify-center rounded-full text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] outline-none shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-2px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_2px_3px_-1px_rgb(0_0_0/0.18),0_10px_18px_-8px_rgb(0_0_0/0.3)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:size-5"
         >
           {/* The default plus turns into a cross, the same icon saying "press again to close" */}
           <motion.span className="flex" animate={{ rotate: open && !icon ? 45 : 0 }} transition={reduce ? { duration: 0 } : springs.snappy}>
@@ -357,7 +370,11 @@ export function MorphMenu({ items, label, icon, onSelect, onOpenChange, onClosed
             setOpenState(true);
           }
         }}
-        className="inline-flex size-9 items-center justify-center rounded-full border border-border bg-card text-card-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+        className={cn(
+          "inline-flex size-9 items-center justify-center rounded-full text-card-foreground outline-none transition-[filter,translate,box-shadow] duration-150 hover:brightness-[1.03] hover:duration-0 focus-visible:ring-2 focus-visible:ring-ring",
+          steelKnob,
+          open && "text-[color:var(--sunui-spot,var(--primary))]",
+        )}
       >
         {icon ?? <Dots />}
       </button>

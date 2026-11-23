@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { ProductArt, useProductNames } from "@/registry/_demo/product-art";
 
@@ -18,6 +20,18 @@ export default function ToastStackCard() {
   const t = useDemoText(copy);
   const name = useProductNames().mug;
   const { toasts, push, dismiss } = useToasts();
+  // One undoable notification is already showing at rest, so the thumbnail shows the block itself
+  useEffect(() => {
+    push({
+      id: "seed",
+      title: t.added,
+      description: `${name}, ${t.glaze}`,
+      media: <ProductArt kind="mug" />,
+      duration: Infinity,
+      action: { label: t.undo, onClick: () => push({ title: t.removed, tone: "info" }) },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="relative mx-auto h-[220px] w-72 overflow-hidden rounded-md border border-border bg-background text-foreground">
       <div className="flex items-center gap-3 border-b border-border px-3 py-2.5">

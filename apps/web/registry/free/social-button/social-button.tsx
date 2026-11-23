@@ -123,7 +123,7 @@ export function SocialButton({
 
   const body = (
     <>
-      <span aria-hidden="true" className={cn("flex", s.glyph)}>
+      <span aria-hidden="true" className={cn("relative flex drop-shadow-[0_-1px_0_rgb(0_0_0/0.22)]", s.glyph)}>
         {icon ?? (
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-full">
             {meta.glyph}
@@ -157,14 +157,22 @@ export function SocialButton({
   );
 
   const shared = {
-    style: { ...style, "--sb-fill": fill } as CSSProperties,
+    // Lacquer over the platform colour: a lighter top and darker base of the same hue, so the disc reads as a thick glossy key
+    style: {
+      ...style,
+      "--sb-fill": fill,
+      backgroundImage:
+        "linear-gradient(180deg, color-mix(in oklch, var(--sb-fill) 74%, white), var(--sb-fill) 52%, color-mix(in oklch, var(--sb-fill) 80%, black))",
+    } as CSSProperties,
     whileHover: reduce ? undefined : { y: -2 },
     whileTap: reduce ? undefined : { scale: 0.97, y: 0 },
     transition: snappy,
     className: cn(
       "group/sb relative grid shrink-0 place-items-center rounded-full bg-[color:var(--sb-fill)] text-white outline-none",
-      // top highlight on the raised disc; near-black fills get a hairline so they read on dark backgrounds
-      "shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_0_0_1px_rgb(255_255_255/0.12)]",
+      // Thickness: top highlight, a dark lower lip inside the rim, and a crisp neutral contact shadow below.
+      // Near-black fills get a hairline in dark mode so they read on dark backgrounds
+      "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_1px_0_rgb(0_0_0/0.1),0_3px_6px_-2px_rgb(0_0_0/0.18)]",
+      "dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),inset_0_-2px_0_rgb(0_0_0/0.3),0_0_0_1px_rgb(255_255_255/0.12)]",
       "transition-[filter] duration-150 hover:brightness-110 hover:duration-0",
       "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       s.box,

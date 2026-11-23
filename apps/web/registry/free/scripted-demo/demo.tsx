@@ -88,7 +88,7 @@ function ScheduleScene() {
         </div>
         <div className="flex items-center gap-2">
           <DemoStatus text={t.status[key]} tone={TONES[key]} />
-          <button ref={target("button")} type="button" tabIndex={-1} aria-hidden className={cn("inline-flex h-8 items-center gap-1.5 rounded-lg bg-foreground px-3 text-xs font-medium text-background transition-all duration-300", sceneKey === "solving" && "scale-95")}>
+          <button ref={target("button")} type="button" tabIndex={-1} aria-hidden className={cn("inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-(--sd-spot-fg) sd-lacquer transition-all duration-300", sceneKey === "solving" && "scale-95")}>
             {sceneKey === "solving" ? <SpinnerIcon className="size-3.5" /> : null}
             {t.button}
           </button>

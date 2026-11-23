@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/product-art";
@@ -117,6 +117,25 @@ export default function ToastStackDemo() {
       },
     });
   };
+
+  // At rest the stack already holds one undoable notification for the tote in the cart, so the block is visible before any press
+  useEffect(() => {
+    push({
+      id: "seed",
+      title: t.added,
+      description: `${names.tote}, ${t.variants.tote}`,
+      media: <ProductArt kind="tote" />,
+      duration: Infinity,
+      action: {
+        label: t.undo,
+        onClick: () => {
+          setCart((list) => list.filter((l) => l.id !== "l1"));
+          push({ title: t.removed, description: names.tote, tone: "info" });
+        },
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const remove = (line: Line) =>
     undoable((list) => list.filter((l) => l.id !== line.id), t.removedName(names[line.kind]), {

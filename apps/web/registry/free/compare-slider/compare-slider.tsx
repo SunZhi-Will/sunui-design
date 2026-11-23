@@ -107,6 +107,14 @@ function Layer({ content, alt, fit }: { content: ReactNode | string; alt: string
   return <div className="size-full">{content}</div>;
 }
 
+// Material (DESIGN.md section 7): the divider handle is a turned steel knob with a knurled rim, lit from straight above.
+// It sits on photos, so it is a fixed light steel in both themes, like the white divider line it hangs on. Neutral greys only
+// Domed face: bright where the top light lands, falling off toward the lower edge
+const knob = { backgroundImage: "radial-gradient(circle at 50% 28%, rgb(255 255 255) 0%, rgb(236 236 238) 38%, rgb(196 196 200) 72%, rgb(170 170 175) 100%)" };
+const knurl = {
+  backgroundImage: "repeating-conic-gradient(rgb(0 0 0 / 0.16) 0deg 5deg, rgb(255 255 255 / 0.25) 5deg 10deg), linear-gradient(180deg, rgb(250 250 251), rgb(150 150 155))",
+};
+
 function ChevronsLeftRight() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden="true">
@@ -207,8 +215,16 @@ export function CompareSlider({
         className="pointer-events-none absolute inset-y-0 z-[1] w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(0_0_0/0.25)]"
         style={{ left: `${pos}%` }}
       >
-        <span className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-md">
-          <ChevronsLeftRight />
+        <span
+          className="absolute top-1/2 left-1/2 flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full shadow-[0_0_0_1px_rgb(0_0_0/0.2),0_2px_3px_rgb(0_0_0/0.22),0_8px_16px_-6px_rgb(0_0_0/0.4)]"
+          style={knurl}
+        >
+          <span
+            className="flex size-[38px] items-center justify-center rounded-full text-[rgb(40_40_44)] shadow-[inset_0_1px_0_rgb(255_255_255),inset_0_-1px_0_rgb(0_0_0/0.18),0_0_0_1px_rgb(0_0_0/0.18),0_1px_1px_rgb(0_0_0/0.2)]"
+            style={knob}
+          >
+            <ChevronsLeftRight />
+          </span>
         </span>
       </div>
       <span className="pointer-events-none absolute top-3 left-3 z-[1] rounded-md bg-black/55 px-2 py-0.5 text-xs font-medium text-white backdrop-blur">

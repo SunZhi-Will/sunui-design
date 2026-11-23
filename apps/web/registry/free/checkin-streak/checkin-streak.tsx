@@ -180,10 +180,25 @@ const MESSAGES: Record<SunLocale, Required<CheckinStreakLabels>> = {
 
 // Zinc palette from the original project (Yumecanvas), one set each for light and dark
 const tokens =
-  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:var(--primary,#18181B)] [--yc-brand-fg:var(--primary-foreground,#FAFAFA)] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
-  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--primary,#FAFAFA)] dark:[--yc-brand-fg:var(--primary-foreground,#09090B)] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
+  "[--yc-card:#FFFFFF] [--yc-fg:#18181B] [--yc-muted:#F4F4F5] [--yc-muted-fg:#6B6B73] [--yc-border:#E4E4E7] [--yc-primary:#18181B] [--yc-primary-fg:#FAFAFA] [--yc-secondary:#F4F4F5] [--yc-ring:#71717A] [--yc-brand-default:var(--sunui-spot,var(--primary,#18181B))] [--yc-brand-fg:var(--sunui-spot-foreground,var(--primary-foreground,#FAFAFA))] [--yc-success:#15803D] [--yc-destructive:#DC2626] [--yc-popover:#FFFFFF] " +
+  "dark:[--yc-card:#111113] dark:[--yc-fg:#FAFAFA] dark:[--yc-muted:#27272A] dark:[--yc-muted-fg:#A1A1AA] dark:[--yc-border:rgba(255,255,255,0.08)] dark:[--yc-primary:#FAFAFA] dark:[--yc-primary-fg:#18181B] dark:[--yc-secondary:#27272A] dark:[--yc-ring:#A1A1AA] dark:[--yc-brand-default:var(--sunui-spot,var(--primary,#FAFAFA))] dark:[--yc-brand-fg:var(--sunui-spot-foreground,var(--primary-foreground,#09090B))] dark:[--yc-success:#4ADE80] dark:[--yc-destructive:#F87171] dark:[--yc-popover:#18181B]";
 
 const ease = [0.23, 1, 0.32, 1] as const;
+
+// Material (DESIGN.md section 7, foil): today's tile is a brand-colour foil coin, light from straight above, a diagonal sheen,
+// fine brushed lines and a raised rim. Past days are a light brand tint so the coin is the one object that reads at rest
+const coin: CSSProperties = {
+  backgroundColor: "var(--yc-brand-c)",
+  backgroundImage: [
+    "linear-gradient(180deg, rgb(255 255 255 / 0.32), rgb(255 255 255 / 0) 48%, rgb(0 0 0 / 0.18))",
+    "linear-gradient(115deg, transparent 34%, rgb(255 255 255 / 0.32) 47%, transparent 60%)",
+    "repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 1px, transparent 1px 3px)",
+  ].join(", "),
+  backgroundSize: "100% 100%, 260% 100%, auto",
+  backgroundPosition: "0 0, 70% 0, 0 0",
+};
+const coinShadow =
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.45),inset_0_-1px_0_rgb(0_0_0/0.2),inset_0_0_0_3px_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.14),0_6px_12px_-6px_rgb(0_0_0/0.35)]";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Dates of the last 7 days (including today), in the same local YYYY-MM-DD format as the backend */
@@ -320,7 +335,7 @@ export function CheckinStreak({
           <p className="text-xs text-[var(--yc-muted-fg)]">{t.description(reward, streak)}</p>
         </div>
         <div className="mt-2 flex items-end gap-2">
-          <span className="relative inline-flex h-12 overflow-hidden text-5xl leading-none font-semibold tracking-tight tabular-nums">
+          <span className="relative inline-flex h-12 overflow-hidden text-5xl leading-none font-semibold tracking-tight text-[var(--yc-brand-c)] tabular-nums">
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span key={streak} initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "-100%", opacity: 0 }} transition={fade}>
                 {streak}
@@ -358,12 +373,13 @@ export function CheckinStreak({
                 initial={false}
                 animate={{ scale: isToday && on && !reduce ? [0.86, 1] : 1 }}
                 transition={spring}
+                style={isToday ? coin : undefined}
                 className={cn(
                   "relative z-10 flex size-9 items-center justify-center rounded-full text-[11px] font-medium tabular-nums",
-                  on
-                    ? "bg-[var(--yc-brand-c)] text-[var(--yc-brand-fg)]"
-                    : isToday
-                      ? "bg-[var(--yc-card)] text-[var(--yc-brand-c)] shadow-[inset_0_0_0_1.5px_var(--yc-brand-c)]"
+                  isToday
+                    ? cn("font-semibold text-[var(--yc-brand-fg)]", coinShadow)
+                    : on
+                      ? "bg-[color-mix(in_oklab,var(--yc-brand-c)_16%,var(--yc-card))] text-[var(--yc-brand-c)] shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--yc-brand-c)_30%,transparent)]"
                       : "bg-[var(--yc-card)] shadow-[inset_0_0_0_1px_var(--yc-border)]",
                 )}
               >

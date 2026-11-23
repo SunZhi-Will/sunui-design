@@ -8,6 +8,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -21,7 +22,7 @@ import { cn } from "@/lib/utils";
 /* ---------- Animation styles (the ww-* keyframes from the original welcome.css) ---------- */
 
 const CSS = `
-.sd-root{--sd-success:var(--sunui-success,var(--success,#1f9d55));--sd-warning:var(--sunui-rating,var(--warning,#c98a12));--sd-popover:var(--popover,var(--card))}
+.sd-root{--sd-spot:var(--sunui-spot,var(--primary));--sd-spot-fg:var(--sunui-spot-foreground,var(--primary-foreground));--sd-success:var(--sunui-success,var(--success,#1f9d55));--sd-warning:var(--sunui-rating,var(--warning,#c98a12));--sd-popover:var(--popover,var(--card))}
 @media (prefers-color-scheme: dark){.sd-root{--sd-success:var(--sunui-success,var(--success,#4cd68a));--sd-warning:var(--sunui-rating,var(--warning,#f5b84a))}}
 @keyframes sd-pop{0%{opacity:0;transform:translateY(6px) scale(.85)}70%{opacity:1;transform:translateY(-1px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes sd-fade-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -40,7 +41,11 @@ const CSS = `
 .sd-blink{animation:sd-blink 1.2s ease-in-out infinite}
 .sd-spin{animation:sd-spin 1s linear infinite}
 .sd-progress{transform-origin:left center;animation:sd-progress var(--sd-duration,2s) cubic-bezier(.4,0,.2,1) both}
-.sd-ripple{position:absolute;left:4px;top:4px;width:36px;height:36px;border-radius:9999px;background:var(--foreground);pointer-events:none;animation:sd-ripple 700ms ease-out both}
+.sd-ripple{position:absolute;left:4px;top:4px;width:36px;height:36px;border-radius:9999px;background:var(--sd-spot);pointer-events:none;animation:sd-ripple 700ms ease-out both}
+.sd-metal{background-color:var(--muted);background-image:repeating-linear-gradient(90deg,rgb(255 255 255/.07) 0 1px,rgb(0 0 0/.018) 1px 2px,transparent 2px 4px),linear-gradient(180deg,color-mix(in oklch,var(--foreground) 2%,var(--card)),color-mix(in oklch,var(--foreground) 12%,var(--card)));box-shadow:inset 0 1px 0 rgb(255 255 255/.85),inset 0 -1px 0 rgb(0 0 0/.06)}
+.dark .sd-metal{background-image:repeating-linear-gradient(90deg,rgb(255 255 255/.04) 0 1px,rgb(0 0 0/.05) 1px 2px,transparent 2px 4px),linear-gradient(180deg,color-mix(in oklch,var(--foreground) 14%,var(--card)),color-mix(in oklch,var(--foreground) 5%,var(--card)));box-shadow:inset 0 1px 0 rgb(255 255 255/.1),inset 0 -1px 0 rgb(0 0 0/.3)}
+.sd-lens{background-image:linear-gradient(180deg,rgb(255 255 255/.35),transparent 55%,rgb(0 0 0/.12));box-shadow:inset 0 0 0 .5px rgb(0 0 0/.18)}
+.sd-lacquer{background-image:linear-gradient(180deg,color-mix(in oklch,var(--sd-spot) 62%,white),var(--sd-spot) 55%,color-mix(in oklch,var(--sd-spot) 78%,black));box-shadow:inset 0 1px 0 rgb(255 255 255/.4),inset 0 -1px 0 rgb(0 0 0/.18)}
 @media (prefers-reduced-motion: reduce){
 .sd-pop,.sd-fade-up,.sd-slide-in-right,.sd-shake,.sd-glow,.sd-blink,.sd-spin{animation:none}
 .sd-progress{animation-duration:1ms}
@@ -220,6 +225,7 @@ export function ScriptedDemo<K extends string = string>({
   children,
 }: ScriptedDemoProps<K>) {
   const t = { ...MESSAGES[resolveLocale(locale)], ...labels };
+  const uid = useId().replace(/:/g, "");
   const reduced = useReducedMotionPref();
   const tabVisible = useTabVisible();
   const [scene, setScene] = useState(0);
@@ -315,13 +321,13 @@ export function ScriptedDemo<K extends string = string>({
           ref={containerRef}
           className="relative overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-20px_rgba(0,0,0,0.18)]"
         >
-          {/* Browser frame */}
-          <div aria-hidden className="flex items-center gap-2 border-b border-border bg-muted/50 px-4 py-2.5">
-            <span className="size-2.5 rounded-full bg-[#FF5F57]" />
-            <span className="size-2.5 rounded-full bg-[#FEBC2E]" />
-            <span className="size-2.5 rounded-full bg-[#28C840]" />
+          {/* Browser frame: a brushed-metal chrome bar lit from above, with lens-like traffic lights and a recessed address field */}
+          <div aria-hidden className="sd-metal flex items-center gap-2 border-b border-border px-4 py-2.5">
+            <span className="sd-lens size-2.5 rounded-full bg-[#FF5F57]" />
+            <span className="sd-lens size-2.5 rounded-full bg-[#FEBC2E]" />
+            <span className="sd-lens size-2.5 rounded-full bg-[#28C840]" />
             {url ? (
-              <div className="mx-auto hidden rounded-md bg-background px-3 py-0.5 font-mono text-[11px] text-muted-foreground sm:block">
+              <div className="mx-auto hidden rounded-md bg-background px-3 py-0.5 font-mono text-[11px] text-muted-foreground shadow-[inset_0_1px_2px_rgb(0_0_0/0.08),0_1px_0_rgb(255_255_255/0.6)] sm:block dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]">
                 {url}
               </div>
             ) : null}
@@ -342,8 +348,16 @@ export function ScriptedDemo<K extends string = string>({
             {current.click ? (
               <span key={`${scene}-${loop}`} className="sd-ripple" style={{ animationDelay: `${current.clickDelay ?? 0}ms` }} />
             ) : null}
-            <svg viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="relative size-5 fill-foreground stroke-background drop-shadow-md">
-              <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
+            {/* Cursor in brand-colour lacquer: lit on top, darker toward the tip's tail, with a light outline */}
+            <svg viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="relative size-5 stroke-card drop-shadow-md">
+              <defs>
+                <linearGradient id={`${uid}-lacquer`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" style={{ stopColor: "color-mix(in oklch, var(--sd-spot) 62%, white)" }} />
+                  <stop offset="0.55" style={{ stopColor: "var(--sd-spot)" }} />
+                  <stop offset="1" style={{ stopColor: "color-mix(in oklch, var(--sd-spot) 78%, black)" }} />
+                </linearGradient>
+              </defs>
+              <path fill={`url(#${uid}-lacquer)`} d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
             </svg>
           </div>
         </div>
@@ -353,7 +367,7 @@ export function ScriptedDemo<K extends string = string>({
           <button
             type="button"
             onClick={() => setPlaying((p) => !p)}
-            className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition-[color,background-color,scale] duration-150 hover:bg-muted hover:duration-0 motion-safe:active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             aria-label={playing ? t.pause : t.play}
           >
             {playing ? (
@@ -376,12 +390,13 @@ export function ScriptedDemo<K extends string = string>({
                   className="group w-full rounded-sm text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   aria-current={i === chapter ? "step" : undefined}
                 >
-                  <span className="relative block h-1 overflow-hidden rounded-full bg-muted">
-                    {i < chapter ? <span className="absolute inset-0 bg-foreground/70" /> : null}
+                  {/* Progress track is recessed; the filled part is a raised strip of brand-colour lacquer */}
+                  <span className="relative block h-1.5 overflow-hidden rounded-full bg-muted shadow-[inset_0_1px_2px_rgb(0_0_0/0.08)]">
+                    {i < chapter ? <span className="sd-lacquer absolute inset-0 rounded-full opacity-60" /> : null}
                     {i === chapter ? (
                       <span
                         key={`${loop}-${i}`}
-                        className="sd-progress absolute inset-0 bg-foreground"
+                        className="sd-progress sd-lacquer absolute inset-0 rounded-full"
                         style={
                           {
                             "--sd-duration": `${chapterDuration(i)}ms`,
@@ -433,7 +448,7 @@ export function DemoStatus({ text, tone }: { text: string; tone: DemoTone }) {
       className={cn(
         "sd-fade-up hidden items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium sm:inline-flex",
         tone === "muted" && "border-border text-muted-foreground",
-        tone === "brand" && "border-border bg-muted text-foreground",
+        tone === "brand" && "border-(--sd-spot)/30 bg-(--sd-spot)/10 text-(--sd-spot)",
         tone === "success" && "border-(--sd-success)/30 bg-(--sd-success)/10 text-(--sd-success)",
         tone === "warning" && "border-(--sd-warning)/30 bg-(--sd-warning)/10 text-(--sd-warning)",
       )}

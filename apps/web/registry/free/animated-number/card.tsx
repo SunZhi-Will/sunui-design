@@ -24,7 +24,7 @@ export default function AnimatedNumberCard() {
     <div className="mx-auto flex w-64 flex-col gap-4 rounded-xl border border-border bg-card p-4 text-card-foreground">
       <div>
         <p className="text-xs text-muted-foreground">{t.total}</p>
-        <AnimatedNumber locale={locale} value={total} currency="USD" trendArrow announce className="text-3xl font-semibold tracking-tight" />
+        <AnimatedNumber locale={locale} value={total} currency="USD" trendArrow announce variant="odometer" className="text-3xl font-semibold tracking-tight" />
       </div>
       <div className="flex items-center justify-between border-t border-border pt-4">
         <span className="text-sm">{t.quantity}</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode, type Ref, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type Ref, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
@@ -100,8 +100,17 @@ const MESSAGES: Record<SunLocale, AddToCartLabels> = {
   },
 };
 
-// Design language (DESIGN.md, craft quality): the raised button has a top-edge highlight and bottom-edge thickness, and what flies out is a floating mini product card
-const raised = "shadow-[inset_0_1px_0_rgb(255_255_255/0.16),inset_0_-1px_0_rgb(0_0_0/0.12),0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.10),0_2px_6px_-2px_rgb(0_0_0/0.08)]";
+// Design language (DESIGN.md, craft quality): what flies out is a floating mini product card
+// Material (DESIGN.md section 7): the button is a lacquered key in the brand colour, lit from straight above, with a darker
+// bottom edge for thickness. On press it travels 1px down and the edge shrinks, like a real key bottoming out
+const lacquer: CSSProperties = {
+  backgroundColor: "var(--sunui-spot, var(--primary))",
+  backgroundImage:
+    "linear-gradient(180deg, color-mix(in oklch, var(--sunui-spot, var(--primary)) 74%, white), var(--sunui-spot, var(--primary)) 52%, color-mix(in oklch, var(--sunui-spot, var(--primary)) 82%, black))",
+};
+const raised =
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_1px_1px_rgb(0_0_0/0.1),0_4px_8px_-4px_rgb(0_0_0/0.3)] " +
+  "enabled:active:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),inset_0_-1px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_0_0_rgb(0_0_0/0),0_1px_2px_-1px_rgb(0_0_0/0.2)]";
 const e1 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 const e2 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.10)]";
 /** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only on the primary button and the count badge */
@@ -203,14 +212,13 @@ export function AddToCartButton({
         onClick={handleClick}
         disabled={disabled}
         aria-busy={state === "adding"}
-        whileTap={reduceMotion || disabled ? undefined : { scale: 0.97 }}
+        whileTap={reduceMotion || disabled ? undefined : { scale: 0.97, y: 1 }}
         transition={springs.snappy}
+        style={lacquer}
         className={cn(
           spotFill,
           raised,
-          "group relative isolate inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-md px-4 text-sm font-medium",
-          // Simulates top light: at most a 3% lightness difference from top to bottom
-          "bg-[linear-gradient(to_bottom,rgb(255_255_255/0.07),transparent_60%)]",
+          "group relative isolate inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-md px-4 text-sm font-medium transition-shadow duration-100",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
           className,
