@@ -51,6 +51,12 @@ export type RegistryItem = {
     addedAt: string;
     /** 區塊頁的使用指引；aliases 也會被目錄搜尋 */
     usage?: BlockUsage;
+    /**
+     * 型錄裡放哪裡（2026-11-23，reports/元件為何普通全面深度分析-2026-11-23.md 第 6 節第 3 步）。
+     * 省略：主型錄。basic：工程扎實但長相必然普通的基礎件，排在型錄底部的「基礎件」區。
+     * hidden：型錄與首頁不顯示，但區塊頁、安裝網址、MCP 與 llms.txt 照常提供，已安裝的人不受影響。
+     */
+    catalog?: "basic" | "hidden";
   };
   files: RegistryFile[];
 };

@@ -240,7 +240,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <section aria-labelledby="play-title" className={SECTION}>
           <SectionHead id="play-title" title={s.playTitle} sub={s.playSub}>
             <Link href="/blocks" className="inline-flex h-10 items-center gap-1.5 rounded-lg px-4 text-sm font-medium btn-secondary">
-              {format(t.catalog.cta, { n: all.length })}
+              {format(t.catalog.cta, { n: all.filter((item) => item.meta.catalog !== "hidden").length })}
               <Arrow className="size-3.5" />
             </Link>
           </SectionHead>

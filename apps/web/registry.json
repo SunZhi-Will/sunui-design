@@ -85,7 +85,8 @@
             "live total checklist",
             "order options"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -229,7 +230,8 @@
             "site notice",
             "dismissible banner"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -280,7 +282,8 @@
             "dashboard shell",
             "responsive nav"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -325,7 +328,8 @@
             "member list",
             "user avatars"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -369,7 +373,8 @@
             "top button",
             "scroll up button"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -666,7 +671,8 @@
             "tab indicator slide",
             "sliding highlight"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -867,7 +873,8 @@
             "step summary",
             "wizard steps"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1095,7 +1102,8 @@
             "sign-in wall",
             "access card"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1142,7 +1150,8 @@
             "privacy preferences",
             "cookie settings"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1189,7 +1198,8 @@
             "copy feedback",
             "copied tooltip"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1488,7 +1498,8 @@
             "responsive dialog",
             "drawer dialog"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1530,7 +1541,8 @@
             "no data",
             "empty list"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -1572,7 +1584,8 @@
             "retry state",
             "fetch error"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -1617,7 +1630,8 @@
             "navbar search",
             "autocomplete"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1663,7 +1677,8 @@
             "like with burst",
             "heart burst"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1716,7 +1731,8 @@
             "password meter",
             "password checklist"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -1905,7 +1921,8 @@
             "hover preview",
             "peek card"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2103,7 +2120,8 @@
             "task tray",
             "job queue"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2199,7 +2217,8 @@
             "stateful button",
             "loading state"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2406,7 +2425,8 @@
             "badge counter",
             "indicator"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -2507,7 +2527,8 @@
             "past orders",
             "order receipts"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2554,7 +2575,8 @@
             "2fa code",
             "shake on error"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2598,7 +2620,8 @@
             "page navigation",
             "next previous"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2642,7 +2665,8 @@
             "order confirmation bar",
             "payment pending notice"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -2690,7 +2714,8 @@
             "member pill",
             "avatar group"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3023,7 +3048,8 @@
             "plus minus input",
             "number roll stepper"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3065,7 +3091,8 @@
             "quota ring",
             "remaining balance"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3111,7 +3138,8 @@
             "min max slider",
             "price filter"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3214,7 +3242,8 @@
             "supporter code",
             "shake on error"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3461,7 +3490,8 @@
             "back to top progress",
             "reading progress ring"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -3507,7 +3537,8 @@
             "scroll-linked text",
             "mask reveal"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3642,7 +3673,8 @@
             "history timeline",
             "stepper timeline"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3687,7 +3719,8 @@
             "option cards",
             "delivery picker"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3733,7 +3766,8 @@
             "drawer slide",
             "bottom sheet"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3778,7 +3812,8 @@
             "skeleton shimmer",
             "pulse placeholder"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3830,7 +3865,8 @@
             "browser tabs",
             "tabs with badges"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -3989,7 +4025,8 @@
             "stamp",
             "status stamp"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4039,7 +4076,8 @@
             "feedback tags",
             "what went wrong"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4086,7 +4124,8 @@
             "progress dot",
             "last updated"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4179,7 +4218,8 @@
             "shop header",
             "cart icon header"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4324,7 +4364,8 @@
             "checkout agreement",
             "gated button"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4625,7 +4666,8 @@
             "section nav",
             "active heading"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -4669,7 +4711,8 @@
             "typed text",
             "animated headline"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -5265,7 +5308,8 @@
             "activity feed",
             "unread badge"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -5312,7 +5356,8 @@
             "ticker",
             "carousel loop"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -5356,7 +5401,8 @@
             "features section",
             "more features"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -5402,7 +5448,8 @@
             "bookmark card",
             "rich link"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {
@@ -5450,7 +5497,8 @@
             "follow buttons",
             "footer social"
           ]
-        }
+        },
+        "catalog": "hidden"
       },
       "files": [
         {
@@ -5494,7 +5542,8 @@
             "video chapters",
             "course player progress"
           ]
-        }
+        },
+        "catalog": "basic"
       },
       "files": [
         {

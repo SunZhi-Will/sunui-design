@@ -258,6 +258,8 @@ const en = {
       `${n} Pro blocks today, new ones every week. Founding members get lifetime access for $79.`,
   },
   catalog: {
+    basicsTitle: "Basics",
+    basicsBody: "Solid everyday controls: inputs, tabs, dialogs, skeletons. Built with the same care, quiet by design.",
     sectionLabel: "Blocks",
     searchLabel: "Search blocks",
     searchPlaceholder: "Search blocks, e.g. coupon, cart, countdown",
@@ -983,6 +985,8 @@ const zhTW: Messages = {
     proBody: (n) => `目前有 ${n} 個 Pro 區塊，每週持續新增。創始會員只要 NT$2,490 即可終身使用。`,
   },
   catalog: {
+    basicsTitle: "基礎件",
+    basicsBody: "每天都用得到的基本控制項：輸入框、分頁、對話框、骨架屏。一樣仔細打磨，長相刻意安靜。",
     sectionLabel: "區塊",
     searchLabel: "搜尋區塊",
     searchPlaceholder: "搜尋區塊，例如優惠券、購物車、倒數",
@@ -1685,6 +1689,8 @@ const zhCN: Messages = {
     proBody: (n) => `目前有 ${n} 个 Pro 区块，每周持续新增。创始会员只需 $79 即可终身使用。`,
   },
   catalog: {
+    basicsTitle: "基础件",
+    basicsBody: "每天都用得到的基本控件：输入框、标签页、对话框、骨架屏。一样仔细打磨，外观刻意安静。",
     sectionLabel: "区块",
     searchLabel: "搜索区块",
     searchPlaceholder: "搜索区块，例如优惠券、购物车、倒计时",
@@ -2379,6 +2385,8 @@ const ja: Messages = {
     proBody: (n) => `現在 ${n} 個の Pro ブロック、毎週追加中。創設メンバーは $79 で永久に使えます。`,
   },
   catalog: {
+    basicsTitle: "ベーシック",
+    basicsBody: "毎日使う基本のコントロール：入力欄、タブ、ダイアログ、スケルトン。同じ丁寧さで作り、見た目はあえて控えめに。",
     sectionLabel: "ブロック",
     searchLabel: "ブロックを検索",
     searchPlaceholder: "ブロックを検索（例：クーポン、カート、カウントダウン）",

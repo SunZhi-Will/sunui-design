@@ -381,7 +381,7 @@
     "av1": false
   },
   "faq-accordion": {
-    "av1": true
+    "av1": false
   },
   "festival-banner": {
     "av1": false
@@ -429,7 +429,7 @@
     "av1": false
   },
   "product-filter-grid": {
-    "av1": true
+    "av1": false
   },
   "product-gallery": {
     "av1": true
@@ -573,13 +573,13 @@
     "av1": false
   },
   "subscription-manager": {
-    "av1": true
+    "av1": false
   },
   "volume-tiers": {
     "av1": false
   },
   "review-request": {
-    "av1": true
+    "av1": false
   },
   "referral-queue": {
     "av1": true

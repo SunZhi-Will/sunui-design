@@ -189,6 +189,25 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
     });
   }, [viewItems, interaction, tier, series, query]);
 
+  // 基礎件（meta.catalog = "basic"）排在主型錄後面，自成一區；搜尋與篩選照樣找得到
+  const main = useMemo(() => visible.filter((item) => item.meta.catalog !== "basic"), [visible]);
+  const basics = useMemo(() => visible.filter((item) => item.meta.catalog === "basic"), [visible]);
+  const renderCard = (list: typeof visible, item: (typeof visible)[number], i: number) => (
+    <BlockCard
+      spot={spotFor(list, i)}
+      key={item.variant ? `${item.name}~${item.variant}` : item.name}
+      name={item.name}
+      variant={item.variant}
+      preview={item.preview}
+      poster={item.poster && !item.variant}
+      title={item.title}
+      note={!expandStyles && item.styleCount ? format(t.styles, { n: item.styleCount }) : undefined}
+      tier={item.meta.tier}
+      locale={locale}
+      labels={cardLabels}
+    />
+  );
+
   // 整組複製用英文原文，順序同畫面
   const setBlocks: SetBlock[] = useMemo(() => {
     if (!activeNames) return [];
@@ -347,22 +366,18 @@ export function Catalog({ items, locale, messages }: { items: CatalogItem[]; loc
 
       {/* 手機一欄排兩百張卡很長（卡片是靜態圖加影片，效果庫單一樣式是 iframe）：先顯示前 24 張，按了才全部展開。sm 以上不受影響 */}
       <ul className={cn("grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3", !showAll && "max-sm:[&>li:nth-child(n+25)]:hidden")}>
-        {visible.map((item, i) => (
-          <BlockCard
-            spot={spotFor(visible, i)}
-            key={item.variant ? `${item.name}~${item.variant}` : item.name}
-            name={item.name}
-            variant={item.variant}
-            preview={item.preview}
-            poster={item.poster && !item.variant}
-            title={item.title}
-            note={!expandStyles && item.styleCount ? format(t.styles, { n: item.styleCount }) : undefined}
-            tier={item.meta.tier}
-            locale={locale}
-            labels={cardLabels}
-          />
-        ))}
+        {main.map((item, i) => renderCard(main, item, i))}
       </ul>
+      {basics.length > 0 && (
+        // 手機上主型錄先只顯示 24 張，基礎件區也等按了「全部顯示」才出現
+        <section aria-labelledby="catalog-basics" className={cn(main.length > 0 && "mt-16 border-t border-line pt-10", !showAll && main.length >= 24 && "max-sm:hidden")}>
+          <h2 id="catalog-basics" className="text-lg font-semibold tracking-tight">
+            {t.basicsTitle}
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-pretty text-subtle">{t.basicsBody}</p>
+          <ul className="mt-6 grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">{basics.map((item, i) => renderCard(basics, item, i))}</ul>
+        </section>
+      )}
       {!showAll && visible.length > 24 && (
         <button
           type="button"

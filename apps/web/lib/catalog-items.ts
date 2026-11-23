@@ -12,7 +12,8 @@ import { variantIds } from "@/registry/__generated__/variants";
  * 免費與 Pro 交叉排（每排中間一張 Pro），動效庫排最後；規則見 lib/catalog-order.ts。
  */
 export function buildCatalogItems(all: RegistryItem[], locale: Locale) {
-  return orderCatalog(all).flatMap((item) => {
+  // meta.catalog = "hidden"：型錄與首頁都不放，區塊頁與安裝網址照常（見 lib/registry.ts）
+  return orderCatalog(all.filter((item) => item.meta.catalog !== "hidden")).flatMap((item) => {
     const { name, title, description, meta, categories } = localizeItem(item, locale);
     // 保留英文標題與描述給搜尋用
     const base = {
