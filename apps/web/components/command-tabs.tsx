@@ -12,7 +12,7 @@ export function CommandTabs({ label, tabs, children }: { label: string; tabs: st
   const [index, setIndex] = useState(0);
   return (
     <div>
-      <div role="tablist" aria-label={label} className="mb-2.5 inline-flex max-w-full gap-0.5 overflow-x-auto rounded-md bg-accent-soft p-0.5 text-[13px]">
+      <div role="tablist" aria-label={label} className="mb-2.5 inline-flex max-w-full gap-0.5 overflow-x-auto rounded-md bg-stage p-0.5 text-[13px]">
         {tabs.map((tab, i) => (
           <button
             key={tab}
