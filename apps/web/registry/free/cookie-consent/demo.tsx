@@ -3,6 +3,7 @@
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { CookieConsent } from "./cookie-consent";
+import { LookArt } from "@/registry/_demo/product-art";
 
 const copy = {
   en: {
@@ -52,9 +53,9 @@ export default function CookieConsentDemo() {
         <p className="text-xs text-muted-foreground">{t.eyebrow}</p>
         <p className="mt-1 text-2xl font-semibold tracking-tight">{t.headline}</p>
         <div aria-hidden="true" className="mt-6 grid grid-cols-3 gap-3">
-          <div className="aspect-[4/5] rounded-md bg-muted" />
-          <div className="aspect-[4/5] rounded-md bg-muted" />
-          <div className="aspect-[4/5] rounded-md bg-muted" />
+          <LookArt look="turtleneck" className="aspect-[4/5] rounded-md" />
+          <LookArt look="cardigan-navy" className="aspect-[4/5] rounded-md" />
+          <LookArt look="scarf-oat" className="aspect-[4/5] rounded-md" />
         </div>
       </div>
       <CookieConsent locale={locale} position="contained" policyHref="#cookies" categories={t.categories} onChange={() => {}} />

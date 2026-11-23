@@ -86,3 +86,14 @@ export function ProductArt({
     </div>
   );
 }
+
+export type LookKind = "boots-black" | "cardigan-navy" | "coat-camel" | "coat-navy" | "field-jacket" | "scarf-oat" | "trousers-grey" | "turtleneck";
+
+/** 情境照（public/demo/looks/）：示範頁面裡原本用灰色方塊佔位的地方改放這個，比例由 className 決定。 */
+export function LookArt({ look, className }: { look: LookKind; className?: string }) {
+  return (
+    <div aria-hidden="true" className={cn("relative w-full overflow-hidden bg-muted", className)}>
+      <img src={`/demo/looks/${look}.webp`} alt="" draggable={false} decoding="async" className="absolute inset-0 size-full object-cover" />
+    </div>
+  );
+}

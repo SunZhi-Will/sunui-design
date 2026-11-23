@@ -1,24 +1,9 @@
 {
   "_note": "/blocks 型錄卡片影片的補充設定（node apps/web/scripts/record-cards.mjs --catalog）。名單自動取自 registry，這裡只寫要人操作才會動的 block：demos.<name> 可以有 demo、seconds、crf，格式和 home-cards.json 一樣，座標是卡片畫面的比例。首頁 home-cards.json 已有的 block 共用首頁那支，不在這裡錄。",
+  "_walls_note": "效果庫的型錄卡片同時秀哪幾種樣式（/preview/<name>/wall）。2026-11-23：一張卡只秀一個樣式看起來太空。",
   "demos": {
     "micro-interactions": {
-      "demo": [
-        {
-          "wait": 500
-        },
-        {
-          "drag": [
-            0.29,
-            0.5,
-            0.83,
-            0.5
-          ],
-          "ms": 1100
-        },
-        {
-          "wait": 2600
-        }
-      ],
+      "stage": "/preview/micro-interactions/wall",
       "seconds": 6
     },
     "tear-pack-reveal": {
@@ -96,6 +81,2073 @@
         }
       ],
       "seconds": 9
+    },
+    "animate-presets": {
+      "stage": "/preview/animate-presets/wall",
+      "seconds": 6
+    },
+    "background-effects": {
+      "stage": "/preview/background-effects/wall",
+      "seconds": 6
+    },
+    "button-effects": {
+      "stage": "/preview/button-effects/wall",
+      "seconds": 6
+    },
+    "camera-moves": {
+      "stage": "/preview/camera-moves/wall",
+      "seconds": 6
+    },
+    "card-effects": {
+      "stage": "/preview/card-effects/wall",
+      "seconds": 6
+    },
+    "chart-effects": {
+      "stage": "/preview/chart-effects/wall",
+      "seconds": 6
+    },
+    "cursor-effects": {
+      "stage": "/preview/cursor-effects/wall",
+      "seconds": 8,
+      "demo": [
+        {
+          "move": [
+            0.12,
+            0.2
+          ],
+          "ms": 300
+        },
+        {
+          "move": [
+            0.38,
+            0.3
+          ],
+          "ms": 900
+        },
+        {
+          "move": [
+            0.2,
+            0.35
+          ],
+          "ms": 600
+        },
+        {
+          "move": [
+            0.62,
+            0.2
+          ],
+          "ms": 500
+        },
+        {
+          "move": [
+            0.88,
+            0.3
+          ],
+          "ms": 900
+        },
+        {
+          "move": [
+            0.7,
+            0.38
+          ],
+          "ms": 600
+        },
+        {
+          "move": [
+            0.12,
+            0.7
+          ],
+          "ms": 500
+        },
+        {
+          "move": [
+            0.38,
+            0.8
+          ],
+          "ms": 900
+        },
+        {
+          "move": [
+            0.2,
+            0.78
+          ],
+          "ms": 500
+        },
+        {
+          "move": [
+            0.62,
+            0.7
+          ],
+          "ms": 500
+        },
+        {
+          "move": [
+            0.88,
+            0.8
+          ],
+          "ms": 900
+        },
+        {
+          "move": [
+            0.72,
+            0.72
+          ],
+          "ms": 500
+        }
+      ]
+    },
+    "image-effects": {
+      "stage": "/preview/image-effects/wall",
+      "seconds": 6
+    },
+    "loading-effects": {
+      "stage": "/preview/loading-effects/wall",
+      "seconds": 6
+    },
+    "motion-principles": {
+      "stage": "/preview/motion-principles/wall",
+      "seconds": 6
+    },
+    "scroll-effects": {
+      "stage": "/preview/scroll-effects/wall",
+      "seconds": 6,
+      "demo": [
+        {
+          "wait": 6000
+        }
+      ]
+    },
+    "svg-effects": {
+      "stage": "/preview/svg-effects/wall",
+      "seconds": 6
+    },
+    "text-effects": {
+      "stage": "/preview/text-effects/wall",
+      "seconds": 6
+    },
+    "type-motion": {
+      "stage": "/preview/type-motion/wall",
+      "seconds": 6
+    },
+    "back-to-top": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            900
+          ],
+          "ms": 2400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "button[aria-label]",
+          "nth": 0,
+          "ms": 500
+        },
+        {
+          "wait": 2200
+        }
+      ]
+    },
+    "store-header": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            420
+          ],
+          "ms": 1800
+        },
+        {
+          "wait": 700
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            -420
+          ],
+          "ms": 1600
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "toc-scrollspy": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.65,
+            0.5,
+            760
+          ],
+          "ms": 3600
+        },
+        {
+          "wait": 400
+        },
+        {
+          "scroll": [
+            0.65,
+            0.5,
+            -760
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "notification-bell": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 1800
+        },
+        {
+          "sel": "button[aria-expanded]",
+          "nth": 0,
+          "ms": 500
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "button[aria-expanded]",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 2800
+        }
+      ]
+    },
+    "cookie-consent": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 600
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[role=switch]",
+          "nth": 1,
+          "ms": 500
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[role=switch]",
+          "nth": 1,
+          "ms": 200
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button:not([role=switch])",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        }
+      ]
+    },
+    "capsule-nav": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            520
+          ],
+          "ms": 2600
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            -520
+          ],
+          "ms": 2000
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "scroll-progress": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            700
+          ],
+          "ms": 2600
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            -700
+          ],
+          "ms": 2000
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "scroll-story": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            900
+          ],
+          "ms": 2600
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.55,
+            -900
+          ],
+          "ms": 2000
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "shoppable-story": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.4,
+            0.5,
+            -320
+          ],
+          "ms": 2400
+        },
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.4,
+            0.5,
+            320
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 1000
+        }
+      ]
+    },
+    "black-friday-weekend": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            900
+          ],
+          "ms": 3400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            -900
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "lunar-new-year": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            800
+          ],
+          "ms": 3400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            -800
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "reservation-timer": {
+      "seconds": 6,
+      "demo": [
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 4000
+        }
+      ]
+    },
+    "festival-banner": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            260
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 6,
+          "ms": 450
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            -260
+          ],
+          "ms": 1700
+        },
+        {
+          "wait": 500
+        }
+      ]
+    },
+    "file-dropzone": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 450
+        },
+        {
+          "wait": 5500
+        }
+      ]
+    },
+    "flash-sale-hero": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            520
+          ],
+          "ms": 3000
+        },
+        {
+          "wait": 600
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            -520
+          ],
+          "ms": 2200
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "free-shipping-progress": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 450
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 250
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 250
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "order-tracker": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            300
+          ],
+          "ms": 2400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            -300
+          ],
+          "ms": 1900
+        },
+        {
+          "wait": 500
+        }
+      ]
+    },
+    "plan-comparison": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 450
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 450
+        },
+        {
+          "wait": 700
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            320
+          ],
+          "ms": 2000
+        },
+        {
+          "wait": 400
+        },
+        {
+          "scroll": [
+            0.5,
+            0.6,
+            -320
+          ],
+          "ms": 1600
+        },
+        {
+          "wait": 500
+        }
+      ]
+    },
+    "stamp-card": {
+      "seconds": 6,
+      "demo": [
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 4500
+        }
+      ]
+    },
+    "gift-card-designer": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 450
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 7,
+          "ms": 450
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 450
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 450
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "sticker-board": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 450
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 5,
+          "ms": 450
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 7,
+          "ms": 450
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 9,
+          "ms": 450
+        },
+        {
+          "wait": 2200
+        }
+      ]
+    },
+    "addon-checklist": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 5,
+          "ms": 400
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 5,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "animated-number": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] input[type=radio]",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 150
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 150
+        },
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] input[type=radio]",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        }
+      ]
+    },
+    "announcement-strip": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1400
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 200
+        },
+        {
+          "wait": 1400
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 200
+        },
+        {
+          "wait": 1100
+        }
+      ]
+    },
+    "app-shell": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1400
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 200
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "confirm-button": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 150
+        },
+        {
+          "wait": 3200
+        }
+      ]
+    },
+    "copy-code-button": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 2300
+        }
+      ]
+    },
+    "empty-state": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 4200
+        }
+      ]
+    },
+    "error-state": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 4200
+        }
+      ]
+    },
+    "expanding-search": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 600
+        },
+        {
+          "type": "lin",
+          "ms": 180
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "key": "Escape"
+        },
+        {
+          "wait": 1200
+        }
+      ]
+    },
+    "favorite-button": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 300
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 200
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 300
+        },
+        {
+          "wait": 800
+        }
+      ]
+    },
+    "hover-card": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 0,
+          "ms": 500
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "move": [
+            0.9,
+            0.9
+          ],
+          "ms": 500
+        },
+        {
+          "wait": 800
+        }
+      ]
+    },
+    "jobs-tray": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1800
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 1800
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 4,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "notify-badge": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 400
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 150
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 4,
+          "ms": 400
+        },
+        {
+          "wait": 1700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 300
+        },
+        {
+          "wait": 1200
+        }
+      ]
+    },
+    "otp-input": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] input",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 300
+        },
+        {
+          "type": "246810",
+          "ms": 230
+        },
+        {
+          "wait": 3000
+        }
+      ]
+    },
+    "payment-status-banner": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 3200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 2500
+        }
+      ]
+    },
+    "quantity-stepper": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 150
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 400
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 150
+        },
+        {
+          "wait": 1300
+        }
+      ]
+    },
+    "shipping-options": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "sliding-tabs": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 800
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 4,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 5,
+          "ms": 300
+        },
+        {
+          "wait": 800
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "terms-consent": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 1,
+          "ms": 300
+        },
+        {
+          "wait": 1000
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 1,
+          "ms": 300
+        },
+        {
+          "wait": 400
+        },
+        {
+          "sel": "[data-preview-stage] input[type=checkbox]",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "tiny-chart": {
+      "seconds": 10,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            260
+          ],
+          "ms": 1300
+        },
+        {
+          "wait": 300
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 5200
+        },
+        {
+          "scroll": [
+            0.5,
+            0.5,
+            -260
+          ],
+          "ms": 1100
+        },
+        {
+          "wait": 300
+        }
+      ]
+    },
+    "morph-menu": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1600
+        },
+        {
+          "key": "Escape"
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1600
+        },
+        {
+          "key": "Escape"
+        },
+        {
+          "wait": 900
+        }
+      ]
+    },
+    "link-preview-card": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] input",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 300
+        },
+        {
+          "type": "https://sunui.dev/journal",
+          "ms": 60
+        },
+        {
+          "wait": 3500
+        }
+      ]
+    },
+    "social-links": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 400
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 900
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 1,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 2,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "hover": "[data-preview-stage] a",
+          "nth": 3,
+          "ms": 300
+        },
+        {
+          "wait": 900
+        },
+        {
+          "move": [
+            0.5,
+            0.9
+          ],
+          "ms": 400
+        },
+        {
+          "wait": 600
+        }
+      ]
+    },
+    "chapter-seekbar": {
+      "seconds": 9,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 2200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 5,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 600
+        }
+      ]
+    },
+    "holiday-cutoff": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 400
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1300
+        }
+      ]
+    },
+    "theme-reveal": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 2600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 2600
+        }
+      ]
+    },
+    "ask-ai-halo": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 6,
+          "ms": 400
+        },
+        {
+          "wait": 1300
+        },
+        {
+          "type": "Draft the banner copy",
+          "ms": 70
+        },
+        {
+          "wait": 2000
+        },
+        {
+          "key": "Escape"
+        },
+        {
+          "wait": 1200
+        }
+      ]
+    },
+    "holiday-calendar": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 400
+        },
+        {
+          "wait": 1600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 1,
+          "ms": 200
+        },
+        {
+          "wait": 1600
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 300
+        },
+        {
+          "wait": 1100
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 200
+        },
+        {
+          "wait": 1200
+        }
+      ]
+    },
+    "liquid-glass-nav": {
+      "seconds": 8,
+      "demo": [
+        {
+          "wait": 700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 3,
+          "ms": 400
+        },
+        {
+          "wait": 1700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 4,
+          "ms": 400
+        },
+        {
+          "wait": 1700
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 2,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        }
+      ]
+    },
+    "wave-confirm": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 900
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 5500
+        }
+      ]
+    },
+    "avatar-stack": {
+      "seconds": 7,
+      "demo": [
+        {
+          "wait": 500
+        },
+        {
+          "move": [
+            0.3,
+            0.5
+          ],
+          "ms": 400
+        },
+        {
+          "move": [
+            0.6,
+            0.5
+          ],
+          "ms": 1500
+        },
+        {
+          "wait": 500
+        },
+        {
+          "sel": "[data-preview-stage] button",
+          "nth": 0,
+          "ms": 400
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "move": [
+            0.3,
+            0.62
+          ],
+          "ms": 800
+        },
+        {
+          "wait": 900
+        }
+      ]
     }
+  },
+  "walls": {
+    "animate-presets": [
+      "jackInTheBox",
+      "bounceIn",
+      "flipInX",
+      "rubberBand",
+      "swing",
+      "tada"
+    ],
+    "background-effects": [
+      "aurora",
+      "mesh-gradient",
+      "waves",
+      "retro-grid",
+      "ripple-rings",
+      "dot-glow"
+    ],
+    "button-effects": [
+      "shine-sweep",
+      "rotating-border",
+      "neon-glow",
+      "rolling-text",
+      "press-3d",
+      "border-draw"
+    ],
+    "camera-moves": [
+      "orbit",
+      "dolly-zoom",
+      "crane-up",
+      "fly-through",
+      "handheld",
+      "barrel-roll"
+    ],
+    "card-effects": [
+      "tilt-3d",
+      "border-beam",
+      "glare",
+      "flip",
+      "stack-fan",
+      "spotlight"
+    ],
+    "chart-effects": [
+      "bar-race",
+      "donut-segments",
+      "line-draw",
+      "number-counter",
+      "radial-progress",
+      "sparkline"
+    ],
+    "cursor-effects": [
+      "spotlight",
+      "trail",
+      "follower",
+      "blend-circle"
+    ],
+    "image-effects": [
+      "ken-burns",
+      "glitch",
+      "slice-transition",
+      "clip-reveal",
+      "parallax-frame",
+      "image-swap"
+    ],
+    "loading-effects": [
+      "dot-matrix",
+      "equalizer",
+      "liquid",
+      "orbit",
+      "spinner-check",
+      "bouncing-dots"
+    ],
+    "micro-interactions": [
+      "like-burst",
+      "confetti",
+      "success-check",
+      "toggle-switch",
+      "send-plane",
+      "slide-to-confirm"
+    ],
+    "motion-principles": [
+      "squash-stretch",
+      "burst",
+      "kaleidoscope",
+      "motion-trail",
+      "exploded-view",
+      "line-boil"
+    ],
+    "scroll-effects": [
+      "stacking-cards",
+      "parallax",
+      "zoom-on-scroll",
+      "scroll-marquee"
+    ],
+    "svg-effects": [
+      "animated-beam",
+      "blob-morph",
+      "gooey",
+      "orbiting-circles",
+      "radar-sweep",
+      "liquid-fill"
+    ],
+    "text-effects": [
+      "gradient-flow",
+      "split-flap",
+      "glitch",
+      "neon-flicker",
+      "kinetic-stack",
+      "highlighter"
+    ],
+    "type-motion": [
+      "text-on-path-circle",
+      "variable-font-wave",
+      "text-mask-gradient",
+      "text-on-path-wave"
+    ]
   }
 }

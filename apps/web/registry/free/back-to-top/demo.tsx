@@ -5,6 +5,9 @@ import { useRef } from "react";
 import { useDemoText } from "@/lib/demo-locale";
 
 import { BackToTop } from "./back-to-top";
+import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/product-art";
+
+const shelf: ProductKind[] = ["jacket", "tote", "sneaker", "mug", "watch", "lamp", "headphones", "bottle"];
 
 const copy = {
   en: { title: "All knitwear", count: "48 products", hint: "Scroll the list", label: "Back to top", item: "Merino crew neck", price: "$68" },
@@ -15,6 +18,7 @@ const copy = {
 
 export default function BackToTopDemo() {
   const t = useDemoText(copy);
+  const names = useProductNames();
   const scroller = useRef<HTMLDivElement>(null);
   return (
     <div className="relative h-[28rem] w-full max-w-2xl overflow-hidden rounded-lg border bg-background">
@@ -27,8 +31,8 @@ export default function BackToTopDemo() {
         <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {Array.from({ length: 18 }, (_, i) => (
             <li key={i}>
-              <div aria-hidden="true" className="aspect-[4/5] rounded-md bg-muted" />
-              <p className="mt-2 text-sm">{t.item}</p>
+              <ProductArt kind={shelf[i % shelf.length]} className="aspect-[4/5] rounded-md" />
+              <p className="mt-2 text-sm">{names[shelf[i % shelf.length]]}</p>
               <p className="text-xs tabular-nums text-muted-foreground">{t.price}</p>
             </li>
           ))}

@@ -180,19 +180,35 @@ const svgProps = {
   "aria-hidden": true,
 } as const;
 
+// Object colours for the drawn scene (the pixel icon pigments), mixed with the card so they read in light and dark
+const mix = (c: string, pct: number) => `color-mix(in oklch, ${c} ${pct}%, var(--card))`;
+const paint = {
+  sky: mix("oklch(0.62 0.12 248)", 38),
+  sun: "oklch(0.82 0.13 92)",
+  cloud: mix("oklch(0.88 0.04 85)", 70),
+  hill: mix("oklch(0.66 0.12 148)", 46),
+  tower: mix("oklch(0.74 0.03 250)", 92),
+  towerDark: mix("oklch(0.62 0.12 248)", 62),
+  windowLit: "oklch(0.82 0.13 92)",
+  ground: mix("oklch(0.66 0.12 148)", 30),
+  stem: "oklch(0.56 0.12 148)",
+  petal: "oklch(0.76 0.11 355)",
+  seed: "oklch(0.82 0.13 92)",
+} as const;
+
 function Sky() {
   return (
     <svg {...svgProps}>
       <defs>
         <linearGradient id="cm-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="var(--muted)" />
-          <stop offset="1" stopColor="var(--background)" />
+          <stop offset="0" stopColor={paint.sky} />
+          <stop offset="1" stopColor="var(--card)" />
         </linearGradient>
       </defs>
       <rect x="-40" y="-40" width="240" height="170" fill="url(#cm-sky)" />
-      <circle cx="118" cy="24" r="9" fill="var(--ring)" opacity="0.55" />
-      <circle cx="118" cy="24" r="15" fill="var(--ring)" opacity="0.12" />
-      <g fill="var(--muted-foreground)" opacity="0.18">
+      <circle cx="118" cy="24" r="9" fill={paint.sun} />
+      <circle cx="118" cy="24" r="15" fill={paint.sun} opacity="0.22" />
+      <g fill={paint.cloud}>
         <ellipse cx="40" cy="20" rx="14" ry="3.5" />
         <ellipse cx="50" cy="17" rx="8" ry="3" />
         <ellipse cx="140" cy="38" rx="11" ry="2.6" />
@@ -204,7 +220,7 @@ function Sky() {
 function Mountains() {
   return (
     <svg {...svgProps}>
-      <path d="M-30 66 L10 38 L32 52 L58 30 L86 54 L112 34 L140 50 L190 40 V120 H-30Z" fill="var(--muted-foreground)" opacity="0.28" />
+      <path d="M-30 66 L10 38 L32 52 L58 30 L86 54 L112 34 L140 50 L190 40 V120 H-30Z" fill={paint.hill} />
     </svg>
   );
 }
@@ -220,17 +236,17 @@ function City() {
   ];
   return (
     <svg {...svgProps}>
-      <g fill="var(--foreground)" opacity="0.32">
-        {blocks.map(([x, y, w]) => (
-          <rect key={x} x={x} y={y} width={w} height={66 - y} />
+      <g>
+        {blocks.map(([x, y, w], i) => (
+          <rect key={x} x={x} y={y} width={w} height={66 - y} fill={i % 2 ? paint.towerDark : paint.tower} />
         ))}
       </g>
-      <g fill="var(--background)" opacity="0.7">
+      <g fill={paint.windowLit} opacity="0.85">
         {blocks.flatMap(([x, y, w]) =>
           [0, 1, 2].map((r) => <rect key={`${x}-${r}`} x={x + 3} y={y + 4 + r * 7} width={w - 6} height={2} />),
         )}
       </g>
-      <rect x="-40" y="66" width="240" height="60" fill="var(--muted-foreground)" opacity="0.22" />
+      <rect x="-40" y="66" width="240" height="60" fill={paint.ground} />
       <g stroke="var(--muted-foreground)" strokeOpacity="0.3" strokeWidth="0.4">
         <line x1="-40" y1="66" x2="200" y2="66" />
         <line x1="80" y1="66" x2="20" y2="100" />
@@ -255,14 +271,14 @@ function Person({ lift }: { lift?: MotionValue<number> }) {
 function Flower() {
   return (
     <svg {...svgProps}>
-      <path d="M22 92 Q24 76 21 66" stroke="var(--foreground)" strokeOpacity="0.6" strokeWidth="1.1" fill="none" />
-      <path d="M22 82 Q15 78 13 72 Q20 74 22 80Z" fill="var(--foreground)" opacity="0.5" />
-      <g fill="var(--ring)">
+      <path d="M22 92 Q24 76 21 66" stroke={paint.stem} strokeWidth="1.1" fill="none" />
+      <path d="M22 82 Q15 78 13 72 Q20 74 22 80Z" fill={paint.stem} />
+      <g fill={paint.petal}>
         {[0, 72, 144, 216, 288].map((a) => (
           <ellipse key={a} cx="21" cy="61" rx="2.4" ry="4.4" transform={`rotate(${a} 21 65)`} />
         ))}
       </g>
-      <circle cx="21" cy="65" r="2" fill="var(--foreground)" opacity="0.75" />
+      <circle cx="21" cy="65" r="2" fill={paint.seed} />
     </svg>
   );
 }

@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { NotificationBell, type NotificationItem } from "./notification-bell";
+import { ProductArt, type ProductKind } from "@/registry/_demo/product-art";
+
+const shelf: ProductKind[] = ["jacket", "tote", "sneaker", "mug", "watch", "lamp", "headphones", "bottle"];
 
 const now = Date.now();
 
@@ -111,7 +114,7 @@ export default function NotificationBellDemo() {
       <div aria-hidden="true" className="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="space-y-2">
-            <div className="aspect-[4/5] rounded-xl bg-muted" />
+            <ProductArt kind={shelf[i % shelf.length]} className="aspect-[4/5] rounded-xl" />
             <div className="h-2 w-3/4 rounded-full bg-muted" />
           </div>
         ))}

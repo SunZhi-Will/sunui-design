@@ -5,6 +5,9 @@ import { useRef, useState } from "react";
 import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 
 import { StoreHeader } from "./store-header";
+import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/product-art";
+
+const shelf: ProductKind[] = ["jacket", "tote", "sneaker", "mug", "watch", "lamp", "headphones", "bottle"];
 
 const copy = {
   en: {
@@ -80,6 +83,7 @@ export default function StoreHeaderDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
   const [count, setCount] = useState(2);
+  const names = useProductNames();
 
   return (
     <div ref={scrollRef} className="h-[30rem] w-full max-w-[52rem] overflow-y-auto rounded-lg border bg-background">
@@ -96,9 +100,11 @@ export default function StoreHeaderDemo() {
         <p className="mt-1 text-2xl font-semibold tracking-tight text-balance">{t.headline}</p>
         <p className="mt-2 text-sm text-muted-foreground">{t.hint}</p>
         <ul className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {t.products.map(([name, price]) => (
+          {t.products.map(([, price], i) => {
+            const name = names[shelf[i % shelf.length]];
+            return (
             <li key={name} className="flex flex-col gap-2">
-              <div aria-hidden="true" className="aspect-[4/5] rounded-md bg-muted" />
+              <ProductArt kind={shelf[i % shelf.length]} className="aspect-[4/5] rounded-md" />
               <div className="flex items-start justify-between gap-2 text-sm">
                 <span className="min-w-0">
                   <span className="block truncate">{name}</span>
@@ -113,7 +119,8 @@ export default function StoreHeaderDemo() {
                 </button>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </div>

@@ -90,13 +90,13 @@
     "av1": false
   },
   "button-effects": {
-    "av1": true
-  },
-  "capsule-nav": {
     "av1": false
   },
-  "card-effects": {
+  "capsule-nav": {
     "av1": true
+  },
+  "card-effects": {
+    "av1": false
   },
   "chart-effects": {
     "av1": true
@@ -105,7 +105,7 @@
     "av1": false
   },
   "checkout-steps": {
-    "av1": false
+    "av1": true
   },
   "cjk-heading": {
     "av1": false
@@ -117,7 +117,7 @@
     "av1": false
   },
   "cookie-consent": {
-    "av1": false
+    "av1": true
   },
   "copy-code-button": {
     "av1": false
@@ -159,13 +159,13 @@
     "av1": false
   },
   "hover-card": {
-    "av1": true
+    "av1": false
   },
   "hover-motion": {
     "av1": false
   },
   "image-effects": {
-    "av1": true
+    "av1": false
   },
   "infinite-canvas": {
     "av1": true
@@ -174,7 +174,7 @@
     "av1": false
   },
   "lightbox": {
-    "av1": false
+    "av1": true
   },
   "loading-button": {
     "av1": false
@@ -186,13 +186,13 @@
     "av1": false
   },
   "micro-interactions": {
-    "av1": true
+    "av1": false
   },
   "notify-badge": {
     "av1": false
   },
   "order-history": {
-    "av1": false
+    "av1": true
   },
   "otp-input": {
     "av1": false
@@ -210,10 +210,10 @@
     "av1": false
   },
   "pixel-fx": {
-    "av1": true
+    "av1": false
   },
   "plush-portrait": {
-    "av1": false
+    "av1": true
   },
   "product-media": {
     "av1": true
@@ -252,7 +252,7 @@
     "av1": true
   },
   "scroll-story": {
-    "av1": false
+    "av1": true
   },
   "scroll-tilt-stage": {
     "av1": true
@@ -264,13 +264,13 @@
     "av1": false
   },
   "side-panel": {
-    "av1": false
+    "av1": true
   },
   "skeleton-set": {
     "av1": true
   },
   "sliding-tabs": {
-    "av1": false
+    "av1": true
   },
   "spring-rig": {
     "av1": true
@@ -279,7 +279,7 @@
     "av1": false
   },
   "star-rating": {
-    "av1": false
+    "av1": true
   },
   "status-dot": {
     "av1": false
@@ -288,7 +288,7 @@
     "av1": false
   },
   "store-header": {
-    "av1": false
+    "av1": true
   },
   "story-player": {
     "av1": true
@@ -309,7 +309,7 @@
     "av1": false
   },
   "tiny-chart": {
-    "av1": false
+    "av1": true
   },
   "toast-stack": {
     "av1": false
@@ -369,19 +369,19 @@
     "av1": false
   },
   "skill-grid": {
-    "av1": false
+    "av1": true
   },
   "cart-drawer": {
-    "av1": false
+    "av1": true
   },
   "checkout-button": {
-    "av1": false
+    "av1": true
   },
   "coupon-claim-card": {
     "av1": false
   },
   "faq-accordion": {
-    "av1": false
+    "av1": true
   },
   "festival-banner": {
     "av1": false
@@ -390,13 +390,13 @@
     "av1": false
   },
   "flash-sale-hero": {
-    "av1": false
+    "av1": true
   },
   "flash-sale-product-card": {
     "av1": false
   },
   "fold-invite-card": {
-    "av1": false
+    "av1": true
   },
   "free-shipping-progress": {
     "av1": false
@@ -408,7 +408,7 @@
     "av1": false
   },
   "newsletter-signup": {
-    "av1": false
+    "av1": true
   },
   "order-tracker": {
     "av1": false
@@ -420,7 +420,7 @@
     "av1": false
   },
   "plan-comparison": {
-    "av1": false
+    "av1": true
   },
   "pricing-cards": {
     "av1": false
@@ -429,7 +429,7 @@
     "av1": false
   },
   "product-filter-grid": {
-    "av1": false
+    "av1": true
   },
   "product-gallery": {
     "av1": true
@@ -444,10 +444,10 @@
     "av1": true
   },
   "stamp-card": {
-    "av1": false
+    "av1": true
   },
   "testimonial-wall": {
-    "av1": false
+    "av1": true
   },
   "upgrade-modal": {
     "av1": true
@@ -459,7 +459,7 @@
     "av1": false
   },
   "shader-campaign-banner": {
-    "av1": false
+    "av1": true
   },
   "loop-shader-hero": {
     "av1": true
@@ -480,13 +480,13 @@
     "av1": true
   },
   "black-friday-weekend": {
-    "av1": false
+    "av1": true
   },
   "checkout-flow": {
-    "av1": false
+    "av1": true
   },
   "lunar-new-year": {
-    "av1": false
+    "av1": true
   },
   "gift-card-designer": {
     "av1": false
@@ -495,7 +495,7 @@
     "av1": false
   },
   "receipt-printer": {
-    "av1": false
+    "av1": true
   },
   "store-help-widget": {
     "av1": false
@@ -516,10 +516,10 @@
     "av1": false
   },
   "cutaway-spec": {
-    "av1": false
+    "av1": true
   },
   "ask-to-shop": {
-    "av1": false
+    "av1": true
   },
   "recipe-glass": {
     "av1": false
@@ -543,16 +543,16 @@
     "av1": true
   },
   "lineup-shelf": {
-    "av1": false
+    "av1": true
   },
   "sticker-board": {
     "av1": false
   },
   "redline-reveal": {
-    "av1": false
+    "av1": true
   },
   "count-chart": {
-    "av1": false
+    "av1": true
   },
   "card-dock": {
     "av1": true
@@ -573,19 +573,19 @@
     "av1": false
   },
   "subscription-manager": {
-    "av1": false
+    "av1": true
   },
   "volume-tiers": {
     "av1": false
   },
   "review-request": {
-    "av1": false
+    "av1": true
   },
   "referral-queue": {
     "av1": true
   },
   "shoppable-story": {
-    "av1": false
+    "av1": true
   },
   "swipe-shortlist": {
     "av1": true
@@ -603,7 +603,7 @@
     "av1": false
   },
   "tear-pack-reveal": {
-    "av1": false
+    "av1": true
   },
   "storage-meter": {
     "av1": false
@@ -615,10 +615,10 @@
     "av1": true
   },
   "liquid-glass-nav": {
-    "av1": false
+    "av1": true
   },
   "team-invite": {
-    "av1": false
+    "av1": true
   },
   "wave-confirm": {
     "av1": false

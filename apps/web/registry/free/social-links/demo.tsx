@@ -3,6 +3,7 @@
 import { useDemoText } from "@/lib/demo-locale";
 
 import { SocialLink, SocialLinks, type SocialLinkItem } from "./social-links";
+import { LookArt } from "@/registry/_demo/product-art";
 
 export const demoCopy = {
   en: {
@@ -94,7 +95,7 @@ export default function SocialLinksDemo() {
       {/* placeholder work grid so the footer sits where it would on a real page */}
       <div aria-hidden="true" className="grid grid-cols-3 gap-3 px-6 sm:px-8">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="aspect-[4/3] rounded-xl bg-muted" />
+          <LookArt key={i} look={(["coat-camel", "field-jacket", "boots-black"] as const)[i]} className="aspect-[4/3] rounded-xl" />
         ))}
       </div>
 

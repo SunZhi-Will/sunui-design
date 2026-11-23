@@ -3,6 +3,7 @@
 import { useDemoText } from "@/lib/demo-locale";
 
 import { DialogSheet } from "./dialog-sheet";
+import { LookArt } from "@/registry/_demo/product-art";
 
 const copy = {
   en: {
@@ -75,7 +76,7 @@ export default function DialogSheetDemo() {
   return (
     <div className="relative h-[30rem] w-full max-w-[44rem] overflow-hidden rounded-lg border bg-background">
       <div className="grid gap-6 p-6 sm:grid-cols-[1fr_1.1fr]">
-        <div aria-hidden="true" className="aspect-[4/5] rounded-md bg-muted" />
+        <LookArt look="turtleneck" className="aspect-[4/5] rounded-md" />
         <div>
           <p className="text-xl font-semibold tracking-tight">{t.product}</p>
           <p className="mt-1 tabular-nums text-muted-foreground">{t.price}</p>

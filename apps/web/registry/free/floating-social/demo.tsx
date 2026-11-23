@@ -4,6 +4,7 @@ import type { SocialButtonItem } from "@/components/ui/social-button";
 import { useDemoText } from "@/lib/demo-locale";
 
 import { FloatingSocial, type FloatingLayout } from "./floating-social";
+import { LookArt } from "@/registry/_demo/product-art";
 
 export const demoCopy = {
   en: {
@@ -31,7 +32,7 @@ export function PageFrame({ title, layout, items, label, hint }: { title: string
     <div className="relative h-80 overflow-hidden rounded-xl bg-card shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]">
       <div aria-hidden="true" className="flex flex-col gap-3 p-5">
         <p className="text-sm font-semibold tracking-tight text-foreground">{title}</p>
-        <div className="aspect-[16/7] rounded-lg bg-muted" />
+        <LookArt look={layout === "petal" ? "coat-camel" : layout === "column" ? "field-jacket" : "scarf-oat"} className="aspect-[16/7] rounded-lg" />
         <div className="h-2 w-4/5 rounded-full bg-muted" />
         <div className="h-2 w-3/5 rounded-full bg-muted" />
       </div>

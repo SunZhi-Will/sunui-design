@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useDemoText } from "@/lib/demo-locale";
 
 import { TocScrollspy } from "./toc-scrollspy";
+import { LookArt } from "@/registry/_demo/product-art";
 
 const copy = {
   en: {
@@ -63,11 +64,11 @@ export default function TocScrollspyDemo() {
       </aside>
       <div ref={scroller} className="relative overflow-y-auto px-6 pb-[16rem] pt-6">
         <h1 className="text-xl font-semibold tracking-tight">{t.title}</h1>
-        {t.sections.map((s) => (
+        {t.sections.map((s, i) => (
           <section key={s.id} id={s.id} className="mt-8 scroll-mt-12 outline-none">
             <h2 className={s.level === 2 ? "text-sm font-semibold" : "text-base font-semibold"}>{s.label}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-            <div aria-hidden="true" className="mt-4 h-24 rounded-md bg-muted" />
+            <LookArt look={(["scarf-oat", "coat-camel", "trousers-grey"] as const)[i % 3]} className="mt-4 aspect-[5/2] rounded-md" />
           </section>
         ))}
       </div>

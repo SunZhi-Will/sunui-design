@@ -9,6 +9,9 @@
 //   { "click": [x, y] }                  點一下
 //   { "drag": [x1, y1, x2, y2], "ms": 900 } 按住拖過去
 //   { "wait": 800 }                      停一下
+//   { "type": "linen" }                  在目前聚焦的欄位逐字輸入（先用 sel 點欄位）
+//   { "key": "Escape" }                  按一個鍵（Escape、Enter、Tab、方向鍵）
+//   { "scroll": [x, y, dy], "ms": 1400 } 滑鼠移到 (x, y)，平滑捲動 dy 像素（負的往上）
 //   { "sel": "[role=tab]", "nth": 1 }    點第 n 個符合選擇器的元素（比座標穩，按鈕順序不隨語言改變）
 //   { "hover": "img", "nth": 2 }         滑鼠移到第 n 個符合選擇器的元素上，不點
 // demo 會從頭到尾跑一次再重來，直到錄滿 seconds 秒（預設 6）。crf 是畫質（預設 28，越大越小檔；點很多的畫面用 34）。
@@ -17,7 +20,8 @@
 //
 // --catalog 錄 /blocks 型錄的卡片（2026-11-22）：每個 block 一支。和首頁一樣用 1280 寬的完整頁面（/preview/<name>）渲染，
 //   block 以原尺寸排版，再框一個剛好裝下整個 block 的 16:10（不裁、不縮小排版）；效果庫錄代表樣式 /preview/<name>/v/<featured>，
-//   整個 800x500 的舞台就是畫面。首頁已經錄過（home-cards.json 有）的跳過，
+//   整個 800x500 的舞台就是畫面。2026-11-23 起效果庫改錄多格同屏牆 /preview/<name>/wall（樣式名單在 catalog-cards.json 的 walls，
+//   demos.<name>.stage 指過去）：一張卡只秀一個樣式看起來太空。首頁已經錄過（home-cards.json 有）的跳過，
 //   兩邊共用同一支。要操作才會動的 block 把 demo 寫在 content/catalog-cards.json 的 demos（格式同上）。沒有靜態圖的順便輸出 <name>.jpg。
 // --manifest 只重寫 content/cards-media.json（並刪掉比 H.264 大的 AV1 檔），不錄影。
 // --idle 不跑 demo，只錄 block 自己會不會動（拿來判斷哪些需要寫 demo），並印出畫面變化量。
@@ -76,8 +80,9 @@ const DPR = catalog ? 2 : 1.5;
 const STAGE = { width: 800, height: 500, dpr: 1.2 };
 const ASPECT = 640 / 550;
 const PAD = 48;
-const MIN_WIDTH = 520;
-const SETTLE = 3500;
+// 2026-11-23：520 改 400，窄的小元件（配額環、邀請卡）在畫面裡才不會只佔中間一小塊
+const MIN_WIDTH = 400;
+const SETTLE = args.includes("--measure") ? 1200 : 3500;
 const FPS = 30;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -281,6 +286,16 @@ const findTargets = (b) => `((b) => {
 /** 型錄卡片頁：FitStage 量好尺寸、裡面有東西才算畫好 */
 const stageReady = `(() => { const r = document.querySelector("[data-fit-stage] > div")?.getBoundingClientRect(); return !!r && r.width > 2 && r.height > 2; })()`;
 
+// 無縫循環（2026-11-23）：示範結束的畫面和開頭不一樣時，影片循環那一下會硬跳。
+// 把開頭 LOOP_FADE 秒疊到結尾淡入，再把開頭那段切掉：最後一格接回第一格是連續的。影片因此短 LOOP_FADE 秒。
+const LOOP_FADE = 0.5;
+/** in 是輸入的 filter 標籤（例如 "[0:v]scale=...,crop=..."），回傳接在後面的 filter_complex，輸出標籤 [out] */
+function loopGraph(input, seconds, tail) {
+  const x = LOOP_FADE;
+  const at = (seconds - 2 * x).toFixed(3);
+  return `${input},split[la][lb];[la]trim=start=${x},setpts=PTS-STARTPTS[lm];[lb]trim=end=${x},setpts=PTS-STARTPTS+${at}/TB,format=yuva420p,fade=t=in:st=${at}:d=${x}:alpha=1[lh];[lm][lh]overlay=eof_action=pass,${tail}[out]`;
+}
+
 async function record(browser, card) {
   const seconds = card.seconds ?? 6;
   const vp = card.stage ? STAGE : VIEWPORT;
@@ -292,6 +307,8 @@ async function record(browser, card) {
     if (Date.now() > deadline) throw new Error("demo 沒有渲染出來");
     await sleep(300);
   }
+  // Pro 預覽底部那行「Licensed version: ...」是給詳情頁看的說明；卡片影片裡只會讓畫面像文件，錄影時藏掉（2026-11-23）
+  await browser.evaluate(`document.querySelectorAll("p").forEach((p) => { if (/^\\s*Licensed version:/.test(p.textContent)) p.style.display = "none"; }); 1`);
   await sleep(SETTLE);
   let rect;
   let vy;
@@ -302,6 +319,14 @@ async function record(browser, card) {
   } else {
     const box = await browser.evaluate(measure);
     rect = card.catalog && !card.crop ? frameFor(box) : cardRect(clipFor(box), card.crop);
+    // --measure：只印出 block 實際用到的寬高，不錄影（找出哪些小元件在畫面裡太小）
+    if (args.includes("--measure")) {
+      // --controls：順便列出舞台裡可操作的元素（寫 demo 時找選擇器用），b 是它在 [data-preview-stage] button 裡的順序
+      const controls = args.includes("--controls")
+        ? await browser.evaluate(`(() => { const st = document.querySelector("[data-preview-stage]"); const bs = [...st.querySelectorAll("button")]; return [...st.querySelectorAll("button,[role=switch],[role=tab],[role=radio],[role=slider],input,select,summary,textarea")].map((e) => { const r = e.getBoundingClientRect(); return [e.tagName.toLowerCase() + (e.getAttribute("role") ? "[" + e.getAttribute("role") + "]" : "") + (e.type && e.tagName === "INPUT" ? ":" + e.type : ""), "b" + bs.indexOf(e), (e.getAttribute("aria-label") || e.textContent || e.placeholder || "").trim().slice(0, 26), Math.round(r.x) + "," + Math.round(r.y + scrollY), e.disabled ? "disabled" : ""].join(" | "); }).join("\\n"); })()`)
+        : "";
+      return { measure: [Math.round(box.r - box.l), Math.round(box.b - box.t)], controls };
+    }
     // 卡片要整塊在視窗裡：捲到它上面一點
     const scroll = Math.max(0, rect.y - 40);
     await browser.evaluate(`window.scrollTo(0, ${scroll}); 1`);
@@ -345,6 +370,22 @@ async function record(browser, card) {
       pos = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e };
       await mouse("mouseMoved", pos, pressed ? { buttons: 1 } : { button: "none" });
       await sleep(16);
+    }
+  };
+  // 平滑捲動：每 16ms 送一小段滾輪，總量 dy，緩進緩出。一次送 60px 的滾輪在影片裡是一格一格跳（2026-11-23）
+  const wheel = async (dy, ms) => {
+    // 照實際經過的時間送（每次送滾輪要等頁面處理完，不一定 16ms 就回來），整段才會剛好 ms 毫秒
+    const began = Date.now();
+    let sent = 0;
+    while (sent !== dy) {
+      const k = Math.min(1, (Date.now() - began) / ms);
+      const e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+      const target = k >= 1 ? dy : Math.round(dy * e);
+      if (target !== sent) {
+        await mouse("mouseWheel", pos, { deltaX: 0, deltaY: target - sent });
+        sent = target;
+      }
+      await sleep(8);
     }
   };
   const start = Date.now();
@@ -400,11 +441,10 @@ async function record(browser, card) {
         await sleep(900);
       } else {
         await glide(at([W / 2, H / 2]), 300);
-        for (let i = 0; i < 12; i++) {
-          await mouse("mouseWheel", pos, { deltaX: 0, deltaY: i < 6 ? 60 : -60 });
-          await sleep(180);
-        }
+        await wheel(360, 1800);
         await sleep(500);
+        await wheel(-360, 1600);
+        await sleep(700);
       }
       continue;
     }
@@ -434,6 +474,21 @@ async function record(browser, card) {
         await mouse("mousePressed", pos, { clickCount: 1 });
         await sleep(60);
         await mouse("mouseReleased", pos, { clickCount: 1 });
+      }
+      if (step.type) {
+        for (const ch of step.type) {
+          await browser.page("Input.insertText", { text: ch });
+          await sleep(step.ms ?? 80);
+        }
+      }
+      if (step.key) {
+        const codes = { Escape: 27, Enter: 13, Tab: 9, ArrowRight: 39, ArrowLeft: 37, ArrowDown: 40, ArrowUp: 38 };
+        for (const type of ["keyDown", "keyUp"]) await browser.page("Input.dispatchKeyEvent", { type, key: step.key, code: step.key, windowsVirtualKeyCode: codes[step.key] });
+      }
+      if (step.scroll) {
+        const [x, y, dy] = step.scroll;
+        await glide(at([x, y]), 250);
+        await wheel(dy, step.ms ?? 1400);
       }
       if (step.drag) {
         const [x1, y1, x2, y2] = step.drag;
@@ -475,7 +530,8 @@ async function record(browser, card) {
     const file = path.join(out, `${card.name}${v.suffix}`);
     execFileSync("ffmpeg", [
       "-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(dir, "f%04d.jpg"),
-      "-vf", `scale=${Math.round(vp.width * s)}:-2,${crop},scale=${v.w}:${v.w * 0.625}:flags=lanczos,format=yuv420p`,
+      "-filter_complex", loopGraph(`[0:v]scale=${Math.round(vp.width * s)}:-2,${crop}`, seconds, `scale=${v.w}:${v.w * 0.625}:flags=lanczos,format=yuv420p`),
+      "-map", "[out]",
       ...v.codec, "-movflags", "+faststart", "-an", file,
     ], { stdio: ["ignore", "ignore", "pipe"] });
     sizes[v.suffix] = Math.round(fs.statSync(file).size / 1024);
@@ -484,7 +540,7 @@ async function record(browser, card) {
   const poster = path.join(out, `${card.name}.jpg`);
   if (card.catalog) {
     execFileSync("ffmpeg", [
-      "-y", "-loglevel", "error", "-i", firstFile,
+      "-y", "-loglevel", "error", "-i", path.join(dir, `f${String(Math.round(LOOP_FADE * FPS)).padStart(4, "0")}.jpg`),
       "-vf", `scale=${Math.round(vp.width * s)}:-2,${crop},scale=960:600:flags=lanczos`, "-q:v", "3", poster,
     ], { stdio: ["ignore", "ignore", "pipe"] });
   }
@@ -515,6 +571,33 @@ function writeManifest() {
   return media;
 }
 
+// --reloop：把已經錄好的影片補上無縫循環（一次性；之後新錄的在編碼時就會做）。要配 --only，不要對同一支跑兩次（每次會再短 LOOP_FADE 秒）。
+if (args.includes("--reloop")) {
+  if (!only.length) throw new Error("--reloop 要配 --only");
+  const tmp = fs.mkdtempSync(path.join(root, "check-out", ".loop-"));
+  for (const name of only) {
+    const src = path.join(out, `${name}.mp4`);
+    if (!fs.existsSync(src)) continue;
+    const seconds = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src]).toString().trim());
+    const keep = path.join(tmp, `${name}.mp4`);
+    fs.copyFileSync(src, keep);
+    for (const v of [
+      { suffix: ".mp4", w: 960, codec: ["-c:v", "libx264", "-preset", "slow", "-crf", "26"] },
+      { suffix: "-480.mp4", w: 480, codec: ["-c:v", "libx264", "-preset", "slow", "-crf", "26"] },
+      { suffix: ".av1.mp4", w: 960, codec: ["-c:v", "libsvtav1", "-preset", "5", "-crf", "46", "-g", "90"] },
+      { suffix: "-480.av1.mp4", w: 480, codec: ["-c:v", "libsvtav1", "-preset", "5", "-crf", "46", "-g", "90"] },
+    ]) {
+      execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", keep, "-filter_complex", loopGraph("[0:v]null", seconds, `scale=${v.w}:${v.w * 0.625}:flags=lanczos,format=yuv420p`), "-map", "[out]", ...v.codec, "-movflags", "+faststart", "-an", path.join(out, `${name}${v.suffix}`)], { stdio: ["ignore", "ignore", "pipe"] });
+    }
+    // 型錄卡的靜態圖是影片第一格：跟著換（首頁那批的靜態圖是分享圖裁的，不動）
+    if (!homeNames.has(name)) execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", path.join(out, `${name}.mp4`), "-frames:v", "1", "-vf", "scale=960:600:flags=lanczos", "-q:v", "3", path.join(out, `${name}.jpg`)], { stdio: ["ignore", "ignore", "pipe"] });
+    console.log(`  ${name}`);
+  }
+  fs.rmSync(tmp, { recursive: true, force: true });
+  writeManifest();
+  process.exit(0);
+}
+
 if (args.includes("--manifest")) {
   console.log(writeManifest());
   process.exit(0);
@@ -526,6 +609,11 @@ try {
   for (const card of cards) {
     try {
       const r = await record(browser, card);
+      if (r.measure) {
+        console.log(`${card.name} ${r.measure.join(" ")}`);
+        if (r.controls) console.log(r.controls);
+        continue;
+      }
       console.log(`  ${card.name.padEnd(24)} H.264 ${r.sizes[".mp4"]}/${r.sizes["-480.mp4"]} KB，AV1 ${r.sizes[".av1.mp4"]}/${r.sizes["-480.av1.mp4"]} KB（960/480）  收到 ${r.frames} 幀`);
     } catch (e) {
       failed.push(`${card.name}: ${e.message}`);
@@ -536,7 +624,7 @@ try {
   await sleep(300);
   fs.rmSync(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 }
-writeManifest();
+if (!args.includes("--measure")) writeManifest();
 if (failed.length) {
   console.error(failed.join("\n"));
   process.exit(1);

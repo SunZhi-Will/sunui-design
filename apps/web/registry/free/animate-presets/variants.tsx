@@ -21,7 +21,10 @@ export default function AnimatePresetsVariant({ variant }: { variant: string }) 
     // IntersectionObserver then reports it as off screen, and the loop would never start
     <div className="grid h-72 w-80 place-items-center overflow-hidden">
       <Animate preset={preset} trigger="loop" repeatDelay={repeatDelay}>
-        <Subject label={t.sample} />
+        {/* The chip alone is tiny in a card-sized frame: show it larger so the motion reads */}
+        <div className="scale-[1.7]">
+          <Subject label={t.sample} />
+        </div>
       </Animate>
     </div>
   );

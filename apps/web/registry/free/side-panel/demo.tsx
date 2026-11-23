@@ -6,6 +6,9 @@ import { useDemoLocale, useDemoText } from "@/lib/demo-locale";
 import { cn } from "@/lib/utils";
 
 import { SidePanel } from "./side-panel";
+import { ProductArt, useProductNames, type ProductKind } from "@/registry/_demo/product-art";
+
+const shelf: ProductKind[] = ["jacket", "tote", "sneaker", "mug", "watch", "lamp", "headphones", "bottle"];
 
 const surface = "bg-card shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-6px_rgb(0_0_0/0.06)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]";
 const surfaceUnder = "bg-muted dark:bg-foreground/10";
@@ -118,6 +121,7 @@ const primary =
 export default function SidePanelDemo() {
   const locale = useDemoLocale();
   const t = useDemoText(copy);
+  const names = useProductNames();
   const [panel, setPanel] = useState<"filters" | "bag" | null>(null);
   const [picked, setPicked] = useState<string[]>(["M"]);
   const close = (open: boolean) => !open && setPanel(null);
@@ -140,10 +144,10 @@ export default function SidePanelDemo() {
       </header>
 
       <ul className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4 sm:p-5">
-        {t.products.map((name, i) => (
+        {t.products.map((_, i) => (
           <li key={i} className="text-sm">
-            <div aria-hidden="true" className={cn("aspect-[4/3] rounded-[3px]", surfaceUnder)} />
-            <p className="mt-2 font-medium">{name}</p>
+            <ProductArt kind={shelf[i % shelf.length]} className="aspect-[4/3] rounded-[3px]" />
+            <p className="mt-2 font-medium">{names[shelf[i % shelf.length]]}</p>
             <p className={cn("tabular-nums", inkMuted)}>
               {t.productColors[i]}
               {t.sep}
