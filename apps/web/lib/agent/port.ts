@@ -44,7 +44,27 @@ export type PortLevel = "verified" | "untested" | "manual" | "web-only";
 // reports/可攜式Prompt跨平台深度分析-2026-11-23.md）。要修過才對的不列：那代表指南當時不夠，補過的規則還沒重跑。
 const firstRound = ["confirm-button", "range-slider", "scratch-card"];
 const verified: Record<PortPlatform, ReadonlySet<string>> = {
+  // otp-input 與 plush-portrait 第二輪沒過，補了指南後換全新的 agent 重做，第一輪通過（第三輪）
   vue: new Set([
+    ...firstRound,
+    "loading-button",
+    "favorite-button",
+    "quantity-stepper",
+    "otp-input",
+    "notify-badge",
+    "sliding-tabs",
+    "animated-number",
+    "checkout-steps",
+    "toast-stack",
+    "compare-slider",
+    "scroll-reveal-text",
+    "plush-portrait",
+  ]),
+  // confirm-button 第二輪寬度量錯，補指南後重做通過
+  svelte: new Set(firstRound),
+  // notify-badge 第二輪徽章蓋住圖示，補指南後重做通過。plush-portrait 是 WebGL 改寫成 Metal。
+  // otp-input 不列：重做後螢幕鍵盤的流程都對，但實體鍵盤的退格被當成向前刪除
+  swiftui: new Set([
     ...firstRound,
     "loading-button",
     "favorite-button",
@@ -56,26 +76,11 @@ const verified: Record<PortPlatform, ReadonlySet<string>> = {
     "toast-stack",
     "compare-slider",
     "scroll-reveal-text",
-  ]),
-  // confirm-button 在 Svelte 要修一輪（寬度量錯），所以不列
-  svelte: new Set(["range-slider", "scratch-card"]),
-  // notify-badge 修了兩輪才對，不列；plush-portrait 是 WebGL 改寫成 Metal，第一輪就過
-  swiftui: new Set([
-    ...firstRound,
-    "loading-button",
-    "favorite-button",
-    "quantity-stepper",
-    "sliding-tabs",
-    "animated-number",
-    "checkout-steps",
-    "toast-stack",
-    "compare-slider",
-    "scroll-reveal-text",
     "plush-portrait",
   ]),
   flutter: new Set(firstRound),
-  // scratch-card 在 React Native 能刮，但筆劃有漏、刮不到門檻，不列
-  "react-native": new Set(["confirm-button", "range-slider"]),
+  // scratch-card 前兩次沒過（漏掉啟動手勢那一下的事件、和外層捲動搶觸控），補指南後第三次重做通過
+  "react-native": new Set(firstRound),
 };
 
 // 只存在於網頁的東西：瀏覽器外框、游標與 hover 效果、頁面捲動導覽、Cookie 橫幅。原生 App 由系統或導覽列處理。
@@ -162,7 +167,10 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
     deps.push({ path: motionPath, code: await readFile(path.join(process.cwd(), motionPath), "utf8") });
   }
   const demoPath = main[0] ? path.join(path.dirname(main[0].path), "demo.tsx") : null;
-  const demo = demoPath && existsSync(path.join(process.cwd(), demoPath)) ? await readFile(path.join(process.cwd(), demoPath), "utf8") : null;
+  const rawDemo = demoPath && existsSync(path.join(process.cwd(), demoPath)) ? await readFile(path.join(process.cwd(), demoPath), "utf8") : null;
+  // demo 用的圖片放在網站的 public/blocks/ 底下。換成完整網址，移植版才拿得到同一批圖：
+  // 有些 block（臉部照片、前後對照）的行為取決於圖片本身，用灰色方塊代替會跑不起來或看不出對錯。
+  const demo = rawDemo?.replace(/(["'`])\/blocks\//g, `$1${siteUrl()}/blocks/`) ?? null;
 
   const level = portLevel(item, platform, main[0]?.code);
   const usage = item.meta.usage;

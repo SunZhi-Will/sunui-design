@@ -74,7 +74,7 @@ Blocks never hard-code colours; they read roles. Map each role to the host app's
 - **Hooks the source exports** (`useToasts`) are part of the interface: port them as the platform's equivalent.
 
 ## Demo helpers that are not in this document
-The demo may import site-only helpers. `ProductArt` draws a neutral product photo: use a muted block of the same size and radius. `useProductNames()` returns display names for those products: use short plain English names. `useDemoAutoplay` and its cursor only replay the demo for recordings: drop them. Local image paths (`/blocks/...`) become muted placeholders unless the block's behaviour depends on the picture, in which case say so.
+The demo may import site-only helpers. `ProductArt` draws a neutral product photo: use a muted block of the same size and radius. `useProductNames()` returns display names for those products: use short plain English names. `useDemoAutoplay` and its cursor only replay the demo for recordings: drop them. Image paths in the demo below are already absolute URLs on the SunUI site: use those pictures, since some blocks (a portrait, a before and after pair) depend on them. Where the block draws a picture into a canvas or a WebGL texture, download the files into the project and load them from there: a browser will not hand over the pixels of an image from another origin.
 
 ## Do not add
 Gradients, glows, coloured shadows, particles, confetti, decorative entrance animations, idle loops, haptics or sounds that fire without a user action.
