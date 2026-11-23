@@ -36,6 +36,12 @@
   { "block": "compare-slider", "platform": "svelte", "source": "b4d2df619300", "date": "2026-11-23", "round": 4, "method": "judged" },
   { "block": "avatar-stack", "platform": "vue", "source": "d0e67f525fc5", "date": "2026-11-23", "round": 4, "method": "judged" },
   { "block": "empty-state", "platform": "vue", "source": "233e735612dc", "date": "2026-11-23", "round": 4, "method": "judged" },
-  { "block": "empty-state", "platform": "svelte", "source": "233e735612dc", "date": "2026-11-23", "round": 4, "method": "judged" }
+  { "block": "empty-state", "platform": "svelte", "source": "233e735612dc", "date": "2026-11-23", "round": 4, "method": "judged" },
+  { "block": "quantity-stepper", "platform": "vue", "source": "b62571a9a8b3", "date": "2026-11-23", "round": 5, "method": "judged" },
+  { "block": "notify-badge", "platform": "vue", "source": "f2e25b59b128", "date": "2026-11-23", "round": 5, "method": "judged" },
+  { "block": "notify-badge", "platform": "svelte", "source": "f2e25b59b128", "date": "2026-11-23", "round": 5, "method": "judged" },
+  { "block": "low-stock-indicator", "platform": "vue", "source": "5d564a8dc12c", "date": "2026-11-23", "round": 5, "method": "judged" },
+  { "block": "hotspots", "platform": "vue", "source": "06faab8a7453", "date": "2026-11-23", "round": 5, "method": "judged" },
+  { "block": "theme-picker", "platform": "vue", "source": "15781f2bfd50", "date": "2026-11-23", "round": 5, "method": "judged" }
  ]
 }

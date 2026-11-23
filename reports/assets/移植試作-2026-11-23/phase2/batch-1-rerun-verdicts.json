@@ -1,0 +1,1697 @@
+[
+ {
+  "block": "confirm-button",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say whether a private Spinner subcomponent with no hooks may be inlined. I inlined the svg in the template.",
+     "The guide gives no direction on `data-active` or `aria-busy` with `undefined` in Vue. I used `armed || undefined` as in the source, assuming attributes with undefined are omitted."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "Svelte transition functions (in:/out:) must declare a node parameter or svelte-check reports 'Expected 0 arguments, but got 1'; the guide does not say so.",
+     "The guide does not say that a $state ref read in $effect.pre needs untrack to avoid extra re-runs.",
+     "The guide does not say how to pin a leaving label inside a button whose own position is static (it needs position: relative added)."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "confirm-button",
+   "itemsTotal": 16,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 15,
+     "itemsPassed": 14,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "swap-motion: the label text is squashed/stretched horizontally while the button resizes; the original keeps it at constant width (layout=\"position\" counter-scales it). Original label bounding width over the whole run: \"Remove signup\" 91.95 to 92.00px, \"Remove\" 48.00 to 48.44px. Vue: \"Remove signup\" enters at 57.06px wide (61 percent) with opacity already 0.7, then 58.06, 62.36, 68.24, 73.99, 80.17, 84.22, 87.83, 90.32, reaching 93.08 only about 160ms after the press (offsetWidth stays 93, so it is a scale, not a reflow). On confirm \"Remove\" enters 63.09px wide (130 percent) and shrinks to 48.55 over about 180ms; on lapse/Escape it peaks at 79.19px (163 percent; snapshot 40ms after Escape: 70.57px vs original 48.44px). Cause visible in the trace: the entering motion.span has transform matrix(1,0,0,1,0,y) (no inverse scaleX) while the original's has matrix(1.6178,0,0,1,...) cancelling the button's layout scale. Incoming label also starts at x=6.74 instead of 11."
+     ],
+     "untestedItems": [
+      "locale-copy: the port demo hardcodes locale=\"en\" and English copy and has no locale switch, so ja/zh-TW/zh-CN could not be driven at runtime (the MESSAGES table and resolveLocale in the source are identical to the original; the original's three locales were measured and match the checklist)"
+     ],
+     "evidence": [
+      "All 33 state snapshots (first render, armed hover/rest, hint gone, lapsed, re-armed, Escape after mouse and keyboard arm, keyboard flow, pending, success, late confirm, reduced motion) equal the original in text, data-active, disabled, aria-busy, role/aria-live, sizes (button 28px tall, 10px padding, 12.8px text, status min-height 16px, max-width 256px, 4px gap), apart from theme colours/fonts",
+      "Timers from press: hint leaves DOM 1933ms (original 1948), arm lapses 2517ms (2514), re-arm restarts both; demo action 499ms (501); result notice lives 1917ms (1933)",
+      "Button width spring matches: 70.55 to 115.08 peak 116.4 in about 350ms (original 70.44 to 113.95 peak 115.25, about 360ms); confirm 115.05 to 88.55 min 87.76 in 333ms (original 113.95 to 88.44 min 87.68, 333ms); spinner removal snaps 88.55 to 70.55 in one frame like the original",
+      "Tab: button then leaves the demo; after removal Tab skips the demo; same as original (ignoring the nextjs-portal dev overlay). The two tabindex=\"-1\" spans inside the button are not Tab stops and have pointer-events none: after a mouse click activeElement is the button, Escape cancels, Enter re-arms without running",
+      "Focus ring: 3px ring at ring/50 unarmed, destructive/20 ring with destructive/40 border when armed, same structure as original",
+      "Repeat presses while pending: label never re-arms, one \"Signup removed\"; after success button disabled at opacity 0.5, activeElement BODY",
+      "Reduced motion: every change in one frame (70.55 to 115.08 to 88.55 to 70.55), label y constant 4.41, spinner 14px with animation-name none, hint 1816ms, lapse 2516ms, action 501ms; identical to original",
+      "Screenshots compared: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/confirm-button-vue-*.png vs confirm-button-original-*.png; rest, armed, pending and success states look the same",
+      "0 console errors and 0 page errors in all sessions"
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 15,
+     "itemsPassed": 11,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "swap-motion / arm-timeout: on disarm the button first moves the wrong way and then snaps. Original 113.95 to 70.44 shrinking over about 360ms (113.85, 110.04, 103.47, 95.64 ... min 69.14). Svelte 115.08 GROWS to 169.17 (116.28, 122.36, 130.86, 139.27, 147.47 ... 167.64) over about 400ms, then jumps to 70.55 in a single frame. Same on every lapse (measured twice) and visible in shots/confirm-button-svelte-21-mid-lapse.png (a 167px wide \"Remove\" key that truncates the meta line)",
+      "escape-cancels: same wrong-way width after Escape. 40ms after Escape the button is 122.36px (original 102.24 and shrinking); 350ms after Escape it is still 167.63px wide (original 70.47); with a quick re-arm it then animates 167.7 down to 115",
+      "confirm-runs-action / swap-motion: on the confirm press the button grows from 115.08 to 187.7px and stays about 186px wide for roughly 400ms of the 500ms pending window, then snaps to 88.55 in one frame; the original shrinks 113.95 to 88.44 with a spring in 333ms. Snapshots during pending: width 186.02 vs original 88.34, spinner 57.91px from the button's left edge vs 8.76 to 11px. Visible in shots/confirm-button-svelte-23-pending-350.png (wide key, card text truncated to \"Looks li...\") against confirm-button-original-23-pending-350.png",
+      "swap-motion: the entering label starts outside the button's left edge (x=-11.27 relative to the button, sliding to 11 over about 230ms) while the original's entering label sits at x=11 the whole time; on confirm the entering \"Remove\" starts at x=90.81 and the spinner at x=-21.47 (original 29 and about 11 to 14)",
+      "success-result (minor): when the result replaces a leftover hint, the leaving hint line is pinned 16px lower (y=16 inside the status line, i.e. on a second row) while it fades; in the original it stays at y=0"
+     ],
+     "untestedItems": [
+      "locale-copy: the port demo hardcodes locale=\"en\" and English copy and has no locale switch, so ja/zh-TW/zh-CN could not be driven at runtime (MESSAGES and resolveLocale in the source are identical to the original)"
+     ],
+     "evidence": [
+      "Settled states match the original in text and attributes: first render, armed (data-active, destructive tint 0.1 at rest and 0.2 under hover, hint text), lapsed, re-armed, pending (disabled, aria-busy=true, svg aria-hidden), success (green rgb(31,157,85) \"Signup removed\", email line-through and muted, button disabled at opacity 0.5), role=status aria-live=polite present from first render",
+      "Timers from press: hint leaves DOM 1950ms (original 1948), arm lapses 2516ms (2514); demo action 501ms; result notice lives 1933ms (1933)",
+      "Arming width spring is correct: 70.55 to 115.08 peak 116.39 in about 366ms; label width constant (93.08 / 48.55); spinner removal snaps 88.55 to 70.55 in one frame like the original",
+      "Tab: button then leaves the demo; after removal Tab skips the demo; after a mouse click activeElement is the button; Escape cancels and Enter re-arms without running; focus ring structure matches",
+      "Reduced motion passes: all changes in one frame (70.55 to 115.08 to 88.55 to 70.55), no offsets, spinner animation-name none, hint 1816ms, lapse 2517ms, action about 500ms",
+      "0 console errors and 0 page errors in all sessions",
+      "Raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/confirm-button.json (widthSegs, armTrace, confirmTrace per target)"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "escape-cancels: says the status line is emptied \"at once\". In the original the hint node stays in the DOM for the 120ms fade out (status text still present until about 135ms after Escape); only its opacity starts dropping immediately. Ports were judged against that.",
+    "swap-motion: says the width spring settles \"in roughly 200 to 300ms\". Measured on the original it overshoots at about 215ms (115.25px) and only settles to within 0.05px after about 330 to 365ms.",
+    "swap-motion: \"no label text is ever drawn outside the button edge\" is true only visually: in the original the leaving label's box does extend past the button edge for several frames and is clipped by overflow-hidden.",
+    "accessible-names: fine as written, but note Playwright's aria snapshot does not expose busy; aria-busy=\"true\" had to be read from the attribute."
+   ],
+   "harnessProblems": [
+    "First full run failed on the vue target with \"Execution context was destroyed, most likely because of a navigation\" (the page at localhost:3161 reloaded mid-run, probably a Vite dev-server reload). A rerun of vue alone completed cleanly with 0 errors; the script now merges per-target reruns into the JSON.",
+    "Neither port demo has a locale switch (locale=\"en\" hardcoded), so locale-copy cannot be tested on the ports without editing them.",
+    "No autoplay was found on the original preview; the demo was confirmed at rest by two equal snapshots 1.2s apart after a real pointer press on the email text.",
+    "Mid-animation screenshots (steps 20 to 23) land some tens of ms later than requested because page.screenshot is slow; the per-frame rAF traces, not the screenshots, are the timing evidence.",
+    "Extra helper files written beside the main script in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/: confirm-button-cmp.mjs, cb-diff.mjs, cb-q.mjs (read-only analysis of confirm-button.json)."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "range-slider",
+  "platforms": [
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide gives no concrete pattern for restarting a spring on a property that animates in % (animating `left` with animate(el) reads computed px). I used motionValue plus animate(mv) and could not check it against the original.",
+     "The acceptance check 1 text says '$20, $120' but the source and the check's own parenthetical say an en dash, so it contradicts itself.",
+     "The guide does not say how a generic component should type a `$bindable` value when it can also be uncontrolled."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "range-slider",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 17,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "first-render-demo (also visible in every later state: arrow-keys, pointer-press-track, pointer-drag, count-floor): the price value text is missing the space before the en dash. Original innerText is \"$20 – $120\" (innerHTML '$20 – $120', width 74.9px); the port renders \"$20– $120\" (innerHTML '$20– $120<!---->', width 72.5px). Same in all states, e.g. \"$25– $120\", \"$60– $120\", \"$20– $30\". Visible in shots/range-slider-svelte-label-zoom.png and range-slider-svelte-8-drag-30.png versus the original. Cause in RangeSlider.svelte: `{format(values[0])}{#if range} – {format(values[1])}{/if}`; Svelte trims the leading whitespace inside the {#if} block. The checklist explicitly requires an en dash with a space on each side."
+     ],
+     "untestedItems": [
+      "pointer-press-track (partly): the exact-midpoint tie-break (high thumb wins) cannot be hit reliably with pixel coordinates; a click at 57.5% with [50,180] moved the low thumb to 115 on both targets identically, and the selection expression is the same in both sources",
+      "pointer-drag (partly): pointercancel was not simulated; the moving drag started on the edge of the low thumb (so focus stayed, identically on both), while the empty-track case was only measured as press, hold, release without movement (tooltip shown while held, gone after release, activeElement BODY on both)"
+     ],
+     "evidence": [
+      "Console and page errors: 0 on original and port, in both normal and reduced-motion contexts; both demos at rest before testing (two state snapshots 1.2s apart identical)",
+      "A deep diff of every recorded state (texts, aria attributes, hidden inputs, tick positions, thumb/fill percentages, z-index, tooltips, activeElement, scrollY) between original and port shows only: the label space defect, colour notation differences (theme), and sub-pixel/frame-timing noise",
+      "Initial: header Filter / 110 products, gap 32px, track 24px, bar 4px, fill 10% to 60% and 0% to 75%, thumbs 20x20 centred at 10/60/75%, 9 ticks of 4px aria-hidden at 0..100% (7 card colour, 2 foreground/30), hidden price-min=20 price-max=120: identical on both",
+      "Aria: Lowest price valuemin 0 valuemax 110 valuetext $20; Highest price valuemin 30 valuemax 200; rating 1..5 valuetext '4.0 ★'; after Highest ArrowLeft lowest valuemax 105: identical",
+      "Tab: exactly 3 stops (Lowest price, Highest price, Minimum rating) then leaves the demo; Shift+Tab reverses; focused outline solid 2px offset 2px; tooltips $20 / $120 / 4.0 ★ one at a time with 7px gap, z-index 20 on the focused thumb: identical on both",
+      "Keys: ArrowRight 25/103 products, rating Up 4.5/95, Down 3.5/125, PageUp 40, PageDown 0, rating Page keys 0.5, Home/End 0/110 and 200/30, rating 1.0/5.0, repeats at limits unchanged, count floor 0 products, Enter/a/Escape/Space no change, scrollY 0: identical",
+      "Keyboard spring (Lowest price PageUp 10% to 20%): original t50 82.7ms, peak 20.29%, port t50 82.5ms, peak 20.26%; rating Home 75% to 0%: t50 83.4 vs 83.6ms, overshoot 2.222 vs 2.217, settle 316.7 vs 316.9ms; first movement in the same direction",
+      "Pointer: click 90% gives $180 in one frame (no spring), 25% gives low 50, right and middle click no change, rating 40% gives 2.5 ★; after empty-track click activeElement BODY and no tooltip; edge clicks clamp to 0 and 200: identical",
+      "Thumb press: off-centre click on Highest price moves it to 125, thumb focused, tooltip stays, ArrowLeft then works (120); with [100,110] elementFromPoint on the overlap is Highest price, values unchanged, it gets focus and tooltip, ArrowRight then gives 115: identical",
+      "Drag: scale 1.15 reached in one frame (width 20 to 23), z-index 20 vs 10, tooltip live, low stops at 110 (high minus 10), 0 beyond the left end, keeps following 120px below the track, high thumb stops at low plus 10 and at 200; release scale spring back: original t50 66.7ms, min 19.912, settle 300ms; port t50 83.4ms (one frame later), min 19.916, settle 300ms",
+      "Rating drag 5.0 to 1.0: 4.0, 3.0, 2.0, 1.5, 1.0 with fill left 0% and right edge following the thumb, zero width at 1.0, tooltip live: identical",
+      "Reduced motion: PageUp and Home move thumb and fill in one frame on both; dragged thumb width stays 20 (scale 1) on both; values and tooltips unchanged",
+      "Screenshots compared (initial, drag at 30%, count floor, label zoom): layouts match apart from the accent colour and font, and the missing space in the price value",
+      "Raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/range-slider.json, script range-slider.mjs and rs-label.mjs in the same folder, screenshots in shots/range-slider-*"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "first-render-demo, arrow-keys, pointer-press-track: the expected strings are written with a comma (\"$20, $120\", \"$25, $120\", \"$20, $180\") while the original renders \"$20 – $120\" (space, en dash, space). The parenthesis in first-render-demo says so, but the quoted strings themselves are wrong and should be written with the en dash.",
+    "dragging-visuals: the tooltip gap is given as 7px (6.5px measured). In the original at device scale 1 the gap measures 7.0px on a focused thumb at rest and 8.05px while dragging, because the tooltip is a child of the thumb and is scaled by 1.15 with it (tooltip height 22px at rest, 25.3px while dragging). The thumb border computes to 1px, not 1.5px, at device scale 1.",
+    "pointer-press-track: the exact-midpoint rule (high thumb wins) is not testable with real pointer coordinates; it can only be checked from the source."
+   ],
+   "harnessProblems": [
+    "The moving drag in my script started at 12% of the price track, which is on the edge of the low thumb (centre 10%, radius 10px), not on empty track; the empty-track release case was therefore measured only without movement (press, hold, release at 90%). Both targets behaved identically in both cases.",
+    "The 1 percent settle threshold on a 10 percentage point keyboard move is about 0.1 point, so settleMs for the price PageUp spring (299ms original, 216ms port) is noise sensitive; t50, peak and the rating spring (316.7 vs 316.9ms) show the curves match."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "loading-button",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say whether a declared `onClick` function prop receives `@click` in a template; I used `:on-click` in the demo. It also does not say how to handle a native `click` event bubbling to the root when `onClick` is a declared prop (the click is consumed by the prop, not forwarded via $attrs).",
+     "No guidance on how to type `:while-press` or whether `motion.button` accepts `v-bind=$attrs` with a `class` already merged."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "A prop named `state` collides with the `$state` rune. The guide does not warn about this, so the local derived value has to be renamed.",
+     "Svelte transition functions need a node parameter in their signature or svelte-check errors with 'Expected 0 arguments'.",
+     "The guide gives easeInOut as the default for a tween without `ease`, but the acceptance checks measure an ease-out-like fade, so the two disagree."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "loading-button",
+   "itemsTotal": 15,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 15,
+     "itemsPassed": 14,
+     "tabOrderMatches": false,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "tab-order: extra Tab stop on the decorative check-mark <path> whenever a success state is showing. With Pay on 'Paid' (sticky), Tab from the email input gives input > Subscribe > Paid button > path > Apply code > body; the original gives input > Subscribe > Paid button > Apply code. Reproduced in three separate runs (S6 focusBefore 'path:', S8 tabInSuccess and tabInLoading). The path has no tabindex attribute (outerHTML identical to the original's, tabIndex -1), so the likely cause is motion-v attaching focus listeners to motion.path, which makes an SVG element focusable in Chrome. Screenshot loading-button-vue-21-tab-in-success.png shows a focus ring drawn around the check icon.",
+      "keyboard consequence of the same defect: after activating Pay with Enter, Tab then Enter does not reach Apply code. Focus is on the path, Enter produces a click on button index 1 (Pay) which re-runs Pay, and focus then drops to BODY when the path unmounts (kbEnterApply: events keydown/click on btn 1, focusAfter 'BODY'). In the original the same keys land on Apply code and run its error cycle (busy at +14ms, 'Code expired' at +1013ms, idle at +3013ms)."
+     ],
+     "untestedItems": [
+      "live-announcements: only the aria-live region text and aria-hidden attributes were read; no real screen reader was run",
+      "success-sticky: 'indefinitely' was checked only up to about 6s after the click"
+     ],
+     "evidence": [
+      "first-render identical: 3 buttons 40px tall, padding 16px, radius 6px, 14px, type=button, empty polite sr-only live region, no svg, no entry animation (content opacity 1 / transform none on every frame of the first 500ms)",
+      "Tab order at rest matches: input > Subscribe > Pay > Apply code > out; button focus outline solid 2px offset 2px on both",
+      "Subscribe click: aria-busy/aria-disabled true at +6ms, success at +1405ms, idle at +3406ms (original +5 / +1412 / +3412). Width shrink 98.3 > 40, half at 138ms, settled 389ms (original half 129ms, settled 395ms); expand 40 > 131.1 half at +133ms, settled +416ms after success (original +116 / +399); radius jumps exactly as in the original (999 at first shrink frame, 15% scale-corrected at first expand frame)",
+      "crossfade: leaving content o 0.77 at +16ms, 0.31 at +66ms, y -6px, popped to position absolute; entering from +6px (original 0.72 / 0.28). Check path dash 0 > 1 over about 280ms on both",
+      "Pay: inline spinner + 'Pay $68.00', width stays 398, 'Paid' at +1807ms, still 'Paid' 6s later; clicking Paid goes straight to loading and 'Paid' again at +1808ms",
+      "Apply code: 'Code expired' at +1010ms with bg oklch(0.577 0.245 27.325), white text, 1px border kept, no svg; idle at +3010ms. Re-click during error at +2052ms: loading, error again at +3053ms, idle only at +5052ms (pending reset cancelled), same as original",
+      "press: scale eases to 0.97 while held (0.97 at about 380ms), no scale while loading; 3 extra clicks plus Enter and Space during loading ignored, success still at +1413ms; focus stays on the button",
+      "after a mouse click document.activeElement is the button itself; Enter then starts a new cycle (busy +14ms, success +1414ms)",
+      "keyboard Space on Subscribe and Enter on Pay run the normal cycles; Enter in the email field: URL unchanged, value kept, no button ever busy. The original's stuck 0.97 scale after Enter (scaleEnd 0.97) is not reproduced (vue ends at 1); treated as not a defect because it is a known bug of the original",
+      "reduced motion: width 98.5 > 40 and 40 > 131.1 in one frame, no y offset, check fully drawn on first frame, held scale 1, spinner still rotating (spin 1s), timings +1408 / +3407, Apply +1010 / +3010, Pay +1806",
+      "one-off timing outlier in the very first run only: success at +1520ms instead of about +1410ms; three later runs gave 1405, 1411, 1413ms, so it was put down to machine load",
+      "0 console errors, 0 page errors"
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 15,
+     "itemsPassed": 12,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "shrink-loading: the width animation first moves the wrong way. On click the button snaps from 98.3px to 39.6px within one frame (+21ms), then GROWS to about 77px at +170ms and only then shrinks back to 40px, settling at about +505ms. The original shrinks monotonically 97.7 > 40 (67.5px at +129ms, settled +395ms). Same on Apply code (108 > 39.8 at +22ms > 82.7 at +172ms > 40 at +505ms) and on keyboard activation.",
+      "success-subscribe: the expansion runs backwards. At success (+1404ms) the button jumps to 128px, then shrinks to 40px over about 500ms while showing 'Subscribed' (label clipped), and snaps to the final 131px at about +1971ms. The original grows 40 > 130 monotonically, settled by +1812ms. Screenshot loading-button-svelte-05-subscribe-success.png (taken +1900ms) shows a 40px button with the text cut to 'Subscr'; the original at the same moment shows the full 'Subscribed' button.",
+      "success-subscribe / return to idle: after the reset the button does not come back to its idle width. Width goes 131 > 169 > 122 > ... > 32px and is still 32px at the end of the recording (+4300ms, 880ms after the reset); the next cycle 3.9s later starts from 40px and again ends at 32.2px. Original ends at 97.75px. Screenshot loading-button-svelte-06-subscribe-idle.png shows a 32px-wide Subscribe button with clipped text 'ubscri'.",
+      "error-state: same broken width curve on Apply code. At the error (+1005ms) the button jumps to 119px, shrinks to 40px by about +1540ms with 'Code expired' clipped, then snaps to 121.6px at about +1590ms; after the reset it collapses to 34.3px (wEnd 34.27 at +3700ms; original 107.3px). In the re-click run it only snapped back to 108px about 570ms after the reset."
+     ],
+     "untestedItems": [
+      "live-announcements: only the aria-live region text and aria-hidden attributes were read; no real screen reader was run",
+      "success-sticky: 'indefinitely' was checked only up to about 6s after the click"
+     ],
+     "evidence": [
+      "first-render identical to the original (same measurements as vue), no entry animation",
+      "Tab order matches in every state: input > Subscribe > Pay > Apply code > out, also while Paid is showing and while Subscribe is loading; outline solid 2px offset 2px",
+      "state timings correct: Subscribe busy +4ms, success +1404ms, idle +3421ms; Pay 'Paid' at +1810ms and sticky at 6s; Apply error +1005ms, idle +3005ms; re-click during error cancels the reset (idle at +5056ms)",
+      "aria-busy and aria-disabled 'true' only while loading; live region '' / Working / Subscribed, Paid, Code expired; radius 999px while shrunk, 6px otherwise; error colours and kept 1px border correct",
+      "crossfade 140ms with 6px slide, leaving node pinned absolute: o 0.81 at +17ms, 0.34 at +67ms versus the original's 0.72 / 0.28; a slightly gentler ease-out, within tolerance. Check draws over about 290ms via stroke-dashoffset 1 > 0",
+      "press scale 0.97 while held, back to 1 on release; ignored while loading; repeat presses (3 clicks, Enter, Space) during loading ignored, success at +1418ms",
+      "mouse click leaves focus on the button; Enter afterwards starts a new cycle; Enter in the email field does nothing to Subscribe",
+      "reduced motion passes: width changes in one frame with no bulge, no slide, check drawn at once, held scale 1, spinner rotating, timings +1405 / +3405, Apply +1010 / +3010, Pay +1814. The width defect only occurs with motion enabled",
+      "likely cause in LoadingButton.svelte: the $effect.pre that rebuilds the layout animation reads the bound `content` state, so it re-runs when the new span binds and starts a second width animation from the already-collapsed width; el.style.width is left at a stale value",
+      "0 console errors, 0 page errors"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "keyboard-activate / press-scale: the stuck 0.97 scale quirk was measured in the original after Enter (scale 0.97 at the end of the Pay, Apply code and Subscribe cycles) but not after Space on Subscribe (scale back to 1). The items say 'Enter or Space ... can get stuck', which is accurate only for Enter in these runs. Neither port reproduces the stuck scale; this was not counted as a defect.",
+    "label-crossfade: the quoted sample points (0.28 at +17ms, 0.72 at +67ms) were measured here about one frame later in the original (0.28 at +24ms, 0.72 at +73ms after the state change). Small, but the stated times are a frame early."
+   ],
+   "harnessProblems": [
+    "Tab order must also be checked while a success state is on screen, not only at rest: the Vue port's extra Tab stop (the motion.path of the check mark) exists only then and a rest-state Tab test passes.",
+    "After a click on a shrink-style button the button moves (it becomes a 40px circle at the right edge and the email input grows into its old place), so repeat clicks at the original coordinates hit the input. The script re-reads the button centre before pressing again.",
+    "After a real pointer press on the hint text, the next Tab starts from that point and leaves the demo; keyboard steps focus the email input first instead.",
+    "The original's layout animation is a transform scale on the button (offsetWidth snaps, getBoundingClientRect animates), while the Svelte port animates the real width; curves were compared on getBoundingClientRect width.",
+    "No autoplay was seen on the original preview page in any run; the rest check passed on the first try each time.",
+    "Raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/loading-button.json; script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/loading-button.mjs; screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/loading-button-<target>-<step>.png. Two helper files (dump.cjs, probe.mjs) were also written in the verify folder."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "favorite-button",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide says to use defineModel for onXChange props, but this source's controlled/uncontrolled split (pressed ?? internal, with the callback never mutating the prop) fits a plain prop plus emit better, and the guide does not say so.",
+     "The guide says to put whilePress only on real controls, but acceptance checks 10-12 expect the inner span to take the tabindex=0 from whilePress. I followed the source.",
+     "The guide does not say how the leaving count number should keep its stale pressed-based exit direction in motion-v. I assumed it behaves like framer-motion and did not verify."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide does not say whether Svelte css(t,u) receives an eased t for exits. I applied the easing myself and left easing out of the transition config.",
+     "Nothing says how to run an interruptible spring on SVG path transforms in Svelte. I used a sampled spring curve in css transitions.",
+     "The guide does not say how to reproduce framer-motion's tabindex=0 on the whileTap element when Enter or Space is pressed. I added an explicit keydown handler on the circle span that toggles the button."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "favorite-button",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 16,
+     "tabOrderMatches": false,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "tab-order: every saved button has an extra Tab stop on the red fill <path> (the motion.path). Normal motion: original gives 8 stops (button, span x4); Vue gives 9: button[Jacket], span, PATH in button[Jacket], button[Mug], span, ... Reduced motion: original gives exactly 4 stops; Vue gives 5: button[Jacket], PATH, button[Mug], button[Lamp], button[Watch]. Reproduced in a separate probe: after Tab, document.activeElement.outerHTML is '<path fill=\"currentColor\" ... style=\"transform: none; opacity: 1; ...\">' (no tabindex attribute, el.tabIndex -1, yet Chrome focuses it). Shift+Tab also lands on it.",
+      "click-focus-target / tab-order: after a mouse click on the Mug heart (which makes it saved), the next Tab goes to 'path in button{Remove Stoneware Mug from saved}' in both normal and reduced motion; in the original the next Tab goes to button{Save Desk Lamp}. The activeElement right after the click itself does match (span[tabindex=0] normal, button reduced) and Enter/Space still toggle."
+     ],
+     "untestedItems": [
+      "locale-labels (demo part): the port demo hardcodes English copy and has no locale switch, so the zh-TW/ja heading and product labels could not be compared. The component's built-in strings and tag mapping were tested in an in-page host and match (zh-TW, zh-Hant-HK -> 加入收藏; zh, zh-CN -> 加入收藏; ja-JP -> お気に入りに追加; fr -> Add to favorites).",
+      "reduced-motion (count part only): the instant count swap under reduced motion was not run in the host; fill, exit, press scale, aria and labels under reduced motion were tested and match.",
+      "dark mode outline colour (#ff6b70) from toggle-on was not exercised; only light (rgb(220,61,67)) was measured."
+     ],
+     "evidence": [
+      "Layout: heading 'You may also like', 4 cards in order with the same names and prices, 4 columns at 760px and 2 at 420px, button 40x40 at top 8 / right 8, icon 20x20, stroke-width 1.5, round joins, svg aria-hidden=true, no count element. Same as original.",
+      "Initial: Jacket aria-pressed=true with 1 fill at scale 1 opacity 1, others false with 0 fills; labels 'Remove Waxed Field Jacket from saved' / 'Save Stoneware Mug'; button attrs aria-label, aria-pressed, type. Same as original.",
+      "toggle-on: fill starts scale 1.5 opacity 0, undershoots to 0.897 (original 0.897), overshoots 1.021 (original 1.021), within 1% after about 280 ms (original 305 ms); stroke transitions to rgb(220,61,67).",
+      "toggle-off: opacity 1 to 0 with scale constant 1, removed after 117 ms (original 150 ms measured at frame resolution, nominal 120 ms).",
+      "press-feedback: circle reaches 0.88 (min 0.8766, original 0.8767), button scale 0.97; release returns monotonically 0.88 -> 0.8947 -> 0.9131 ... 1.0033 -> 1, like the original.",
+      "hover: border oklch(0.922) -> foreground at 0.3 alpha via a transition, reverts on leave.",
+      "repeated-presses: 5 quick clicks give true,false,true,false,true, one fill at scale 1 opacity 1, never more than one fill, other cards unchanged; interrupted on/off leaves no stuck fill.",
+      "keyboard-activate: Space saves, Enter unsaves on the button; ring box-shadow 2px background + 4px ring, outline none; Space and Enter on the focused inner span also toggle. Same as original.",
+      "Host (mounted in page from the port's own modules): count 1200 -> '1.2K' 14px/500/tabular-nums, gap 6px, pr 8px; count 0 -> '0'; no count -> no number, pr 0; sm 32/16 12px, lg 48/24 16px. Count roll on save: '1K' enters from +19.6px below while '999' drops out below; on unsave '999' enters from above while '1K' leaves upward; settles in about 350 ms. Uncontrolled: starts pressed, click -> false, spy [false]. Controlled without prop update: spy [true], then [true,true], aria-pressed stays false, no fill.",
+      "Reduced motion: fill appears at scale 1 opacity 1 in the first frame, exit removed in the same frame, circle scale 1 and button scale none while held, span has no tabindex, click leaves focus on the button.",
+      "0 console errors and 0 page errors in all runs. Screenshots match the original apart from the grey image placeholders and neutral theme."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "uncontrolled-mode (controlled half): when pressed is supplied and the host does not update it, the port still flips. In-page host with pressed=false and a spy that does not write back: after one click aria-pressed='true', label 'Remove from favorites', 1 fill path, spy [true]; second click gives spy [true,false]. Original (and the Vue port): aria-pressed stays 'false', no fill, spy [true,true]. Same result with a getter-backed prop (host 'a': pressed true after click while the host still supplies false). Cause in source: toggle() does `internal = next; pressed = next;` on a $bindable prop, which overrides the parent's value locally.",
+      "press-feedback: on release the circle first moves the wrong way. Held at 0.88, the first frames after pointer up read 0.8796 -> 0.8389 -> 0.8318 -> 0.8458 -> 0.8712 before rising to 1 (second run: 0.88 -> 0.8422 -> 0.8308 -> 0.8436). The original goes 0.88 -> 0.8833 -> 0.8977 -> 0.9173 and Vue 0.88 -> 0.8823 -> 0.8947, both monotonic. The dip is about 0.05 of scale (40 percent of the 0.12 press travel, about 2 px on the 40 px circle) for roughly 35 ms, and the return takes about 180 ms against 150 ms. Reproduced in two runs."
+     ],
+     "untestedItems": [
+      "locale-labels (demo part): the port demo hardcodes English copy and has no locale switch, so the zh-TW/ja heading and product labels could not be compared. Built-in strings and tag mapping were tested in an in-page host and match (zh-TW, zh-Hant-HK, zh, zh-CN, ja-JP, fr).",
+      "reduced-motion (count part only): the instant count swap under reduced motion was not run in the host; the rest of the item was tested and matches.",
+      "dark mode outline colour (#ff6b70) was not exercised; only light was measured."
+     ],
+     "evidence": [
+      "Layout, geometry, initial states, labels and attributes identical to the original (40x40 button at top 8 / right 8, 20x20 icon, stroke 1.5, aria-hidden svg, Jacket pressed with one fill, 4 columns at 760px and 2 at 420px).",
+      "Tab order normal motion: button, span[tabindex=0] for each of the 4 cards, 8 stops, then leaves; reduced motion: exactly 4 buttons. Same as original. Shift+Tab order also matches.",
+      "click-focus-target: after a mouse click activeElement is span[tabindex=0] inside the button (normal) or the button (reduced); Enter then Space toggle false then true; next Tab goes to button{Save Desk Lamp}. Same as original.",
+      "keyboard-activate: Space saves, Enter unsaves; ring box-shadow 2px + 4px, outline none; Space and Enter on the focused span toggle; the span shows the browser's default 'auto 1px' outline as in the original.",
+      "toggle-on: scale 1.5 / opacity 0 -> undershoot 0.900 (original 0.897) -> overshoot 1.021 (original 1.021), within 1% after about 297 ms (original 305 ms).",
+      "toggle-off: opacity only, scale constant 1, removed after 133 ms (original 150 ms at frame resolution). Curve is ease-in-out where the original is closer to ease-out; not counted as a defect at this duration.",
+      "press-feedback hold phase matches: circle 0.88, button scale 0.97, reached in about 150 ms.",
+      "repeated-presses and independent-cards match: sequence true,false,true,false,true, single fill, other cards unchanged, no stuck fill after an interrupted toggle.",
+      "Host: count-display matches ('1.2K', '0', no number and pr 0 without count, gap 6px, 14px/500/tabular-nums; sm 32/16, lg 48/24). count-roll matches: on save '1K' rises from +20px while '999' drops to +20px; on unsave '999' comes from -20px while '1K' leaves to -20px; about 350 ms. Uncontrolled half passes: defaultPressed starts true, click -> false, spy [false].",
+      "Reduced motion: fill at scale 1 opacity 1 from the first frame, exit in the same frame, no press scale on circle or button, aria and labels still update.",
+      "0 console errors and 0 page errors in all runs. Screenshots match the original apart from grey image placeholders and neutral theme."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "keyboard-activate: 'no default outline' is true only for the button. When the inner span has focus in the original (normal motion), the span shows the browser default focus outline (computed outline 'auto 1px') and the button shows no ring. Both ports reproduce this.",
+    "toggle-on: the original's fill opacity is also driven by the spring, so after reaching 1 it dips to about 0.958 during the scale overshoot (around 270 ms after the click) before settling at 1; the item only says 'opacity 0 to 1'. The original's measured scale undershoots to 0.897 before the 1.021 overshoot. Both ports reproduce this.",
+    "toggle-off: measured at frame resolution the original's fill is removed about 150 ms after aria-pressed flips (nominal 0.12 s plus the removal frame); not wrong, but a tolerance should be stated."
+   ],
+   "harnessProblems": [
+    "The Vue dev server (port 3161) reloaded the page in the middle of the first run (Playwright: 'Execution context was destroyed, most likely because of a navigation'; in the reduced run the demo state reset silently). The script now counts main-frame navigations and retries a pass that saw one; the second run completed with zero reloads on every pass and is the one judged.",
+    "The original preview has no autoplay; a real pointer press on the heading was made anyway and the state was identical before and 3 s after.",
+    "The original has no host for count, controlled or uncontrolled props, so count-display, count-roll and uncontrolled-mode were judged against the original's source rather than a measurement. For the ports a host was mounted inside the running page by importing the port's own component module and framework runtime; no port file was edited.",
+    "Port demos have no locale switch, so the demo part of locale-labels cannot be compared; the original's zh-TW and ja output was measured and matches the checklist.",
+    "The Next.js dev overlay (nextjs-portal) is a Tab stop after the demo in the original and was ignored.",
+    "Files: script /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/favorite-button.mjs, raw data /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/favorite-button.json, screenshots in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/ (favorite-button-<target>-<step>.png); helper files fb-an.mjs, fb-probe.mjs and an2.txt in the same verify folder."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "quantity-stepper",
+  "platforms": [
+   "vue"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say whether defineModel seeding at setup emits update:modelValue. I assumed it is harmless.",
+     "Acceptance check 3 says dividers are solid, but the source names its variable `dashed`. The guide did not flag this. I followed the source classes, which are solid.",
+     "No guidance on emulating React's no-change-event behaviour for same-value typing. I added a manual guard in the input handler."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "quantity-stepper",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 18,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "press-hold-repeat (partly): release stopping was tested (20 trials per target across normal and reduced contexts, 0 steps after pointerup); pointercancel and lostpointercapture were not triggered with real events, only confirmed as wired in the port source (@pointercancel / @lostpointercapture call stop)",
+      "first-render (partly): line totals hidden below the sm breakpoint was not tested at a narrow viewport; the class (hidden sm:block) is identical and display is flex/block at 900px on both",
+      "live-announcement (partly): 'no change callback fires' was checked indirectly (no aria-valuenow mutation, totals unchanged, status region empty), not by spying on the emit",
+      "remove-line / rolling-digit (partly): spring stiffness and damping were not read directly, only compared through the sampled curves and the identical constants in the source"
+     ],
+     "evidence": [
+      "Console and page errors: 0 on the port and 0 on the original, in both the normal and the reduced-motion contexts. The original was at rest after a real pointer press on the heading (state identical across 900 ms).",
+      "Automated diff of every recorded state between original and port: the only non-timing, non-colour differences are theme ones (pill radius 6px vs 8px from the theme's --radius, Geist Mono vs ui-monospace, font-weight 510 vs 500, ring colour). All texts, aria attributes, disabled flags, tabindex values and totals are identical at every step.",
+      "first-render / controls / layout: 'Your bag', '6 items', lines 2 / 1 / 3 with $44.00, $48.00, $102.00, Subtotal $194.00, 'Limit 3 per order' on the Bottle. Pill 102x32, buttons 32 wide with 14px svg (aria-hidden), cell 36 wide with 1px solid dividers at 20% alpha, outer border 1px at 10% alpha, same two-layer shadow. Enabled icon alpha 0.6, disabled plus 0.25, hover full colour. No digit movement in the first 500 ms after load (dy 0, opacity 1 on both).",
+      "press-step-once: value is 3 about 40 ms after mouse down and before mouse up on both; a single log entry; '7 items', $216.00, $66.00; a right-button press changes nothing on both. After the mouse press document.activeElement is button[Increase quantity] on both.",
+      "press-hold-repeat: step times after pointerdown, original 5.5 / 406 / 512 / 605 / 688 / 759 / 825 / 880 ms, port 3 / 405 / 511 / 604 / 687 / 759 / 822 / 878 ms; both stop at 10 with plus disabled and 'Limit 10 per order'.",
+      "hold-down-into-remove: Bottle 3 to 2 at ~4 ms and 2 to 1 at ~405 ms on both, then the trash 'Remove Steel Bottle 500 ml' appears and the line stays after release (3 lines). Mug from 2, held and quick press, ends at 1 with 'Remove Stoneware Mug' and the line still present; a separate press on the trash removes it (2 lines, '4 items', $150.00).",
+      "rolling-digit (per-frame samples): plus: 3 enters from +20px at opacity 0 and 2 exits to -20px; first minus: 2 enters from -20px while 3 still exits up to -20px; second minus: 1 enters from -20px and 2 exits down to +20px. Same on the port with the same overshoot (0.59px). Settle time of the entering digit about 255 ms original vs 230 ms port; exit node removed at about 415-425 ms vs 392-399 ms (within 10 percent).",
+      "remove-line: li height 89 to 1px and opacity to 0 on both, monotonic; half height at 129-141 ms on both, under 2px at 366-379 ms, opacity under 0.01 at 408-416 ms, detached at 575-583 ms (original) vs 575-579 ms (port). Trash scale 0.97 while pressed on both. '5 items', $146.00.",
+      "keyboard-remove: Enter and Space on the focused trash both remove the Tote with the same collapse (detached 576-585 ms original, 568-585 ms port); focus falls to BODY afterwards on both.",
+      "empty-bag: 'Your bag is empty.' centered, '0 items', $0.00 on both.",
+      "tab-order: Mug field, 'Remove Market Tote', Tote field, Bottle field, then out of the demo, on both (the original additionally stops on the Next.js dev overlay portal, ignored). Shift+Tab order identical. Focused field: background oklab(0 0 0 / 0), transparent text, whole text selected [0,1]; focused trash shows a 2px inset ring on both.",
+      "spinbutton-keys after a MOUSE click into the field (activeElement is the input on both): ArrowUp 3, ArrowUp 4, ArrowDown 3, PageUp 10, PageDown 1 (trash appears), End 10, Home 1, ArrowDown stays 1, ArrowLeft and 'a' do nothing and are not default-prevented, identical step by step including totals, limit note and announcement.",
+      "typed-entry: '7' Enter gives 7; '15' gives 10; '0' gives 1 with trash; '2.6' Tab gives 3 and focus moves to the Tote trash; 'a7b' leaves draft '7'; '-' Enter reverts to 2 with no announcement; 5 then ArrowUp gives 6, ArrowDown gives 4; committed typed values show no slide (dy 0 throughout); typing the same '2' creates no draft (text stays transparent, overlay present); while drafting the input has the 4% tint and visible text and plus/minus reflect the committed value; emptying the draft and blurring reverts. All identical.",
+      "enter-escape-no-draft: Escape after typing 8 restores 2 with no announcement and is default-prevented; a second Escape is not prevented; Enter with no draft changes nothing and is default-prevented, on both.",
+      "accessible-names / live-announcement: role spinbutton, names '<product> quantity', valuenow / valuemin 1 / valuemax 10, 10, 3 / valuetext, 'Decrease quantity', 'Increase quantity', 'Remove Market Tote', role=status aria-live=polite reading 'Stoneware Mug quantity 3' after plus; End on the Bottle at 3 leaves its status empty and the value unchanged, on both.",
+      "reduced-motion: digits swap in place (dy 0, opacity 1 in every frame), the removed line is detached within 27-48 ms (original) and 5-34 ms (port) with no height change, trash scale is 'none' while pressed, on both.",
+      "Screenshots compared side by side for first render, mid-roll, hold to 10, collapsing line, focused trash, draft 15, empty bag, all-at-1 and keyboard states: same layout and states; the only visible differences are the grey placeholder in place of product photos and the neutral theme."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "tab-order (minor wording): 'Plus and minus buttons never receive focus' holds for Tab only. In the original a mouse press on plus leaves document.activeElement on button[Increase quantity] (pointerdown is default-prevented, mousedown is not). The port does the same.",
+    "remove-line (minor): the original detaches the line at about 575-585 ms in my runs, not 'about 550 ms'. The port measures 575-579 ms."
+   ],
+   "harnessProblems": [
+    "A screenshot taken while the mouse button was held took about 700 ms on the original and let the hold-repeat run to 7; fixed by taking the screenshot after release.",
+    "One run showed two extra repeat steps on the port after a 560 ms hold; this was a delayed mouse-up from the harness under load. Rechecked with the in-page pointerup timestamp: 0 steps after pointerup in 20 trials per target.",
+    "After a mouse press on plus, Chrome moves the Tab starting point to that button, so a Tab count from there overshoots; the live-announcement step now clicks the Bottle field instead.",
+    "The mid-roll screenshot is not time-aligned between targets (the original's screenshot is slower), so the roll was judged from per-frame samples, not from that image.",
+    "Script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/quantity-stepper.mjs; raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/quantity-stepper.json; screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/quantity-stepper-<target>-<nn>-<step>.png"
+   ]
+  },
+  "challenge": {
+   "challenges": [
+    {
+     "platform": "vue",
+     "upheld": true,
+     "notReallyTested": [
+      "first-render (partly): the clause that line totals are shown only at the sm breakpoint and wider is never checked at a narrow viewport. The script only runs at 900x700 and records totalDisplay 'flex'. The demo source uses the same class (hidden ... sm:block), so risk is low and it is not a core state.",
+      "press-hold-repeat (partly): pointercancel and lostpointercapture stopping is never triggered. Only pointerup is exercised (the release loop, 0 steps after pointerup in all 5 trials on both targets). The handlers @pointercancel and @lostpointercapture are present in the port source.",
+      "live-announcement (partly): 'no change callback fires' is only inferred from an empty status region and an unchanged aria-valuenow, not by spying on the emit. In the port, set() returns false before assigning model.value, so it matches the original."
+     ],
+     "missedDefects": []
+    }
+   ]
+  }
+ },
+ {
+  "block": "otp-input",
+  "platforms": [
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "svelte",
+    "gaps": [
+     "Checker's transition functions need a node parameter (stampIn(node)): the guide's `in:`/`out:` description does not say so.",
+     "The guide does not say how to keep native inputs controlled in Svelte: a value attribute does not reset the DOM when the state is unchanged (rejected character), so I added a post-tick sync.",
+     "Acceptance check 5 contradicts the source demo (completing 123456 does shake), and the guide does not say which to follow beyond 'source wins'."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "otp-input",
+   "itemsTotal": 16,
+   "verdicts": [
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "success-state: the \"Verified\" marker's line box is 17.5px in the port, 20px in the original. Measured marker rect height 18px (port) vs 20px (original), computed line-height 17.5px vs 20px, and the disc sits 0px below the marker top in the port vs 1px in the original, so disc and label render 1px higher (marker top is 8px below the row in both, disc top at y=455 in the port vs y=456 in the original at the same row position). The checklist names this exact value (\"line box 20px tall ... disc sits 1px lower than it would in an 18px line box\"). Same result in the reduced-motion run and at the 480px viewport. Cause in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/svelte/src/lib/components/OtpInput.svelte: the marker span has the literal classes \"text-sm leading-tight\", so leading-tight wins; in the original cn/tailwind-merge drops leading-tight because text-sm comes after it, leaving the 20px text-sm line height. Fix: remove leading-tight from the marker span (or set leading-5)."
+     ],
+     "untestedItems": [
+      "accessible-names (partly): the zh-TW, zh-CN and ja names could not be exercised because the port demo is fixed to locale=\"en\" with no locale switch; the strings in the port's MESSAGES table are identical to the original's by source reading only. English names and all attributes were measured.",
+      "error-state / success-state (partly): localised error, marker and screen-reader texts not exercised at runtime for the same reason; English texts measured.",
+      "multi-char-autofill: scope touch, not required on web. A desktop stand-in (keyboard.insertText of \"246810\" into Digit 1) gave 246810, focus Digit 6, success on both targets."
+     ],
+     "evidence": [
+      "Console errors and page errors: 0 on the original and 0 on the port across the normal, reduced-motion and 480px runs.",
+      "first-render: identical text; cells 48x56 at x offsets 0/56/112/190/246/302 on both, gap 8px, divider 10x1 with margin 0 2px, status line min-height 20px and height 20px, no focus at load, section 508x268 and aside 240x167.5 on both. At 480px wide: cells 40x56, gap 6px, caret inset 10px on both.",
+      "accessible-names: role=group, aria-label \"One-time code\", no aria-describedby while idle; cells \"Digit 1 of 6\"..\"Digit 6 of 6\", inputmode numeric, autocomplete one-time-code on the first and off on the rest, pattern [0-9]*, maxlength 6; divider and caret aria-hidden; aside aria-label \"Email preview\". All equal.",
+      "tab-order: Digit 1..6 then Resend code on both, Shift+Tab the same list backwards; no explicit tabindex and no extra focusable element in either. After the block the original goes to the Next.js dev overlay, the port to body.",
+      "focus-caret: caret 2px tall, 12px inset each side, 8px above the cell bottom, on the focused cell only; focused border at 45% alpha; caret-color transparent; filled cell selected [0,1] on click; caret removed when focus leaves. Equal.",
+      "type-advance: per-keystroke values and focus equal (1_____ -> Digit 2 ... 123456 stays on Digit 6). Typing 7 into Digit 2 with a collapsed caret [1,1] gives 173456, focus Digit 3, shake 0px on both; caret-at-start variant also equal.",
+      "reject-letters, backspace-delete, arrow-home-end, gaps-kept: every recorded value, focus target and selection range is string-identical between the two targets (e.g. gaps: 24_81_ -> 24_810 with no shake/status -> 2__810 focus Digit 2 -> 246810 success). Escape and Enter after a mouse click do nothing on both.",
+      "paste-distribute (real clipboard, Meta+V): \"246 810\" -> 246810, focus Digit 6, success; \"9a8\" at Digit 4 -> ___98_, focus Digit 6; \"77\" at Digit 2 of 12345 -> 17745_, focus Digit 4; \"abc\" no change; \"1234567\" at Digit 4 -> ___123. Equal.",
+      "error-state shake: original first moves left, extremes -6.0/+4.79/-2.84/+1.97 px, 283-300 ms; port first moves left, extremes -5.79/+4.81/-2.67/+1.89 px, 296-300 ms. aria-invalid=true on all six, border at 50% alpha, error text identical, aria-live polite, aria-describedby equals the status id, Resend visible.",
+      "edit-clears-status: Backspace -> idle (no aria-invalid, no describedby); typing 2 -> shakes again (orig -5.81/+4.83, 300 ms; port -5.55/+4.37, 284 ms); overwriting Digit 1 with 3 keeps error with 0px shake; Delete -> idle. Equal.",
+      "success-state motion: fade-in 146 ms (orig) vs 150 ms (port); disc width 10.8 -> 19.47 -> 18 (orig) vs 10.82 -> 19.44 -> 18 (port), settle 312 vs 284 ms; check draw starts at 79 vs 83 ms and reaches 98% at 213 vs 200 ms. Marker 8px below the row and 4px in from the right, aria-hidden, sr-only \"Code verified\", describedby set, no caret, no aria-invalid, focus on Digit 6. Only the line box differs (see defect).",
+      "success-hides-resend: Resend visibility hidden with the paragraph rect unchanged (450x20 at the same y), Tab from Digit 6 leaves the block; after Delete the marker fades out over about 120 ms on both, caret returns on Digit 6, Resend visible and reached by Tab.",
+      "resend-inert: click moves focus to the button (activeElement is the button on both), caret removed, values and status unchanged in idle and in error; hover and keyboard focus underline; scale 0.97 while the mouse button or Space is held (width ratio 0.970 on both); Enter and Space change nothing.",
+      "reduced-motion: wrong code 0px movement with error text and aria-invalid present; marker first frame opacity 1, disc 18px, check fully drawn; marker gone at once after Delete; Resend scale none while pressed. Equal on both.",
+      "Screenshots compared by eye (first-render, error, success): same layout, the port in the neutral theme; the only visible difference besides theme is the marker sitting 1px higher."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "type-advance: \"The row does not shake at any point\" is wrong for the trigger as written. Typing 1 2 3 4 5 6 completes a wrong code, so the original enters the error state and shakes once at the sixth digit (measured -5.88/+4.92 px over 300 ms, error text shown, aria-invalid=true). Only the later overwrite with 7 is shake-free (0px), and the row stays in the error state then. The port does the same.",
+    "arrow-home-end: \"The landed cell's content is selected\" only holds for filled cells; landing on an empty cell gives selection [0,0] in the original (trivially). ArrowUp and ArrowDown are not handled by the block and just move the native caret; same in the port."
+   ],
+   "harnessProblems": [
+    "The original's site theme sets the default transition easing to cubic-bezier(0.23, 1, 0.32, 1) while the port harness uses Tailwind's default cubic-bezier(0.4, 0, 0.2, 1); both are 150 ms. This makes the Resend press reach 0.97 in about 83 ms on the original vs 133 ms on the port. Treated as a theme difference, not a port defect, because the block source sets no easing.",
+    "Sampling getComputedStyle on the original's marker shows one frame of opacity 0 right after the fade-in finishes (and one frame of opacity 1 just before removal on exit). It looks like a framer-motion handover artefact; it was ignored and not expected of the port.",
+    "The port demo is English-only (locale=\"en\" hard-coded, no ?l= switch), so localised checklist strings cannot be verified at runtime on the port.",
+    "The original measures check drawing through stroke-dasharray (framer pathLength) and the port through stroke-dashoffset; the script normalises both to a drawn fraction. Script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/otp-input.mjs, raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/otp-input.json, screenshots under /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "notify-badge",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say how to reproduce the framer-motion rule that a badge present at first render never plays its inner bump; I had to infer an explicit flag from the acceptance checks.",
+     "It does not say how motion-v treats `initial` on a keyed inner child under `AnimatePresence :initial=\"false\"`, so whether the flag is needed in motion-v is unknown.",
+     "No guidance on porting a function prop with a default that takes arguments (`label`) alongside Boolean defaults; I kept it as a function prop."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide gives no recipe for spring-driven AnimatePresence enter/exit in Svelte, since css transitions cannot take a spring. I had to sample the spring analytically.",
+     "The framer-motion quirk where initial={false} is inherited by later-mounted children is only described in the acceptance checks, not in the rules, so it is easy to port wrongly.",
+     "The Motion animate() call for the bump relies on the guide's claim that the options match framer-motion's. I did not check the installed types."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "notify-badge",
+   "itemsTotal": 13,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 13,
+     "itemsPassed": 13,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "badge-geometry (partly): top-left and bottom-right placements are not used by the demo; only checked in source (same class strings as the original)",
+      "max-overflow (partly): default max 99 / \"99+\" not exercised by the demo; source only",
+      "live-announcements (partly): default label \"<n> new\" not exercised; actual screen-reader speech not tested, only the aria-live region's text and attributes"
+     ],
+     "evidence": [
+      "first-render: text, order and counts identical (dot / 2 / 1); first sampled frame already scale 1, no mount animation; 5 buttons, 0 tabindex attributes",
+      "badge-geometry: number badge 18.39x18.39px, min-width 18.4px, padding 4px, font 10.88px, tabular-nums, line-height 10.88px, 2px ring in background colour, translate 33.33% -33.33%, dot 10x10: identical to original (weight 600 vs 590 is the font)",
+      "auto-increment: 2>3>4>5 at 2563/5059/7557 ms (2496 and 2499 ms apart), stays 5 for 3.2 s more; original 2471 and 2505 ms apart",
+      "stamp-bump: no bump on first climb or on any cart press (cart inner scale range [1,1], inline 'transform: none'); after refill, bump on 1>2 first frame 1.342, min 0.929 at 116 ms, settled about 450 ms; original 1.35, 0.928 at 133 ms, about 450 ms",
+      "clear-hides: scale 1 > 0.79 > 0.55 > 0.29 > 0.07 by 78 ms, overshoot to -0.204 at 128 ms, opacity 0 by 95 ms; original -0.205 at 142 ms, opacity 0 by 92 ms. Node removed about 505 ms after the click versus about 670 ms in the original; the difference is entirely in the invisible tail (opacity 0, |scale| < 0.002), so not counted as a defect",
+      "refill-after-clear: 1 appears 2511 ms after clear (original 2509); pop-in outer 0 > 1.204 peak at 117 ms with inner 1.341 > 0.929, matches original (1.201 at 148 ms, inner 1.35 > 0.93); then 2,3,4,5 at 2500 ms steps; Enter on the bell at count 2 restarts the wait (2513 ms, original 2521)",
+      "repeat-clear-at-zero: second press 1 s later changed nothing; refill still fired once, 2511 ms after the first press",
+      "max-overflow: 2..9, then \"9+\" at 10, 11, 12; live region reads \"10 items in cart\" etc.",
+      "live-announcements / accessible-names: aria-live polite, sr-only 1x1 absolute, texts identical at every step, empty at 0; wrapper aria-hidden with pointer-events none; svgs and square aria-hidden; aria-labels Messages, Notifications, Cart",
+      "tab-order: Messages > Notifications > Cart > Add to cart > Mark all read > body, same as original (original has one extra Next.js dev portal stop, ignored). After a mouse click activeElement is the BUTTON itself in both; Enter and Space then work (cart 2>3>4; bell cleared by Enter); Messages and Cart do nothing; Shift+Tab works",
+      "button-feedback: icon buttons 40x40, hover background equals the muted square colour; Add to cart held scale 0.9738 (original 0.9736), Mark all read 0.9706 (original 0.9739, width rounding)",
+      "reduced-motion: outer and inner scale stay exactly 1 throughout; badge removed 1 to 2 frames after the click (original 2 frames); refill enters at scale 1 with no bump; held Add to cart scale 1.004 (no press-in); counts and live text unchanged",
+      "screenshots compared at 11 steps: same layout and states; only the bell tone (neutral primary instead of site blue) and 8px vs 6px radius differ, both theme"
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 13,
+     "itemsPassed": 13,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "badge-geometry (partly): top-left and bottom-right placements are not used by the demo; only checked in source (same class strings as the original)",
+      "max-overflow (partly): default max 99 / \"99+\" not exercised by the demo; source only",
+      "live-announcements (partly): default label \"<n> new\" not exercised; actual screen-reader speech not tested, only the aria-live region's text and attributes"
+     ],
+     "evidence": [
+      "first-render: text, order and counts identical (dot / 2 / 1); first sampled frame already scale 1, no mount animation; 5 buttons, 0 tabindex attributes",
+      "badge-geometry: all computed values identical to the Vue port and the original (18.39px pill, 4px padding, 10.88px tabular figures, 2px ring, translate 33.33% -33.33%, 10px dot)",
+      "auto-increment (clean second run): 2>3>4>5 at 2715/5178/7677 ms (2463 and 2500 ms apart), then stays at 5",
+      "stamp-bump: no bump on first climb or any cart press (cart inner scale range [1,1]); after refill, bump on 1>2 first frame 1.347, min 0.930 at 115 ms, settled about 450 ms; 4>5 first frame 1.33, min 0.928 at 115 ms; original 1.35, 0.928 at 133 ms",
+      "clear-hides: scale 1 > 0.91 > 0.69 > 0.43 > 0.18 by 81 ms, overshoot -0.202 at 147 ms, opacity 0 by 98 ms; original -0.205 at 142 ms. Node removed about 550 ms after the click versus about 670 ms in the original (invisible tail only, 18 percent shorter, not a defect)",
+      "refill-after-clear: 1 appears 2514 ms after clear; pop-in outer 0 > 1.202 peak at 133 ms with inner 1.336 > 0.928, matches original; then 2 to 5 at 2500 ms steps; Enter on the bell at count 2 restarts the wait (2513 ms)",
+      "repeat-clear-at-zero: second press changed nothing; one refill 2514 ms after the first press",
+      "max-overflow: 2..9, \"9+\" at 10, 11, 12 with live text \"10 items in cart\" etc.",
+      "live-announcements / accessible-names: identical attributes and texts to the original at every step",
+      "tab-order: Messages > Notifications > Cart > Add to cart > Mark all read > body, same as original; after a mouse click activeElement is the BUTTON; Enter and Space work afterwards; Messages and Cart do nothing",
+      "button-feedback: hover background equals muted colour; held scale 0.9738 (Add to cart) and 0.9706 (Mark all read), original 0.9736 and 0.9739",
+      "reduced-motion: scale exactly 1 throughout; on clear the node stays 2 frames (33 ms) then is removed, like the original, but it is already at opacity 0 during those 2 frames where the original is still at opacity 1 (a 33 ms difference, not counted); refill enters at scale 1 with no bump; no press-in on the action button",
+      "screenshots compared at 11 steps: same layout and states as the original; only theme colour and radius differ"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "stamp-bump and max-overflow: \"the inline style is 'transform: none'\" describes framer-motion's own output, not behaviour. It holds for the original and the Vue port (motion-v); the Svelte port has no inline style on the cart badge at all and renders the same (scale flat at 1). The item should only require that the scale stays flat.",
+    "clear-hides: the original's opacity runs about one frame ahead of its scale (opacity 0.85 / 0.61 / 0.35 at scale 0.99 / 0.84 / 0.60), so the two are not on exactly the same curve as the item implies; both ports tie opacity to scale. The node lifetime measured here was 667 to 670 ms (item says about 680 ms), consistent.",
+    "reduced-motion: the original also logs a console warning from framer-motion (\"You have Reduced Motion enabled on your device\") in the reduced-motion context; the ports log nothing. Not a port issue."
+   ],
+   "harnessProblems": [
+    "The Vue dev server (localhost:3161) did full page reloads in the middle of the run (4 navigations in about 30 s on one attempt) because other files in the same project were being written at the time (for example FloatingField.vue). The first two Vue runs were invalid. Fixed in the script by stubbing window.WebSocket on the port pages so Vite's HMR client cannot reload; the final Vue and Svelte runs had exactly 1 navigation each.",
+    "Machine load from parallel jobs caused frame stalls (up to 265 ms) in the first Svelte run, which made two auto-increment steps look like 2434 and 2747 ms. The Svelte run was repeated and was clean (max frame gap 54 ms, intervals 2463 and 2500 ms).",
+    "The original preview showed no autoplay for this block; a pointer press on the title was still done first on all targets.",
+    "Files: script /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/notify-badge.mjs, measurements /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/notify-badge.json, per-frame samples notify-badge-frames-<target>.json beside it, screenshots and three comparison sheets (sheet-notify-badge-a/b/r.png) in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/"
+   ]
+  },
+  "challenge": {
+   "challenges": [
+    {
+     "platform": "vue",
+     "upheld": true,
+     "notReallyTested": [
+      "tones (partly): the script reads computed bg/color of the three demo badges, but the judge's evidence never lists it. The data shows accent falls back to primary (oklch 0.205) and ink differs from primary (0.145 vs 0.205). The --sunui-spot and --sunui-spot-foreground override path is never set or compared. Class strings are identical to the original.",
+      "badge-geometry (partly): top-left and bottom-right placements are never rendered, as the judge says.",
+      "max-overflow (partly): the default max of 99 is never exercised.",
+      "live-announcements (partly): the default label \"<n> new\" is never exercised."
+     ],
+     "missedDefects": []
+    },
+    {
+     "platform": "svelte",
+     "upheld": true,
+     "notReallyTested": [
+      "tones (partly): same gap as Vue. Only the demo's three tone values are read, and the --sunui-spot override is never tested.",
+      "badge-geometry (partly): placements other than top-right are never rendered.",
+      "max-overflow (partly): the default 99+ is never exercised.",
+      "live-announcements (partly): the default label \"<n> new\" is never exercised.",
+      "Interruption cases are not tested: a count rise while the exit transition is still running, and a clear pressed during the pop-in. The Svelte port hand-rolls in/out transitions, so these could differ from framer-motion's reversible exit. They are not core demo states."
+     ],
+     "missedDefects": []
+    }
+   ]
+  }
+ },
+ {
+  "block": "sliding-tabs",
+  "platforms": [
+   "vue"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say how to set a boolean-or-array v-model's uncontrolled initial value; I kept a separate inner ref and used `model ?? inner`.",
+     "Unclear whether `aria-label` as a Vue prop should be `ariaLabel` or an inherited attribute; I declared `ariaLabel` (the hyphenated attribute maps to it).",
+     "The guide does not say whether AnimatePresence `custom` updates the exiting child's variant `custom` in motion-v; I passed `:custom` on both and could not check the direction on exit."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "sliding-tabs",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 16,
+     "tabOrderMatches": false,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "tab-order-and-focus-ring: the port has an extra Tab stop on the decorative check mark svg inside every selected chip. Original Tab sequence: Details tab, underline tabpanel, Week radio, To ship tab, folder tabpanel, Home radio, New in button, On sale button, Free shipping button, then out of the demo (9 stops). Vue sequence: ..., Home radio, New in button, svg (class 'relative size-3.5', aria-hidden=true), On sale button, Free shipping button (10 stops). The focused svg matches :focus-visible and shows the browser default ring ('auto' outline) instead of the 2px/2px button ring. Reproduced in 4 runs (normal and reduced-motion contexts, forward and Shift+Tab, and again after selecting Care). A separate probe showed it scales with selection: after also selecting On sale, Tab from New in goes svg, On sale button, svg, Free shipping button. The svg has no tabindex attribute and svg.tabIndex reads -1, so it is not visible in markup; the probable cause (not verified) is that motion-v attaches focus listeners to every motion element and Chrome treats an SVG element with focus listeners as keyboard focusable. Only motion.svg is affected: the motion.span indicators and the plain dock icon svgs are not Tab stops."
+     ],
+     "untestedItems": [
+      "locale: the Vue demo hard-codes the English copy and the port harness has no locale switch (opening ?only=sliding-tabs&l=zh-TW or &l=ja still renders English, '$54' prices, group names Sales / Orders / App navigation). The original does switch (zh-TW: 商品說明 / 洗滌方式 / 評價128, radiogroup 銷售額, NT$1,580; ja: 商品詳細, アプリのナビゲーション). Not counted as a defect because the harness gives the port no locale input, but it is unverified."
+     ],
+     "evidence": [
+      "Renders, 0 console errors and 0 page errors in both normal and reduced-motion contexts; demo at rest on both targets (state identical 2.5s apart, no autoplay observed).",
+      "Accessibility tree (Playwright ariaSnapshot) is string-identical to the original in both contexts: tablist (unnamed) with tab 'Details' [selected], 'Care', 'Reviews 128'; radiogroup 'Sales'; tablist 'Orders' with 'To ship ( 3 )' etc.; radiogroup 'App navigation' with Home/Search/Saved/Profile named once; group 'Filter products' with pressed buttons; only matching products exposed. aria-controls points at the tabpanel id on both; no live regions on either.",
+      "Initial state matches: selection Details / Week / To ship / Home / New in; bars 55,62,48,75,80,68,90; product opacity 1, 0.25, 1, 0.25 with aria-hidden false/true/false/true; folder badges 3, 2, 18, 0 at 18.39px tall; Reviews inline '128' at opacity 0.6.",
+      "Sizes identical: segment buttons 32px high / 12px padding / 12px text, container padding 4px; underline, folder, chips buttons 40px / 16px / 14px; dock buttons 40px / 12px, icon box 20px with 18px svg; folder inverted corners 8x8 at -8px and at the right edge on both.",
+      "Indicator slide curves match (x from click, original vs vue): underline Reviews to Details half-way 93ms vs 93ms, overshoot to 3.57 vs 3.58, settle 342 vs 343ms; segment Week to Month half 98 vs 83ms, settle 315 vs 299ms; folder On the way to Returns half 98 vs 95ms, peak 386.55 vs 388.32, settle 347 vs 344ms; dock Home to Saved half 99 vs 100ms, settle 382 vs 383ms. Exactly one indicator per bar in every frame on both; other instances' indicators moved 0px.",
+      "Panel direction matches: forward enter starts at +16px (vue first sampled frame 15.8) and exits to -16px, backward enter from -16px and exit to +16px; half-way 126 vs 126ms, x settles 326 vs 325ms, old and new overlap for 34 vs 33 frames, old node removed at 560 vs 543ms. Folder panel same (rest x 16, enter from 32).",
+      "Bars: 300ms ease-out on both (Week to Month bar0 55 to 40, half 82 vs 83ms, settle 232 vs 232ms). Dock label grow 0 to 50.8 vs 50.4px, shrink to 0, bar width changes continuously (240.3 to 245.3 to 242.8 vs 241 to 244.8 to 242.4). Chips: fill fades over about 150ms, check width 0 to 14 with overshoot 14.39 on both, settle 149 vs 147ms; product opacity transition 200ms on both.",
+      "Chips toggle states match after each click (On sale on: only Wool beanie at 1; New in off: Canvas tote and Wool beanie at 1; On sale off: all four at 1; empty message never shown). Repeat click on selected Details and Week changes nothing on either.",
+      "Keyboard handling matches step for step: underline ArrowRight/ArrowDown/ArrowRight(wrap)/ArrowLeft(wrap)/End/Home/ArrowUp, segment ArrowRight x2 (bars 40,58,72... then 30,45,38...), dock ArrowLeft wraps to Profile, folder ArrowLeft/ArrowRight/End, chips ArrowRight/Space/End/Enter/ArrowRight/ArrowLeft/Home move focus without toggling and Space/Enter toggle; scrollY stayed 0.",
+      "After a mouse click document.activeElement is the button itself in all five variants on both targets, :focus-visible false, no outline; ArrowRight then moves selection (or focus for chips) and Enter toggles the chip, identical to the original. Escape does nothing on either.",
+      "Hover: unselected text changes colour in all five variants, folder unselected gains the 4% tint, chip border goes 10% to 40%, selected items unchanged, on both. Press: scale 0.97 on all five variants on both; with reduced motion scale stays none on both.",
+      "Reduced motion matches: indicators jump in one frame (2 distinct x values), panel never has 2 children and no offset or fade, bars and product opacity have transition 'none', dock label appears with no width growth, and the dock pill shows the same one-frame transient (original x -17.91 then 97; vue -18.81 then 97).",
+      "Narrow layout matches: 1 column below 768px and 2 columns at 768px; product grid 2 columns at 639px and 4 at 640px; at 340px and 500px the underline and folder rows have scrollWidth equal to clientWidth (499 vs 500) and the grid item overflows the card at its min-content width (498.89 vs 500.45px); chips stay on one row.",
+      "Screenshots compared by eye (initial, after clicks, chips, narrow 340): layout, spacing and states are the same; only the accent colour (blue vs neutral black), fonts and the stage background differ, which is expected."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "tab-order-and-focus-ring: no error about the original, but the expected order should state explicitly that the chip check mark svg is not a stop; that is exactly where the Vue port diverges.",
+    "chips-toggle: 'Product opacity changes over 200ms' is correct for duration, but the easing in the original preview is the site's default curve cubic-bezier(0.23, 1, 0.32, 1), not part of the block; a port on stock Tailwind gets cubic-bezier(0.4, 0, 0.2, 1). Same 200ms, visibly different curve (original is at 0.55 after 49ms, vue at 0.94 after 47ms). Judged as a theme difference, not a defect.",
+    "panel-direction: in the original the last frame before the outgoing panel node is removed (about 561ms after the click) reads outgoing opacity 1 and incoming opacity 0 for one frame via getComputedStyle; the Vue port does not show this. Likely a style hand-off artefact in framer-motion, not something a port should copy; the checklist does not mention it.",
+    "locale: cannot be tested on ports whose demo hard-codes English; the item should say whether a port demo is expected to carry the four locales."
+   ],
+   "harnessProblems": [
+    "The port harness (App.vue) has no locale input, so the locale item is untestable for the port.",
+    "The port harness pads the page by 32px while the original stage pads less, so absolute card widths at narrow viewports differ by about 22px (grid 298 vs 276 at 340px); only relative measurements (scrollWidth vs clientWidth, column counts, min-content width) were compared.",
+    "The original's Tab sequence continues into the Next.js dev overlay (nextjs-portal) after the last chip; ignored as instructed.",
+    "The first sampled click on the Vue port (underline Details to Reviews) started moving 64ms after the click versus 36ms in the original, then matched the original within a frame on every later click; treated as first-interaction latency, not a timing defect.",
+    "With reduced motion the Vue chip fill and check mark update one frame (about 16ms) after the product opacity change, where the original updates all in the same frame; no movement involved, not counted as a defect.",
+    "The focusable svg in the Vue port has no tabindex attribute and tabIndex -1, so a static scan for focusable elements misses it; only real Tab presses reveal it."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "checkout-steps",
+  "platforms": [
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "svelte",
+    "gaps": [
+     "Guide does not say how to write a private subcomponent that takes props in a single Svelte file; snippets are the obvious answer but unstated.",
+     "No guidance on how motion animate() reads a scaleX start value from an element after stop(), so spring restarts on the ink line are unverified.",
+     "Unclear whether clearing inline width after an interrupted layout animation should happen via the animation's finished promise; I guarded it with a token."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "checkout-steps",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "morph-spring (ink line and narrow segment, going back): the port's ink first moves the WRONG WAY. On the simplest path (step 1 -> 2, wait 2.5s, click the completed answer to go back) the ink under the step that becomes a tick grows before it shrinks. Wide, port frames (cell width | ink width): t=15ms 96.72 | 130.04, t=31ms 95.39 | 148.72 (1.56x the cell, an unclipped 1px line sticking out about 53px to the right over the next tick's cell), t=48ms 145.74, t=65ms 132.43, back under the cell width only at about 130ms. Original, same step: 95.89 | 95.89 at 15ms, 93.46 at 31ms, 84.14 at 48ms, 71.67 at 65ms, monotonic shrink. Same on 3 -> 2 (port ink 135.92, 154.03, 150.81 on a 100px cell; original 99.45, 97.98, 89.24). Narrow layout, same cause: port segment fill 64.25 -> 83.95 -> 98.61 -> 102.73 (scaleX about 1.6, clipped by overflow-hidden so the segment just stays full about 130ms longer) before shrinking, settle 456ms vs original 398ms; original 69.75 -> 68.84 -> 64.77 -> 59.21. It happens whenever the last animation of that ink was the forward 0 -> 1 one (scaleTo action in CheckoutSteps.svelte: animate(node,{scaleX}) after ctl.stop()); a second reverse right after another reverse did not overshoot (wide_21 run: 94.6, 87.24, 75.73).",
+      "morph-spring (completed answer size): the original shows the new completed answer at its final size on the first frame and it only slides (item width 144 constant from t=16ms on 2 -> 3; 125.73 constant on 1 -> 2). The port animates the real li width, so the answer button (min-w-0) is clamped by the growing cell and its text is cut with a moving ellipsis for about 400ms: 2 -> 3 answer width 84.72 at 15ms, 90.03 at 49ms, 106.58 at 99ms, 125.06 at 166ms, 144 only at about 600ms; 1 -> 2 answer width 115.02 -> 130.42 over about 300ms. Visible in the mid-animation screenshots: port shows '2 items · NT$1,...' and '7-Eleven 信...' while the original shows '2 items · NT$1,280' and '7-Eleven 信義店 p' (full size, overlapped by the pill) at the same moment (shots checkout-steps-svelte-x-wide-12-mid.png / -23-mid.png vs the original ones)."
+     ],
+     "untestedItems": [
+      "autoplay-script: original-only by the checklist; the port demo has no autoplay (heading stayed 'Review order' for 10.5s untouched), so skipped as the checklist allows",
+      "demo-locale: original-only by the checklist; the port demo is fixed to locale=\"en\" with no switch",
+      "a11y-done-button-name (zh-TW, zh-CN, ja part only): the port demo cannot switch locale, so only the en name was measured in the browser; the MESSAGES table and separators in the port source are identical to the original by reading",
+      "done-truncate (ja and other locales part): only en was measured, for the same reason"
+     ],
+     "evidence": [
+      "No console or page errors on either target in any context (wide, narrow, reduced motion).",
+      "States match at steps 1, 2, 3, after the cap presses, and after going back: same headings, notes, button labels, aria-current on the right li, aria-label 'Checkout steps', title on done buttons, type=button, pill 28px tall with number opacity 0.7, ticks 20x20 with 1px border and 11px text, li 40px tall, check 12x12 stroke 1.5 aria-hidden, track font 13px, answer max-width 144px (Delivery answer exactly 144 wide, truncated, scrollW 139 > clientW 128 in the port vs 137 > 128 in the original).",
+      "Accessibility tree (CDP): one list named 'Checkout steps'; button names 'Edit Review order: 2 items · NT$1,280 , completed' and 'Edit Delivery: 7-Eleven 信義店 pickup , completed' identical in both; no live region in either.",
+      "Tab order identical inside the demo: step 1 main button only; step 2 Review order answer, main; step 3 Review order answer, Delivery answer, main (wide and narrow). The original's only extra stop is the Next.js dev overlay portal, ignored. Focus rings: done button 2px ring, main button 2px ring with 2px offset in both.",
+      "After a mouse click on the main button document.activeElement is the main button in both and Enter then advances; after clicking a done answer (button removed) activeElement is BODY in both and the next Tab lands on the main button in both. Enter on the Delivery answer, Space on the Review order answer, Enter and Space on the main button all work in both.",
+      "Advance cap: three presses on 'Pay NT$1,280' leave step 3 and no frame moves in either target. Clicking the current pill or a tick does nothing in either.",
+      "Hover on a done answer: muted -> foreground with a 0.15s colour transition and cursor pointer in both.",
+      "Forward morph timing matches: 2 -> 3 cell width half-way at 131ms (orig) vs 130ms (port), within 1px of the end at 398ms vs 396ms; trailing tick settles at 448ms vs 447ms; first movement in the same direction; left step anchored (x constant) in both. Narrow forward segment fill: settle 399ms vs 382ms.",
+      "Reduced motion: every step change lands in a single frame in both (wide cells, ink, narrow segments), final states identical; no overshoot in the port under reduced motion.",
+      "Narrow layout (375px viewport): counter '1/4', '2/4', '3/4' plus name, p and bar aria-hidden=true, 4 segments 4px tall with 4px gap, list margin 8px, 12px text, 12px/4px gaps, sr-only items with aria-current on the current one, answers clickable back to step 2 and step 1, all equal. Just above 420px (container 424px) the wide track still shows in both, pill text not wrapped, ticks 20px.",
+      "Screenshots compared by eye at rest for steps 1 to 3 wide, narrow step 1 and 3, and the 424px container: layouts equal apart from theme and font. Raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/checkout-steps.json; script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/checkout-steps.mjs; shots in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/"
+     ]
+    }
+   ],
+   "checklistProblems": [],
+   "harnessProblems": [
+    "The svelte harness wraps the demo in a main with p-8, so at a 375px viewport the port's container is 269px wide against 291px in the original preview; the two completed answers therefore wrap onto two rows in the port's narrow step 3 while they fit on one row in the original. This is the harness width, not the component (flex-wrap is the same), and was not counted as a defect.",
+    "The port demo is fixed to locale=\"en\" with no locale switch, so the non-English accessible names of the checklist cannot be measured in the port.",
+    "The original's autoplay measured here: step changes at 1.68s, 3.46s, 6.05s, 8.36s from load (reduced motion: 0.30s, 1.40s, 2.72s, 3.82s), consistent with the checklist.",
+    "Mid-animation screenshots are taken about 60 to 120ms after the click and are not frame-synchronised between targets; the per-frame samples in the JSON (key extra) are the evidence for the two motion defects."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "toast-stack",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say motion-v's drag-end callback is the prop :on-drag-end (type (event: PointerEvent, info: PanInfo)); I had to grep node_modules/motion-v to find it.",
+     "The guide does not say whether the useToasts and useUndoable exports should take refs: I chose a shallowRef for toasts and a Ref plus setter for useUndoable's value.",
+     "The guide does not say how a function ref for per-item measurement should behave when Vue re-invokes it every patch; I made it idempotent with cached per-id functions."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "Nothing says how a Snippet prop such as media can be built in script code. The demo needs createRawSnippet for this.",
+     "The guide does not say how to port a hook that returns reactive state (useToasts). A getter object over $state.raw in the module script worked, but it is unstated.",
+     "The guide does not say how to combine motion's animate() with a Svelte out: transition when the element already carries a motion-written inline transform. I read the computed matrix and wrote a css() function.",
+     "No guidance on drag='x' with elastic and constraints. I had to build it by hand.",
+     "The guide says nothing on porting framer's `height: auto` animation target."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "toast-stack",
+   "itemsTotal": 17,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 13,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "pause-and-resume: after a mouse click on X (or Undo) inside the region and moving the pointer out, the original stays expanded and paused; the Vue port collapses and resumes. Scenario B4 (add first product, hover, click X on the seeded toast, pointer out, add Mug, wait 6000ms): original still shows both timed toasts, list height 180px, timer lines frozen (scaleX 1 and 0.896, play-state paused); Vue shows 0 toasts, list height 0. 900ms after pointer-out the original timer is 'paused' at 0.896, Vue is 'running' at 0.61. Reproduced in two runs. Cause: the port's native focusout listener on the section receives the focusout Chrome fires for the removed button; React never delivers it to the section's onBlur.",
+      "undo-add: after clicking Undo on the older add toast and moving the pointer out, the original keeps 'Removed from cart', the Mug toast and the seeded toast for 6500ms (list 238px, timers paused); in Vue both timed toasts auto-dismissed and only the seeded toast is left (list 68px). Cart result, new toast text, info icon, no thumbnail, no action all match.",
+      "dismiss-button: after pressing X the original stack stays expanded and paused once the pointer leaves; Vue collapses and timers run (same measurements as B4). Also seen after keyboard actions: after Delete on a focused toast the original shows the remaining timed toast 'paused' at y -94 expanded, Vue shows it 'running' with the seed collapsed at y -10 scale 0.96; after Enter on Undo the original is expanded/paused, Vue collapsed/running."
+     ],
+     "untestedItems": [
+      "locales: the port demo hardcodes locale=\"en\" and has English copy only, so the zh-TW/zh-CN/ja switch cannot be driven. Source inspection only: ToastStack.vue carries the same MESSAGES table and resolveLocale as the original.",
+      "swipe-dismiss (flick sub-case only): the 600px/s flick rule was not tested, as the checklist says scripted input is unreliable for it. Short drag, 80px drag, 120px drag right and left were tested.",
+      "pause-and-resume (hidden tab sub-case) was tested only synthetically: document.hidden overridden and visibilitychange dispatched, not a real tab switch. Result matched (resumed with about 3500ms left in all three)."
+     ],
+     "evidence": [
+      "First render identical: headings, 3 product rows, buttons 112px, cart '2 items', region SECTION aria-label 'Notifications' 16px from right and bottom, width 352, ol aria-live polite aria-relevant additions, one toast with 44x44 aria-hidden thumbnail, Undo, X 'Dismiss notification', no timer span, tabindex 0, aria-atomic true.",
+      "Add toast: enter starts at y 28 opacity 0, settles to within 0.5px in 371ms (original 381ms), no overshoot; seed layer glides to y -10 scale 0.96 height 86; timer 2px, opacity 0.8, linear 4.5s, origin left; exit starts 4521ms after click (original 4530ms), y to 12 and opacity to 0 in about 150ms.",
+      "Hover pause: timer frozen at 0.548 for 5s in both; dismissed 2437ms after pointer-out (original 2484ms). Focus pause: dismissed 2786ms after Shift+Tab out (original 2836ms).",
+      "Collapsed stack of 5: y 0/-10/-20/-30/-40, scale 1/.96/.92/.88/.84, layers 3-4 opacity 0, aria-hidden true, tabindex -1, inert; list height 106; expanded height 462 with y 0/-94/-188/-282/-376; height transition 0.3s ease-out, curves match the original frame by frame.",
+      "Queue limit: 6 quick adds give 5 toasts and 7 visible cart rows consistent with the original run (original shows the same count text).",
+      "Remove with undo, notify (green check rgb(31,157,85), auto-dismiss at 4517ms), X dismiss, Undo pressed state (translate 0px 1px, scale 0.97) all equal to the original.",
+      "Tab order identical forward and backward (12 stops with Mug added; 24 stops with 4 added toasts, hidden layers become reachable); every stop has a ring and :focus-visible.",
+      "After mouse click: Add button stays focused (BUTTON); click on toast body focuses the LI as in the original, Escape then dismisses the front toast and Delete dismisses the focused one. Delete/Backspace on Undo or X do nothing (counts 3,3,3).",
+      "Swipe: x 30 at 50px drag, 72 at 120px, 48 at 80px; short drag returns monotonically, settle 614-679ms (original 617ms); 120px right and left dismiss.",
+      "Narrow (400px): one column, cart border-top 1px, buttons 'Add'/'Notify' 72px wide, region 16px offsets, width = frame minus 32.",
+      "Reduced motion: no timer span, new toast at y 0 opacity 1 from the first painted frame, restack and expand in one frame, list transition-property none, auto-dismiss at 4492ms (original 4504ms). A one-callback transient (back layers height 2px, list 10px) is corrected before paint in the same frame, so it is not counted.",
+      "Not counted, for information: Escape inside the region does not reach a document keydown listener in the port (0) but does in the original (1); the port follows the source's intent.",
+      "Screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/toast-stack-sheet-1.png to toast-stack-sheet-5.png (original, vue, svelte side by side); sheet 5 rows 2 and 3 show the paused-state difference."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 12,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "swipe-dismiss: the snap-back after a short drag bounces and is more than twice as fast as the original. After releasing a 50px drag (toast at x 30): original goes 30 -> 0 monotonically, never below 0, within 0.5px after 617ms; Svelte crosses zero at about 125ms, overshoots to -3.6px at about 165-195ms, and is settled at 262-268ms (two runs). The port uses its own spring (stiffness 500, damping 25) where the original's drag snap-back is overdamped. Secondary: after a 120px drag is released, the original toast drifts back from x 72 to about 36 while fading out; the Svelte toast stays at x 72 while fading.",
+      "pause-and-resume: after a mouse click on X (or Undo) inside the region and moving the pointer out, the original stays expanded and paused; the Svelte port collapses and resumes. Scenario B4 after 6000ms: original still shows both timed toasts (list 180px, timers paused at 1 and 0.896); Svelte shows 0 toasts. 900ms after pointer-out the original timer is 'paused', Svelte is 'running' at 0.59. Reproduced in two runs. Svelte marks the leaving toast inert, so focus drops to BODY within 60-80ms of the click (original and Vue keep the button focused during the 160ms exit) and the section's focusout handler clears the focused state.",
+      "undo-add: after Undo on the older add toast and pointer out, the original keeps three toasts for 6500ms (list 238px, timers paused); in Svelte the two timed toasts auto-dismissed and only the seeded toast is left (list 68px). Cart result and the 'Removed from cart' toast content match.",
+      "dismiss-button: after pressing X the original stack stays expanded and paused once the pointer leaves; Svelte collapses and timers run. Same after Delete on a focused toast and after Enter on Undo (original expanded/paused, Svelte collapsed/running)."
+     ],
+     "untestedItems": [
+      "locales: the port demo hardcodes locale=\"en\" and has English copy only, so the locale switch cannot be driven. Source inspection only: ToastStack.svelte carries the same MESSAGES table and resolveLocale as the original.",
+      "swipe-dismiss (flick sub-case only): the 600px/s flick rule was not tested with scripted input, as the checklist advises.",
+      "pause-and-resume (hidden tab sub-case) was tested only synthetically (document.hidden overridden, visibilitychange dispatched). Result matched (resumed with about 3500ms left)."
+     ],
+     "evidence": [
+      "First render identical to the original: same texts, region 16px from right and bottom, width 352, same attributes on section, ol, li, thumbnail, buttons; no timer on the seeded toast.",
+      "Add toast: enter starts at y 28 opacity 0, within 0.5px after 352ms (original 381ms), no overshoot; seed layer to y -10 scale 0.96 height 86; timer linear 4.5s; exit starts 4534ms after click (original 4530ms), y to 12, opacity to 0 in about 135-150ms. The exit fade uses ease-in-out where the original decelerates (opacity 16ms into the exit: 0.98 vs 0.79); same start, direction, end and duration, so not counted.",
+      "Hover pause: timer frozen at 0.548; dismissed 2482ms after pointer-out (original 2484ms). Focus pause: 2836ms after Shift+Tab out (original 2836ms).",
+      "Collapsed stack, expand on hover, collapse again: positions, scales, opacity, aria-hidden, tabindex -1, inert and list heights (106 / 462 / 106) equal to the original; curves match.",
+      "Remove with undo, notify (auto-dismiss at 4523-4527ms), X dismiss, queue limit, Undo pressed state (translate 0px 1px, scale 0.97) equal to the original.",
+      "Tab order identical forward and backward (12 stops; 24 stops with 4 added toasts); every stop has a ring and :focus-visible.",
+      "After mouse click on a toast body the LI is focused as in the original; Escape then dismisses the front toast, Delete the focused one. Delete/Backspace on Undo or X do nothing. Escape while only hovering does nothing; Escape with no toasts does nothing.",
+      "Drag follow ratio equal: x 30 at 50px, 72 at 120px, -72 at -120px, 48 at 80px; thresholds behave the same (80px springs back, 120px dismisses).",
+      "Narrow (400px): one column, cart border-top 1px, 'Add'/'Notify' 72px wide, region offsets 16px.",
+      "Reduced motion: no timer span, no 28px rise, restack/expand/dismiss within one frame, list transition-property none, auto-dismiss at 4495ms (original 4504ms).",
+      "Not counted, for information: Escape inside the region does not reach a document keydown listener in the port (0) but does in the original (1).",
+      "Screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/toast-stack-sheet-1.png to toast-stack-sheet-5.png."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "pause-and-resume, undo-add, dismiss-button (stuck expanded and paused after Undo/X): the description of the original is correct and was re-measured, but the cause is React-specific. Chrome 158 does fire blur/focusout (relatedTarget null) on the removed button about 180ms after the click; React does not deliver it to the section's onBlur because the button's fiber is already unmounted. Any port with a native focusout listener receives it and collapses, so both ports fail these three items for the same reason. If this is an original bug rather than wanted behaviour, the items should say so; as written they fail every faithful non-React port. The same stuck state also follows Delete/Backspace on a focused toast and Enter on Undo, which the checklist does not mention.",
+    "keyboard-dismiss: 'the key event does not reach handlers outside the region' is not true of the original for native listeners. A keydown listener on document still receives Escape (count 1) when the front toast is dismissed, because React delegates at the document and only stops React handlers. The ports stop it natively at the section (count 0).",
+    "Product names: the original shows 'Chelsea Boot', 'Stoneware Mug', 'Waxed Field Jacket', 'Market Tote', 'Steel Bottle 500 ml', not Sneaker, Mug, Jacket, Tote, Bottle. Toast texts are e.g. 'Chelsea Boot, Black leather, size 42', 'Removed Steel Bottle 500 ml', and trash buttons 'Remove Market Tote'. The longer names wrap, so the Mug add toast is 88px tall in the original and 70px in the ports.",
+    "Not in the checklist: when Undo pushes a new toast while another is leaving, the original moves the remaining timed toast's li in the DOM and its CSS timer animation restarts, so its line jumps back to full width (0.878 -> 1.0) although its real remaining time is unchanged. The ports keep the line where it was (0.811).",
+    "collapsed-stack: 'cut to the front toast's height' and 'container height equals front height plus ...' use the front toast's body height (86px for an 88px toast, the li has 1px borders), e.g. list height 106 = 86 + 20. Same in the ports."
+   ],
+   "harnessProblems": [
+    "The original dev server on localhost:3100 refused connections part-way through the first run (scenarios G onward failed with ERR_CONNECTION_REFUSED); it came back by itself and the original was re-run alone. I did not start or stop anything.",
+    "The first run used name-based selectors ('Sneaker,' etc.) that do not fit the original's product names; the script was changed to match on variant text and all three targets were run again with the final script. Port results were the same in both runs.",
+    "The port demos are English only (locale=\"en\" hardcoded), so the locales item cannot be exercised on either port.",
+    "Hidden-tab pause was simulated by overriding document.hidden and dispatching visibilitychange; a real tab switch is not available in headless Chrome.",
+    "Port pages had WebSocket stubbed to stop Vite HMR reloads during measurement.",
+    "Files: script /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/toast-stack.mjs; measurements /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/toast-stack.json; per-frame samples /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/toast-stack-frames.json; helper scripts ts-cmp.mjs, ts-frames.mjs, ts-probe.mjs, ts-probe2.mjs in the same folder."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "floating-field",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "A computed or ref in script setup that has the same name as a prop (error, rules, id) makes vue-tsc type the whole template context as never. The resulting errors all read 'Property X does not exist on type never' and give no hint about the name clash. The guide should say to rename the setup binding.",
+     "The guide does not say how to port an attribute-spreading input that also needs its own handlers. I used v-bind=\"$attrs\" plus @focus/@blur/@input, which merge, and left onFocus/onBlur undeclared.",
+     "Vue's template whitespace condensing adds a space around interpolations next to elements inside a whitespace-pre container (the letter morph). The guide does not warn about this. I wrote that span with no whitespace between nodes.",
+     "The guide does not say how to name a prop whose name is a reserved word in the React source (class). I declared a class prop in a defineProps type with a string type, because a clsx type could not be resolved by the compiler.",
+     "useAnimate in motion-v returns a ref scope that works with ref=\"scope\" in the template. The guide does not mention useAnimate."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide does not say how to port a render-prop-like ReactNode function (didYouMean(s) returning JSX with a clickable child); I had to invent the split-on-substring approach",
+     "No guidance on AnimatePresence mode=\"wait\" in Svelte (new element must wait for the old to finish); I used a delay on the intro plus absolute positioning of the leaver",
+     "No guidance on driving springs as Svelte transitions (in:/out: need css+easing); I sampled motion's spring() to build an easing",
+     "Guide does not say how to handle a prop-spread onto both input and textarea in Svelte typings (needed a cast)",
+     "The multiple-component-in-one-file case (private CountRing) is not covered for Svelte; I used a snippet with {@const} and an action for the svg scale"
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "floating-field",
+   "itemsTotal": 17,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 15,
+     "tabOrderMatches": false,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "tab-order: Tab stops on decorative motion-v SVG elements that the original never focuses. Empty form, Tab x7: original = name, zip, email, password, Show, note, (leaves form); Vue = name, zip, email, password, Show, <path d=\"M3 6.2l2 2L9 4\"> x4 (the four rule check marks), note, then <svg viewBox=\"0 0 18 18\"> (the ring counter), then body. The focused elements report tabIndex=-1 and carry no tabindex attribute, yet Chrome stops on them (probe output in ff-probe.mjs run; screenshot shots/floating-field-vue-tab-on-path.png).",
+      "tab-order / email-suggestion: with 'lin@gmial.com' typed, Tab from Email lands on the success check <svg viewBox=\"0 0 24 24\"> (original: input[name=password]). That svg is then removed when the suggestion replaces the success state, so document.activeElement falls to BODY (step D1: original active=input[name=password], Vue active=BODY).",
+      "suggestion-accept-morph (keyboard path): because focus was lost to BODY, Shift+Tab lands on input[name=email] instead of the 'lin@gmail.com' button (step D2: original active=button \"lin@gmail.com\", Vue active=input[name=email]); the offer disappears and Enter does not accept it (step D3 value: original 'lin@gmail.com', Vue 'lin@gmial.com'). Same result in the reduced-motion run (rm-5: original value 'lin@gmail.com' + success message, Vue still 'lin@gmial.com' + 'Did you mean'). The mouse path works and matches (F1: value replaced, focus back on input[name=email], letters 'a','i' drop from y -11px, overlay removed after 466 ms vs 484 ms)."
+     ],
+     "untestedItems": [
+      "message-swap, source-only clause (same kind, different text swaps without fade): not reachable in the demo; checked by reading the source only (motion.p keyed on messageKey, same as the original)."
+     ],
+     "evidence": [
+      "All 57 static snapshots (text, values, aria-invalid, aria-describedby text, roles, required, ghost text, border/label colour class, strength word, live region, ring offsets) are identical to the original except where the focus bug cascades (D1-D4, E, rm-4..rm-9 email state).",
+      "CDP accessibility tree identical: names 'Full name','ZIP code','Email','Create a password','Delivery note'; required=true on name and email; password description 'At least 8 characters , not met Upper and lowercase , not met ...'; note description 'Optional'.",
+      "label-float: scale 1 to 0.86, y 0 to -10, top edge 17.8 to 9.2 px, y settles in 217 ms (original 216 ms); return 216 ms vs 214 ms, no wrong-way movement.",
+      "shake: x peaks -5.6, +4.3, -2.7, +1.9 over 349 ms (original -6, +4.8, -2.5, +1.8 over 333 ms); repeats on blur 2 and 3; none on empty blur; none with reduced motion.",
+      "check mark: opacity 0 to 1, scale 0.6 to 1.012 overshoot to 1 in 417 ms (original 433 ms); fades out on refocus.",
+      "message swap: old fades to 0 by 133-150 ms, new fades in from y -3, total 300 ms (original 315 ms), never both visible; row height constant 20 px, password box top constant.",
+      "strength: 'a' = Weak [1,0,0,0]; Harbor- = Fair; Harbor-2 and Harbor-27 = Strong; live region 'Password strength: Weak/Fair/Strong'. Paste: segments start at 56/88/122/172 ms (original 71/105/139/189), delete: segment 4 first; dot pop 0.7 to 1.06 to 1; check draws in 215 ms.",
+      "show-password: mouse click leaves focus on the button, type text/password toggles, Enter and Space toggle it too, value and meter unchanged.",
+      "ring: no number at 34/35, at 36 number '4' slides from x 4 and ring scales to 1.15, at 40 number '0' and arc destructive, 41st char refused; arc transition 0.15s ease-out.",
+      "reduced motion: label jumps in one frame, no shake, check at scale 1, segments and ring change in one frame, ring stays at scale 1.",
+      "Mouse click on a field focuses the input itself; typing after mouse-accept works (F2).",
+      "No console or page errors. Screenshots compared by eye (A-first, G2, D1, H4): layout matches the original apart from the neutral theme."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "label-float (return to rest): the label first moves the wrong way and takes about twice as long. ZIP blur while empty (B2): original y -10, -9.4, -8.0, -6.3 ... 0 in 214 ms; Svelte y -10, -11.0, -13.8, -13.9, -12.4, -10.2 ... 0 in 417 ms, and scale 0.86 dips to 0.81 before rising (original rises monotonically). Top edge of the label goes 9.2 up to 5.7 px before coming down to 17.8 (original 9.2 straight to 17.8). Reproduced on all three measured returns (B2, B11 cleared ZIP: peak y -14.0; C7 cleared Email: peak y -14.1, 417 ms vs 217 ms). The first float up (B1) is correct (217 ms).",
+      "strength-motion: segments move the wrong way before settling. Paste 'Harbor-27' (G4), segment 1 width fraction: original 0, 0.10, 0.19, 0.28, 0.38, 0.47 ... rising monotonically to 1 in 584 ms; Svelte 0, 0.41, 0.57, 0.60, 0.52, 0.40, 0.25, 0.10, 0.05, then 0.19 ... 1 in 650 ms (fills to 60%, empties to 5%, fills again). Segment 4 does the same (0.35, 0.56, 0.60, 0.54, 0.43, 0.28, 0.13, 0.02, then up). Delete (G3), segment 4 scaleX: original 1, 0.95, 0.88, 0.79 ... 0; Svelte 1, 1.39, 1.57, 1.60, 1.53, 1.41 ... back to 1 at about 140 ms and only then shrinks, 650 ms vs 583 ms (the bar stays full for the first 140 ms because the overshoot is clipped). Stagger order is correct (starts 37/88/122/172 ms on paste)."
+     ],
+     "untestedItems": [
+      "message-swap, source-only clause (same kind, different text swaps without fade): not reachable in the demo; checked by reading the source only ({#each messageItems as key (key)} keyed on the kind, same as the original)."
+     ],
+     "evidence": [
+      "Tab order identical to the original: name, zip, email, password, Show, note, out; with 'lin@gmial.com' Tab from Email lands on input[name=password]; Shift+Tab from password lands on button 'lin@gmail.com', then email, zip, name.",
+      "All 57 static snapshots match the original (text, values, aria-invalid, roles alert/status, required, ghost text '00000'/'000'/'00', border and label colour class, strength word and live region, ring offsets). Only raw-DOM difference: rule li textContent has a space before ', met' ('A number , met'); Chrome's computed accessible description is identical to the original's, so not counted.",
+      "CDP accessibility tree identical to the original (names, required, descriptions).",
+      "shake: x peaks -5.8, +4.3, -2.6, +1.9 over 333 ms (original -6, +4.8, -2.5, +1.8 over 333 ms); repeats on each invalid blur; none on empty blur or with reduced motion.",
+      "check mark: scale 0.6 to 1.012 to 1, opacity 0 to 1, 416 ms (original 433 ms); fades out on refocus.",
+      "message swap: old fades out over about 150 ms while the new one sits at opacity 0, then the new one fades in from y -3; total 316 ms (original 315 ms); never both visible; row height 20 px constant. Note, not counted: the fade uses an ease-in-out curve (0.03, 0.12, 0.27 at 17/33/50 ms) where the original starts faster (0.31, 0.48, 0.62), and both <p> share the same id for the 140 ms exit.",
+      "suggestion accept by Enter and by mouse: value 'lin@gmail.com', focus on input[name=email], letters 'a','i' drop from y -11 px with the second delayed, overlay removed at 467 ms (original 467-484 ms), then success state; typing afterwards works.",
+      "strength states: 'a' = Weak, Harbor- = Fair, Harbor-2/Harbor-27 = Strong; dot pop 0.7 to 1.06 to 1 in 517 ms (original 515 ms); check draws in 234 ms (original 215 ms).",
+      "show-password: focus stays on the button after a mouse click, Enter and Space toggle, value and meter unchanged.",
+      "ring: number '4' at 36 slides from x 4, ring to 1.15 in 383 ms (original 366 ms); return 1.15 to 1 is monotonic; '0' and destructive colour at 40; 41st char refused.",
+      "reduced motion: label jumps in one frame, no shake, no morph overlay, check at scale 1 at once, segments and ring number change in one frame, ring stays at scale 1.",
+      "No console or page errors. Screenshots compared by eye (A-first, B4, D1, G2): layout matches the original apart from the neutral theme."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "live-validation-after-touch: the behaviour line says nothing is validated while typing until the field has been left once. In the original only the ERROR waits for the first blur. A valid address typed into a never-blurred Email already shows the green border, the check mark and 'We will send tracking here' while focused (step D0 on the original: msg 'We will send tracking here', check present, success border), because `valid` does not depend on `touched`. Both ports match the original here.",
+    "tab-order: it should state that while Email is focused and holds a valid address (including 'lin@gmial.com' before blur) the success check mark svg is on screen and must not be a Tab stop; that is exactly where the Vue port breaks."
+   ],
+   "harnessProblems": [
+    "The original's Tab out of the form lands on the Next.js dev overlay (nextjs-portal) where the ports land on BODY; ignored.",
+    "In the Vue run the keyboard suggestion flow (steps D2-D4 and rm-5 onward) is contaminated by the lost focus, so Vue's morph and success-after-accept were judged from the mouse path (F1, F2) instead.",
+    "Script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/floating-field.mjs; raw data floating-field.json beside it; helper analysis scripts ff-diff.mjs, ff-frames.mjs, ff-probe.mjs in the same folder; screenshots in shots/floating-field-<target>-<step>.png."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "pagination",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide gave no pattern for the source's item() helper, which picks a link, button or span: I used a dynamic component with a props-building function. It type-checks, but nobody has compared it with the original.",
+     "The guide did not say how a controlled page prop plus onPageChange maps when the prop is named page rather than value. I used a plain page prop with an update:page emit instead of defineModel.",
+     "The guide did not say whether a layoutId prop in motion-v is kebab-case in templates. I wrote :layout-id and could not confirm it behaves correctly without running it."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "It does not say how to read the shared-layout (layoutId) underline when the old and new cells land at the same screen position. Check 9 expects an offset that a plain FLIP cannot produce.",
+     "It does not say whether a snippet that renders a link or a button should be one snippet or split, or how to pass the 'current' flag and the underline through it.",
+     "The guide gives no way to know when the animate() promise returned by motion should clear the inline width and transform, and what animate() returns in motion 14. I used a cautious then() call."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "pagination",
+   "itemsTotal": 19,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 17,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "underline-spring (b): the backward move 7 to 6 snaps where the original springs. Original: after clicking Previous on page 7 the bar's first frame is +40px right of rest and it springs back, last moving frame at 291ms, settled by 307ms (16 moving frames); repeated via the left neighbour Page 6: +40px, settled 311ms. Vue: offset 0.00px on every sampled frame in both runs (0 moving frames), so the bar never moves. The checklist states that a port that snaps on a backward move fails. Forward 6 to 7 does match (-20px, settled 268ms vs 270ms).",
+      "underline-spring (c), minor, not counted as failing on its own: on 7 to 12 the original's first frame is 136px left of rest (20px left of the old cell) while Vue starts 116px left (exactly at the old cell); settle time matches (345ms vs 349ms)."
+     ],
+     "untestedItems": [
+      "locale: the port's demo hard-codes locale=\"en\" and has no locale switch, so zh-TW, zh-CN and ja could not be exercised at runtime. By source reading only, the MESSAGES table in Pagination.vue is identical to the original's; the demo copy (card titles, range header) exists in English only.",
+      "limits-disabled, hover part only: 'no hover background' on a disabled control was checked through pointer-events: none and opacity 0.4, not by sampling the background under a hover."
+     ],
+     "evidence": [
+      "Initial state identical to the original apart from theme colours and font metrics: header '121 to 144 of 286 items', rows 'Previous | 1 | … | 5 | [6] | 7 | … | 12 | Next', 'Previous | [1] | 2 | 3 | 4 | Next', 'Previous | 3 / 38 | Next'; cells 36x36, ellipsis 28x36, gaps 4px, underline 20x2 inset 8/8/4.",
+      "Tab order identical, 14 stops: nav0 Previous, Page 1, 5, 6, 7, 12, Next; nav1 a Page 1 to 4, a Next; nav2 Previous, Next. No stop on svg, span or the underline. Focus ring box-shadow has the same 2px + 4px structure.",
+      "After a mouse click document.activeElement is the same as in the original (button Page 7, button Page 12, button Previous, a Page 3, a Previous; BODY after clicking the disabled Next). Enter then Space on the mouse-focused Previous went 5 to 4 to 3 as in the original.",
+      "Ranges at pages 1, 4, 5, 9, 12, range text at both ends ('1 to 24', '265 to 286'), disabled Previous/Next (disabled attribute, opacity 0.4, pointer-events none, no change after 3 clicks), current-page no-op, prev-next sequence 7, 6, 5 all equal to the original.",
+      "Keyboard: Enter on Page 7 gives page 7 with focus kept on Page 7; Space on Next gives page 8 with focus on Next. Same as original.",
+      "Link mode: same tags, hrefs and aria-disabled as the original at every step; href lag reproduced (Previous from page 4: page 3 shown, hash #orders-page-2; Next from page 2: page 3 shown, hash #orders-page-4). Space on a link does nothing, Enter navigates, current link keeps its href.",
+      "Compact: '3 / 38' to '4 / 38' inside li[aria-live=polite]; Previous disabled at 1 / 38, Next disabled at 38 / 38.",
+      "Narrow: at 600px and 340px the Previous/Next words are 1x1px absolutely positioned with textContent kept; cells stay 36px; at 340px the row overflows the card on both sides as in the original.",
+      "Reduced motion: same as the original on every step (6 to 7 one frame at -20px then rest; 7 to 12 one frame at the old position then rest; link card 1 to 2 one frame at -40px then rest), no spring.",
+      "Other instances' underlines did not move while the first card changed (1 distinct position each across all frames).",
+      "0 console errors, 0 page errors. Screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/pagination-vue-*.png"
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 16,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "underline-spring (a): forward 6 to 7 snaps where the original moves. Original: first frame -20px left of rest, springs back, settled by 261 to 270ms in three runs (12 to 13 moving frames); same on keyboard Enter (-20px, 257ms). Svelte: offset 0.00px on every frame in all three mouse runs and in the keyboard run. Cause visible in the source: the indicator action animates from the old bar's screen box, and the row re-centres so old and new boxes coincide (dx = 0).",
+      "underline-spring (b): backward 7 to 6 snaps. Original: +40px right of rest, settled by 307ms (Previous) and 311ms (left neighbour). Svelte: 0.00px on every frame in both runs. The checklist states that a port that snaps on a backward move fails.",
+      "reduced-motion: the original renders one sampled frame with the bar offset before it lands (6 to 7: -20px; 7 to 12: -136px; 12 to 11: +40px; link 1 to 2: -40px). Svelte shows no offset frame on any of these (0 moving frames). Low visual weight (a single frame), but it differs from the original and from the checklist's expectation for 6 to 7.",
+      "underline-spring (c), minor, not counted on its own: 7 to 12 starts from the old cell (first sampled frame -110px, already moving) where the original starts at -136px; settle 332ms vs 349ms, within tolerance."
+     ],
+     "untestedItems": [
+      "locale: the port's demo hard-codes locale=\"en\" and has no locale switch, so zh-TW, zh-CN and ja could not be exercised at runtime. By source reading only, the MESSAGES table in Pagination.svelte is identical to the original's; the demo copy exists in English only.",
+      "limits-disabled, hover part only: 'no hover background' on a disabled control was checked through pointer-events: none and opacity 0.4, not by sampling the background under a hover."
+     ],
+     "evidence": [
+      "Initial state, sizes, gaps, underline geometry (20x2, inset 8/8/4), attributes and accessible names identical to the original apart from theme colours and font metrics.",
+      "Tab order identical, 14 stops, none on svg, span or the underline; same focus ring structure.",
+      "After a mouse click document.activeElement matches the original at every step; Enter and Space on the mouse-focused Previous still work (5 to 4 to 3).",
+      "Ranges, range text at both ends, disabled limits, current-page no-op, prev-next, keyboard activate, link mode, href lag (hash #orders-page-2 with page 3 shown after Previous from 4; #orders-page-4 with page 3 shown after Next from 2), link keyboard and compact live region all equal to the original.",
+      "Narrow 600px and 340px: words hidden to 1x1px with textContent kept, cells 36px, row overflows the card at 340px as in the original.",
+      "Moves where the row does not re-centre do animate: 7 to 12 (travel 116px, settled 332ms), link 1 to 3 (-77px first frame, settled 315ms vs original 326ms).",
+      "Other instances' underlines did not move while the first card changed.",
+      "0 console errors, 0 page errors. Screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/pagination-svelte-*.png"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "reduced-motion: the item says that on 7 to 12 and in the link card the bar lands in a single frame with no intermediate position. Measured on the original under reducedMotion: reduce, every page change shows one sampled frame at the old position before landing, not only 6 to 7: 7 to 12 first frame -136px from rest, 12 to 11 +40px, link 1 to 2 -40px, link 2 to 4 -80px, then rest on the next frame. (Sampled with getBoundingClientRect in requestAnimationFrame, so whether that frame is actually painted is not proven, which applies equally to the item's own 6 to 7 claim.)",
+    "underline-spring (c): the item does not say that the original's 7 to 12 move starts 20px to the left of the old cell (first frame 477.28px while the old bar was at 497.28px, travel 136px instead of 116px), the same 20px quirk as on 6 to 7. A port that starts exactly at the old cell differs by 20px at the start.",
+    "underline-spring / reduced-motion: the absolute positions quoted (447.3px, 427.3px) depend on the viewport; at a 1000px viewport the rest position is 497.28px. Offsets (-20px, +40px) and durations (about 250ms forward, about 300 to 310ms backward) were confirmed."
+   ],
+   "harnessProblems": [
+    "The port demos hard-code locale=\"en\" and have no locale switch, so the locale item cannot be tested at runtime on either port.",
+    "The port harness pads the page by 32px where the original preview pads 16px, so at 340px the first card is 276px wide instead of 298px and its title wraps to two lines (card 126px tall vs 106px). This is the harness, not the port; the row overflow itself matches.",
+    "The original's Tab sequence ends on the Next.js dev overlay (nextjs-portal) while the ports end on BODY; ignored as instructed.",
+    "The pagination preview did not autoplay: the state was identical before the pointer press, after it and 1.5s later on all three targets.",
+    "Script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/pagination.mjs; raw measurements: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/pagination.json; a helper that diffs the JSON was also written to /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/pagination-cmp.mjs."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "countdown-banner",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say how to define private per-item components inside script setup when only two files may be written; I used defineComponent with render functions assigned to consts, which worked.",
+     "No guidance on typing h(motion.span, ...) calls; I cast motion.span to Component.",
+     "The style and class props need a type the SFC compiler can resolve; the guide covers class but not style."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "`cubicBezier` is not listed among motion's exports, but it imports and type-checks from \"motion\" (14.14).",
+     "The guide has no rule for a private stateful subcomponent (FlipCard) in a one-file Svelte port. A snippet cannot hold state, so I had to hoist per-tile state into the parent.",
+     "Svelte passes (node, params) to a transition function. A zero-argument out: function fails type-check, and the guide does not say so.",
+     "No Svelte equivalent is given for framer's whileTap on an element that is either an a or a button, so I used an action. The guide also says nothing about mirroring framer's keyboard and mouse press quirk from the acceptance list."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "countdown-banner",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 12,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "ended-state: banner 4's discount fades in on load instead of being at 0.4 from the first painted frame. First frames after mount on Vue: opacity 1, 0.980, 0.894, 0.726, 0.583, 0.498, 0.448, 0.419, 0.404, 0.4 (about 150 ms; colour already muted, timer already 0.4). Original and Svelte: 0.4 on the very first frame the banner exists. Reproduced in 3 of 3 Vue loads.",
+      "cta-press: after a keyboard Enter activation ('Shop headphones', URL gains '#'), a mouse press on 'Shop now' still scales on Vue (none -> 0.996 -> ... -> matrix(0.97) within about 250 ms). The original keeps transform 'none' for the whole press (measured), as the checklist states; Svelte also keeps 'none'.",
+      "live-announcement-and-prices: the sr-only price prefix lost its trailing space. Vue renders the span as 'Was' with no whitespace before <s>, so the price line textContent is '$77Was$129' (all four banners); original has 'Was ' giving '$77Was $129'. The Vue template compiler trimmed the '{{ t.original }} ' trailing space.",
+      "cta-activation / tab-order: the CTAs have no tabindex attribute on Vue (getAttribute('tabindex') = null on all three links); the original carries tabindex=\"0\" on each, as the checklist expects. Focus behaviour is unaffected (links are focusable), so this is an attribute-only difference."
+     ],
+     "untestedItems": [
+      "server-render-placeholder: needs a server render of the component with each banner's props; the running port demo only mounts in the browser and I may not add a test page. By source reading the idle branch (dateLabel sentence, '--' tiles with Days, no aria-label) is carried over.",
+      "callbacks-and-invalid-date: the demo passes no callbacks and no invalid date; needs a test page. Source reading only: emits 'start'/'end' on phase change with flush sync, invalid endDate never starts the clock.",
+      "locale-and-layout (locale half): the port demo hard-codes locale=\"en\" and has no locale switch. The MESSAGES tables for zh-TW, zh-CN and ja are textually identical to the original by source reading. The layout half was tested and matches.",
+      "background-pause-resync (end passes while hidden): only the running case was tested (hidden 3.3 s, no updates, jump of 3 s with one flip on return)."
+     ],
+     "evidence": [
+      "No console or page errors in any of the five scenarios.",
+      "Text, headings, prices, CTAs, unit labels, date lines, timer role/aria-live/aria-label, aria-hidden groups and status region match the original in the rest, upcoming, live and ended states (e.g. 'Starts in 0 Days 0 Hrs 0 Min' -> 'LIVE NOW ENDS IN', 00:59:59, status 'Live now', 'Ends Wed, Nov 25, 9:00 PM' -> 'Ended Wed, Nov 25, 9:00 PM', status empty, CTA gone).",
+      "Tick: value changes every 1000 ms; top leaf 0 -> -90 deg in about 160 ms then bottom leaf 90 -> 0 in about 160 ms; leaves present for 333 ms (original 350 ms); unchanged digits have no leaves. Tile 25.6 x 36 px with a 1 px midline, same as the original.",
+      "Days toggle: 01:00:00:00 'Time left: 1 Days 0 Hrs 0 Min' -> 23:59:59 under Hrs, Min, Sec with 'Time left: 0 Days 23 Hrs 59 Min', same as the original.",
+      "Ended crossing: mark fades 0.07, 0.24, 0.40, 0.54, 0.67, 0.78, 0.88, 0.95, 0.99, 1 over about 150 ms; discount turns muted at once and fades to 0.4 in about 150 ms; CTA removed in the same frame; no later updates.",
+      "Tab order: 'Shop headphones', 'Remind me', 'Shop now', then out of the demo; Shift+Tab reverses; focus ring is white 2 px plus ring 4 px, same geometry as the original. After a mouse click activeElement is the <a> itself; Enter then follows the link and Tab moves to 'Remind me'.",
+      "Fresh mouse press: none -> 0.97 in about 250 ms and back to none in about 270 ms, curve within a frame of the original; hover opacity 0.9; keyboard Enter press scales to 0.97.",
+      "Reduced motion: digits swap with 0 leaves at 1000 ms intervals, CTA transform stays 'none' on press, Ended mark is at opacity 1 on the frame the banner ends.",
+      "Screenshots (rest, live, ended, narrow, focus) look the same as the original apart from the neutral theme and the narrower demo column."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 16,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "cta-press: on release after a held press the CTA first moves the wrong way. Svelte, release after holding about 500 ms: 0.97 -> 0.960 -> 0.958 -> 0.961 -> 0.967 -> 0.974 -> ... -> 1.001 -> 1, settling about 250 to 290 ms after it starts moving. Original: 0.97 -> 0.971 -> 0.975 -> 0.980 -> ... -> 1.0007 -> none, monotonic, about 185 ms. Reproduced on two different CTAs in the same run and again in a second run (dip to 0.9579 each time). The release is also about 35 to 50 percent longer than the original. A quick click (50 ms hold) matches the original, so the fault is in the release from rest (the action stops the running animation and starts a new spring that picks up a stale velocity)."
+     ],
+     "untestedItems": [
+      "server-render-placeholder: needs a server render of the component with each banner's props; the running port demo only mounts in the browser and I may not add a test page. By source reading the idle branch (dateLabel sentence, '--' tiles with Days, no aria-label) is carried over.",
+      "callbacks-and-invalid-date: the demo passes no callbacks and no invalid date; needs a test page. Source reading only: onStart/onEnd are called from a phase effect, invalid endDate returns before the clock starts.",
+      "locale-and-layout (locale half): the port demo hard-codes locale=\"en\" and has no locale switch. The MESSAGES tables for zh-TW, zh-CN and ja are textually identical to the original by source reading. The layout half was tested and matches.",
+      "background-pause-resync (end passes while hidden): only the running case was tested (hidden 3.3 s, no updates, jump of 3 s with one flip on return)."
+     ],
+     "evidence": [
+      "No console or page errors in any of the five scenarios.",
+      "Text, headings, prices ('$77 Was $129' with the sr-only prefix and space), CTAs (<a href=\"#\" tabindex=\"0\">), unit labels, date lines, timer role/aria-live/aria-label, aria-hidden groups and status region match the original in the rest, upcoming, live and ended states.",
+      "Ended on load: banner 4 discount is at opacity 0.4 and muted, mark at opacity 1, timer 0.4, no CTA, on the first frame it exists, as in the original.",
+      "Tick: value changes every 1000 ms; top leaf 0 -> -90 deg in about 160 ms then bottom leaf 90 -> 0 in about 160 ms; leaves present for about 350 ms (original 350 ms).",
+      "Days toggle: 01:00:00:00 -> 23:59:59 under Hrs, Min, Sec with 'Time left: 0 Days 23 Hrs 59 Min', same as the original.",
+      "Ended crossing: mark fades 0, 0.18, 0.34, 0.49, 0.62, 0.74, 0.84, 0.92, 0.98, 1 over about 150 ms; discount muted at once and fades to 0.4 in about 150 ms; CTA removed in the same frame; date line becomes 'Ended Wed, Nov 25, 9:00 PM'; no later updates.",
+      "Tab order: 'Shop headphones', 'Remind me', 'Shop now', then out of the demo; Shift+Tab reverses; same focus ring geometry. After a mouse click activeElement is the <a>; Enter follows the link and Tab moves on.",
+      "Press down: none -> 0.97 in about 265 ms, same curve as the original. After a keyboard Enter activation a mouse press keeps transform 'none', as in the original; a keyboard press still scales to 0.97.",
+      "Reduced motion: digits swap with 0 leaves, CTA transform stays 'none' on press, Ended mark at opacity 1 on the frame the banner ends.",
+      "Screenshots (rest, live, ended, narrow, focus) look the same as the original apart from the neutral theme and the narrower demo column."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "ended-crossing: the one-frame drop of the Ended mark to opacity 0 at the end of its fade is real in the original (my run: 144 ms 0.996, 161 ms 0, 178 ms 1) but it is a rendering glitch of the original's animation library hand-off, not intended behaviour. Neither port reproduces it (both go straight to 1). I did not count its absence as a defect; the item should not require it.",
+    "ended-crossing: the listed discount opacity steps (1, 0.74, 0.56, 0.47, 0.43, 0.4) are the original site's transition easing. Both ports fade over the same 130 to 150 ms but with the neutral theme's default easing (1, 0.98, 0.89, 0.73, 0.58, 0.50, 0.45, 0.42, 0.40). I treated this as a theme difference, not a defect; the item should give only the duration.",
+    "tab-order and cta-activation both require tabindex=\"0\" on the CTA while describing it as an artefact of the animation library that is harmless. As written it makes a port fail on an attribute with no behavioural effect (the Vue port omits it). The item should say whether the attribute is required."
+   ],
+   "harnessProblems": [
+    "Playwright's page.clock (fake timers) is not usable for this block: after clock.fastForward the Ended mark stayed at opacity 0 forever in the original and in Vue (the animation library's frame loop did not advance), which looked like a defect but was an artefact. I replaced it with a Date shim (real timers, shifted Date.now) and re-measured everything.",
+    "The port demo column is 832 px wide while the original preview stage gives the block 960 px, so the title column wraps more in the ports (first banner title on four lines). Same grid rules, different container; not counted.",
+    "The port demos hard-code locale=\"en\" and have no locale switch, so the locale half of locale-and-layout cannot be tested in the browser.",
+    "The original dev server on port 3100 refused connections for a short time mid-run (ERR_CONNECTION_REFUSED on three scenarios); it came back by itself and I re-ran those scenarios.",
+    "The original preview has no autoplay for this block; the pointer press on a heading was done anyway and the layout was confirmed stable before measuring.",
+    "Script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/countdown-banner.mjs; raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/countdown-banner.json; screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/countdown-banner-<target>-<step>.png"
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "low-stock-indicator",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The doc does not say how to keep the Count element's identity by position when message labels are VNodeChild functions. Vue's unkeyed fragment diff matches from the end and would keep the Count across in-stock to low, which breaks check 10. I keyed the parts by index to get React's behaviour.",
+     "The doc says a private component in the plain script block is not resolved by the template, but it does not say how to call a render-function component from message functions, or that the plain and setup blocks share one scope. Duplicate imports in the two blocks raise TS2300 errors.",
+     "The doc does not say how to pass `class` as a declared prop alongside `withDefaults`.",
+     "The doc does not say whether motion-v lets `h(motion.span, ...)` type-check, or whether a leaving child's `exit` is read from its last-rendered props (check 9). I could not verify either without running it."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide does not say what a function prop returning ReactNode should do when the node embeds another component (the animated Count). I chose to return a string and split it on String(n). A rule for this would help.",
+     "It gives no recipe for playing a framer-motion spring through a Svelte transition. I sampled motion's spring() generator to get a duration and progress function, which the guide does not mention.",
+     "It does not say that transition functions in:/out: receive (node, params, options), so a zero-argument function fails type-checking.",
+     "It does not say how to keep React's reconciliation-by-position behaviour. Here the Count must remount when its position in the message changes, and that needed a keyed block.",
+     "The 'only errors in your own files count' note says nothing about the one error that svelte-check reported from another job's file."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "low-stock-indicator",
+   "itemsTotal": 18,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 18,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "locale-and-labels (partly): labels overrides were tested with string values only (soldOut \"Gone\", meter \"Units\"); function overrides (inStock/low/critical returning nodes) were not exercised. Locale was switched through the locale prop, since the port demo has no locale switcher.",
+      "a11y-wiring (partly): checked from DOM attributes (role, aria-*, sr-only span, aria-hidden); the computed accessibility tree was not dumped."
+     ],
+     "evidence": [
+      "Props were driven on the demo's own component instances (instance.props) and compared with the original driven through React's overrideProps on the demo's own fibers; same step sequence on both.",
+      "First render: 178 frames sampled from page start, 0 digits off rest, 0 faded digits, 0 faded markers. Card text, cells and labels equal the original: 16 in stock 16/20, Only 7 left 7/20, Last 2 in stock 2/12, Sold out 0/20; cells 8px high, 2px gap, 1px radius, transition 0.2s.",
+      "Flip 7 to 6: new digit enters at -100% opacity 0, old leaves to +100%; overshoot peak 0.030 (orig 0.029); old digit removed at 381ms (orig 400ms). 6 to 9: enters from +94..100%, old 6 still leaves to +100% (as original). 9 to 8: enters from above, 9 leaves to -100%. Digit box overflow hidden.",
+      "Boundaries: 8 to 11 and 11 to 10 (en) no slide, 0 frames with two digits, same as original; 4 to 3 flips from above and digit plus cells turn accent (oklch 0.205 vs foreground 0.145; orig blue rgb(47,107,255)); 0 to 1 no slide; zh-TW 11 to 10 flips (exit -100% as in original).",
+      "Sold out marker: first sell out after mount opacity 1 at once (card 2 and card 4); second and third fade 0 to 1 in 133 to 150ms (orig 132 to 134ms). Marker aria-hidden true, muted colour, weight 500, no svg; sr-only sibling holds the text.",
+      "Thresholds, custom thresholds, 3.7 and -2, stock 30 / capacity 20 (valuenow 20), capacity 0 (max 0, now 0), capacity -5 (max -5, now -5), capacity 24, 12.6 (12 cells, valuemax 12.6), 0.5 (bar): all texts and aria values identical to the original.",
+      "Bar: capacity 40 stock 10 is 0.25 with no animation on first appearance; 10 to 20 settles in 363ms (orig 366ms), values at 100/200/300ms 0.381/0.463/0.491 (orig 0.387/0.465/0.489), no overshoot; stock 60 caps at 1.0; critical bar fill accent; capacity 0 ratio 0. Height 3px, origin left.",
+      "Cell 16 at 16 to 15: colour transition 215ms (orig 201ms).",
+      "Locales zh-TW, zh-CN, ja, fr, zh-Hant-HK and ja with labels: every string and meter name identical to the original.",
+      "Updated label: absent for undefined and for empty string (row has 1 child); at 150px card width it wraps below (top offset 24px, same as original).",
+      "Keyboard: 12 Tab presses never focus anything inside the demo; no focusable elements in the root; after mouse clicks on status line and meter activeElement is BODY, same as original.",
+      "Reduced motion: digit swaps with 0 two-digit frames, second sell out at opacity 1 immediately, bar jumps 0.25 to 0.5 in one frame, cell colour transition still 198ms; values and aria equal. 0 console messages in both contexts.",
+      "Screenshots compared: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/low-stock-indicator-vue-00-initial.png and -vue-10-bar-critical.png against the orig equivalents: same layout apart from grey photo blocks and neutral accent."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 18,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "locale-and-labels (partly): labels overrides tested with string values only (soldOut, meter); the port's message functions return plain strings by design and function overrides were not exercised. Locale was switched through the locale prop.",
+      "a11y-wiring (partly): checked from DOM attributes; the computed accessibility tree was not dumped."
+     ],
+     "evidence": [
+      "The Svelte demo passes constant props, so for the prop-change steps the same component module was mounted into the same <li> with the same initial props backed by signals; its markup was identical to the demo's own instance on all four cards (remountSame true x4). First render and Tab order were measured on the untouched demo.",
+      "First render: 157 frames sampled from page start, 0 digits off rest, 0 faded digits or markers. Card text, cells and labels equal the original.",
+      "Flip 7 to 6: enters at -100% opacity 0, old leaves to +100%, overshoot 0.029 (orig 0.029), old digit removed at 401ms (orig 400ms). 6 to 9: enters from +100%, old 6 leaves to +100%. 9 to 8: enters from above, 9 leaves to -100%. All as in the original.",
+      "Boundaries: 8 to 11 and 11 to 10 (en) swap with no slide; 4 to 3 flips from above with accent digit and cells; 0 to 1 no slide; zh-TW 11 to 10 flips.",
+      "Sold out marker: first sell out instant on card 2 (mounted at 7) and card 4 (mounted at 0); later sell outs fade 0 to 1 in 149 to 150ms (orig about 133ms sampled, spec 150ms).",
+      "Thresholds, custom thresholds, sanitised stock, meter range, cells for capacity 24 / 12.6 / 0.5: texts and aria values identical to the original.",
+      "Bar: 0.25 static on first appearance; 10 to 20 settles in 367ms (orig 366ms), 0.366/0.457/0.489 at 100/200/300ms (orig 0.387/0.465/0.489); 20 to 60 settles in 400ms (orig 400ms) and caps at 1.0; critical fill accent; capacity 0 ratio 0.",
+      "Cell colour transition 210ms (orig 201ms). Locale strings and meter names identical for zh-TW, zh-CN, ja, fr, zh-Hant-HK and ja with labels.",
+      "Updated label absent for undefined and empty string; wraps below at 150px width like the original.",
+      "Keyboard: no Tab stop inside the demo in 12 presses, no focusable elements; activeElement BODY after mouse clicks, as original.",
+      "Reduced motion: digit swaps in place, second sell out at full opacity at once, bar jumps in one frame, cell transition still 217ms. 0 console messages in both contexts.",
+      "Only textual difference: a whitespace text node between the aria-hidden marker and the sr-only span (textContent \"Sold out Sold out\" vs \"Sold outSold out\"); it sits in a flex container, is not rendered, and does not change the accessible text, so not counted as a defect.",
+      "Screenshots compared: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/low-stock-indicator-svelte-00-initial.png and -svelte-10-bar-critical.png against the orig equivalents."
+     ]
+    }
+   ],
+   "checklistProblems": [],
+   "harnessProblems": [
+    "Neither the original preview nor the port demos expose controls for changing props, yet 13 of 18 items need rerenders. Props were driven from outside: React devtools overrideProps on the original (a minimal __REACT_DEVTOOLS_GLOBAL_HOOK__ injected before load), instance.props on Vue, and for Svelte a second mount of the same component module with signal-backed props (the demo's props are constants). A demo with a stock stepper would make this direct.",
+    "Port harness cards are 190px wide (max-w-4xl container) against 222px in the original, so the updated label wraps under the status text on cards 1 and 3 in both ports at first render. This is the block's own wrap behaviour at that width (the original wraps the same way when narrowed), not a port defect, but it makes the initial screenshots look different.",
+    "The original logs a framer-motion console warning under reduced motion (\"You have Reduced Motion enabled on your device\"); it comes from the original only and was ignored.",
+    "In the original, the last frame of a digit flip and of the marker fade shows a one-frame opacity drop (marker series ...0.971, 0.999, 0, 1; entering digit opacity 0 for one frame at about 420ms). The ports do not reproduce this artifact; it was not treated as required behaviour. The original's digit opacity also runs slightly ahead of its position mid-flight (0.63 at half travel vs 0.52 to 0.55 in the ports); both reach 1 at about 150ms, within tolerance.",
+    "The port demos hardcode locale \"en\" and have no locale switcher, so the checklist trigger \"switch the demo locale\" was replaced by setting the locale prop on all three targets."
+   ]
+  },
+  "challenge": {
+   "challenges": [
+    {
+     "platform": "vue",
+     "upheld": true,
+     "notReallyTested": [
+      "locale-and-labels (partly): function overrides of labels.inStock/low/critical returning nodes were never driven; only string soldOut and meter were. Low risk for the core states.",
+      "a11y-wiring (partly): only DOM attributes were read, not the accessibility tree. Low risk."
+     ],
+     "missedDefects": []
+    },
+    {
+     "platform": "svelte",
+     "upheld": false,
+     "notReallyTested": [
+      "count-flip-exit-direction: only the 7,6,9,8 chain was driven. The path where the count is re-created after a sell out (0 up to N, then a further change) was never followed by a second flip, so the leaving-digit direction there was not compared.",
+      "locale-and-labels (partly): label overrides were tested with strings only; a11y-wiring (partly): DOM attributes only, no accessibility tree."
+     ],
+     "missedDefects": [
+      "Wrong leaving-digit direction after restocking from sold out. In LowStockIndicator.svelte, `dir` is a `$derived.by` that mutates `prevStock` and `lastDir`, and it is only read by `remember` and `flipIn`, which run only while a count is rendered. While the block is sold out no count exists, so `prevStock` keeps the last pre-sell-out value. In the original, `if (safeStock !== prevStock) { setPrevStock(safeStock); setDir(...) }` runs on every render. Repro in the judge's own sequence: `set(1,{stock:1})` then sell to 0 (`sell1`) then back to 1 (`back1`). On the 0 to 1 render the svelte `dir` sees 1 === `prevStock` (1), skips the update and keeps `lastDir` -1 from the earlier 3 to 1 drop. The original sets dir to +1 for that increase. The re-created digit \"1\" therefore gets `dataset.dir` of \"-1\" in the port, versus an exit direction of -100% in the original. A following restock 1 to 2 then makes the \"1\" leave downward (+100%) in svelte but upward (-100%) in the original. This breaks \"the leaving digit keeps the direction of the change that created it\". The judge's `back1` only checked that no slide happens on re-entry and never ran a further change. The same wrong direction appears when restocking to any value at or below the pre-sell-out stock, for example 7 to 0, then 0 to 1, because it compares 1 against the stale 7 and gets -1 where the original gets +1. Vue is not affected: its `watch(safeStock, ..., { flush: 'sync' })` runs on every change."
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "block": "avatar-stack",
+  "platforms": [
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide's pop spring (620/20/0.8) differs from the source's pop spring (460/26); I followed the source.",
+     "Nothing says how to share per-instance state when a private subcomponent (Lift) would need its own file; I used a snippet plus one parent state.",
+     "No guidance on whether to wrap animate() on a lifted element for reduced motion when the first run needs duration 0."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "avatar-stack",
+   "itemsTotal": 15,
+   "verdicts": [
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 13,
+     "itemsPassed": 10,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "hover-lift-and-tooltip: the lift spring first moves the WRONG way on every lift except the very first one after page load. Per-frame disc top, relative to start, hover-in cycle 2 and 3 on Leo C. (target -3px): port 0 -> +1.00 (17ms) -> +1.21 (33ms) -> +0.87 -> +0.25 -> -0.46 (83ms) ... -3.13 -> -3; original 0 -> -0.17 -> -0.55 -> -1.05 -> -1.52 ... -3.09 -> -3, never positive. Pointer-leave return (target +3px), all 3 cycles: port 0 -> -0.98 (33ms) -> -1.22 (50ms) -> -0.88 -> -0.27 -> +0.43 (100ms) ... +3.13 -> +3; original 0 -> +0.17 -> +0.55 -> +1.05 ..., min 0. So the disc jumps about 1.2px (40 percent of the travel) in the opposite direction for about 70ms first. Time to half travel is 100ms in the port vs 50ms in the original (2x, beyond the 25 percent tolerance); overshoot 0.13px vs 0.09px. Likely cause in AvatarStack.svelte liftY(): ctl?.stop() followed by a new motion animate(node,{y},spring) inherits a stale velocity from the previous animation.",
+      "focus-lift-and-tooltip: same wrong-way spring on keyboard focus. Tab onto Leo C.: port max +0.69px before going up (original max 0); Tab away: port min -1.24px before dropping back (original min 0). End states (lifted 3px, tooltip texts, Ava L. lifted after Tab) match.",
+      "overflow-lift-and-tooltip: same wrong-way spring on the overflow discs. +1.3K hover-in: port max +0.66px (original 0); +410 hover-in: port max +0.70px; return on all three overflow discs: port min -1.22px (original min 0). Tooltip texts (Sara K. / Noah W. / 94 more) and end positions match.",
+      "Missing state (hover and focus are one shared key per stack instead of per-disc state): with Noah W. keyboard-focused and the pointer hovering Leo C., the original shows two tooltips and both discs lifted (Leo y 389.25, Noah y 389.25); the port shows only Leo's tooltip and Noah drops to y 392.25 while still focused with its focus ring. After the pointer leaves Leo, the original keeps Noah's tooltip and 3px lift (still focused); the port shows no tooltip at all and Noah stays at y 0, so a focused disc has lost its tooltip and lift. Same result in the reduced-motion run (original tips [Leo, Noah] then [Noah]; port [Leo] then []). Screenshots avatar-stack-orig-10-focus-noah-after-leave.png vs avatar-stack-svelte-10-focus-noah-after-leave.png."
+     ],
+     "untestedItems": [
+      "locale-zh-tw: the port's demo hard-codes English data and locale=\"en\" and has no locale switch, so it could not be exercised in the running port. By source reading only, the port's MESSAGES, resolveLocale, initialsOf and compact are copied verbatim from the original.",
+      "locale-zh-cn-ja: same reason as locale-zh-tw.",
+      "photo-less-fallback (partly): tint and gradient per id were compared through the inline style attributes and are identical to the original (ids 1-4 tints 20/28/12/20 percent; gradients 40/0, 55/15, 28/8, 65/22), counted as tested and passed; stability across a locale switch and back could not be tested in the port because there is no locale switch.",
+      "no-entrance-on-first-render: only the mount case was tested (passed); the entrance of a person added later and the 150ms exit fade are not reachable in either demo."
+     ],
+     "evidence": [
+      "Renders; 0 console errors and 0 page errors in both normal and reduced-motion runs (original also 0).",
+      "Initial state identical: list names Recent buyers (1284), Buyers of Stoneware Mug (412), Buyers of Market Tote (96); discs MP LC AL NW +1.3K at 36x36, role img, tabindex 0, aria-labels identical, initials span aria-hidden; related rows 28x28 gradient discs without letters, 2px border, +410 and +94; z-index 5,4,3,2,1 and 3,2,1; margins -9px and -7px; elementFromPoint confirms each left disc covers its right neighbour's left edge on both. Overflow disc widths differ only by font (45.9 vs 49, 38 vs 40.2, 31.9 vs 33.7).",
+      "No entrance animation: li opacity 1 and transform none in every sampled frame from first paint on both.",
+      "Tab order identical, 12 stops: Mina P., Leo C., Ava L., Noah W., +1.3K, Add to cart, mug Leo C., Ava L., +410, tote Noah W., Sara K., +94; Shift+Tab reverses identically; no extra stops in the port.",
+      "Focus ring matches in shape: box-shadow 0 0 0 2px white + 0 0 0 4px ring colour, outline-style none, :focus-visible true (ring colour differs by theme only).",
+      "Tooltip matches: aria-hidden true, pointer-events none, 12px, radius 3px, 8px gap, centred (delta 0), line 1 medium weight, line 2 opacity 0.7, appears in the same frame range, vanishes at once; moving the pointer onto the tooltip removes it and drops the disc on both. Lift wrapper z-index 50 while active, li z-index unchanged, Mina still covers Leo's left edge on both.",
+      "Mouse click on Ava L.: activeElement is the span[role=img] disc itself on both, :focus-visible false, tooltip shown; Tab afterwards moves to Noah W. on both; Escape and Enter change nothing on both.",
+      "Reduced motion: disc y stays 0 through hover, focus and overflow hover on both, tooltips still appear with the same text, no entrance motion.",
+      "Fine-grained curves, three hover cycles per target, are in avatar-stack.json under fine; first port hover-in after load is correct (0 -> -0.17 -> -0.56 -> -1.05 ...), every later lift and every return starts in the wrong direction.",
+      "Raw data: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/avatar-stack.json; script: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/avatar-stack.mjs; screenshots: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/avatar-stack-<orig|svelte>[-reduced]-<step>.png"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "focus-lift-and-tooltip says 'Only the focused disc shows a tooltip'. In the original each disc keeps its own active state, so a focused disc and a different hovered disc both show tooltips and both lift at the same time (measured: Noah W. focused + Leo C. hovered gives two tooltips), and the focused disc keeps its tooltip and lift after the pointer leaves the other disc. The item holds only for keyboard-only use.",
+    "hover-lift-and-tooltip / focus-lift-and-tooltip do not mention that in the original a pointer leave clears the active state even while the disc is still focused (click Ava L., move the pointer away: tooltip gone and y back to 0 although Ava is still document.activeElement). The port matches this."
+   ],
+   "harnessProblems": [
+    "The svelte port's demo (src/demos/AvatarStackDemo.svelte) hard-codes English data and has no locale switch, so the two locale checklist items cannot be tested in the running port; only the original was measured for zh-TW, zh-CN and ja (it matches the checklist).",
+    "Neither demo can add or remove a person after mount, so the pop-in entrance (spring 460/26) and the 150ms exit fade of the component are not exercised on any target."
+   ]
+  },
+  "challenge": null
+ },
+ {
+  "block": "hotspots",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide gives no advice on controlled props whose value can legitimately be null (active: string | null | undefined). defineModel would fit poorly here, so I used a plain prop plus emits.",
+     "It does not say how a nested motion element's exit plays when its direct AnimatePresence child is a plain wrapper div. It only lists custom components as unchecked.",
+     "The default easing for a duration-only tween (easeInOut) contradicts the measured ease-out fade in the acceptance checks, and the guide does not say which wins in this case.",
+     "No guidance on how to type ReactNode fields inside spot data (VNodeChild or a render function) when a slot is not suitable."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The guide gives no pattern for the 'enter by spring, exit by tween' case (an action for the intro plus an out: transition). I made that up.",
+     "It does not say that Svelte calls transition functions with (node, params), so a zero-argument function fails type-checking with 'Expected 0 arguments'.",
+     "The 'Hooks the source exports' and bindable-prop rules do not cover a prop where undefined means uncontrolled. I used `$bindable(undefined)` and wrote back to it only when it is defined."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "hotspots",
+   "itemsTotal": 17,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 17,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "switch-single-open (partly): 'the fading card still receives pointer presses' was checked by a per-frame hit test (elementFromPoint on the outgoing card) rather than by an actual press inside the 120ms window",
+      "card-size-content (partly): the optional action row and the missing-description case are not exercised by the demo; the max-width cap was read from the inline style only (calc(100% - 1rem)), not forced on a narrow photo",
+      "first-render (partly): the narrow, stacked layout was not run; only the two-column layout at a 1100px viewport"
+     ],
+     "evidence": [
+      "First render identical to the original: text, 4 markers at 50/16, 30/42, 68/72, 87/85 percent, marker 2 open with the plus at 45 degrees, card 224 x 93 with the same copy; marker offsets relative to the photo equal to 0.1px (photo 378.53 x 473.16 on both)",
+      "Attributes equal: aria-label titles, aria-expanded, aria-controls only on the open marker and equal to the card id, role=region with aria-label, svg aria-hidden, no live region. Only difference: the original's buttons carry tabindex=\"0\" (added by framer-motion), the port has none; both are native buttons and the Tab order is the same",
+      "Tab: Corduroy collar, Waxed cotton, Hand-warmer pockets, Storm cuffs, then out of the block, each with outline solid 2px offset 2px; no extra stop. Enter/Enter/Space/Escape/Escape states identical; focus stays on the BUTTON",
+      "After a mouse click document.activeElement is the BUTTON (same as original); Escape and Enter still work afterwards",
+      "Open motion (card opacity/scale after click): orig 0.052/0.9603, 0.412/0.9729, 0.709/0.9862, 0.919/0.996 at 26, 92, 159, 259ms; vue 0.06/0.9624, 0.423/0.9769, 0.717/0.9887, 0.921/0.9968 at 27, 94, 161, 261ms",
+      "Icon rotation on open: orig 0.68, 12.17, 26.58, 37.5, 43.37, peak 46.34, settles 45; vue 0.9, 12.54, 26.96, 37.59, 43.44, peak 46.33, settles 45. Close: both overshoot to about -1.3 and settle at 0",
+      "Press scale while held: orig 0.9826, 0.9501, 0.9233, 0.907, 0.8971; vue 0.9944, 0.965, 0.9341, 0.913, 0.8977; release back to 1 with a 1.003 overshoot on both",
+      "Exit fade: orig 0.629, 0.448, 0.291, 0.16, 0.061, 0.007 at 31..115ms; vue 0.626, 0.446, 0.29, 0.159, 0.061, 0.006 at 32..115ms, scale stays 1, card removed by 132ms",
+      "Switch: both cards on screen for about 115ms, outgoing card remains the hit target at its own position on every frame (hit=card:Waxed cotton), same as the original",
+      "Placement: card edges relative to the point are 22/-14 (collar, wax) and -22/+14 (pockets, cuffs), transform-origin 0 0 and 224px 93px; collar card runs 56.74px past the photo's right edge and a press there keeps it open, as in the original",
+      "Outside press on '$184' closes on pointer down before release (all aria-expanded false while the button is still held); press on the photo and on the card body keep it open; outside press with nothing open does nothing",
+      "Rapid presses: true,false,true,false,true then one card; after 8 presses none",
+      "Reduced motion: card appears at opacity 1 / scale 1 within one frame, icon jumps 0 to 45, held marker stays at scale 1, exit still fades over about 115ms (0.827, 0.626, 0.446, 0.289, 0.159, 0.061, 0.006)",
+      "Hover: closed marker background becomes foreground at 10% (oklab(0.145 0 0 / 0.1)); open marker keeps its fill",
+      "Screenshots compared by eye: hotspots-vue-1-first.png, -9-place-3.png against hotspots-orig-*; same layout, neutral theme instead of blue",
+      "0 console errors, 0 page errors in both the normal and the reduced-motion run"
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 17,
+     "itemsPassed": 15,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": false,
+     "defects": [
+      "marker-icon-rotate-and-tap: the icon first turns the wrong way. On open the span angle goes 0, -10.09, -18.06, -15.98, -8.06, 2.18, 12.68 ... 46.87, 45 (frames 11 to 77ms after the click), where the original goes 0, 0.68, 5.1, 12.17, 19.83, 26.58 ... 46.34, 45 and never goes negative. On close it goes 45, 57.86, 63.49, 59.63, 51.08, 40.65 ... -1.87, 0, where the original goes 45, 43.3, 37.57, 30.12, 22.55 straight down. Same pattern on the outgoing marker during a switch (45 to 58.95 before falling). An 18 degree swing against the direction of travel at the start of every open and close. Cause is in the rotateTo action (animate(node, { rotate }) starting from an inline transform it set by hand)",
+      "switch-single-open: the fading card is made click-through. Svelte marks the outroing card inert for the whole 120ms fade (closest('[inert]') true on every exit frame), and the per-frame hit test at the outgoing Waxed cotton card returns IMG (the photo underneath) from the first frame after the click, while the original and the Vue port return card:Waxed cotton until the card is removed at about 130ms. The checklist states the exiting card must still receive pointer presses. Same in the Escape close, the marker close and the reduced-motion run"
+     ],
+     "untestedItems": [
+      "card-size-content (partly): the optional action row and the missing-description case are not exercised by the demo; the max-width cap was read from the inline style only (calc(100% - 1rem))",
+      "first-render (partly): the narrow, stacked layout was not run; only the two-column layout at a 1100px viewport"
+     ],
+     "evidence": [
+      "First render identical to the original: text, marker positions (equal to 0.1px), open marker 2 with the plus at 45 degrees and no mount animation of the icon, card 224 x 93, mount enter curve 0/0.96 to 1/1 (0.178/0.9671 at 45ms, 0.683/0.9873 at 144ms, 0.943/0.9977 at 278ms vs orig 0.144/0.9627 at 33ms, 0.661/0.9839 at 132ms, 0.938/0.9969 at 266ms)",
+      "Attributes equal to the original (aria-label, aria-expanded, aria-controls on the open marker only and equal to the card id, region label, svg aria-hidden, no live region)",
+      "Tab: the four marker buttons in order then out, outline solid 2px offset 2px, no extra stop; Enter/Enter/Space/Escape states identical; activeElement after a mouse click is the BUTTON and Escape/Enter work afterwards",
+      "Card enter after a click matches: 0.062/0.9625, 0.425/0.977, 0.718/0.9887, 0.921/0.9969 at 27, 93, 161, 261ms (orig 0.052/0.9603, 0.412/0.9729, 0.709/0.9862, 0.919/0.996)",
+      "Press scale matches: 0.9659, 0.9349, 0.9133, 0.902, 0.8977 held, release to 1 with 1.003 overshoot",
+      "Exit fade is about 120ms and ease-out shaped but starts one frame later: 0.781, 0.586, 0.412, 0.261, 0.138, 0.049, 0.006 at 29..130ms (orig 0.629, 0.448, 0.291, 0.16, 0.061, 0.007 at 31..115ms); within tolerance, not counted as a defect",
+      "Placement, card-not-clamped (56.74px past the photo edge, press there keeps it open), outside press (closes on pointer down), rapid presses and hover all equal to the original",
+      "Reduced motion: card at opacity 1 / scale 1 at once, icon jumps 0 to 45 with no wrong-way swing, held marker stays at scale 1, exit still fades over about 120ms; passes that item",
+      "Screenshots compared by eye: hotspots-svelte-1-first.png, -3-tab-focus.png, -10-collar-over-text.png against the original; static layout is the same",
+      "0 console errors, 0 page errors"
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "card-enter-exit-motion / escape-closes: the quoted exit samples (0.74 at 23ms, 0.38 at 56ms, 0.03 at 107ms) are measured from the start of the fade, not from the key or click. Measured from the event, the original holds opacity 1 for one to two frames first: 1 at 16ms, 0.618 at 33ms, 0.438 at 49ms, 0.283 at 66ms, 0.058 at 100ms, 0.005 at 116ms. The item should say which origin it uses",
+    "card-enter-exit-motion: not mentioned, the original shows the exiting card at computed opacity 1 for one frame (about 131ms after the close) just before it is removed, in every close, switch and reduced-motion run. Neither port reproduces this; I treated it as an artefact of the original, not a requirement",
+    "marker-geometry: '1.5px border' is the authored value; at device pixel ratio 1 Chrome computes border-top-width 1px on the original and on both ports",
+    "accessible-names / tab-order: the original's marker buttons carry tabindex=\"0\" (added by framer-motion for whileTap); the ports have no tabindex. Behaviour is the same, but the checklist does not say the attribute is optional"
+   ],
+   "harnessProblems": [
+    "Card corner radius: original 12px, both ports 14px with the same rounded-xl class, because the ports' sunui-theme.css sets --radius 0.625rem and --radius-xl calc(var(--radius) + 4px). Treated as a theme difference of the port harness, not a port defect, but it contradicts the checklist's '12px'",
+    "The original preview did not autoplay for this block: the state before and after the stopping press was identical",
+    "After the block, the original page has two further Tab stops (page chrome) and the port pages one; only the in-block sequence was compared",
+    "Raw data and scripts: /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/hotspots.mjs, /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/hotspots.json, comparison helpers hotspots-cmp.mjs and hotspots-cmp2.mjs in the same folder, screenshots in /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/p3/verify/shots/hotspots-<target>-<step>.png. The full run takes about 3 minutes"
+   ]
+  },
+  "challenge": {
+   "challenges": [
+    {
+     "platform": "vue",
+     "upheld": true,
+     "notReallyTested": [
+      "escape-closes (partly): the script only presses Escape with focus on a marker button or on the page body after a photo press. The checklist says 'focus anywhere, including outside the block', and no run starts with focus on page chrome or on the right-column text. The listener is on document in both the original and the port, so the risk is low.",
+      "card-size-content / card-not-clamped (partly): the narrow photo case and the action row are never run. The script checks the 224px width and the 'calc(100% - 1rem)' inline style but never forces a narrow photo, so the max-width cap is not compared in layout. The action row (v-if=\"open.action\" with the border-t block) is unreachable from the demo. The wrapper style code is identical to the original, so this is a coverage gap, not a defect.",
+      "marker-geometry (brand colour): the open-marker colour is compared only as the theme's --primary fallback (oklch(0.205 0 0)) against the original's blue (rgb(47, 107, 255)). The original shows blue, so the original preview sets --sunui-spot. The script never sets --sunui-spot or --sunui-spot-foreground on the port, so the override path of the var() chain is not exercised. The class strings are identical to the original, so I found no defect.",
+      "tab-order (reverse): the tabBack check on the port is trivial. After the forward walk focus sat on 'Waxed cotton', so one Shift+Tab reached 'Corduroy collar' and the loop stopped. The original was walked back through Storm cuffs, Hand-warmer pockets, Waxed cotton and Corduroy collar. Reverse order is not a checklist item, and forward order is compared properly.",
+      "switch-single-open (partly): 'still receives pointer presses' is only a per-frame elementFromPoint test. No real press lands on the fading card inside the 120ms window. The recorded hits are the same as the original (hit=card:Waxed cotton through 116ms, then IMG), and the port source has no inert or pointer-events change on the exiting card, so the test is adequate for Vue."
+     ],
+     "missedDefects": []
+    },
+    {
+     "platform": "svelte",
+     "upheld": false,
+     "notReallyTested": [],
+     "missedDefects": [
+      "The judge did not pass svelte, so it has nothing to uphold. The judge's own failure on svelte stands: in the recorded switch curve, svelte shows 'hit=IMG' with Waxed cotton marked '/inert' from the first frame (15ms). Vue and the original show 'hit=card:Waxed cotton' until about 116ms. In the source, the Svelte exit is out:cardOut|global, which is the cause. The icon swing is recorded as b2=58.95 at 15ms against 45 in the original."
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "block": "theme-picker",
+  "platforms": [
+   "vue",
+   "svelte"
+  ],
+  "guideGaps": [
+   {
+    "platform": "vue",
+    "gaps": [
+     "The guide does not say how to ship a second exported component such as ThemeSwitch when only one file is allowed. I put it in the plain script block as defineComponent render functions and imported it by name.",
+     "A shared plain script and script setup cannot import the same name twice. I aliased motion and useReducedMotion in the plain block, and the guide does not mention this.",
+     "The guide does not say how to put a MotionValue-driven style or CSS mask properties through h(motion.span). I used `as never` casts and did not verify the mask output at runtime.",
+     "The guide does not say how to port a press effect that must not make a nested element focusable, when the source's whileTap is on a non-control span. The tabindex and pointer-events advice assumes decorative elements, not the pressed one.",
+     "The guide does not say whether useSpring accepts a reactive config, or whether useTransform with a callback re-evaluates when props change. I read the .d.ts only and did not test it."
+    ]
+   },
+   {
+    "platform": "svelte",
+    "gaps": [
+     "The block's source has three files (picker, theme-script, switch) but the harness lists one component file. The guide does not say where the second exported component (ThemeSwitch) or theme-script.ts should go.",
+     "The guide does not say how to export a second component or a hook from one .svelte file. Exported snippets and rune functions in a module script work but had to be found by trial.",
+     "The guide gives no recipe for turning a framer-motion spring into a Svelte transition css function, as the check badge needs.",
+     "The guide does not say that svelte-check reports an error on a module-script export of a snippet, or how to silence it."
+    ]
+   }
+  ],
+  "verdict": {
+   "block": "theme-picker",
+   "itemsTotal": 19,
+   "verdicts": [
+    {
+     "platform": "vue",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 18,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "locale-copy: the port demo hard-codes English copy and the port harness has no locale switch, so zh-TW / zh-CN / ja could not be exercised (the component does take labels and aria-label props, and the radiogroup name follows the title in English)",
+      "tile-previews (sm size only): the demo renders only md, so 64x40 tiles and the 8px gap were not measured",
+      "hover (150ms duration only): a 1px lift cannot resolve a curve; end state, ring colour and label colour were measured"
+     ],
+     "evidence": [
+      "initial-render: heading 'Appearance', hint 'Applies to this preview only', radios System/Light/Dark with aria-checked false,false,true and tabindex -1,-1,0; stage rgb(28,28,34), glows 0/1, switch 200x104, key x=7, aria-checked=true, card 'Linen Tote $48 Add to bag' at opacity 1; state identical 1.5s later (no mount animation). Same as original.",
+      "tile-previews: tiles 96x56, gap 12px, preview colours #f4f4f4/#fff/#e4e4e4/#a3a3a3 and #262626/#3a3a3a/#444/#8f8f8f, System clip inset(0 50% 0 0): identical to original.",
+      "click-select: new badge 16px, 4px from bottom right, grows 0.43 -> peak 1.038 -> 1.0 with opacity 0 -> 1 (original 0.40 -> 1.038 -> 1.0); peak about 150ms after start in both; old badge shrinks to 0.40 and fades in about 65ms (original about 70 to 100ms). Rings 2px foreground / 1px border and label weights swap.",
+      "repeat-press-selected: three clicks on Dark: badge scale and opacity stay 1, one badge node, one card, stage colour constant.",
+      "arrow-keys: ArrowRight/Down next, ArrowLeft/Up previous, wraps Dark -> System and System -> Dark, focus follows selection, scrollY 0, Home/End/'a' do nothing: sequence identical to original.",
+      "roving-tabindex: Tab stops are switch button, checked radio (2 stops). Original has 3 (switch, key span with tabindex=0, checked radio); the checklist accepts 2. No stop on any decorative element. After changing to System, Tab lands on System.",
+      "enter-space, focus-ring: Space and Enter on the checked radio change nothing; keyboard focus draws 2px offset + 2px ring on the tile with outline none; a mouse click shows only the 2px selection ring.",
+      "switch-keyboard: focus ring 2px offset + 2px ring, Space -> aria-checked false and picker Light, Enter -> true and picker Dark, focus stays on the switch.",
+      "switch-mouse-focus: after a mouse click on the key, activeElement is the switch button and Space still toggles it (original focuses the key span; checklist accepts the port behaviour). After a mouse click on a radio, activeElement is the radio button and ArrowRight works, as in the original.",
+      "hover: tile lifts 1px (434.5 -> 433.5), ring becomes 1px muted-foreground, label turns foreground; selected tile lifts and keeps the 2px ring.",
+      "system / fixed / switch-sync: System follows emulated OS scheme live in both directions with System staying checked, no second card when the OS already matches; Dark ignores OS changes; switch click from Dark selects Light, from System with OS dark selects Light, picking Light/Dark moves the switch. All states equal to the original.",
+      "theme-transitions: stage settles about 665ms and panel about 500ms after the click with cubic-bezier(0.4,0,0.2,1) (original about 535ms / 385ms with the site easing; the checklist accepts both); card crossfade about 230ms with two stacked cards in the 88px slot, like the original.",
+      "switch-motion: key 7 -> 103, painted positions after the first frame 8.36, 12.81, 18.47, 25.95 (original 8.92, 13.13, 19.26, 26.39), within 0.5px of the end after 433ms (original 433ms); glyph re-forms over 951ms (original 950ms); hold shrinks the key 90 -> 86.4px (0.96) as in the original; mid-flight second click reverses from about 93px without jumping. The key overshoots by 0.23px (max 103.23, min 6.77) where the original stops at exactly 103.00: below one pixel, not counted as a defect.",
+      "reduced-motion: new badge appears at scale 1 and opacity 1 in one frame, old badge fades without shrinking in about 90ms, card swaps in one frame (never two cards), key jumps 7 -> 103 in one painted frame, glyph changes within one frame, hold does not shrink (90px).",
+      "Screenshots (shots/tp-sheet-a.png, tp-sheet-b.png, tp-sheet-rm.png and the per-step files) show the same layout and states as the original; only the neutral theme colours differ. 0 console errors and 0 page errors in both runs."
+     ]
+    },
+    {
+     "platform": "svelte",
+     "renders": true,
+     "consoleErrors": 0,
+     "itemsTested": 18,
+     "itemsPassed": 18,
+     "tabOrderMatches": true,
+     "reducedMotionChecked": true,
+     "pass": true,
+     "defects": [],
+     "untestedItems": [
+      "locale-copy: the port demo has English copy only and the port harness has no locale switch, so zh-TW / zh-CN / ja could not be exercised",
+      "tile-previews (sm size only): the demo renders only md",
+      "hover (150ms duration only): a 1px lift cannot resolve a curve; end state, ring colour and label colour were measured"
+     ],
+     "evidence": [
+      "initial-render: same texts, aria-checked false,false,true, tabindex -1,-1,0, stage rgb(28,28,34), glows 0/1, switch 200x104 with key x=7 and aria-checked=true, one card at opacity 1, no change over 1.5s. Same as original.",
+      "tile-previews: tiles 96x56, gap 12px, all fixed preview colours and the 50% clip identical to the original.",
+      "click-select: new badge 16px, 4px inset, grows 0.40 -> peak 1.038 -> 1.0 (original 0.40 -> 1.038 -> 1.0), peak about 185ms after start (original about 160ms); old badge shrinks to 0.43 and fades in about 95ms (original about 70 to 100ms).",
+      "repeat-press-selected: badge stays at 1/1, one badge node, one card, stage colour constant.",
+      "arrow-keys, enter-space: key sequence results identical to the original, including wrap, focus following selection, scrollY 0 and Home/End ignored.",
+      "roving-tabindex: Tab stops are switch button, checked radio (original adds the key span quirk; the checklist accepts 2 stops). Nothing decorative takes focus. After a change Tab lands on the newly checked radio.",
+      "focus-ring / switch-keyboard: tile ring 2px offset + 2px ring with outline none on keyboard focus only; switch ring the same; Space -> light, Enter -> dark, focus stays on the switch.",
+      "switch-mouse-focus: after a mouse click on the key, activeElement is the switch button and Space toggles; after a mouse click on a radio, activeElement is the radio and ArrowRight works.",
+      "hover, system-resolves-to-os, fixed-mode-ignores-os, switch-sync: every recorded state equals the original's (lift 1px, ring and label colours, live OS following, switch selects Light from System with OS dark).",
+      "theme-transitions: stage about 666ms, panel about 500ms (Tailwind default easing, accepted by the checklist); card crossfade lasts about 250ms with both cards stacked in the 88px slot. The fade follows an ease-in-out curve where the original is close to linear; same duration, not counted.",
+      "switch-motion: painted key positions 8.54, 12.5, 18.47, 25.08 (original 8.92, 13.13, 19.26, 26.39), max exactly 103.00, within 0.5px after 450ms (original 433ms); glyph 933 to 967ms (original 950 to 966ms); hold shrinks to 86.4px (brief 86.15); mid-flight reversal continues from about 90px. An in-rAF read shows the key at the target for one tick (the template writes the end transform before the spring starts), but the post-paint read shows 8.54, so that frame is never painted.",
+      "reduced-motion: new badge at 1/1 in one frame, old badge fades without shrinking in about 80ms, key jumps 7 -> 103 in one frame, glyph changes in one frame, hold does not shrink. Deviation that is not visible: the old product card stays in the DOM and fades 1 -> 0 over about 280ms (the original removes it in the same frame), but it sits under the new card, which is at opacity 1 with an opaque background from its first frame; the mid-transition screenshot (theme-picker-svelte-rm-06-rm-select-mid.png) shows only the new card. Worth fixing in the port, not a visible defect.",
+      "Screenshots match the original in layout and states; only theme colours differ. 0 console errors and 0 page errors in both runs."
+     ]
+    }
+   ],
+   "checklistProblems": [
+    "reduced-motion: 'the switch key jumps to its end immediately' is not exact for the original. On the first toggle after load under reduced motion the original paints one intermediate frame (key x=75.61 between 7 and 103) before reaching the end; later toggles are a single-frame jump. Also the original's old badge fade measured about 130ms, not about 95ms.",
+    "switch-motion: the original's 'exactly 103.00' maximum comes from framer-motion ending the spring early; the stated spring (stiffness 140, damping 21, mass 1) is slightly underdamped and a faithful spring overshoots by about 0.23px, which is what the Vue port does. The item should allow a sub-pixel overshoot."
+   ],
+   "harnessProblems": [
+    "The port harness (?only=theme-picker) has no locale switch and both port demos hard-code English copy, so locale-copy cannot be judged on the ports.",
+    "Reading positions inside requestAnimationFrame is not paint-accurate: it reported a one-frame jump of the Svelte key to its target that is never painted. The script now also reads positions in a task posted right after each frame (keyXp); judge motion on those values.",
+    "Both demos render only the md size, so the sm dimensions in tile-previews cannot be measured anywhere."
+   ]
+  },
+  "challenge": {
+   "challenges": [
+    {
+     "platform": "vue",
+     "upheld": true,
+     "notReallyTested": [
+      "locale-copy: the Vue demo hard-codes English strings, so zh-TW, zh-CN and ja were never compared with the original. This is only copy, not a core state.",
+      "tile-previews (sm size): only md was measured. The sm classes (h-10 w-16, gap-2) are copied from the original source and were not measured.",
+      "hover (150ms curve): the recorded frames show the 1px lift in one step (434.5 to 433.5 between 45ms and 63ms), so no curve was compared. Only the end values were compared, and they match the original. Both sources carry duration-150."
+     ],
+     "missedDefects": []
+    },
+    {
+     "platform": "svelte",
+     "upheld": false,
+     "notReallyTested": [
+      "locale-copy: the Svelte demo has English copy only, so the other three locales were not exercised. This is only copy, not a core state.",
+      "tile-previews (sm size): only md was measured.",
+      "hover (150ms curve): the recorded frames show the lift in one step, so no curve was compared. End state only.",
+      "reduced-motion (product card swap): the script recorded the old card staying in the DOM, and the judge waived it. The checklist says the card swaps instantly with no fade and never two cards."
+     ],
+     "missedDefects": [
+      "Reduced-motion card swap is wrong in the port source. In the Svelte demo, `const fadeOut = (_n: Element) => ({ duration: 250, easing: ease, css: ... })` never checks `prefersReducedMotion.current`, while `fadeIn` does (`duration: prefersReducedMotion.current ? 0 : 250`). With reduced motion on, the old product card therefore stays in the DOM and fades for about 250 to 280ms, so two cards with duplicate text (\"Linen Tote $48 Add to bag\") exist together. The original and the Vue port remove the old card in the same frame (`transition: { duration: reduce ? 0 : 0.25 }`). The judge's own notes record 'the old product card stays in the DOM and fades 1 -> 0 over about 280ms (the original removes it in the same frame)' and then marked the check as passed. That contradicts the checklist's 'card swaps instantly with no fade' and 'never two cards'.",
+      "Card crossfade easing differs from the original. The Svelte demo uses `cubicBezier(0.42, 0, 0.58, 1)` (ease-in-out), where the original opacity fade is close to linear. The judge saw this ('ease-in-out curve where the original is close to linear') and did not count it. The checklist specifies only opacity 0 to 1 over 0.25s, so this is minor."
+     ]
+    }
+   ]
+  }
+ }
+]
