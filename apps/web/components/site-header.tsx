@@ -16,7 +16,7 @@ export async function SiteHeader() {
           href="/"
           className="-ml-1 flex shrink-0 items-center gap-2 rounded-md px-1 py-1 font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <SunMark />
+          <SunMark className="text-accent" />
           {/* 窄螢幕只留標誌，導覽的四個連結（含圖示）才放得下；日文的導覽字最長，440px 以下就收起 */}
           <span className="max-[399px]:sr-only [:lang(ja)_&]:max-[439px]:sr-only">SunUI</span>
         </Link>
@@ -38,7 +38,7 @@ export async function SiteHeader() {
             </a>
             <LocaleSwitcher locale={locale} label={m.nav.language} />
             <ThemeMenu labels={m.nav} />
-            <Link href="/pricing" className="ml-1 hidden h-8 items-center rounded-md px-3 text-[13px] font-semibold btn-primary sm:inline-flex">
+            <Link href="/pricing" className="ml-1 hidden h-8 items-center rounded-md px-3 text-[13px] font-semibold btn-primary bg-accent text-accent-fg sm:inline-flex">
               {m.home.hero.getPro}
             </Link>
           </div>
