@@ -1,0 +1,152 @@
+{
+ "block": "quantity-stepper",
+ "summary": "Checklist for porting quantity-stepper: a compact minus / number field / plus control with a rolling digit, press-and-hold repeat, a spinbutton keyboard model, and a trash button that replaces the minus at the minimum, shown in a three-line shopping bag demo.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens as a bag with three lines, each with a size sm stepper, and totals that match the quantities.",
+   "trigger": "initial render (locale en)",
+   "expect": "Heading \"Your bag\", count \"6 items\". Lines in order: Stoneware Mug (\"Sand, 350 ml, $22.00\") qty 2; Market Tote (\"Natural, $48.00\") qty 1; Steel Bottle 500 ml (\"Matte sand, 500 ml, $34.00\") qty 3 with \"Limit 3 per order\" under it. Line totals $44.00, $48.00, $102.00 (shown only at the sm breakpoint and wider). Footer \"Subtotal\" $194.00. No number animates on first render.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "first-render-controls",
+   "behaviour": "Which left button each line shows, and which buttons are disabled, depends on value against min (1) and max.",
+   "trigger": "initial render",
+   "expect": "Mug: minus button, enabled; plus enabled (max 10). Tote: value equals min 1, so a trash icon replaces the minus and is enabled; plus enabled (max 10). Bottle: minus enabled; plus disabled because value 3 equals max 3. Disabled buttons show the icon at 25% of the text colour; enabled at 60%, full colour on hover or keyboard focus.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "layout-sm",
+   "behaviour": "The stepper is one bordered rounded pill: left button, number cell with a solid thin divider on each side, right button.",
+   "trigger": "initial render",
+   "expect": "Size sm: height 32px; each button 32px wide with a 14px icon; number cell 36px wide, small text, monospaced medium-weight tabular digits, centered. Solid 1px divider lines (not dashed) on both sides of the number cell at 20% foreground. Outer border 1px at 10% foreground, radius md, card background with a soft shadow.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "press-step-once",
+   "behaviour": "Pressing plus or minus with the primary pointer changes the value by one step at once on press, not on release, and updates the line, count and subtotal.",
+   "trigger": "Press and release plus on the Mug line quickly (under 400 ms)",
+   "expect": "Mug goes 2 to 3 on pointer down and does not step again. Line total $66.00, count \"7 items\", subtotal $216.00. A secondary (right) mouse button press does nothing.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "press-hold-repeat",
+   "behaviour": "Holding plus or minus repeats stepping after a delay and speeds up, and stops at the bound or on release.",
+   "trigger": "Press and hold plus on the Mug line (starting at 2)",
+   "expect": "Step to 3 on press. The first repeat (to 4) comes 400 ms after the press. The next gap is 105.6 ms (120 x 0.88), then about 92.9 ms, each gap multiplied by 0.88 again, with a floor of 35 ms. Stepping stops at 10 (plus then disabled, \"Limit 10 per order\" appears under the Mug). Releasing, pointer cancel or losing pointer capture stops repeating immediately.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "hold-down-into-remove",
+   "behaviour": "Holding minus down to the minimum swaps in the trash button but never removes the line during that press.",
+   "trigger": "Press and hold minus on the Bottle line (starting at 3) past 600 ms, then release; repeat on the Mug line from 2",
+   "expect": "Bottle: 3 to 2 on press, 2 to 1 at 400 ms, then stops; the minus is replaced by the trash labelled \"Remove Steel Bottle 500 ml\". Mug from 2: goes to 1 on press and stops; trash \"Remove Stoneware Mug\" appears. In both cases the line is still in the bag after release. Only a new, separate press of the trash removes it.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "limit-note-toggle",
+   "behaviour": "The per-line limit note and the disabled plus follow the current value against max.",
+   "trigger": "Press minus on the Bottle line (3 to 2), then press plus (2 to 3)",
+   "expect": "At 2 the \"Limit 3 per order\" note disappears and plus becomes enabled. Back at 3 the note shows again and plus is disabled. The Mug and Tote show the note only when they reach 10.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "remove-line",
+   "behaviour": "Activating the trash removes the line from the bag with a collapse animation and the totals update.",
+   "trigger": "Click the trash on the Market Tote line",
+   "expect": "The Tote line fades to opacity 0 and collapses to height 0 on a spring of stiffness 240, damping 30. Count becomes \"5 items\", subtotal $146.00. The trash scales to 0.97 while pressed (only when motion is allowed).",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "keyboard-remove",
+   "behaviour": "The trash button works from the keyboard as well as the pointer.",
+   "trigger": "Tab to the Tote trash button (\"Remove Market Tote\") and press Enter; reset, then do the same with Space",
+   "expect": "Each key removes the Tote line with the same collapse, count \"5 items\", subtotal $146.00.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "empty-bag",
+   "behaviour": "Removing every line leaves the empty state.",
+   "trigger": "Bring every line to 1 and remove all three with their trash buttons",
+   "expect": "The list is empty and the text \"Your bag is empty.\" appears centered. Header \"0 items\", subtotal $0.00.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "rolling-digit",
+   "behaviour": "A changed value rolls in vertically from the side that matches the change; the outgoing number leaves in the direction it had when it came in.",
+   "trigger": "On the Mug line press plus (2 to 3), then minus (3 to 2), then minus again (2 to 1)",
+   "expect": "Plus: 3 enters from y +100% (below) at opacity 0 to y 0% opacity 1; 2 exits to y -100% (up), opacity 0. First minus: 2 enters from y -100% (above), but 3 still exits up to -100% because its exit was set when it rolled in on an increase. Second minus: 1 enters from -100% and 2 exits down to +100%. Spring stiffness 520, damping 34. The number is clipped to its cell.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion the number swaps instantly and removed lines vanish without collapsing.",
+   "trigger": "Enable prefers-reduced-motion, then change a value and remove a line",
+   "expect": "New value appears in place with no slide (duration 0); old value disappears instantly. A removed line goes to opacity 0 with duration 0, no height animation. The trash has no press scale.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Only the number field and the trash button are in the Tab order; plus and minus are skipped.",
+   "trigger": "From before the demo, press Tab repeatedly on first render",
+   "expect": "Stops, in order: Mug quantity field; Tote trash button (\"Remove Market Tote\"); Tote quantity field; Bottle quantity field. Plus and minus buttons never receive focus, and nothing decorative (icons, product images, totals) is a stop. A keyboard-focused trash shows a 2px inset ring; the focused field gets a 4% foreground tint. Focusing a field selects its whole text.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "spinbutton-keys",
+   "behaviour": "The number field is a spinbutton driven by keys, clamped to min and max.",
+   "trigger": "Focus the Mug field (value 2) with no typed draft and press keys",
+   "expect": "ArrowUp +1, ArrowDown -1, PageUp +10, PageDown -10, Home sets 1, End sets 10. Results clamp to 1..10 (PageUp from 2 gives 10; PageDown gives 1, and the trash appears). Each change rolls the digit and updates totals. Other keys do not step.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "typed-entry",
+   "behaviour": "Typing edits a draft shown as plain text; it commits on Enter or blur, snapped to the step and clamped.",
+   "trigger": "Focus the Mug field (value 2) and type, then press Enter or Tab away",
+   "expect": "Only digits, \".\" and \"-\" are accepted (letters are dropped as typed). \"7\" commits 7; \"15\" commits 10; \"0\" commits 1 (trash appears); \"2.6\" commits 3. A committed typed value appears without the rolling slide. Empty or unparseable text (such as \"-\") reverts to the previous value with no change. While typing, the plus and minus states still reflect the committed value. ArrowUp or ArrowDown during a draft discard the draft and step from the typed number (type 5, ArrowUp gives 6).",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "enter-escape-no-draft",
+   "behaviour": "Escape discards an uncommitted draft; Enter and Escape with no draft change nothing.",
+   "trigger": "Focus the Mug field (value 2), type 8, press Escape; then press Escape again; then press Enter without typing",
+   "expect": "After the first Escape the field shows 2 again, value and totals unchanged, no announcement. Escape with no draft does nothing. Enter with no draft changes nothing, and its default action is prevented (keydown defaultPrevented is true), so it would not submit a surrounding form.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "Each control has a name; the demo overrides the quantity and remove names per product.",
+   "trigger": "initial render, inspect the accessibility tree",
+   "expect": "Field: role spinbutton, name \"Stoneware Mug quantity\" (\"Market Tote quantity\", \"Steel Bottle 500 ml quantity\"), valuenow = current value, valuemin 1, valuemax 10 / 10 / 3, valuetext = the value as text. Minus: \"Decrease quantity\". Plus: \"Increase quantity\". Trash: \"Remove Market Tote\". Icons are hidden from assistive tech; the visible rolling number is hidden and the field carries the value.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "live-announcement",
+   "behaviour": "Each real value change is announced politely; no-op attempts are silent.",
+   "trigger": "Press plus on the Mug line (2 to 3); then press End on the Bottle field (already 3)",
+   "expect": "A polite live region (role status) in the Mug stepper reads \"Stoneware Mug quantity 3\". The Bottle End press changes nothing, its live region stays empty, and no change callback fires.",
+   "kind": "text",
+   "scope": "all"
+  }
+ ]
+}

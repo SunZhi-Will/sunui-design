@@ -1,0 +1,152 @@
+{
+ "block": "compare-slider",
+ "summary": "A before and after image comparison where a draggable, clickable and keyboard-operable divider reveals the before image on the left and the after image on the right, with an optional one-time intro sweep that any earlier or mid-sweep press cancels for good.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo shows a card with a 16:9 rounded frame, the before image (pencil sketch) on the left of the divider and the after image (rendered painting) on the right, and a caption row below.",
+   "trigger": "initial render (before the frame scrolls into view, or with reduced motion on)",
+   "expect": "Divider at exactly 50% of the frame width. Frame aspect ratio 16 / 9, max width calc(70dvh * 16 / 9). Chip 'Original' at top-left and chip 'Result' at top-right, each 12px (top-3, left-3 / right-3) from the frame edges, white 12px medium text on black at 55% opacity. Caption reads 'Lighthouse at dusk' on the left and '1920 x 1080' on the right (en locale).",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "divider-visual",
+   "behaviour": "The divider is a thin white vertical line through the full height with a round steel knob at its vertical center holding a left and right chevron icon.",
+   "trigger": "initial render",
+   "expect": "Line 2px wide, white, with a 1px black outline at 25% opacity, centered on the split position. At 50% height, centered on the line, sits a 40px (size-10) circle with a knurled, striped conic-gradient rim and a drop shadow; inside it a 32px (size-8) domed light grey knob, brightest near its top, containing a 16px dark grey (rgb 40 40 44) double chevron pointing left and right. The knob looks the same in light and dark theme. The line, knob and chips do not intercept pointer input.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "clip-split",
+   "behaviour": "The before image is visible only to the left of the divider and the after image only to the right; the before image is not squeezed when the divider moves.",
+   "trigger": "move the divider to any position p",
+   "expect": "Before layer is clipped with inset(0 (100 - p)% 0 0): it covers 0 to p% of the width, after layer fills the rest. At p = 0 only the after image shows; at p = 100 only the before image shows. The before image keeps its size and position (it is clipped, not scaled). In the demo the square sketch is centered with contain on a #efece6 background; the 16:9 render fills with cover.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "intro-sweep",
+   "behaviour": "When the frame first enters the viewport, and nobody has pressed inside it yet, the divider sweeps once by itself: from 50 to the left, across to the right, then back to 50, and stops.",
+   "trigger": "scroll the demo so the frame's top crosses a line 20% above the viewport bottom (intersection rootMargin 0px 0px -20% 0px)",
+   "expect": "Total duration 2400ms. Keyframes by progress: 0 -> 50%, 0.3 (720ms) -> 8%, 0.75 (1800ms) -> 92%, 1 (2400ms) -> 50%. Each segment eases with ease-in-out quad (2t^2 for t < 0.5, else 1 - (-2t + 2)^2 / 2). The divider ends exactly at 50%.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "sweep-fractional",
+   "behaviour": "During the sweep the divider line and the before clip move smoothly through fractional positions, unlike click, drag and keys, which land on whole percents.",
+   "trigger": "inspect the divider line's inline left style and the before layer's clip-path on a frame mid-sweep (for example around 400ms)",
+   "expect": "Divider left and the clip inset use the unrounded position (for example left 23.47% and inset(0 76.53% 0 0)), while the slider value is the rounded whole number (23). After a click, drag or key press the left value is always a whole percent.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "sweep-once",
+   "behaviour": "The intro sweep plays only the first time; scrolling away and back does not replay it.",
+   "trigger": "after the sweep finished, scroll the frame out of view and back in, repeatedly",
+   "expect": "No second sweep. The divider stays where it was left.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "sweep-cancel",
+   "behaviour": "Any pointer press or key press inside the block during the sweep stops the sweep immediately, and the sweep never resumes.",
+   "trigger": "press a pointer anywhere on the frame, or press any key while the slider has focus, mid-sweep (for example at about 1000ms)",
+   "expect": "Automatic movement stops on that press. With a pointer press the divider goes to the pressed point; with a key press it ends where the sweep left it plus the key's effect. The divider does not continue to 92% or return to 50% afterwards.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "early-press-skips-sweep",
+   "behaviour": "A press inside the frame before the sweep has started cancels the sweep in advance, so it never plays.",
+   "trigger": "scroll so only the top of the frame shows inside the bottom 20% of the viewport (sweep not yet started), click or drag in the frame, then scroll the frame fully into view",
+   "expect": "The divider moves to the pressed point and stays there. No intro sweep plays when the frame crosses the 20% line, then or later.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion requested the intro sweep does not run; manual dragging, clicking and keys still work and move the divider instantly.",
+   "trigger": "enable prefers-reduced-motion: reduce, then scroll the demo into view",
+   "expect": "Divider stays at 50% with no automatic movement. Manual input still moves it, with no transition or animation on the divider.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "click-jump",
+   "behaviour": "Clicking or tapping anywhere in the frame moves the divider straight to that horizontal point.",
+   "trigger": "click at about 25% of the frame width",
+   "expect": "Divider jumps to about 25% (whole percent, step 1) without animation, before image shown from 0 to 25%.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "drag",
+   "behaviour": "Pressing and dragging horizontally anywhere in the frame moves the divider with the pointer, limited to the frame edges.",
+   "trigger": "press inside the frame and drag left past the left edge, then right past the right edge",
+   "expect": "Divider follows the pointer in whole percent steps and stops at 0% and 100%; it never leaves the frame. The cursor over the frame is the east-west resize cursor.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "touch-scroll",
+   "behaviour": "On touch devices a horizontal swipe moves the divider while a vertical swipe still scrolls the page.",
+   "trigger": "on a touch device, swipe vertically over the frame, then swipe horizontally",
+   "expect": "Vertical swipe scrolls the page and does not move the divider (touch-action pan-y). Horizontal swipe moves the divider.",
+   "kind": "state",
+   "scope": "touch"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "The block has exactly one Tab stop: the slider. Chips, divider line, knob, images and caption are not focusable.",
+   "trigger": "press Tab from before the demo, then Tab again",
+   "expect": "First Tab focuses the slider and shows an inset focus ring over the whole frame (ring 3px, ring color at 60% opacity, frame radius). Next Tab leaves the block. Tabbing in does not cancel or start the sweep by itself.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keys",
+   "behaviour": "Arrow keys move the divider by 1 percent; Home and End jump to the limits.",
+   "trigger": "focus the slider at 50 and press ArrowRight, ArrowUp, ArrowLeft twice, Home, End, then ArrowRight at 100",
+   "expect": "Values 51, 52, 51, 50, 0, 100, and stays 100 at the upper limit (ArrowLeft at 0 stays 0). Each change moves the divider instantly.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-name",
+   "behaviour": "The slider is exposed as a range from 0 to 100 with a name built from the two side labels.",
+   "trigger": "inspect the slider with an accessibility tool (en locale)",
+   "expect": "Role slider, min 0, max 100, step 1, value 50. Accessible name 'Divider position between Original and Result'. Value text 'Original 50%, Result 50%'.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "value-text-updates",
+   "behaviour": "The value text follows the divider as a whole-number pair that always sums to 100, including during the sweep.",
+   "trigger": "move the divider to 30 with keys; also read the value mid-sweep",
+   "expect": "Value 30 and value text 'Original 30%, Result 70%'. Mid-sweep the value is the rounded position (for example 'Original 8%, Result 92%' at the 720ms keyframe).",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "locales",
+   "behaviour": "Chip text, accessible name, value text, caption and image alts follow the demo locale.",
+   "trigger": "switch the demo locale to zh-TW, then zh-CN, then ja",
+   "expect": "zh-TW: chips '原圖' and '成品', name '原圖與成品之間的分隔線位置', value text '原圖 50%，成品 50%', caption '黃昏的燈塔'. zh-CN: chips '原图' and '成品', name '原图与成品之间的分隔线位置', caption '黄昏的灯塔'. ja: chips '元画像' and '完成', name '元画像と完成の境界線の位置', value text '元画像 50%、完成 50%', caption '夕暮れの灯台'. Caption size text '1920 x 1080' is unchanged.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "image-alts",
+   "behaviour": "The two images carry descriptive alternative text from the demo copy.",
+   "trigger": "inspect the images (en locale)",
+   "expect": "Before image alt 'Uploaded pencil sketch of a lighthouse'; after image alt 'Rendered painting of a lighthouse at dusk'. Both images have draggable=false, so they cannot be dragged out as files.",
+   "kind": "attribute",
+   "scope": "all"
+  }
+ ]
+}

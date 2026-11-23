@@ -1,0 +1,144 @@
+{
+ "block": "animated-number",
+ "summary": "A formatted number whose digits roll on per-column wheels in the direction of the change, with an optional trend arrow and aria-live announcement, shown as an odometer total in a watch product card with finish, strap and quantity controls.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens in a known default state (en demo locale; other locales covered by locale-switch)",
+   "trigger": "initial render",
+   "expect": "A \"Total\" label above a large number reading \"$189.00\". Each digit of the total sits on its own recessed drum inside a metal housing (odometer variant); the quantity number is plain inline text. Finish radio \"Brushed steel case\" is checked, \"Brass case\" shows \"+$40\", the checkbox \"Add a spare leather strap +$29\" is unchecked. The stepper shows \"1\" between a minus button and a plus button. No trend arrow is visible and no digit is moving.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "total-math",
+   "behaviour": "The total is (189 + finish extra + strap) times quantity, in USD with 2 decimals; radios and checkbox respond to clicks on the input or on its label text",
+   "trigger": "Click the label text \"Brass case\", then the label text \"Add a spare leather strap\", then press plus once",
+   "expect": "Brass alone gives \"$229.00\"; adding the strap gives \"$258.00\"; quantity 2 gives \"$516.00\". Clicking the label text selects the radio or toggles the checkbox exactly like clicking the input. Clicking the strap label again unchecks it and the total returns to \"$458.00\" (229 x 2).",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "roll-direction-up",
+   "behaviour": "When the value increases, every changing digit rolls upward (new digit enters from below, old digit leaves upward), always forward through the ring and never the short way back",
+   "trigger": "Check the strap checkbox (189 to 218)",
+   "expect": "Hundreds rolls 1 to 2 (1 step up), tens rolls 8 to 1 forward through 9, 0 (3 steps up), ones rolls 9 to 8 forward through 0 to 7 (9 steps up, not 1 step down). 9 wraps to 0 continuing in the same direction. The \"$\", decimal point and cents stay still.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "roll-direction-down",
+   "behaviour": "When the value decreases, every changing digit rolls downward, always backward through the ring",
+   "trigger": "Uncheck the strap checkbox (218 to 189)",
+   "expect": "Ones rolls 8 to 9 backward through 7 to 0 (9 steps down), tens 1 to 8 backward (3 steps down), hundreds 2 to 1 (1 step down). Digits that do not change (the cents \"00\") and the \"$\" and decimal point stay still.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "settle",
+   "behaviour": "Each wheel decelerates into place like a gentle spring rather than a linear tween, and rests on exactly one digit",
+   "trigger": "Select Brass, then watch the total until it stops",
+   "expect": "The moving wheels start fast and slow down smoothly, coming to rest within roughly half a second after their delay with no visible bounce or overshoot. Each step is exactly one character height. At rest every column shows one whole digit, vertically aligned with its neighbours; the digits above and below are clipped and not visible.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "stagger",
+   "behaviour": "Wheels start one after another from right to left like a mechanical counter",
+   "trigger": "Select Brass (189 to 229)",
+   "expect": "Delay per column = position from the right x 0.03 s, counting every character including the cents, decimal point, comma and \"$\". In \"$189.00\" the ones digit is position 3 (0.09 s), tens position 4 (0.12 s), hundreds position 5 (0.15 s). For 189 to 229 the tens wheel rolls 8 to 2 (4 steps up) starting after 0.12 s, the hundreds wheel rolls 1 to 2 (1 step up) starting after 0.15 s, and the ones digit 9 stays still. The tens visibly starts before the hundreds.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "trend-arrow",
+   "behaviour": "After the total changes a small arrow appears to the right of the number, pointing up for an increase and down for a decrease, then disappears",
+   "trigger": "Select Brass (increase), wait 2 s, then select Steel (decrease)",
+   "expect": "An up arrow (vertical stroke with a chevron at the top) after the increase, a down arrow (chevron at the bottom) after the decrease. The arrow is text-coloured at 60% opacity, 0.5em square with a minimum of 8 px, 4 px left margin, vertically centred, stroke width 1.5 on a 12 x 12 viewBox. It appears immediately on the change and disappears 1400 ms later with no exit animation.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "trend-restart",
+   "behaviour": "Repeated changes restart the arrow timer and update its direction",
+   "trigger": "Press plus, then within 1400 ms press minus",
+   "expect": "The arrow switches to point down immediately and stays visible for a fresh 1400 ms measured from the second press, not the first.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "qty-no-arrow",
+   "behaviour": "The quantity number rolls but has no trend arrow and no live announcement",
+   "trigger": "Press plus or minus",
+   "expect": "The quantity digit rolls up on plus and down on minus with the same easing; no arrow appears next to the quantity (only next to the total). The quantity's hidden text has no aria-live attribute, so its value is not announced.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "no-op-changes",
+   "behaviour": "Actions that leave the value unchanged do nothing visible",
+   "trigger": "Press minus at quantity 1; press plus repeatedly at quantity 9; click the already-checked finish radio or its label",
+   "expect": "Quantity stays \"1\" or \"9\" and the total keeps its value; no digit moves, no trend arrow appears and nothing is announced. The stepper buttons are never disabled; they simply do nothing at the limit. Re-selecting the checked radio changes nothing.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "digit-count-change",
+   "behaviour": "When the total gains or loses a digit, columns stay keyed from the right: existing wheels keep rolling and only the new leading digit appears without rolling",
+   "trigger": "Select Brass, check the strap, press plus until quantity is 3, then press plus once more (774 to 1,032)",
+   "expect": "Total reads \"$1,032.00\" with a thousands comma. The cents and decimal point stay still. The ones wheel rolls 4 to 2 (8 steps up), tens 7 to 3 (6 steps up), and the existing hundreds wheel rolls 7 to 0 (3 steps up), not appearing fresh. The character that was \"$\" becomes the comma in place, a new \"$\" appears one column further left, and the new leading \"1\" wheel appears instantly at its digit without rolling. Pressing minus back to 774 removes the leading \"1\" and comma instantly while the remaining wheels roll down. Columns use tabular numerals so widths do not jitter.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "interrupt",
+   "behaviour": "A new change during a roll redirects the wheel from where it currently is, without snapping",
+   "trigger": "Press plus several times rapidly",
+   "expect": "Each wheel continues from its current in-flight position toward the latest target, rolling further in the same direction (it may pause briefly for its stagger delay). It never jumps back to the old digit first and settles on the correct final digit.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "a11y-names",
+   "behaviour": "Controls have accessible names and decorative parts are hidden (en demo locale)",
+   "trigger": "Inspect the accessibility tree",
+   "expect": "Minus button is named \"Decrease quantity\", plus button \"Increase quantity\" (their SVG icons are aria-hidden). Radios are labelled \"Brushed steel case\" and \"Brass case +$40\" inside a group with legend \"Finish\"; checkbox labelled \"Add a spare leather strap +$29\". Each number exposes one plain text string (for example \"$189.00\", \"1\"); the digit wheels and the trend arrow are aria-hidden.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "live-announce",
+   "behaviour": "Total changes are announced politely as one full value (en demo locale)",
+   "trigger": "Check the strap checkbox",
+   "expect": "The total's visually hidden text has aria-live=\"polite\" and its content changes to \"$218.00\" immediately on the change, not digit by digit and not after the animation.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the real controls, in source order",
+   "trigger": "Press Tab repeatedly from before the demo",
+   "expect": "Order: finish radio group (one stop, on the checked radio; Arrow keys move between Steel and Brass and select it), strap checkbox (Space toggles), Decrease quantity button, Increase quantity button (Enter or Space activate). The total, the quantity number, the product art and the arrow are never focused.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "locale-switch",
+   "behaviour": "The demo copy and number format follow the demo locale, and switching locale alone does not animate",
+   "trigger": "Switch the demo locale to zh-TW (then zh-CN and ja) at the default state",
+   "expect": "Labels and aria-labels change, for example zh-TW shows \"總計\", \"霧面鋼殼\", buttons named \"減少數量\" and \"增加數量\". The total uses that locale's USD format (zh-TW shows \"US$189.00\"). The value is unchanged, so no wheel rolls and no trend arrow appears.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion the digits change instantly",
+   "trigger": "Enable prefers-reduced-motion, then change finish, strap or quantity",
+   "expect": "Digits jump straight to the new value with no rolling and no stagger. The trend arrow still appears and still hides after 1400 ms, and the live announcement is unchanged. The stepper buttons no longer shrink to 0.97 scale while pressed.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

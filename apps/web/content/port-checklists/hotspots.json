@@ -1,0 +1,144 @@
+{
+ "block": "hotspots",
+ "summary": "An image with numbered circular markers at percentage positions; pressing a marker opens one detail card beside it, and only one card can be open at a time.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens with the jacket photo, four markers and the Waxed cotton card already open.",
+   "trigger": "initial render",
+   "expect": "Four circular markers sit at (x 50%, y 16%), (30%, 42%), (68%, 72%) and (87%, 85%) of the photo, in that order. Markers 1, 3 and 4 show the digits 1, 3 and 4. Marker 2 (Waxed cotton) is the open one: it shows a plus icon turned 45 degrees (so it looks like an x), with no digit. Its card is visible with the title 'Waxed cotton' and the description 'Sheds rain and darkens where it creases. Rewax once a year.' and no action row. Beside the photo (below it on narrow screens): 'Waxed field jacket', '$184' and 'Tap a number to see the detail.'",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "marker-geometry",
+   "behaviour": "Each marker is a circle centred on its point, with closed and open colours that differ.",
+   "trigger": "initial render",
+   "expect": "Each marker is 28 x 28 px, fully round, with a 1.5px border, centred on its point (offset -14px left and -14px up). Text is 12px semibold with tabular figures. A closed marker has a foreground-coloured border, the card background and foreground text. The open marker uses the brand colour (--sunui-spot, falling back to --primary) for both border and fill, with --sunui-spot-foreground (falling back to --primary-foreground) for the icon. Markers sit above the image and the card sits above the markers.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "toggle-open-close",
+   "behaviour": "Pressing a closed marker opens its card. Pressing the open marker closes it.",
+   "trigger": "Press marker 1 (Corduroy collar), then press marker 1 again",
+   "expect": "First press: marker 1 shows the turned plus icon in the brand colours, the card titled 'Corduroy collar' appears, and the Waxed cotton card goes away. Second press: the card closes, marker 1 shows the digit 1 again, and no card is open. With nothing open, every marker shows its digit.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "switch-single-open",
+   "behaviour": "Only one card is ever open. Pressing a different marker moves the selection, and the outgoing card stays pressable while it fades.",
+   "trigger": "With Waxed cotton open, press marker 3 (Hand-warmer pockets)",
+   "expect": "The press inside the block does not trigger the outside-close; the marker's click alone moves the selection. The Waxed cotton card fades out over 0.12s and the Hand-warmer pockets card scales and fades in. During the switch both cards can be on screen at once, and the fading Waxed cotton card still receives pointer presses (it is not made click-through while exiting). When it settles, only the Hand-warmer pockets card is visible, marker 3 shows the turned plus and marker 2 shows the digit 2 again.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "card-placement",
+   "behaviour": "The card opens on the side of the point that faces into the image. A point with x above 55 opens to the left, and a point with y above 60 opens upward.",
+   "trigger": "Open each of the four markers in turn",
+   "expect": "Collar (50, 16) and Waxed cotton (30, 42): the card's left edge is 22px to the right of the point and its top edge is 14px above the point (translate 22px, -14px), so the card grows from its top-left corner. Pockets (68, 72) and Storm cuffs (87, 85): the card's right edge is 22px to the left of the point and its bottom edge is 14px below the point (translate calc(-100% - 22px), calc(-100% + 14px)), so the card grows from its bottom-right corner.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "card-not-clamped",
+   "behaviour": "The card is not clamped or flipped to stay inside the photo. A card can run past the photo's edge and cover the text next to it.",
+   "trigger": "At the sm two-column layout with the demo at its full 768px width (photo about 380px wide), open Corduroy collar, then press on the part of the card that lies over the right column",
+   "expect": "The collar card starts about 212px from the photo's left edge (50% plus 22px) and stays 224px wide, so it ends about 436px, roughly 56px past the photo's right edge, across the 24px gap and over the start of the 'Waxed field jacket' heading. It paints on top of that text. Pressing the card there does not close it, because the card is inside the block. By contrast the Waxed cotton card ends about 360px, inside the photo. On narrower photos other cards can likewise extend past the photo edges; the only limit is the width cap of the photo width minus 16px.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "card-size-content",
+   "behaviour": "The card has a fixed width and fixed content order.",
+   "trigger": "Open any marker",
+   "expect": "Card width is 224px, never wider than the image width minus 16px (1rem). Corner radius 12px, padding 14px, a hairline border at foreground 10% opacity, card background. Content in order: title (14px semibold), then description (12px, muted colour, 4px gap above). When there is no description or action, those rows are left out. An action, if given, sits below a top border with 12px above and below it (the demo spots have none).",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "card-enter-exit-motion",
+   "behaviour": "The card scales up and fades in on a gentle spring, and fades out fast when it closes.",
+   "trigger": "Open a marker, then close it",
+   "expect": "Enter: opacity goes from 0 to 1 and scale from 0.96 to 1 on a spring with stiffness 240 and damping 30. The scale grows from the corner nearest the point (top-left for right/down cards, bottom-right for left/up cards). Exit: opacity goes to 0 over 0.12s with no scale change. The Waxed cotton card that is open on first render also plays the enter animation when the block mounts.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "marker-icon-rotate-and-tap",
+   "behaviour": "The marker icon turns when it opens, and a press shrinks the marker.",
+   "trigger": "Press a closed marker, then press it again to close it",
+   "expect": "When it opens, the marker content changes from the digit to the plus icon and rotates from 0 to 45 degrees on a spring with stiffness 520 and damping 34. When it closes, it rotates back to 0 and shows the digit. While the pointer is held down the marker scales to 0.9, then returns to 1 on the same 520/34 spring. On first render the open marker is already at 45 degrees and does not animate in.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "escape-closes",
+   "behaviour": "Escape closes the open card from anywhere on the page.",
+   "trigger": "With a card open, press Escape (focus anywhere, including outside the block)",
+   "expect": "The card closes with the 0.12s fade, and every marker shows its digit with aria-expanded false. Focus does not move. Pressing Escape with no card open does nothing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "outside-press-closes",
+   "behaviour": "A pointer press outside the block closes the open card. A press inside the block does not. With nothing open, outside presses do nothing.",
+   "trigger": "With the Waxed cotton card open, press on the '$184' text in the right column; reopen it and press on the photo itself and on the card body; then, with no card open, press outside again",
+   "expect": "A press on the right-column text (outside the block) closes the card as soon as the pointer goes down, before release. A press on the photo or inside the open card leaves the card open, because both are inside the block. A press on another marker switches to that marker's card rather than just closing. With no card open, a press outside changes nothing and no card appears.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "Each marker is a button named by its spot title, and it reports whether it is expanded and which card it controls.",
+   "trigger": "initial render, then open and close markers",
+   "expect": "The four buttons are named 'Corduroy collar', 'Waxed cotton', 'Hand-warmer pockets' and 'Storm cuffs' (not the digits). The open marker has aria-expanded true and aria-controls pointing at the card's id. Closed markers have aria-expanded false and no aria-controls. The open card is a region named by its title, for example 'Waxed cotton'. The marker icon is hidden from assistive tech. There is no live region: opening a card is reported only through aria-expanded and the region.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the four marker buttons, in spot order. The photo and the card are not stops.",
+   "trigger": "Press Tab from before the block through to after it, with the Waxed cotton card open",
+   "expect": "Focus goes Corduroy collar (1), Waxed cotton (2), Hand-warmer pockets (3), Storm cuffs (4), then leaves the block. The image, the card and the right-column text get no stop (the demo cards have no focusable action). Each focused marker shows a 2px focus outline with a 2px offset. Opening a card does not move focus into it.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-activation",
+   "behaviour": "Enter or Space on a focused marker toggles it the same way a press does.",
+   "trigger": "Tab to Corduroy collar and press Enter, press Enter again, then press Space",
+   "expect": "The first Enter opens the Corduroy collar card and closes Waxed cotton. The second Enter closes it, so no card is open. Space opens it again. Focus stays on the marker throughout.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "hover-closed-marker",
+   "behaviour": "A closed marker gets a light tint on hover. The open marker keeps its brand fill.",
+   "trigger": "Hover a closed marker, then hover the open marker",
+   "expect": "The closed marker background becomes foreground at 10% opacity, as a colour transition. The open marker stays in the brand fill with no hover tint.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "rapid-presses",
+   "behaviour": "Repeated quick presses on one marker toggle it each time without leaving stray cards.",
+   "trigger": "Press the same marker 5 times quickly",
+   "expect": "Each press flips the state: after an odd number of presses the card is open, after an even number it is closed. When it settles, at most one card is visible and the marker icon matches the state (turned plus when open, digit when closed).",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "Reduced motion removes the scale and spring motion but keeps the short exit fade.",
+   "trigger": "Turn on reduced motion in the OS, then open, switch and close cards and press markers",
+   "expect": "The card appears at full opacity and scale 1 at once, with no scale from 0.96 and no spring. The marker icon jumps straight between 0 and 45 degrees (duration 0). Pressing a marker does not shrink it to 0.9. Closing still fades the card out over 0.12s. Placement, states and keyboard behaviour do not change.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

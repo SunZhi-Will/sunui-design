@@ -1,0 +1,144 @@
+{
+ "block": "favorite-button",
+ "summary": "A round heart toggle button that saves or unsaves an item, stamping a red fill in with a spring and optionally rolling a compact favorite count, shown in the demo as a save button on four product cards.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-layout",
+   "behaviour": "The demo shows a section headed \"You may also like\" with four product cards in order Waxed Field Jacket ($128), Stoneware Mug ($22), Desk Lamp ($86), Field Watch 38 mm ($165). Each card has a square product image with a round favorite button pinned 8px from its top and right edges, and the name (left, truncated) and price (right) below. Grid is 2 columns on narrow screens and 4 columns from the sm breakpoint.",
+   "trigger": "initial render",
+   "expect": "Heading text \"You may also like\"; 4 cards in the listed order; button offset top 8px, right 8px over the image; no count number appears next to any heart",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "first-render-states",
+   "behaviour": "Only the jacket starts saved. Its heart is filled red with a red outline; the other three hearts are outline only in the text colour. On first render the saved heart appears already filled with no stamp animation.",
+   "trigger": "initial render",
+   "expect": "Jacket: filled heart, aria-pressed=true. Mug, Lamp, Watch: outline heart, aria-pressed=false. No scale or fade animation plays on load",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "button-geometry",
+   "behaviour": "At size md (used by the demo) the circle is 40x40 with a 1px border in the border colour and the background colour fill, fully rounded; the heart icon is 20x20 drawn in a 24x24 viewBox with a 1.5 stroke and round joins. Sizes sm and lg are 32/16 and 48/24 (circle/icon).",
+   "trigger": "initial render",
+   "expect": "md circle 40px, icon 20px, stroke width 1.5 of 24; sm 32px/16px; lg 48px/24px",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "toggle-on",
+   "behaviour": "Activating an unsaved button saves it: the outline turns red and a red fill stamps in, starting at scale 1.5 and opacity 0 and springing to scale 1 and opacity 1, scaled around the heart's own centre.",
+   "trigger": "Click or tap the Stoneware Mug heart",
+   "expect": "aria-pressed becomes true; fill animates scale 1.5 to 1 and opacity 0 to 1 with spring stiffness 620, damping 20, mass 0.8 (a slight overshoot then settles); outline colour #dc3d43 in light, #ff6b70 in dark (or var(--sunui-like) if set)",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "toggle-off",
+   "behaviour": "Activating a saved button unsaves it: the red fill fades out without scaling and the outline returns to the text colour.",
+   "trigger": "Click or tap the Waxed Field Jacket heart",
+   "expect": "aria-pressed becomes false; fill opacity goes 1 to 0 over 0.12s; no scale change on exit; outline colour transitions back to the foreground colour",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "press-feedback",
+   "behaviour": "While pressed down, the circle shrinks with a spring and the whole button shrinks slightly; both return on release.",
+   "trigger": "Press and hold on any heart, then release",
+   "expect": "Circle scales to 0.88 with spring stiffness 520, damping 34; whole button scales to 0.97 while active; both return to 1 on release",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "hover-border",
+   "behaviour": "Hovering the button darkens the circle border.",
+   "trigger": "Move the mouse over any heart",
+   "expect": "Circle border changes from the border colour to the foreground colour at 30% opacity, with a colour transition; reverts when the pointer leaves",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "repeated-presses",
+   "behaviour": "Each activation flips the state exactly once, and rapid repeated presses never leave the visual state out of step with aria-pressed; an interrupted fill exit or entry reverses cleanly.",
+   "trigger": "Click the Desk Lamp heart 5 times quickly",
+   "expect": "Ends saved (odd number of presses), aria-pressed=true, one filled heart visible with no duplicate or stuck half-faded fill; the other three cards are unaffected",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "independent-cards",
+   "behaviour": "Each card holds its own saved state; toggling one never changes another.",
+   "trigger": "Toggle the Field Watch 38 mm heart on",
+   "expect": "Watch becomes saved; Jacket stays saved, Mug and Lamp stay unsaved",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the four favorite buttons, in card order. Images, names, prices, the heading and the heart graphic are not focusable.",
+   "trigger": "Press Tab repeatedly from before the demo",
+   "expect": "Focus order: Jacket button, Mug button, Lamp button, Watch button, then leaves the demo; exactly 4 stops",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-activate",
+   "behaviour": "The focused button is a native toggle button: Enter and Space toggle it, and keyboard focus shows a ring.",
+   "trigger": "Tab to the Mug button, press Space, then press Enter",
+   "expect": "Space saves it (aria-pressed=true), Enter unsaves it (aria-pressed=false); a 2px focus ring in the ring colour with a 2px offset in the background colour is visible only on keyboard focus, no default outline",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-name",
+   "behaviour": "The button is announced as a toggle button whose label describes the action it will take, and the label swaps with the state. The demo overrides the built-in labels with product-specific ones. The heart SVG is hidden from assistive tech.",
+   "trigger": "Inspect each button before and after toggling",
+   "expect": "Unsaved: role button, aria-pressed=false, label \"Save Stoneware Mug\". Saved: aria-pressed=true, label \"Remove Waxed Field Jacket from saved\". Label flips immediately on toggle. Without a labels override the built-in en strings are \"Add to favorites\" / \"Remove from favorites\"; SVG has aria-hidden=true",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "locale-labels",
+   "behaviour": "Switching the demo locale changes the heading and the button labels. Built-in strings: zh-TW and zh-CN \"加入收藏\" / \"取消收藏\", ja \"お気に入りに追加\" / \"お気に入りから削除\". Tags starting with zh that contain hant, tw, hk or mo map to zh-TW, other zh tags to zh-CN, ja tags to ja, everything else to English.",
+   "trigger": "Switch the demo locale to zh-TW, then ja",
+   "expect": "zh-TW: heading \"你可能也會喜歡\", unsaved label \"收藏 石陶馬克杯\", saved label \"把 蠟布獵裝外套 移出收藏\". ja: heading \"こちらもおすすめ\", labels use the pattern \"<name>を保存\" / \"<name>を保存から外す\"",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "count-display",
+   "behaviour": "Outside the demo (needs a test host), passing a count shows it to the right of the circle with a 6px gap and 8px right padding on the button, in medium weight tabular figures at the size's text size, formatted with compact notation for the given locale. Any defined count shows, including 0. Without a count only the heart is shown and there is no right padding. There is no animation on first render.",
+   "trigger": "Render FavoriteButton with count=1200, then with count=0, then with no count",
+   "expect": "count=1200 with locale en: text \"1.2K\", md text size text-sm; count=0: text \"0\" is shown; no count: no number element and no pr-2 padding; nothing slides on mount",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "count-roll",
+   "behaviour": "Outside the demo (needs a test host), when the count changes the new number replaces the old inside a clipped box. The entering number takes its direction from the current pressed value; the leaving number keeps the pressed value it was last rendered with. So when the host flips pressed and count in the same update, both numbers travel the same way on screen relative to their start: on save the new number rises from below (y 100% to 0) while the old one drops out below (y 0 to 100%); on unsave the new number drops in from above (y -100% to 0) while the old one rises out above (y 0 to -100%).",
+   "trigger": "In a controlled host, change pressed=false, count=999 to pressed=true, count=1000 in one update; then change back to pressed=false, count=999 in one update",
+   "expect": "Save: \"1K\" enters from y 100% with opacity 0 to 1, \"999\" exits to y 100% with opacity to 0. Unsave: \"999\" enters from y -100%, \"1K\" exits to y -100%. Both use spring stiffness 520, damping 34; movement is clipped to the number box",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "uncontrolled-mode",
+   "behaviour": "Outside the demo (needs a test host), when pressed is omitted the button keeps its own state, starting from defaultPressed, and still reports each change through onPressedChange. When pressed is supplied, clicking only calls onPressedChange and the visual state follows the prop.",
+   "trigger": "Render FavoriteButton with defaultPressed=true and an onPressedChange spy, click it; then render with pressed=false and a spy that does not update the prop, click it",
+   "expect": "Uncontrolled: starts filled with aria-pressed=true, after click aria-pressed=false and spy called with false. Controlled with no prop update: spy called with true but aria-pressed stays false and no fill appears",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion on, state changes still happen and colours still change, but there is no movement: the fill appears without scaling, disappears instantly, the press shrink is off, and count changes swap without sliding.",
+   "trigger": "Enable prefers-reduced-motion, then toggle the Mug heart on and off and press and hold it",
+   "expect": "Fill appears at scale 1, opacity 1 immediately; exit duration 0; no 0.88 or 0.97 press scale; count (if shown in a test host) swaps instantly with exit duration 0 and no y movement; aria-pressed and labels still update",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

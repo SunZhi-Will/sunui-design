@@ -1,0 +1,152 @@
+{
+ "block": "theme-picker",
+ "summary": "A three-option theme radiogroup (System, Light, Dark) whose tiles are miniature previews of each theme, shown in a demo panel together with the companion ThemeSwitch and a product card that re-themes as the choice changes.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "initial-render",
+   "behaviour": "On first render the demo starts in Dark mode. The picker, the switch and the panel all agree, and nothing animates on mount.",
+   "trigger": "initial render",
+   "expect": "Panel heading reads \"Appearance\" with the hint \"Applies to this preview only\". Three tiles in the order System, Light, Dark with labels \"System\", \"Light\", \"Dark\". The Dark tile is selected: 2px foreground ring, its check badge already fully visible with no entrance animation, and its label in medium weight foreground colour. The other two labels are muted. The top stage background is #1c1c22 with the cool glow showing (opacity 1) and the warm glow hidden (opacity 0). The switch is 200 x 104 with its key at the left end showing the pixel moon, no glyph animation, and aria-checked=true. The product card reads \"Linen Tote\", \"$48\", \"Add to bag\", uses the dark theme and does not fade in.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tile-previews",
+   "behaviour": "Each tile is a tiny picture of its theme with fixed colours, and System is split in half.",
+   "trigger": "initial render",
+   "expect": "md tiles are 96 x 56 px (sm: 64 x 40) with a 12px gap between options (sm: 8px). Light preview: background #f4f4f4, pill bar #ffffff with a 1px #e4e4e4 inset edge, search icon stroke #a3a3a3 and text bar #e4e4e4. Dark preview: background #262626, bar #3a3a3a, edge #444444, ink #8f8f8f. System preview: left half shows the dark preview and right half shows the light preview, split exactly at 50% width. Preview colours do not change with the panel theme.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "click-select",
+   "behaviour": "Clicking or tapping an unselected tile selects it: the old badge leaves, the new badge pops in, rings and labels swap.",
+   "trigger": "Click the Light tile while Dark is selected",
+   "expect": "Light gets aria-checked=true and the 2px foreground ring; Dark returns to aria-checked=false and a 1px border ring. The new badge (16px circle, 4px from the bottom right corner of the tile, foreground fill with a 2px background-coloured outline and a check mark) grows from about 40% size and transparent to full size and opaque, with a quick springy settle well under half a second. The old badge shrinks and fades out in about 100ms. Labels swap weight and colour.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-press-selected",
+   "behaviour": "Pressing the already selected tile changes nothing.",
+   "trigger": "Click the Dark tile repeatedly while Dark is selected",
+   "expect": "Dark stays checked, the badge does not re-animate or flicker, the product card does not crossfade and the stage colours do not change.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "arrow-keys",
+   "behaviour": "Arrow keys move the selection and the focus together, wrapping at both ends. Selection follows focus. Home and End are not handled.",
+   "trigger": "Focus the checked tile, then press ArrowRight / ArrowDown / ArrowLeft / ArrowUp, then Home and End",
+   "expect": "ArrowRight and ArrowDown go to the next option, ArrowLeft and ArrowUp to the previous one, in the order System, Light, Dark. From Dark, ArrowRight selects System; from System, ArrowLeft selects Dark. Each press immediately sets aria-checked on the new option and moves focus to it. The page does not scroll on arrow presses. Home, End and other keys do not change the selection or focus.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "roving-tabindex",
+   "behaviour": "Only the selected option is a Tab stop; the group counts as one stop.",
+   "trigger": "Press Tab from before the demo, then keep pressing Tab",
+   "expect": "Tab order is exactly: 1) the theme switch, 2) the currently checked radio in the picker (Dark on first render). Unchecked radios are skipped (tabindex -1). After a selection change the next Tab into the group lands on the newly checked option. Nothing else in the demo takes focus: no preview, badge, stage glow, product card or the \"Add to bag\" label.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "enter-space",
+   "behaviour": "Enter and Space activate the focused option like a click.",
+   "trigger": "Focus the checked radio and press Space or Enter",
+   "expect": "The focused option stays selected (it is already checked) and nothing else changes; no error, no deselect.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "focus-ring",
+   "behaviour": "Keyboard focus is shown on the tile, not as a default outline on the whole button.",
+   "trigger": "Reach a radio with Tab or arrow keys",
+   "expect": "The preview tile shows a 2px ring in the ring colour with a 2px offset in the background colour. No browser outline. Mouse clicks do not show this ring.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "switch-keyboard",
+   "behaviour": "The theme switch works from the keyboard and shows its own focus ring.",
+   "trigger": "Tab to the switch, then press Space, then Enter",
+   "expect": "On focus the switch shows a 2px ring in the ring colour with a 2px background-coloured offset and no browser outline. Space toggles it from dark to light (aria-checked becomes false, picker moves to Light); Enter toggles it back to dark (aria-checked true, picker moves to Dark). Focus stays on the switch.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "hover",
+   "behaviour": "Hovering a tile lifts it and darkens its edge and label.",
+   "trigger": "Hover an unselected tile with a mouse",
+   "expect": "Tile moves up 1px, its ring becomes 1px muted-foreground and its label turns foreground colour, over 150ms. On the selected tile the lift still happens but the 2px foreground ring stays.",
+   "kind": "motion",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "The picker exposes a named radiogroup with named radios and correct checked state; the switch is a named switch.",
+   "trigger": "Inspect the accessibility tree",
+   "expect": "role=radiogroup named \"Appearance\" (the demo passes its title; default is \"Theme\"). Three role=radio children named \"System\", \"Light\", \"Dark\" with aria-checked true on exactly one. Preview and check icons are hidden from assistive tech. The switch is role=switch named \"Dark mode\" with aria-checked true when the panel resolves to dark.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "system-resolves-to-os",
+   "behaviour": "Choosing System makes the demo follow the OS colour scheme, live.",
+   "trigger": "Select System, then toggle the OS or emulated prefers-color-scheme between light and dark",
+   "expect": "With OS light the panel resolves to light, with OS dark it resolves to dark, and it updates without a reload when the OS setting changes. The System tile stays checked throughout. If the OS already matches the previous theme, selecting System causes no product card crossfade.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "fixed-mode-ignores-os",
+   "behaviour": "When Light or Dark is chosen, the OS colour scheme has no effect.",
+   "trigger": "Select Dark (or Light), then toggle the OS or emulated prefers-color-scheme",
+   "expect": "The panel, stage colours, switch position and product card stay on the chosen theme. No crossfade, no change in aria-checked anywhere.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "switch-sync",
+   "behaviour": "The switch and the picker drive the same state; the switch only ever sets light or dark.",
+   "trigger": "Click the switch while the picker shows Dark; then select System with OS dark and click the switch",
+   "expect": "First click: picker moves to Light (badge animates onto Light), switch aria-checked becomes false. With System selected and OS dark the switch shows the night position (aria-checked=true); clicking it selects Light in the picker, not System. Picking Light or Dark in the picker moves the switch to match.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "theme-transitions",
+   "behaviour": "Changing the resolved theme recolours the panel with set durations and crossfades the product card.",
+   "trigger": "Change the resolved theme from dark to light (click the Light tile)",
+   "expect": "Stage background goes from #1c1c22 to #ecebe8 over 700ms; the warm glow fades in and the cool glow fades out over 700ms; panel surface colours transition over 500ms. The product card crossfades: the new card fades from opacity 0 to 1 and the old one fades to 0 over 0.25s, stacked in the same 88px tall slot.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "switch-motion",
+   "behaviour": "The switch key slides across with a soft spring and its pixel sun turns into a pixel moon.",
+   "trigger": "Click the switch to go from dark to light, then click again before the key settles",
+   "expect": "At md the key moves 96px, from the left end (7px inset) in dark to the right end (103px) in light, easing out with at most a slight overshoot and settling in under about a second. The pixel glyph breaks apart and re-forms as the sun (or moon) over about 950ms. Pressing and holding the key shrinks it slightly. A second click mid-flight reverses from the current position without jumping back to an end.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion the state changes still happen but the movement is removed.",
+   "trigger": "Enable prefers-reduced-motion: reduce, then change the selection and click the switch",
+   "expect": "The new check badge appears at full size and opacity instantly (no grow). The old badge only fades, with no shrink. The product card swaps instantly with no fade. The switch key jumps to its end immediately, the pixel glyph changes in one frame, and pressing the key does not shrink it. Colour transitions of the panel may remain.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "locale-copy",
+   "behaviour": "Demo copy follows the demo locale in all four languages.",
+   "trigger": "Switch the demo locale to zh-TW, zh-CN and ja",
+   "expect": "zh-TW: title \"外觀\", labels \"跟隨系統\" / \"淺色\" / \"深色\", switch named \"深色模式\", price \"NT$1,480\". zh-CN: \"外观\", \"跟随系统\" / \"浅色\" / \"深色\", switch \"深色模式\", \"¥328\". ja: \"外観\", \"システム\" / \"ライト\" / \"ダーク\", switch \"ダークモード\", \"¥6,800\". The radiogroup name follows the title and the radio names follow the labels.",
+   "kind": "text",
+   "scope": "all"
+  }
+ ]
+}

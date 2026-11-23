@@ -1,0 +1,152 @@
+{
+ "block": "toast-stack",
+ "summary": "Acceptance checklist for porting toast-stack: a stacked, swipeable, auto-dismissing notification queue with pause on hover and focus, keyboard and button dismissal, undo toasts, four locales, and a shop-and-cart demo that drives it.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens with a product list, a cart with two lines, and one seeded undo toast for the Tote already in the stack.",
+   "trigger": "initial render",
+   "expect": "Left heading \"New this week\" with three rows: Sneaker $88 with a filled \"Add to cart\" button, Mug $24 with \"Add to cart\", Jacket $148 with a bordered \"Notify me\" button. Right heading \"Your cart\", count \"2 items\", lines Tote $36 and Bottle $32, each with a trash button. A region named \"Notifications\" sits 16px from the bottom and right of the demo frame, width min(22rem, 100% minus 2rem), holding one toast: title \"Added to cart\", description \"Tote, Natural, one size\", a 44px square thumbnail, an \"Undo\" key and an X button. This seeded toast has no timer line and never auto-dismisses.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "add-to-cart-toast",
+   "behaviour": "Adding a product prepends a cart line and pushes a toast with thumbnail, title, description, an Undo key and a countdown line.",
+   "trigger": "Press \"Add to cart\" on Sneaker",
+   "expect": "Count becomes \"3 items\" with Sneaker as the first cart line. A new front toast shows title \"Added to cart\", description \"Sneaker, Black leather, size 42\", a 44px square thumbnail on the left, a small filled \"Undo\" key in the brand colour (it moves 1px down while pressed), and an X button named \"Dismiss notification\". A 2px brand-colour line at 80% opacity along the toast bottom shrinks from full width to zero toward the left, linearly over 4500ms.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "pause-and-resume",
+   "behaviour": "Timed toasts dismiss after 4500ms unless the region is hovered, holds keyboard focus, or the tab is hidden; the countdown then resumes from the time left.",
+   "trigger": "Press \"Add to cart\" on Mug and leave it alone; then repeat, wait about 2000ms, hover the region (or Tab into it) for 5000ms, then move the pointer out (or Tab out)",
+   "expect": "Untouched, the toast leaves 4500ms after it appeared. While hovered or while focus is anywhere inside the region it stays and its bottom line freezes; after the pointer and focus have both left it dismisses about 2500ms later, not a full 4500ms. Moving the mouse out while focus stays inside (for example after clicking a toast) keeps it paused. Switching to another browser tab also pauses it.",
+   "kind": "timing",
+   "scope": "web"
+  },
+  {
+   "id": "enter-exit-motion",
+   "behaviour": "A new toast rises into place from below, the stack re-settles smoothly, and a leaving toast fades down.",
+   "trigger": "Push any toast, then dismiss one",
+   "expect": "The new toast starts invisible about 28px below its slot and rises to place while fading in, settling in roughly half a second with no visible bounce (spring stiffness 240, damping 30). Toasts already shown glide to their new positions with the same motion. A dismissed toast fades out while moving about 12px down over 0.16s.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "collapsed-stack",
+   "behaviour": "When the region is neither hovered nor focused, toasts collapse into a stack where at most three layers show.",
+   "trigger": "Push toasts until four or more are queued, pointer and focus outside the region",
+   "expect": "Newest is in front at full size. The layer at index i sits i*10px higher, is scaled to 1 minus 0.04*i, and is cut to the front toast's height. Layers at index 3 and beyond are invisible, aria-hidden=true and not reachable by Tab. Container height equals front height plus (min(count, 3) minus 1) * 10px and animates over 300ms ease-out.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "expand-on-hover",
+   "behaviour": "Hovering the region fans every toast out into a full list; leaving collapses it.",
+   "trigger": "Move the mouse over the region with three or more toasts, then move it away",
+   "expect": "All toasts become visible at scale 1 and natural height, newest at the bottom and each older one stacked above with an 8px gap. Container height becomes the sum of all toast heights plus 8px between toasts. Moving the mouse out (with focus outside) collapses the stack again.",
+   "kind": "layout",
+   "scope": "web"
+  },
+  {
+   "id": "undo-add",
+   "behaviour": "The Undo key on an add toast removes that line, closes only its own toast, and announces the removal.",
+   "trigger": "Add Sneaker and then Mug, then press \"Undo\" on the older Sneaker toast (expand the stack to reach it)",
+   "expect": "Only the Sneaker line just added leaves the cart (count drops by 1); the Sneaker toast closes while the Mug toast and the seeded Tote toast stay. A new front toast appears titled \"Removed from cart\" with description \"Sneaker\", a circled i icon, no thumbnail, no action, auto-dismissing after 4500ms. Pressing Undo on the seeded toast removes the Tote line the same way.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "remove-with-undo",
+   "behaviour": "Removing a cart line happens immediately and shows a persistent toast whose Undo restores the whole previous cart.",
+   "trigger": "Press the trash button named \"Remove Tote\", then \"Remove Bottle\", then press Undo on the toasts",
+   "expect": "Tote disappears at once, count \"1 item\", and a toast titled \"Removed Tote\" with description \"Natural, one size\", a thumbnail and an \"Undo\" key appears with no timer line and never auto-dismisses. After also removing Bottle the cart reads \"Your cart is empty.\" and \"0 items\". Undo on the \"Removed Bottle\" toast restores the Bottle-only cart; Undo on the \"Removed Tote\" toast restores Tote and Bottle, \"2 items\". Each Undo closes its own toast.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "notify-toast",
+   "behaviour": "The sold out item gives a success toast and leaves the cart alone.",
+   "trigger": "Press \"Notify me\" on Jacket, twice",
+   "expect": "Each press pushes a new toast titled \"We'll email you\" with description \"When the Jacket is back in M.\", a green check icon, no thumbnail, no action, with a countdown line and auto-dismiss after 4500ms. The cart is unchanged.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "queue-limit",
+   "behaviour": "The queue keeps at most five toasts, dropping the oldest.",
+   "trigger": "From first render, press \"Add to cart\" six times quickly, then hover the region",
+   "expect": "Expanded, exactly 5 toasts are listed, all \"Added to cart\"; the seeded Tote toast and the first add toast have been dropped. The cart gains 6 lines and reads \"8 items\".",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "dismiss-button",
+   "behaviour": "The X button removes only its own toast.",
+   "trigger": "With two or more toasts, press the X button named \"Dismiss notification\" on one of them",
+   "expect": "That toast leaves with the exit motion; the others remain and the stack re-settles. The cart is unchanged. Works on the seeded toast too.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab visits the demo controls, then each toast and its buttons, newest first, skipping decorative parts.",
+   "trigger": "Add Mug once, then press Tab repeatedly from the top of the demo",
+   "expect": "Order: Add to cart (Sneaker), Add to cart (Mug), Notify me (Jacket), Remove Mug, Remove Tote, Remove Bottle, then the newest toast itself, its Undo key, its Dismiss notification button, then the seeded toast, its Undo, its Dismiss button. Focus entering the region expands the stack so layers beyond three become reachable. Thumbnails, icons and the timer line are never focused. Every focused element shows a 2px focus ring.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-dismiss",
+   "behaviour": "Escape dismisses the newest toast when focus is inside the region; Delete or Backspace dismisses the focused toast.",
+   "trigger": "Focus any toast or button in the region and press Escape; focus a toast itself and press Delete or Backspace; also hover the region with focus outside and press Escape",
+   "expect": "Escape removes the front (newest) toast whatever is focused inside the region, and the key event does not reach handlers outside the region. Delete or Backspace on a focused toast removes that toast; pressed while its Undo or X button is focused, nothing happens. Escape while only hovering (focus outside) does nothing, and Escape with no toasts does nothing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "swipe-dismiss",
+   "behaviour": "Toasts can be dragged sideways to dismiss; short drags spring back.",
+   "trigger": "Drag the front toast left or right (or any toast while expanded); try a short slow drag and a long or fast one",
+   "expect": "The toast follows horizontally with resistance (about 0.6 of the pointer distance). Releasing after the pointer moved more than 90px sideways, or flicking faster than 600px/s, dismisses it; otherwise it springs back to its place. Collapsed back layers cannot be dragged.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "accessibility-names",
+   "behaviour": "The region, list and buttons expose names and polite announcements.",
+   "trigger": "Inspect the accessibility tree after pushing a toast",
+   "expect": "Region landmark named \"Notifications\". The list is a polite live region announcing additions only; each toast is read as a whole (title plus description). X buttons are named \"Dismiss notification\"; trash buttons are named \"Remove <product>\". Thumbnails, tone icons and the timer line are hidden from assistive tech, and toasts hidden in the collapsed stack are aria-hidden with inert contents.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "locales",
+   "behaviour": "Demo copy and the block's built-in strings follow the demo locale (en, zh-TW, zh-CN, ja).",
+   "trigger": "Switch the demo locale to zh-TW, then add a product and remove a cart line",
+   "expect": "Heading \"本週新品\", buttons \"加入購物車\" and \"到貨通知\", cart heading \"購物車\", count \"2 件\". Region named \"通知\", X buttons named \"關閉通知\". New add toast titled \"已加入購物車\" with action \"復原\"; removal toast titled \"已移除 <name>\" with action \"復原\". zh-CN uses \"撤销\" and \"关闭通知\"; ja uses \"元に戻す\" and \"通知を閉じる\". Toasts pushed before the switch keep their original text.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "narrow-viewport",
+   "behaviour": "Below the sm breakpoint (640px) the demo stacks into one column with shorter button labels.",
+   "trigger": "Render the demo narrower than 640px",
+   "expect": "The cart section sits under the product list, separated by a top border instead of a left divider. The product buttons read \"Add\" and \"Notify\" (the \" to cart\" and \" me\" parts are hidden) and are at least 4.5rem wide. The toast region stays 16px from the bottom and right with width 100% minus 2rem when that is under 22rem.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion, toasts appear and leave without movement and show no countdown line.",
+   "trigger": "Enable prefers-reduced-motion, then push, stack, expand and dismiss toasts",
+   "expect": "Enter, restacking and exit happen instantly (duration 0) with no 28px rise, no 12px drop and no spring; container height changes without the 300ms transition; the bottom countdown line is not rendered. Timed toasts still auto-dismiss after 4500ms.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

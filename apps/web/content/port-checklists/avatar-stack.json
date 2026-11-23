@@ -1,0 +1,144 @@
+{
+ "block": "avatar-stack",
+ "summary": "A row of overlapping buyer avatars with a +N overflow disc, a hover or focus lift with a name tooltip, and localized accessible names, shown in a product card and two related-product rows.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-main-stack",
+   "behaviour": "The product card stack shows the first 4 of 5 buyers plus an overflow disc that counts against the total of 1284, not against the people list.",
+   "trigger": "initial render (locale en)",
+   "expect": "Four 36x36 round discs reading MP, LC, AL, NW from left to right (first letter of the first word plus first letter of the last word, dots removed, uppercase), then an overflow disc reading \"+1.3K\" (1284 minus 4 visible = 1280, compact notation with at most 1 fraction digit from 1,000 up), at least 36px wide and 36px tall. The text next to it reads \"1,284 bought in the last 30 days\". No demo person has an image, so each initials disc has a tint of the brand spot colour with the initials in the spot colour.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "first-render-related-rows",
+   "behaviour": "The two related-product rows use small gradient stacks with max 2.",
+   "trigger": "initial render (locale en)",
+   "expect": "Stoneware Mug row: two 28x28 gradient discs with no letters (Leo C., Ava L.) then \"+410\" (412 minus 2). Market Tote row: two 28x28 gradient discs with no letters (Noah W., Sara K.) then \"+94\" (96 minus 2). Overflow text below 1,000 is not compacted. Gradient discs have a 2px border in the card colour.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "overlap-and-stacking",
+   "behaviour": "Discs overlap leftward and the leftmost disc sits on top; the overflow disc is at the bottom.",
+   "trigger": "initial render",
+   "expect": "Each disc after the first is pulled left by 9px at size md (main stack) and 7px at size sm (related rows); the overflow disc gets the same negative margin. List item stacking order is visible count minus index plus 1 (main stack: 5, 4, 3, 2) and 1 for the overflow item, so each left disc covers the left edge of its right neighbour.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "no-entrance-on-first-render",
+   "behaviour": "Avatars present at mount do not play an entrance animation.",
+   "trigger": "initial render",
+   "expect": "All discs appear at full opacity, scale 1 and x 0 immediately; no fade, scale or slide on load.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "group-accessible-name",
+   "behaviour": "Each stack is a list whose accessible name is the label plus the raw total count in parentheses.",
+   "trigger": "initial render, inspect accessibility tree",
+   "expect": "Main stack: list named \"Recent buyers (1284)\". Mug row: \"Buyers of Stoneware Mug (412)\". Tote row: \"Buyers of Market Tote (96)\". Count is not compacted. Each disc sits in a list item.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "avatar-accessible-names",
+   "behaviour": "Each avatar disc is an image named with the person's name and note; the initials text is hidden from assistive tech.",
+   "trigger": "initial render, inspect accessibility tree",
+   "expect": "Main stack avatars: role img with names \"Mina P., Taipei, 2 hours ago\", \"Leo C., Osaka, 5 hours ago\", \"Ava L., Seoul, yesterday\", \"Noah W., Taichung, yesterday\" (name, comma space, note). The initials span is aria-hidden and not read separately.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "overflow-accessible-name",
+   "behaviour": "The overflow disc, with no click handler supplied in the demo, is a focusable image naming the raw hidden count and the hidden people.",
+   "trigger": "initial render, inspect accessibility tree",
+   "expect": "Main stack overflow: role img, name \"1280 more, including Sara K.\" (uncompacted). Mug overflow: \"410 more, including Noah W.\". Tote overflow has no hidden people in its list so the name is just \"94 more\". None of the overflow discs is a button in the demo.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops on every avatar disc and overflow disc in visual order, then moves on through the page.",
+   "trigger": "Press Tab repeatedly from before the demo",
+   "expect": "Order: Mina P., Leo C., Ava L., Noah W., +1.3K, Add to cart button, then mug row Leo C., Ava L., +410, then tote row Noah W., Sara K., +94. Nothing else inside the stacks takes focus (no tooltip, no wrapper). Shift+Tab reverses the order.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "focus-ring",
+   "behaviour": "A keyboard-focused disc shows a focus ring instead of the default outline.",
+   "trigger": "Tab onto any avatar or overflow disc",
+   "expect": "A 2px ring in the ring colour with a 2px offset appears around the round disc; no default browser outline.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "hover-lift-and-tooltip",
+   "behaviour": "Hovering a disc lifts it and shows a tooltip above it with the name and note.",
+   "trigger": "Move the pointer over the second main-stack avatar (Leo C.), then move it away",
+   "expect": "The disc moves up 3px with a spring of stiffness 520, damping 34. Its stacking among neighbours does not change: Mina P. still covers its left edge while it is lifted. A dark tooltip (foreground background, background-colour text, 12px text, 3px radius) appears instantly, centred above the disc with an 8px gap: first line \"Leo C.\" in medium weight, second line \"Osaka, 5 hours ago\" at 70% opacity. On pointer leave the tooltip disappears at once with no exit animation and the disc springs back to y 0.",
+   "kind": "motion",
+   "scope": "web"
+  },
+  {
+   "id": "focus-lift-and-tooltip",
+   "behaviour": "Keyboard focus triggers the same lift and tooltip as hover, and blur removes it.",
+   "trigger": "Tab onto Leo C. in the main stack, then press Tab once",
+   "expect": "While focused: disc lifted 3px, tooltip \"Leo C.\" over \"Osaka, 5 hours ago\" above it. After Tab: that tooltip is gone, Leo C. springs back to y 0, and Ava L. is lifted with its own tooltip \"Ava L.\" over \"Seoul, yesterday\". Only the focused disc shows a tooltip.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "overflow-lift-and-tooltip",
+   "behaviour": "The overflow disc lifts like an avatar and its tooltip lists the hidden names, or the localized count text when nobody is hidden.",
+   "trigger": "Hover or focus each overflow disc in turn",
+   "expect": "Each overflow disc moves up 3px with the same 520/34 spring. Tooltip text, single line, no second line: main stack +1.3K shows \"Sara K.\", mug +410 shows \"Noah W.\", tote +94 shows \"94 more\". On leave or blur the tooltip vanishes and the disc returns to y 0.",
+   "kind": "motion",
+   "scope": "web"
+  },
+  {
+   "id": "tooltip-hidden-from-at",
+   "behaviour": "The tooltip is a visual aid only and does not intercept the pointer.",
+   "trigger": "Hover a disc, inspect the tooltip, then move the pointer up onto the tooltip",
+   "expect": "Tooltip has aria-hidden true and is not announced; there is no live region. It has pointer-events none, so moving onto it counts as leaving the disc: the tooltip disappears and the disc drops back to y 0.",
+   "kind": "attribute",
+   "scope": "web"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion, discs do not lift but tooltips still appear.",
+   "trigger": "Enable prefers-reduced-motion, reload, then hover or focus an avatar and an overflow disc",
+   "expect": "Each disc stays at y 0 (no 3px lift, no spring); the tooltip still appears above it with the same text. Stacking among neighbours is unchanged. Initial render is still instant with no entrance motion.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "locale-zh-tw",
+   "behaviour": "In zh-TW the buyers data, demo copy, labels and separators switch, and 1280 is not compacted.",
+   "trigger": "Switch the demo locale to zh-TW",
+   "expect": "Main stack initials 林, 陳, 李, 王 (single-word names give one character); overflow disc reads \"+1280\" and is named \"還有 1280 人，包括 柯莎拉\"; list named \"最近購買 (1284)\". Text beside it reads \"1,284 人在過去 30 天購買\"; button \"加入購物車\"; heading \"經常一起購買\". Mug list named \"石陶馬克杯的買家 (412)\" with overflow \"+410\" named \"還有 410 人，包括 王諾亞\"; tote list named \"市場托特包的買家 (96)\" with overflow named \"還有 94 人\". Hovering 林 shows tooltip \"林美娜\" over \"台北，2 小時前\"; its accessible name is \"林美娜, 台北，2 小時前\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "locale-zh-cn-ja",
+   "behaviour": "zh-CN and ja use their own strings and data, and 1280 is not compacted.",
+   "trigger": "Switch the demo locale to zh-CN, then to ja",
+   "expect": "zh-CN: list \"最近购买 (1284)\", initials 林, 陈, 李, 王, overflow \"+1280\" named \"还有 1280 人，包括 柯莎拉\", mug list \"石陶马克杯的买家 (412)\", tote list \"市集托特包的买家 (96)\", button \"加入购物车\". ja: list \"最近の購入者 (1284)\", initials 佐, 中, 鈴, 渡, overflow \"+1280\" named \"ほか 1280 人（加藤沙羅 など）\", mug list \"ストーンウェアマグの購入者 (412)\", tote overflow named \"ほか 94 人\", button \"カートに入れる\", heading \"よく一緒に購入されている商品\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "photo-less-fallback",
+   "behaviour": "People without an image show a stable fallback chosen from their id.",
+   "trigger": "initial render (no demo person has a src)",
+   "expect": "Main stack (fallback initials): initials on a spot-colour tint of 12%, 20% or 28% picked by hashing the id. Related rows (fallback gradient): a 135 degree gradient of the spot colour picked from 5 presets by hashing the id, no letters. The same id gets the same tint or gradient on every render, so Leo C. (id 2) has the same gradient in the mug row as Noah W. does not, and Noah W. (id 4) looks identical in the mug and tote rows.",
+   "kind": "state",
+   "scope": "all"
+  }
+ ]
+}

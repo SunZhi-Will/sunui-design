@@ -11,6 +11,7 @@ This is still React. Keep the hooks, state logic, timers, props, callbacks and m
 - All text sits inside `<Text>`. `tabular-nums` = `fontVariant: ["tabular-nums"]`. `font-mono` = `fontFamily: Platform.select({ ios: "Menlo", default: "monospace" })`. `tracking` in em = `letterSpacing: em * fontSize`. Leave font scaling on (`allowFontScaling` default).
 - `gap`, `flexDirection: "row"`, `alignItems`, `justifyContent` replace the flex classes. The default flex direction is column.
 
+<!-- only:motion -->
 ### Motion
 - Springs map one to one: `withSpring(value, { stiffness: 520, damping: 34, mass: 1 })`. Do not use the `duration`-based spring config.
 - Tweens: `withTiming(value, { duration: ms, easing: Easing.bezier(x1, y1, x2, y2) })` with the source's control points.
@@ -19,6 +20,7 @@ This is still React. Keep the hooks, state logic, timers, props, callbacks and m
 - `AnimatePresence` enter and exit = the `entering` and `exiting` props. For `initial y: 6, opacity: 0` use a custom entering worklet that returns `{ initialValues, animations }` with `withTiming`; give each swapped child a `key`. With `mode="popLayout"` nothing more is needed: a view that is exiting is already out of layout in Reanimated.
 - A CSS `animate-spin` spinner = `withRepeat(withTiming(360, { duration: 1000, easing: Easing.linear }), -1)`, stopped under reduced motion.
 - Reduced motion: `useReducedMotion()` from `react-native-reanimated`; set values directly instead of animating.
+<!-- end -->
 
 ### Input
 - There is no hover. Drop `hover:` styles. Keep pressed styles with `Pressable` (`style={({ pressed }) => ...}`): `active:translate-y-px` = `transform: [{ translateY: 1 }]`, `active:scale-[0.97]` = scale 0.97.
@@ -35,7 +37,9 @@ This is still React. Keep the hooks, state logic, timers, props, callbacks and m
 ### Surfaces
 - Colours come from `useSunUITheme()` (below). If the project has no equivalent, add it as `sunui-theme.ts`; if the app already has its own colour system, point the roles at that instead.
 - A CSS shadow: use the `boxShadow` style string where the installed React Native supports it (0.76 and later with the new architecture); otherwise `shadowColor`, `shadowOffset`, `shadowOpacity`, `shadowRadius: blur / 2` on iOS and nothing on Android. A 1px ring or `border` is `borderWidth: StyleSheet.hairlineWidth` or 1.
+<!-- only:canvas -->
 - HTML canvas = `react-native-svg`. `destination-out` erasing = the cover inside a `<Mask>` whose strokes are black paths. There is no pixel read; when the source samples pixels, track the same quantity yourself (a 64 x 64 grid of cells marked as the brush passes) and keep the same threshold semantics.
+<!-- end -->
 
 ### Shape of the code
 - One self-contained `.tsx` file for the component, same props and defaults. `ReactNode` props stay `ReactNode`. `className` is replaced by a `style` prop.

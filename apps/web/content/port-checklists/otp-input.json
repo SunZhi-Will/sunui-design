@@ -1,0 +1,144 @@
+{
+ "block": "otp-input",
+ "summary": "A 6-cell one-time code entry row that moves focus as you type, spreads pasted or autofilled codes across cells, shakes once and shows an error on a wrong code, and shows a \"Verified\" result marker on the right code (demo code 246810).",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens with an empty code row inside a checkout card, next to an email preview that shows the code.",
+   "trigger": "initial render",
+   "expect": "Card: heading \"Confirm it's you\", line \"We emailed a 6-digit code to s••••@mail.com. Enter it to finish checking out.\", then 6 empty cells in two groups of 3 with a short horizontal divider (10px wide, 1px tall, muted colour) between cell 3 and cell 4, an empty status line (min height 20px), and \"Didn't get it? Resend code\". No cell is focused (no autofocus), no caret line, no result marker. Aside: \"Inbox\" (uppercase, small), \"Your sign-in code\", \"Use this code to confirm your order. It expires in 10 minutes.\", and the code \"246 810\" in monospace. Each cell is 56px tall and 40px wide (48px at sm and up), gap 6px (8px at sm and up), centred monospace text.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "The row and each cell have accessible names, decorative parts are hidden from assistive tech, and the email preview is a complementary landmark.",
+   "trigger": "initial render",
+   "expect": "The row is a group named \"One-time code\" with no aria-describedby while idle. Cells are named \"Digit 1 of 6\" through \"Digit 6 of 6\". The divider and the caret line are aria-hidden. Each cell has inputmode numeric; the first cell has autocomplete one-time-code, the others autocomplete off. The email preview is an aside, so a complementary landmark named \"Email preview\". Localised names: zh-TW group \"一次性驗證碼\", cell \"第 1 碼，共 6 碼\"; zh-CN \"一次性验证码\", \"第 1 位，共 6 位\"; ja \"ワンタイムコード\", \"6 桁中 1 桁目\".",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab visits the six cells in order, then the Resend button, and nothing decorative.",
+   "trigger": "Press Tab repeatedly from before the block (idle state)",
+   "expect": "Focus order: Digit 1, Digit 2, Digit 3, Digit 4, Digit 5, Digit 6, Resend code. The divider, the status line, the email preview and the code \"246 810\" never take focus. Shift+Tab walks the same list backwards.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "focus-caret",
+   "behaviour": "Focusing a cell selects its content and shows a thin caret line under that cell only.",
+   "trigger": "Focus any cell by click, tap or Tab",
+   "expect": "A 2px tall line in the brand accent colour (--sunui-spot, falling back to --primary) sits 8px above the cell bottom, inset 10px from each side (12px at sm and up). The cell border darkens (foreground at 45%). No text caret is visible. Any existing character in the cell is selected so the next keystroke replaces it. Moving focus moves the line; focus leaving the row removes it.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "type-advance",
+   "behaviour": "Typing an allowed character fills the cell and moves focus to the next cell; the last cell keeps focus. A filled cell is always replaced, never appended to, whether or not its character is selected.",
+   "trigger": "Focus Digit 1 and type 1, 2, 3, 4, 5, 6; then click Digit 2, click it again so its character is no longer selected, and type 7",
+   "expect": "Cells show 1 2 3 4 5 6 and focus moves one cell per keystroke, staying on Digit 6 after the last one. After typing 7 into Digit 2 without a selection, Digit 2 shows only 7 (the old 2 is dropped) and focus moves to Digit 3.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reject-letters",
+   "behaviour": "Only digits are accepted in the demo (numeric mode); other characters are ignored.",
+   "trigger": "Type a, Z, space, or - into any cell",
+   "expect": "The cell stays as it was, focus does not move, no status change.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "backspace-delete",
+   "behaviour": "Backspace clears the current cell if it has a character, otherwise clears the previous cell and moves there; Delete clears the current cell without moving.",
+   "trigger": "With 1 2 3 filled and focus on Digit 3, press Backspace twice; then focus Digit 1 and press Delete; then press Backspace on the now empty Digit 1",
+   "expect": "First Backspace clears Digit 3, focus stays on Digit 3. Second Backspace clears Digit 2 and moves focus to Digit 2. Delete on Digit 1 clears it and focus stays on Digit 1. Backspace on an empty Digit 1 does nothing (no wrap, no error).",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "arrow-home-end",
+   "behaviour": "Arrow keys move between cells and clamp at the ends; Home and End jump to the first and last cell.",
+   "trigger": "Press ArrowLeft on Digit 1, ArrowRight on Digit 6, Home, End, and ArrowLeft/ArrowRight from a middle cell",
+   "expect": "ArrowLeft on Digit 1 stays on Digit 1; ArrowRight on Digit 6 stays on Digit 6. ArrowLeft/ArrowRight move one cell, Home goes to Digit 1, End to Digit 6. The divider is skipped. The landed cell's content is selected.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "gaps-kept",
+   "behaviour": "Clearing a middle cell leaves a gap that keeps later characters in place; a code with a gap does not complete; Backspace on a gap cell acts as if the cell were empty.",
+   "trigger": "1. Type 2, 4, 6, 8, 1 into Digits 1 to 5. 2. Focus Digit 3 and press Delete. 3. Focus Digit 6 and type 0. 4. Focus Digit 3 and press Backspace. 5. Type 4 into Digit 2, then 6 into Digit 3.",
+   "expect": "After step 2 cells read 2 4 _ 8 1 _ (Digits 4 and 5 do not shift left). After step 3 the row reads 2 4 _ 8 1 0: no shake, no error, no marker, status line empty. Step 4 (Backspace on the gap) clears Digit 2 and moves focus to Digit 2, giving 2 _ _ 8 1 0. After step 5 the row reads 2 4 6 8 1 0 and the success state appears.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "paste-distribute",
+   "behaviour": "Pasting spreads the allowed characters across cells starting at the focused cell, overwrites in place without shifting, drops the rest, and moves focus past the last pasted character.",
+   "trigger": "Separately: focus Digit 1 on an empty row and paste \"246 810\"; on an empty row focus Digit 4 and paste \"9a8\"; with 1 2 3 4 5 filled focus Digit 2 and paste \"77\"; paste \"abc\" into any cell",
+   "expect": "\"246 810\" fills 2 4 6 8 1 0 (space removed), the success state appears, focus lands on Digit 6 (clamped). \"9a8\" at Digit 4 sets Digit 4 = 9 and Digit 5 = 8, focus moves to Digit 6. \"77\" at Digit 2 gives 1 7 7 4 5 (Digits 2 and 3 overwritten, Digits 4 and 5 unchanged), focus moves to Digit 4. Characters beyond Digit 6 are dropped. \"abc\" changes nothing and focus does not move.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "multi-char-autofill",
+   "behaviour": "When several characters arrive in one cell at once (SMS one-time-code autofill on the first cell), they are spread across the cells like a paste.",
+   "trigger": "On a phone, focus Digit 1 and pick the suggested code 246810 from the keyboard's one-time-code autofill",
+   "expect": "Cells fill as 2 4 6 8 1 0, focus ends on Digit 6, and the success state appears. Non-digit characters in the inserted text are dropped.",
+   "kind": "state",
+   "scope": "touch"
+  },
+  {
+   "id": "error-state",
+   "behaviour": "Completing all 6 cells with a code other than 246810 enters the error state: the row shakes once, cells are marked invalid, and the error text is announced.",
+   "trigger": "Fill all six cells with 1 1 1 1 1 1",
+   "expect": "The whole row makes one short horizontal shake (left about 6px, then smaller swings back to rest, about a third of a second). Every cell gets aria-invalid=true and a darker border (foreground at 50%). The status line (aria-live polite) shows \"That code doesn't match. Check the email and try again.\" and the group's aria-describedby points to it. Resend stays visible. zh-TW: \"驗證碼不符，請檢查信件後再試一次。\"; zh-CN: \"验证码不正确，请检查邮件后重试。\"; ja: \"コードが一致しません。メールを確認して、もう一度お試しください。\"",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "edit-clears-status",
+   "behaviour": "Clearing a cell returns the block to idle, and completing a wrong code again from idle shakes again. Overwriting a cell of a full wrong code with another wrong digit keeps the error without a second shake.",
+   "trigger": "From the error state (111111): press Backspace on Digit 6, then type 2. Then focus Digit 1 and type 3. Then press Delete on Digit 1.",
+   "expect": "After Backspace: error text disappears, aria-invalid is removed from all cells, borders return to normal, the group has no aria-describedby. After typing 2 the row reads 1 1 1 1 1 2, shakes again and the error text returns. After typing 3 into Digit 1 (row 3 1 1 1 1 2) the error text and aria-invalid stay but the row does not shake. After Delete on Digit 1 the block is idle again.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "success-state",
+   "behaviour": "Completing 246810 enters the success state: a \"Verified\" result marker appears below the row on the right, the caret line hides, and the success is announced only to screen readers.",
+   "trigger": "Type 2 4 6 8 1 0",
+   "expect": "A marker reading \"Verified\" (zh-TW \"已驗證\", zh-CN \"已验证\", ja \"認證済み\" as \"認証済み\") appears 8px below the row, 4px in from its right edge, with a small filled disc in the brand accent colour holding a check mark. With motion allowed it fades in and the disc grows slightly while the check draws, settling within about half a second. The marker is aria-hidden. The status line contains visually hidden text \"Code verified\" (zh-TW \"驗證碼正確\", zh-CN \"验证码正确\", ja \"コードを確認しました\") and the group's aria-describedby points to it. Focus stays on Digit 6 but no caret line shows. No shake, no aria-invalid.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "success-hides-resend",
+   "behaviour": "In success the Resend line becomes invisible but keeps its space, and leaves the Tab order; any edit restores it.",
+   "trigger": "Reach success, press Tab from Digit 6; then Shift+Tab back to Digit 6 and press Delete",
+   "expect": "While success: \"Didn't get it? Resend code\" is invisible, the layout does not shift, and Tab from Digit 6 leaves the block without stopping on Resend. After Delete: Digit 6 is cleared, status returns to idle, the marker fades out, the caret line returns on Digit 6, and Resend is visible and tabbable again.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "resend-inert",
+   "behaviour": "The Resend button is a real button that does not change the code or status in the demo.",
+   "trigger": "In idle or error, click \"Resend code\", or Tab to it and press Enter or Space",
+   "expect": "Cell contents, status text and aria-invalid are unchanged. Clicking moves focus to the button, so the caret line leaves the previously focused cell. With motion allowed the button scales to 0.97 while the mouse button or Space is held down. Its label underlines on hover and on keyboard focus.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion the error does not shake and the success marker appears and leaves without animation; texts and states are unchanged.",
+   "trigger": "Enable prefers-reduced-motion, then enter 111111, then clear and enter 246810, then press Delete on a cell",
+   "expect": "Wrong code: the row does not move, error text and aria-invalid still appear. Right code: the \"Verified\" marker appears at once at full opacity, disc at full size, check fully drawn. After Delete the marker disappears at once. Resend does not scale when pressed.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

@@ -1,0 +1,152 @@
+{
+ "block": "range-slider",
+ "summary": "A step-snapping slider with one or two thumbs, a spring-animated fill, optional tick dots and a value tooltip; the demo is a product filter with a price range and a minimum rating.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-demo",
+   "behaviour": "On first render the demo shows a card headed \"Filter\" with a result count and two sliders: a price range and a single minimum-rating slider.",
+   "trigger": "initial render",
+   "expect": "Header row: \"Filter\" on the left, \"110 products\" on the right (count = max(0, round((high - low) * 1.4 - (rating - 3) * 30)) = round(100 * 1.4 - 30) = 110). First slider: label \"Price\" on the left, \"$20, $120\" on the right (en dash with spaces). Second slider: label \"Minimum rating\", value \"4.0 ★\". 32px vertical space between the two sliders. No tooltip is visible.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "first-render-geometry",
+   "behaviour": "Fill and thumb positions match the values as a percentage of min..max.",
+   "trigger": "initial render (measure bounding boxes of the track, fill and thumbs)",
+   "expect": "Price (min 0, max 200): the 4px tall grey track spans the full 24px tall track area; the accent fill's left edge is at 10% of the track width and its right edge at 60%; the two thumb centres are at 10% and 60%. Rating (min 1, max 5): fill from 0% to 75%; one thumb centred at 75%. Each thumb is a 20x20px circle whose vertical centre matches the track's vertical centre.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "ticks",
+   "behaviour": "The rating slider shows 9 decorative tick dots (ticks=8 divisions); dots inside the filled part use the card colour, dots outside use a muted foreground colour.",
+   "trigger": "initial render, then change the rating",
+   "expect": "9 dots of 4px at values 1, 1.5, ..., 5 (0%, 12.5%, ..., 100%), each with aria-hidden=\"true\". At rating 4.0 the 7 dots at 0% to 75% are card-coloured and the 2 dots at 87.5% and 100% are foreground at 30% opacity. After End (5.0) all 9 are card-coloured. The price slider has no tick dots.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the slider thumbs, in visual order; ticks, labels, values and the track are not focusable.",
+   "trigger": "Press Tab repeatedly from before the demo",
+   "expect": "Exactly 3 stops in this order: \"Lowest price\" thumb, \"Highest price\" thumb, \"Minimum rating\" thumb. Shift+Tab reverses. A keyboard-focused thumb shows a 2px outline offset by 2px.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-names-values",
+   "behaviour": "Every thumb is a slider element with a name, current value, range and formatted value text; the low and high price thumbs advertise the minGap-limited range. The price slider submits two hidden form fields.",
+   "trigger": "initial render (inspect the DOM attributes of the three role=slider elements and the hidden inputs)",
+   "expect": "Lowest price: role=\"slider\", aria-label \"Lowest price\", aria-valuenow 20, aria-valuemin 0, aria-valuemax 110 (120 - minGap 10), aria-valuetext \"$20\". Highest price: aria-label \"Highest price\", aria-valuenow 120, aria-valuemin 30 (20 + 10), aria-valuemax 200, aria-valuetext \"$120\". Rating: aria-label \"Minimum rating\", aria-valuenow 4, aria-valuemin 1, aria-valuemax 5, aria-valuetext \"4.0 ★\". Hidden inputs name=\"price-min\" value=\"20\" and name=\"price-max\" value=\"120\"; no hidden input for the rating. After Highest price ArrowLeft to 115, Lowest price aria-valuemax becomes 105.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "arrow-keys",
+   "behaviour": "Arrow keys move the focused thumb by one step: Right and Up increase, Left and Down decrease. Each press updates the label value, tooltip and result count.",
+   "trigger": "Focus a thumb and press arrow keys",
+   "expect": "Price step 5: Lowest price ArrowRight from 20 gives 25, label \"$25, $120\", count \"103 products\" (round(95 * 1.4 - 30)). Rating step 0.5: ArrowUp from 4.0 gives \"4.5 ★\" and count 95; ArrowDown from 4.0 gives \"3.5 ★\" and count 125. The page does not scroll on these keys. Other keys such as Enter or letters change nothing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "page-keys",
+   "behaviour": "PageUp and PageDown move by max(step, (max - min) / 10).",
+   "trigger": "Focus a thumb and press PageUp or PageDown",
+   "expect": "Price: big step max(5, 20) = 20, so Lowest price PageUp from 20 gives 40, PageDown from 20 gives 0. Rating: big step max(0.5, 0.4) = 0.5 (the step wins), so PageUp from 4.0 gives \"4.5 ★\" and PageDown gives \"3.5 ★\", the same as one arrow press.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "home-end-and-gap",
+   "behaviour": "Home jumps to the minimum and End to the maximum, but in range mode a thumb never comes closer than minGap 10 to the other thumb and the thumbs never cross.",
+   "trigger": "With price at [20,120], focus a thumb and press Home or End",
+   "expect": "Lowest price: Home gives 0; End gives 110 (not 200). Highest price: End gives 200; Home gives 30 (not 0). Rating: Home gives \"1.0 ★\", End gives \"5.0 ★\".",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "limits-repeat",
+   "behaviour": "Repeated presses at a limit leave the value unchanged and never overshoot; values stay on the step grid.",
+   "trigger": "Press ArrowRight repeatedly with Lowest price at 110 and Highest price at 120, or with rating at 5.0; press ArrowLeft repeatedly with Lowest price at 0 or rating at 1.0",
+   "expect": "Lowest price stays 110 (gap 10 kept), rating stays \"5.0 ★\", Lowest price stays 0, rating stays \"1.0 ★\". aria-valuenow is always a multiple of 5 for price and of 0.5 from 1 for rating, with no floating point noise such as 4.499999.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "count-floor",
+   "behaviour": "The demo result count never goes below zero.",
+   "trigger": "Set price to [20,30] (Highest price Home) and rating to 5.0 (End)",
+   "expect": "Count reads \"0 products\" (formula gives 14 - 60 = -46, clamped to 0).",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "pointer-press-track",
+   "behaviour": "Pressing the primary button on the track moves a thumb to that spot, snapped to the step and clamped to the track ends. In range mode: a press at or left of the low value moves the low thumb, at or right of the high value moves the high thumb, between them moves the closer one, and an exact midpoint picks the high thumb. Non-primary buttons do nothing. The jump is instant, not sprung.",
+   "trigger": "With a mouse, click on empty price track at about 90% of its width, then at about 25%, then right-click; click the rating track at 40%",
+   "expect": "At 90%: Highest price jumps to 180, label \"$20, $180\". At 25% (between 20 and 180, closer to 20): Lowest price moves to 50. Right-click: no change. Rating at 40%: \"2.5 ★\" (raw 2.6 snapped). The thumb and fill reach the new spot with no spring animation. After a mouse click on empty track no thumb remains focused (document.activeElement is not a thumb) and no tooltip is visible after release.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "press-on-thumb",
+   "behaviour": "Pressing on a thumb itself goes through the same track handler: the value snaps to the pointer position, and which thumb moves is chosen by distance to the pointer, not by which thumb was pressed. The pressed thumb receives focus from the mouse press.",
+   "trigger": "Click a thumb off its centre; then set price to [100,110] and press the right half of the Lowest price thumb",
+   "expect": "An off-centre click on a thumb can move that thumb by one or more steps to the snapped pointer value instead of leaving it in place. With price [100,110], a press at raw about 106 picks the Highest price thumb (closer to 110), which stays at 110 because of the gap, so values do not change. After a mouse click on a thumb that thumb is focused and its tooltip stays visible after release.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "pointer-drag",
+   "behaviour": "While the button is held after a track press, moving the pointer updates the dragged thumb continuously (snapped, clamped by minGap and the track ends), even when the pointer leaves the track. Release or pointer cancel ends the drag.",
+   "trigger": "Press on empty price track near the low thumb and drag left and right, past the other thumb and past the track ends, then release",
+   "expect": "Values follow the pointer in steps of 5 (0.5 on the rating slider); the low thumb stops at high - 10 and never passes the high thumb; dragging beyond the ends stops at 0 or 200. Label value and result count update live during the drag. During the drag the dragged thumb shows its tooltip; after releasing a drag that started on empty track the tooltip disappears and no thumb is focused.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "dragging-visuals",
+   "behaviour": "The dragged thumb grows, follows the pointer with no animation lag and shows a tooltip above it, stacked above the other thumb.",
+   "trigger": "Press and hold on the track and move, then release",
+   "expect": "While dragging: the thumb's scale is 1.15, reached instantly (transition duration 0); thumb position and fill change with duration 0. Tooltip: small bordered box centred above the thumb with an 8px gap, text size xs, showing the formatted value (e.g. \"$85\" or \"3.5 ★\"). The dragged thumb has z-index 20, the other 10. On release the scale returns to 1 with the spring (stiffness 520, damping 34).",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "keyboard-spring",
+   "behaviour": "Keyboard value changes animate the fill and thumb position with a spring; there is no animation on first render.",
+   "trigger": "Focus Lowest price and press PageUp; also reload the page",
+   "expect": "Thumb left position and fill left and width animate to the new value with a spring of stiffness 520 and damping 34. On load, thumbs and fill appear in place with no animation.",
+   "kind": "motion",
+   "scope": "web"
+  },
+  {
+   "id": "tooltip-focus",
+   "behaviour": "The tooltip appears whenever a thumb is focused or dragged and disappears when the thumb loses focus and is not dragged, whether by Tab or by clicking elsewhere.",
+   "trigger": "Tab to Lowest price, Tab to Highest price, Tab past the last thumb; then focus a thumb and click on the page background outside the slider",
+   "expect": "Focusing Lowest price shows \"$20\" above it; tabbing on hides it and shows \"$120\" above Highest price; tabbing past the rating thumb hides all tooltips. Clicking the page background while a thumb is focused hides its tooltip and its z-index returns to 10. At most one tooltip is visible at a time.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "rating-single-thumb",
+   "behaviour": "The single-thumb rating slider behaves like one thumb of the range: fill always starts at 0%, tooltip on focus and drag, no gap limit.",
+   "trigger": "Tab to the Minimum rating thumb, then drag it from 5.0 down to 1.0",
+   "expect": "On focus the tooltip shows \"4.0 ★\" above the thumb. Dragging moves the thumb in 0.5 steps across the full 1.0 to 5.0 range; the fill's left edge stays at 0% and its right edge follows the thumb; at 1.0 the fill has zero width. The tooltip shows the live value during the drag.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion enabled, position changes are instant and the dragged thumb does not grow.",
+   "trigger": "Enable prefers-reduced-motion, then press keys and drag",
+   "expect": "Fill and thumb move with duration 0 on keyboard and pointer changes (no spring). The dragged thumb stays at scale 1. Tooltips and values behave as without reduced motion.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

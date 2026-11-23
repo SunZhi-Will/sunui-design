@@ -5,6 +5,7 @@
 - Fonts: `.system(size:weight:)` at the source size, wrapped so Dynamic Type still scales (`@ScaledMetric` on the size, or `Font.system(size:).leading(...)` with `relativeTo`). `tabular-nums` = `.monospacedDigit()`. `font-mono` = `.system(design: .monospaced)`. Letter spacing in em = `.tracking(em × fontSize)`.
 - Corners: `RoundedRectangle(cornerRadius:, style: .continuous)`.
 
+<!-- only:motion -->
 ### Motion
 - Springs map one to one: `.interpolatingSpring(mass: m, stiffness: k, damping: c)`. snappy = `(mass: 1, stiffness: 520, damping: 34)`, gentle = `(1, 240, 30)`, pop = `(0.8, 620, 20)`. Do not use `.spring()`, `.bouncy` or `.snappy` presets.
 - Tweens: `.timingCurve(x1, y1, x2, y2, duration:)` with the source's control points and seconds.
@@ -12,6 +13,7 @@
 - `AnimatePresence` enter and exit = conditional view with `.transition(.asymmetric(insertion:removal:))`; give each swapped child a distinct `.id` so SwiftUI treats it as a new view. `initial y: 6, exit y: -6` = `.offset(y:)` combined with `.opacity`. `mode="popLayout"` means the leaving child must not hold layout space: put the children in a `ZStack`.
 - A CSS `animate-spin` spinner = a `Circle().trim` rotating with `.linear(duration: 1).repeatForever(autoreverses: false)`; stop it under Reduce Motion.
 - Reduced motion: `@Environment(\.accessibilityReduceMotion)`; pass `nil` animation or zero duration.
+<!-- end -->
 
 ### Input
 - There is no hover. Drop `hover:` styles. Keep pressed styles: read `configuration.isPressed` in a `ButtonStyle` (`active:translate-y-px` = `.offset(y: 1)`, `active:scale-[0.97]` = `.scaleEffect(0.97)` with snappy).
@@ -28,7 +30,9 @@
 ### Surfaces
 - Colours come from `SunUITheme` (below). If the project has no equivalent, add it as `SunUITheme.swift`; if the app already has its own colour system, point the roles at that instead. Read it with `@Environment(\.sunuiTheme)`. Never use `Color.accentColor`, `.primary`, `.secondary` or system fills in place of a role.
 - A CSS shadow with blur B is about `.shadow(radius: B / 2)`. A 1px ring (`0 0 0 1px`) or `border` is an `.overlay` of `strokeBorder(lineWidth: 1)`. An inset top highlight is an overlay stroke masked to the top edge.
+<!-- only:canvas -->
 - HTML canvas = SwiftUI `Canvas`. `destination-out` erasing = draw the strokes with `.blendMode(.destinationOut)` inside a `.compositingGroup()`. There is no `getImageData`; when the source samples pixels, track the same quantity yourself (for example a coarse grid of cells marked as the brush passes) and keep the same threshold semantics.
+<!-- end -->
 
 ### Shape of the code
 - One self-contained Swift file for the component. Props become `init` parameters with the same defaults; `ReactNode` children become `@ViewBuilder` closures (or `String` where the source only ever passes text); callbacks become closures; an `async` action stays `async`.
@@ -88,7 +92,9 @@ extension EnvironmentValues {
 
 ### Details that came up in testing
 - **Fixed heights and Dynamic Type.** A fixed control height (`h-6`, `h-8`) scales with the text: put the height in `@ScaledMetric` too. At the default text size it must equal the source.
+<!-- only:motion -->
 - **Two timings on one view.** When width springs while colour tweens over 150ms and opacity is instant, do not wrap them in one `withAnimation`. Use the scoped `.animation(_:body:)` per property, or stack layers and animate each. Enter and exit with different durations = `AnyTransition.animation(_:)` on each side of `.asymmetric`.
+<!-- end -->
 - **Touch has no blur.** A visual the source shows on focus (a value bubble that stays after click) shows only while the finger is down; keep it for hardware-keyboard and VoiceOver focus.
 - **44pt targets.** Layout size stays as in the source; the hit area may overflow it (`.contentShape` with negative insets, or an invisible larger frame overlaid).
 - **Shadows with negative spread** (`0 4px 12px -6px`) have no equivalent: halve the radius again.
@@ -100,11 +106,17 @@ extension EnvironmentValues {
 - **Result haptics** (`.success`, `.error`) may fire when the awaited action finishes; that still counts as the user's action.
 - **`aria-pressed`** = `.accessibilityAddTraits(.isToggle)` plus `.isSelected` when on. **`aria-current="step"`** = `.isSelected`. **`role="spinbutton"`** on a text field = label, value and `.accessibilityAdjustableAction` on the field.
 - **Typography passed through `className`** (size, weight, tracking, line height on the block itself) becomes explicit parameters with the demo's values as defaults, or the environment font where the block is meant to inherit. CSS line height = `.lineSpacing(lineHeight - fontLineHeight)` plus half of that as vertical padding.
+<!-- only:scroll -->
 - **Scroll-linked motion** (`useScroll` + `useTransform`): read the element's frame in the nearest scroll view with `onGeometryChange` and `proxy.bounds(of: .scrollView)`. framer's offset `["start 0.85", "end 0.45"]` means progress = `(0.85 * H - top) / (height + 0.4 * H)` with H the scroll view's height, clamped to 0...1. Style per word with one `Text` built from an `AttributedString`, not one view per word.
+<!-- end -->
 - **Container queries** (`@container`, `@min-[420px]:`) = the component measures its own width with `onGeometryChange`. Viewport units and `IntersectionObserver` = the same measurement against the scroll view or screen bounds; a `requestAnimationFrame` loop = `TimelineView(.animation)`.
 - **A drag inside a scroll view** (`touch-pan-y`, press and hold): attach it with `.simultaneousGesture` and lock the axis, so a mostly vertical move hands over to scrolling. React to touch down at once; do not wait for the finger to lift.
+<!-- only:input -->
 - **Several inputs acting as one field** (a code with one box per digit): one invisible `UITextField` subclass over the row with `deleteBackward` overridden and `textContentType = .oneTimeCode`. SwiftUI's `TextField` cannot see Backspace on an empty field. Do not register a `UIKeyCommand` for `UIKeyCommand.inputDelete`: on iOS that is the backspace key of a hardware keyboard, and a command for it takes the press away from `deleteBackward`. A tap picks the nearest cell; each cell is its own accessibility element.
+<!-- end -->
+<!-- only:motion -->
 - **A keyframe array** (`x: [0, -6, 5, -3, 2, 0]` with one duration and ease) is evenly spaced, with the ease applied to each segment: `keyframeAnimator` with one `LinearKeyframe(_, duration:, timingCurve:)` per step.
+<!-- end -->
 - **A corner badge that scales in and out** must not lose its size while it leaves, or the corner offset jumps: keep an invisible copy that holds the layout. Use 0.001 instead of a scale of exactly 0.
 - **A `key` change that remounts with an `initial` value** (a number that starts at scale 1.35 and settles) = `.id(key)` on a child that keeps its start value in `@State` and animates in `onAppear`.
 - **An exit whose direction depends on current state** (a rolling digit): a plain `.transition(.asymmetric(...))` bakes the direction in at the previous render. Read the direction from a reference box in a custom `Transition`.

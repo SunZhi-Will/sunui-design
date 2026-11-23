@@ -1,0 +1,922 @@
+{
+ "note": "Lines in free block sources that could mislead a port. Found by Haiku, confirmed by Sonnet. Nothing has been changed in the sources.",
+ "findings": [
+  {
+   "block": "add-to-cart-button",
+   "line": 33,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Replaces the shopping bag icon on the button (shown in idle and adding; added keeps the check). Any SVG is scaled to 16px */",
+   "why": "The icon render shows Spinner while state is adding, so the custom icon only appears in idle."
+  },
+  {
+   "block": "add-to-cart-button",
+   "line": 249,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, scale: 0.6, transition: { duration: reduceMotion ? 0 : 0.1 } }}",
+   "why": "The icon exit fades opacity and scale with a duration but no ease and no spring type."
+  },
+  {
+   "block": "addon-checklist",
+   "line": 228,
+   "kind": "stale-design-wording",
+   "quote": "/** Dotted leader between the item name and the amount on the receipt */",
+   "why": "Uses receipt as a visual metaphor, but the code draws a plain dotted border on a card surface."
+  },
+  {
+   "block": "AnimatedCheckbox",
+   "line": 314,
+   "kind": "tween-without-ease",
+   "quote": "if (!reduce) void animateBox(box.current, { scale: [1, 0.8, 1.08, 1] }, { duration: 0.35 });",
+   "why": "Scale keyframe animation sets duration 0.35 with no ease."
+  },
+  {
+   "block": "announcement-strip",
+   "line": 171,
+   "kind": "tween-without-ease",
+   "quote": "exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { x: dir * -16, opacity: 0, transition: { duration: 0.12 } }}",
+   "why": "The exit move and fade uses a 0.12s duration with no ease and no spring type (the quoted line is 171, not 172)."
+  },
+  {
+   "block": "app-shell (MoreSheet backdrop)",
+   "line": 1451,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.2 }}",
+   "why": "The backdrop opacity fade sets a duration with no ease and no spring type, so the curve is the framer-motion default."
+  },
+  {
+   "block": "avatar-stack",
+   "line": 161,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.15 } }}",
+   "why": "The exit opacity fade is a duration-only tween with no ease and no spring type."
+  },
+  {
+   "block": "back-to-top",
+   "line": 55,
+   "kind": "tween-without-ease",
+   "quote": "exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16, transition: { duration: 0.15 } }}",
+   "why": "Opacity and y exit tween has duration 0.15 with no ease and no spring type."
+  },
+  {
+   "block": "background-effects",
+   "line": 377,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.9 / speed }}",
+   "why": "The opacity fade (initial 0, animate 1, exit 0) on the grid cell gives only a duration, with no ease and no spring type, so the curve is unspecified."
+  },
+  {
+   "block": "book-3d",
+   "line": 162,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Title of this book: spine label, title page, running head on the right page */",
+   "why": "The spine renders SpineArt with seriesTitle (line 621), not title, so calling title the spine label is false."
+  },
+  {
+   "block": "book-3d",
+   "line": 538,
+   "kind": "comment-contradicts-code",
+   "quote": "// when turning back, the right page is already the destination's right page and the sheet swings back from the left.",
+   "why": "Spread is set to the destination, and on a prev turn rightStatic is turn.from (the source page) while leftStatic is spread (the destination's left page), so the comment has left and right reversed."
+  },
+  {
+   "block": "browser-frame",
+   "line": 256,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Outline color for demo states: failed, success, brand */",
+   "why": "BrowserFrameTone is default, danger, success, brand; there is no failed tone, the value is danger."
+  },
+  {
+   "block": "brush-reveal",
+   "line": 20,
+   "kind": "comment-contradicts-code",
+   "quote": "* quarter of the element's size, capped at 320px wide) where brush stamps",
+   "why": "resize() sets k = Math.min(0.2, 224 / w), so the mask is at most a fifth of the element size and capped at 224px wide, not a quarter capped at 320px."
+  },
+  {
+   "block": "button-effects",
+   "line": 442,
+   "kind": "tween-without-ease",
+   "quote": ": { scaleX: [1, 1.14, 0.92, 1.05, 0.98, 1], scaleY: [1, 0.86, 1.08, 0.96, 1.02, 1], transition: { duration: 0.7 } }",
+   "why": "The jelly whileHover keyframe scale transition has duration 0.7 with no ease and no spring type, so the curve is left implicit."
+  },
+  {
+   "block": "card-effects",
+   "line": 487,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ pathOffset: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }, opacity: { duration: 0.12, delay: 0.3 } }}",
+   "why": "The opacity fade sub-transition gives a duration and delay but no ease and no spring type, while pathOffset beside it states an ease."
+  },
+  {
+   "block": "chapter-seekbar",
+   "line": 256,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, scale: reduce ? 1 : 0.96, transition: reduce ? { duration: 0 } : { duration: 0.1 } }}",
+   "why": "Popover exit fades and scales on a duration-only tween with no ease when motion is allowed."
+  },
+  {
+   "block": "chart-effects",
+   "line": 407,
+   "kind": "tween-without-ease",
+   "quote": "variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: d * 0.6, delay: delay + d * 0.5 } } }}",
+   "why": "The area fill fades opacity with a duration and delay but no ease, while sibling transitions in the file set one."
+  },
+  {
+   "block": "checkin-streak",
+   "line": 378,
+   "kind": "comment-contradicts-code",
+   "quote": "{/* Milestone: each cell is one day, the last cell is the bonus */}",
+   "why": "The bar renders exactly `every` day cells, and the bonus is a separate gift icon with a \"+{bonus}\" label after the cells, not the last cell."
+  },
+  {
+   "block": "cjk-heading",
+   "line": 22,
+   "kind": "stale-design-wording",
+   "quote": "/** Keyword marked in a vermilion seal style; one per heading is recommended */",
+   "why": "The highlight class uses bg-foreground and text-background, a neutral inverted chip, with no vermilion or seal look."
+  },
+  {
+   "block": "cjk-heading",
+   "line": 57,
+   "kind": "stale-design-wording",
+   "quote": "// Design language (DESIGN.md): vermilion is used only for the seal keyword",
+   "why": "The seal class that follows renders bg-foreground/text-background, so no vermilion colour is drawn."
+  },
+  {
+   "block": "command-palette",
+   "line": 421,
+   "kind": "tween-without-ease",
+   "quote": "exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.98, transition: { duration: 0.12 } }}",
+   "why": "Exit fade and scale uses a plain duration of 0.12 with no ease and no spring type."
+  },
+  {
+   "block": "command-palette",
+   "line": 422,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0 } : { ...springs.snappy, opacity: { duration: 0.15 } }}",
+   "why": "The opacity sub-transition is a 0.15s duration with no ease, a visible fade whose curve is left to the library default."
+  },
+  {
+   "block": "command-palette",
+   "line": 594,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.15 }}",
+   "why": "Backdrop opacity fade uses a 0.15s duration with no ease and no spring type."
+  },
+  {
+   "block": "confirm-button",
+   "line": 37,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Style swapped in while pending; defaults to destructive */",
+   "why": "armedVariant is applied while armed (variants[armed ? armedVariant : variant]), not while pending."
+  },
+  {
+   "block": "confirm-button",
+   "line": 180,
+   "kind": "comment-contradicts-code",
+   "quote": "width uses a layout tween",
+   "why": "The layout animation uses the snappy spring transition, or duration 0 under reduced motion, not a tween."
+  },
+  {
+   "block": "copy-code-button",
+   "line": 33,
+   "kind": "stale-design-wording",
+   "quote": "/** Stamp text pressed onto the slip after copying */",
+   "why": "Describes text pressed onto a paper slip, but the code renders it as children of a neutral Result tick over a bg-card surface."
+  },
+  {
+   "block": "copy-code-button",
+   "line": 81,
+   "kind": "comment-contradicts-code",
+   "quote": "// The dashed line uses a faint text colour; a border colour would be almost invisible on the surface",
+   "why": "The file draws no dashed line anywhere; edge is a plain foreground/25 colour."
+  },
+  {
+   "block": "copy-code-button",
+   "line": 171,
+   "kind": "stale-design-wording",
+   "quote": "after copying the stamp lands on the code and the code fades into an ink impression",
+   "why": "The code only drops the code to opacity 20 and overlays a neutral Result tick; there is no ink impression."
+  },
+  {
+   "block": "copy-code-button",
+   "line": 185,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.15 } }}",
+   "why": "Opacity fade with a duration and no ease or spring type."
+  },
+  {
+   "block": "CopyFeedback",
+   "line": 511,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.15 }}",
+   "why": "Icon rotate, scale and opacity transition has duration but no ease."
+  },
+  {
+   "block": "CopyFeedback",
+   "line": 528,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0.15 } : pop}",
+   "why": "Reduced-motion branch is an opacity fade with duration and no ease."
+  },
+  {
+   "block": "countdown-banner",
+   "line": 301,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.15 } }}",
+   "why": "Opacity fade exit with duration only, no ease."
+  },
+  {
+   "block": "coupon-wallet",
+   "line": 219,
+   "kind": "comment-contradicts-code",
+   "quote": "{/* The face value sits inside the concave area (concentric radii 12 - 4 = 8). When unavailable only the content is dimmed and the surface stays opaque, so coupons behind do not show through when the fan opens */}",
+   "why": "Says the value sits in a concave area, but the code draws a raised rounded-lg foil plate with convex inset highlights."
+  },
+  {
+   "block": "cursor-effects",
+   "line": 191,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.2 }}",
+   "why": "The ring animates opacity and scale with a duration only, no ease."
+  },
+  {
+   "block": "cursor-effects",
+   "line": 316,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.25 }}",
+   "why": "The blend circle animates opacity and scale with a duration only, no ease."
+  },
+  {
+   "block": "cursor-effects",
+   "line": 441,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.2 }}",
+   "why": "The image-hover card animates opacity and scale on enter and exit with a duration only, no ease."
+  },
+  {
+   "block": "cursor-effects",
+   "line": 451,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.18 }}",
+   "why": "The preview crossfade animates opacity with a duration only, no ease."
+  },
+  {
+   "block": "dialog-sheet",
+   "line": 53,
+   "kind": "comment-contradicts-code",
+   "quote": "(desktop only, once per session by default)",
+   "why": "Without storageKey, which is the default, nothing is persisted to sessionStorage, so it fires once per mount, not once per session."
+  },
+  {
+   "block": "dialog-sheet",
+   "line": 161,
+   "kind": "tween-without-ease",
+   "quote": "closed: { opacity: 0, scale: reduce ? 1 : 0.96, transition: reduce ? t : { duration: 0.15 } },",
+   "why": "Opacity and scale close animation with a duration and no ease or spring type."
+  },
+  {
+   "block": "dialog-sheet",
+   "line": 177,
+   "kind": "tween-without-ease",
+   "quote": "animate={{ opacity: 1, transition: { duration: 0.2 } }}",
+   "why": "Backdrop opacity fade with a duration and no ease."
+  },
+  {
+   "block": "dialog-sheet",
+   "line": 178,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.18 } }}",
+   "why": "Backdrop opacity fade-out with a duration and no ease."
+  },
+  {
+   "block": "expanding-search",
+   "line": 351,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }}",
+   "why": "Opacity fade exit uses a duration-only tween with no ease."
+  },
+  {
+   "block": "expanding-search",
+   "line": 352,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.12 }}",
+   "why": "Opacity fade enter uses a duration-only tween with no ease."
+  },
+  {
+   "block": "favorite-button",
+   "line": 45,
+   "kind": "comment-contradicts-code",
+   "quote": "// Design language (DESIGN.md): an outline in the text color, filled with the brand accent once favorited",
+   "why": "The favorited heart uses the semantic --sunui-like red, which the comment on line 47 says does not follow the brand spot."
+  },
+  {
+   "block": "favorite-button",
+   "line": 120,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.12 } }}",
+   "why": "Opacity fade exit has a duration but no ease and no spring type."
+  },
+  {
+   "block": "floating-field",
+   "line": 534,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.14 }}",
+   "why": "The message fades opacity and moves y by 3px with a duration only, no ease and no spring."
+  },
+  {
+   "block": "floating-social",
+   "line": 155,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0 } : { duration: 0.1 }}",
+   "why": "Opacity fade of the middle line has a duration but no ease and no spring type."
+  },
+  {
+   "block": "HoldToConfirm",
+   "line": 802,
+   "kind": "tween-without-ease",
+   "quote": "animate(progress, 0, { duration: 0.3 });",
+   "why": "Progress reset tween has duration but no ease, unlike the sibling reset at line 825 which uses easeOut."
+  },
+  {
+   "block": "hotspots",
+   "line": 39,
+   "kind": "comment-contradicts-code",
+   "quote": "/** number: shows the number; dot: just a dot */",
+   "why": "With marker 'dot' the button renders a plus icon (line 104-106), not a dot."
+  },
+  {
+   "block": "hotspots",
+   "line": 136,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.12 } }}",
+   "why": "Opacity fade exit has a duration but no ease and no spring type."
+  },
+  {
+   "block": "hover-motion",
+   "line": 78,
+   "kind": "stale-design-wording",
+   "quote": "/** Underline colour: ink is the text colour, accent is vermilion */",
+   "why": "The doc claims the accent tone is vermilion, but the code uses bg-foreground for both tones, so no vermilion is rendered."
+  },
+  {
+   "block": "image-effects",
+   "line": 267,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0 } : { duration: 0.2 }}",
+   "why": "The lens animates opacity and scale with a duration only, no ease or spring."
+  },
+  {
+   "block": "image-effects",
+   "line": 312,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0 } : { duration: 0.25 }}",
+   "why": "The indicator dots animate width and opacity with a duration only, no ease."
+  },
+  {
+   "block": "image-effects",
+   "line": 586,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.25 }}",
+   "why": "The lightbox backdrop fades opacity with a duration only, no ease."
+  },
+  {
+   "block": "KaleidoscopeFx",
+   "line": 802,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { duration: d / 3, repeat: Infinity, ease: \"easeInOut\" } : { duration: 0.4 }}",
+   "why": "The rest-state transition { duration: 0.4 } has no ease and moves y back to rest."
+  },
+  {
+   "block": "lightbox",
+   "line": 130,
+   "kind": "tween-without-ease",
+   "quote": "animate={{ opacity: 1, transition: { duration: 0.2 } }}",
+   "why": "The overlay opacity fade is a duration-only tween with no ease."
+  },
+  {
+   "block": "lightbox",
+   "line": 131,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: 0.18 } }}",
+   "why": "The overlay opacity fade-out is a duration-only tween with no ease."
+  },
+  {
+   "block": "LikeBurstProps",
+   "line": 89,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Particle colours, default follows --sunui-spot (falls back to --primary) */",
+   "why": "The default is likeColors, built from --sunui-like with a #dc3d43 fallback, not --sunui-spot or --primary."
+  },
+  {
+   "block": "link-preview-card",
+   "line": 137,
+   "kind": "tween-without-ease",
+   "quote": "exit: { opacity: 0, transition: { duration: 0.1 } },",
+   "why": "Opacity fade with a duration-only tween and no ease or spring."
+  },
+  {
+   "block": "link-preview-card",
+   "line": 168,
+   "kind": "tween-without-ease",
+   "quote": "<motion.div key=\"ready\" exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.1 } }}>",
+   "why": "Opacity exit uses a duration-only tween with no ease."
+  },
+  {
+   "block": "link-preview-card",
+   "line": 229,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.2 }}",
+   "why": "Thumbnail opacity fade is a duration-only tween with no ease."
+  },
+  {
+   "block": "loading-button",
+   "line": 102,
+   "kind": "tween-without-ease",
+   "quote": "const fade = reduce ? { duration: 0 } : { duration: 0.14 };",
+   "why": "Used as transition for the opacity and y content swap (line 131); duration without ease or spring."
+  },
+  {
+   "block": "loading-effects",
+   "line": 207,
+   "kind": "tween-without-ease",
+   "quote": "transition={active ? loop({ duration: 0.6, delay: i * 0.12, repeatDelay: 0.3 }) : { duration: 0.2 }}",
+   "why": "The inactive branch is a 0.2s y tween with no ease or spring."
+  },
+  {
+   "block": "loading-effects",
+   "line": 232,
+   "kind": "tween-without-ease",
+   "quote": "transition={active ? loop({ duration: 1.1 + i * 0.08, ease: \"easeInOut\" }) : { duration: 0.2 }}",
+   "why": "The inactive branch returns scaleY to rest with a 0.2s tween and no ease."
+  },
+  {
+   "block": "loading-effects",
+   "line": 294,
+   "kind": "tween-without-ease",
+   "quote": "transition={done ? t({ ...pop, delay: 0.18 }) : t({ duration: 0.15 })}",
+   "why": "The disc opacity and scale reset is a 0.15s tween with no ease."
+  },
+  {
+   "block": "loading-effects",
+   "line": 301,
+   "kind": "tween-without-ease",
+   "quote": "transition={done ? t({ duration: 0.2, ease: \"easeOut\", delay: 0.28 }) : t({ duration: 0.1 })}",
+   "why": "The check path reset uses a 0.1s tween with no ease."
+  },
+  {
+   "block": "loading-effects",
+   "line": 529,
+   "kind": "tween-without-ease",
+   "quote": "run(animate(opacity, 0, { duration: 0.35 }), () => scale.jump(0)),",
+   "why": "The opacity fade-out has a duration but no ease."
+  },
+  {
+   "block": "loading-effects",
+   "line": 629,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.3, delay: 0.1 }}",
+   "why": "The check stroke pathLength draw has a duration but no ease."
+  },
+  {
+   "block": "loading-effects",
+   "line": 855,
+   "kind": "comment-contradicts-code",
+   "quote": "* the check and cross run it left to right so the few dots they keep still carry the whole gradient.",
+   "why": "In the error state grad is undefined so no gradient is applied to the cross; only the check (success) runs gradientAt left to right."
+  },
+  {
+   "block": "low-stock-indicator",
+   "line": 18,
+   "kind": "stale-design-wording",
+   "quote": "/** Enters the critical state (vermilion) when stock is at or below this value */",
+   "why": "The critical tone is the theme accent (spot, var(--sunui-spot, var(--primary))), not vermilion."
+  },
+  {
+   "block": "low-stock-indicator",
+   "line": 213,
+   "kind": "stale-design-wording",
+   "quote": "// One cell per unit, like the stubs left on a torn ticket",
+   "why": "Torn-ticket metaphor, but the code draws plain bordered rounded cells with no tear edges."
+  },
+  {
+   "block": "module header comment (TinyChart engine and layout doc)",
+   "line": 14,
+   "kind": "comment-contradicts-code",
+   "quote": "Three layouts share one machine: flow (steps and branches), timeline (to-scale time axis), cycle (loops and exits). */",
+   "why": "TinyChartLayout is \"flow\" | \"timeline\" | \"cycle\" | \"isometric\", so there are four layouts, not three."
+  },
+  {
+   "block": "morph-menu",
+   "line": 214,
+   "kind": "tween-without-ease",
+   "quote": "tween(\"ghost\", 0, { duration: 0.1 }),",
+   "why": "Opacity fade with duration only, no ease."
+  },
+  {
+   "block": "morph-menu",
+   "line": 215,
+   "kind": "tween-without-ease",
+   "quote": "tween(\"content\", 1, { duration: 0.15, delay: 0.06 }),",
+   "why": "Opacity fade with duration only, no ease."
+  },
+  {
+   "block": "morph-menu",
+   "line": 226,
+   "kind": "tween-without-ease",
+   "quote": "running.current = [tween(\"content\", 0, { duration: 0.08 }), tween(\"ghost\", 1, { duration: 0.12, delay: 0.1 }), shrink];",
+   "why": "Collapse opacity fades use duration-only tweens with no ease."
+  },
+  {
+   "block": "morph-menu",
+   "line": 290,
+   "kind": "tween-without-ease",
+   "quote": "opacity: { duration: 0.12, delay: i * 0.03 } };",
+   "why": "Opacity override is a duration-only tween with no ease."
+  },
+  {
+   "block": "morph-menu",
+   "line": 291,
+   "kind": "tween-without-ease",
+   "quote": "opacity: { duration: 0.1, delay: (n - 1 - i) * 0.02 } };",
+   "why": "Opacity override is a duration-only tween with no ease."
+  },
+  {
+   "block": "MotionPrincipleProps (interface)",
+   "line": 186,
+   "kind": "comment-contradicts-code",
+   "quote": "/** One-shot actions: when to play. Looping principles: run only on hover / click / inView */",
+   "why": "The default trigger is \"mount\" and useTrigger sets running true for mount and loop, so looping principles also run on mount or loop, not only on hover, click or inView."
+  },
+  {
+   "block": "NotificationBadge",
+   "line": 594,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.5 }}",
+   "why": "Scale and y keyframe bump has duration but no ease."
+  },
+  {
+   "block": "notify-badge",
+   "line": 22,
+   "kind": "stale-design-wording",
+   "quote": "/** accent: vermilion; ink: the text colour; primary: the theme's primary colour */",
+   "why": "The accent tone renders the theme spot colour (var(--sunui-spot, var(--primary))), not vermilion."
+  },
+  {
+   "block": "orbit-gallery",
+   "line": 305,
+   "kind": "comment-contradicts-code",
+   "quote": "{/* Contact shadow directly beneath the sphere: with light from straight above, the sphere has weight. Only one layer of black, within 10% */}",
+   "why": "The light variant uses rgb(0_0_0/0.10) but the dark variant class uses rgb(0_0_0/0.35), so the shadow is not within 10% black in dark mode."
+  },
+  {
+   "block": "order-history",
+   "line": 135,
+   "kind": "comment-contradicts-code",
+   "quote": "/** The accent colour is reserved for \"Awaiting payment\", the one state that needs buyer action; cancelled uses muted text */",
+   "why": "The pending status is labelled \"Unpaid\" and gets className text-foreground (line 197), not an accent colour."
+  },
+  {
+   "block": "otp-input",
+   "line": 132,
+   "kind": "stale-design-wording",
+   "quote": "// On error the whole row shakes once, like a sheet of paper pushed back; no shake with reduced motion",
+   "why": "Paper metaphor; the code only runs a shake keyframe translation on the row."
+  },
+  {
+   "block": "otp-input",
+   "line": 248,
+   "kind": "stale-design-wording",
+   "quote": "{/* Thin line caret: the fill-in position on a printed form */}",
+   "why": "Printed-form metaphor; the code draws a neutral bg-current bar."
+  },
+  {
+   "block": "person-chip",
+   "line": 259,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, x: -12, transition: reduce ? instant : { duration: 0.12 } }}",
+   "why": "The exit transition fades opacity and slides x with a duration but no ease and no spring, so the curve choice is visible."
+  },
+  {
+   "block": "phone-frame",
+   "line": 79,
+   "kind": "comment-contradicts-code",
+   "quote": "Overall phone height. Defaults to a real phone's 9:19.5 ratio; overflowing content scrolls inside the screen",
+   "why": "Code defaults to aspectRatio \"71.9 / 150\" (line 195), not 9:19.5."
+  },
+  {
+   "block": "PingPong",
+   "line": 710,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { duration: d, repeat: Infinity, repeatType: \"reverse\", ease: toEase(ease) } : { duration: 0.4 }}",
+   "why": "The rest-state transition { duration: 0.4 } has no ease and moves x back to the start."
+  },
+  {
+   "block": "product-media",
+   "line": 122,
+   "kind": "tween-without-ease",
+   "quote": "const fade = reduce ? { duration: 0 } : { duration: 0.2 };",
+   "why": "This fade object is used for the opacity transition (line 151) and gives a duration with no ease and no spring type."
+  },
+  {
+   "block": "Pulse",
+   "line": 688,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { ...loop, delay: lag * d, repeatDelay: 0 } : { duration: 0.2 }}",
+   "why": "The rest-state transition { duration: 0.2 } has no ease and fades opacity and scale of the rings."
+  },
+  {
+   "block": "Pulse",
+   "line": 694,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { ...loop, times: [0, 0.1, 0.22, 0.32, 0.46, 1] } : { duration: 0.2 }}",
+   "why": "The rest-state transition { duration: 0.2 } has no ease and scales the child back to 1."
+  },
+  {
+   "block": "quantity-stepper",
+   "line": 58,
+   "kind": "stale-design-wording",
+   "quote": "// Design language (DESIGN.md): receipt paper, dashed borders, text-colored digits",
+   "why": "Surface is bg-card and the field border is a solid border-x, not receipt paper with dashed borders."
+  },
+  {
+   "block": "quantity-stepper",
+   "line": 220,
+   "kind": "stale-design-wording",
+   "quote": "{/* Number field: dashed lines on both sides, like a quantity cell on a receipt */}",
+   "why": "Receipt metaphor, and the code uses a solid border-x (colour border-foreground/20), not dashed lines."
+  },
+  {
+   "block": "redeem-key-input",
+   "line": 437,
+   "kind": "comment-contradicts-code",
+   "quote": "* Matches the error code first, then the three most common raw messages, and falls back to the raw text only if none match.",
+   "why": "mapLicenseError returns null when nothing matches; the raw-text fallback happens in the caller handleActivate."
+  },
+  {
+   "block": "redeem-key-input",
+   "line": 976,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: reduce ? instant : { duration: 0.1 } }}",
+   "why": "The exit opacity fade is a 0.1s tween with no ease, while the enter sets one."
+  },
+  {
+   "block": "redeem-key-input",
+   "line": 1009,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? instant : { opacity: { duration: 0.12 }, y: springs.snappy }}",
+   "why": "The opacity key is a 0.12s tween with no ease."
+  },
+  {
+   "block": "RepeaterFx",
+   "line": 771,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { duration: d, repeat: Infinity, ease: \"easeInOut\", delay: (i * d) / n } : { duration: 0.3 }}",
+   "why": "The rest-state transition { duration: 0.3 } has no ease and animates scale and rotate back to rest."
+  },
+  {
+   "block": "reservation-timer",
+   "line": 24,
+   "kind": "tween-without-ease",
+   "quote": "exit: (d: number) => ({ y: d >= 0 ? \"-60%\" : \"60%\", opacity: 0, transition: { duration: 0.12 } }),",
+   "why": "Digit roll exit moves and fades with a duration-only tween and no ease."
+  },
+  {
+   "block": "reservation-timer",
+   "line": 72,
+   "kind": "stale-design-wording",
+   "quote": "/** When the hold started. Only with this (or holdMs) are the ink dots shown that represent the whole hold */",
+   "why": "The dots are drawn with bg-foreground/15 and bg-foreground theme colours, not ink, so 'ink dots' is leftover paper-era wording."
+  },
+  {
+   "block": "reservation-timer",
+   "line": 170,
+   "kind": "stale-design-wording",
+   "quote": "/** A calm hold ticket: first says the time it is held until, precision increases as time runs down, and the ink dots go out one by one.",
+   "why": "The countdown dots are theme-coloured discs that scale and fade, so 'ink dots' misdescribes the rendered look."
+  },
+  {
+   "block": "reservation-timer",
+   "line": 235,
+   "kind": "tween-without-ease",
+   "quote": "const fade = (ms: number) => (reduce ? instant : { duration: ms / 1000 });",
+   "why": "Shared opacity-fade helper returns a duration-only tween with no ease, used by the exits at lines 275, 281, 306 and 317."
+  },
+  {
+   "block": "reservation-timer",
+   "line": 305,
+   "kind": "tween-without-ease",
+   "quote": "animate={{ opacity: 1, transition: reduce ? instant : { duration: 0.18, delay: 0.06 } }}",
+   "why": "Opacity fade uses a duration and delay tween with no ease."
+  },
+  {
+   "block": "scene-transitions",
+   "line": 550,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Direction for push, wipe, tiles, blinds and whip (which way the new scene moves) */",
+   "why": "The file has no tiles transition (only wipe, push, whip-pan, blinds and others), so the doc names a transition that does not exist."
+  },
+  {
+   "block": "scene-transitions",
+   "line": 554,
+   "kind": "stale-design-wording",
+   "quote": "/** Band color for bands, liquid color for liquid, paper-back color for page-curl */",
+   "why": "CurlFlap draws a caller-supplied theme colour (colors[0]) with a gradient, not a paper surface."
+  },
+  {
+   "block": "scroll-effects",
+   "line": 73,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Maximum offset of the near layer (px); the far and middle layers scale down proportionally */",
+   "why": "The near layer moves only distance * 0.5 (line 94), the far layer moves distance * 0.6 (line 92, the largest), and the middle layer moves distance * 0.25, so distance is not the near layer's maximum and the other layers do not scale down from it."
+  },
+  {
+   "block": "scroll-reveal-text",
+   "line": 20,
+   "kind": "stale-design-wording",
+   "quote": "/** Words to emphasize (may be multi-character), printed in vermilion once read */",
+   "why": "The default accentClassName is text-foreground, so no vermilion is drawn."
+  },
+  {
+   "block": "scroll-story",
+   "line": 120,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Scene frame: white card, large radius, soft long shadow. */",
+   "why": "StoryPanel uses the bg-card theme token (not white) and shadow-sm (a short shadow, not a soft long one)."
+  },
+  {
+   "block": "scroll-timeline",
+   "line": 124,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.2 }}",
+   "why": "Opacity animation of the item body has a duration but no ease and no spring type."
+  },
+  {
+   "block": "SendPlaneButton",
+   "line": 993,
+   "kind": "tween-without-ease",
+   "quote": "<motion.path d=\"M3 8.5l3 3 7-7\" initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3 }} />",
+   "why": "Path draw transition has duration but no ease."
+  },
+  {
+   "block": "SendPlaneButton",
+   "line": 1025,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.18 }}",
+   "why": "Label swap opacity and y transition has duration but no ease."
+  },
+  {
+   "block": "sliding-tabs",
+   "line": 201,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.15 }}",
+   "why": "Chip background opacity fade is a duration-only tween with no ease."
+  },
+  {
+   "block": "social-links",
+   "line": 175,
+   "kind": "tween-without-ease",
+   "quote": "transition={reduce ? { duration: 0 } : { duration: expanded ? 0.18 : 0.1, delay: expanded ? 0.06 : 0 }}",
+   "why": "The label opacity fade is a tween with a duration and delay but no ease and no spring type."
+  },
+  {
+   "block": "stamp",
+   "line": 87,
+   "kind": "tween-without-ease",
+   "quote": "exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12 } }}",
+   "why": "Opacity fade exit has a duration but no ease and no spring type."
+  },
+  {
+   "block": "star-rating",
+   "line": 106,
+   "kind": "comment-contradicts-code",
+   "quote": "// Design language (DESIGN.md): thin-line stars, no gold",
+   "why": "The code below defines an amber filled-star colour (#e8a020 / #f5b84a) for ratings, so the comment tells a porter to avoid gold when the code uses it."
+  },
+  {
+   "block": "status-dot",
+   "line": 42,
+   "kind": "tween-without-ease",
+   "quote": "exit: (d: number) => ({ y: d >= 0 ? \"-60%\" : \"60%\", opacity: 0, transition: { duration: 0.12 } }),",
+   "why": "The roll exit moves y and fades opacity with a duration and no ease or spring type."
+  },
+  {
+   "block": "store-header",
+   "line": 187,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: reduce ? 0 : 0.2 }}",
+   "why": "Scrim opacity fade with a duration and no ease."
+  },
+  {
+   "block": "story-player",
+   "line": 300,
+   "kind": "tween-without-ease",
+   "quote": ": ({ delay: 0.5, duration: 0.24 } as const);",
+   "why": "The pulse transition for the hint arrows (opacity and x) sets a duration but no ease and no spring type."
+  },
+  {
+   "block": "story-player",
+   "line": 421,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ delay: reduce ? 0 : 0.7, duration: reduce ? 0 : 0.4 }}",
+   "why": "The island entrance animates opacity, y and scale with a duration but no ease and no spring type."
+  },
+  {
+   "block": "story-player",
+   "line": 433,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ delay: reduce ? 0 : 0.85 + i * 0.05, duration: reduce ? 0 : 0.3 }}",
+   "why": "The action buttons animate opacity and scale with a duration but no ease and no spring type."
+  },
+  {
+   "block": "SuccessCheck",
+   "line": 273,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ delay: delay + 0.6, duration: 0.45, times: [0, 0.01, 0.5, 1] }}",
+   "why": "Scale keyframe pulse sets duration and times but no ease."
+  },
+  {
+   "block": "SuccessCheck",
+   "line": 282,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ delay: delay + 0.9, duration: 0.35 }}",
+   "why": "Opacity and y fade-in uses duration with no ease."
+  },
+  {
+   "block": "testimonial-marquee",
+   "line": 177,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Low-chroma warm grey background hashed from the name; avatars do not use the accent colour */",
+   "why": "avatarTone returns hsl(${h % 360} 14% 24%), so the hue spans the full 0-359 range and is not a fixed warm grey."
+  },
+  {
+   "block": "text-effects",
+   "line": 89,
+   "kind": "comment-contradicts-code",
+   "quote": "/** Entrance effects: when to play; looping effects: run only on hover / click */",
+   "why": "The default trigger is \"mount\" and the running flag is true for looping effects under mount, loop and inView, so they do not run only on hover or click."
+  },
+  {
+   "block": "text-effects",
+   "line": 254,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { duration: d, repeat: Infinity, ease: \"easeInOut\", delay: i * stagger } : { duration: 0.3 }}",
+   "why": "The paused branch returns y to rest over 0.3s with a duration and no ease."
+  },
+  {
+   "block": "text-effects",
+   "line": 422,
+   "kind": "tween-without-ease",
+   "quote": "transition={{ duration: 0.05 }}",
+   "why": "The rotateX flip from -90 to 0 gives a duration but no ease or spring."
+  },
+  {
+   "block": "text-effects",
+   "line": 531,
+   "kind": "comment-contradicts-code",
+   "quote": "// Red and blue are the conventional colours for an RGB split, and can be overridden via colors[3] and colors[4]",
+   "why": "The default for colors[4] is #22d3ee, which is cyan, not blue."
+  },
+  {
+   "block": "text-effects",
+   "line": 690,
+   "kind": "tween-without-ease",
+   "quote": ": { duration: 0.3 }",
+   "why": "The paused branch of ExplodeOut returns x, y, rotate and opacity to rest with a duration and no ease."
+  },
+  {
+   "block": "theme-picker",
+   "line": 184,
+   "kind": "tween-without-ease",
+   "quote": "exit={reduce ? { opacity: 0 } : { scale: 0.4, opacity: 0, transition: { duration: 0.1 } }}",
+   "why": "The exit scale and opacity tween has a duration but no ease and no spring type."
+  },
+  {
+   "block": "toast-stack",
+   "line": 317,
+   "kind": "tween-without-ease",
+   "quote": "exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 12 * -dir, transition: { duration: 0.16 } }}",
+   "why": "Exit move and fade uses a duration-only transition with no ease."
+  },
+  {
+   "block": "type-motion",
+   "line": 409,
+   "kind": "comment-contradicts-code",
+   "quote": "* At the end the whole picture appears: once per cycle when looping, for other triggers it plays once and stays on the full image */",
+   "why": "For hover and click, revealAnim uses t.active (line 495), so opacity returns to the faded state when the pointer leaves or the toggle is off, rather than staying on the full image."
+  },
+  {
+   "block": "variant-picker",
+   "line": 147,
+   "kind": "comment-contradicts-code",
+   "quote": "// Previewing stock changes only opacity and strikethrough color, never the layout",
+   "why": "The off state also applies -translate-y-1.5 and the fade transition animates translate, so the change is not only opacity and strikethrough colour."
+  },
+  {
+   "block": "Wiggle",
+   "line": 668,
+   "kind": "tween-without-ease",
+   "quote": "transition={running ? { duration: d, repeat: Infinity, ease: \"easeInOut\" } : { duration: 0.3 }}",
+   "why": "The rest-state transition { duration: 0.3 } has no ease and animates rotate and x back to 0."
+  }
+ ]
+}

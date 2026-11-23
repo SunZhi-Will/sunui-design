@@ -1,0 +1,120 @@
+{
+ "block": "notify-badge",
+ "summary": "A count or dot badge pinned to the corner of an icon that pops in with a spring, does a stamp-like press each time the count goes up, caps at \"max+\" and announces the count politely to screen readers.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens with a store header (title \"Field Goods\") holding three icon buttons in this order: Messages (chat icon), Notifications (bell), Cart (bag). Below is a decorative muted square, an \"Add to cart\" button and a \"Mark all read\" button.",
+   "trigger": "initial render",
+   "expect": "Messages shows a plain dot with no number; Notifications shows \"2\"; Cart shows \"1\". Badges are already at full size on first render: no scale-in animation and no bump plays on mount.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "badge-geometry",
+   "behaviour": "Number badges are pills pinned to the top-right corner of the icon, pushed outward by one third of their own size, with a ring in the background colour separating them from the icon.",
+   "trigger": "initial render",
+   "expect": "Number badge: height 1.15rem, min-width 1.15rem, horizontal padding 0.25rem (4px), fully rounded, font size 0.68rem, semibold, tabular figures, line height 1, 2px ring in the background colour. Offset: translate +33.3% x and -33.3% y from the top-right corner (top-left placement mirrors x; bottom-right uses +33.3% y). Dot badge: 0.625rem (10px) circle with the same ring and no text.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "tones",
+   "behaviour": "Each demo badge uses a different tone.",
+   "trigger": "initial render",
+   "expect": "Messages dot uses tone ink: filled with the foreground colour. Notifications uses tone accent (default): filled with --sunui-spot, falling back to the theme primary, text in --sunui-spot-foreground falling back to primary-foreground. Cart uses tone primary: primary fill, primary-foreground text.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "auto-increment",
+   "behaviour": "The Notifications count rises by itself to simulate arriving notifications and stops at 5.",
+   "trigger": "wait after initial render",
+   "expect": "Every 2500 ms the bell count goes up by 1: 2 to 3 at 2.5 s, 4 at 5 s, 5 at 7.5 s, then it stays at 5 and no further timer runs.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "stamp-bump",
+   "behaviour": "Each time a count goes up, the badge is pressed like a stamp: it jumps larger and springs back.",
+   "trigger": "bell count increases on its own timer, or pressing \"Add to cart\"",
+   "expect": "The badge starts at scale 1.35 and springs to 1 with a spring of stiffness 620, damping 20, mass 0.8 (slight overshoot, settles quickly). Every increase replays it, including rapid repeated presses (each press restarts the bump from 1.35).",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "clear-hides",
+   "behaviour": "Clearing notifications hides the badge with an exit animation, because a count of 0 is hidden when showZero is false. Clearing never plays the 1.35 bump.",
+   "trigger": "press \"Mark all read\" or the Notifications bell button",
+   "expect": "Bell count becomes 0 and the badge springs from scale 1 to 0 while fading to opacity 0 (spring 620 / 20 / mass 0.8), then is removed. No \"0\" is ever shown and no grow-then-settle bump plays before it shrinks.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "refill-after-clear",
+   "behaviour": "After clearing, the simulated notifications start again from 0 and climb back to 5.",
+   "trigger": "press \"Mark all read\" or the bell, then wait",
+   "expect": "2500 ms later the count becomes 1 and the badge pops in: outer scale 0 to 1 and inner bump 1.35 to 1, both on the 620 / 20 / 0.8 spring. It continues 2, 3, 4, 5 at 2500 ms intervals and stops at 5. Pressing clear mid-way resets to 0 and restarts the 2500 ms wait.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-clear-at-zero",
+   "behaviour": "Clearing when already at 0 does nothing visible.",
+   "trigger": "press \"Mark all read\" twice in a row quickly (within 2500 ms)",
+   "expect": "Second press causes no badge, no animation and no new announcement; the 2500 ms refill timer counted from the first press still fires once, giving 1.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "max-overflow",
+   "behaviour": "Cart has max 9; counts above max show \"max+\".",
+   "trigger": "press \"Add to cart\" repeatedly from the initial count of 1",
+   "expect": "Badge reads 2, 3 ... 9; on the 9th press (count 10) it reads \"9+\" and keeps reading \"9+\" for 11, 12 and beyond, still bumping on each press. Default max is 99 (\"99+\" above 99). The bell never exceeds 5.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "live-announcements",
+   "behaviour": "Each badge has a visually hidden polite live region holding the full label; the visible badge itself is hidden from assistive tech and ignores pointer events.",
+   "trigger": "initial render and every count change",
+   "expect": "Live region (aria-live polite) text: Messages \"1 unread messages\", Notifications \"2 new notifications\" then \"3 new notifications\" etc., Cart \"1 items in cart\" then \"2 items in cart\" etc. (the label receives the raw count, so cart at 10 reads \"10 items in cart\" while the badge shows \"9+\"). At count 0 the region is empty. Default label without a label prop is \"<n> new\". The visible badge is aria-hidden and not clickable.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "The three icon buttons are named by their aria-label, not by badge contents; icons are decorative.",
+   "trigger": "inspect accessibility tree",
+   "expect": "Buttons named \"Messages\", \"Notifications\", \"Cart\"; then \"Add to cart\" and \"Mark all read\". SVG icons and the muted square are aria-hidden.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the five real buttons in document order and never on badges, icons or the decorative square.",
+   "trigger": "press Tab repeatedly from before the demo",
+   "expect": "Order: Messages, Notifications, Cart, Add to cart, Mark all read. Enter or Space on Notifications or Mark all read clears the bell count to 0; on Add to cart adds 1 to the cart; Messages and Cart do nothing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "button-feedback",
+   "behaviour": "Header icon buttons highlight on hover; the two action buttons press in slightly.",
+   "trigger": "hover an icon button; press and hold \"Add to cart\" or \"Mark all read\"",
+   "expect": "Icon buttons are 2.5rem (40px) squares, rounded, muted background on hover. Action buttons are 2.5rem tall and scale to 0.97 while pressed (only when motion is allowed).",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion on, badges appear, change and disappear without scaling.",
+   "trigger": "enable prefers-reduced-motion, then add to cart, clear notifications, and wait for the refill",
+   "expect": "Entering badge starts at scale 1 (no pop); exit is instant (duration 0) with no shrink; no 1.35 bump on increases; action buttons do not scale to 0.97. Counts, \"9+\" and live announcements are unchanged.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

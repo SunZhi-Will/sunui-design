@@ -1,0 +1,136 @@
+{
+ "block": "confirm-button",
+ "summary": "A two-press confirm button: the first press arms it (label swaps to the confirm label, the steel outline key turns destructive, a hint line appears), a second press within 2500ms runs the async action with a spinner, and the result shows in a polite live status line under the button.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo first shows a card row with the email, a meta line, and one small outline-style confirm button at the top right. The status line under the button is empty but keeps its height.",
+   "trigger": "initial render",
+   "expect": "Left side: \"test+qa@example.com\" (text-sm, medium weight, not struck through) and below it \"Presale signup · yesterday · Looks like test data\" (text-xs, muted). Right side: an enabled button reading \"Remove\" at sm size (28px tall, 10px horizontal padding, 0.8rem text), styled as the outline variant: a light steel keycap gradient with a 1px ring and a darker bottom edge, foreground-coloured text. About 4px below it, right-aligned, an empty status line at least 16px tall. No spinner, no hint text, no data-active attribute on the button.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "arm-on-first-press",
+   "behaviour": "The first press does not run the action. It arms the button: the label swaps to the confirm label, the style swaps to destructive, and a hint appears with the confirm label in lowercase.",
+   "trigger": "Click or tap \"Remove\" once",
+   "expect": "The button text becomes \"Remove signup\" and the button gets data-active. It turns destructive: destructive-coloured text on a destructive/10 tinted background, without the steel keycap gradient. The status line reads \"Press again to remove signup\" in the muted colour. The email row is unchanged and the action has not run.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "arm-timeout",
+   "behaviour": "The armed state ends by itself if no second press comes within 2500ms. The hint is cleared earlier, on its own 1800ms timer.",
+   "trigger": "Press once, then wait without pressing again",
+   "expect": "The hint text disappears about 1800ms after the press while the button still reads \"Remove signup\". About 2500ms after the press the button goes back to \"Remove\" with the outline style and loses data-active. The action never runs.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "rearm-after-lapse",
+   "behaviour": "A press after the armed state has lapsed starts over: it arms again with fresh timers and does not run the action.",
+   "trigger": "Press once, wait more than 2500ms, then press again",
+   "expect": "The second press shows \"Remove signup\" and \"Press again to remove signup\" again. The new hint clears about 1800ms and the arm lapses about 2500ms after this second press, not the first. The email is not struck through.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "confirm-runs-action",
+   "behaviour": "A second press within 2500ms disarms the button straight away and runs the action. While the action is in flight the button is disabled, busy, and shows a spinner in front of the label. The hint from the first press is not cleared by the confirm.",
+   "trigger": "Press \"Remove\", then press \"Remove signup\" within 2500ms",
+   "expect": "The label goes back to \"Remove\" with the outline style right away. A spinning arc icon (14px at sm size, currentColor) appears to the left of the label. The button is disabled (50% opacity, ignores presses) and has aria-busy=\"true\". The demo action takes about 500ms. If the confirm came less than 1800ms after the first press, \"Press again to remove signup\" is still shown in the status line during pending until its own 1800ms timer ends or the result replaces it; if it came later, the status line is empty during pending.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "success-result",
+   "behaviour": "On success the message the action returned is flashed in the success tone, replacing any leftover hint, and the demo marks the row as removed. The button then stays disabled for good.",
+   "trigger": "The 500ms demo action resolves after confirming",
+   "expect": "The spinner is removed and aria-busy is gone. The status line reads \"Signup removed\" in the success green (var(--sunui-success), fallback #1f9d55 in light, #4cd68a in dark), not muted. It clears about 1800ms after the result appears, counted from the result and not from the first press. The email \"test+qa@example.com\" becomes muted and struck through. The button reads \"Remove\", stays at 50% opacity and disabled, and further presses do nothing.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-press-while-pending",
+   "behaviour": "Presses made while the action is pending are ignored. They neither re-arm the button, show a new hint, nor run the action a second time.",
+   "trigger": "Click the button several times during the 500ms pending window",
+   "expect": "The label never changes to \"Remove signup\", no new hint is flashed (only the leftover first-press hint may still be visible), and the action runs only once: a single \"Signup removed\" result.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "escape-cancels",
+   "behaviour": "Pressing Escape while the button is armed and focused cancels the confirm. It disarms the button and clears the hint at once. Escape does nothing when the button is not armed.",
+   "trigger": "Focus the button, press Enter to arm it, then press Escape",
+   "expect": "Straight away the label goes back to \"Remove\" with the outline style, data-active is removed, and the status line is emptied without waiting for 1800ms. Focus stays on the button. Pressing Enter once more only arms it again and does not run the action. Pressing Escape on an unarmed button changes nothing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-activation",
+   "behaviour": "The button is a native button that both Enter and Space activate, so a keyboard user can do the whole two-press flow.",
+   "trigger": "Focus the button with Tab, press Space (or Enter), then press it again within 2500ms",
+   "expect": "The first key press arms the button (\"Remove signup\" plus the hint). The second runs the action (spinner, then \"Signup removed\"). A visible 3px focus ring shows while the button has keyboard focus; while armed the ring uses the destructive tint.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "focus-after-confirm",
+   "behaviour": "The block does not move focus itself. Because the button becomes disabled on confirm and stays disabled after success in the demo, it stops responding to keys and is no longer a focus target.",
+   "trigger": "Complete the two-press flow with the keyboard, then press Enter, Space and Tab",
+   "expect": "From the confirm onward Enter and Space on the button do nothing. After success the button is not the active element any more, and pressing Tab moves to the next focusable element after the demo rather than back onto the button.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "The block has exactly one Tab stop: the button. The status line, the spinner and the card text are not focusable.",
+   "trigger": "Press Tab through the demo before and after removing the signup",
+   "expect": "Before removal Tab stops once, on the button, and the next Tab leaves the demo. After removal (button disabled) Tab skips the demo altogether.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "The button's accessible name is its visible label and follows the state. The spinner is hidden from assistive tech.",
+   "trigger": "Inspect the accessibility tree at rest, while armed, and while pending",
+   "expect": "At rest: role button, name \"Remove\". Armed: name \"Remove signup\". Pending: name \"Remove\", disabled, busy=true; the spinner svg has aria-hidden=\"true\" and adds nothing to the name.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "live-announcements",
+   "behaviour": "The hint and the result live in a status region that is always present and polite, so screen readers announce each message.",
+   "trigger": "Arm the button, then confirm",
+   "expect": "An element with role=\"status\" and aria-live=\"polite\" sits under the button from the first render. It contains \"Press again to remove signup\" on arming and then \"Signup removed\" on success. The text is right-aligned, text-xs with a 16px line height, and wraps at a maximum width of 256px.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "swap-motion",
+   "behaviour": "The label, spinner and notice animate in short steps instead of cutting, and the button width changes smoothly. The label is clipped to the button while it moves.",
+   "trigger": "Arm the button, let it disarm, then confirm; record frames or step through animations in devtools",
+   "expect": "On arming the new label rises in from below while the old one moves up and fades, and no label text is ever drawn outside the button edge. The button width grows from \"Remove\" to \"Remove signup\" over several frames (a spring, settling in roughly 200 to 300ms) and shrinks back the same way. The spinner grows from a smaller scale as it fades in. The notice text rises a few pixels as it fades in and only fades on the way out. Every enter or exit has finished within about 300ms.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion on, every state change is instant and nothing moves, but the states, text and timers are the same.",
+   "trigger": "Enable the OS reduced-motion setting, then arm, confirm and wait for the result",
+   "expect": "Label, notice and spinner appear and disappear in a single frame with no vertical offset or scale. The button width snaps to its new size in one frame. The spinner icon does not rotate. The hint still clears at about 1800ms, the arm still lapses at about 2500ms, and the demo action still takes about 500ms.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "locale-copy",
+   "behaviour": "The built-in hint follows the demo locale and inserts the confirm label into it. The demo's own copy switches too.",
+   "trigger": "Switch the demo locale to ja, zh-TW or zh-CN and run the flow",
+   "expect": "ja: the button reads \"削除\", armed \"登録を削除\", hint \"もう一度押すと登録を削除\", result \"登録を削除しました\". zh-TW: \"移除\", armed \"移除登記\", hint \"再按一次以移除登記\", result \"已移除登記\". zh-CN: \"移除\", armed \"移除登记\", hint \"再按一次以移除登记\", result \"已移除登记\".",
+   "kind": "text",
+   "scope": "all"
+  }
+ ]
+}

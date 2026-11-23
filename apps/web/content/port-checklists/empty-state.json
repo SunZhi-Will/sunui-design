@@ -1,0 +1,144 @@
+{
+ "block": "empty-state",
+ "summary": "A static, dashed-border empty state with an icon, title, description, a primary \"Load example\" button and an outline secondary link. In the demo, the button swaps the empty state for a filled-in three-person bill.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-content",
+   "behaviour": "On first render the demo shows the heading and the empty state, not the bill list",
+   "trigger": "initial render (locale en)",
+   "expect": "A heading reading \"This bill\" sits above a box with a dashed border, a corner radius of 12px and a transparent background. Inside, centred, top to bottom: a people (users) icon, the title \"No bill yet\", the description \"Start by adding people, or load a filled-in example to see how it works.\", then a row with the primary button \"Load example\" (a sparkles icon before the text) and an outline control \"Add people\". No list rows and no dollar amounts are visible.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "empty-layout-metrics",
+   "behaviour": "The empty state keeps the original spacing and sizes",
+   "trigger": "initial render",
+   "expect": "Inner padding is 20px left and right and 64px top and bottom. The vertical gap between the icon, the text group and the button row is 16px. The icon is 24x24 with a 1.5 stroke width in the muted foreground colour. The title is 14px, medium weight, in the foreground colour. The description is 14px, muted colour, 4px below the title, no wider than 384px and centred horizontally. All text is centre-aligned.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "button-row-metrics",
+   "behaviour": "The two built-in controls sit side by side, centred, and wrap when space runs out",
+   "trigger": "initial render, then narrow the container until both controls no longer fit on one line",
+   "expect": "The controls are centred with an 8px gap. Each is 32px tall with 10px horizontal padding, an 8px corner radius, 14px medium-weight text and no line wrapping inside a control. \"Load example\" has a filled primary background with primary-foreground text, and its 16px sparkles icon has a stroke width of 2 with a 6px gap to the label. \"Add people\" has a border-coloured 1px border on the background colour. When narrow, the second control wraps to a new line, still centred, keeping the 8px gap.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the two actionable controls, in source order",
+   "trigger": "Press Tab repeatedly from before the demo, on first render",
+   "expect": "First stop: the \"Load example\" button. Second stop: the \"Add people\" link. Then focus leaves the block. The heading, the icon, the title, the description and the sparkles icon are never focused.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "focus-ring",
+   "behaviour": "A keyboard-focused control shows a visible focus ring",
+   "trigger": "Tab onto either control",
+   "expect": "The focused control gets a ring-coloured border plus a 3px ring in the ring colour at 50% opacity. A mouse click alone does not show the ring (focus-visible only).",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "load-example-activates",
+   "behaviour": "Activating Load example replaces the empty state with the filled bill",
+   "trigger": "Click \"Load example\", or focus it and press Enter or Space",
+   "expect": "The dashed empty-state box disappears entirely and in its place, under the same \"This bill\" heading, there is a bordered list (12px radius, card background, dividers between rows) with three rows in this order: \"Ava\" $210, \"Ben\" $180, \"Chloe\" $170. Each row has 16px horizontal and 12px vertical padding, the name on the left (medium weight, truncated with an ellipsis if too long) and the amount on the right with tabular figures and a leading \"$\". The swap is instant, with no enter or exit animation.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "loaded-is-terminal",
+   "behaviour": "The loaded state is one-way and has nothing left to press",
+   "trigger": "Activate \"Load example\" once, then inspect the demo and press Tab through it",
+   "expect": "After loading, the \"Load example\" button and the \"Add people\" link are no longer in the page, the list shows exactly three rows, and the list contains no buttons, links or other focusable elements, so Tab never stops inside the block. Nothing in the demo brings the empty state back; only remounting the demo (for example a page reload) shows it again.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "secondary-is-link",
+   "behaviour": "The secondary control is a real link to #members, not a button",
+   "trigger": "Inspect \"Add people\", then activate it by click or by focusing it and pressing Enter",
+   "expect": "It is exposed as a link (role link) with the accessible name \"Add people\" and the target \"#members\". Activating it changes the URL fragment to #members. It does not load the example, and the empty state stays visible. Space does not activate it (native link behaviour).",
+   "kind": "keyboard",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "Controls and the region have correct accessible names, and the icons are hidden",
+   "trigger": "initial render, read the accessibility tree",
+   "expect": "The section is labelled by its heading \"This bill\" (heading level 2). The primary control is a button named exactly \"Load example\". The secondary is a link named \"Add people\". The users icon and the sparkles icon are hidden from assistive technology (aria-hidden), so neither adds anything to the names. The title and the description are plain text, not headings.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "no-live-announcement",
+   "behaviour": "No live region is used, and the state change is not announced",
+   "trigger": "Activate \"Load example\" with a screen reader running",
+   "expect": "No element with aria-live or a status or alert role exists, before or after the swap, and nothing is announced automatically. The focused button is removed from the page and focus is not moved to the list or the heading; the focused element is no longer inside the block (usually the document body).",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "hover-press-feedback",
+   "behaviour": "The controls give hover and press feedback",
+   "trigger": "Hover each control with a mouse, then press and hold",
+   "expect": "Hovering \"Load example\" changes its background to the primary colour at 80% opacity. Hovering \"Add people\" changes its background to the muted colour, with foreground-coloured text. While a control is pressed it moves down 1px (translateY 1px) and returns on release. Colour changes use a short transition, not an instant jump.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "press-feedback-touch",
+   "behaviour": "A tap gives the same pressed feedback and activates",
+   "trigger": "Tap \"Load example\" on a touch device",
+   "expect": "The control shifts down 1px while touched, and on release the bill list with Ava $210, Ben $180 and Chloe $170 replaces the empty state.",
+   "kind": "state",
+   "scope": "touch"
+  },
+  {
+   "id": "locale-strings",
+   "behaviour": "The built-in button label and the demo copy follow the locale",
+   "trigger": "Switch the demo locale to zh-TW, then zh-CN, then ja, loading the example in each from a fresh demo",
+   "expect": "The built-in button reads \"載入範例\" for zh-TW, \"加载示例\" for zh-CN and \"サンプルを読み込む\" for ja. The demo text changes too: zh-TW shows the heading \"這筆帳單\", the title \"還沒有帳單\" and the link \"新增成員\"; zh-CN shows \"这笔账单\", \"还没有账单\" and \"添加成员\"; ja shows \"この会計\", \"まだ会計がありません\" and \"メンバーを追加\". After loading, the names are 小安, 阿傑, 佳琪 (zh-TW), 小安, 阿杰, 佳琪 (zh-CN) or さくら, けんた, ゆい (ja), with the same amounts $210, $180 and $170 in that order.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "locale-switch-while-empty",
+   "behaviour": "Changing locale while the empty state is shown keeps the empty state and swaps all its text at once",
+   "trigger": "On first render (en, nothing loaded), switch the demo locale to zh-TW",
+   "expect": "The empty state stays visible and no list appears. In the same update the heading becomes \"這筆帳單\", the title \"還沒有帳單\", the description \"先新增成員，或載入一份填好的範例，看看實際怎麼運作。\", the link \"新增成員\" and the built-in button \"載入範例\". Layout and the dashed box are unchanged.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "locale-switch-after-load",
+   "behaviour": "Changing locale after loading keeps the bill and only swaps the names",
+   "trigger": "In en, activate \"Load example\", then switch the demo locale to ja",
+   "expect": "The list stays visible with exactly three rows; the empty state does not come back. The heading becomes \"この会計\" and the names become さくら, けんた, ゆい in that order, still with $210, $180 and $170.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "locale-fallback",
+   "behaviour": "Language tags map onto the four built-in languages, and anything else falls back to English",
+   "trigger": "Give the block the locale tags zh-Hant-HK, zh-MO, zh-SG, ja-JP, fr and de",
+   "expect": "zh-Hant-HK and zh-MO give \"載入範例\" (any zh tag containing hant, tw, hk or mo, case-insensitive). zh-SG gives \"加载示例\" (other zh tags). ja-JP gives \"サンプルを読み込む\". fr and de give \"Load example\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "Reduced motion changes nothing, because the block has no motion to reduce",
+   "trigger": "Turn on prefers-reduced-motion (or the platform's reduce-motion setting) and repeat the load flow",
+   "expect": "Layout, content and the instant swap to the list are the same as with motion on. There is still no enter or exit animation, and the only movement anywhere is the 1px press shift. A port must not add animations that would need reducing.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

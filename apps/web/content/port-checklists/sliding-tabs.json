@@ -1,0 +1,152 @@
+{
+ "block": "sliding-tabs",
+ "summary": "Animated tab and selector bar in five variants (underline, segment, folder, dock, chips) whose selection indicator slides between items, with optional content panel, counts and single or multiple selection.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-layout",
+   "behaviour": "With the English locale, the demo shows five instances in this order: underline tabs with a content panel, a Sales heading with a small segmented Day/Week/Month control above a 7-bar chart, folder tabs for Orders with a content panel, a centred dock bar with four icons, and three filter chips above a 4-product grid.",
+   "trigger": "initial render of the preview with ?l=en",
+   "expect": "Underline: Details, Care, Reviews; Details selected with a 2px spot-colour underline inset 8px from each side of the tab; panel text starts 'Midweight merino, 18.5 micron.'; Reviews shows a muted inline '128' at 60% opacity. Segment: Week selected with a raised background pill, bars at heights 55, 62, 48, 75, 80, 68, 90 percent. Folder: To ship selected and joined to the panel, panel reads '3 orders are packed and leave the warehouse today.'. Dock: Home selected, only Home shows its text label, Search, Saved and Profile show icon only. Chips: New in selected (spot fill, spot border, spot-foreground text and a 14px check mark); On sale and Free shipping outlined with a 10% foreground border and muted text. Products: Linen shirt and Wool beanie at full opacity, Canvas tote and Denim jacket at 0.25.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "counts-and-badges",
+   "behaviour": "Folder counts render as pill badges whose colour follows selection; the other instances render counts as plain inline numbers.",
+   "trigger": "initial render, then click On the way in the folder tabs",
+   "expect": "Folder badges read 3, 2, 18, 0 (the zero count still shows a badge). The selected tab's badge has the spot background and spot-foreground text; unselected badges are a muted grey pill. After clicking On the way, its badge turns spot and To ship's badge turns muted. Chips show inline counts New in 2, On sale 2, Free shipping 3 with no pill. Underline Reviews shows the full number '128' as inline text, not '99+'.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "click-single-select",
+   "behaviour": "Clicking a tab in a single-select instance selects it, moves the indicator there and, if the instance has content, swaps the panel.",
+   "trigger": "click Care in the underline tabs, then Month in the segment, then Delivered in the folder, then Saved in the dock",
+   "expect": "Underline panel shows 'Hand wash cold or use the wool cycle. Dry flat, away from direct heat.' and the underline sits under Care. Segment pill moves to Month and bars animate to 40, 58, 72, 66, 84, 92, 78 percent over 300ms ease-out. Folder raised surface moves to Delivered and the panel shows '18 orders delivered this year. Reviews are open for 30 days.'. Dock: Saved shows its label and Home's label collapses. Exactly one item per instance is selected.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "indicator-slide",
+   "behaviour": "The selection indicator (underline bar, segment pill, folder raised surface with its two inverted corners, dock highlight pill) slides from the old item to the new one instead of fading or jumping, and each instance moves only its own indicator.",
+   "trigger": "click a tab two positions away in each of the underline, segment, folder and dock instances",
+   "expect": "During the transition the indicator is visible between the two items and changes width to match the new item; there is never a frame with two indicators or none in the same bar. It settles under the new item in well under a second. Clicking in one instance leaves the other instances' indicators where they were.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "panel-direction",
+   "behaviour": "Panel content slides in from the side of travel: moving to a later tab, new content enters from the right and old content leaves to the left; moving to an earlier tab, the reverse. Old and new overlap briefly during the swap.",
+   "trigger": "in the underline tabs click Reviews (from Details), then click Details (from Reviews)",
+   "expect": "Forward: entering text starts transparent about 16px to the right and settles at full opacity in place; outgoing text fades while moving about 16px left. Backward: entering text starts about 16px to the left, outgoing text moves right. Nothing shows outside the panel box (overflow is clipped). The folder panel behaves the same way.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-click-selected",
+   "behaviour": "Clicking the already selected tab in a single-select instance keeps it selected and does not deselect anything.",
+   "trigger": "click Details when Details is selected; click Week when Week is selected",
+   "expect": "Selection unchanged, panel text unchanged, no item becomes unselected, bars do not change.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "chips-toggle",
+   "behaviour": "Chips are multi-select toggles: each click flips one chip without affecting the others, and the product grid dims items that do not match every selected filter.",
+   "trigger": "click On sale, then click New in, then click On sale again",
+   "expect": "After On sale: New in and On sale filled, only Wool beanie at full opacity, the other three at 0.25. After New in off: only On sale filled, Canvas tote and Wool beanie at opacity 1. After On sale off: no chip selected and all four products at opacity 1. Product opacity changes over 200ms. The chip fill fades in or out over about 0.15s and the check mark grows from zero width to 14px when selected and shrinks back to zero when unselected. Wool beanie carries all three tags, so the empty message 'Nothing matches every filter.' never appears with the demo data.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "dock-label-grow",
+   "behaviour": "In the dock only the selected item shows its text label; the label width animates so the selected pill grows and the previous one shrinks.",
+   "trigger": "click Search in the dock",
+   "expect": "Search label grows from zero width and transparent to its natural width and full opacity; Home label shrinks to zero width and fades; the bar width changes smoothly rather than jumping. Dock buttons are 40px tall with 12px horizontal padding; icons are 18px inside a 20px box.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order-and-focus-ring",
+   "behaviour": "Each single-select instance has one Tab stop (the selected item); content panels are a Tab stop; every chip is a Tab stop. Nothing decorative receives focus. Buttons show a keyboard focus ring; panels do not.",
+   "trigger": "press Tab repeatedly from before the demo on first render, then select Care and Tab through again",
+   "expect": "Focus order: Details tab, underline content panel, Week radio, To ship tab, folder content panel, Home radio, New in chip, On sale chip, Free shipping chip, then out of the demo. After selecting Care, the underline stop is Care instead of Details. A focused button shows a 2px outline offset 2px; a focused content panel shows no outline. Mouse clicks do not show the ring.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "arrow-keys-single",
+   "behaviour": "In single-select instances the arrow keys move focus and selection together, wrapping at the ends; Home and End jump to the first and last item. This holds for the underline, segment, folder and dock instances.",
+   "trigger": "focus Details and press ArrowRight, ArrowDown, ArrowRight, ArrowLeft, End, Home; then focus Week and press ArrowRight, ArrowRight; then focus Home in the dock and press ArrowLeft",
+   "expect": "Underline: Details to Care to Reviews to Details (wrap), ArrowLeft to Reviews (wrap), End stays on Reviews, Home goes to Details; the panel swaps each time. Segment: Week to Month, then wraps to Day, bars change each time (Day bars 30, 45, 38, 60, 52, 70, 48). Dock: Home wraps to Profile and Profile's label grows. Focus and selection always land on the same item, and the page does not scroll on these keys.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keys-chips",
+   "behaviour": "In the chips group the arrow, Home and End keys move focus only and do not toggle; Enter or Space toggles the focused chip.",
+   "trigger": "focus New in, press ArrowRight, then Space, then End, then Enter, then ArrowRight",
+   "expect": "ArrowRight focuses On sale without changing selection; Space selects On sale; End focuses Free shipping without toggling; Enter selects Free shipping, leaving all three chips selected and only Wool beanie at full opacity; the last ArrowRight wraps focus to New in without toggling.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "roles-and-names",
+   "behaviour": "Each instance exposes a role that matches its use and a name where the demo gives one; decorative parts do not appear in the accessibility tree.",
+   "trigger": "initial render, inspect the accessibility tree",
+   "expect": "Underline: tablist with no accessible name, tabs with aria-selected, each tab has aria-controls pointing at the tabpanel. Segment: radiogroup named 'Sales', radios with aria-checked. Folder: tablist named 'Orders', tabs with aria-selected, a tabpanel. Dock: radiogroup named 'App navigation', radios with aria-checked. Chips: group named 'Filter products', buttons with aria-pressed true or false. Indicators, chip fills, icons and chart bars produce no nodes in the accessibility tree (the folder and dock indicators, icons, check mark and chart carry aria-hidden; the underline bar, segment pill and chip fill are empty spans). No live region announces changes.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names-items",
+   "behaviour": "Item names include their counts, and dock items are named once by their label even when the visible label is hidden.",
+   "trigger": "initial render, read each item's accessible name",
+   "expect": "Folder tabs read 'To ship (3)', 'On the way (2)', 'Delivered (18)', 'Returns (0)' (parentheses are screen-reader only). Reviews reads 'Reviews 128'. Dock items read 'Home', 'Search', 'Saved', 'Profile' exactly once each, including unselected ones; the visible animated label is aria-hidden. Products that do not match the selected chips have aria-hidden true.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "hover-and-press",
+   "behaviour": "Unselected items respond to hover; items shrink slightly while pressed.",
+   "trigger": "hover an unselected item in each variant, then press and hold the mouse button on any item",
+   "expect": "Unselected text goes from muted to foreground colour. Folder unselected tabs gain a 4% foreground tint background. Unselected chips' border goes from 10% to 40% foreground. Selected items do not change on hover. While pressed the button scales to 0.97.",
+   "kind": "state",
+   "scope": "web"
+  },
+  {
+   "id": "sizes",
+   "behaviour": "Item sizes follow the size prop: the segment is small, the other instances medium.",
+   "trigger": "initial render, measure buttons",
+   "expect": "Segment buttons 32px tall with 12px horizontal padding and extra-small text; the segmented container has 4px inner padding and rounded corners. Underline, folder and chip buttons 40px tall with 16px horizontal padding and small text. Folder tabs have rounded top corners only, and the selected tab has 8px inverted corners on both sides joining it to the panel.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "narrow-layout",
+   "behaviour": "The demo stacks into one column on narrow screens and the tab rows scroll instead of wrapping; chips wrap.",
+   "trigger": "view the demo at a width below 768px, then at 768px or wider",
+   "expect": "Below 768px all five instances stack in one column. At 768px and above, underline tabs and the Sales block sit side by side, and the folder, dock and chips rows span both columns. Underline and folder tab rows never wrap; when too narrow they scroll horizontally with no visible scrollbar. Chips wrap onto a second line with an 8px gap. The product grid is 2 columns below 640px and 4 at 640px and above.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "locale",
+   "behaviour": "The demo copy follows the preview locale in English, Traditional Chinese, Simplified Chinese and Japanese.",
+   "trigger": "open the preview with ?l=zh-TW, then ?l=ja",
+   "expect": "zh-TW: tabs read 商品說明, 洗滌方式, 評價 128; segment 日, 週, 月 named 銷售額; folder named 訂單 with 待出貨 3, 配送中 2, 已送達 18, 退貨 0; dock named App 導覽 with 首頁 shown; chips 新品, 特價, 免運 in a group named 篩選商品; prices like NT$1,580. ja: tabs 商品詳細, お手入れ, レビュー; dock named アプリのナビゲーション. Counts, selection and behaviour are the same as in English.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion requested, all movement is removed: indicators, panels, chip fill and check mark, dock labels, press scale, chart bars and product dimming change instantly. Short colour fades on text, borders and badges remain.",
+   "trigger": "enable prefers-reduced-motion, then switch tabs in each instance, toggle chips and press items",
+   "expect": "Indicators jump to the new item with no slide. Panel content swaps instantly with no 16px offset and no fade. Chip fill and check mark appear and disappear instantly. Dock label appears and disappears instantly with no width growth. No 0.97 press scale. Chart bars and product opacity change without transition. Text, hover, chip border and badge colours may still fade briefly; nothing moves.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

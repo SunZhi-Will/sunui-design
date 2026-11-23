@@ -1,0 +1,152 @@
+{
+ "block": "floating-field",
+ "summary": "A floating-label text field with live or on-blur validation, a shake on invalid blur, an email typo suggestion that morphs only the changed letters, input masks with grey ghost slots, a password strength meter with a rule checklist, and a character counter (number or ring).",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo opens as a shipping form with five fields in this order: Full name and ZIP code side by side, then Email, Create a password (with a Show button inside it), and Delivery note (multi-line).",
+   "trigger": "initial render (en locale, before autoplay acts)",
+   "expect": "Heading 'Shipping details'. Full name is pre-filled 'Lin Wei' and its label sits floated, with a ' *' after it. Email also has ' *'. ZIP code, Email and password are empty with labels resting inside the field. Below the password field are four empty bar segments, an empty status word, and four unmet rules: 'At least 8 characters', 'Upper and lowercase', 'A number', 'A symbol'. Delivery note shows a small faint ring track (foreground at 10% opacity) at its top right with no coloured arc and no number, and the hint 'Optional' below it. No error, check mark or suggestion appears anywhere. Every field has a light neutral border.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the real controls, in source order. The ring counter, ghost slots, strength bar, rule icons and asterisks are not focusable. The suggestion button joins the order only while it shows.",
+   "trigger": "Press Tab repeatedly from before the form",
+   "expect": "Order: Full name, ZIP code, Email, the 'Did you mean' suggestion button (only while visible, it sits right after Email), Create a password, Show/Hide button, Delivery note. Nothing else takes focus.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "label-float",
+   "behaviour": "The label floats up and shrinks when the field is focused or has a value, and settles back only when it is both empty and unfocused.",
+   "trigger": "Focus the empty ZIP field, then blur it while it is still empty",
+   "expect": "On focus the label moves to y -10px at scale 0.86 from its left edge, using a spring with stiffness 520 and damping 34. Blurring with an empty value brings it back to y 0 and scale 1 with the same spring. The border uses the brand (primary) colour while focused and goes back to neutral on blur. No error and no shake, because an empty field is not validated.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "Each field is named by its visible label. The asterisk is not read. The message line and strength meter are linked as the field's description.",
+   "trigger": "Inspect the accessibility tree",
+   "expect": "Inputs are named 'Full name', 'ZIP code', 'Email', 'Create a password', 'Delivery note', with no ' *' in the names. Full name and Email are marked required. The note field is described by 'Optional'. The password field is described by the strength meter, including each rule followed by ', not met' or ', met'.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "mask-ghost",
+   "behaviour": "The ZIP field accepts only characters that fit the mask slots. Grey ghost characters show the slots still left whenever the label is floated (focused or holding a value).",
+   "trigger": "Focus ZIP and type '9a4'",
+   "expect": "The value becomes '94' (the letter is dropped). The en mask is '99999', so on focus with no value the grey ghost reads '00000', and after '94' it reads '000' right after the typed digits. Typing stops once 5 digits are in. (zh-TW mask '999-999' and ja mask '999-9999' insert the '-' on their own once the next digit is typed.)",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "blur-validation-shake",
+   "behaviour": "A field set to validate on blur shows an error only when you leave it with an invalid value. The field shakes, the error is announced, and the unfilled ghost slots stay visible beside the partial value.",
+   "trigger": "Type '941' in ZIP, then press Tab",
+   "expect": "The message 'ZIP codes are 5 digits' appears with role alert. Border and label turn the destructive colour and the input gets aria-invalid=true. The field box shakes along x through [0, -6, 5, -3, 2, 0] px over 0.32 s with easeOut. The grey ghost '00' is still shown after '941' even though the field is no longer focused.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "shake-conditions",
+   "behaviour": "The shake runs on every blur that leaves a non-empty invalid value, in both validation modes, and never on an empty or valid value.",
+   "trigger": "With ZIP at '941', focus it and Tab away again twice. Then clear ZIP and Tab away. Separately, type 'lin@' in an untouched Email and Tab away",
+   "expect": "ZIP shakes again on each of the two repeat blurs. Clearing ZIP and blurring gives no shake and no error. Email shakes on its very first blur with 'lin@' and shows its error at the same time.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "blur-mode-refocus",
+   "behaviour": "In blur mode both the error and the success state are hidden while the field has focus and are checked again on the next blur.",
+   "trigger": "After the ZIP error, focus ZIP, type 2 more digits so it reads '94107', Tab away, then focus ZIP again",
+   "expect": "While focused with the error, the message, red border and aria-invalid go away and the border shows the brand colour. After blur with 5 digits the border turns success green and a check mark scales in on the right from 0.6 to 1 with opacity 0 to 1 (spring 520/34). No message text shows because ZIP has no success message. On refocusing the valid ZIP, the check mark fades out and the border switches from green back to the brand focus colour.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "live-validation-after-touch",
+   "behaviour": "In change mode (Email) nothing is validated while typing until the field has been left once. After that, errors and success update live with every keystroke, and success stays while the field is focused.",
+   "trigger": "Type 'lin@' in Email, Tab away, then focus Email again and continue typing 'site.org'",
+   "expect": "No error while 'lin@' is typed the first time. On blur: 'That email is missing something, like name@example.com' (role alert) and a red border. Back in the field, the error stays until the value is valid, which happens at 'lin@site.or'. At that moment, while still focused, the border turns green, the check mark appears and 'We will send tracking here' replaces the error. Typing the final 'g' keeps that success state.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "empty-not-validated",
+   "behaviour": "An empty field is never validated, so clearing a touched field removes both the error and the success.",
+   "trigger": "After Email shows an error or success, select all and delete the text, then blur",
+   "expect": "No error, no shake, no check mark and no message, even though Email is marked required. The border is neutral when unfocused.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "email-suggestion",
+   "behaviour": "After leaving the field, a likely mistyped mail domain gets a suggestion with a clickable fix. The suggestion is never shown while the field has focus.",
+   "trigger": "Type 'lin@gmial.com' in Email and press Tab",
+   "expect": "Below the field, a status message (role status): 'Did you mean lin@gmail.com?', where 'lin@gmail.com' is an underlined button. No check mark and no success message while the offer shows, and the border stays neutral. A domain shorter than 4 characters, an exact known domain, or one 3 or more edits away gets no suggestion.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "suggestion-accept-morph",
+   "behaviour": "Choosing the suggestion replaces the value, animates only the changed letters, moves focus back to the field, and never offers that same value again.",
+   "trigger": "Click (or press Enter on) the 'lin@gmail.com' button",
+   "expect": "The value becomes 'lin@gmail.com' and focus returns to the Email input. 'lin@gm' and 'l.com' stay still. The two new letters 'ai' drop in from y -55% with opacity 0 to y 0 and opacity 1 (spring 520/34), the second letter delayed 0.04 s. The overlay is removed after 450 ms and the real text shows. Then the field is valid: green border, check mark, 'We will send tracking here'.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "message-swap",
+   "behaviour": "Only one message shows below a field, picked by priority: error, then suggestion, then success, then hint. When the kind of message changes, the old one fades out before the new one fades in. The message row keeps its height so nothing below moves.",
+   "trigger": "With Email focused and showing 'We will send tracking here' for 'lin@site.org', delete back to 'lin@site.' (record the screen or use slow motion in devtools)",
+   "expect": "The success text fades to opacity 0 over 0.14 s and only then 'That email is missing something, like name@example.com' fades in from opacity 0 and 3px higher over 0.14 s. The two messages are never visible at the same time. The row under each field is at least 20px tall, so the password field below does not shift when a message appears or disappears. If the text changes but the kind stays the same (one error text replaced by another), it swaps at once with no fade.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "password-strength",
+   "behaviour": "The strength level is the number of rules met, but any non-empty value counts as at least 1. Bars, status word and checklist follow the value. Screen readers hear about it only when the level changes.",
+   "trigger": "In the password field type 'a', then change it to 'Harbor-27'",
+   "expect": "'a' meets no rule but shows level 1: one segment filled, word 'Weak'. 'Harbor-27' meets all four rules: all four segments fill, word 'Strong' in the brand colour, and every rule dot turns brand-coloured with a check. The polite live region reads 'Password strength: Weak' and later 'Password strength: Strong', and it does not repeat on keystrokes that keep the same level. Levels: 1 Weak, 2 Fair, 3 Good, 4 Strong. Empty clears the word and the announcement.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "strength-motion",
+   "behaviour": "When the level jumps by several steps at once, the segments fill one after another from the left and empty one after another from the right. A rule that becomes met pops and draws its check, and the check undraws when the rule stops being met.",
+   "trigger": "Paste 'Harbor-27' into the empty password field, then select all and delete (record the screen or use slow motion in devtools)",
+   "expect": "On paste, each segment grows from its left edge and segment 1 starts first, then 2, 3 and 4, each about 0.04 s after the previous. On delete, segment 4 starts shrinking first and segment 1 last, again about 0.04 s apart. Each rule dot briefly grows from 70% to full size with a small overshoot as it turns brand-coloured, and its check mark draws in over about 0.2 s. On delete the checks undraw and fade while the dots return to grey.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "show-password",
+   "behaviour": "The trailing Show button switches the password between hidden and visible without touching the value or the meter.",
+   "trigger": "Type 'Harbor-27', click Show, then click again",
+   "expect": "The first click shows the typed characters and the button reads 'Hide'. The second masks them again and it reads 'Show'. Focus stays on the button, the value is unchanged, and the strength meter still shows four segments and 'Strong'. No check mark appears in the password field.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "ring-counter",
+   "behaviour": "The note field shows a small ring for its 40-character limit. The faint track is always drawn; the arc fills with the share used, the characters left show in the last tenth, and it turns destructive at the limit. It is hidden from screen readers.",
+   "trigger": "Type into Delivery note up to 36 characters, then up to 40, then try one more",
+   "expect": "At 0 characters only the faint grey track circle shows and the arc has no colour. As you type, the arc fills by count/40 in the brand colour with a 150 ms ease-out transition. From 36 characters (4 or fewer left, since ceil(40 x 0.1) = 4) the number left appears to the left of the ring, sliding from x 4px and opacity 0, and the ring grows to scale 1.15 (spring 520/34). At 40 the number reads 0 and the number and arc turn the destructive colour. A 41st character is refused. The demo's note text 'Leave it at the front desk, please' is 34 characters, so the ring fills about 85% and shows no number.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion on, every state still changes, but nothing moves.",
+   "trigger": "Turn on the OS reduced-motion setting and repeat label float, invalid blur, suggestion accept, strength typing and the ring near the limit",
+   "expect": "The label jumps between positions (duration 0). There is no shake. Accepting a suggestion swaps the text with no letter morph. Messages appear with no y offset and duration 0. The check mark appears at scale 1 at once. Strength segments and rule checks change at once with no pop. The ring stays at scale 1 and the number left appears without sliding. The stroke transition is off.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

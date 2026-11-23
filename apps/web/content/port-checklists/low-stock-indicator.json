@@ -1,0 +1,152 @@
+{
+ "block": "low-stock-indicator",
+ "summary": "A read-only stock gauge that shows a status line (in stock, low, critical, sold out) with a flipping count, an optional updated label, and a meter drawn as one cell per unit (capacity up to 24) or a continuous bar.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-demo",
+   "behaviour": "The demo shows four product cards, each with one indicator, in this order and state, and nothing animates on first render",
+   "trigger": "initial render of the demo (locale en)",
+   "expect": "Card 1 jacket: \"16 in stock\", 20 cells with the first 16 filled, right label \"Updated 2 min ago\". Card 2 tote: \"Only 7 left\", 20 cells with 7 filled, \"Updated 2 min ago\". Card 3 watch: \"Last 2 in stock\", 12 cells with 2 filled, \"Updated just now\". Card 4 lamp: \"Sold out\", 20 cells all empty (outline only), \"Restock in 2 weeks\". The count digit is semibold with tabular numerals. No digit slides, no marker fades and no bar grows on first render.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "level-thresholds",
+   "behaviour": "With the default lowAt 10 and criticalAt 3 the level is chosen from the whole stock number, and boundary values belong to the more urgent level",
+   "trigger": "render the component (default props, locale en) with stock 0, 1, 3, 4, 10 and 11 in turn",
+   "expect": "0 shows \"Sold out\"; 1 shows \"Last 1 in stock\" and 3 shows \"Last 3 in stock\"; 4 shows \"Only 4 left\" and 10 shows \"Only 10 left\"; 11 shows \"11 in stock\".",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "custom-thresholds",
+   "behaviour": "Custom lowAt and criticalAt move the boundaries, and the checks run in order sold out, then critical, then low, then in stock",
+   "trigger": "render with lowAt 5 and criticalAt 1 at stock 6, 5, 2, 1, 0; then render with lowAt 3 and criticalAt 10 at stock 5",
+   "expect": "lowAt 5 / criticalAt 1: 6 shows \"6 in stock\", 5 shows \"Only 5 left\", 2 shows \"Only 2 left\", 1 shows \"Last 1 in stock\", 0 shows \"Sold out\". lowAt 3 / criticalAt 10 at stock 5 shows \"Last 5 in stock\" (critical wins because it is checked before low).",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "stock-sanitised",
+   "behaviour": "A fractional or negative stock is floored and clamped to at least 0 before the text, cells and meter use it",
+   "trigger": "render with capacity 20 and stock 3.7, then with stock -2",
+   "expect": "3.7 shows \"Last 3 in stock\", 3 filled cells, meter aria-valuenow 3. -2 shows \"Sold out\", 0 filled cells, meter aria-valuenow 0.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "critical-accent",
+   "behaviour": "Only the critical level uses the brand accent colour (var --sunui-spot, falling back to --primary) on the count digit and the filled part of the meter, in both cell and bar mode",
+   "trigger": "initial demo render, compare card 3 (stock 2) with cards 1 and 2; then render capacity 40 with stock 2 and with stock 20",
+   "expect": "Card 3: digit \"2\" and its 2 filled cells are in the accent colour. Cards 1 and 2: digit and filled cells use the normal foreground colour. Bar mode at stock 2 (critical): the bar fill is the accent colour; at stock 20 (in stock) it is foreground. Empty cells and the bar's hairline track are a faint 10 percent foreground border at every level.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "sold-out-marker",
+   "behaviour": "Sold out replaces the message with a muted text marker with no icon, hidden from assistive tech, plus a visually hidden copy of the text",
+   "trigger": "initial demo render of card 4 (stock 0)",
+   "expect": "\"Sold out\" appears in muted foreground colour, medium weight, with no check disc or icon. The visible marker has aria-hidden=\"true\"; a sibling span with class sr-only contains \"Sold out\". The digit and count are not rendered. Because the block mounted sold out, the marker is at full opacity immediately.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "sold-out-lands",
+   "behaviour": "The sold out marker appears instantly on the first sell out after mount and fades in only on later sell outs",
+   "trigger": "mount with stock 1, rerender with stock 0, then stock 1, then stock 0 again",
+   "expect": "First change 1 to 0: the marker shows at opacity 1 at once, no fade. Second change 1 to 0: the marker fades from opacity 0 to 1 over 150 ms, ease-out, delay 0. Every later sell out also fades the same way. A block that mounts at stock 0 behaves the same: its first later sell out is instant, the one after that fades. Going from 0 back above 0 removes the marker at once.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "count-flip-down",
+   "behaviour": "When the count decreases within the same level the new number slides in from above, clipped to the digit box",
+   "trigger": "mount with stock 7 (low), rerender with stock 6",
+   "expect": "New digit 6 starts at translateY -100 percent and opacity 0 and settles at y 0, opacity 1 with a spring of stiffness 520, damping 34. Old digit 7 slides to translateY +100 percent and opacity 0. The digit box has overflow hidden, so neither digit is visible outside it.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "count-flip-exit-direction",
+   "behaviour": "The entering digit follows the direction of the current change, but the leaving digit keeps the direction of the change that created it",
+   "trigger": "mount with stock 7, then rerender 7 to 6, then 6 to 9, then 9 to 8 (all in the low level)",
+   "expect": "7 to 6: 6 enters from above (-100 percent), 7 leaves downward (+100 percent). 6 to 9: 9 enters from below (+100 percent), but 6 still leaves downward (+100 percent) because it was created by a decrease. 9 to 8: 8 enters from above, 9 leaves upward (-100 percent) because it was created by an increase. All use the 520 / 34 spring with opacity 0 at the far end.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "count-flip-boundaries",
+   "behaviour": "The digit only flips while the count element stays in the same position of the message; level changes that move it swap the number with no slide",
+   "trigger": "locale en: rerender 11 to 10, then 4 to 3, then 1 to 0, then 0 to 1; then locale zh-TW: 11 to 10",
+   "expect": "en 11 to 10 (in stock to low): the text becomes \"Only 10 left\" and 10 appears in place with no slide. en 4 to 3 (low to critical): 3 flips in from above and turns accent coloured. 1 to 0: the count disappears and the sold out marker replaces the line. 0 to 1: \"Last 1 in stock\" appears with no slide. zh-TW 11 to 10: the digit does flip, because every zh-TW message has the count in the same position.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "cells-mode",
+   "behaviour": "When capacity is above 0 and at most 24 the meter prints floor(capacity) equal cells and fills the first N",
+   "trigger": "render capacity 20 with stock 16, rerender stock 15; render capacity 24; render capacity 12.6",
+   "expect": "Capacity 20: 20 cells, each 8 px tall, 2 px gap, 1 px radius; 16 solid, the rest outline. At 15, cell 16 changes to an outline with a 200 ms colour transition. Capacity 24 shows 24 cells. Capacity 12.6 shows 12 cells while aria-valuemax stays 12.6. Capacity 0.5 floors to 0 cells, so the bar is shown instead.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "bar-mode",
+   "behaviour": "When capacity is above 24 or 0 or less the meter is a 3 px continuous bar over a hairline track, filled from the left by stock divided by capacity, capped at 1",
+   "trigger": "render capacity 40 with stock 10, rerender stock 20, then stock 60; render capacity 0 with stock 5",
+   "expect": "Stock 10: fill is 25 percent of the width with no animation on first render. Stock 20: fill grows to 50 percent by scaleX from the left edge with a spring of stiffness 240, damping 30. Stock 60: fill stops at 100 percent while the text reads \"60 in stock\". Capacity 0: the bar is empty (ratio 0).",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "meter-range",
+   "behaviour": "The meter value is stock capped at capacity, and aria-valuemax is the capacity prop as given",
+   "trigger": "render capacity 20 with stock 30; render capacity 0 with stock 5; render capacity -5 with stock 5",
+   "expect": "Capacity 20, stock 30: text \"30 in stock\", all 20 cells filled, aria-valuemin 0, aria-valuemax 20, aria-valuenow 20. Capacity 0: aria-valuemax 0, aria-valuenow 0. Capacity -5: aria-valuemax -5, aria-valuenow -5.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "a11y-wiring",
+   "behaviour": "The gauge is a meter described by the status line, the status line is a polite live region, and the cells or bar are hidden",
+   "trigger": "inspect the DOM and accessibility tree on demo card 2 (stock 7) and card 4 (stock 0)",
+   "expect": "Card 2: element with role meter, aria-label \"Stock level\", aria-valuemin 0, aria-valuemax 20, aria-valuenow 7, aria-describedby pointing to the id of the status paragraph whose text is \"Only 7 left\". That paragraph has role status and aria-live polite. The cell row (or bar) has aria-hidden=\"true\". Card 4: the status paragraph's accessible text is \"Sold out\", coming from the sr-only span, not the aria-hidden marker.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "no-tab-stops",
+   "behaviour": "The block is purely presentational and has no focusable controls",
+   "trigger": "press Tab repeatedly through the demo",
+   "expect": "Focus never lands on any part of any indicator (status line, updated label, meter, cells). There are no Tab stops inside the four cards.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "locale-and-labels",
+   "behaviour": "Built-in copy follows the locale tag (zh with hant, tw, hk or mo to zh-TW, other zh to zh-CN, ja to ja, anything else to en), and the labels prop overrides it",
+   "trigger": "switch the demo locale to zh-TW, zh-CN, ja; render with locale \"fr\", locale \"zh-Hant-HK\"; render locale ja with labels { soldOut: \"Gone\", meter: \"Units\" } at stock 0",
+   "expect": "zh-TW: \"尚有 16 件庫存\", \"只剩 7 件\", \"最後 2 件\", \"已售完\", meter name \"庫存量\". zh-CN: \"现有库存 16 件\", \"仅剩 7 件\", \"最后 2 件\", \"已售罄\", \"库存量\". ja: \"在庫 16 点\", \"残り 7 点\", \"残りわずか 2 点\", \"売り切れ\", \"在庫量\". fr: English copy. zh-Hant-HK: zh-TW copy. ja with labels: marker and sr-only text read \"Gone\", meter aria-label \"Units\"; unspecified strings stay Japanese.",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "updated-label",
+   "behaviour": "The updated label is optional and sits at the right end of the status line as small muted text that wraps below when space runs out",
+   "trigger": "initial demo render; render without updatedLabel and with updatedLabel \"\"; narrow the card until the line cannot fit",
+   "expect": "With a label: it is extra-small muted text, right-aligned on the same row as the status text, and does not shrink. Without it or with an empty string: no right-hand element is rendered. When the row is too narrow the label wraps onto a second line below the status text.",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "With reduced motion on, the digit, the sold out marker and the bar change instantly; the cell colour transition is not gated",
+   "trigger": "enable prefers-reduced-motion, then rerender 7 to 6, sell out twice (1 to 0, 1 to 0), change stock in bar mode, and change stock in cell mode",
+   "expect": "The digit swaps in place with no slide or fade. The sold out marker appears at full opacity with no fade, even on the second sell out. The bar jumps to its new width (duration 0). Cells still change between filled and outline with the 200 ms colour transition. Text, colours, cell counts and ARIA values are the same as with motion on.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

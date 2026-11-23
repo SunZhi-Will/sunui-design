@@ -1,0 +1,1489 @@
+{
+ "note": "Haiku and Sonnet classified every block independently from its metadata; Opus settled the ones they disagreed on. Opinion, not ground truth: reviewed by nobody yet.",
+ "blocks": [
+  {
+   "name": "add-to-cart-button",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "A press button with a rolling label and a product flying into the cart; the feel is the value and shopping apps rarely have it.",
+   "by": "opus"
+  },
+  {
+   "name": "addon-checklist",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A checkbox list with a subtotal is a standard form pattern that native rows already cover.",
+   "by": "opus"
+  },
+  {
+   "name": "animate-presets",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Preset library of 62 animations switched by prop; native frameworks have built-in animation APIs.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "animated-number",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "The rolling odometer feel carries over, but native numeric text transitions are close enough.",
+   "by": "opus"
+  },
+  {
+   "name": "announcement-strip",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Dismissible notice bar is a common banner that apps already build easily.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "app-shell",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A sidebar and top bar frame is what the native navigation container already provides.",
+   "by": "opus"
+  },
+  {
+   "name": "ask-ai-halo",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "An assistant pill that opens into a composer with a light shockwave; the page-bending SVG filter is web-specific but the open moment carries over.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "ask-to-shop",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A search field with chips turning into result cards, a standard search flow apps already build.",
+   "by": "opus"
+  },
+  {
+   "name": "avatar-stack",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Overlapping avatars are common everywhere, and its tooltips depend on hover.",
+   "by": "opus"
+  },
+  {
+   "name": "back-to-top",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Page-scroll helper; native lists have status-bar tap and system scroll behavior.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "background-effects",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "Thirteen animated backdrops switched by prop carry over as decorative backgrounds but are not distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "black-friday-weekend",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A full sale landing page assembled from several blocks.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "book-3d",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A readable 3D book with page turns is a distinctive object that suits touch swiping.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "browser-frame",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Browser and window chrome mockups exist only to present web pages.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "brush-reveal",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "Painting with a finger to uncover a layer is a feel-driven gesture that works better on touch.",
+   "by": "opus"
+  },
+  {
+   "name": "bundle-node-builder",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A node-and-wire bundle builder that works by touch drag but is a niche commerce interaction.",
+   "by": "opus"
+  },
+  {
+   "name": "button-effects",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Sixteen button effects switched by prop, mostly hover-based, with the press ones already native.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "camera-moves",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Camera move presets on layered scenes, mostly scroll and hover driven hero effects.",
+   "by": "opus"
+  },
+  {
+   "name": "campaign-landing",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A full sale landing page built on page-scroll storytelling is tied to a web page.",
+   "by": "opus"
+  },
+  {
+   "name": "capsule-nav",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Scroll-morphing site header with section highlighting is page chrome that native apps get from navigation.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "card-dock",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Physical membership cards on a spring dock are distinctive and swipe works better than a mouse.",
+   "by": "opus"
+  },
+  {
+   "name": "card-effects",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Fourteen hover-driven card effects switched by prop depend mostly on a pointer.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "cart-drawer",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A cart drawer with steppers and undo is a standard commerce pattern that carries over to apps as a bottom sheet.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "catalog-flipbook",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Drag-to-turn printed flyer with a shaded fold is distinctive and natural on touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "chapter-seekbar",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "Chapter-segmented scrubbing works well with touch drag, though native players ship seek bars.",
+   "by": "opus"
+  },
+  {
+   "name": "chart-effects",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "Animated chart variants switched by a prop carry over, though native chart libraries exist.",
+   "by": "opus"
+  },
+  {
+   "name": "checkin-streak",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A daily streak chain you claim from fits mobile engagement loops and is more than a plain control.",
+   "by": "opus"
+  },
+  {
+   "name": "checkout-button",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A pay button that prints a thermal receipt is a distinctive object scene that works well with a tap.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "checkout-flow",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A whole shop flow from shelf to receipt, and apps already have their own checkout and payment sheets.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "checkout-steps",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A compact stepper that keeps answers is useful on phones but still a standard progress pattern.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "cjk-heading",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Static typographic heading; native text engines already handle CJK typesetting and vertical text.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "cloth-curtain",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A cloth curtain you drag aside suits touch, but it is a heavy WebGL piece with niche use.",
+   "by": "opus"
+  },
+  {
+   "name": "collection-accordion",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Expanding photo strips are an accordion with a skin, and native carousels cover it.",
+   "by": "opus"
+  },
+  {
+   "name": "command-palette",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A Cmd+K keyboard launcher is a desktop browser pattern with no real place in a phone app.",
+   "by": "opus"
+  },
+  {
+   "name": "compare-slider",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Before/after drag divider is a common pattern that carries over to touch but is not distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "confirm-button",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "Press-twice confirm is a useful tactile pattern on touch, though platforms offer confirmation dialogs.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "content-gate",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A paywall card and overlay is standard; apps use store paywalls and their own gating.",
+   "by": "opus"
+  },
+  {
+   "name": "cookie-consent",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Browser cookie banner; native apps use system tracking consent prompts.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "copy-code-button",
+   "class": "tactile",
+   "nativeValue": "low",
+   "reason": "Tap-to-copy with a check is useful, but phones already offer good enough copy feedback.",
+   "by": "opus"
+  },
+  {
+   "name": "count-chart",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "Charts drawn as countable objects you tap to read, more distinctive than a plain chart library.",
+   "by": "opus"
+  },
+  {
+   "name": "countdown-banner",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A sale banner with a flip countdown carries over to apps but is a standard promo section.",
+   "by": "opus"
+  },
+  {
+   "name": "coupon-apply",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A coupon that breaks into particles and flows into the total is a manipulable object moment that works for mobile checkout.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "coupon-claim-card",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A coupon with a lifting lid revealing the code is a recognisable object that suits touch claiming.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "coupon-wallet",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A fanning stack of coupons you pick from is a distinctive object that works well with tap and focus on a phone.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "cursor-effects",
+   "class": "effect-library",
+   "nativeValue": "none",
+   "reason": "A prop-switched set of cursor effects that has no meaning without a pointer.",
+   "by": "opus"
+  },
+  {
+   "name": "curve-rail-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A launch hero tied to page scroll and hover; native apps have carousels that are good enough.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "cutaway-spec",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A drag-to-reveal take-apart of a product that works as well by touch and is hard to find elsewhere.",
+   "by": "opus"
+  },
+  {
+   "name": "day-night-hero",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "An SVG scene that turns from day to night, charming but made as a campaign hero.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "depth-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "Landing hero with mouse parallax layers; on phones only scroll or tilt parallax remains and it is page-tied.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "dial-scrubber",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "A momentum ruler that snaps with a spring is a distinctive drag picker that feels great on touch.",
+   "by": "opus"
+  },
+  {
+   "name": "dialog-sheet",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Dialog and bottom sheet are built into every mobile platform.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "drop-release-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A composed landing hero whose feature cards preview on hover, so it suits web pages more than app screens.",
+   "by": "opus"
+  },
+  {
+   "name": "empty-state",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Static empty-state card that every app already has.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "error-state",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Static error panel with retry; standard in every app.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "expanding-search",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Search field with suggestions is a standard control with native search bars; the slash shortcut is keyboard-only.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "faq-accordion",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "An accordion FAQ is a standard section and its SEO JSON-LD has no native value.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "favorite-button",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "The heart press delight carries over, but the control is simple and common in native apps.",
+   "by": "opus"
+  },
+  {
+   "name": "festival-banner",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A seasonal announcement banner or hero with presets; apps already have in-app banners.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "file-dropzone",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Drag-and-drop upload is a web idiom; phones use system file and photo pickers.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "flash-sale-hero",
+   "class": "page-template",
+   "nativeValue": "medium",
+   "reason": "A sale hero with countdown can serve as an app promo screen but is a composed, not distinctive, section.",
+   "by": "opus"
+  },
+  {
+   "name": "flash-sale-product-card",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A product card with sold progress and quick add is useful in shop app grids but is a common pattern.",
+   "by": "opus"
+  },
+  {
+   "name": "floating-field",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A masked form field; phone keyboards, input types and autofill already cover most of it.",
+   "by": "opus"
+  },
+  {
+   "name": "floating-social",
+   "class": "tactile",
+   "nativeValue": "low",
+   "reason": "A fan-out corner menu feels good, but apps have FAB speed dials and social link menus are a website need.",
+   "by": "opus"
+  },
+  {
+   "name": "fold-invite-card",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A folded invitation card that opens on tap is a distinctive manipulable object suited to touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "free-shipping-progress",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A spend-goal progress line fits app cart screens directly, though it is a simple common element.",
+   "by": "opus"
+  },
+  {
+   "name": "gift-box-reveal",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A gift sleeve and tag that unlocks and slides out is a small object scene that feels good on touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "gift-card-designer",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A gift card that flips and updates live as you type, a recognisable object that works well on touch.",
+   "by": "opus"
+  },
+  {
+   "name": "gift-guide-fan",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Draggable fanned card stack with swipe to keep or skip is a strong touch interaction.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "glass-cube-hero",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A draggable glass cube holding a small world, distinctive on touch but a heavy shader aimed at heroes.",
+   "by": "opus"
+  },
+  {
+   "name": "glass-lens-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A full hero built around a drag-to-switch theme lens; the glass optics lean on SVG filters and pointer light, and native has theme toggles.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "glow-dock",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A phone or desktop scene with an expanding island of widgets; it copies a native pattern and the dock is a showcase scene.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "gradient-backdrop",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "One file with nine background presets via prop; shader gradients work on phones but are just a backdrop.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "hero-billboard-carousel",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "At its core a peeking-cover swipe carousel; touch suits it, but native pagers already cover most of it.",
+   "by": "opus"
+  },
+  {
+   "name": "holiday-calendar",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A standard month calendar whose seasonal header scene adds some flavour.",
+   "by": "opus"
+  },
+  {
+   "name": "holiday-cutoff",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Shipping method picker with live countdowns carries over but is a standard checkout section.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "hoop-upload",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "Flicking a file into a hoop suits touch, but it is a campaign novelty next to the system photo picker.",
+   "by": "opus"
+  },
+  {
+   "name": "hotspots",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Numbered pins with note cards on an image carry over to touch, but it is a fairly standard annotation pattern.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "hover-card",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Opens on a hover delay; phones use long-press previews or sheets instead.",
+   "by": "opus"
+  },
+  {
+   "name": "hover-motion",
+   "class": "effect-library",
+   "nativeValue": "none",
+   "reason": "One block holding several pointer hover effects that switch off on touch.",
+   "by": "opus"
+  },
+  {
+   "name": "image-effects",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "Library of image effects switched by prop; some are hover-based but reveal, Ken Burns and lightbox carry over.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "infinite-canvas",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A wrapping gallery board you drag to pan with inertia; touch panning feels better than mouse and it is distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "ink-filter-bar",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "Filter chips whose value is the ink-pour feel when tapped, though filter chips are common.",
+   "by": "opus"
+  },
+  {
+   "name": "jobs-tray",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A standard background-progress tray; platforms offer progress notifications and live activities.",
+   "by": "opus"
+  },
+  {
+   "name": "kelvin-switch",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "Glass-key colour temperature slider with snapping and trail is a distinctive drag control that suits touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "lamp-dimmer-scene",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A lit lamp scene driven by a drag key is distinctive and suits touch.",
+   "by": "opus"
+  },
+  {
+   "name": "launch-countdown-wall",
+   "class": "page-template",
+   "nativeValue": "medium",
+   "reason": "A composed drop section with flip countdown, notify signup and states; countdowns carry to apps but not distinctively.",
+   "by": "opus"
+  },
+  {
+   "name": "launch-stage-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A launch landing hero with carousel and tabs, which fits a web page more than an app screen.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "lightbox",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A standard image viewer, but the grow-from-thumbnail and drag-to-dismiss feel carries over well.",
+   "by": "opus"
+  },
+  {
+   "name": "lineup-shelf",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "Dragging a strip so products on a shelf follow and step forward is a good touch gesture, but it is a product carousel.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "link-preview-card",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Unfurled link cards are a standard pattern and native platforms offer link preview components.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "liquid-glass-nav",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A floating site header over a hero photo; iOS provides liquid glass navigation natively.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "live-activity-wall",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A marketing wall imitating lock-screen cards makes no sense inside a phone app.",
+   "by": "opus"
+  },
+  {
+   "name": "live-bento",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A marketing feature bento section for landing pages, not a phone app screen.",
+   "by": "opus"
+  },
+  {
+   "name": "loading-button",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "A button with loading, success and error states; useful on phones but a common pattern.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "loading-effects",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Many loaders switched by a variant prop; every platform has spinners and skeletons that are good enough.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "logo-marquee",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A trusted-by logo strip is landing-page marketing chrome that phone apps do not use.",
+   "by": "opus"
+  },
+  {
+   "name": "lookbook-expand-hero",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A landing hero driven by page scroll, tied to a web page.",
+   "by": "opus"
+  },
+  {
+   "name": "loop-shader-hero",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A full landing hero with WebGL backgrounds, partly tied to page scroll, and decorative on a phone.",
+   "by": "opus"
+  },
+  {
+   "name": "low-stock-indicator",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A simple stock meter, trivial to rebuild natively.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "lunar-new-year",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A full seasonal campaign page with many sections.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "micro-interactions",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "Slide, hold and swipe to confirm, stretchy toggle and like burst are touch-first and feel-driven.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "morph-menu",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "The value is the morph from trigger into menu, which carries to touch, but native context menus already cover the basic need.",
+   "by": "opus"
+  },
+  {
+   "name": "motion-principles",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "Wrapper with 18 animation principles on any child; tap-triggered reactions work well on touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "newsletter-signup",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A plain email signup form that every platform already has.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "notification-bell",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Bell with unread badge and popover; phones have system notifications and inbox screens.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "notify-badge",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Count badge on an icon; every platform ships tab and icon badges.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "orbit-gallery",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A draggable 3D sphere of images with inertia; touch spinning is natural and it is distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "order-history",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "An expandable list of orders, a standard account list section.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "order-island",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "A morphing status pill is a Dynamic Island style interaction that suits phones very well.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "order-tracker",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A shipping timeline is a standard section but very common and useful in commerce apps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "otp-input",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A common phone pattern; the shake and success feel add polish over the bare system field.",
+   "by": "opus"
+  },
+  {
+   "name": "pagination",
+   "class": "generic-control",
+   "nativeValue": "none",
+   "reason": "Numbered, crawlable page links are a web pattern; phone apps use infinite scroll.",
+   "by": "opus"
+  },
+  {
+   "name": "payment-status-banner",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A checkout result banner with polling is a standard feedback section that every app builds natively.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "peel-sticker-coupon",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A drag-to-peel sticker that reveals a coupon works great with touch and is distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "person-chip",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A standard avatar and name badge that every team already builds.",
+   "by": "opus"
+  },
+  {
+   "name": "phone-frame",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A device mockup for marketing pages makes no sense inside a real phone app.",
+   "by": "opus"
+  },
+  {
+   "name": "photo-looks",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "24 image looks via prop; filters exist natively and the hover interaction does not carry over.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "physics-cart-jar",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Tokens fall into a jar and can be grabbed and flung, which suits touch and gyro well.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pickup-ticket",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A pass ticket with a swipe-to-redeem bar is a natural touch gesture and fits wallet-style app screens.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-boss-sale",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A flash sale shown as a boss fight with HP and loot works on phones but is limited to sale events.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-build-progress",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A pixel building site with a crew is a small world you watch, and progress for exports or downloads fits phones, though it is a one-way display.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-check-in",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Tapping to claim coins into a wallet and a chest burst on day seven is a daily-reward loop that suits game and reward apps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-fx",
+   "class": "effect-library",
+   "nativeValue": "high",
+   "reason": "Reward burst, confetti and dissolve effects switch by preset, and touch-triggered celebration moments suit phones well.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-gacha",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A capsule machine with a rarity reveal is a distinctive touch-friendly reward that mobile games use heavily.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-grove",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A drag-to-gust pixel tree world where a lantern falls and reveals a reward is a touch-friendly toy scene.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-level-track",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "XP orbs flying into a bar with a level-up burst is a battle-pass pattern that phone apps use as a core loop.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "pixel-preregister",
+   "class": "object-scene",
+   "nativeValue": "low",
+   "reason": "A pixel pre-registration counter with fireworks, mainly a web launch-page device.",
+   "by": "opus"
+  },
+  {
+   "name": "plan-comparison",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A plan comparison table is a standard section that apps rarely need in custom form.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "plush-portrait",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A portrait you grab and stretch like a soft toy is playful and works better with touch than a mouse.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "point-cloud",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A 3D dot object the user spins by dragging; touch works, but it is mostly decorative.",
+   "by": "opus"
+  },
+  {
+   "name": "price-history",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A scrubbable price chart that suits touch, but charts are a standard section.",
+   "by": "opus"
+  },
+  {
+   "name": "pricing-cards",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Pricing cards are a standard section and native paywall patterns already exist.",
+   "by": "opus"
+  },
+  {
+   "name": "prize-wheel",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A spinning prize wheel is a recognisable object that works well on touch in games and promotions.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "product-filter-grid",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A filterable product grid is a standard commerce list that native lists and filter sheets handle.",
+   "by": "opus"
+  },
+  {
+   "name": "product-finder",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A common quiz-and-rank flow that carries over; only the re-ranking motion stands out.",
+   "by": "opus"
+  },
+  {
+   "name": "product-gallery",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Swipe galleries with a fullscreen viewer are built into every platform.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "product-media",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A product image gallery with swipe and zoom is covered by native pagers and image viewers.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "quantity-stepper",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "Long-press repeat and remove-at-minimum make a small touch control whose value is in the press.",
+   "by": "opus"
+  },
+  {
+   "name": "quota-meter",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A usage ring or bar with a percent is a standard progress display that platforms already provide.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "range-slider",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "A dual-thumb slider carries over and drag works on touch, but native sliders exist and range ones are only partly covered.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "raster-image",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Image modes switched by a prop; the reaction is pointer-led and it is a niche hero treatment.",
+   "by": "opus"
+  },
+  {
+   "name": "receipt-printer",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A receipt feeds out of a printer slot and folds, a distinctive moment after payment in an app.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "recipe-glass",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "Ingredients pouring into a drawn glass layer by layer is a tappable object scene, useful in recipe or drink apps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "redeem-key-input",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A license key input that formats as you type is a plain form field with a result card, which phones already handle.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "redline-reveal",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "It builds a wireframe from the live DOM and flies a camera over page elements, which only makes sense on a scrolling web page.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "referral-queue",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Waitlist with share link and progress track carries over to apps but is a common pattern.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "reservation-timer",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A hold ticket with rolling digits fits phone checkout, but a countdown is easy to build.",
+   "by": "opus"
+  },
+  {
+   "name": "restock-notify",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Variant picker with a notify-me email form is a standard product-page pattern that carries over to apps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "review-request",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A star rating and reason chips form that platforms and teams already have.",
+   "by": "opus"
+  },
+  {
+   "name": "ribbon-carousel",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A swipeable carousel on a curved ribbon works well with touch, though carousels are a standard component.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "scene-transitions",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Film-style transitions switched by prop are decorative; native navigation already handles screen changes.",
+   "by": "opus"
+  },
+  {
+   "name": "scratch-card",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Scratching a card with a finger is a natural touch interaction and distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "scripted-demo",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "An auto-playing walkthrough in a browser frame with a fake cursor, built as a web landing hero.",
+   "by": "opus"
+  },
+  {
+   "name": "scroll-effects",
+   "class": "effect-library",
+   "nativeValue": "none",
+   "reason": "A set of effects for page-scroll storytelling, tied to a web page narrative.",
+   "by": "opus"
+  },
+  {
+   "name": "scroll-progress",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A reading progress bar tied to page scroll is page chrome that a native navigation container handles.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "scroll-reveal-text",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Text that darkens as the page scrolls is landing-page scroll storytelling.",
+   "by": "opus"
+  },
+  {
+   "name": "scroll-story",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Page-scroll storytelling with a sticky panel tied to a web landing page.",
+   "by": "opus"
+  },
+  {
+   "name": "scroll-tilt-stage",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A 3D tilt reveal driven by page scroll for web landing sections.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "scroll-timeline",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A vertical timeline whose progress mode is order tracking, which carries to apps; scroll mode is the web part.",
+   "by": "opus"
+  },
+  {
+   "name": "scrub-stat-card",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "Running a finger along a chart to read values is a touch-native interaction.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "self-building-page",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A landing page that assembles itself on page scroll, which only makes sense as a web page.",
+   "by": "opus"
+  },
+  {
+   "name": "shader-campaign-banner",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A campaign hero section on a GLSL shader; native apps would use Metal or Skia shaders and rarely a banner like this.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "shipping-options",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Radio cards for delivery methods, a standard checkout control platforms already cover.",
+   "by": "opus"
+  },
+  {
+   "name": "shoppable-lookbook",
+   "class": "page-template",
+   "nativeValue": "medium",
+   "reason": "A composed lookbook section whose photo pins and bundle carry over to shopping apps, though it is not unique.",
+   "by": "opus"
+  },
+  {
+   "name": "shoppable-story",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A whole editorial article with hover cards; apps use native article views and sheets.",
+   "by": "opus"
+  },
+  {
+   "name": "showcase-mosaic",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A lookbook section of filter sidebar plus grid, standard parts with a hover scrim that needs a tap redesign.",
+   "by": "opus"
+  },
+  {
+   "name": "side-panel",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A drawer or sheet, which every mobile platform already ships.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "size-finder",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "Sliders move a needle on a tape ruler, which feels good by touch, but it is a niche size calculator.",
+   "by": "opus"
+  },
+  {
+   "name": "skeleton-set",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Loading placeholders that every platform and team already has.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "skill-grid",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A filterable logo tile grid is a portfolio section that carries over but adds little in an app.",
+   "by": "opus"
+  },
+  {
+   "name": "sky-time-switch",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Draggable lake landscape that scrubs time of day is a memorable touch-driven small world and theme switch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "sliding-tabs",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Tabs and segmented control with a sliding indicator, which native segmented controls already provide.",
+   "by": "opus"
+  },
+  {
+   "name": "social-button",
+   "class": "tactile",
+   "nativeValue": "low",
+   "reason": "Coloured round social buttons with a press spring are useful but native apps have standard icon buttons.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "social-links",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Plain row of social profile links with hover-expanding labels; every app already has share and link buttons.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "specimen-scan",
+   "class": "object-scene",
+   "nativeValue": "low",
+   "reason": "A drawn dot-matrix product scene with tracking overlay, but hover-driven and suited to web product heroes.",
+   "by": "opus"
+  },
+  {
+   "name": "spine-shelf",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A 3D shelf of spines picked by tap carries to touch, though hover tilt is lost and the use is niche.",
+   "by": "opus"
+  },
+  {
+   "name": "spring-rig",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "Springy line drawings that react to taps and long presses; playful but mostly decorative in an app.",
+   "by": "opus"
+  },
+  {
+   "name": "stamp",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "A small result mark with a spring-drawn check that works on touch but is not distinctive.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "stamp-card",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A loyalty stamp card is a recognisable object that fits phone wallets and loyalty apps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "star-rating",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "A touch-friendly rating input with reason chips, useful but a familiar pattern.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "status-dot",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A status badge with a morphing dot that platforms already cover well enough.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "step-demo",
+   "class": "page-template",
+   "nativeValue": "none",
+   "reason": "A scrubbable product demo window for marketing landing pages, not app UI.",
+   "by": "opus"
+  },
+  {
+   "name": "sticker-board",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Peeling die-cut stickers and dragging them onto a surface is a hands-on interaction that feels natural by touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "storage-meter",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A storage usage card with a categorised bar is a standard settings section; hover highlights would need to become taps.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "store-header",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "A site header that hides on scroll; native navigation bars provide this.",
+   "by": "opus"
+  },
+  {
+   "name": "store-help-widget",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A help bubble and chat panel, which apps already get from support SDKs.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "story-player",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Full-screen tap-to-step stories with long-press pause are native to phones.",
+   "by": "opus"
+  },
+  {
+   "name": "subscription-manager",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Account management screen with chips and a stepper is useful but standard.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "svg-effects",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "One file switching between ten SVG effects through a prop, mostly decorative.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "swipe-shortlist",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "A swipe deck with tilt and undo is native to phones and works better on touch.",
+   "by": "opus"
+  },
+  {
+   "name": "team-invite",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A standard invite form with chips and roles that every team already has.",
+   "by": "opus"
+  },
+  {
+   "name": "tear-pack-reveal",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "Dragging to tear a foil pack and reveal reward cards is a touch-native object interaction well suited to phones.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "terms-consent",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A checkout consent checklist that every team builds with standard checkboxes.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "testimonial-marquee",
+   "class": "page-template",
+   "nativeValue": "low",
+   "reason": "A landing-page social proof section with looping review rows; hover parts drop out and scrollers are standard.",
+   "by": "opus"
+  },
+  {
+   "name": "testimonial-wall",
+   "class": "generic-control",
+   "nativeValue": "none",
+   "reason": "A masonry review wall is a marketing page section with little place in a phone app.",
+   "by": "opus"
+  },
+  {
+   "name": "text-effects",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "One file switching 21 text effects by prop; text animation carries over to phones but is decorative.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "theme-picker",
+   "class": "tactile",
+   "nativeValue": "low",
+   "reason": "A feel-driven sun-to-moon toggle, but the OS and settings screens already handle appearance.",
+   "by": "opus"
+  },
+  {
+   "name": "theme-reveal",
+   "class": "effect-library",
+   "nativeValue": "medium",
+   "reason": "Switches between theme transition effects through a prop; usable in apps but not essential.",
+   "by": "opus"
+  },
+  {
+   "name": "tier-progress",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A loyalty card with progress gauge and tier ladder is common progress UI that carries over well.",
+   "by": "opus"
+  },
+  {
+   "name": "tiny-chart",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A playable isometric process explainer that works on touch but serves niche help content.",
+   "by": "opus"
+  },
+  {
+   "name": "toast-stack",
+   "class": "tactile",
+   "nativeValue": "medium",
+   "reason": "Swipe-to-dismiss stacked toasts with undo suit touch, though snackbars cover the basic need.",
+   "by": "opus"
+  },
+  {
+   "name": "toc-scrollspy",
+   "class": "web-only",
+   "nativeValue": "none",
+   "reason": "Table of contents following page scroll is page-level web navigation.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "type-motion",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Three typographic effects behind a prop; text on path and variable fonts are available natively.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "typewriter",
+   "class": "effect-library",
+   "nativeValue": "low",
+   "reason": "Simple typing text effect that is easy to build natively anywhere.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "upgrade-modal",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "A plan upgrade dialog is a standard modal that native sheets cover well.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "upsell-drawer",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "An add-to-cart bottom sheet with add-ons that carries over well but is a standard sheet pattern.",
+   "by": "opus"
+  },
+  {
+   "name": "variant-picker",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "Colour and size selector with stock state is a standard commerce control, though hover preview is lost on touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "voice-note",
+   "class": "object-scene",
+   "nativeValue": "high",
+   "reason": "A voice message waveform that morphs into a transcript fits chat apps, which live on phones.",
+   "by": "opus"
+  },
+  {
+   "name": "volume-tiers",
+   "class": "generic-control",
+   "nativeValue": "medium",
+   "reason": "A quantity-break pricing table with a stepper; useful but standard.",
+   "by": "opus"
+  },
+  {
+   "name": "vote-terrain",
+   "class": "object-scene",
+   "nativeValue": "medium",
+   "reason": "A contour landscape you tap to raise a hill, touch friendly but an occasional campaign moment.",
+   "by": "opus"
+  },
+  {
+   "name": "wave-confirm",
+   "class": "tactile",
+   "nativeValue": "high",
+   "reason": "A confirm-press card where a light wave rises from the touch point is a distinctive payment moment that works well with touch.",
+   "by": "haiku+sonnet"
+  },
+  {
+   "name": "workspace-tabs",
+   "class": "generic-control",
+   "nativeValue": "low",
+   "reason": "Browser-style desktop tabs with close and reorder suit desktop frames; phones have their own tab bars.",
+   "by": "haiku+sonnet"
+  }
+ ]
+}

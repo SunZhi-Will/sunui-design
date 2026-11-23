@@ -7,6 +7,7 @@ Use `package:flutter/widgets.dart` plus what you need from `material.dart` for `
 - Text: `TextStyle(fontSize:, height: lineHeight / fontSize, fontWeight: FontWeight.w500 / w600, letterSpacing: em * fontSize)`. `tabular-nums` = `fontFeatures: [FontFeature.tabularFigures()]`. `font-mono` = `fontFamily: 'monospace'` with `fontFamilyFallback: ['Menlo', 'Courier']`. Text scales with the system setting by default; leave that on.
 - Corners: `BorderRadius.circular(r)`.
 
+<!-- only:motion -->
 ### Motion
 - Springs map one to one: `SpringDescription(mass: m, stiffness: k, damping: c)`. Drive an unbounded `AnimationController` with `controller.animateWith(SpringSimulation(spring, from, to, velocity))` and read `controller.value`, which may overshoot. Do not use `Curves.elasticOut` or `SpringDescription.withDampingRatio` as a stand-in.
 - Tweens: `Cubic(x1, y1, x2, y2)` with the source's control points and a `Duration` in milliseconds.
@@ -14,6 +15,7 @@ Use `package:flutter/widgets.dart` plus what you need from `material.dart` for `
 - `AnimatePresence` enter and exit = `AnimatedSwitcher` with `duration`, `reverseDuration`, `switchInCurve`, `switchOutCurve` and a `transitionBuilder`. Give each child a `ValueKey`. The out curve is applied to a reversing animation, so pass the source curve `.flipped`. One builder serves both directions: when enter and exit differ (y 6 in, y -6 out, or fade only on the way out) branch on `animation.status == AnimationStatus.reverse`. `mode="popLayout"` = a `layoutBuilder` that puts the previous children in `Positioned` inside a `Stack`, re-applying any max width, so the leaving one holds no space.
 - A CSS `animate-spin` spinner = a repeating 1 second `RotationTransition`, stopped under reduced motion.
 - Reduced motion: `MediaQuery.disableAnimationsOf(context)`; jump to the end value instead of animating.
+<!-- end -->
 
 ### Input
 - There is no hover on touch. Drop `hover:` styles. Keep pressed styles with `GestureDetector` (`onTapDown`, `onTapUp`, `onTapCancel`): `active:translate-y-px` = `Transform.translate(offset: Offset(0, 1))`, `active:scale-[0.97]` = `Transform.scale`.
@@ -29,7 +31,9 @@ Use `package:flutter/widgets.dart` plus what you need from `material.dart` for `
 ### Surfaces
 - Colours come from `SunUITheme` (below), a `ThemeExtension`. If the project has no equivalent, add it as `sunui_theme.dart`; if the app already has its own colour system, point the roles at that instead. Read it with `SunUITheme.of(context)`. Never use `Theme.of(context).colorScheme` in place of a role.
 - A CSS shadow maps to `BoxShadow(offset:, blurRadius: blur, spreadRadius: spread, color:)`; negative spread is supported. A 1px ring or `border` is `Border.all(width: 1)`. An inset top highlight is a 1px `Container` at the top inside a `ClipRRect`.
+<!-- only:canvas -->
 - HTML canvas = `CustomPainter`. `destination-out` erasing = draw inside `canvas.saveLayer` and paint the strokes with `BlendMode.clear`. There is no cheap pixel read; when the source samples pixels, track the same quantity yourself (a 64 x 64 grid of cells marked as the brush passes) and keep the same threshold semantics.
+<!-- end -->
 
 ### Shape of the code
 - One self-contained Dart file for the component, a `StatefulWidget`. Props become named constructor parameters with the same defaults; `ReactNode` becomes `Widget` (or `String` where the source only ever passes text); callbacks become `VoidCallback` / `ValueChanged<T>`; an awaited action is `Future<T?> Function()`.

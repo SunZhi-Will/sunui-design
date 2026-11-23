@@ -12,6 +12,7 @@ The target is still the web, so the styling does not change at all.
 - Spring objects, tween objects, easing arrays, durations.
 - DOM structure, roles, aria attributes, pointer and keyboard handlers (`onclick`, `onpointerdown`, `onkeydown`: lower-case attributes in Svelte 5).
 
+<!-- only:motion -->
 ### Motion
 `import { animate } from "motion"`. `animate(element, { left: "40%", scale: 1.15 }, { type: "spring", stiffness: 520, damping: 34 })` takes the same spring and tween options as framer-motion's `transition`. Check the installed package's types in `node_modules/motion` and `node_modules/motion-dom` for anything you are unsure of; do not guess from the React API.
 
@@ -25,6 +26,7 @@ The target is still the web, so the styling does not change at all.
 | `mode="popLayout"` | the leaving node must not hold layout space: set `position: absolute` on it in `onoutrostart` |
 | `useReducedMotion()` | `prefersReducedMotion.current` from `svelte/motion` |
 | `whileTap`, `whileHover` | the CSS `active:` / `hover:` classes if the source also has them, otherwise pointer handlers calling `animate` |
+<!-- end -->
 
 ### React to Svelte
 - One component file, `<script lang="ts">`. A generic component uses `<script lang="ts" generics="...">`.

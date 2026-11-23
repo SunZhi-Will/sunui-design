@@ -1,0 +1,152 @@
+{
+ "block": "pagination",
+ "summary": "Acceptance checklist for the SunUI pagination block: numbered page list with fixed-length ellipsis ranges, previous and next controls, a sliding current-page underline, a link mode and a compact \"3 / 38\" mode, checked against the three-instance demo.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render-main",
+   "behaviour": "The first demo card (Home and living) shows a 12-page pagination (286 items at 24 per page) on page 6, with the item range text above it.",
+   "trigger": "initial render",
+   "expect": "Header text reads \"121 to 144 of 286 items\". Row reads in order: Previous, 1, ellipsis, 5, 6, 7, ellipsis, 12, Next. Page 6 is semibold in the foreground colour with a 2px underline; other numbers are muted. Previous and Next are both enabled.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "first-render-secondary",
+   "behaviour": "The other two demo cards render their initial states.",
+   "trigger": "initial render",
+   "expect": "Order history: Previous (disabled, 40% opacity), 1, 2, 3, 4, Next, with 1 as the current page and no ellipsis. Customer reviews: compact mode reading \"Previous 3 / 38 Next\" with no page numbers, both controls enabled.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "range-fixed-length",
+   "behaviour": "With 12 pages and 1 sibling the number row always has exactly 7 slots (siblings*2+5), so the layout does not change length when moving pages. An ellipsis appears on a side only when that side hides more than one page.",
+   "trigger": "Select pages 1, 4, 5, 9 and 12 in the first card",
+   "expect": "Page 1: 1 2 3 4 5 … 12. Page 4: 1 2 3 4 5 … 12. Page 5: 1 … 4 5 6 … 12. Page 9: 1 … 8 9 10 11 12. Page 12: 1 … 8 9 10 11 12. Always 7 slots between Previous and Next. When total is 7 or fewer, all pages show with no ellipsis (Order history shows 1 to 4).",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "select-page",
+   "behaviour": "Activating a page number makes it current and the demo range text updates.",
+   "trigger": "Click or activate \"Page 7\" in the first card",
+   "expect": "Page 7 becomes current (aria-current=\"page\", semibold, underlined), row becomes 1 … 6 7 8 … 12, header reads \"145 to 168 of 286 items\".",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "prev-next",
+   "behaviour": "Previous moves one page back and Next one page forward.",
+   "trigger": "From page 6, activate Next once, then Previous twice",
+   "expect": "Current page goes 7, then 6, then 5. Header after the last press reads \"97 to 120 of 286 items\".",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "range-text-ends",
+   "behaviour": "The demo range text is correct at both ends; on the last page the upper bound is clamped to the item total, so the last page holds 22 items, not 24.",
+   "trigger": "In the first card, select page 1, then page 12",
+   "expect": "Page 1 header reads \"1 to 24 of 286 items\". Page 12 header reads \"265 to 286 of 286 items\" (never \"265 to 288\").",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "limits-disabled",
+   "behaviour": "Previous is disabled on the first page and Next is disabled on the last page; pressing a disabled control does nothing.",
+   "trigger": "Navigate the first card to page 1, then to page 12; press the disabled control repeatedly",
+   "expect": "On page 1 Previous is disabled at 40% opacity with no hover background and no effect when pressed; on page 12 Next is the same. The page never goes below 1 or above 12. In compact mode Previous disables at 1 / 38 and Next at 38 / 38.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "current-page-noop",
+   "behaviour": "Activating the button for the page that is already current, repeatedly, changes nothing visible.",
+   "trigger": "In the first card, click \"Page 6\" several times while page 6 is current",
+   "expect": "Page 6 stays current with aria-current=\"page\", the underline stays under 6 without moving or replaying, the row stays 1 … 5 6 7 … 12, and the header stays \"121 to 144 of 286 items\".",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "underline-spring",
+   "behaviour": "The underline under the current page slides from the old page to the new page instead of jumping, and each instance has its own underline.",
+   "trigger": "In the first card, with motion allowed, move from page 6 to page 7, then from page 7 to page 12",
+   "expect": "A 2px-high rounded bar in the foreground colour, inset 8px from the left and right of the cell and 4px from its bottom, is seen at intermediate positions between the old and new cell for a short moment (well under 1s) before resting under the new page; it is not an instant jump. The underlines in Order history and Customer reviews never move or flash when the first card changes.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "Under reduced motion the underline moves to the new page instantly.",
+   "trigger": "Enable prefers-reduced-motion and change pages in the first card",
+   "expect": "The underline appears under the new current page in the next frame, with no intermediate positions. Everything else (states, text, colours) is unchanged.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order-buttons",
+   "behaviour": "Tab stops only on interactive controls, in visual order; ellipses, the underline, chevrons and the compact text are skipped. Disabled controls are not stops.",
+   "trigger": "Press Tab repeatedly from before the first card on initial render",
+   "expect": "First card: Previous, Page 1, Page 5, Page 6, Page 7, Page 12, Next (7 stops). Order history: Page 1, Page 2, Page 3, Page 4, Next (the disabled Previous is not a stop). Customer reviews: Previous, Next. Each focused control shows a 2px focus ring with a 2px offset.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-activate",
+   "behaviour": "Buttons activate with Enter and Space, and focus stays on the activated control when it remains enabled.",
+   "trigger": "Focus \"Page 7\" in the first card and press Enter; focus Next and press Space",
+   "expect": "Enter on Page 7 makes it current and focus remains on Page 7. Space on Next advances to page 8 and focus stays on Next.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "link-mode",
+   "behaviour": "When hrefs are provided (Order history) pages and Previous/Next render as links with real hrefs, and the disabled control is a non-focusable element marked aria-disabled.",
+   "trigger": "Inspect Order history, then click Page 3, then Page 4",
+   "expect": "Page links point to #orders-page-1 to #orders-page-4. The disabled Previous is not a link, has aria-disabled=\"true\" and no href. Clicking Page 3 sets the URL hash to #orders-page-3 and Page 3 becomes current; Previous becomes an enabled link to #orders-page-2. On page 4 Next becomes the aria-disabled non-link.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "link-keyboard-and-current",
+   "behaviour": "Links in Order history activate with Enter only, and the current page link keeps its href, so activating it still navigates to its hash while the state stays the same.",
+   "trigger": "On initial render, focus Page 2 in Order history and press Space, then press Enter; then activate Page 1 while page 2 is current, then activate Page 1 again",
+   "expect": "Space on the Page 2 link does not change the page (the browser may scroll). Enter on Page 2 makes it current and sets the hash to #orders-page-2. Activating Page 1 sets the hash to #orders-page-1 and makes it current; activating it again keeps the hash #orders-page-1 and page 1 stays current with nothing else changing.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "accessible-names",
+   "behaviour": "The control has a named navigation landmark, page numbers have spoken names, and the current page is marked.",
+   "trigger": "initial render, read the accessibility tree",
+   "expect": "Each instance is a navigation landmark named \"Pagination\" containing a list. Page controls are named \"Page 1\", \"Page 5\" and so on; the current one has aria-current=\"page\". Previous and Next are named \"Previous\" and \"Next\" from their text; chevron icons, the underline and the ellipsis items are hidden from assistive tech.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "compact-live",
+   "behaviour": "In compact mode the \"page / total\" text sits in a polite live region, so page changes are announced.",
+   "trigger": "Activate Next in the Customer reviews card",
+   "expect": "Text changes from \"3 / 38\" to \"4 / 38\" inside a list item with aria-live=\"polite\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "locale",
+   "behaviour": "Built-in block strings and the demo copy (card titles and range header) follow the demo locale.",
+   "trigger": "With the first card on page 6, switch the demo locale to zh-TW, zh-CN and ja",
+   "expect": "zh-TW: nav \"分頁\", \"上一頁\", \"下一頁\", page names \"第 6 頁\"; titles 居家生活, 訂單紀錄, 顧客評價; header \"第 121 至 144 項，共 286 項\". zh-CN: \"分页\", \"上一页\", \"下一页\", \"第 6 页\"; titles 家居生活, 订单记录, 用户评价; header \"第 121 至 144 项，共 286 项\". ja: \"ページ送り\", \"前へ\", \"次へ\", \"6 ページ目\"; titles ホーム & リビング, 注文履歴, カスタマーレビュー; header \"全 286 件中 121〜144 件\". Compact text stays \"3 / 38\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "layout-narrow",
+   "behaviour": "Cells keep a fixed size, and below the small breakpoint the Previous and Next words are visually hidden but still read.",
+   "trigger": "Measure the first card, then narrow the viewport below 640px",
+   "expect": "Each page cell is 36px tall and at least 36px wide; ellipsis slots are 36px tall and at least 28px wide; items are 4px apart and centered. Below 640px Previous and Next show only the chevron, and their accessible names remain \"Previous\" and \"Next\".",
+   "kind": "layout",
+   "scope": "all"
+  }
+ ]
+}

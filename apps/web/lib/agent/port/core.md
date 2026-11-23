@@ -7,8 +7,11 @@
 4. **Continuity.** When the source morphs one element (same button grows wider, text slides out and in), the port morphs the same element. Do not swap in a different view or cross-fade the whole thing.
 5. **Reduced motion.** Where the source checks `useReducedMotion`, the port checks the platform setting and switches instantly, losing no information.
 6. **Accessibility.** Every role, label, live announcement and keyboard action in the source has a platform equivalent.
+<!-- only:locale -->
 7. **Built-in copy, if the source has it.** Where the source has a four-language message table (en, zh-TW, zh-CN, ja), a `locale` prop and a `labels` override, keep all three. Where it has none, add none.
+<!-- end -->
 
+<!-- only:motion -->
 ## The three springs (physical parameters; mass is 1 unless given)
 | name | stiffness | damping | mass | used for |
 |---|---|---|---|---|
@@ -25,6 +28,7 @@ Tweens in framer-motion (checked against version 12):
 - A value with no transition at all: transforms use a spring (stiffness 500, damping 25; scale uses 550 and 30), everything else a 0.3s tween on (0.25, 0.1, 0.35, 1).
 - `whileTap` and `whileHover` animate with the element's own `transition` prop, not with a default.
 - `layout` also animates `borderRadius` and `boxShadow` set in `style`.
+<!-- end -->
 
 ## Colour roles and their default values
 Blocks never hard-code colours; they read roles. Map each role to the host app's own colour system if it has one, otherwise use these defaults.
@@ -64,8 +68,12 @@ Blocks never hard-code colours; they read roles. Map each role to the host app's
 - **Press feedback follows the source.** A CSS `active:` style on a property that is in the element's `transition-[...]` list takes Tailwind's 150ms tween; on a property that is not listed it is instant. A framer-motion `whileTap` uses that element's `transition`. Use the snappy spring only where the source does.
 - **Tailwind's default transition** (a bare `transition-[...]` or `transition-colors`) is 150ms on cubic-bezier(0.4, 0, 0.2, 1).
 - **`className`** is a web styling hook. On another web framework keep it as a `class` prop merged through `cn`; on a native platform drop it.
+<!-- only:deps -->
 - **Dependencies** (a second source file in this document): port only the part this block uses, as a private helper. Old aliases are not needed.
+<!-- end -->
+<!-- only:canvas -->
 - **Pixel sampling** (`getImageData` to measure how much is erased): where the platform cannot read pixels, track a 64 x 64 grid of cells and mark a cell once the brush has covered its centre.
+<!-- end -->
 
 - **Reduced motion is about movement.** A CSS colour transition with no `motion-safe:` in front of it stays under reduced motion; only what the source switches off is switched off.
 - **Private subcomponents** defined in the source file stay in the component's file.
@@ -73,8 +81,10 @@ Blocks never hard-code colours; they read roles. Map each role to the host app's
 - **`sr-only` text next to an `aria-hidden` visual** is one accessible element: its text is the label of the visual.
 - **Hooks the source exports** (`useToasts`) are part of the interface: port them as the platform's equivalent.
 
+<!-- only:demo -->
 ## Demo helpers that are not in this document
 The demo may import site-only helpers. `ProductArt` draws a neutral product photo: use a muted block of the same size and radius. `useProductNames()` returns display names for those products: use short plain English names. `useDemoAutoplay` and its cursor only replay the demo for recordings: drop them. Image paths in the demo below are already absolute URLs on the SunUI site: use those pictures, since some blocks (a portrait, a before and after pair) depend on them. Where the block draws a picture into a canvas or a WebGL texture, download the files into the project and load them from there: a browser will not hand over the pixels of an image from another origin.
+<!-- end -->
 
 ## Do not add
 Gradients, glows, coloured shadows, particles, confetti, decorative entrance animations, idle loops, haptics or sounds that fire without a user action.

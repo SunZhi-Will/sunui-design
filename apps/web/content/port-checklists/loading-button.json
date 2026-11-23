@@ -1,0 +1,128 @@
+{
+ "block": "loading-button",
+ "summary": "A button that runs an async action and moves through idle, loading, success and error states, either shrinking to a spinner circle or keeping its width with an inline spinner, then resets to idle after a delay.",
+ "written": "2026-11-23",
+ "by": "opus, checked by sonnet, revised by opus",
+ "items": [
+  {
+   "id": "first-render",
+   "behaviour": "The demo's first render shows three examples in a bordered card, all idle, with no entry animation",
+   "trigger": "initial render",
+   "expect": "Row 1: an empty email input with placeholder and accessible name \"Email for restock news\", then a \"Subscribe\" button in the primary/spot colour. Row 2: a full-width \"Pay $68.00\" button in the primary colour. Row 3: a monospace \"SUMMER24\" code chip, then an outlined card-coloured \"Apply code\" button (paper variant: 1px border at foreground/10, card background, foreground text). Below it, the hint \"This code fails on purpose so you can see the error state.\" Every button is 40px tall, 16px horizontal padding, corner radius 6px, 14px medium text, and none shows a spinner or check. Labels do not fade or slide in on mount.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "tab-order",
+   "behaviour": "Tab stops only on the real controls, in source order",
+   "trigger": "Press Tab repeatedly from before the demo",
+   "expect": "Focus goes to the email input, then Subscribe, then Pay $68.00, then Apply code, then leaves the demo. The SUMMER24 chip, the hint text, spinners and icons never take focus. A focused button shows a 2px focus outline offset 2px from its edge.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "keyboard-activate",
+   "behaviour": "Buttons activate from the keyboard like native buttons, and Enter in the email field does not start Subscribe",
+   "trigger": "Focus Subscribe and press Enter or Space; separately, type in the email field and press Enter",
+   "expect": "Enter or Space on a focused button starts the same flow as a click. Enter in the email field does not reload the page and does not put Subscribe into loading (the button is type=button and the form submit is prevented).",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "shrink-loading",
+   "behaviour": "Default shrink style collapses the button to a circular spinner while the action is pending",
+   "trigger": "Click Subscribe (or Apply code)",
+   "expect": "The button becomes a 40x40px circle (horizontal padding 0, corner radius 999) showing only a 16px spinner: a faint full ring at 25% opacity with a solid quarter arc, spinning continuously. The label text is gone. The width and radius change animates with a spring of stiffness 240, damping 30. The colour stays the variant colour (primary for Subscribe, card with border for Apply code).",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "inline-loading",
+   "behaviour": "Inline style keeps the button width and puts the spinner before the label",
+   "trigger": "Click Pay $68.00",
+   "expect": "The button stays full width with radius 6px. Its content becomes a 16px spinning spinner, an 8px gap, then the unchanged text \"Pay $68.00\".",
+   "kind": "layout",
+   "scope": "all"
+  },
+  {
+   "id": "success-subscribe",
+   "behaviour": "A resolved action shows the success label with a drawn check, then returns to idle",
+   "trigger": "Click Subscribe and wait",
+   "expect": "1400ms after the click the button expands back to its normal width and shows a 16px check mark, an 8px gap, and \"Subscribed\" in the primary colour. The check stroke draws from 0 to full length over 0.28s with ease-out. 2000ms after success appears, the button returns to \"Subscribe\".",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "success-sticky",
+   "behaviour": "With resetAfter 0 the success state stays until pressed again",
+   "trigger": "Click Pay $68.00 and wait",
+   "expect": "1800ms after the click the content becomes a drawn check plus \"Paid\". It stays on \"Paid\" indefinitely with no automatic return to \"Pay $68.00\".",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "error-state",
+   "behaviour": "A rejected action shows the error label in the destructive colour, then returns to idle",
+   "trigger": "Click Apply code and wait",
+   "expect": "1000ms after the click the button expands from the circle and turns destructive red with white text showing \"Code expired\", with no icon. bg-destructive and text-white replace the card background and foreground text, but the faint 1px border at foreground/10 stays around the red button. 2000ms after the error appears it returns to the outlined \"Apply code\" button.",
+   "kind": "timing",
+   "scope": "all"
+  },
+  {
+   "id": "label-crossfade",
+   "behaviour": "Each content change crossfades with a small vertical slide",
+   "trigger": "Any state change (idle to loading, loading to success or error, back to idle)",
+   "expect": "The outgoing content fades to opacity 0 while moving up 6px; the incoming content starts at opacity 0 and 6px lower, and settles at opacity 1 and 0px. Each fade lasts 0.14s. The outgoing content is popped out of layout so the two do not stack.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "press-scale",
+   "behaviour": "Pressing a button that is not loading scales it down slightly",
+   "trigger": "Press and hold on an idle, success or error button",
+   "expect": "The button scales to 0.97 while pressed and returns to 1 on release. A loading button does not scale when pressed.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-press-loading",
+   "behaviour": "Presses while loading are ignored",
+   "trigger": "Click Subscribe, then click or press Enter on it several more times before 1400ms",
+   "expect": "Only one action runs: success appears once, 1400ms after the first click, and the timeline is not restarted or extended. The button stays focusable while loading (it is not natively disabled).",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "repeat-press-result",
+   "behaviour": "Pressing a button that is showing success or error starts the action again",
+   "trigger": "Click Paid (after paying), or click Code expired before it resets",
+   "expect": "The button goes straight back to loading and runs the full cycle again (Pay: inline spinner then Paid after 1800ms; Apply code: circle then Code expired after 1000ms). For Apply code the pending 2000ms reset is cancelled, so the button does not jump to idle mid-load.",
+   "kind": "state",
+   "scope": "all"
+  },
+  {
+   "id": "aria-busy",
+   "behaviour": "The loading state is exposed to assistive tech",
+   "trigger": "Click any demo button and inspect it while loading",
+   "expect": "While loading the button has aria-busy=\"true\" and aria-disabled=\"true\". In idle, success and error neither attribute is present.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "live-announcements",
+   "behaviour": "A polite live region inside each button announces state changes",
+   "trigger": "Run each demo button through its cycle with a screen reader or by reading the live region text",
+   "expect": "A visually hidden aria-live=\"polite\" region reads \"Working\" while loading, then \"Subscribed\" / \"Paid\" on success or \"Code expired\" on error, and is empty in idle. Spinner and check icons are aria-hidden. The idle accessible names are \"Subscribe\", \"Pay $68.00\" and \"Apply code\"; while a shrink button is a circle its name comes from the live text \"Working\".",
+   "kind": "text",
+   "scope": "all"
+  },
+  {
+   "id": "reduced-motion",
+   "behaviour": "Reduced motion removes movement but keeps every state and timing",
+   "trigger": "Enable prefers-reduced-motion, then run each demo button",
+   "expect": "Shrink to circle and expand back happen instantly with no spring. Labels swap with 0s duration and no 6px slide. The check appears fully drawn at once. Pressing does not scale to 0.97. The 1400ms, 1800ms and 1000ms action times and the 2000ms reset are unchanged, and the spinner still rotates.",
+   "kind": "reduced-motion",
+   "scope": "all"
+  }
+ ]
+}

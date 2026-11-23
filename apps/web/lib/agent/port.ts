@@ -126,12 +126,56 @@ const levelNote: Record<PortLevel, string> = {
 
 const cache = new Map<string, string>();
 
-function adapter(name: "core" | PortPlatform) {
-  const hit = cache.get(name);
-  if (hit && process.env.NODE_ENV !== "development") return hit;
-  const text = readFileSync(path.join(process.cwd(), "lib", "agent", "port", `${name}.md`), "utf8").trim();
-  cache.set(name, text);
-  return text;
+/** 轉接規則裡用 `<!-- only:flag -->` 到 `<!-- end -->` 包起來的段落，只給用得到的 block。 */
+type PortFlags = { motion: boolean; locale: boolean; canvas: boolean; scroll: boolean; input: boolean; deps: boolean; demo: boolean };
+
+function flagsOf(main: SourceFile[], deps: SourceFile[], demo: string | null): PortFlags {
+  const code = main.map((file) => file.code).join("\n");
+  return {
+    // 只匯入 useReducedMotion 的不算：那種 block 沒有彈簧也沒有進出場，動效規則對它是雜訊
+    motion: /\bmotion\.[a-z]|AnimatePresence|useAnimate|useSpring|useMotionValue|\banimate\(/.test(code + deps.map((file) => file.code).join("\n")),
+    locale: /resolveLocale|MESSAGES\b/.test(code),
+    canvas: /<canvas\b|getContext\(/.test(code),
+    scroll: /useScroll\b|IntersectionObserver/.test(code),
+    input: /<input\b|<textarea\b/.test(code),
+    deps: deps.length > 0,
+    demo: Boolean(demo && /ProductArt|useProductNames|useDemoAutoplay|\/blocks\//.test(demo)),
+  };
+}
+
+function adapter(name: "core" | PortPlatform, flags: PortFlags) {
+  let text = cache.get(name);
+  if (!text || process.env.NODE_ENV === "development") {
+    text = readFileSync(path.join(process.cwd(), "lib", "agent", "port", `${name}.md`), "utf8").trim();
+    cache.set(name, text);
+  }
+  return text
+    .replace(/<!-- only:([a-z]+) -->\n([\s\S]*?)<!-- end -->\n?/g, (_all, flag: keyof PortFlags, body: string) => (flags[flag] ? body : ""))
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+type ChecklistItem = { id: string; behaviour: string; trigger: string; expect: string; kind: string; scope: "all" | "web" | "touch" };
+
+/**
+ * 這個 block 的驗收清單（content/port-checklists/<name>.json，由模型讀原始碼產生、另一個模型對過）。
+ * 放在指南最後：移植的人照它自我檢查，之後驗證的人也用同一份。沒有清單的 block 就沒有這一段。
+ */
+function acceptance(item: Pick<RegistryItem, "name">, platform: PortPlatform) {
+  const file = path.join(process.cwd(), "content", "port-checklists", `${item.name}.json`);
+  if (!existsSync(file)) return null;
+  const { items } = JSON.parse(readFileSync(file, "utf8")) as { items: ChecklistItem[] };
+  const touch = isNative(platform);
+  const rows = items.filter((row) => row.scope === "all" || (touch ? row.scope === "touch" : row.scope === "web"));
+  if (rows.length === 0) return null;
+  return [
+    "## Acceptance checks",
+    "Operate your demo and confirm each of these before you report. They were taken from the React source; where one disagrees with the source above, the source wins and you should say so.",
+    rows.map((row, i) => `${i + 1}. **${row.behaviour}** When: ${row.trigger}. Expect: ${row.expect}`).join("\n"),
+    touch ? "Checks that need a mouse, hover or a hardware keyboard are left out for this platform." : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 type SourceFile = { path: string; code: string };
@@ -176,6 +220,7 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
   const usage = item.meta.usage;
   const label = portPlatformLabels[platform];
   const base = siteUrl();
+  const flags = flagsOf(main, deps, demo);
 
   return [
     `# Port the SunUI block "${item.title}" (\`${item.name}\`) to ${label}`,
@@ -189,8 +234,8 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
     ]
       .filter(Boolean)
       .join("\n\n"),
-    adapter("core"),
-    adapter(platform),
+    adapter("core", flags),
+    adapter(platform, flags),
     [
       "## The block",
       item.description,
@@ -210,6 +255,7 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
           fence({ path: "demo.tsx", code: demo }),
         ].join("\n\n")
       : null,
+    acceptance(item, platform),
   ]
     .filter(Boolean)
     .join("\n\n");
