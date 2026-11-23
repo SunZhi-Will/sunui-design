@@ -1,7 +1,9 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import verifiedData from "@/content/port-verified.json";
 import { motionLibName } from "@/lib/motion-lib";
 import { getItem, readRegistryFile, type RegistryItem } from "@/lib/registry";
 import { licenseSummary, siteUrl } from "@/lib/site";
@@ -40,48 +42,37 @@ export function parsePortPlatform(value: string | undefined | null): PortPlatfor
 /** verified：我們實際跑過並和原版比對。untested：規則涵蓋但沒人跑過。manual：用到轉接規則沒有對應的技術。web-only：這個東西在該平台沒有意義。 */
 export type PortLevel = "verified" | "untested" | "manual" | "web-only";
 
-// 每一筆都是「用全新的 agent 只給這份指南、第一輪生成就通過」才列入（2026-11-23 兩輪試作，紀錄在
-// reports/可攜式Prompt跨平台深度分析-2026-11-23.md）。要修過才對的不列：那代表指南當時不夠，補過的規則還沒重跑。
-const firstRound = ["confirm-button", "range-slider", "scratch-card"];
-const verified: Record<PortPlatform, ReadonlySet<string>> = {
-  // otp-input 與 plush-portrait 第二輪沒過，補了指南後換全新的 agent 重做，第一輪通過（第三輪）
-  vue: new Set([
-    ...firstRound,
-    "loading-button",
-    "favorite-button",
-    "quantity-stepper",
-    "otp-input",
-    "notify-badge",
-    "sliding-tabs",
-    "animated-number",
-    "checkout-steps",
-    "toast-stack",
-    "compare-slider",
-    "scroll-reveal-text",
-    "plush-portrait",
-  ]),
-  // confirm-button 第二輪寬度量錯，補指南後重做通過
-  svelte: new Set(firstRound),
-  // notify-badge 第二輪徽章蓋住圖示，補指南後重做通過。plush-portrait 是 WebGL 改寫成 Metal。
-  // otp-input 不列：重做後螢幕鍵盤的流程都對，但實體鍵盤的退格被當成向前刪除
-  swiftui: new Set([
-    ...firstRound,
-    "loading-button",
-    "favorite-button",
-    "quantity-stepper",
-    "notify-badge",
-    "sliding-tabs",
-    "animated-number",
-    "checkout-steps",
-    "toast-stack",
-    "compare-slider",
-    "scroll-reveal-text",
-    "plush-portrait",
-  ]),
-  flutter: new Set(firstRound),
-  // scratch-card 前兩次沒過（漏掉啟動手勢那一下的事件、和外層捲動搶觸控），補指南後第三次重做通過
-  "react-native": new Set(firstRound),
-};
+// 已驗證清單在 content/port-verified.json。每一筆都是「用全新的 agent 只給這份指南、第一輪生成就通過」才列入
+// （2026-11-23 三輪試作，紀錄在 reports/可攜式Prompt跨平台深度分析-2026-11-23.md）。要修過才對的不列。
+// 每一筆記著當時主檔的指紋：block 的原始碼之後改了，驗證過的就不是現在這份，所以自動降回未驗證。
+type VerifiedEntry = { block: string; platform: string; source: string; date: string; round: number };
+const verifiedEntries = (verifiedData as { entries: VerifiedEntry[] }).entries;
+
+/** 主檔內容的指紋（去掉結尾空白後的 SHA-256 前 12 碼）。只是雜湊，不會洩漏 Pro 原始碼。 */
+export function sourceFingerprint(code: string) {
+  return createHash("sha256").update(`${code.trimEnd()}\n`).digest("hex").slice(0, 12);
+}
+
+const fingerprints = new Map<string, string | null>();
+
+function currentFingerprint(item: Pick<RegistryItem, "name" | "files">, source?: string) {
+  if (source !== undefined) return sourceFingerprint(source);
+  const cached = fingerprints.get(item.name);
+  if (cached !== undefined && process.env.NODE_ENV !== "development") return cached;
+  const file = item.files[0] ? path.join(process.cwd(), item.files[0].path) : null;
+  const value = file && existsSync(file) ? sourceFingerprint(readFileSync(file, "utf8")) : null;
+  fingerprints.set(item.name, value);
+  return value;
+}
+
+type Verification = { state: "current" | "stale"; date: string } | null;
+
+/** 這個組合驗證過沒有；驗證過但原始碼已經改了回傳 stale。 */
+function verification(item: Pick<RegistryItem, "name" | "files">, platform: PortPlatform, source?: string): Verification {
+  const entry = verifiedEntries.find((e) => e.block === item.name && e.platform === platform);
+  if (!entry) return null;
+  return { state: currentFingerprint(item, source) === entry.source ? "current" : "stale", date: entry.date };
+}
 
 // 只存在於網頁的東西：瀏覽器外框、游標與 hover 效果、頁面捲動導覽、Cookie 橫幅。原生 App 由系統或導覽列處理。
 const webOnlyOnNative: ReadonlySet<string> = new Set([
@@ -102,14 +93,24 @@ const needsShader = /<fe(?:Turbulence|DisplacementMap|Morphology|ConvolveMatrix)
 
 const isNative = (platform: PortPlatform) => platform === "swiftui" || platform === "flutter" || platform === "react-native";
 
-/** `source` 是主檔原始碼；沒給就只看名單（給公開頁面判斷 Pro block 用，不讀 Pro 原始碼）。 */
-export function portLevel(item: Pick<RegistryItem, "name">, platform: PortPlatform, source?: string): PortLevel {
-  if (verified[platform].has(item.name)) return "verified";
+/** `source` 是主檔原始碼；沒給就自己讀檔算指紋（只取雜湊，公開頁面判斷 Pro block 時不會把原始碼帶出去）。 */
+export function portLevel(item: Pick<RegistryItem, "name" | "files">, platform: PortPlatform, source?: string): PortLevel {
+  if (verification(item, platform, source)?.state === "current") return "verified";
   if (isNative(platform)) {
     if (webOnlyOnNative.has(item.name)) return "web-only";
     if (source && needsShader.test(source)) return "manual";
   }
   return "untested";
+}
+
+/** 指南開頭的那句狀態說明。驗證過但原始碼改了要講清楚，不然讀的人會以為從來沒人試過。 */
+function levelSentence(item: Pick<RegistryItem, "name" | "files">, platform: PortPlatform, source?: string) {
+  const level = portLevel(item, platform, source);
+  const was = verification(item, platform, source);
+  if (level === "untested" && was?.state === "stale") {
+    return `Untested for the current source: SunUI verified this port on ${was.date}, but the block's source has changed since then. The rules below still apply; compare the result with the reference closely.`;
+  }
+  return levelNote[level];
 }
 
 const levelNote: Record<PortLevel, string> = {
@@ -172,7 +173,6 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
   // 有些 block（臉部照片、前後對照）的行為取決於圖片本身，用灰色方塊代替會跑不起來或看不出對錯。
   const demo = rawDemo?.replace(/(["'`])\/blocks\//g, `$1${siteUrl()}/blocks/`) ?? null;
 
-  const level = portLevel(item, platform, main[0]?.code);
   const usage = item.meta.usage;
   const label = portPlatformLabels[platform];
   const base = siteUrl();
@@ -181,7 +181,7 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
     `# Port the SunUI block "${item.title}" (\`${item.name}\`) to ${label}`,
     [
       `You are porting a SunUI block from React + Tailwind + framer-motion to ${label}. The React source below is the specification. Port its behaviour exactly; do not redesign it.`,
-      `**Port status.** ${levelNote[level]}`,
+      `**Port status.** ${levelSentence(item, platform, main[0]?.code)}`,
       `**Reference.** Live original: ${base}/blocks/${item.name} (preview only: ${base}/preview/${item.name}). Recording: ${base}/cards/${item.name}.mp4.`,
       licensed
         ? `**License.** SunUI Pro, licensed copy (${licensed.displayKey}). The ported code may ship in the license holder's own and client projects. Do not publish or redistribute this document or the ported source. Terms: ${base}/license`
@@ -230,7 +230,7 @@ export function proPortInstructions(item: RegistryItem, platform: PortPlatform) 
   const label = portPlatformLabels[platform];
   return [
     `"${item.title}" is a SunUI Pro block. Its ${label} port guide contains the Pro source, so it is served only with a license.`,
-    `Port status: ${levelNote[portLevel(item, platform)]}`,
+    `Port status: ${levelSentence(item, platform)}`,
     "With `SUNUI_LICENSE_KEY` set in the environment (never ask for the key in chat, print it or commit it), fetch the guide and follow it:",
     `\`\`\`bash\n${portFetchCommand(item, platform)}\n\`\`\``,
     `No license: ${licenseSummary()} ${siteUrl()}/pricing. Do not rebuild a Pro block from its preview or description; offer a free block instead.`,

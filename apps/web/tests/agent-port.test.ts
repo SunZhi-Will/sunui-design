@@ -28,3 +28,18 @@ test("public callers never build a Pro port guide", () => {
   assert.ok(route.indexOf("checkLicense(") < route.indexOf("displayKey: license.displayKey"));
   assert.match(read("lib/agent/port.ts"), /if \(isPro && !licensed\) throw/);
 });
+
+test("verified ports name real platforms and carry a source fingerprint", () => {
+  const platforms = read("lib/agent/port.ts").match(/portPlatforms = \[([^\]]+)\]/)![1].match(/"([^"]+)"/g)!.map((p) => p.slice(1, -1));
+  const { entries } = JSON.parse(read("content/port-verified.json")) as { entries: { block: string; platform: string; source: string; date: string }[] };
+  assert.ok(entries.length > 0);
+  const seen = new Set<string>();
+  for (const e of entries) {
+    assert.ok(platforms.includes(e.platform), `${e.block}: unknown platform ${e.platform}`);
+    assert.match(e.source, /^[0-9a-f]{12}$/, `${e.block} on ${e.platform}: source must be a 12 character fingerprint`);
+    assert.match(e.date, /^\d{4}-\d{2}-\d{2}$/);
+    const key = `${e.platform}:${e.block}`;
+    assert.ok(!seen.has(key), `duplicate entry ${key}`);
+    seen.add(key);
+  }
+});
