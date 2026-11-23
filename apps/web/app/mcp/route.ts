@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { blockLine, catalogMarkdown, describeBlock, planInstall, proSetup, searchBlocks, suggestNames } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
-import { parsePortPlatform, portPlatforms, portPrompt, proPortInstructions } from "@/lib/agent/port";
+import { parsePortPlatform, portPlatformLabels, portPlatformStacks, portPlatforms, portPrompt, proPortInstructions } from "@/lib/agent/port";
 import { findIcon, iconLibraryUsage, iconSetsSummary, proIconUsage, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
 import { skillMarkdown } from "@/lib/agent/skill";
 import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
@@ -149,10 +149,10 @@ const handler = createMcpHandler(
       {
         title: "Port a SunUI block to another platform",
         description:
-          "For projects that are NOT React: a port guide that carries one SunUI block to Vue or SwiftUI. It holds the platform's adapter rules (how springs, colours, hover, touch targets and accessibility map across) plus the block's source and demo, and states whether SunUI has verified that port. Follow the guide to write the component in the user's project. In a React project use plan_install instead. Pro blocks return how to fetch the guide with the user's license key.",
+          `For projects that are NOT React: a port guide that carries one SunUI block to ${portPlatforms.map((p) => portPlatformLabels[p]).join(", ")}. It holds the platform's adapter rules (how springs, colours, hover, touch targets and accessibility map across) plus the block's source and demo, and states whether SunUI has verified that port. Follow the guide to write the component in the user's project. In a React project use plan_install instead. Pro blocks return how to fetch the guide with the user's license key.`,
         inputSchema: z.object({
           name: z.string().describe("Block name from search_blocks, e.g. 'range-slider'."),
-          platform: z.enum(portPlatforms).describe("vue: Vue 3.5 + Tailwind v4 + motion-v. swiftui: SwiftUI on iOS 17+."),
+          platform: z.enum(portPlatforms).describe(portPlatforms.map((p) => `${p}: ${portPlatformStacks[p]}.`).join(" ")),
         }),
         annotations: readOnly,
       },
@@ -296,7 +296,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: "sunui", version: "1.0.0" },
-    instructions: `SunUI: ${getItems().length} refined animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. If the project is not React (Vue, SwiftUI), use get_port_prompt instead of plan_install. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
+    instructions: `SunUI: ${getItems().length} refined animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. If the project is not React (Vue, Svelte, SwiftUI, Flutter, React Native), use get_port_prompt instead of plan_install. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
   },
 );
 

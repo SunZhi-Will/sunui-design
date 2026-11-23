@@ -15,7 +15,8 @@ test("every platform has an adapter file", () => {
 test("adapters keep the three springs and use no em dashes", () => {
   const core = read("lib/agent/port/core.md");
   for (const row of ["| snappy | 520 | 34 | 1 |", "| gentle | 240 | 30 | 1 |", "| pop | 620 | 20 | 0.8 |"]) assert.ok(core.includes(row), row);
-  for (const name of ["core", "vue", "swiftui"]) assert.ok(!/[—]/.test(read(`lib/agent/port/${name}.md`)), name);
+  const platforms = read("lib/agent/port.ts").match(/portPlatforms = \[([^\]]+)\]/)![1].match(/"([^"]+)"/g)!.map((p) => p.slice(1, -1));
+  for (const name of ["core", ...platforms]) assert.ok(!/[—]/.test(read(`lib/agent/port/${name}.md`)), name);
 });
 
 test("public callers never build a Pro port guide", () => {

@@ -1,0 +1,400 @@
+{
+ "web": {
+  "confirmArmWidth": [
+   [
+    0,
+    63.4
+   ],
+   [
+    77,
+    68.4
+   ],
+   [
+    85,
+    69.4
+   ],
+   [
+    102,
+    72.4
+   ],
+   [
+    118,
+    79
+   ],
+   [
+    135,
+    85.7
+   ],
+   [
+    152,
+    91.5
+   ],
+   [
+    168,
+    96.3
+   ],
+   [
+    186,
+    99.6
+   ],
+   [
+    202,
+    102.5
+   ],
+   [
+    218,
+    103.8
+   ],
+   [
+    235,
+    104.8
+   ],
+   [
+    252,
+    105.3
+   ],
+   [
+    268,
+    105.4
+   ],
+   [
+    301,
+    105.2
+   ],
+   [
+    318,
+    105.1
+   ],
+   [
+    335,
+    104.8
+   ],
+   [
+    351,
+    104.7
+   ],
+   [
+    368,
+    104.5
+   ],
+   [
+    385,
+    104.4
+   ],
+   [
+    401,
+    104.3
+   ],
+   [
+    418,
+    104.2
+   ]
+  ],
+  "confirmArmed": {
+   "text": "Remove signup",
+   "notice": "Press again to remove signup"
+  },
+  "confirmPending": {
+   "disabled": true,
+   "busy": "true",
+   "spinner": true
+  },
+  "confirmDone": {
+   "text": "Remove",
+   "notice": "Signup removed",
+   "disabled": true
+  },
+  "confirmAfter": "",
+  "confirmDisarmMs": 2639,
+  "confirmEscape": {
+   "text": "Remove",
+   "notice": ""
+  },
+  "sliderDragging": {
+   "now": "145",
+   "bubble": "$145",
+   "transform": "matrix(1.15, 0, 0, 1.15, 0, 0)",
+   "z": "20"
+  },
+  "sliderAfterDrag": [
+   "20",
+   "145",
+   "4"
+  ],
+  "sliderJump": [
+   [
+    0,
+    263.5
+   ],
+   [
+    14,
+    147.3
+   ]
+  ],
+  "sliderAfterClick": [
+   "20",
+   "145",
+   "2.5"
+  ],
+  "sliderKeys": [
+   "135",
+   "145",
+   "2.5"
+  ],
+  "sliderHidden": [
+   "price-min=135",
+   "price-max=145"
+  ],
+  "scratchMid": "22% scratched",
+  "scratchDone": {
+   "live": "Card revealed. You won 20% off your next order with code LUCKY20.",
+   "canvas": 1,
+   "buttons": [
+    "Reveal all"
+   ]
+  },
+  "errors": []
+ },
+ "svelte": {
+  "confirmArmWidth": [
+   [
+    0,
+    63.8
+   ],
+   [
+    73,
+    74
+   ],
+   [
+    77,
+    74.4
+   ],
+   [
+    93,
+    75.7
+   ],
+   [
+    110,
+    82.8
+   ],
+   [
+    127,
+    89.1
+   ],
+   [
+    143,
+    94.8
+   ],
+   [
+    159,
+    99.2
+   ],
+   [
+    176,
+    102.3
+   ],
+   [
+    194,
+    104.6
+   ],
+   [
+    210,
+    106
+   ],
+   [
+    226,
+    106.8
+   ],
+   [
+    243,
+    107.1
+   ],
+   [
+    260,
+    107.2
+   ],
+   [
+    276,
+    107.1
+   ],
+   [
+    293,
+    107
+   ],
+   [
+    310,
+    106.8
+   ],
+   [
+    327,
+    106.6
+   ],
+   [
+    343,
+    106.4
+   ],
+   [
+    360,
+    106.2
+   ],
+   [
+    377,
+    106.1
+   ],
+   [
+    393,
+    106
+   ]
+  ],
+  "confirmArmed": {
+   "text": "Remove signup",
+   "notice": "Press again to remove signup"
+  },
+  "confirmPending": {
+   "disabled": true,
+   "busy": "true",
+   "spinner": true
+  },
+  "confirmDone": {
+   "text": "Remove",
+   "notice": "Signup removed",
+   "disabled": true
+  },
+  "confirmAfter": "",
+  "confirmDisarmMs": 2636,
+  "confirmEscape": {
+   "text": "Remove",
+   "notice": ""
+  },
+  "sliderDragging": {
+   "now": "150",
+   "bubble": "$150",
+   "transform": "matrix(1.15, 0, 0, 1.15, 0, 0)",
+   "z": "20"
+  },
+  "sliderAfterDrag": [
+   "20",
+   "150",
+   "4"
+  ],
+  "sliderJump": [
+   [
+    0,
+    263
+   ],
+   [
+    35,
+    255
+   ],
+   [
+    51,
+    235.2
+   ],
+   [
+    68,
+    213.9
+   ],
+   [
+    85,
+    188.4
+   ],
+   [
+    101,
+    167.1
+   ],
+   [
+    118,
+    150.6
+   ],
+   [
+    135,
+    137.2
+   ],
+   [
+    151,
+    127.6
+   ],
+   [
+    168,
+    121.8
+   ],
+   [
+    185,
+    117.8
+   ],
+   [
+    201,
+    115.5
+   ],
+   [
+    218,
+    114.8
+   ],
+   [
+    252,
+    115.3
+   ],
+   [
+    268,
+    115.9
+   ],
+   [
+    285,
+    116.6
+   ],
+   [
+    301,
+    117.3
+   ],
+   [
+    317,
+    117.8
+   ],
+   [
+    335,
+    118.3
+   ],
+   [
+    351,
+    118.6
+   ],
+   [
+    367,
+    118.8
+   ],
+   [
+    384,
+    119
+   ],
+   [
+    402,
+    119.1
+   ],
+   [
+    418,
+    119
+   ]
+  ],
+  "sliderAfterClick": [
+   "20",
+   "150",
+   "2"
+  ],
+  "sliderKeys": [
+   "140",
+   "150",
+   "2"
+  ],
+  "sliderHidden": [
+   "price-min=140",
+   "price-max=150"
+  ],
+  "scratchMid": "35% scratched",
+  "scratchDone": {
+   "live": "Card revealed. You won 20% off your next order with code LUCKY20.",
+   "canvas": 0,
+   "buttons": []
+  },
+  "errors": []
+ }
+}

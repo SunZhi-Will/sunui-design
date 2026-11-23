@@ -192,8 +192,11 @@ export function QuantityStepper({
         className,
       )}
     >
+      {/* The two buttons need their own keys. Without them React reuses one DOM node, so the press that takes the
+          value from 2 to 1 turns that node into the remove button mid-press and its click removes the line. */}
       {showRemove ? (
         <button
+          key="remove"
           type="button"
           aria-label={t.remove}
           disabled={disabled}
@@ -207,7 +210,7 @@ export function QuantityStepper({
           </svg>
         </button>
       ) : (
-        <button type="button" aria-label={t.decrement} tabIndex={-1} disabled={disabled || value <= min} {...pressHandlers(-step)} className={buttonClass}>
+        <button key="decrement" type="button" aria-label={t.decrement} tabIndex={-1} disabled={disabled || value <= min} {...pressHandlers(-step)} className={buttonClass}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true" strokeLinejoin="round">
             <path d="M5 12h14" />
           </svg>

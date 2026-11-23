@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>移植試作第二輪 2026-11-23</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafafa;--fg:#171717;--mut:#737373;--line:#e5e5e5;--card:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#0a0a0a;--fg:#fafafa;--mut:#a1a1a1;--line:#262626;--card:#171717}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 ui-sans-serif,system-ui,"PingFang TC",sans-serif}
+main{max-width:1280px;margin:0 auto;padding:40px 24px 80px}h1{font-size:28px;letter-spacing:-.02em;margin:0 0 8px}h2{font-size:20px;margin:56px 0 4px}
+p{margin:0 0 12px;max-width:72ch}.mut{color:var(--mut)}figure{margin:16px 0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+figure img{display:block;width:100%;height:auto}figcaption{padding:8px 12px;font-size:13px;border-top:1px solid var(--line);background:var(--card)}
+.tag{font:600 11px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-weight:600}
+.ok{color:#1f9d55;font-weight:600}.warn{color:#b7791f;font-weight:600}.bad{color:#dc3d43;font-weight:600}
+</style></head><body><main>
+<p class="tag">SunUI 移植試作 · 第二輪 · 2026-11-23</p>
+<h1>12 個區塊 × Vue 與 SwiftUI，加上三個新平台</h1>
+<p class="mut">做法和第一輪一樣：每份移植指南交給一個看不到原專案的全新 agent。這一輪的指南是從網站的正式端點取得的。「第一輪通過」代表沒有任何人工修改。示範裡的商品照片依規則換成灰色方塊，所以移植版沒有照片是預期的。</p>
+<table><tr><th>區塊</th><th>Vue</th><th>SwiftUI</th></tr>
+<tr><td>loading-button</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>favorite-button</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>quantity-stepper</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>otp-input</td><td class="warn">能用，搖晃數值是猜的</td><td class="warn">能用，搖晃數值是猜的</td></tr>
+<tr><td>notify-badge</td><td class="ok">第一輪通過</td><td class="bad">修了兩輪才對</td></tr>
+<tr><td>sliding-tabs</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>animated-number</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>checkout-steps</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過（只看到窄版）</td></tr>
+<tr><td>toast-stack</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>compare-slider</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>scroll-reveal-text（捲動連動）</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>plush-portrait（WebGL）</td><td class="bad">引擎沒有啟動</td><td class="ok">第一輪通過，改寫成 Metal</td></tr></table>
+<table><tr><th>新平台（各 3 個區塊）</th><th>confirm-button</th><th>range-slider</th><th>scratch-card</th></tr>
+<tr><td>Svelte</td><td class="bad">修一輪才對（寬度量錯）</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>Flutter</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>React Native</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td><td class="bad">能刮但筆劃有漏，刮不到門檻</td></tr></table>
+
+<h2>Vue：原版（左）對移植版（右）</h2>
+<figure><img src="../round2/m1.jpg"><figcaption>由上到下：loading-button（載入中）、favorite-button、quantity-stepper、otp-input</figcaption></figure>
+<figure><img src="../round2/m2.jpg"><figcaption>notify-badge、sliding-tabs、animated-number、checkout-steps</figcaption></figure>
+<figure><img src="../round2/m3.jpg"><figcaption>toast-stack、compare-slider、scroll-reveal-text、plush-portrait（Vue 版停在靜態圖，WebGL 引擎沒啟動）</figcaption></figure>
+
+<h2>SwiftUI：iPhone 17 Pro 模擬器</h2>
+<figure><img src="../round2/ios-idle-1.jpg"><figcaption>靜止畫面：loading-button、favorite-button、quantity-stepper、otp-input、notify-badge（修正前，圖示被徽章蓋住）、sliding-tabs</figcaption></figure>
+<figure><img src="../round2/ios-idle-2.jpg"><figcaption>靜止畫面：animated-number、checkout-steps、toast-stack、compare-slider、scroll-reveal-text、plush-portrait</figcaption></figure>
+<figure><img src="../round2/ios-act-1.jpg"><figcaption>操作後：載入中、已訂閱、收藏、數量加一、驗證碼通過、徽章加一、切換分頁</figcaption></figure>
+<figure><img src="../round2/ios-act-2.jpg"><figcaption>操作後：數字滾動、步驟前進、加入購物車、拖曳比較、捲動揭示文字、plush-portrait</figcaption></figure>
+<figure><img src="../round2/zoom1.jpg"><figcaption>放大：徽章（修正前）、數字滾到一半與落定、提示訊息含復原</figcaption></figure>
+<figure><img src="../round2/plush-frames.jpg"><figcaption>plush-portrait 在 iPhone 上：抓住、往右上拉、放開後暈眩。原版是 WebGL，移植版是執行期編譯的 Metal 著色器</figcaption></figure>
+<figure><img src="../round2/ios-notify-badge-fix2.jpg"><figcaption>notify-badge 修正兩輪後</figcaption></figure>
+<figure><img src="../round2/ios-dark-large-text.jpg"><figcaption>第一輪的三個 SwiftUI 版：深色模式加最大一級的輔助字級</figcaption></figure>
+
+<h2>新平台</h2>
+<figure><img src="../round2/svelte-check.jpg"><figcaption>Svelte：滑桿原版、Svelte 版、刮刮卡原版（公開預覽）、Svelte 版刮到一半、全開、確認按鈕</figcaption></figure>
+<figure><img src="../round2/flutter-check.jpg"><figcaption>Flutter（iPhone 模擬器）：待確認、完成、滑桿、刮刮卡三個階段</figcaption></figure>
+<figure><img src="../round2/rn-check.jpg"><figcaption>React Native（iPhone 模擬器）：待確認、完成、滑桿、刮刮卡。最右邊刮了兩輪只到 38%，其他平台同樣的動作已經全開</figcaption></figure>
+</main></body></html>

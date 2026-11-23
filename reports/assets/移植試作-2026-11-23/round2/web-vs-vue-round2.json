@@ -1,0 +1,230 @@
+{
+ "loading-button": {
+  "web": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Subscribe Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "text1": "Working Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "text2": "Subscribed Subscribed Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Subscribe Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "text1": "Working Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "text2": "Subscribed Subscribed Pay $68.00 SUMMER24 Apply code This code fails on purpose so you can see the error state.",
+   "errors": []
+  }
+ },
+ "favorite-button": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "You may also like Waxed Field Jacket $128 Stoneware Mug $22 Desk Lamp $86 Field Watch 38 mm $165",
+   "text1": "You may also like Waxed Field Jacket $128 Stoneware Mug $22 Desk Lamp $86 Field Watch 38 mm $165",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "You may also like Jacket $128 Mug $22 Lamp $86 Watch $165",
+   "text1": "You may also like Jacket $128 Mug $22 Lamp $86 Watch $165",
+   "errors": []
+  }
+ },
+ "quantity-stepper": {
+  "web": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Your bag 6 items Stoneware Mug Sand, 350 ml, $22.00 2 $44.00 Market Tote Natural, $48.00 1 $48.00 Steel Bottle 500 ml Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $194.00",
+   "text1": "Your bag 8 items Stoneware Mug Sand, 350 ml, $22.00 4 Stoneware Mug quantity 4 $88.00 Market Tote Natural, $48.00 1 $48.00 Steel Bottle 500 ml Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $238.00",
+   "text2": "Your bag 7 items Stoneware Mug Sand, 350 ml, $22.00 3 Stoneware Mug quantity 3 $66.00 Market Tote Natural, $48.00 1 $48.00 Steel Bottle 500 ml Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $216.00",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Your bag 6 items Mug Sand, 350 ml, $22.00 2 $44.00 Tote Natural, $48.00 1 $48.00 Bottle Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $194.00",
+   "text1": "Your bag 8 items Mug Sand, 350 ml, $22.00 4 Mug quantity 4 $88.00 Tote Natural, $48.00 1 $48.00 Bottle Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $238.00",
+   "text2": "Your bag 7 items Mug Sand, 350 ml, $22.00 3 Mug quantity 3 $66.00 Tote Natural, $48.00 1 $48.00 Bottle Matte sand, 500 ml, $34.00 Limit 3 per order 3 $102.00 Subtotal $216.00",
+   "errors": []
+  }
+ },
+ "otp-input": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Confirm it's you We emailed a 6-digit code to s••••@mail.com. Enter it to finish checking out. Didn't get it? Resend code INBOX Your sign-in code Use this code to confirm your order. It expires in 10 minutes. 246 810",
+   "text1": "Confirm it's you We emailed a 6-digit code to s••••@mail.com. Enter it to finish checking out. That code doesn't match. Check the email and try again. Didn't get it? Resend code INBOX Your sign-in code Use this code to confirm your order. It expires in 10 minutes. 246 810",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Confirm it's you We emailed a 6-digit code to s••••@mail.com. Enter it to finish checking out. Didn't get it? Resend code INBOX Your sign-in code Use this code to confirm your order. It expires in 10 minutes. 246 810",
+   "text1": "Confirm it's you We emailed a 6-digit code to s••••@mail.com. Enter it to finish checking out. That code doesn't match. Check the email and try again. Didn't get it? Resend code INBOX Your sign-in code Use this code to confirm your order. It expires in 10 minutes. 246 810",
+   "errors": []
+  }
+ },
+ "notify-badge": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Field Goods 1 unread messages 2 new notifications 2 1 items in cart 1 Add to cart Mark all read",
+   "text1": "Field Goods 1 unread messages 2 items in cart 2 Add to cart Mark all read",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Field Goods 1 unread messages 2 new notifications 2 1 items in cart 1 Add to cart Mark all read",
+   "text1": "Field Goods 1 unread messages 2 items in cart 2 Add to cart Mark all read",
+   "errors": []
+  }
+ },
+ "sliding-tabs": {
+  "web": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Details Care Reviews 128 Midweight merino, 18.5 micron. Ribbed cuffs and hem, relaxed fit through the body. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "text1": "Details Care Reviews 128 Hand wash cold or use the wool cycle. Dry flat, away from direct heat. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "text2": "Details Care Reviews 128 4.8 out of 5. Most say it runs true to size and softens after the first wash. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok",
+    "ok"
+   ],
+   "text0": "Details Care Reviews 128 Midweight merino, 18.5 micron. Ribbed cuffs and hem, relaxed fit through the body. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "text1": "Details Care Reviews 128 Hand wash cold or use the wool cycle. Dry flat, away from direct heat. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "text2": "Details Care Reviews 128 4.8 out of 5. Most say it runs true to size and softens after the first wash. Sales Day Week Month To ship ( 3 ) On the way ( 2 ) Delivered ( 18 ) Returns ( 0 ) 3 orders are packed and leave the warehouse today. Home Home Search Saved Profile New in 2 On sale 2 Free shipping 3 Linen shirt $54 Canvas tote $22 Wool beanie $18 Denim jacket $96",
+   "errors": []
+  }
+ },
+ "animated-number": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Field Watch 38 mm Hand-wound, sapphire crystal, 100 m water resistant. Finish Brushed steel case Brass case +$40 Add a spare leather strap +$29 Total $189.00 $ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 . 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 1 0 1 2 3 4 5 6 7 8 9",
+   "text1": "Field Watch 38 mm Hand-wound, sapphire crystal, 100 m water resistant. Finish Brushed steel case Brass case +$40 Add a spare leather strap +$29 Total $567.00 $ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 . 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 3 0 1 2 3 4 5 6 7 8 9",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Watch Hand-wound, sapphire crystal, 100 m water resistant. Finish Brushed steel case Brass case +$40 Add a spare leather strap +$29 Total $189.00 $ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 . 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 1 0 1 2 3 4 5 6 7 8 9",
+   "text1": "Watch Hand-wound, sapphire crystal, 100 m water resistant. Finish Brushed steel case Brass case +$40 Add a spare leather strap +$29 Total $567.00 $ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 . 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 3 0 1 2 3 4 5 6 7 8 9",
+   "errors": []
+  }
+ },
+ "checkout-steps": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "1 Review order 2 Delivery 3 Payment 4 Confirmation Review order Linen tote ×1, canvas pouch ×1. Total NT$1,280 including tax. Continue to delivery",
+   "text1": "Edit Review order: 2 items · NT$1,280 , completed 2 Delivery 3 Payment 4 Confirmation Delivery Pick up at 7-Eleven 信義店. We will text you when the parcel arrives. Continue to payment",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "1 Review order 2 Delivery 3 Payment 4 Confirmation Review order Linen tote ×1, canvas pouch ×1. Total NT$1,280 including tax. Continue to delivery",
+   "text1": "Edit Review order: 2 items · NT$1,280 , completed 2 Delivery 3 Payment 4 Confirmation Delivery Pick up at 7-Eleven 信義店. We will text you when the parcel arrives. Continue to payment",
+   "errors": []
+  }
+ },
+ "toast-stack": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "New this week Chelsea Boot Black leather, size 42 $88 Add to cart Stoneware Mug Oat glaze, 350 ml $24 Add to cart Waxed Field Jacket Olive wax, M $148 Notify me Your cart 2 items Market Tote $36 Steel Bottle 500 ml $32",
+   "text1": "New this week Chelsea Boot Black leather, size 42 $88 Add to cart Stoneware Mug Oat glaze, 350 ml $24 Add to cart Waxed Field Jacket Olive wax, M $148 Notify me Your cart 4 items Stoneware Mug $24 Chelsea Boot $88 Market Tote $36 Steel Bottle 500 ml $32 Added to cart Stoneware Mug, Oat glaze, 350 ml Undo Added to cart Chelsea Boot, Black leather, size 42 Undo",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "New this week Sneaker Black leather, size 42 $88 Add to cart Mug Oat glaze, 350 ml $24 Add to cart Jacket Olive wax, M $148 Notify me Your cart 2 items Tote $36 Bottle $32",
+   "text1": "New this week Sneaker Black leather, size 42 $88 Add to cart Mug Oat glaze, 350 ml $24 Add to cart Jacket Olive wax, M $148 Notify me Your cart 4 items Mug $24 Sneaker $88 Tote $36 Bottle $32 Added to cart Mug, Oat glaze, 350 ml Undo Added to cart Sneaker, Black leather, size 42 Undo",
+   "errors": []
+  }
+ },
+ "compare-slider": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Original Result Lighthouse at dusk 1920 x 1080",
+   "text1": "Original Result Lighthouse at dusk 1920 x 1080",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Original Result Lighthouse at dusk 1920 x 1080",
+   "text1": "Original Result Lighthouse at dusk 1920 x 1080",
+   "errors": []
+  }
+ },
+ "scroll-reveal-text": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "2026 Anniversary Sale · Foreword November, a gift to this year's you. Fri 11/7 to Mon 11/17 · Storewide Every year there are a few things you want but leave sitting in your cart. For these eleven days, get $10 off every $100 storewide, members save another 10%, and checking out in the app earns 5% back. Every year there are a few things you want but leave sitting in your cart. For these eleven day",
+   "text1": "2026 Anniversary Sale · Foreword November, a gift to this year's you. Fri 11/7 to Mon 11/17 · Storewide Every year there are a few things you want but leave sitting in your cart. For these eleven days, get $10 off every $100 storewide, members save another 10%, and checking out in the app earns 5% back. Every year there are a few things you want but leave sitting in your cart. For these eleven day",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "2026 Anniversary Sale · Foreword November, a gift to this year's you. Fri 11/7 to Mon 11/17 · Storewide Every year there are a few things you want but leave sitting in your cart. For these eleven days, get $10 off every $100 storewide, members save another 10%, and checking out in the app earns 5% back. Every year there are a few things you want but leave sitting in your cart. For these eleven day",
+   "text1": "2026 Anniversary Sale · Foreword November, a gift to this year's you. Fri 11/7 to Mon 11/17 · Storewide Every year there are a few things you want but leave sitting in your cart. For these eleven days, get $10 off every $100 storewide, members save another 10%, and checking out in the app earns 5% back. Every year there are a few things you want but leave sitting in your cart. For these eleven day",
+   "errors": []
+  }
+ },
+ "plush-portrait": {
+  "web": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Hi, I'm Mei I design small things people touch every day. Go on, grab my cheek and pull. I'll forgive you. Hover, grab and stretch. Leave it alone and she gets bored. Frame Circle Square None",
+   "text1": "Hi, I'm Mei I design small things people touch every day. Go on, grab my cheek and pull. I'll forgive you. Hover, grab and stretch. Leave it alone and she gets bored. Frame Circle Square None",
+   "errors": []
+  },
+  "vue": {
+   "steps": [
+    "ok"
+   ],
+   "text0": "Hi, I'm Mei I design small things people touch every day. Go on, grab my cheek and pull. I'll forgive you. Hover, grab and stretch. Leave it alone and she gets bored. Frame Circle Square None",
+   "text1": "Hi, I'm Mei I design small things people touch every day. Go on, grab my cheek and pull. I'll forgive you. Hover, grab and stretch. Leave it alone and she gets bored. Frame Circle Square None",
+   "errors": []
+  }
+ }
+}

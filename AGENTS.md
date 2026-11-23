@@ -14,7 +14,7 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 | `apps/web/content/registry-i18n/<name>.json` | zh-TW, zh-CN, ja copy for each free block |
 | `apps/web/registry/lab/` | Blocks moved out of the catalog (off-strategy). Not served |
 | `apps/web/lib/agent/` | Everything AI-facing: search, install plans, design rules for agents, the SunUI skill |
-| `apps/web/lib/agent/port.ts`, `lib/agent/port/*.md`, `app/r/port/` | Port guides (added 2026-11-23): carry a block to Vue or SwiftUI. One adapter file per platform plus the block's source; the source is the spec, so there is no per-block prose spec. Pilot and method: `reports/可攜式Prompt跨平台深度分析-2026-11-23.md` |
+| `apps/web/lib/agent/port.ts`, `lib/agent/port/*.md`, `app/r/port/` | Port guides (added 2026-11-23): carry a block to Vue, Svelte, SwiftUI, Flutter or React Native. One adapter file per platform plus the block's source; the source is the spec, so there is no per-block prose spec. Pilot and method: `reports/可攜式Prompt跨平台深度分析-2026-11-23.md` |
 | `apps/web/app/mcp/route.ts` | SunUI MCP server (Streamable HTTP, read-only) |
 | `apps/web/app/llms.txt`, `llms-full.txt`, `r/`, `skills/` | Plain-text and registry endpoints |
 | `packages/*`, `src/`, `.cursorrules/` | Legacy npm packages and their old docs. Do not add new work there |

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { motionLibName } from "@/lib/motion-lib";
 import { getItem, readRegistryFile, type RegistryItem } from "@/lib/registry";
 import { licenseSummary, siteUrl } from "@/lib/site";
 
@@ -11,10 +12,25 @@ import { licenseSummary, siteUrl } from "@/lib/site";
 // Pro 的移植指南含 Pro 原始碼：只有 /r/port/<platform>/<name>.md 在驗過授權後才組出來，
 // 頁面、MCP、llms-full.txt 都只拿得到 proPortInstructions()。
 
-export const portPlatforms = ["vue", "swiftui"] as const;
+export const portPlatforms = ["vue", "svelte", "swiftui", "flutter", "react-native"] as const;
 export type PortPlatform = (typeof portPlatforms)[number];
 
-export const portPlatformLabels: Record<PortPlatform, string> = { vue: "Vue", swiftui: "SwiftUI" };
+export const portPlatformLabels: Record<PortPlatform, string> = {
+  vue: "Vue",
+  svelte: "Svelte",
+  swiftui: "SwiftUI",
+  flutter: "Flutter",
+  "react-native": "React Native",
+};
+
+/** 給 MCP 工具與文件用的一行說明：這個平台的轉接規則假設什麼環境 */
+export const portPlatformStacks: Record<PortPlatform, string> = {
+  vue: "Vue 3.5 + Tailwind v4 + motion-v",
+  svelte: "Svelte 5 + Tailwind v4 + motion",
+  swiftui: "SwiftUI on iOS 17+",
+  flutter: "Flutter widgets, no third-party packages",
+  "react-native": "React Native with Reanimated and Gesture Handler",
+};
 
 export function parsePortPlatform(value: string | undefined | null): PortPlatform | undefined {
   const v = (value ?? "").toLowerCase();
@@ -24,10 +40,42 @@ export function parsePortPlatform(value: string | undefined | null): PortPlatfor
 /** verified：我們實際跑過並和原版比對。untested：規則涵蓋但沒人跑過。manual：用到轉接規則沒有對應的技術。web-only：這個東西在該平台沒有意義。 */
 export type PortLevel = "verified" | "untested" | "manual" | "web-only";
 
-// 2026-11-23 試作：三個 block 在兩個平台都是第一輪生成就通過。新驗證過的加在這裡。
+// 每一筆都是「用全新的 agent 只給這份指南、第一輪生成就通過」才列入（2026-11-23 兩輪試作，紀錄在
+// reports/可攜式Prompt跨平台深度分析-2026-11-23.md）。要修過才對的不列：那代表指南當時不夠，補過的規則還沒重跑。
+const firstRound = ["confirm-button", "range-slider", "scratch-card"];
 const verified: Record<PortPlatform, ReadonlySet<string>> = {
-  vue: new Set(["confirm-button", "range-slider", "scratch-card"]),
-  swiftui: new Set(["confirm-button", "range-slider", "scratch-card"]),
+  vue: new Set([
+    ...firstRound,
+    "loading-button",
+    "favorite-button",
+    "quantity-stepper",
+    "notify-badge",
+    "sliding-tabs",
+    "animated-number",
+    "checkout-steps",
+    "toast-stack",
+    "compare-slider",
+    "scroll-reveal-text",
+  ]),
+  // confirm-button 在 Svelte 要修一輪（寬度量錯），所以不列
+  svelte: new Set(["range-slider", "scratch-card"]),
+  // notify-badge 修了兩輪才對，不列；plush-portrait 是 WebGL 改寫成 Metal，第一輪就過
+  swiftui: new Set([
+    ...firstRound,
+    "loading-button",
+    "favorite-button",
+    "quantity-stepper",
+    "sliding-tabs",
+    "animated-number",
+    "checkout-steps",
+    "toast-stack",
+    "compare-slider",
+    "scroll-reveal-text",
+    "plush-portrait",
+  ]),
+  flutter: new Set(firstRound),
+  // scratch-card 在 React Native 能刮，但筆劃有漏、刮不到門檻，不列
+  "react-native": new Set(["confirm-button", "range-slider"]),
 };
 
 // 只存在於網頁的東西：瀏覽器外框、游標與 hover 效果、頁面捲動導覽、Cookie 橫幅。原生 App 由系統或導覽列處理。
@@ -47,7 +95,7 @@ const webOnlyOnNative: ReadonlySet<string> = new Set([
 // SVG 濾鏡與 WebGL 在原生平台沒有直接對應，要改寫成著色器。這一類還沒有試作過。
 const needsShader = /<fe(?:Turbulence|DisplacementMap|Morphology|ConvolveMatrix)\b|getContext\(\s*["'](?:webgl2?|experimental-webgl)["']|gl_FragColor|#version 300 es/;
 
-const isNative = (platform: PortPlatform) => platform === "swiftui";
+const isNative = (platform: PortPlatform) => platform === "swiftui" || platform === "flutter" || platform === "react-native";
 
 /** `source` 是主檔原始碼；沒給就只看名單（給公開頁面判斷 Pro block 用，不讀 Pro 原始碼）。 */
 export function portLevel(item: Pick<RegistryItem, "name">, platform: PortPlatform, source?: string): PortLevel {
@@ -65,7 +113,7 @@ const levelNote: Record<PortLevel, string> = {
   untested:
     "Untested: the rules below cover what this block uses, but nobody at SunUI has run this combination. Compare the result with the reference closely.",
   manual:
-    "Needs manual work: this block uses SVG filters or WebGL, which have no direct equivalent here. Port the structure and states from this guide, then rebuild that effect as a platform shader, and tell the user this part is an approximation.",
+    "Needs manual work: this block uses SVG filters or WebGL, which have no direct equivalent here. Port the structure and states from this guide, then rebuild that effect as a platform shader (on Apple platforms a Metal shader compiled from a string at run time worked in our test), and tell the user this part is an approximation.",
   "web-only":
     "Web only: this block exists because of the browser (page scrolling, hover, cursor, cookie law, browser chrome). On this platform the system or the navigation container does this job. Tell the user that, and port it only if they still want it.",
 };
@@ -98,16 +146,21 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
   if (isPro && !licensed) throw new Error(`portPrompt: "${item.name}" is a Pro block and needs a checked license`);
 
   const main = await sourcesOf(item);
-  // 共用的免費項目（例如結果圓片 stamp）要一起給，不然移植時只能用猜的
+  // 共用的免費項目（例如結果圓片 stamp）要一起給，不然移植時只能用猜的。
+  // sunui-motion 不是 block、不在 registry.json 裡（見 lib/motion-lib.ts），但 block 會從它匯入彈簧與搖晃的數值。
+  const depNames = (item.registryDependencies ?? []).filter((dep) => dep.startsWith("@sunui/")).map((dep) => dep.slice("@sunui/".length));
   const deps = (
     await Promise.all(
-      (item.registryDependencies ?? [])
-        .filter((dep) => dep.startsWith("@sunui/"))
-        .map((dep) => getItem(dep.slice("@sunui/".length), "free"))
+      depNames
+        .map((name) => getItem(name, "free"))
         .filter((dep): dep is RegistryItem => Boolean(dep))
         .map(sourcesOf),
     )
   ).flat();
+  if (depNames.includes(motionLibName) || main.some((file) => file.code.includes("@/lib/sunui-motion"))) {
+    const motionPath = "registry/lib/sunui-motion/motion.ts";
+    deps.push({ path: motionPath, code: await readFile(path.join(process.cwd(), motionPath), "utf8") });
+  }
   const demoPath = main[0] ? path.join(path.dirname(main[0].path), "demo.tsx") : null;
   const demo = demoPath && existsSync(path.join(process.cwd(), demoPath)) ? await readFile(path.join(process.cwd(), demoPath), "utf8") : null;
 
