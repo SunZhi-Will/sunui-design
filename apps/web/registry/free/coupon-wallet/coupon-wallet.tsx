@@ -91,7 +91,6 @@ const edge = "border-foreground/10";
 const ink = "text-foreground";
 const inkMuted = "text-muted-foreground";
 /** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only for selection, offers and current progress */
-const spot = "text-[color:var(--sunui-spot,var(--primary))]";
 const spotBorder = "border-[color:var(--sunui-spot,var(--primary))]";
 
 const springs = {
@@ -218,15 +217,25 @@ export function CouponWallet({ coupons, value, defaultValue = null, onChange, lo
                 )}
               >
                 {/* The face value sits inside the concave area (concentric radii 12 - 4 = 8). When unavailable only the content is dimmed and the surface stays opaque, so coupons behind do not show through when the fan opens */}
+                {/* Face value on a raised foil plate in the brand colour (2026-11-23). The sheen sits at a different spot on each coupon
+                    and slides as the fan opens, like light on tilted metal. Unavailable coupons get plain steel instead */}
                 <span
                   className={cn(
-                    "flex shrink-0 flex-col items-center justify-center rounded-lg bg-muted/70 shadow-[inset_0_1px_2px_rgb(0_0_0/0.06)] dark:bg-foreground/[0.04] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.4)]",
-                    c.unavailableReason && "opacity-55",
+                    "flex shrink-0 flex-col items-center justify-center rounded-lg shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-1px_0_rgb(0_0_0/0.18),0_1px_2px_rgb(0_0_0/0.12)]",
+                    c.unavailableReason ? "text-foreground/60" : "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]",
                   )}
-                  style={{ width: STUB }}
+                  style={{
+                    width: STUB,
+                    backgroundColor: c.unavailableReason ? "color-mix(in oklch, var(--foreground) 14%, var(--card))" : "var(--sunui-spot, var(--primary))",
+                    backgroundImage:
+                      "linear-gradient(180deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 45%, rgb(0 0 0 / 0.16)), linear-gradient(115deg, transparent 34%, rgb(255 255 255 / 0.3) 47%, transparent 60%), repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px)",
+                    backgroundSize: "100% 100%, 260% 100%, auto",
+                    backgroundPosition: `0 0, ${open ? 50 - d * 22 + (lifted ? -12 : 0) : 70 - r * 8}% 0, 0 0`,
+                    transition: "background-position 500ms cubic-bezier(0.23, 1, 0.32, 1)",
+                  }}
                 >
-                  <span className={cn("text-2xl leading-none font-semibold tracking-tight tabular-nums", spot)}>{c.amount}</span>
-                  <span className={cn("mt-1 text-[10px] font-medium tracking-[0.14em]", inkMuted)}>{t.off}</span>
+                  <span className="text-2xl leading-none font-semibold tracking-tight tabular-nums">{c.amount}</span>
+                  <span className="mt-1 text-[10px] font-medium tracking-[0.14em] opacity-80">{t.off}</span>
                 </span>
                 <span className={cn("flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3", c.unavailableReason && "opacity-55")}>
                   <span className="truncate text-sm font-medium">{c.title}</span>
