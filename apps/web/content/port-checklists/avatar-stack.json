@@ -2,7 +2,7 @@
  "block": "avatar-stack",
  "summary": "A row of overlapping buyer avatars with a +N overflow disc, a hover or focus lift with a name tooltip, and localized accessible names, shown in a product card and two related-product rows.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-main-stack",
@@ -136,9 +136,10 @@
    "id": "photo-less-fallback",
    "behaviour": "People without an image show a stable fallback chosen from their id.",
    "trigger": "initial render (no demo person has a src)",
-   "expect": "Main stack (fallback initials): initials on a spot-colour tint of 12%, 20% or 28% picked by hashing the id. Related rows (fallback gradient): a 135 degree gradient of the spot colour picked from 5 presets by hashing the id, no letters. The same id gets the same tint or gradient on every render, so Leo C. (id 2) has the same gradient in the mug row as Noah W. does not, and Noah W. (id 4) looks identical in the mug and tote rows.",
+   "expect": "Main stack (fallback initials): initials on a spot-colour tint of 12%, 20% or 28% picked by hashing the id. Related rows (fallback gradient): a 135 degree gradient of the spot colour picked from 5 presets by hashing the id, no letters. The same id gets the same tint or gradient on every render (for example after switching locale and back). In the demo the mug row shows only Leo C. (id 2) and Ava L. (id 3) as discs, since its max is 2 and Noah W. is hidden there (he appears only in the +410 name and tooltip), and the tote row shows Noah W. (id 4) and Sara K. (id 5) as discs. No person is a gradient disc in both rows, so a cross-row comparison of the same person cannot be made in the demo; check stability by re-rendering the same row instead.",
    "kind": "state",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

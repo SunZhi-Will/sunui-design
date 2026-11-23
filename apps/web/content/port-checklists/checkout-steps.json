@@ -2,7 +2,7 @@
  "block": "checkout-steps",
  "summary": "A checkout progress track where completed steps collapse into clickable one-line answers, the current step is a filled pill and future steps are numbered ticks, with a narrow \"n/total\" plus segmented bar layout below 420px, shown in a demo that plays itself once.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -14,9 +14,9 @@
   },
   {
    "id": "autoplay-script",
-   "behaviour": "The demo plays a scripted run once when it scrolls into view: an arrow cursor clicks the main button twice, clicks the completed pickup answer, then clicks the main button again, and the run ends on Payment. A real press or key inside the card stops it.",
-   "trigger": "Scroll the card into view and wait; in a second run, press anywhere inside the card while the script is playing",
-   "expect": "About 600ms of visible time after entering view, the cursor fades in and clicks 'Continue to delivery' (step 2), about 1.1s later 'Continue to payment' (step 3), about 1.3s later the completed '7-Eleven 信義店 pickup' answer (back to step 2), about 1.1s later 'Continue to payment' (step 3). About 0.5s later the cursor fades out over 0.2s; final state is Payment with steps 1 and 2 done. The timer pauses while the card is out of view or the tab is hidden and resumes where it left off. A real pointerdown or keydown inside the card stops the script at once, the cursor fades out in about 0.12s and the step stays where it was. The cursor is hidden from assistive tech and does not take pointer events. The script never runs a second time without a reload.",
+   "behaviour": "Original site demo only (the useDemoAutoplay helper; a port that drops the autoplay skips this item). The demo plays a scripted run once when it scrolls into view: an arrow cursor clicks the main button twice, clicks the completed pickup answer, then clicks the main button again, and the run ends on Payment. A real press or key inside the card stops it.",
+   "trigger": "Original demo with motion on: load the page with the card in view and wait; in a second run, press anywhere inside the card while the script is playing",
+   "expect": "Measured from load, the step changes happen at about 1.6s (step 2, 'Continue to delivery'), 3.4s (step 3, 'Continue to payment'), 5.9s (back to step 2 by clicking the completed '7-Eleven 信義店 pickup' answer) and 8.2s (step 3 again), so the gaps are about 1.8s, 2.5s and 2.3s. The script's own waits of 600ms, 1.1s, 1.3s and 1.1s do not include cursor travel (0.4 to 0.9s), the 120ms dwell and the press. The cursor is gone at about 9.0s; final state is Payment with steps 1 and 2 done. The timer pauses while the card is out of view or the tab is hidden and resumes where it left off. A real pointerdown or keydown inside the card stops the script at once, the cursor fades out in about 0.12s and the step stays where it was. The cursor is hidden from assistive tech and does not take pointer events. The script never runs a second time without a reload.",
    "kind": "timing",
    "scope": "all"
   },
@@ -88,14 +88,14 @@
    "id": "a11y-done-button-name",
    "behaviour": "A completed-step button has a full spoken name: edit verb, a space, step name, colon, answer, comma, completed word; its tooltip is the step name.",
    "trigger": "Inspect the completed step 1 button on step 2 in en, zh-TW, zh-CN and ja",
-   "expect": "en name 'Edit Review order: 2 items · NT$1,280, completed', title 'Review order'. zh-TW '修改 確認訂單：2 件 · NT$1,280，已完成'. zh-CN '修改 确认订单：2 件 · NT$1,280，已完成'. ja '変更 注文の確認：2点 · NT$1,280，完了'. Non-English locales use the full-width colon and comma with no space around them, but keep the space after the edit verb. The check icon is hidden from assistive tech. No live region exists; on a step change the visible heading changes instead.",
+   "expect": "en name as exposed by Chrome is 'Edit Review order: 2 items · NT$1,280 , completed' (a space before the comma comes from the span boundaries; same in the original and ports), title 'Review order'. zh-TW '修改 確認訂單：2 件 · NT$1,280，已完成'. zh-CN '修改 确认订单：2 件 · NT$1,280，已完成'. ja '変更 注文の確認：2点 · NT$1,280，完了'. Non-English locales use the full-width colon and comma and keep the space after the edit verb; a span-boundary space before the comma may also appear there and is acceptable. The check icon is hidden from assistive tech. No live region exists; on a step change the visible heading changes instead.",
    "kind": "text",
    "scope": "all"
   },
   {
    "id": "demo-locale",
-   "behaviour": "All demo copy (step names, summaries, headings, notes, button labels) follows the demo locale.",
-   "trigger": "Switch the demo locale to zh-TW, zh-CN and ja and step through 1 to 3",
+   "behaviour": "Original site demo only (a port demo uses the English entry with locale=\"en\" and has no locale switch, so it skips this item; the component's own strings are covered by a11y-list-names and a11y-done-button-name). All demo copy (step names, summaries, headings, notes, button labels) follows the demo locale.",
+   "trigger": "Original demo: switch the demo locale to zh-TW, zh-CN and ja and step through 1 to 3",
    "expect": "zh-TW steps '確認訂單, 配送, 付款, 完成', summaries '2 件 · NT$1,280' and '7-11 信義店取貨', buttons '下一步：配送', '下一步：付款', '付款 NT$1,280'. zh-CN steps '确认订单, 配送, 付款, 完成', summaries '2 件 · NT$1,280' and '7-11 信义店自提', buttons '下一步：配送', '下一步：付款', '支付 NT$1,280'. ja steps '注文の確認, お届け, お支払い, 完了', summaries '2点 · NT$1,280' and 'セブン 信義店で受取', buttons 'お届け方法へ進む', 'お支払いへ進む', 'NT$1,280 を支払う'. Headings match the current step name; the narrow counter line shows the localized step name.",
    "kind": "text",
    "scope": "all"
@@ -110,9 +110,9 @@
   },
   {
    "id": "morph-spring",
-   "behaviour": "On a step change the track items morph position and size with a spring and the ink line grows or shrinks from the left.",
+   "behaviour": "On a step change the track cells resize and the items inside them move with a spring, and the ink line grows or shrinks from the left.",
    "trigger": "Press the main button on step 1, then click the completed step to go back",
-   "expect": "Items slide and resize with a spring of stiffness 240, damping 30 (no fixed duration); the leftmost step stays anchored. The ink segment under the new current step scales horizontally from 0 to 1 with origin at its left edge using the same spring; going back, the segment of the step that becomes a tick scales from 1 to 0. In the narrow layout the bar segments fill and empty from the left with the same spring.",
+   "expect": "Only the li cell and its ink line resize with the spring (stiffness 240, damping 30, no fixed duration). The pill, tick and answer inside each cell are position-only layout items: they appear at their final size on the first frame and then only slide, they do not scale. The leftmost step stays anchored. For roughly the first 100ms the moving ticks pass over the right end of the new pill; this is how the original behaves, not a defect. The ink segment under the new current step scales horizontally from 0 to 1 with origin at its left edge using the same spring; going back, the segment of the step that becomes a tick scales from 1 to 0. In the narrow layout the bar segments fill and empty from the left with the same spring.",
    "kind": "motion",
    "scope": "all"
   },
@@ -120,7 +120,7 @@
    "id": "reduced-motion",
    "behaviour": "With reduced motion all step changes are instant and the autoplay cursor never appears.",
    "trigger": "Enable prefers-reduced-motion, reload, let autoplay run, then advance and go back by hand",
-   "expect": "No layout morph and no sliding: steps, pill and ticks jump to their new positions; ink line and narrow segments change with duration 0. Autoplay still changes steps in the same order and timing (step 2, step 3, step 2, step 3) but no cursor is shown or moved. Final states are identical to the animated version.",
+   "expect": "No layout morph and no sliding: steps, pill and ticks jump to their new positions; ink line and narrow segments change with duration 0. In the original site demo only, autoplay still changes steps in the same order (step 2, step 3, step 2, step 3), measured at about 0.25s, then +1.11s, +1.30s and +1.11s (the script's plain waits, since there is no cursor travel), but no cursor is shown or moved; a port without autoplay skips this sentence. Final states are identical to the animated version.",
    "kind": "reduced-motion",
    "scope": "all"
   },
@@ -148,5 +148,6 @@
    "kind": "attribute",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -2,7 +2,7 @@
  "block": "toast-stack",
  "summary": "Acceptance checklist for porting toast-stack: a stacked, swipeable, auto-dismissing notification queue with pause on hover and focus, keyboard and button dismissal, undo toasts, four locales, and a shop-and-cart demo that drives it.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -23,8 +23,8 @@
   {
    "id": "pause-and-resume",
    "behaviour": "Timed toasts dismiss after 4500ms unless the region is hovered, holds keyboard focus, or the tab is hidden; the countdown then resumes from the time left.",
-   "trigger": "Press \"Add to cart\" on Mug and leave it alone; then repeat, wait about 2000ms, hover the region (or Tab into it) for 5000ms, then move the pointer out (or Tab out)",
-   "expect": "Untouched, the toast leaves 4500ms after it appeared. While hovered or while focus is anywhere inside the region it stays and its bottom line freezes; after the pointer and focus have both left it dismisses about 2500ms later, not a full 4500ms. Moving the mouse out while focus stays inside (for example after clicking a toast) keeps it paused. Switching to another browser tab also pauses it.",
+   "trigger": "Press \"Add to cart\" on Mug and leave it alone; then repeat, wait about 2000ms, hover the region (or Tab into it) for 5000ms, then move the pointer out (or Tab out); also click Undo or X on a toast, move the pointer out, and wait 6000ms",
+   "expect": "Untouched, the toast leaves 4500ms after it appeared. While hovered or while focus is anywhere inside the region it stays and its bottom line freezes; after the pointer and focus have both left it dismisses about 2500ms later, not a full 4500ms. Moving the mouse out while focus stays inside (for example after clicking a toast) keeps it paused. Switching to another browser tab also pauses it. In the original, activating Undo or X inside the region (mouse click or Enter) leaves the stack expanded and paused even after the pointer leaves and focus is on the body: the section's blur handler never runs for the removed button, so the paused state lasts until focus enters the region again and then leaves it. Measured after a mouse click on Undo and moving out: toast scales stay at 1, the list stays at its expanded height (144px in the measured case), and a toast pushed afterwards was still present after 6000ms with its timer line frozen at scaleX 1.",
    "kind": "timing",
    "scope": "web"
   },
@@ -56,7 +56,7 @@
    "id": "undo-add",
    "behaviour": "The Undo key on an add toast removes that line, closes only its own toast, and announces the removal.",
    "trigger": "Add Sneaker and then Mug, then press \"Undo\" on the older Sneaker toast (expand the stack to reach it)",
-   "expect": "Only the Sneaker line just added leaves the cart (count drops by 1); the Sneaker toast closes while the Mug toast and the seeded Tote toast stay. A new front toast appears titled \"Removed from cart\" with description \"Sneaker\", a circled i icon, no thumbnail, no action, auto-dismissing after 4500ms. Pressing Undo on the seeded toast removes the Tote line the same way.",
+   "expect": "Only the Sneaker line just added leaves the cart (count drops by 1); the Sneaker toast closes while the Mug toast and the seeded Tote toast stay. A new front toast appears titled \"Removed from cart\" with description \"Sneaker\", a circled i icon, no thumbnail, no action, and a countdown line. Its 4500ms auto-dismiss runs only if the region is not left paused: because Undo was just activated inside the region, the stack stays expanded and paused after the pointer leaves, and the \"Removed from cart\" toast did not leave within 6500ms when measured. Pressing Undo on the seeded toast removes the Tote line the same way.",
    "kind": "state",
    "scope": "all"
   },
@@ -88,7 +88,7 @@
    "id": "dismiss-button",
    "behaviour": "The X button removes only its own toast.",
    "trigger": "With two or more toasts, press the X button named \"Dismiss notification\" on one of them",
-   "expect": "That toast leaves with the exit motion; the others remain and the stack re-settles. The cart is unchanged. Works on the seeded toast too.",
+   "expect": "That toast leaves with the exit motion; the others remain and the stack re-settles. The cart is unchanged. Works on the seeded toast too. After pressing X (mouse or Enter) the stack stays expanded and paused even once the pointer leaves, until focus enters the region again and leaves, so remaining timed toasts stop counting down.",
    "kind": "state",
    "scope": "all"
   },
@@ -111,10 +111,18 @@
   {
    "id": "swipe-dismiss",
    "behaviour": "Toasts can be dragged sideways to dismiss; short drags spring back.",
-   "trigger": "Drag the front toast left or right (or any toast while expanded); try a short slow drag and a long or fast one",
-   "expect": "The toast follows horizontally with resistance (about 0.6 of the pointer distance). Releasing after the pointer moved more than 90px sideways, or flicking faster than 600px/s, dismisses it; otherwise it springs back to its place. Collapsed back layers cannot be dragged.",
+   "trigger": "Drag the front toast left or right (or any toast while expanded); try a short drag, a drag past 90px, and a quick flick",
+   "expect": "The toast follows horizontally with resistance (about 0.6 of the pointer distance). Releasing after the pointer moved more than 90px sideways dismisses it; a shorter drag springs back to its place. The flick rule (faster than 600px/s) uses velocity averaged over about 100ms, so it only applies when the travel stays under 90px and the motion is sustained; an 84px flick over about 50ms sprang back on the original. Do not rely on scripted input to test the flick.",
    "kind": "motion",
    "scope": "all"
+  },
+  {
+   "id": "swipe-collapsed-layers",
+   "behaviour": "Back layers of the collapsed stack cannot be dragged; only the front toast can.",
+   "trigger": "On a touch device with three or more toasts and no hover, try to drag a back layer",
+   "expect": "Only the front toast follows the finger. Back layers do not move. On the web with a mouse this cannot be reached, because hovering the region expands the stack and makes every toast draggable.",
+   "kind": "motion",
+   "scope": "touch"
   },
   {
    "id": "accessibility-names",
@@ -148,5 +156,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -2,7 +2,7 @@
  "block": "quantity-stepper",
  "summary": "Checklist for porting quantity-stepper: a compact minus / number field / plus control with a rolling digit, press-and-hold repeat, a spinbutton keyboard model, and a trash button that replaces the minus at the minimum, shown in a three-line shopping bag demo.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -64,7 +64,7 @@
    "id": "remove-line",
    "behaviour": "Activating the trash removes the line from the bag with a collapse animation and the totals update.",
    "trigger": "Click the trash on the Market Tote line",
-   "expect": "The Tote line fades to opacity 0 and collapses to height 0 on a spring of stiffness 240, damping 30. Count becomes \"5 items\", subtotal $146.00. The trash scales to 0.97 while pressed (only when motion is allowed).",
+   "expect": "The Tote line fades to opacity 0 and collapses on a spring of stiffness 240, damping 30. The line does not reach height 0 before removal: it sits at 1px (its bottom border) with opacity below 0.01 for the last ~150 ms and is detached from the DOM at about 550 ms. Count becomes \"5 items\", subtotal $146.00. The trash scales to 0.97 while pressed (only when motion is allowed).",
    "kind": "motion",
    "scope": "all"
   },
@@ -104,7 +104,7 @@
    "id": "tab-order",
    "behaviour": "Only the number field and the trash button are in the Tab order; plus and minus are skipped.",
    "trigger": "From before the demo, press Tab repeatedly on first render",
-   "expect": "Stops, in order: Mug quantity field; Tote trash button (\"Remove Market Tote\"); Tote quantity field; Bottle quantity field. Plus and minus buttons never receive focus, and nothing decorative (icons, product images, totals) is a stop. A keyboard-focused trash shows a 2px inset ring; the focused field gets a 4% foreground tint. Focusing a field selects its whole text.",
+   "expect": "Stops, in order: Mug quantity field; Tote trash button (\"Remove Market Tote\"); Tote quantity field; Bottle quantity field. Plus and minus buttons never receive focus, and nothing decorative (icons, product images, totals) is a stop. A keyboard-focused trash shows a 2px inset ring; a focused field with no draft shows no visible tint (measured computed background is fully transparent, oklab(0 0 0 / 0), and its text is transparent while the rolling number shows through). The 4% foreground tint appears only while a draft is being typed and the input switches to visible text. Focusing a field selects its whole text.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -120,7 +120,7 @@
    "id": "typed-entry",
    "behaviour": "Typing edits a draft shown as plain text; it commits on Enter or blur, snapped to the step and clamped.",
    "trigger": "Focus the Mug field (value 2) and type, then press Enter or Tab away",
-   "expect": "Only digits, \".\" and \"-\" are accepted (letters are dropped as typed). \"7\" commits 7; \"15\" commits 10; \"0\" commits 1 (trash appears); \"2.6\" commits 3. A committed typed value appears without the rolling slide. Empty or unparseable text (such as \"-\") reverts to the previous value with no change. While typing, the plus and minus states still reflect the committed value. ArrowUp or ArrowDown during a draft discard the draft and step from the typed number (type 5, ArrowUp gives 6).",
+   "expect": "Only digits, \".\" and \"-\" are accepted (letters are dropped as typed). \"7\" commits 7; \"15\" commits 10; \"0\" commits 1 (trash appears); \"2.6\" commits 3. A committed typed value appears without the rolling slide. Empty or unparseable text (such as \"-\") reverts to the previous value with no change. While typing, the plus and minus states still reflect the committed value. ArrowUp or ArrowDown during a draft discard the draft and step from the typed number (type 5, ArrowUp gives 6). Typing the same character that is already shown (select the 2 and type 2) creates no draft at all: React fires no change event when the string is unchanged, so the field stays transparent with the rolling number overlay still showing and nothing commits.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -148,5 +148,6 @@
    "kind": "text",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

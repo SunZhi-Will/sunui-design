@@ -2,7 +2,7 @@
  "block": "confirm-button",
  "summary": "A two-press confirm button: the first press arms it (label swaps to the confirm label, the steel outline key turns destructive, a hint line appears), a second press within 2500ms runs the async action with a spinner, and the result shows in a polite live status line under the button.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -16,7 +16,7 @@
    "id": "arm-on-first-press",
    "behaviour": "The first press does not run the action. It arms the button: the label swaps to the confirm label, the style swaps to destructive, and a hint appears with the confirm label in lowercase.",
    "trigger": "Click or tap \"Remove\" once",
-   "expect": "The button text becomes \"Remove signup\" and the button gets data-active. It turns destructive: destructive-coloured text on a destructive/10 tinted background, without the steel keycap gradient. The status line reads \"Press again to remove signup\" in the muted colour. The email row is unchanged and the action has not run.",
+   "expect": "The button text becomes \"Remove signup\" and the button gets data-active. It turns destructive: destructive-coloured text on a destructive/10 tinted background (at rest; if the pointer is still over the button after the press, the hover tint destructive/20 shows instead, measured alpha 0.2), without the steel keycap gradient. The status line reads \"Press again to remove signup\" in the muted colour. The email row is unchanged and the action has not run.",
    "kind": "state",
    "scope": "all"
   },
@@ -24,7 +24,7 @@
    "id": "arm-timeout",
    "behaviour": "The armed state ends by itself if no second press comes within 2500ms. The hint is cleared earlier, on its own 1800ms timer.",
    "trigger": "Press once, then wait without pressing again",
-   "expect": "The hint text disappears about 1800ms after the press while the button still reads \"Remove signup\". About 2500ms after the press the button goes back to \"Remove\" with the outline style and loses data-active. The action never runs.",
+   "expect": "The hint text node leaves the DOM about 1920 to 1950ms after it appeared (the 1800ms timer plus the 120ms fade out) while the button still reads \"Remove signup\". About 2500ms after the press the button goes back to \"Remove\" with the outline style and loses data-active. The action never runs.",
    "kind": "timing",
    "scope": "all"
   },
@@ -48,7 +48,7 @@
    "id": "success-result",
    "behaviour": "On success the message the action returned is flashed in the success tone, replacing any leftover hint, and the demo marks the row as removed. The button then stays disabled for good.",
    "trigger": "The 500ms demo action resolves after confirming",
-   "expect": "The spinner is removed and aria-busy is gone. The status line reads \"Signup removed\" in the success green (var(--sunui-success), fallback #1f9d55 in light, #4cd68a in dark), not muted. It clears about 1800ms after the result appears, counted from the result and not from the first press. The email \"test+qa@example.com\" becomes muted and struck through. The button reads \"Remove\", stays at 50% opacity and disabled, and further presses do nothing.",
+   "expect": "The spinner is removed and aria-busy is gone. The status line reads \"Signup removed\" in the success green (var(--sunui-success), fallback #1f9d55 in light, #4cd68a in dark), not muted. It leaves the DOM about 1920 to 1950ms after the result appears (the 1800ms timer plus the 120ms fade out), counted from the result and not from the first press. The email \"test+qa@example.com\" becomes muted and struck through. The button reads \"Remove\", stays at 50% opacity and disabled, and further presses do nothing.",
    "kind": "state",
    "scope": "all"
   },
@@ -62,9 +62,9 @@
   },
   {
    "id": "escape-cancels",
-   "behaviour": "Pressing Escape while the button is armed and focused cancels the confirm. It disarms the button and clears the hint at once. Escape does nothing when the button is not armed.",
-   "trigger": "Focus the button, press Enter to arm it, then press Escape",
-   "expect": "Straight away the label goes back to \"Remove\" with the outline style, data-active is removed, and the status line is emptied without waiting for 1800ms. Focus stays on the button. Pressing Enter once more only arms it again and does not run the action. Pressing Escape on an unarmed button changes nothing.",
+   "behaviour": "Pressing Escape while the button is armed and focused cancels the confirm. It disarms the button and clears the hint at once. A mouse press also leaves focus on the button, so Escape cancels a mouse-armed confirm too. Escape does nothing when the button is not armed.",
+   "trigger": "Arm the button with the keyboard (focus it, press Enter) or with a mouse click, then press Escape",
+   "expect": "Straight away the label goes back to \"Remove\" with the outline style, data-active is removed, and the status line is emptied without waiting for 1800ms. Focus stays on the button. This is the same whether it was armed by keyboard or by a mouse click. Pressing Enter once more only arms it again and does not run the action. Pressing Escape on an unarmed button changes nothing.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -111,8 +111,8 @@
   {
    "id": "swap-motion",
    "behaviour": "The label, spinner and notice animate in short steps instead of cutting, and the button width changes smoothly. The label is clipped to the button while it moves.",
-   "trigger": "Arm the button, let it disarm, then confirm; record frames or step through animations in devtools",
-   "expect": "On arming the new label rises in from below while the old one moves up and fades, and no label text is ever drawn outside the button edge. The button width grows from \"Remove\" to \"Remove signup\" over several frames (a spring, settling in roughly 200 to 300ms) and shrinks back the same way. The spinner grows from a smaller scale as it fades in. The notice text rises a few pixels as it fades in and only fades on the way out. Every enter or exit has finished within about 300ms.",
+   "trigger": "Arm the button, let it disarm, then confirm; record frames or step through animations in devtools (also let the result arrive and watch the spinner leave)",
+   "expect": "On arming the new label rises in from below while the old one moves up and fades, and no label text is ever drawn outside the button edge. The button width grows from \"Remove\" to \"Remove signup\" over several frames (a spring, settling in roughly 200 to 300ms) and shrinks back the same way on disarm and on the confirm press. When the spinner is removed after the result, the width does not spring: it snaps from 88.44px to 70.44px in a single frame. The label span uses layout=\"position\", so it moves with the button but is never scaled or squashed: its width stays constant while the button resizes (91.95px for \"Remove signup\", 48.44px for \"Remove\"). The spinner grows from a smaller scale as it fades in. The notice text rises a few pixels as it fades in and only fades on the way out. Every enter or exit has finished within about 300ms.",
    "kind": "motion",
    "scope": "all"
   },
@@ -132,5 +132,6 @@
    "kind": "text",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

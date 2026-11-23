@@ -1,0 +1,777 @@
+{
+ "note": "Phase 2 batch 1, 2026-11-23. One entry per block and platform: the judge's verdict and what the challenger found.",
+ "results": [
+  {
+   "block": "confirm-button",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 13,
+   "itemsTested": 15,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [
+    "escape-cancels (and focus handling): a mouse press does not leave focus on the button, so Escape cannot cancel a mouse-armed confirm. The port puts tabindex=\"-1\" on the label, spinner and notice spans (and the svg); the mousedown lands on the label span, which takes focus (activeElement during mousedown = SPAN[tabindex=-1]; original and svelte = BUTTON), and when that span is swapped out on arming focus drops to BODY (activeElement after arming = BODY; original = BUTTON). Pressing Escape 400ms after a mouse arm: original is back to \"Remove\", data-active removed, status empty within 180ms; vue is still \"Remove signup\", data-active=true, status \"Press again to remove signup\" 180ms and 580ms later (screenshot confirm-button-vue-16-mouse-escape-180ms.png shows the armed red button, original shows the plain Remove key). Keyboard-armed Escape works (Tab, Enter, Escape matches the original).",
+    "swap-motion: the entering label is stretched horizontally during the width change instead of keeping its size. Sampled label width while entering: vue \"Remove signup\" 57.06px -> 84.46px over the first ~75ms (final 93.08) and re-entering \"Remove\" 79.19px -> 55.88px (final 48.55); the original's labels stay at a constant 91.95px / 48.44px throughout (layout=\"position\"). Button width spring itself matches (70.55 -> 116.4 peak -> 115.08 in ~300ms vs original 70.44 -> 115.25 -> 113.95 in ~280-300ms)."
+   ],
+   "untestedItems": [
+    "locale-copy: the port demo hardcodes locale=\"en\" and has no locale switch, so ja / zh-TW / zh-CN could not be exercised in the browser. By source the MESSAGES table and resolveLocale are identical to the original."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "confirm-button",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 14,
+   "itemsTested": 15,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [
+    "swap-motion (visibly broken layout on every disarm): when the button leaves the armed state it grows instead of shrinking, holds the bloated width, then snaps. Lapse / Escape: width 115.08 -> 169.17px peak, sits at ~167.6px, then jumps to 70.55 in one frame after 416ms; the original springs 113.94 -> 69.15 -> 70.05 in ~300ms and never exceeds its start width. Sampled curve svelte: 115.08 123.75 140.78 155.39 163.97 167.94 169.14 ... 167.63 -> 70.55; original: 113.94 107.54 93.92 81.43 73.62 70.29 69.22 ... 70.05. Screenshot confirm-button-svelte-16-mouse-escape-180ms.png shows a ~169px wide Remove key (original ~70px).",
+    "swap-motion / confirm-runs-action: on confirm the pending button balloons to 187.7px and stays ~185.6px for about 416ms before snapping to 88.55; the original shrinks 113.95 -> 87.7 in 200ms. Measured 200ms after the confirm press: svelte 187.72px, original 87.68px, vue 87.77px. Screenshot confirm-button-svelte-18-pending-200ms.png shows the spinner and label centred in a button twice the normal width, pushing the meta line into an earlier ellipsis.",
+    "swap-motion: when the spinner leaves after success the port animates the width 88.55 -> 70.11 over 183ms, where the original snaps 88.44 -> 70.44 in a single frame (minor, reverse of the snap rule).",
+    "Re-arming while the bloated width is still held starts from the wrong size (Enter 385ms after Escape: width 167.63 -> 119.69 -> 115.08, original 70.48 -> 114.35)."
+   ],
+   "untestedItems": [
+    "locale-copy: the port demo hardcodes locale=\"en\" and has no locale switch, so ja / zh-TW / zh-CN could not be exercised in the browser. By source the MESSAGES table and resolveLocale are identical to the original."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "range-slider",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 18,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "pointer-drag (partly): the pointercancel path was not exercised, only pointer release; everything else in the item was tested",
+    "arrow-keys (partly): 'the page does not scroll' was checked through keydown.defaultPrevented (true for all four arrows, false for Enter, letter, Space, same as original), because none of the three pages is tall enough to scroll",
+    "Touch input was not tested, mouse and keyboard only"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "range-slider",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": true,
+   "itemsPassed": 17,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "pointer-press-track: a click whose press and release land in the same frame is animated with the spring instead of jumping. Measured with mouse down and up with no hold at 90% of the price track: thumb centre went 60, 60.07, 62.48, 66.64, 71.73, 76.37, 80.9, 84.15, 86.75, 88.58, 89.71, 90.42, 90.77, 90.89 (overshoot 0.89%), settling after about 367ms over 22 frames; the fill width did the same (50 to 80, peak 80.89). The original and the Vue port jump 60 to 90 in one frame (about 17ms) in the same test. With a 40ms or 100ms hold the Svelte port is also instant, so this only shows on very fast clicks (tap to click, scripted clicks). First run confirmed it independently: 300ms after a plain click at the track ends the thumb was still at -0.57% and 100.1% while the original was at 0 and 100. Likely cause in RangeSlider.svelte: motionTo's update calls controls.stop() on the duration-0 animation before it has applied a frame, then starts the spring from the old value when dragging returns to null"
+   ],
+   "untestedItems": [
+    "pointer-drag (partly): the pointercancel path was not exercised, only pointer release; everything else in the item was tested",
+    "arrow-keys (partly): 'the page does not scroll' was checked through keydown.defaultPrevented (same as original), because none of the pages is tall enough to scroll",
+    "Touch input was not tested, mouse and keyboard only"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "loading-button",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 13,
+   "itemsTested": 15,
+   "itemsTotal": 15,
+   "tabOrderMatches": true,
+   "defects": [
+    "repeat-press-loading / focus retention: a mouse click never leaves focus on the button. The inner motion.span carries tabindex=\"-1\" (LoadingButton.vue line ~145, also on the check motion.path), so the click focuses that span, and when the span is swapped out focus drops to BODY. Measured after a real mouse click on Subscribe: document.activeElement = BODY during loading, success and idle (original and Svelte: BUTTON in all three). The sampler shows focus=false on the Vue button in every mouse run (subscribe, pay, apply, hold-press), focus=true in the original.",
+    "keyboard-activate: consequence of the above. After clicking Subscribe with the mouse and waiting for idle, pressing Space starts a new cycle in the original (aria-busy at +18ms, Subscribed at +1418ms) and in Svelte, but does nothing in Vue (no state change over 4s). Keyboard activation works in Vue only when focus arrived by Tab."
+   ],
+   "untestedItems": [
+    "live-announcements: only the live region text, aria-live value and aria-hidden on icons were read from the DOM; no real screen reader was run",
+    "first-render colours: compared only structurally (ports use the neutral theme by design)"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "loading-button",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 11,
+   "itemsTested": 15,
+   "itemsTotal": 15,
+   "tabOrderMatches": true,
+   "defects": [
+    "success-subscribe: the check mark is never drawn with motion enabled. The check path's computed stroke-dasharray stays '0px, 1px' for the whole 2000ms success state (original and Vue go 0 > 1px in about 285ms). Screenshots loading-button-svelte-x-3-success.png and loading-button-svelte-4-subscribe-success.png show only a dot left of 'Subscribed'. Under reduced motion the check is drawn (dasharray '1px, 1px').",
+    "success-sticky: same bug on Pay. 'Paid' is shown with a dot instead of a check and it stays that way indefinitely (loading-button-svelte-8-pay-paid.png, loading-button-svelte-12-end.png, taken many seconds after success).",
+    "shrink-loading (expand back): the port springs border-radius in px from 999 to 6, so the button stays a full pill for about 400ms after success/error (radius 330px at +150ms, 64px at +283ms, below the 20px clamp only at about +380ms, 6px at +530ms). The original sets the radius immediately: 6px vertical ('15%') from the first frame of the expansion. Visible in loading-button-svelte-x-3-success.png (pill) versus loading-button-orig-x-3-success.png (6px corners) at the same moment. Note the checklist text asks for an animated radius; the original does not do that.",
+    "press-scale (release): on release the scale first moves the wrong way, 0.970 > 0.954 (about 50ms after release) before returning to 1; original and Vue return monotonically 0.970 > 1. Same thing on a quick click: a brief 1.003 to 1.004 blip. Small (about 6px on the full-width Pay button) but measured on every release (hold on idle Subscribe, idle Pay and Paid)."
+   ],
+   "untestedItems": [
+    "live-announcements: only the live region text, aria-live value and aria-hidden on icons were read from the DOM; no real screen reader was run",
+    "first-render colours: compared only structurally (ports use the neutral theme by design)"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "favorite-button",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": false,
+   "itemsPassed": 12,
+   "itemsTested": 13,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [
+    "keyboard-activate / focus: after a real mouse click on a heart, focus does not stay on the button, so Enter/Space no longer toggles it. Measured on the Lamp button: at mousedown document.activeElement is path{tabindex=-1} (the fill path), after mouseup it is body (focus log: focusin:path{-1}, focusout:path{-1}); Enter then leaves aria-pressed unchanged (enterToggles=false). Same on the unsaved Mug: active element body after click, Space and Enter both leave aria-pressed=false. Original: Enter/Space after a click toggles in both modes (normal: focus on the inner span and aria-pressed false->true->false; reduced motion: focus on the button). Svelte: focus on the button, toggles. Cause: tabindex=\"-1\" added to motion.span and motion.path in FavoriteButton.vue makes them click-focusable inside the button, and the focused path is unmounted on unsave. Happens in normal and reduced-motion contexts.",
+    "attribute difference: Vue renders tabindex=\"-1\" on the circle span and on the fill path (innerFocusables [\"SPAN:-1\",\"path:-1\"]); the original has tabindex=\"0\" on the span in normal motion and no tabindex at all in reduced motion, and never one on the path."
+   ],
+   "untestedItems": [
+    "locale-labels: the port demo hardcodes English and the port harness has no locale switch; only checked by reading the source (resolveLocale and MESSAGES are identical to the original)",
+    "count-display: needs a test host with a count prop; the demo never passes count (confirmed no number and padding-right 0px on all targets)",
+    "count-roll: needs a controlled test host that changes count and pressed together",
+    "uncontrolled-mode: needs a test host; demo is controlled only (Vue uses v-model:pressed / update:pressed instead of onPressedChange)",
+    "button-geometry sm and lg sizes: demo only renders md (md measured)",
+    "toggle-on dark-mode colour #ff6b70 and --sunui-like override: only light theme was run"
+   ],
+   "missedDefects": [
+    "Confirmed in the judge's own data: R.clickFocus for vue is {atDown:\"path{tabindex=-1}\", atUp:\"body\", enterToggles:false}, against the original's span{tabindex=0} and Enter toggling. R.spaceAfterMouse and R.enterAfterMouse stay pressed=\"false\" with active \"body[]\". Cause: FavoriteButton.vue lines 106 and 121 `tabindex=\"-1\"` on motion.span and motion.path. The judge already failed Vue for this, so this is not a missed defect."
+   ]
+  },
+  {
+   "block": "favorite-button",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": false,
+   "itemsPassed": 13,
+   "itemsTested": 13,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-labels: the port demo hardcodes English and the port harness has no locale switch; only checked by reading the source (resolveLocale and MESSAGES are identical to the original)",
+    "count-display: needs a test host with a count prop; the demo never passes count (confirmed no number and padding-right 0px on all targets)",
+    "count-roll: needs a controlled test host; the Svelte port reimplements it with CSS transitions, so this is the least verified part",
+    "uncontrolled-mode: needs a test host; demo is controlled only",
+    "button-geometry sm and lg sizes: demo only renders md (md measured)",
+    "toggle-on dark-mode colour #ff6b70 and --sunui-like override: only light theme was run"
+   ],
+   "missedDefects": [
+    "Interrupted fill transition (from source, not shown in data): FavoriteButton.svelte lines 119-134 `fillOut` returns `css: (tt) => `opacity: ${tt}`` from 1 and ignores the current opacity and scale. The original `exit={{ opacity: 0 ... }}` animates from the live value. A click during the ~83-100 ms entry, or a re-click during the 120 ms exit, can jump the heart to full opacity or snap from scale>1 to 1, and may briefly show two fills. The script's rapid test uses 45 ms gaps but only reads the state after 1200 ms, so this would not show up.",
+    "Count path rewritten and never executed: lines 136-164 (`countItems`, `countIn`, `countOut`, `popOut`). The judge lists it as untested. Its checklist item count-roll is scope all, so a core feature of the block (the animated count) is unverified for Svelte.",
+    "Pointer handling differs from framer whileTap (source): lines 181-186 start the shrink on any pointerdown, including right or middle button, and have no keyboard press. framer whileTap is primary-button only. The tests only cover left-button mouse down and up."
+   ]
+  },
+  {
+   "block": "quantity-stepper",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": false,
+   "itemsPassed": 18,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "press-hold-repeat (part): 'losing pointer capture stops repeating' was not triggered with a real event; release was tested with a real mouse (value stays 5 after a 550 ms hold) and pointercancel only with a synthetic PointerEvent during a real hold (value stays 4)",
+    "live-announcement (part): 'no change callback fires' cannot be observed from outside; checked by proxy (count, subtotal, aria-valuenow and live region unchanged after End on the Bottle at 3)",
+    "first-render-controls (part): 'full colour on keyboard focus' for plus/minus cannot be reached, they are tabindex -1 on all targets; hover full colour and 60% / 25% alpha were measured"
+   ],
+   "missedDefects": [
+    "QuantityStepper.vue adds an attribute the original does not have: `<motion.span :key=\"value\" tabindex=\"-1\" ...>` on the rolling digit. The original's `<motion.span key={value} ... className=\"block\">` has no tabindex. The result is an aria-hidden element that is script-focusable. The script's state dump reads tabindex only from the input and buttons, so it never saw this. It is not a Tab stop, so tab-order still passes. This is minor.",
+    "Typing the digit already shown (2 over the selected 2) enters draft mode in the port. In `onInput`, `draft.value = el.value.replace(...)` always runs. The original gets no React change event, so `draft` stays null, the field stays transparent and the rolling overlay stays. The judge noted this but dismissed it. It is a reachable visible difference: the port shows plain text with the 4% focus tint and Escape becomes defaultPrevented, while the original shows neither. The checklist item typed-entry says typing opens a draft, so this is at most a small deviation."
+   ]
+  },
+  {
+   "block": "quantity-stepper",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 18,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "press-hold-repeat (part): 'losing pointer capture stops repeating' was not triggered with a real event; release was tested with a real mouse (value stays 5 after a 550 ms hold) and pointercancel only with a synthetic PointerEvent during a real hold (value stays 4)",
+    "live-announcement (part): 'no change callback fires' cannot be observed from outside; checked by proxy (count, subtotal, aria-valuenow and live region unchanged after End on the Bottle at 3)",
+    "first-render-controls (part): 'full colour on keyboard focus' for plus/minus cannot be reached, they are tabindex -1 on all targets; hover full colour and 60% / 25% alpha were measured"
+   ],
+   "missedDefects": [
+    "Typing the digit already shown (2 over the selected 2) enters draft mode. `onFieldInput` always sets `draft = cleaned`. The original stays out of draft because React fires no change event. The judge noted this and dismissed it. The visible differences are the plain-text digit with the focus tint and a defaultPrevented Escape. This is not a new miss and is minor, so it does not change the pass."
+   ]
+  },
+  {
+   "block": "otp-input",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "multi-char-autofill: scope touch (SMS autofill on a phone), not applicable on web and not run",
+    "accessible-names / error-state / success-state, localised strings only (zh-TW, zh-CN, ja): the port demo is fixed to locale en, so these were checked by reading the MESSAGES table in OtpInput.vue (identical to the original), not at runtime"
+   ],
+   "missedDefects": [
+    "Marker fade-out easing differs and the judge compared only duration (about 117 ms in both). Recorded successFadeOut curve: original [0.711,0.522,0.355,0.213,0.099,0.024] (ease-out), vue [0.794,0.596,0.42,0.266,0.141,0.049,0.002] (near ease-in-out). The judge flagged this for svelte but not vue. OtpInput.vue exit is `{ opacity: 0, transition: { duration: reduceMotion ? 0 : 0.12 } }` with no ease.",
+    "Disc pop timing is earlier than the original. In successMarker the original discPeakMs is 148 and vue is 117. The original disc holds 10.8 for two frames then grows, while vue grows from the first frame (10.91, 11.84, 13.55). The judge reported only the settle times (297 vs 283 ms) as matching.",
+    "Marker box differs: height 18 vs 20, disc y 64 vs 65, width 74.9 vs 74.4 (marker rect in 32-success). Cause is `leading-tight` on the marker span in OtpInput.vue. The judge listed it as minor.",
+    "Extra tabindex=\"-1\" on the marker span, disc span and path (OtpInput.vue lines 299, 314, 338), not in the original. It is on an aria-hidden, pointer-events-none subtree, so it is not a Tab stop. The judge noted it but did not count it."
+   ]
+  },
+  {
+   "block": "otp-input",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 14,
+   "itemsTested": 16,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [
+    "edit-clears-status (also seen in the type-advance overwrite step): overwriting one digit of a full wrong code shakes the row again; the original keeps the error without a second shake. Measured: typing 3 into Digit 1 of 111112 gives original max dx 0 px over 54 frames, svelte -5.83/+4.35 px for 283 ms. Repeated on three cells in a second run: original [0, 0, 0] px, vue [0, 0, 0] px, svelte [5.89, 5.85, 5.72] px. Cause is the $effect in OtpInput.svelte re-running when the parent sets status idle then error in the same tick",
+    "success-state: the check mark does not draw, it snaps to fully drawn. Original path stroke-dasharray goes 0 to 1 between about 80 ms and 300 ms (15 distinct values, 60 ms delay + 220 ms); svelte has no dasharray on the first frame and '1 0' (fully drawn) from the second frame on, 2 states total. Visible in shots/_m-check.png: at the first sample the original and vue show a partial tick, svelte shows the complete tick. The animate(path, { pathLength }) calls in markerSettle have no visible effect"
+   ],
+   "untestedItems": [
+    "multi-char-autofill: scope touch (SMS autofill on a phone), not applicable on web and not run",
+    "accessible-names / error-state / success-state, localised strings only (zh-TW, zh-CN, ja): the port demo is fixed to locale en, so these were checked by reading the MESSAGES table in OtpInput.svelte (identical to the original), not at runtime"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "notify-badge",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 13,
+   "itemsTested": 14,
+   "itemsTotal": 14,
+   "tabOrderMatches": true,
+   "defects": [
+    "stamp-bump (differs from the ORIGINAL's real behaviour, although it matches the checklist and the source comment): in the original a badge that was already there at first render never bumps. Measured on Add to cart: original cart badge scale stays 1.00 on every frame (inline style 'transform: none' 25 ms after the click, also on rapid presses, on 9+ and after the bell was cleared), Vue starts at 1.33x (1.36 measured vs 1.022 rest baseline), dips to 0.93x at about 130 ms and settles. Same for the bell's first automatic 2 to 3, 3 to 4, 4 to 5: original flat at 1.00, Vue bumps from 1.35. Only once the bell badge has been cleared and re-mounted does the original bump (1 to 2 after refill: original first frame 1.379, Vue 1.355, same curve, min 0.948 at about 117 to 133 ms). So the port moves where the original snaps in the demo's default state. This is very likely a bug in the original (AnimatePresence initial={false} switches off 'initial' for motion children mounted later under a first-render child); a human should decide whether the port or the original is right before publishing.",
+    "attribute (not a checklist item): the Vue port puts tabindex=\"-1\" on both badge spans (outer 'block' span and inner pill) of all three badges, 6 elements in total; the original has no tabindex anywhere in the demo. They sit inside aria-hidden=\"true\" with pointer-events none and are not Tab stops, so there is no user-visible effect, but it is an extra attribute the original does not have."
+   ],
+   "untestedItems": [
+    "badge-geometry: top-left and bottom-right placements are not used by the demo, only compared in source (class strings identical)",
+    "max-overflow: default max 99 / '99+' not reachable in the demo, only compared in source",
+    "live-announcements: default label '<n> new' not reachable in the demo (source identical); real screen reader output not tested, only the aria-live region text and attributes"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "notify-badge",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 13,
+   "itemsTested": 14,
+   "itemsTotal": 14,
+   "tabOrderMatches": true,
+   "defects": [
+    "stamp-bump (differs from the ORIGINAL's real behaviour, although it matches the checklist and the source comment): in the original a badge that was already there at first render never bumps. Measured on Add to cart: original cart badge scale stays 1.00 on every frame (inline 'transform: none' 25 ms after the click, also on rapid presses, on 9+ and after the bell was cleared), Svelte starts at 1.33x (1.357 measured vs 1.022 rest baseline), dips to 0.93x at about 131 ms and settles. Same for the bell's first automatic 2 to 3, 3 to 4, 4 to 5: original flat, Svelte bumps from 1.36. Only after the bell badge has been cleared and re-mounted does the original bump (1 to 2 after refill: original first frame 1.379, Svelte 1.35, same curve). So the port moves where the original snaps in the demo's default state. Very likely a bug in the original (AnimatePresence initial={false} switching off 'initial' for later-mounted motion children); a human should decide which side is right before publishing."
+   ],
+   "untestedItems": [
+    "badge-geometry: top-left and bottom-right placements are not used by the demo, only compared in source (class strings identical)",
+    "max-overflow: default max 99 / '99+' not reachable in the demo, only compared in source",
+    "live-announcements: default label '<n> new' not reachable in the demo (source identical); real screen reader output not tested, only the aria-live region text and attributes"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "sliding-tabs",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 14,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "counts-and-badges: the folder count badges are missing completely. Original folder tabs contain a pill badge (text '(3)', '(2)', '(18)', '(0)', 18.4px high, spot background when selected, muted grey otherwise); the Vue port renders an empty unknown element <slidingtabcountbadge> instead (button children: 'span slidingtabcountbadge(empty)', count = null). Folder tabs are therefore narrower: To ship 85.2px vs 102.7px, On the way 111.8 vs 130.3, Delivered 100.4 vs 121.8, Returns 89.5 vs 108.0. Visible in shots/sliding-tabs-vue-00-initial.png vs sliding-tabs-web-00-initial.png. Cause in source: the template uses <SlidingTabCountBadge>, but that name is only an export alias ('export { CountBadge as SlidingTabCountBadge }'), not a binding the <script setup> template can resolve.",
+    "accessible-names-items: folder tab names lose their counts. Chrome accessibility tree, original: tab 'To ship ( 3 )', 'On the way ( 2 )', 'Delivered ( 18 )', 'Returns ( 0 )'; Vue: tab 'To ship', 'On the way', 'Delivered', 'Returns'. Same cause as above.",
+    "Console: Vue logs the warning '[Vue warn]: Failed to resolve component: SlidingTabCountBadge' on every render (35 warnings in the main run, 16 in the reduced-motion run, 5 per layout run). It is console.warn, not console.error, so consoleErrors stays 0, but it is the direct trace of the missing badge.",
+    "tab-order-and-focus-ring ('nothing decorative receives focus') and attributes: the port adds tabindex=\"-1\" to every motion element (underline bar, segment pill, folder surface and its two corner spans, dock pill, dock label, chip fill, check svg, panel content div); the original has no tabindex on any of them. Result: a mouse click lands focus on a decorative, partly aria-hidden node instead of the button. Measured document.activeElement after a click: dock Home -> 'span.relative.overflow-hidden \"Home\"' (original: button[radio] Home); chip Free shipping clicked on its left padding -> 'span.absolute.inset-0.rounded-full' (original: the button); segment Month and Week clicked on the padding -> 'span.absolute.inset-0.rounded-[5px]' (original: the radio button). Arrow keys and Space still worked afterwards because the events bubble, and the Tab sequence itself is unchanged."
+   ],
+   "untestedItems": [
+    "locale: the port demo hardcodes English copy and the port harness has no locale switch, so zh-TW and ja could not be exercised on the port. The original was checked and matches the checklist text.",
+    "narrow-layout, chips wrapping part only: in the demo the chips row never becomes narrower than the chips (the block keeps a min-content width of about 423px in this port), so wrapping never triggers; only flex-wrap: wrap and gap 8px were confirmed from computed style. Same limitation on the original."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "sliding-tabs",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 17,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale: the port demo hardcodes English copy and the port harness has no locale switch, so zh-TW and ja could not be exercised on the port. The original was checked and matches the checklist text.",
+    "narrow-layout, chips wrapping part only: in the demo the chips row never becomes narrower than the chips (the block keeps a min-content width of 500.5px, original 498.9px), so wrapping never triggers; only flex-wrap: wrap and gap 8px were confirmed from computed style. Same limitation on the original."
+   ],
+   "missedDefects": [
+    "No new defect found that the judge did not report. One accepted deviation deserves more weight. The dock highlight pill never stretches in the Svelte port, because the source only interpolates translate and marginRight from the old rect to the new one. The judge's own data shows the original pill peaking at 114.0px on Saved>Search before settling at 100.4px, while the Svelte pill grows monotonically 94.4->100.2px. On leftward moves its left edge trails by about 10px (x at 86ms: 64.2 original vs 74.5 Svelte; t90 83ms vs 116ms). The judge reported this and accepted it as within tolerance. The checklist only requires the indicator to slide and match the new item width, so it does not break the pass.",
+    "Source comparison of the Svelte port against the original found no other differences: role, aria-selected, aria-checked, aria-pressed, aria-controls, roving tabindex, arrow/Home/End handling, the 99+ cap and sr-only parentheses, folder flares, the chips check mark and the dock sr-only label all match. There is no tabindex on decorative spans, so the Vue focus-landing defect does not apply."
+   ]
+  },
+  {
+   "block": "animated-number",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-switch: the port demo hard-codes locale \"en\" and the harness has no demo-locale switch, so zh-TW/zh-CN/ja copy and the no-animation-on-locale-change rule could not be exercised (source reading only: format is a computed on props.locale). Original verified: zh-TW 總計 / US$189.00 / 減少數量, no wheel moves, no arrow."
+   ],
+   "missedDefects": [
+    "First-render text, quoted from the judge's own first.text. Original: \"Field Watch 38 mm Hand-wound, sapphire crystal...\". Vue: \"Field Watch Hand-wound, sapphire crystal...\". The \"38 mm\" is missing. The judge's evidence says screenshots match \"apart from theme font and the grey product block\" and never mentions it. Cause: vue/src/demos/AnimatedNumberDemo.vue line 34 hard-codes <h2>Field Watch</h2> where the original demo uses productNames.watch. This is demo copy only. The block source (AnimatedNumber.vue) is a faithful line-by-line match to the React version, so I did not treat it as a block defect.",
+    "Minor and unreported: the script never tests the arrow's \"0.5em square, min 8 px\" rule beyond the single measured 15x15 at 30px. The rule is present in the source class string, so there is no defect."
+   ]
+  },
+  {
+   "block": "animated-number",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-switch: the port demo hard-codes locale \"en\" and the harness has no demo-locale switch, so the other locales and the no-animation-on-locale-change rule could not be exercised (source reading only: format is $derived from locale)."
+   ],
+   "missedDefects": [
+    "First-render text, quoted from the judge's own first.text. Original: \"Field Watch 38 mm Hand-wound...\". Svelte: \"Field Watch Hand-wound...\". The \"38 mm\" is missing. svelte/src/demos/AnimatedNumberDemo.svelte line 19 has `const productName = \"Field Watch\"` where the original demo uses productNames.watch. This is demo copy only. The judge did not mention it.",
+    "Recorded timing gap that the judge attributes to warm-up. In the rapid-press interrupt run (file animated-number-results-math_restart_interrupt.json), Svelte's presses end at 793 ms against 749 ms for the original, so the judge's \"same offset\" explanation is plausible. The first-file run is less clean: brass up starts at 197 ms against 134 ms, and rapid col 4 starts at 299 ms against 146 ms. The cleaner rerun matches, so this is not a defect, but the judge's first-roll warm-up explanation was never tested with a pre-warmed first roll.",
+    "The port also reproduces the original's flip-direction freeze bug (flipsame: ones wheel stops at 12.67, live text $218.00, shown $213~.00). The judge reports this accurately as matching the original, so it is not a defect in the port."
+   ]
+  },
+  {
+   "block": "checkout-steps",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "autoplay-script: the port has no autoplay and no cursor (probe: 9s untouched, stays on 'Review order', no cursor node). The port guide (lib/agent/port/core.md, 'Demo helpers') tells porters to drop useDemoAutoplay, so this is not counted as a defect, but the item was not exercised on the port.",
+    "demo-locale: the port demo hardcodes the English copy and locale=\"en\" as the guide instructs, so zh-TW, zh-CN and ja could not be switched at runtime. Only read statically: MESSAGES, resolveLocale and the full-width separators in CheckoutSteps.vue are identical to the original.",
+    "a11y-done-button-name: tested in en only (name and title identical to the original); the three non-English names were not rendered for the same reason.",
+    "reduced-motion: the manual advance and go-back parts were tested; the clause about autoplay under reduced motion does not apply to a port without autoplay."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "checkout-steps",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": true,
+   "itemsPassed": 15,
+   "itemsTested": 16,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "morph-spring: on every step change the track items after the changed step first jump the wrong way by the full travel distance, then slide to the target; the original slides monotonically from the old position. Measured after paint, forward 1 to 2: tick '3' goes 184.0 > 104.0 on the first frame (80px left, on top of the pill) > 134.9@50ms > 180.4@100ms > 264.1; original 182.8 > 185.8 > 200.3 > 221.3 > 258.6. Forward 2 to 3: tick '4' 296.1 > 172.6 > 423.6 (original 290.6 > 291.1 > 418.2).",
+    "morph-spring (going back): back 3 to 2, tick '4' goes 423.6 > 547.2 on the first frame, which is past the right end of the track and outside the 512px card, then returns to 296.1; original 418.2 > 416.8 > 290.6. Back 2 to 1: tick '3' 264.1 > 341.5 > 184.0 (original 258.6 > 257.5 > 182.8). Visible in shots/checkout-steps-svelte-mid-back32-a.png: '4' sits at the card edge with a detached piece of ink line under it.",
+    "Cause, from the source: flip() in CheckoutSteps.svelte animates both width [before, after] (a real reflow that already moves the following siblings) and x [dx, 0] with the full dx, so the displacement is counted twice. Position settle is also later: 397 to 400ms against 347 to 349ms (about 15 percent, inside tolerance on its own).",
+    "morph-spring (side effect): because the completed cell's real width is animated, the answer is cut with an ellipsis during the move ('2 items · NT$1,...' in shots/checkout-steps-svelte-mid-fwd12-a.png) while the original shows the full text throughout."
+   ],
+   "untestedItems": [
+    "autoplay-script: the port has no autoplay and no cursor (probe: 9s untouched, stays on 'Review order'). Dropped on the guide's instruction, not counted as a defect, not exercised.",
+    "demo-locale: the port demo hardcodes English and locale=\"en\" as the guide instructs; zh-TW, zh-CN and ja not rendered. Read statically only: MESSAGES, resolveLocale and separators match the original.",
+    "a11y-done-button-name: en only, identical to the original; other locales not rendered.",
+    "reduced-motion: manual advance and go-back tested; the autoplay clause does not apply."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "toast-stack",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 14,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "enter-exit-motion: when a toast is pushed, the toasts already shown first sink and shrink before gliding up; the original moves monotonically. Seed toast after pressing Add to cart, per frame (ms: top/height): original 34: 431.46/70.87, 64: 429.77/71.83, 97: 425.45/74.26 (433 -> 410.44, never above 433, height never below 70). Vue 39: 437.86/64.72, 63: 436.46/64.48, 80: 434.72/65.29, 96: 432.32/66.74, back to 70 only at ~129 ms (a second run peaked at top 441.38, height 60.61). About 5 to 8 px the wrong way for ~80 ms. Likely cause: bodyRef measures offsetHeight before the new li is laid out, so frontHeight is 0 for the first frames (ToastStack.vue bodyRef/measure), where the original measures in a layout effect before paint.",
+    "reduced-motion: same root cause, sampled once per push in a reducedMotion context: first frame after the press has ol height 10px and the seed toast at top 491.08 / height 1.92px, the next sample (2 ms later) is correct (96px, 410.44/82.56). Original and Svelte go straight to 96px. I could not prove that the bad frame is painted, so treat as plausible flicker; reproduced in 2 of 2 runs.",
+    "pause-and-resume (differs from the original's real behaviour, see checklistProblems): after Undo or X is activated by mouse click or by Enter, the original stays expanded and paused (scales [1,1], ol 144px, a Mug toast added afterwards still present after 6 s with timer paused at scaleX 1). Vue collapses and resumes (scales [1,0.96], ol 78px, Mug toast gone after 6 s). This looks like a bug in the original (React drops the blur of the removed button), but the port does not match it."
+   ],
+   "untestedItems": [
+    "locales: the port demo hardcodes English and has no locale switch; only checked by reading the source that MESSAGES and resolveLocale are identical to the original",
+    "swipe-dismiss, velocity part: an 84px flick in ~50 ms did not dismiss in the original but did in Vue; the gesture is borderline for synthetic input (velocity is averaged over 100 ms and distance must stay under 90px), so I do not count it either way",
+    "swipe-dismiss, 'collapsed back layers cannot be dragged': a mouse over the region always expands the stack, so this cannot be reached with a mouse; source uses the same drag condition (index === 0 || expanded)",
+    "pause-and-resume, hidden tab: only simulated by overriding document.hidden and dispatching visibilitychange (dismissed 3392 ms after return vs original 3391 ms)"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "toast-stack",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 13,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "enter-exit-motion: the new toast does not rise. Its top is 415.25 on every frame from the first (47 ms) to the last while opacity goes 0 -> 1; the original starts at 443.25 (28px below) and rises to 415.25 by ~390 ms. Visible in shots/toast-stack-montage-e.png row 17-push-burst0 (Svelte fades in place). The `from` y in motionTo is not taking effect.",
+    "enter-exit-motion / dismiss-button: when a toast is dismissed while expanded, the remaining toast is kicked the wrong way before settling. Seed toast top after pressing X: Svelte 281 -> 246 (11 ms) -> 193.1 (61 ms) -> 357 (88px up first); original 281 -> 263.8 -> ... -> 357 monotonic. Same after auto-dismiss: scale dips 0.96 -> 0.936 and top 410.4 -> 407.2 before going to 1 / 433.",
+    "expand-on-hover: collapsing flings the toasts upward and over-scales them. Seed toast on mouse leave: Svelte top 281 -> 227.9 (14 ms) -> 198.9 (47 ms) -> 420.4, scale up to 1.048; middle toast 357 -> 316 -> 427.7, scale 1.024. Original 261 -> 402 and 337 -> 408.5 monotonic, scale never above 1. On expand the scale first drops 0.92 -> 0.876 (original rises monotonically). Visible in shots/toast-stack-montage-e.png row 18-collapse-burst0, where the Svelte stack covers the Notify me button. Stale velocity from the previous animation is reused.",
+    "swipe-dismiss: spring back is bouncy and about twice as fast. After a 60px drag (x -36): Svelte reaches half at 71 ms, overshoots to +4.32px, settles at 354 ms; original half 181 ms, no overshoot, settles 665 ms (dragX uses stiffness 500 / damping 25).",
+    "swipe-dismiss: dragging selects the toast text; shots/toast-stack-svelte-13-swipe-held.png shows 'Natural' highlighted, the original and Vue show no selection.",
+    "swipe-dismiss: a press on the Undo key that moves 40px away and back before release is swallowed (cart stays 0 items, 'Removed Bottle' toast stays); in the original and Vue the same gesture fires Undo (cart back to 1 item, toast closed).",
+    "pause-and-resume (differs from the original's real behaviour, see checklistProblems): after Undo or X is activated by mouse or Enter, the original stays expanded and paused (scales [1,1], ol 144px, later Mug toast still present after 6 s); Svelte collapses and resumes (scales [1,0.96], ol 78px, Mug toast gone). Likely a bug in the original, but the port does not match it."
+   ],
+   "untestedItems": [
+    "locales: the port demo hardcodes English and has no locale switch; only checked by reading the source that MESSAGES and resolveLocale are identical to the original",
+    "swipe-dismiss, velocity part: an 84px flick in ~50 ms did not dismiss in the original but did in Svelte; borderline for synthetic input, not counted either way",
+    "swipe-dismiss, 'collapsed back layers cannot be dragged': a mouse over the region always expands the stack; source uses the same condition (index === 0 || expanded)",
+    "pause-and-resume, hidden tab: only simulated by overriding document.hidden and dispatching visibilitychange (dismissed 3406 ms after return vs original 3391 ms)"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "compare-slider",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locales: the port demo hardcodes the en copy and the port harness has no locale switch (no ?l= equivalent), so zh-TW / zh-CN / ja chips, name, value text, caption and alts could not be exercised. The component source does carry the same four-locale MESSAGES table as the original, but that is a source read, not a test.",
+    "touch-scroll: scope is touch, not in the web set. Only the computed touch-action: pan-y on the range input was confirmed (same as original)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "compare-slider",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 16,
+   "itemsTested": 16,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locales: the port demo hardcodes the en copy and the port harness has no locale switch, so zh-TW / zh-CN / ja could not be exercised. The component source carries the same four-locale MESSAGES table as the original, but that is a source read, not a test.",
+    "touch-scroll: scope is touch, not in the web set. Only the computed touch-action: pan-y on the range input was confirmed (same as original)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "floating-field",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 17,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "tab-order (minor, attribute): the port puts tabindex=\"-1\" on decorative motion elements (label, morph letters, check svg, strength fills, rule dots and their paths, message p). Tab order itself is identical to the original, but these nodes are now mouse-focusable, which the original's are not. Measured: after a real click on the hint text 'Optional' document.activeElement is the <p> (original: BODY); after a click on the 'A symbol' rule dot it is the <span> (original: BODY). Reproduced in two runs. Source: FloatingField.vue template, tabindex=\"-1\" on motion.label, motion.span, motion.svg, motion.path, motion.p. The checklist says rule icons and the like are not focusable and nothing else takes focus. This is the only deviation found; everything else matched."
+   ],
+   "untestedItems": [
+    "message-swap (partly): the 'same kind, different text swaps at once with no fade' clause cannot be triggered in the demo, each field has only one error text. The success to error swap was tested and matches.",
+    "mask-ghost (partly): zh-TW '999-999' and ja '999-9999' auto-separator masks not tested, the port demo is hard-coded to en ('99999').",
+    "accessible-names / password-strength (partly): screen reader output was checked through the DOM only (label for/id, aria-describedby targets, aria-live polite + aria-atomic, sr-only text), not with a real screen reader.",
+    "Exact colours (brand, success green, destructive) were compared by class category only, since the port uses the neutral theme."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "floating-field",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 16,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "label-float: every label animation after the first one starts by moving the wrong way. On blur with an empty value the label first jumps up and shrinks before settling: y 9.2 to 5.7 (3.5 px above the floated position) and scale 0.865 to 0.807 at about 83 ms, then travels to 17.8, settling at about 333 ms. Original: monotonic 9.2 to 17.8 (overshoot 18.03 only), settled at about 234 ms, so the port's return takes about 316 ms against about 185 ms (+70 percent). On the second and third focus the label first dips below its rest position: y peaks at 21.34 (rest is 17.8) and scale at 1.06 before floating, settling at 366 ms against 267 ms. Reproduced on ZIP (5 recordings) and Email (blur after clearing: min y 5.67, scale 0.80) in two separate runs. Only the very first focus after load matches the original. Raw frames: floating-field-raw-svelte-B-zip-blur-empty.json, -B-zip-focus-2.json, -B-zip-blur-empty-3.json.",
+    "strength-motion: the same wrong-way start affects the strength segments. On delete each fill first grows to scaleX 1.6 (hidden by the track's overflow) and only drops below full after about 165 ms, so the visible emptying starts about 130 ms late and each segment needs about 417 ms instead of about 333 ms (+25 percent): seg4 moves at 18 ms, is still at 1.12 at 167 ms, ends at 435 ms (original: starts shrinking at 50 ms, ends 383 ms); seg1 ends at 551 ms (original 500). A segment that has been filled and emptied before also fills slower on the next paste (seg1 433 ms against 350 ms). Order (4 first on delete, 1 first on paste) and the roughly 40 ms stagger are correct. Raw frames: floating-field-raw-svelte-D-pw-delete.json. Likely cause: motionTo in FloatingField.svelte re-runs motion's animate() on the same node and the new spring inherits a wrong initial velocity; elements that use Svelte transitions (check mark, messages, ring number) are not affected."
+   ],
+   "untestedItems": [
+    "message-swap (partly): the 'same kind, different text swaps at once with no fade' clause cannot be triggered in the demo. The success to error swap was tested and matches.",
+    "mask-ghost (partly): zh-TW and ja masks not tested, the port demo is hard-coded to en.",
+    "accessible-names / password-strength (partly): checked through the DOM only, not with a real screen reader.",
+    "Exact colours compared by class category only (neutral theme in the port)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "pagination",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 15,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "underline-spring: the underline snaps on every backward page change inside the sliding window, where the original moves. Motion matrix (per-frame sampling, first card): Previous 7 to 6: original bar starts 40px right of rest (447.3 > 487.3) and springs back over 299ms with 12 intermediate frames; vue 0ms, 0 intermediate frames. Same for clicking Page 5 from 6 (original 276ms, 13 frames; vue 0), clicking Page 6 from 7 (original 300ms; vue 0), Previous 6 to 5 (original 299ms; vue 0). Reproduced in two separate runs (steps prev-6 and prev-5 of the main run: original 301ms and 299ms, vue 0ms).",
+    "underline-spring: Previous 5 to 4 (row changes from '1 … 4 5 6 … 12' to '1 2 3 4 5 … 12') slides in from the wrong side: original starts 44px to the right (447.3 > 491.3, 300ms), vue starts 16px to the left (452.8 > 436.8, 249ms). Clicking Page 5 from 4 and Next 4 to 5: vue offset is 40px (456.8 > 416.8, 283 to 285ms) against the original's 24px (451.3 > 427.3, 250ms).",
+    "accessible-names / attribute: the underline span carries tabindex=\"-1\", which the original does not have (original attrs: aria-hidden only). Effect measured: a mouse click on the underline of the current page moves focus to the aria-hidden SPAN in vue (document.activeElement = SPAN.absolute), while the original and svelte focus the BUTTON 'Page 6'. It is not a Tab stop, so Tab order is unaffected."
+   ],
+   "untestedItems": [
+    "locale: the vue demo hard-codes locale=\"en\" and its copy, and the harness has no locale switch, so zh-TW, zh-CN and ja could not be exercised at runtime. By source reading only, the MESSAGES table and resolveLocale in Pagination.vue are identical to the original."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "pagination",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 16,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "underline-spring: the underline does not animate at all when the row re-centres, which is every change between middle pages, including the checklist's own trigger 6 to 7. Original 6 to 7: bar jumps 20px left (447.3 > 427.3) and springs back over 229 to 250ms with 8 to 18 intermediate frames; svelte: 0ms, 0 intermediate frames, bar rect constant at left 452.8. Same for Next 5 to 6, Next 6 to 7, clicking Page 7 (original about 250ms, svelte 0) and for Previous 7 to 6, clicking Page 5 or 6, Previous 6 to 5 (original 276 to 300ms from a 40px offset, svelte 0). Cause visible in the source: the action only animates when the old and new screen rects differ by more than 0.5px, and in the centred window the new current cell lands on the same screen position.",
+    "underline-spring: where the row switches between the centred and the edge layout the movement is much smaller and shorter than the original: Page 4 to 5 and Next 4 to 5: original 24px over 250ms, svelte 4px over 116 to 117ms; Previous 5 to 4: original 44px over 300ms, svelte 4px over 116ms (timing off by more than 50 percent)."
+   ],
+   "untestedItems": [
+    "locale: the svelte demo hard-codes locale=\"en\" and its copy, and the harness has no locale switch, so zh-TW, zh-CN and ja could not be exercised at runtime. By source reading only, the MESSAGES table and resolveLocale in Pagination.svelte are identical to the original."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "countdown-banner",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 15,
+   "itemsTested": 16,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "ended-state (minor, the only failing item): on first load the discount of the already-ended banner 4 ('25% OFF') fades from opacity 1 to 0.4 over about 150 ms, where the original shows 0.4 from the first painted frame. Measured in 4 of 4 loads (A, A reduced, B, B reduced). Vue early frames after navigation: t=145ms 1, 168ms 0.98, 184ms 0.895, 201ms 0.726, 217ms 0.583, 251ms 0.448, 301ms 0.4. Original: 0.4 on every frame from the first one (t=577ms onward); Svelte also 0.4 from the first frame. The Ended mark, timer opacity (0.4) and colour are correct from the first frame; only the transition-opacity on the discount runs. Likely cause: something in mount (motion-v) forces a style computation between the idle render and the first tick, so the CSS transition has a start value. Fix idea: do not apply transition-opacity until after the first tick, or read the time before first paint."
+   ],
+   "untestedItems": [
+    "server-render-placeholder: the port harness is a client-only Vite page with no server render entry, and I may not add files to the port",
+    "callbacks-and-invalid-date: needs a test page with onStart/onEnd spies and an invalid endDate; the demo passes neither and I may not edit the port",
+    "locale-and-layout (locale half only): the port demo hard-codes locale=\"en\" and has no switch, so zh-TW, zh-CN and ja strings were only compared by reading the source (MESSAGES table is identical to the original). The layout half was tested and passes"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "countdown-banner",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 15,
+   "itemsTested": 16,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "cta-press: the press spring starts with a stale velocity, so the scale first moves the wrong way. On release the original goes 0.97 > 0.9703 > 0.9732 > ... > 1.0008 > 1 (min 0.97, settled 157 ms); Svelte goes 0.97 > 0.9656 > 0.9582 > 0.9587 > 0.9635 > ... > 1.0009 > 1 (min 0.958, settled 175 to 178 ms). On every press after the first, and on Enter-key press, the original goes 1 > 0.9993 > 0.9958 > ... > 0.97 (max 1.000, reaches 0.97 at about 210 ms); Svelte goes 1 > 1.0106 > 1.0119 > 1.0082 > 1.0018 > 0.9948 > ... > 0.97 (max 1.012, reaches 0.97 at about 237 ms). The wrong-way excursion is 0.012 on a total travel of 0.03 (40 percent of the amplitude), reproduced in 3 of 3 releases and 2 of 2 repeat presses plus a separate probe run. Only the very first mouse press matches the original. Cause: tapScale calls ctl.stop() and then animate(node, { scale }, spring), which inherits the previous animation's velocity. Fix idea: start each press and release with velocity 0 (or drive one motion value)."
+   ],
+   "untestedItems": [
+    "server-render-placeholder: the port harness is a client-only Vite page with no server render entry, and I may not add files to the port",
+    "callbacks-and-invalid-date: needs a test page with onStart/onEnd spies and an invalid endDate; the demo passes neither and I may not edit the port",
+    "locale-and-layout (locale half only): the port demo hard-codes locale=\"en\" and has no switch, so zh-TW, zh-CN and ja strings were only compared by reading the source (MESSAGES table is identical to the original). The layout half was tested and passes"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "low-stock-indicator",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": false,
+   "itemsPassed": 18,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [],
+   "missedDefects": [
+    "Extra tabindex attribute on three elements. LowStockIndicator.vue sets `tabindex: -1` on the digit motion.span in Count, sets `tabindex: -1` on the sold-out marker motion.span in Result (next to `aria-hidden: \"true\"`), and sets tabindex=\"-1\" on the bar-fill motion.span. The original low-stock-indicator.tsx has no tabindex anywhere. The judge's own snapshot records it: results.json vue steps.initial and steps.finalSnap give tabindexEls = ['span[tabindex=-1]'] on every card, versus [] for react. A tabindex=-1 element takes focus on mouse click, so clicking the visible digit can put focus on a span inside the status line, which the original cannot do. The judge saw the attribute and dismissed it with an unmeasured claim about click focus. It is a real attribute difference on a block whose checklist item is 'Focus never lands on any part of any indicator'."
+   ]
+  },
+  {
+   "block": "low-stock-indicator",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 17,
+   "itemsTested": 18,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "bar-mode: the bar spring is only correct for the first animated change. Every later change starts with a wrong initial velocity: the fill first moves the wrong way or shoots past the target, and timing is off by 40 to 90 percent. Measured over 10 consecutive changes (capacity 40, 1.4 s apart), fill ratio per frame: 0.5>0.25 first rises to 0.647; 0.25>0.5 first dips to 0.10; 1>0.5 first grows to 1.30 (bar 30% wider than its track); 1>0.05 peaks at 1.42; tHalf 188-212 ms and t95 354-387 ms versus the original's 136-141 ms and 319-324 ms with max/min never leaving the start-end range; 0.5>1 was instead too fast (tHalf 43-58 ms, t95 175 ms). Still wrong with 4 s between changes: 0.75>1 peaked at 1.39 and 1>0.5 went 1.00, 1.09, 1.12, 1.10, 1.06 before falling (original and Vue: monotonic 1.00, 0.998, 0.977, 0.938). Visible in shots/low-stock-indicator-svelte-01-barprobe-60-20-mid.png: 90 ms into 60>20 the fill sticks out past the right end of the track, while the original (react-01-barprobe-60-20-mid.png) is already at about 73%. Likely cause: barFill() calls motion animate(node, {scaleX}) again on the same element after stop(), which reuses a stale velocity."
+   ],
+   "untestedItems": [],
+   "missedDefects": []
+  },
+  {
+   "block": "avatar-stack",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 15,
+   "itemsTested": 15,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-zh-tw: the port demo is hard-coded to English (locale=\"en\", English buyers) and ignores ?l=zh-TW (list label stayed \"Recent buyers (1284)\"), so it could not be exercised at runtime. Source reading only: MESSAGES, resolveLocale and compact() are copied verbatim from the original.",
+    "locale-zh-cn-ja: same reason, no locale switch in the port demo; not exercised at runtime."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "avatar-stack",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 12,
+   "itemsTested": 15,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [
+    "hover-lift-and-tooltip: on pointer leave the disc first jumps about 1.2px FURTHER up before returning, and takes about 60% longer to settle. Leo, per-frame y after leave: svelte 5ms -3.02, 20ms -3.93, 36ms -4.24, 53ms -3.92, 70ms -3.33 ... overshoot +0.13, settled 286 ms. Original: 12ms -3, 29ms -3, 45ms -2.83, 62ms -2.45 ... overshoot +0.09, settled 178 ms (vue 155 ms). The original never goes above -3. Reproduced on every run (two full runs, 5 discs each: min y -4.21 to -4.24, settle 285 to 292 ms).",
+    "focus-lift-and-tooltip: the same wrong-direction kick on keyboard focus and blur. Focusing Leo after it had been animated once: svelte y goes DOWN first, 17ms +0.89, 32ms +1.24, 51ms +0.95, 66ms +0.37, then up to -3.13 peak; original 15ms -0.1, 32ms -0.44, 48ms -0.93, monotonic to -3.09. On blur svelte 5ms -3.26, 22ms -4.15, 38ms -4.16 before returning; original stays at or below -3 in magnitude. Final rest positions (-3 and 0) are correct.",
+    "overflow-lift-and-tooltip: same return-leg defect on the overflow discs (+1.3K leave: 3ms -3.02, 19ms -3.99, 36ms -4.21, settled 285 ms vs original 168 ms; +410 and +94 min y -4.21/-4.22, settle 289 ms). Likely cause: the lift action calls controls.stop() then motion animate(node,{y}) again, which starts the new spring with a wrong initial velocity; only the first animation of each disc is clean (first hover-in matches the original: peak -3.09, settled about 155 ms)."
+   ],
+   "untestedItems": [
+    "locale-zh-tw: the port demo is hard-coded to English (locale=\"en\") and ignores ?l=zh-TW (list label stayed \"Recent buyers (1284)\"); not exercised at runtime. Source reading only: MESSAGES, resolveLocale and compact() are copied verbatim.",
+    "locale-zh-cn-ja: same reason, no locale switch in the port demo; not exercised at runtime."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "hotspots",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 16,
+   "itemsTested": 17,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [
+    "tab-order / accessible-names (focus target): the port adds tabindex=\"-1\" to the icon span inside every marker button (<button ...><span tabindex=\"-1\">1</span></button>; the original span has no tabindex). After any real mouse press on a marker document.activeElement is that unnamed span, not the button (every mouse step: original active = button[Corduroy collar], vue active = span{tabindex=-1}). Consequence measured: after clicking marker 1, Shift+Tab lands on the same marker's button (original: leaves the block to BODY) and the next Tab goes to Waxed cotton (original: Corduroy collar). Forward Tab sequence from outside the block is identical and Enter/Space still toggle, so this is one extra attribute plus a wrong focus target after pointer use, not an extra forward Tab stop."
+   ],
+   "untestedItems": [
+    "card-size-content: the action row (top border, 12px spacing) is not rendered by the demo on any target, so only title + description were measured",
+    "marker-geometry: the marker=\"dot\" variant is not in the demo; stacking was checked through z-index values (10 / 20) and screenshots only",
+    "switch-single-open: 'fading card still receives presses' was checked by per-frame elementFromPoint on the exiting card (7 of 7 frames hit the card), not by an actual press during the 120ms window"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "hotspots",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 15,
+   "itemsTested": 17,
+   "itemsTotal": 17,
+   "tabOrderMatches": true,
+   "defects": [
+    "marker-icon-rotate-and-tap: from the second toggle of a marker onward the icon first swings about 18 degrees the wrong way before turning. Measured per frame on marker 1, repeated toggles: closing goes 45 > 51.9 > 62.7 > 61.9 > 44.6 > ... > 0 (original 45 > 43.8 > 38.8 > ... monotonic, min -1.3); opening goes 0 > -15.3 > -18.1 > -12.9 > -3.5 > 7.1 > ... > 46.9 (original 0 > 1 > 6.2 > 13.5 ... monotonic). Icon bounding box confirms it is painted (17.2, 17.7, 16.8, 14.8 then up to 19.8 on open). Reproduces with mouse, Enter and Space, and on other markers (marker 2 closing during a switch peaked at 62.9). Only the very first toggle after load is clean. It also delays the turn: t50 118ms / t90 168ms after the click vs original 99 / 149.",
+    "switch-single-open: while the outgoing card fades it does not receive pointer presses. elementFromPoint at the centre of the fading Waxed cotton card returned IMG in 8 of 8 exit frames (original and vue: the card in 9 of 9 / 7 of 7). Svelte makes the outgoing node inert; the checklist and the original keep it pressable. No visible consequence in this demo because the cards have no action."
+   ],
+   "untestedItems": [
+    "card-size-content: the action row (top border, 12px spacing) is not rendered by the demo on any target, so only title + description were measured",
+    "marker-geometry: the marker=\"dot\" variant is not in the demo; stacking was checked through z-index values (10 / 20) and screenshots only"
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "empty-state",
+   "platform": "vue",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 12,
+   "itemsTested": 12,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-strings: the port demo hardcodes locale=\"en\" and English copy and the port harness has no locale switch, so zh-TW/zh-CN/ja could not be rendered. Source only: MESSAGES in EmptyState.vue is identical to the original.",
+    "locale-switch-while-empty: same reason, no way to change locale at runtime in the port harness.",
+    "locale-switch-after-load: same reason.",
+    "locale-fallback: not run at runtime. Source only: resolveLocale in EmptyState.vue is character-for-character the original's (zh + /hant|tw|hk|mo/ -> zh-TW, other zh -> zh-CN, ja* -> ja, else en).",
+    "press-feedback-touch: scope touch, not applicable on web (not counted in itemsTotal)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "empty-state",
+   "platform": "svelte",
+   "judgePass": true,
+   "challengeUpheld": true,
+   "itemsPassed": 12,
+   "itemsTested": 12,
+   "itemsTotal": 16,
+   "tabOrderMatches": true,
+   "defects": [],
+   "untestedItems": [
+    "locale-strings: the port demo hardcodes locale=\"en\" and English copy and the port harness has no locale switch, so zh-TW/zh-CN/ja could not be rendered. Source only: MESSAGES in EmptyState.svelte is identical to the original.",
+    "locale-switch-while-empty: same reason, no way to change locale at runtime in the port harness.",
+    "locale-switch-after-load: same reason.",
+    "locale-fallback: not run at runtime. Source only: resolveLocale in EmptyState.svelte is identical to the original's.",
+    "press-feedback-touch: scope touch, not applicable on web (not counted in itemsTotal)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "theme-picker",
+   "platform": "vue",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 16,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "switch-keyboard / focus-ring (switch): a mouse click on the switch does not focus the button, it focuses an inner decorative span. The port puts tabindex=\"-1\" on 8 motion spans inside the switch (track-night, key, press, key-day, key-night, 3 rings), which makes them click-focusable. Measured: click on the track at (x+100, y+4) -> document.activeElement = SPAN tabindex=-1 class \"absolute inset-0\" (original and Svelte: BUTTON role=switch). Pressing Space/Enter afterwards still toggles, but the switch never matches :focus-visible (swFV=false, box-shadow none), so the designed 2px ring + 2px offset never appears; the original shows it (swFV=true, ring box-shadow present). Visible in shots/theme-picker-{orig,vue,svelte}-f1-trackclick-then-keys.png (montage tp-m-f1-trackclick-then-keys.png): original and Svelte show the ring around the switch, Vue shows none. Same after every mouse click in the main run (swClick end: act=span in Vue, act=button[switch] in original). Fix: do not put tabindex on the track span; if the motion-v press span needs it, keep focus on the button."
+   ],
+   "untestedItems": [
+    "locale-copy: the port demo hard-codes English copy and the harness URL has no locale switch, so zh-TW / zh-CN / ja could not be exercised on the port. The component does take labels and ariaLabel props (radiogroup name follows the title, radio names follow labels in English)."
+   ],
+   "missedDefects": []
+  },
+  {
+   "block": "theme-picker",
+   "platform": "svelte",
+   "judgePass": false,
+   "challengeUpheld": null,
+   "itemsPassed": 15,
+   "itemsTested": 17,
+   "itemsTotal": 18,
+   "tabOrderMatches": true,
+   "defects": [
+    "theme-transitions (minor): the product card crossfade has the right 250ms duration but the wrong curve and stacking. The demo's fade() uses cubicBezier(0.42,0,0.58,1) (ease-in-out); the original fades fast-then-slow. New card opacity at +17/+67/+134ms after the first frame: original 0.18/0.46/0.76 (Vue 0.15/0.44/0.75), Svelte 0.01/0.15/0.56; time to 50% is ~125ms vs ~84ms (+49%). The new card is also inserted before the old one in the DOM ([light 0, dark 1] vs original [dark 1, light 0]), so the outgoing card is painted on top of the incoming one. Visible in shots/theme-picker-svelte-09-switch-midflight.png: at 180ms the card is still mostly the old dark card while original and Vue already show the light one.",
+    "reduced-motion (minor): the old check badge fades without shrinking, as required, but over 150ms ease-in-out (badgeOut hard-codes reduce ? 150) instead of the original's ~95ms. Opacity samples after the click: original 0.83, 0.66, 0.48, 0.32, 0.19, 0.08, 0.01 (0 at +93ms); Svelte 1, 0.98, 0.90, 0.77, 0.59, 0.41, 0.23, 0.10, 0.02 (0 at +150ms), about 40 to 55 percent longer."
+   ],
+   "untestedItems": [
+    "locale-copy: the port demo hard-codes English copy and the harness URL has no locale switch, so zh-TW / zh-CN / ja could not be exercised on the port. The component does take labels and aria-label props."
+   ],
+   "missedDefects": []
+  }
+ ]
+}

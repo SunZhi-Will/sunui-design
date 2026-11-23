@@ -2,7 +2,7 @@
  "block": "hotspots",
  "summary": "An image with numbered circular markers at percentage positions; pressing a marker opens one detail card beside it, and only one card can be open at a time.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -64,7 +64,7 @@
    "id": "card-enter-exit-motion",
    "behaviour": "The card scales up and fades in on a gentle spring, and fades out fast when it closes.",
    "trigger": "Open a marker, then close it",
-   "expect": "Enter: opacity goes from 0 to 1 and scale from 0.96 to 1 on a spring with stiffness 240 and damping 30. The scale grows from the corner nearest the point (top-left for right/down cards, bottom-right for left/up cards). Exit: opacity goes to 0 over 0.12s with no scale change. The Waxed cotton card that is open on first render also plays the enter animation when the block mounts.",
+   "expect": "Enter: opacity goes from 0 to 1 and scale from 0.96 to 1 on a spring with stiffness 240 and damping 30. The scale grows from the corner nearest the point (top-left for right/down cards, bottom-right for left/up cards). Exit: opacity goes to 0 over 0.12s with no scale change. The exit fade is ease-out shaped, not linear: measured opacity is about 0.74 at 23ms, 0.38 at 56ms and 0.03 at 107ms after the close starts, so it drops fast first and slows toward the end. The Waxed cotton card that is open on first render also plays the enter animation when the block mounts.",
    "kind": "motion",
    "scope": "all"
   },
@@ -80,7 +80,7 @@
    "id": "escape-closes",
    "behaviour": "Escape closes the open card from anywhere on the page.",
    "trigger": "With a card open, press Escape (focus anywhere, including outside the block)",
-   "expect": "The card closes with the 0.12s fade, and every marker shows its digit with aria-expanded false. Focus does not move. Pressing Escape with no card open does nothing.",
+   "expect": "The card closes with the 0.12s ease-out fade (opacity about 0.74 at 23ms, 0.38 at 56ms, 0.03 at 107ms), and every marker shows its digit with aria-expanded false. Focus does not move. Pressing Escape with no card open does nothing.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -140,5 +140,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

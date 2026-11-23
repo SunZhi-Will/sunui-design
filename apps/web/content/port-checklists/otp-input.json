@@ -2,7 +2,7 @@
  "block": "otp-input",
  "summary": "A 6-cell one-time code entry row that moves focus as you type, spreads pasted or autofilled codes across cells, shakes once and shows an error on a wrong code, and shows a \"Verified\" result marker on the right code (demo code 246810).",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -40,7 +40,7 @@
    "id": "type-advance",
    "behaviour": "Typing an allowed character fills the cell and moves focus to the next cell; the last cell keeps focus. A filled cell is always replaced, never appended to, whether or not its character is selected.",
    "trigger": "Focus Digit 1 and type 1, 2, 3, 4, 5, 6; then click Digit 2, click it again so its character is no longer selected, and type 7",
-   "expect": "Cells show 1 2 3 4 5 6 and focus moves one cell per keystroke, staying on Digit 6 after the last one. After typing 7 into Digit 2 without a selection, Digit 2 shows only 7 (the old 2 is dropped) and focus moves to Digit 3.",
+   "expect": "Cells show 1 2 3 4 5 6 and focus moves one cell per keystroke, staying on Digit 6 after the last one. After typing 7 into Digit 2 without a selection, Digit 2 shows only 7 (the old 2 is dropped) and focus moves to Digit 3. The row does not shake at any point: overwriting a filled cell of 1 2 3 4 5 6 with 7 is not a completion, the measured horizontal shake is 0px.",
    "kind": "state",
    "scope": "all"
   },
@@ -112,7 +112,7 @@
    "id": "success-state",
    "behaviour": "Completing 246810 enters the success state: a \"Verified\" result marker appears below the row on the right, the caret line hides, and the success is announced only to screen readers.",
    "trigger": "Type 2 4 6 8 1 0",
-   "expect": "A marker reading \"Verified\" (zh-TW \"已驗證\", zh-CN \"已验证\", ja \"認證済み\" as \"認証済み\") appears 8px below the row, 4px in from its right edge, with a small filled disc in the brand accent colour holding a check mark. With motion allowed it fades in and the disc grows slightly while the check draws, settling within about half a second. The marker is aria-hidden. The status line contains visually hidden text \"Code verified\" (zh-TW \"驗證碼正確\", zh-CN \"验证码正确\", ja \"コードを確認しました\") and the group's aria-describedby points to it. Focus stays on Digit 6 but no caret line shows. No shake, no aria-invalid.",
+   "expect": "A marker reading \"Verified\" (zh-TW \"已驗證\", zh-CN \"已验证\", ja \"認証済み\") appears 8px below the row, 4px in from its right edge, in a line box 20px tall (text-sm line height, so the marker is 20px tall and its disc sits 1px lower than it would in an 18px line box), with a small filled disc in the brand accent colour holding a check mark. With motion allowed it fades in and the disc grows slightly while the check draws, settling within about half a second. The marker is aria-hidden. The status line contains visually hidden text \"Code verified\" (zh-TW \"驗證碼正確\", zh-CN \"验证码正确\", ja \"コードを確認しました\") and the group's aria-describedby points to it. Focus stays on Digit 6 but no caret line shows. No shake, no aria-invalid.",
    "kind": "motion",
    "scope": "all"
   },
@@ -140,5 +140,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

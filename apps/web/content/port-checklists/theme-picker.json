@@ -2,7 +2,7 @@
  "block": "theme-picker",
  "summary": "A three-option theme radiogroup (System, Light, Dark) whose tiles are miniature previews of each theme, shown in a demo panel together with the companion ThemeSwitch and a product card that re-themes as the choice changes.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "initial-render",
@@ -46,9 +46,9 @@
   },
   {
    "id": "roving-tabindex",
-   "behaviour": "Only the selected option is a Tab stop; the group counts as one stop.",
+   "behaviour": "The picker group is a single Tab stop for its radios, but the original also has an extra focusable key span inside the switch.",
    "trigger": "Press Tab from before the demo, then keep pressing Tab",
-   "expect": "Tab order is exactly: 1) the theme switch, 2) the currently checked radio in the picker (Dark on first render). Unchecked radios are skipped (tabindex -1). After a selection change the next Tab into the group lands on the newly checked option. Nothing else in the demo takes focus: no preview, badge, stage glow, product card or the \"Add to bag\" label.",
+   "expect": "Measured Tab sequence on the original is three stops: 1) the theme switch button, 2) a span inside the switch (the moving key, which gets tabindex=0 from framer-motion's whileTap and shows a browser default outline), 3) the currently checked radio (Dark on first render). Unchecked radios are skipped (tabindex -1). After a selection change the next Tab into the group lands on the newly checked option. The key span stop is an accessibility quirk of the original (a focusable span nested in a button), not intended design; a port may have only two stops (switch, checked radio) and that is acceptable. Nothing else takes focus: no preview, badge, stage glow, product card or the \"Add to bag\" label.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -72,8 +72,16 @@
    "id": "switch-keyboard",
    "behaviour": "The theme switch works from the keyboard and shows its own focus ring.",
    "trigger": "Tab to the switch, then press Space, then Enter",
-   "expect": "On focus the switch shows a 2px ring in the ring colour with a 2px background-coloured offset and no browser outline. Space toggles it from dark to light (aria-checked becomes false, picker moves to Light); Enter toggles it back to dark (aria-checked true, picker moves to Dark). Focus stays on the switch.",
+   "expect": "On focus the switch shows a 2px ring in the ring colour with a 2px background-coloured offset and no browser outline. Space toggles it from dark to light (aria-checked becomes false, picker moves to Light); Enter toggles it back to dark (aria-checked true, picker moves to Dark). Focus stays on the switch. This holds for keyboard use. A mouse click on the key itself is different, see switch-mouse-focus.",
    "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "switch-mouse-focus",
+   "behaviour": "In the original, clicking the switch key with a mouse moves focus onto the key span rather than the switch button.",
+   "trigger": "Click the moving key (not the track) of the switch with a mouse, then press a key such as Tab or Space",
+   "expect": "Focus moves to the key span (it has tabindex=0 from framer-motion's whileTap), not the switch button. The next key press draws a browser default outline on the key instead of the 2px switch ring. This is an accessibility quirk of the original; a port that keeps focus on the switch button with its ring is acceptable.",
+   "kind": "state",
    "scope": "web"
   },
   {
@@ -120,7 +128,7 @@
    "id": "theme-transitions",
    "behaviour": "Changing the resolved theme recolours the panel with set durations and crossfades the product card.",
    "trigger": "Change the resolved theme from dark to light (click the Light tile)",
-   "expect": "Stage background goes from #1c1c22 to #ecebe8 over 700ms; the warm glow fades in and the cool glow fades out over 700ms; panel surface colours transition over 500ms. The product card crossfades: the new card fades from opacity 0 to 1 and the old one fades to 0 over 0.25s, stacked in the same 88px tall slot.",
+   "expect": "Stage background goes from #1c1c22 to #ecebe8 over 700ms; the warm glow fades in and the cool glow fades out over 700ms; panel surface colours transition over 500ms. Durations are 0.7s and 0.5s, but the easing is the project default, not fixed by the block. On the original preview page the site easing cubic-bezier(0.23,1,0.32,1) applies, so the stage visibly finishes at about 530ms and the panel at about 385ms. In a neutral Tailwind project the default cubic-bezier(0.4,0,0.2,1) applies and they visibly finish near 650ms and 530ms. Either is correct; do not treat the difference as a timing defect. The product card crossfades: the new card fades from opacity 0 to 1 and the old one fades to 0 over 0.25s, stacked in the same 88px tall slot.",
    "kind": "timing",
    "scope": "all"
   },
@@ -128,7 +136,7 @@
    "id": "switch-motion",
    "behaviour": "The switch key slides across with a soft spring and its pixel sun turns into a pixel moon.",
    "trigger": "Click the switch to go from dark to light, then click again before the key settles",
-   "expect": "At md the key moves 96px, from the left end (7px inset) in dark to the right end (103px) in light, easing out with at most a slight overshoot and settling in under about a second. The pixel glyph breaks apart and re-forms as the sun (or moon) over about 950ms. Pressing and holding the key shrinks it slightly. A second click mid-flight reverses from the current position without jumping back to an end.",
+   "expect": "At md the key moves 96px, from the left end (7px inset) in dark to the right end (103px) in light, easing out with no overshoot (measured maximum key x is exactly 103.00px) and settling in under about a second. The pixel glyph breaks apart and re-forms as the sun (or moon) over about 950ms. Pressing and holding the key shrinks it slightly. A second click mid-flight reverses from the current position without jumping back to an end.",
    "kind": "motion",
    "scope": "all"
   },
@@ -136,7 +144,7 @@
    "id": "reduced-motion",
    "behaviour": "With reduced motion the state changes still happen but the movement is removed.",
    "trigger": "Enable prefers-reduced-motion: reduce, then change the selection and click the switch",
-   "expect": "The new check badge appears at full size and opacity instantly (no grow). The old badge only fades, with no shrink. The product card swaps instantly with no fade. The switch key jumps to its end immediately, the pixel glyph changes in one frame, and pressing the key does not shrink it. Colour transitions of the panel may remain.",
+   "expect": "The new check badge appears at full size and opacity instantly (no grow). The old badge only fades, with no shrink, over about 95ms (the spring on opacity). The product card swaps instantly with no fade. The switch key jumps to its end immediately, the pixel glyph changes in one frame, and pressing the key does not shrink it. Colour transitions of the panel may remain.",
    "kind": "reduced-motion",
    "scope": "all"
   },
@@ -148,5 +156,6 @@
    "kind": "text",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

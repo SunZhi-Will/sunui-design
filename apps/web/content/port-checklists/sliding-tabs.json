@@ -2,7 +2,7 @@
  "block": "sliding-tabs",
  "summary": "Animated tab and selector bar in five variants (underline, segment, folder, dock, chips) whose selection indicator slides between items, with optional content panel, counts and single or multiple selection.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-layout",
@@ -104,7 +104,7 @@
    "id": "accessible-names-items",
    "behaviour": "Item names include their counts, and dock items are named once by their label even when the visible label is hidden.",
    "trigger": "initial render, read each item's accessible name",
-   "expect": "Folder tabs read 'To ship (3)', 'On the way (2)', 'Delivered (18)', 'Returns (0)' (parentheses are screen-reader only). Reviews reads 'Reviews 128'. Dock items read 'Home', 'Search', 'Saved', 'Profile' exactly once each, including unselected ones; the visible animated label is aria-hidden. Products that do not match the selected chips have aria-hidden true.",
+   "expect": "Folder tabs read 'To ship ( 3 )', 'On the way ( 2 )', 'Delivered ( 18 )', 'Returns ( 0 )' as Chrome computes them, with spaces around the number (the parentheses are screen-reader only). Reviews reads 'Reviews 128'. Dock items read 'Home', 'Search', 'Saved', 'Profile' exactly once each, including unselected ones; the visible animated label is aria-hidden. Products that do not match the selected chips have aria-hidden true.",
    "kind": "text",
    "scope": "all"
   },
@@ -126,9 +126,9 @@
   },
   {
    "id": "narrow-layout",
-   "behaviour": "The demo stacks into one column on narrow screens and the tab rows scroll instead of wrapping; chips wrap.",
+   "behaviour": "The demo stacks into one column on narrow screens; the tab rows do not scroll and the chips row does not wrap, because the grid item overflows the card instead.",
    "trigger": "view the demo at a width below 768px, then at 768px or wider",
-   "expect": "Below 768px all five instances stack in one column. At 768px and above, underline tabs and the Sales block sit side by side, and the folder, dock and chips rows span both columns. Underline and folder tab rows never wrap; when too narrow they scroll horizontally with no visible scrollbar. Chips wrap onto a second line with an 8px gap. The product grid is 2 columns below 640px and 4 at 640px and above.",
+   "expect": "Below 768px all five instances stack in one column. At 768px and above, underline tabs and the Sales block sit side by side, and the folder, dock and chips rows span both columns. In the demo the tab rows do not scroll and the chips row does not wrap: at 500px and 340px viewports each underline and folder tab row has scrollWidth equal to clientWidth (499 and 499), so it cannot be scrolled. The grid item keeps its min-content width (498.9px) and overflows the card instead, while the grid itself is 458px wide at 500px and 298px wide at 340px. The scroll and wrap classes exist (overflow-x auto, hidden scrollbar, flex-wrap, 8px gap) but the demo grid never constrains the rows enough to use them. The product grid is 2 columns below 640px and 4 at 640px and above.",
    "kind": "layout",
    "scope": "all"
   },
@@ -144,9 +144,10 @@
    "id": "reduced-motion",
    "behaviour": "With reduced motion requested, all movement is removed: indicators, panels, chip fill and check mark, dock labels, press scale, chart bars and product dimming change instantly. Short colour fades on text, borders and badges remain.",
    "trigger": "enable prefers-reduced-motion, then switch tabs in each instance, toggle chips and press items",
-   "expect": "Indicators jump to the new item with no slide. Panel content swaps instantly with no 16px offset and no fade. Chip fill and check mark appear and disappear instantly. Dock label appears and disappears instantly with no width growth. No 0.97 press scale. Chart bars and product opacity change without transition. Text, hover, chip border and badge colours may still fade briefly; nothing moves.",
+   "expect": "Indicators jump to the new item with no slide. The one exception is the dock pill: because the label width changes instantly, it shows a one-frame transient at a wrong x (for example -17.9px, then 97px) before landing on the new item. Panel content swaps instantly with no 16px offset and no fade. Chip fill and check mark appear and disappear instantly. Dock label appears and disappears instantly with no width growth. No 0.97 press scale. Chart bars and product opacity change without transition. Text, hover, chip border and badge colours may still fade briefly; nothing moves.",
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

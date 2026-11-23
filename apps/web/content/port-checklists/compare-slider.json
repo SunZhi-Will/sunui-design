@@ -2,7 +2,7 @@
  "block": "compare-slider",
  "summary": "A before and after image comparison where a draggable, clickable and keyboard-operable divider reveals the before image on the left and the after image on the right, with an optional one-time intro sweep that any earlier or mid-sweep press cancels for good.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -16,7 +16,7 @@
    "id": "divider-visual",
    "behaviour": "The divider is a thin white vertical line through the full height with a round steel knob at its vertical center holding a left and right chevron icon.",
    "trigger": "initial render",
-   "expect": "Line 2px wide, white, with a 1px black outline at 25% opacity, centered on the split position. At 50% height, centered on the line, sits a 40px (size-10) circle with a knurled, striped conic-gradient rim and a drop shadow; inside it a 32px (size-8) domed light grey knob, brightest near its top, containing a 16px dark grey (rgb 40 40 44) double chevron pointing left and right. The knob looks the same in light and dark theme. The line, knob and chips do not intercept pointer input.",
+   "expect": "Line 2px wide, white, with a 1px black outline at 25% opacity, centered on the split position. At 50% height, centered on the line, sits a 48px (size-12) circle with a knurled, striped conic-gradient rim and a drop shadow; inside it a 38px (size-[38px]) domed light grey knob, brightest near its top, containing a 16px dark grey (rgb 40 40 44) double chevron pointing left and right. The knob looks the same in light and dark theme. The line, knob and chips do not intercept pointer input. Measured in the browser: outer circle 48x48, inner knob 38x38.",
    "kind": "layout",
    "scope": "all"
   },
@@ -79,8 +79,8 @@
   {
    "id": "click-jump",
    "behaviour": "Clicking or tapping anywhere in the frame moves the divider straight to that horizontal point.",
-   "trigger": "click at about 25% of the frame width",
-   "expect": "Divider jumps to about 25% (whole percent, step 1) without animation, before image shown from 0 to 25%.",
+   "trigger": "click at exactly 25% of the frame width",
+   "expect": "Divider jumps without animation to value 24 (measured; the native range thumb geometry makes the value one lower than the click fraction), not 25. Accept a whole-percent value within 1 of the click position. Before image shown from 0 to 24%.",
    "kind": "state",
    "scope": "all"
   },
@@ -117,6 +117,14 @@
    "scope": "web"
   },
   {
+   "id": "page-keys",
+   "behaviour": "PageUp and PageDown move the divider by 10 percent, as the native range input does.",
+   "trigger": "focus the slider at 100 and press PageDown, then PageUp",
+   "expect": "Value goes 100 to 90 on PageDown and back to 100 on PageUp (measured), changing instantly. PageUp at 100 and PageDown at 0 stay at the limit.",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
    "id": "accessible-name",
    "behaviour": "The slider is exposed as a range from 0 to 100 with a name built from the two side labels.",
    "trigger": "inspect the slider with an accessibility tool (en locale)",
@@ -148,5 +156,6 @@
    "kind": "attribute",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

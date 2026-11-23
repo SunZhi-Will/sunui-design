@@ -2,13 +2,13 @@
  "block": "range-slider",
  "summary": "A step-snapping slider with one or two thumbs, a spring-animated fill, optional tick dots and a value tooltip; the demo is a product filter with a price range and a minimum rating.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-demo",
    "behaviour": "On first render the demo shows a card headed \"Filter\" with a result count and two sliders: a price range and a single minimum-rating slider.",
    "trigger": "initial render",
-   "expect": "Header row: \"Filter\" on the left, \"110 products\" on the right (count = max(0, round((high - low) * 1.4 - (rating - 3) * 30)) = round(100 * 1.4 - 30) = 110). First slider: label \"Price\" on the left, \"$20, $120\" on the right (en dash with spaces). Second slider: label \"Minimum rating\", value \"4.0 ★\". 32px vertical space between the two sliders. No tooltip is visible.",
+   "expect": "Header row: \"Filter\" on the left, \"110 products\" on the right (count = max(0, round((high - low) * 1.4 - (rating - 3) * 30)) = round(100 * 1.4 - 30) = 110). First slider: label \"Price\" on the left, \"$20, $120\" on the right (en dash with a space on each side, not a comma). Second slider: label \"Minimum rating\", value \"4.0 ★\". 32px vertical space between the two sliders. No tooltip is visible.",
    "kind": "state",
    "scope": "all"
   },
@@ -95,8 +95,8 @@
   {
    "id": "press-on-thumb",
    "behaviour": "Pressing on a thumb itself goes through the same track handler: the value snaps to the pointer position, and which thumb moves is chosen by distance to the pointer, not by which thumb was pressed. The pressed thumb receives focus from the mouse press.",
-   "trigger": "Click a thumb off its centre; then set price to [100,110] and press the right half of the Lowest price thumb",
-   "expect": "An off-centre click on a thumb can move that thumb by one or more steps to the snapped pointer value instead of leaving it in place. With price [100,110], a press at raw about 106 picks the Highest price thumb (closer to 110), which stays at 110 because of the gap, so values do not change. After a mouse click on a thumb that thumb is focused and its tooltip stays visible after release.",
+   "trigger": "Click a thumb off its centre; then set price to [100,110] (the thumbs are only about 16.7px apart and 20px wide, so they overlap) and press on the overlap area, which is the right half of the Lowest price thumb but is covered by the Highest price thumb, the later one in the DOM and on top",
+   "expect": "An off-centre click on a thumb can move that thumb by one or more steps to the snapped pointer value instead of leaving it in place. With price [100,110], the press lands on the Highest price thumb, not Lowest price, at raw about 106, which is closer to 110, so the Highest price thumb is picked. It stays at 110 because of the gap, so values do not change; it receives focus and its tooltip stays visible after release. After a mouse click on any thumb that thumb is focused and its tooltip stays visible after release.",
    "kind": "state",
    "scope": "web"
   },
@@ -112,7 +112,7 @@
    "id": "dragging-visuals",
    "behaviour": "The dragged thumb grows, follows the pointer with no animation lag and shows a tooltip above it, stacked above the other thumb.",
    "trigger": "Press and hold on the track and move, then release",
-   "expect": "While dragging: the thumb's scale is 1.15, reached instantly (transition duration 0); thumb position and fill change with duration 0. Tooltip: small bordered box centred above the thumb with an 8px gap, text size xs, showing the formatted value (e.g. \"$85\" or \"3.5 ★\"). The dragged thumb has z-index 20, the other 10. On release the scale returns to 1 with the spring (stiffness 520, damping 34).",
+   "expect": "While dragging: the thumb's scale is 1.15, reached instantly (transition duration 0); thumb position and fill change with duration 0. Tooltip: small bordered box centred above the thumb with a 7px gap between the tooltip bottom and the thumb top (6.5px measured, because the 8px margin is taken from inside the thumb's 1.5px border), text size xs, showing the formatted value (e.g. \"$85\" or \"3.5 ★\"). The dragged thumb has z-index 20, the other 10. On release the scale returns to 1 with the spring (stiffness 520, damping 34).",
    "kind": "motion",
    "scope": "all"
   },
@@ -148,5 +148,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -2,7 +2,7 @@
  "block": "favorite-button",
  "summary": "A round heart toggle button that saves or unsaves an item, stamping a red fill in with a spring and optionally rolling a compact favorite count, shown in the demo as a save button on four product cards.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-layout",
@@ -78,17 +78,25 @@
   },
   {
    "id": "tab-order",
-   "behaviour": "Tab stops only on the four favorite buttons, in card order. Images, names, prices, the heading and the heart graphic are not focusable.",
+   "behaviour": "With normal motion, framer-motion's whileTap puts tabindex=\"0\" on the inner circle span of each button, so Tab stops on each button and then on its inner span. Images, names, prices, the heading and the heart SVG are not focusable. With prefers-reduced-motion on, whileTap is undefined, the span gets no tabindex, and Tab stops only on the four buttons.",
    "trigger": "Press Tab repeatedly from before the demo",
-   "expect": "Focus order: Jacket button, Mug button, Lamp button, Watch button, then leaves the demo; exactly 4 stops",
+   "expect": "Normal motion: 8 stops in order button[Jacket], span, button[Mug], span, button[Lamp], span, button[Watch], span, then leaves the demo. Reduced motion: exactly 4 stops, one per button",
    "kind": "keyboard",
    "scope": "web"
   },
   {
    "id": "keyboard-activate",
-   "behaviour": "The focused button is a native toggle button: Enter and Space toggle it, and keyboard focus shows a ring.",
-   "trigger": "Tab to the Mug button, press Space, then press Enter",
-   "expect": "Space saves it (aria-pressed=true), Enter unsaves it (aria-pressed=false); a 2px focus ring in the ring colour with a 2px offset in the background colour is visible only on keyboard focus, no default outline",
+   "behaviour": "The button is a native toggle button: Enter and Space toggle it, and keyboard focus shows a ring. With normal motion the inner span is also a tab stop, and Enter or Space pressed while the inner span has focus still toggles the state.",
+   "trigger": "Tab to the Mug button (first stop of its pair), press Space, then press Enter; then Tab once more to the inner span and press Space",
+   "expect": "Space saves it (aria-pressed=true), Enter unsaves it (aria-pressed=false); a 2px focus ring in the ring colour with a 2px offset in the background colour is visible on the button only on keyboard focus, no default outline; with the inner span focused (normal motion), Space still toggles aria-pressed on the button",
+   "kind": "keyboard",
+   "scope": "web"
+  },
+  {
+   "id": "click-focus-target",
+   "behaviour": "With normal motion, a mouse click on a heart leaves keyboard focus on the inner circle span (tabindex=0 added by whileTap), not on the button itself. Enter and Space still toggle from there. Under prefers-reduced-motion the span has no tabindex, so focus stays on the button.",
+   "trigger": "Click the Stoneware Mug heart with the mouse, then read document.activeElement; repeat with prefers-reduced-motion on",
+   "expect": "Normal motion: activeElement is the inner span with tabindex=\"0\", not the button; pressing Enter or Space toggles aria-pressed on the button. Reduced motion: activeElement is the button",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -140,5 +148,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

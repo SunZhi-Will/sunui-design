@@ -2,13 +2,13 @@
  "block": "empty-state",
  "summary": "A static, dashed-border empty state with an icon, title, description, a primary \"Load example\" button and an outline secondary link. In the demo, the button swaps the empty state for a filled-in three-person bill.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-content",
    "behaviour": "On first render the demo shows the heading and the empty state, not the bill list",
    "trigger": "initial render (locale en)",
-   "expect": "A heading reading \"This bill\" sits above a box with a dashed border, a corner radius of 12px and a transparent background. Inside, centred, top to bottom: a people (users) icon, the title \"No bill yet\", the description \"Start by adding people, or load a filled-in example to see how it works.\", then a row with the primary button \"Load example\" (a sparkles icon before the text) and an outline control \"Add people\". No list rows and no dollar amounts are visible.",
+   "expect": "A heading reading \"This bill\" sits above a box with a dashed border, a corner radius from the rounded-xl class (12px under the site theme, 14px under the published sunui-theme.css with --radius 0.625rem) and a transparent background. Inside, centred, top to bottom: a people (users) icon, the title \"No bill yet\", the description \"Start by adding people, or load a filled-in example to see how it works.\", then a row with the primary button \"Load example\" (a sparkles icon before the text) and an outline control \"Add people\". No list rows and no dollar amounts are visible.",
    "kind": "state",
    "scope": "all"
   },
@@ -24,7 +24,7 @@
    "id": "button-row-metrics",
    "behaviour": "The two built-in controls sit side by side, centred, and wrap when space runs out",
    "trigger": "initial render, then narrow the container until both controls no longer fit on one line",
-   "expect": "The controls are centred with an 8px gap. Each is 32px tall with 10px horizontal padding, an 8px corner radius, 14px medium-weight text and no line wrapping inside a control. \"Load example\" has a filled primary background with primary-foreground text, and its 16px sparkles icon has a stroke width of 2 with a 6px gap to the label. \"Add people\" has a border-coloured 1px border on the background colour. When narrow, the second control wraps to a new line, still centred, keeping the 8px gap.",
+   "expect": "The controls are centred with an 8px gap. Each is 32px tall with 10px horizontal padding, a corner radius from the rounded-lg class (8px under the site theme, 10px under the published sunui-theme.css), 14px medium-weight text and no line wrapping inside a control. \"Load example\" has a filled primary background with primary-foreground text, and its 16px sparkles icon has a stroke width of 2 with a 6px gap to the label. \"Add people\" has a border-coloured 1px border on the background colour. When narrow, the second control wraps to a new line, still centred, keeping the 8px gap.",
    "kind": "layout",
    "scope": "all"
   },
@@ -48,7 +48,7 @@
    "id": "load-example-activates",
    "behaviour": "Activating Load example replaces the empty state with the filled bill",
    "trigger": "Click \"Load example\", or focus it and press Enter or Space",
-   "expect": "The dashed empty-state box disappears entirely and in its place, under the same \"This bill\" heading, there is a bordered list (12px radius, card background, dividers between rows) with three rows in this order: \"Ava\" $210, \"Ben\" $180, \"Chloe\" $170. Each row has 16px horizontal and 12px vertical padding, the name on the left (medium weight, truncated with an ellipsis if too long) and the amount on the right with tabular figures and a leading \"$\". The swap is instant, with no enter or exit animation.",
+   "expect": "The dashed empty-state box disappears entirely and in its place, under the same \"This bill\" heading, there is a bordered list (rounded-xl radius: 12px under the site theme, 14px under the published sunui-theme.css; card background, dividers between rows) with three rows in this order: \"Ava\" $210, \"Ben\" $180, \"Chloe\" $170. Each row has 16px horizontal and 12px vertical padding, the name on the left (medium weight, truncated with an ellipsis if too long) and the amount on the right with tabular figures and a leading \"$\". The swap is instant, with no enter or exit animation.",
    "kind": "state",
    "scope": "all"
   },
@@ -88,7 +88,7 @@
    "id": "hover-press-feedback",
    "behaviour": "The controls give hover and press feedback",
    "trigger": "Hover each control with a mouse, then press and hold",
-   "expect": "Hovering \"Load example\" changes its background to the primary colour at 80% opacity. Hovering \"Add people\" changes its background to the muted colour, with foreground-coloured text. While a control is pressed it moves down 1px (translateY 1px) and returns on release. Colour changes use a short transition, not an instant jump.",
+   "expect": "Hovering \"Load example\" changes its background to the primary colour at 80% opacity. Hovering \"Add people\" changes its background to the muted colour, with foreground-coloured text. While a control is pressed it moves down 1px (translateY 1px) and returns on release. Colour changes use a transition measured at 150ms with cubic-bezier(0.23, 1, 0.32, 1), not an instant jump. These values come from the site's default transition timing, not from the block, so a port should set them explicitly.",
    "kind": "state",
    "scope": "web"
   },
@@ -140,5 +140,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

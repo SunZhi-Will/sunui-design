@@ -2,7 +2,7 @@
  "block": "pagination",
  "summary": "Acceptance checklist for the SunUI pagination block: numbered page list with fixed-length ellipsis ranges, previous and next controls, a sliding current-page underline, a link mode and a compact \"3 / 38\" mode, checked against the three-instance demo.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-main",
@@ -70,17 +70,17 @@
   },
   {
    "id": "underline-spring",
-   "behaviour": "The underline under the current page slides from the old page to the new page instead of jumping, and each instance has its own underline.",
-   "trigger": "In the first card, with motion allowed, move from page 6 to page 7, then from page 7 to page 12",
-   "expect": "A 2px-high rounded bar in the foreground colour, inset 8px from the left and right of the cell and 4px from its bottom, is seen at intermediate positions between the old and new cell for a short moment (well under 1s) before resting under the new page; it is not an instant jump. The underlines in Order history and Customer reviews never move or flash when the first card changes.",
+   "behaviour": "The underline under the current page is a shared-layout bar that springs when the current page changes. Because the 12-page row re-centres on the new page, the old and new current cells can sit at the same screen position (6 to 7: left edge 447.3px before and after). The bar still moves: it starts offset from its resting place and springs back, and the offset differs by direction. Each instance has its own underline.",
+   "trigger": "In the first card, with motion allowed: (a) from page 6 activate Page 7 (forward by one); (b) then activate Previous or the left neighbour to go back from 7 to 6 (backward by one); (c) then go from page 7 to page 12",
+   "expect": "A 2px-high rounded bar in the foreground colour, inset 8px from the left and right of the cell and 4px from its bottom. (a) Forward 6 to 7: the bar jumps about 20px to the left of its rest position and springs back to rest in about 230 to 250ms. (b) Backward 7 to 6: the bar jumps about 40px to the right of its rest position and springs back in about 300ms, so backward is larger and slightly slower than forward; a port that snaps straight to rest on a backward move fails. (c) 7 to 12: the bar is seen at intermediate positions between the old and new cell and rests under page 12 well under 1s. The underlines in Order history and Customer reviews never move or flash when the first card changes.",
    "kind": "motion",
    "scope": "all"
   },
   {
    "id": "reduced-motion",
-   "behaviour": "Under reduced motion the underline moves to the new page instantly.",
-   "trigger": "Enable prefers-reduced-motion and change pages in the first card",
-   "expect": "The underline appears under the new current page in the next frame, with no intermediate positions. Everything else (states, text, colours) is unchanged.",
+   "behaviour": "Under reduced motion the underline transition has zero duration, but on the 6 to 7 step in the first card one frame still renders with the bar offset before it lands.",
+   "trigger": "Enable prefers-reduced-motion and change pages in the first card (6 to 7, then 7 to 12), and in the Order history link card",
+   "expect": "On 6 to 7 in the first card, one frame is rendered with the bar about 20px left of rest (left 427.3px) and the next frame has it at rest (447.3px); there is no spring and no further intermediate position. On 7 to 12 and in the link card the bar lands under the new page in a single frame with no intermediate position. Everything else (states, text, colours) is unchanged.",
    "kind": "reduced-motion",
    "scope": "all"
   },
@@ -105,6 +105,14 @@
    "behaviour": "When hrefs are provided (Order history) pages and Previous/Next render as links with real hrefs, and the disabled control is a non-focusable element marked aria-disabled.",
    "trigger": "Inspect Order history, then click Page 3, then Page 4",
    "expect": "Page links point to #orders-page-1 to #orders-page-4. The disabled Previous is not a link, has aria-disabled=\"true\" and no href. Clicking Page 3 sets the URL hash to #orders-page-3 and Page 3 becomes current; Previous becomes an enabled link to #orders-page-2. On page 4 Next becomes the aria-disabled non-link.",
+   "kind": "attribute",
+   "scope": "all"
+  },
+  {
+   "id": "link-href-lag",
+   "behaviour": "The Previous and Next links re-render their href as soon as the click updates the page, before the browser follows the click. So the URL hash ends one page further than the page shown. Page number links are not affected, because their href does not depend on the current page.",
+   "trigger": "In Order history go to page 4 by clicking Page 4, then click the Previous link; then, from page 2, click the Next link",
+   "expect": "After clicking Previous on page 4, Page 3 is shown as current but the URL hash is #orders-page-2 (not #orders-page-3). Next behaves the same way by the same mechanism (hash one page ahead of the page shown, measured on Previous). Clicking a numbered page link such as Page 3 gives matching state and hash (#orders-page-3).",
    "kind": "attribute",
    "scope": "all"
   },
@@ -142,11 +150,12 @@
   },
   {
    "id": "layout-narrow",
-   "behaviour": "Cells keep a fixed size, and below the small breakpoint the Previous and Next words are visually hidden but still read.",
-   "trigger": "Measure the first card, then narrow the viewport below 640px",
-   "expect": "Each page cell is 36px tall and at least 36px wide; ellipsis slots are 36px tall and at least 28px wide; items are 4px apart and centered. Below 640px Previous and Next show only the chevron, and their accessible names remain \"Previous\" and \"Next\".",
+   "behaviour": "Cells keep a fixed size, and below the small breakpoint the Previous and Next words are visually hidden but still read. The row does not shrink or wrap, so on a very narrow viewport it overflows the card.",
+   "trigger": "Measure the first card, then narrow the viewport below 640px, then to 340px",
+   "expect": "Each page cell is 36px tall and at least 36px wide; ellipsis slots are 36px tall and at least 28px wide; items are 4px apart and centered. Below 640px Previous and Next show only the chevron, and their accessible names remain \"Previous\" and \"Next\". At 340px the first card's row is wider than the card, so the chevrons sit outside the card border; this is also true of the original and is not a defect to fix.",
    "kind": "layout",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

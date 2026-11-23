@@ -2,7 +2,7 @@
  "block": "loading-button",
  "summary": "A button that runs an async action and moves through idle, loading, success and error states, either shrinking to a spinner circle or keeping its width with an inline spinner, then resets to idle after a delay.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -24,7 +24,7 @@
    "id": "keyboard-activate",
    "behaviour": "Buttons activate from the keyboard like native buttons, and Enter in the email field does not start Subscribe",
    "trigger": "Focus Subscribe and press Enter or Space; separately, type in the email field and press Enter",
-   "expect": "Enter or Space on a focused button starts the same flow as a click. Enter in the email field does not reload the page and does not put Subscribe into loading (the button is type=button and the form submit is prevented).",
+   "expect": "Enter or Space on a focused button starts the same action flow as a click (loading, then success or error with the same timings). Known quirk of the original: after keyboard activation of an idle button, the press scale of 0.97 can get stuck, because the button switches to loading while the key is still held and the press-scale animation is switched off before the key is released, so the button may stay visibly scaled down instead of returning to 1. A mouse click does not show this. Enter in the email field does not reload the page and does not put Subscribe into loading (the button is type=button and the form submit is prevented).",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -32,7 +32,7 @@
    "id": "shrink-loading",
    "behaviour": "Default shrink style collapses the button to a circular spinner while the action is pending",
    "trigger": "Click Subscribe (or Apply code)",
-   "expect": "The button becomes a 40x40px circle (horizontal padding 0, corner radius 999) showing only a 16px spinner: a faint full ring at 25% opacity with a solid quarter arc, spinning continuously. The label text is gone. The width and radius change animates with a spring of stiffness 240, damping 30. The colour stays the variant colour (primary for Subscribe, card with border for Apply code).",
+   "expect": "The button becomes a 40x40px circle (horizontal padding 0) showing only a 16px spinner: a faint full ring at 25% opacity with a solid quarter arc, spinning continuously. The label text is gone. Only the size (width) change animates, with a spring of stiffness 240, damping 30. The corner radius is NOT sprung: it is a plain style value that jumps to 999 at the first frame of the shrink and jumps back to 6px at the first frame of the expansion (the computed value reads as 15% vertical with a scale-corrected horizontal radius while the box is still growing). So during the expansion the button is already rounded like a 6px button, and it does not stay a pill while the width grows back. The colour stays the variant colour (primary for Subscribe, card with border for Apply code).",
    "kind": "motion",
    "scope": "all"
   },
@@ -72,7 +72,7 @@
    "id": "label-crossfade",
    "behaviour": "Each content change crossfades with a small vertical slide",
    "trigger": "Any state change (idle to loading, loading to success or error, back to idle)",
-   "expect": "The outgoing content fades to opacity 0 while moving up 6px; the incoming content starts at opacity 0 and 6px lower, and settles at opacity 1 and 0px. Each fade lasts 0.14s. The outgoing content is popped out of layout so the two do not stack.",
+   "expect": "The outgoing content fades to opacity 0 while moving up 6px; the incoming content starts at opacity 0 and 6px lower, and settles at opacity 1 and 0px. Each fade lasts 0.14s using Motion's default ease, which is ease-out-like and not ease-in-out: measured opacity is about 0.28 at +17ms and about 0.72 at +67ms. The outgoing content is popped out of layout so the two do not stack.",
    "kind": "motion",
    "scope": "all"
   },
@@ -80,7 +80,7 @@
    "id": "press-scale",
    "behaviour": "Pressing a button that is not loading scales it down slightly",
    "trigger": "Press and hold on an idle, success or error button",
-   "expect": "The button scales to 0.97 while pressed and returns to 1 on release. A loading button does not scale when pressed.",
+   "expect": "With the mouse, the button scales to 0.97 while pressed and returns to 1 on release. A loading button does not scale when pressed. Known quirk of the original: when pressed with Enter or Space on an idle button, the scale can stay stuck at 0.97 after the action starts (see keyboard-activate), so the return to 1 is only reliable for pointer presses.",
    "kind": "motion",
    "scope": "all"
   },
@@ -124,5 +124,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -45,7 +45,7 @@ export type PortLevel = "verified" | "untested" | "manual" | "web-only";
 // 已驗證清單在 content/port-verified.json。每一筆都是「用全新的 agent 只給這份指南、第一輪生成就通過」才列入
 // （2026-11-23 三輪試作，紀錄在 reports/可攜式Prompt跨平台深度分析-2026-11-23.md）。要修過才對的不列。
 // 每一筆記著當時主檔的指紋：block 的原始碼之後改了，驗證過的就不是現在這份，所以自動降回未驗證。
-type VerifiedEntry = { block: string; platform: string; source: string; date: string; round: number };
+type VerifiedEntry = { block: string; platform: string; source: string; date: string; round: number; method: "judged" | "manual" };
 const verifiedEntries = (verifiedData as { entries: VerifiedEntry[] }).entries;
 
 /** 主檔內容的指紋（去掉結尾空白後的 SHA-256 前 12 碼）。只是雜湊，不會洩漏 Pro 原始碼。 */
@@ -65,13 +65,13 @@ function currentFingerprint(item: Pick<RegistryItem, "name" | "files">, source?:
   return value;
 }
 
-type Verification = { state: "current" | "stale"; date: string } | null;
+type Verification = { state: "current" | "stale"; date: string; method: "judged" | "manual" } | null;
 
 /** 這個組合驗證過沒有；驗證過但原始碼已經改了回傳 stale。 */
 function verification(item: Pick<RegistryItem, "name" | "files">, platform: PortPlatform, source?: string): Verification {
   const entry = verifiedEntries.find((e) => e.block === item.name && e.platform === platform);
   if (!entry) return null;
-  return { state: currentFingerprint(item, source) === entry.source ? "current" : "stale", date: entry.date };
+  return { state: currentFingerprint(item, source) === entry.source ? "current" : "stale", date: entry.date, method: entry.method };
 }
 
 // 只存在於網頁的東西：瀏覽器外框、游標與 hover 效果、頁面捲動導覽、Cookie 橫幅。原生 App 由系統或導覽列處理。
@@ -110,12 +110,15 @@ function levelSentence(item: Pick<RegistryItem, "name" | "files">, platform: Por
   if (level === "untested" && was?.state === "stale") {
     return `Untested for the current source: SunUI verified this port on ${was.date}, but the block's source has changed since then. The rules below still apply; compare the result with the reference closely.`;
   }
+  if (level === "verified" && was?.method === "manual") {
+    return "Verified by hand: SunUI ran this guide for this block on this platform and compared the result with the original by operating it and reading screenshots. Keyboard order and reduced motion were not tested. Results still vary by model, so compare yours with the reference too.";
+  }
   return levelNote[level];
 }
 
 const levelNote: Record<PortLevel, string> = {
   verified:
-    "Verified: SunUI ran this guide for this block on this platform and compared the result with the original (states, spring curve, timeouts). Results still vary by model, so compare yours with the reference too.",
+    "Verified: SunUI ran this guide for this block on this platform, and an independent model ran the block's acceptance checks on the original and the port with one script (states, attributes, timing curves, Tab order, reduced motion). Results still vary by model, so compare yours with the reference too.",
   untested:
     "Untested: the rules below cover what this block uses, but nobody at SunUI has run this combination. Compare the result with the reference closely.",
   manual:

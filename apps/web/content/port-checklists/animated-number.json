@@ -2,7 +2,7 @@
  "block": "animated-number",
  "summary": "A formatted number whose digits roll on per-column wheels in the direction of the change, with an optional trend arrow and aria-live announcement, shown as an odometer total in a watch product card with finish, strap and quantity controls.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -40,7 +40,7 @@
    "id": "settle",
    "behaviour": "Each wheel decelerates into place like a gentle spring rather than a linear tween, and rests on exactly one digit",
    "trigger": "Select Brass, then watch the total until it stops",
-   "expect": "The moving wheels start fast and slow down smoothly, coming to rest within roughly half a second after their delay with no visible bounce or overshoot. Each step is exactly one character height. At rest every column shows one whole digit, vertically aligned with its neighbours; the digits above and below are clipped and not visible.",
+   "expect": "The moving wheels start fast and slow down smoothly with no visible bounce or overshoot. Settling time depends on distance, measured to within 0.01 of a digit after the column's delay: 1 step about 400 ms, 4 steps about 480 ms, 9 steps about 380 ms (so always within roughly 380 to 480 ms, and not longer for longer rolls). Each step is exactly one character height. At rest every column shows one whole digit, vertically aligned with its neighbours; the digits above and below are clipped and not visible.",
    "kind": "motion",
    "scope": "all"
   },
@@ -94,9 +94,17 @@
   },
   {
    "id": "interrupt",
-   "behaviour": "A new change during a roll redirects the wheel from where it currently is, without snapping",
-   "trigger": "Press plus several times rapidly",
-   "expect": "Each wheel continues from its current in-flight position toward the latest target, rolling further in the same direction (it may pause briefly for its stagger delay). It never jumps back to the old digit first and settles on the correct final digit.",
+   "behaviour": "A new change in the same direction during a roll redirects the wheel from where it currently is, without snapping",
+   "trigger": "Press plus several times rapidly (every press raises the value)",
+   "expect": "Each wheel continues from its current in-flight position toward the latest target, rolling further in the same direction (it may pause briefly for its stagger delay). It never jumps back to the old digit first and settles on the correct final digit. This holds only while the direction stays the same; a direction flip is covered by interrupt-direction-flip.",
+   "kind": "motion",
+   "scope": "all"
+  },
+  {
+   "id": "interrupt-direction-flip",
+   "behaviour": "Known defect in the original: when a second change flips the direction while a wheel is still rolling and that wheel's digit is the same before and after the second change, the wheel freezes mid-roll and never recovers",
+   "trigger": "Select Brass and let it settle ($229.00), check the strap ($258.00), then 200 ms later select Steel ($218.00)",
+   "expect": "The live text reads \"$218.00\", but the ones wheel (digit 8 both before and after the second change) stops partway, at position about 13.7 so it shows a blend between 3 and 4, and stays there indefinitely instead of resting on 8. The cause is that the effect cleanup stops the running animation and the early return for an unchanged digit never restarts it. Wheels whose digit does change in the second step still settle correctly. Ports that match the original show the same freeze (Vue about 12.27, Svelte about 12.67); this is a bug worth fixing at source.",
    "kind": "motion",
    "scope": "all"
   },
@@ -104,7 +112,7 @@
    "id": "a11y-names",
    "behaviour": "Controls have accessible names and decorative parts are hidden (en demo locale)",
    "trigger": "Inspect the accessibility tree",
-   "expect": "Minus button is named \"Decrease quantity\", plus button \"Increase quantity\" (their SVG icons are aria-hidden). Radios are labelled \"Brushed steel case\" and \"Brass case +$40\" inside a group with legend \"Finish\"; checkbox labelled \"Add a spare leather strap +$29\". Each number exposes one plain text string (for example \"$189.00\", \"1\"); the digit wheels and the trend arrow are aria-hidden.",
+   "expect": "Minus button is named \"Decrease quantity\", plus button \"Increase quantity\" (their SVG icons are aria-hidden). Radios sit inside a group with legend \"Finish\". The radio label's text content is \"Brushed steel case\" and \"Brass case+$40\" with no space character between the name and the price span; the visible gap comes from the flex gap, so do not require a literal space. The checkbox label reads \"Add a spare leather strap +$29\" (this one has a real space). Each number exposes one plain text string (for example \"$189.00\", \"1\"); the digit wheels and the trend arrow are aria-hidden.",
    "kind": "attribute",
    "scope": "all"
   },
@@ -140,5 +148,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

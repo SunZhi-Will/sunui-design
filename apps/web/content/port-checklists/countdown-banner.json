@@ -2,7 +2,7 @@
  "block": "countdown-banner",
  "summary": "A sale or livestream banner with title, discount and prices, a flip-digit countdown to a real start or end time, a CTA, and an Ended mark once the time has passed.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render-stack",
@@ -64,7 +64,7 @@
    "id": "ended-state",
    "behaviour": "A banner whose end time has passed shows the ended look: discount and timer at 40% opacity, discount muted instead of the accent colour, a muted 'Ended' mark centred over the discount and price area, and no CTA",
    "trigger": "initial render of banner 4 (end time one hour in the past)",
-   "expect": "'25% OFF' at opacity 0.4 in muted colour, muted text 'Ended' over it with no tick disc, timer 00 : 00 : 00 at opacity 0.4 under the label 'Ends in', date line 'Ended <date>', no button or link. The Ended mark is fully opaque on the first frame with no fade. The timer does not change afterwards",
+   "expect": "'25% OFF' at opacity 0.4 in muted colour from the first painted frame (no fade on load), muted text 'Ended' over it with no tick disc, timer 00 : 00 : 00 at opacity 0.4 under the label 'Ends in', date line 'Ended <date>', no button or link. The Ended mark is fully opaque on the first frame with no fade. The timer does not change afterwards",
    "kind": "state",
    "scope": "all"
   },
@@ -72,7 +72,7 @@
    "id": "ended-crossing",
    "behaviour": "When a running banner reaches its end while on screen, it switches to the ended look, the Ended mark fades in, the CTA is removed and ticking stops",
    "trigger": "control the page clock and advance it past banner 3's end time (or past 13:00 UTC on banner 2 in the livestream scenario)",
-   "expect": "On the tick at the end the timer reads 00 : 00 : 00 at opacity 0.4, the discount turns muted at opacity 0.4, the 'Ended' mark fades from opacity 0 to 1 over 0.15 s easeOut, the CTA disappears in the same frame with no exit animation, and the date line changes from 'Ends <date>' to 'Ended <date>'. No further updates happen",
+   "expect": "On the tick at the end the timer reads 00 : 00 : 00 at opacity 0.4 and the discount turns muted at once, while its opacity fades from 1 to 0.4 over about 133 to 150 ms (measured steps 1, 0.74, 0.56, 0.47, 0.43, 0.4). The 'Ended' mark fades from opacity 0 to 1 over 0.15 s easeOut, then drops to opacity 0 for a single frame right as the fade completes and returns to 1 on the next (measured in 3 of 3 crossings: 150 ms 0.999, 167 ms 0, 183 ms 1), so it ends at opacity 1. The CTA disappears in the same frame with no exit animation, and the date line changes from 'Ends <date>' to 'Ended <date>'. No further updates happen",
    "kind": "motion",
    "scope": "all"
   },
@@ -80,7 +80,7 @@
    "id": "tab-order",
    "behaviour": "Tab stops only on the CTAs, one per banner that is not ended, in document order. Digits, labels, the Ended mark and the discount are not focusable",
    "trigger": "press Tab repeatedly from the top of the demo",
-   "expect": "Focus goes to 'Shop headphones', then 'Remind me', then 'Shop now', then leaves the demo. Banner 4 has no stop. Each CTA shows a 2px focus ring with a 2px offset on keyboard focus",
+   "expect": "Focus goes to 'Shop headphones', then 'Remind me', then 'Shop now', then leaves the demo. Banner 4 has no stop. Each CTA carries tabindex=\"0\" and shows a 2px focus ring with a 2px offset on keyboard focus",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -88,15 +88,15 @@
    "id": "cta-activation",
    "behaviour": "With ctaHref the CTA is a link; every visible CTA in the demo is a link. It is 40px tall with the accent fill and dims on hover",
    "trigger": "focus a demo CTA and press Enter, or hover it with a mouse",
-   "expect": "Each visible CTA is an <a href=\"#\">; Enter follows it (the URL gains '#'). On hover the CTA drops to opacity 0.9",
+   "expect": "Each visible CTA is an <a href=\"#\"> that also carries tabindex=\"0\" (added by the animation library; harmless, since a link is focusable anyway); Enter follows it (the URL gains '#'). On hover the CTA drops to opacity 0.9",
    "kind": "keyboard",
    "scope": "web"
   },
   {
    "id": "cta-press",
-   "behaviour": "Pressing a CTA scales it down slightly with a spring and releases back",
-   "trigger": "press and hold on a CTA, then release",
-   "expect": "Scale goes to 0.97 while pressed and back to 1 on release, spring stiffness 520, damping 34",
+   "behaviour": "Pressing a CTA with the mouse scales it down slightly with a spring and releases back, except after a keyboard activation: once any CTA has been activated with Enter, a mouse press on a CTA no longer scales it",
+   "trigger": "press and hold a CTA with the mouse, then release; run it once on a fresh page, and once after Tab to 'Shop headphones' and Enter (the URL gains '#') followed by a mouse press on another CTA",
+   "expect": "On a fresh page, or after only hover or Tab and Shift+Tab, the computed transform goes to matrix(0.97, 0, 0, 0.97, 0, 0) while pressed and back to scale 1 on release, spring stiffness 520, damping 34. After a keyboard Enter activation, a mouse press on another CTA keeps transform 'none' for the whole press (measured: tabEnter sequence gives none). A keyboard press still scales afterwards",
    "kind": "motion",
    "scope": "all"
   },
@@ -148,5 +148,6 @@
    "kind": "state",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -2,7 +2,7 @@
  "block": "notify-badge",
  "summary": "A count or dot badge pinned to the corner of an icon that pops in with a spring, does a stamp-like press each time the count goes up, caps at \"max+\" and announces the count politely to screen readers.",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -38,9 +38,9 @@
   },
   {
    "id": "stamp-bump",
-   "behaviour": "Each time a count goes up, the badge is pressed like a stamp: it jumps larger and springs back.",
-   "trigger": "bell count increases on its own timer, or pressing \"Add to cart\"",
-   "expect": "The badge starts at scale 1.35 and springs to 1 with a spring of stiffness 620, damping 20, mass 0.8 (slight overshoot, settles quickly). Every increase replays it, including rapid repeated presses (each press restarts the bump from 1.35).",
+   "behaviour": "The stamp press (jump larger, spring back) only plays on a badge whose outer span was mounted after first render. In the original, a badge that was already present on first render never plays it, because framer-motion keeps initial disabled for motion children that mount later under a child that was present at first render (the inner span sits under AnimatePresence initial={false}).",
+   "trigger": "pressing \"Add to cart\" (cart badge present at first render), the bell's automatic 2 to 3 to 4 to 5 climb from the initial render, or the bell climbing again after a clear and refill",
+   "expect": "Cart badge: no bump on any Add to cart press, including rapid presses and the step to \"9+\"; scale stays flat and the inline style is 'transform: none'. Bell during the first automatic climb (2 to 3 to 4 to 5): no bump either. Bell after a clear and refill (badge outer span mounted after first render): the bump plays on each increase, measured scale 1.34 to 1.38 on the first frame, minimum about 0.93 at about 130 ms, settled by about 250 to 300 ms (spring stiffness 620, damping 20, mass 0.8).",
    "kind": "motion",
    "scope": "all"
   },
@@ -48,7 +48,7 @@
    "id": "clear-hides",
    "behaviour": "Clearing notifications hides the badge with an exit animation, because a count of 0 is hidden when showZero is false. Clearing never plays the 1.35 bump.",
    "trigger": "press \"Mark all read\" or the Notifications bell button",
-   "expect": "Bell count becomes 0 and the badge springs from scale 1 to 0 while fading to opacity 0 (spring 620 / 20 / mass 0.8), then is removed. No \"0\" is ever shown and no grow-then-settle bump plays before it shrinks.",
+   "expect": "Bell count becomes 0 and the badge springs from scale 1 to 0 while fading to opacity 0 (spring 620 / 20 / mass 0.8). The visible part ends at about 100 ms, but the node stays in the DOM for about 680 ms because the spring overshoots through 0 and rings (scale magnitude up to about 0.2 at opacity 0 to 0.04), and is then removed. No \"0\" is ever shown and no grow-then-settle bump plays before it shrinks.",
    "kind": "state",
    "scope": "all"
   },
@@ -72,7 +72,7 @@
    "id": "max-overflow",
    "behaviour": "Cart has max 9; counts above max show \"max+\".",
    "trigger": "press \"Add to cart\" repeatedly from the initial count of 1",
-   "expect": "Badge reads 2, 3 ... 9; on the 9th press (count 10) it reads \"9+\" and keeps reading \"9+\" for 11, 12 and beyond, still bumping on each press. Default max is 99 (\"99+\" above 99). The bell never exceeds 5.",
+   "expect": "Badge reads 2, 3 ... 9; on the 9th press (count 10) it reads \"9+\" and keeps reading \"9+\" for 11, 12 and beyond. The cart badge does not bump on any of these presses (scale flat, inline 'transform: none'; see stamp-bump). Default max is 99 (\"99+\" above 99). The bell never exceeds 5.",
    "kind": "text",
    "scope": "all"
   },
@@ -112,9 +112,10 @@
    "id": "reduced-motion",
    "behaviour": "With reduced motion on, badges appear, change and disappear without scaling.",
    "trigger": "enable prefers-reduced-motion, then add to cart, clear notifications, and wait for the refill",
-   "expect": "Entering badge starts at scale 1 (no pop); exit is instant (duration 0) with no shrink; no 1.35 bump on increases; action buttons do not scale to 0.97. Counts, \"9+\" and live announcements are unchanged.",
+   "expect": "Entering badge starts at scale 1 (no pop); exit has duration 0 with no shrink, but the original still keeps the node for 2 frames (about 31 ms) after the click before removing it; no 1.35 bump on increases; action buttons do not scale to 0.97. Counts, \"9+\" and live announcements are unchanged.",
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }

@@ -2,7 +2,7 @@
  "block": "floating-field",
  "summary": "A floating-label text field with live or on-blur validation, a shake on invalid blur, an email typo suggestion that morphs only the changed letters, input masks with grey ghost slots, a password strength meter with a rule checklist, and a character counter (number or ring).",
  "written": "2026-11-23",
- "by": "opus, checked by sonnet, revised by opus",
+ "by": "opus, checked by sonnet, revised by opus, corrected by sonnet from a judge's measurements of the original",
  "items": [
   {
    "id": "first-render",
@@ -14,9 +14,9 @@
   },
   {
    "id": "tab-order",
-   "behaviour": "Tab stops only on the real controls, in source order. The ring counter, ghost slots, strength bar, rule icons and asterisks are not focusable. The suggestion button joins the order only while it shows.",
-   "trigger": "Press Tab repeatedly from before the form",
-   "expect": "Order: Full name, ZIP code, Email, the 'Did you mean' suggestion button (only while visible, it sits right after Email), Create a password, Show/Hide button, Delivery note. Nothing else takes focus.",
+   "behaviour": "Tab stops only on the real controls, in source order. The ring counter, ghost slots, strength bar, rule icons and asterisks are not focusable. The suggestion button is only rendered while Email is not focused, so it is reachable only backwards.",
+   "trigger": "Press Tab repeatedly from before the form, with Email holding 'lin@gmail.com' style text that triggers a suggestion (for example 'lin@gmial.com'); then press Shift+Tab from the password field",
+   "expect": "Forward order: Full name, ZIP code, Email, Create a password, Show/Hide button, Delivery note. The 'Did you mean' suggestion button is not in the forward order: it only appears once focus has left Email, so Tab from Email lands on input[name=password], not on the button. Focusing Email again removes the suggestion. Backwards, Shift+Tab from the password field lands on the suggestion button (named after the suggested address, for example 'lin@gmail.com'). Nothing else takes focus.",
    "kind": "keyboard",
    "scope": "web"
   },
@@ -24,7 +24,7 @@
    "id": "label-float",
    "behaviour": "The label floats up and shrinks when the field is focused or has a value, and settles back only when it is both empty and unfocused.",
    "trigger": "Focus the empty ZIP field, then blur it while it is still empty",
-   "expect": "On focus the label moves to y -10px at scale 0.86 from its left edge, using a spring with stiffness 520 and damping 34. Blurring with an empty value brings it back to y 0 and scale 1 with the same spring. The border uses the brand (primary) colour while focused and goes back to neutral on blur. No error and no shake, because an empty field is not validated.",
+   "expect": "On focus the label animates to y -10px at scale 0.86 with its transform origin at its left centre, using a spring with stiffness 520 and damping 34. Because of that origin, the measured top edge of the label box moves only 8.6px (from 17.8px to 9.2px inside the field), not 10px; judge by the 8.6px top-edge move and the 0.86 scale. Blurring with an empty value brings it back to y 0 and scale 1 with the same spring. The border uses the brand (primary) colour while focused and goes back to neutral on blur. No error and no shake, because an empty field is not validated.",
    "kind": "motion",
    "scope": "all"
   },
@@ -104,7 +104,7 @@
    "id": "message-swap",
    "behaviour": "Only one message shows below a field, picked by priority: error, then suggestion, then success, then hint. When the kind of message changes, the old one fades out before the new one fades in. The message row keeps its height so nothing below moves.",
    "trigger": "With Email focused and showing 'We will send tracking here' for 'lin@site.org', delete back to 'lin@site.' (record the screen or use slow motion in devtools)",
-   "expect": "The success text fades to opacity 0 over 0.14 s and only then 'That email is missing something, like name@example.com' fades in from opacity 0 and 3px higher over 0.14 s. The two messages are never visible at the same time. The row under each field is at least 20px tall, so the password field below does not shift when a message appears or disappears. If the text changes but the kind stays the same (one error text replaced by another), it swaps at once with no fade.",
+   "expect": "The success text fades to opacity 0 over 0.14 s and only then 'That email is missing something, like name@example.com' fades in from opacity 0 and 3px higher over 0.14 s. The two messages are never visible at the same time. The row under each field is at least 20px tall, so the password field below does not shift when a message appears or disappears. Source-only clause, not testable in the demo because every field has a single error text: if the text changes but the kind stays the same, it swaps at once with no fade. Check it by reading the source or with a custom harness.",
    "kind": "timing",
    "scope": "all"
   },
@@ -148,5 +148,6 @@
    "kind": "reduced-motion",
    "scope": "all"
   }
- ]
+ ],
+ "corrected": "2026-11-23"
 }
