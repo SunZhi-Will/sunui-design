@@ -1,0 +1,63 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>移植試作並排比較 2026-11-23</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafafa;--fg:#171717;--mut:#737373;--line:#e5e5e5;--card:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#0a0a0a;--fg:#fafafa;--mut:#a1a1a1;--line:#262626;--card:#171717}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 ui-sans-serif,system-ui,"PingFang TC",sans-serif}
+main{max-width:1280px;margin:0 auto;padding:40px 24px 80px}h1{font-size:28px;letter-spacing:-.02em;margin:0 0 8px}h2{font-size:20px;margin:56px 0 4px}h3{font-size:14px;font-weight:600;margin:28px 0 10px;color:var(--mut)}
+p{margin:0 0 12px;max-width:70ch}.mut{color:var(--mut)}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.row figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row img,.row video{display:block;width:100%;height:auto}.row figcaption{padding:8px 12px;font-size:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
+.tag{font:600 11px/1 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-weight:600}
+.ok{color:#1f9d55;font-weight:600}.warn{color:#b7791f;font-weight:600}.wide{display:grid;grid-template-columns:1fr 2fr;gap:16px;align-items:start}
+@media(max-width:800px){.row,.wide{grid-template-columns:1fr}}
+</style></head><body><main>
+<p class="tag">SunUI 移植試作 · 2026-11-23</p>
+<h1>同一個元件：原版、Vue、iPhone</h1>
+<p class="mut">三個元件各用一份「轉接規則加原始碼」的 Prompt，交給看不到原專案的全新 agent 生成。下面全部是第一輪生成的結果，沒有任何人工修改。左欄是 SunUI 原版（React），中欄 Vue，右欄 SwiftUI 跑在 iPhone 17 Pro 模擬器。原版用的是網站主題（藍色專色），移植版用預設中性主題，所以強調色不同是預期的。</p>
+<table><tr><th>元件</th><th>Vue</th><th>SwiftUI</th></tr>
+<tr><td>confirm-button</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>range-slider</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr>
+<tr><td>scratch-card（Pro，canvas）</td><td class="ok">第一輪通過</td><td class="ok">第一輪通過</td></tr></table>
+
+<h2>confirm-button</h2><p class="mut">按一下變成待確認（同一顆按鈕變寬變色，下方出現提示），2.5 秒內再按一下才執行。</p>
+<h3>待確認</h3><div class="row">
+<figure><img src="img/web-confirm-2-armed.jpg"><figcaption><span>原版 React</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-confirm-2-armed.jpg"><figcaption><span>Vue</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-confirm-2-armed.jpg"><figcaption><span>SwiftUI</span><span class="tag">第一輪</span></figcaption></figure></div>
+<h3>完成</h3><div class="row">
+<figure><img src="img/web-confirm-4-done.jpg"><figcaption><span>原版 React</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-confirm-4-done.jpg"><figcaption><span>Vue</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-confirm-4-done.jpg"><figcaption><span>SwiftUI</span><span class="tag">第一輪</span></figcaption></figure></div>
+<h3>量到的數字（原版對 Vue，無頭 Chrome 逐格取樣）</h3>
+<table><tr><th>項目</th><th>原版</th><th>Vue</th></tr>
+<tr><td>按鈕寬度：起點、彈簧最高點、落定</td><td>63.4 → 105.4 → 104.2 px</td><td>63.8 → 107.2 → 106.0 px</td></tr>
+<tr><td>彈簧過衝</td><td>1.2 px</td><td>1.2 px</td></tr>
+<tr><td>待確認逾時</td><td>2595 ms</td><td>2624 ms</td></tr>
+<tr><td>Escape 取消、執行中停用、完成訊息、1.8 秒後清除</td><td>都有</td><td>都有</td></tr></table>
+<h3>iPhone 上的逐格畫面（錄影抽出有變化的影格）</h3>
+<div class="wide"><figure style="margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden"><video src="img/ios-run.mp4" controls muted playsinline style="display:block;width:100%"></video></figure>
+<figure style="margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden"><img src="img/ios-confirm-frames.jpg" style="display:block;width:100%"></figure></div>
+<p class="mut" style="margin-top:10px">影片是整段操作（三個元件）。右圖前兩列是變寬和文字上下替換的過程。看得到的小差異：完成訊息的顏色比文字早一格切換。</p>
+
+<h2>range-slider</h2><p class="mut">拖曳、點軌道跳到最近的把手、步進吸附、最小間距。</p>
+<h3>靜止</h3><div class="row">
+<figure><img src="img/web-slider-1-idle.jpg"><figcaption><span>原版 React</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-slider-1-idle.jpg"><figcaption><span>Vue</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-slider-1-idle.jpg"><figcaption><span>SwiftUI</span><span class="tag">第一輪</span></figcaption></figure></div>
+<h3>拖曳中 / 操作後</h3><div class="row">
+<figure><img src="img/web-slider-2-dragging.jpg"><figcaption><span>原版：拖曳中，把手 1.15 倍加數值氣泡</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-slider-2-dragging.jpg"><figcaption><span>Vue：同上</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-slider-3-after.jpg"><figcaption><span>SwiftUI：拖曳加點軌道之後</span><span class="tag">第一輪</span></figcaption></figure></div>
+<p class="mut" style="margin-top:10px">iPhone 版放開手指後氣泡會收起（觸控沒有「失焦」），這是移植時 agent 自己做的合理調整，已寫回轉接規則。</p>
+
+<h2>scratch-card（Pro）</h2><p class="mut">canvas 刮除，刮超過 55% 自動全開，中獎時結果圓片落定一次。左欄的原版是公開預覽版（另一份實作，樣式略有不同）；移植依據的是 Pro 原始碼。</p>
+<h3>刮到一半</h3><div class="row">
+<figure><img src="img/web-scratch-2-mid.jpg"><figcaption><span>原版（公開預覽）</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-scratch-2-mid.jpg"><figcaption><span>Vue</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-scratch-2-mid.jpg"><figcaption><span>SwiftUI</span><span class="tag">第一輪</span></figcaption></figure></div>
+<h3>全開</h3><div class="row">
+<figure><img src="img/web-scratch-3-revealed.jpg"><figcaption><span>原版（公開預覽）</span><span class="tag">web</span></figcaption></figure>
+<figure><img src="img/vue-scratch-3-revealed.jpg"><figcaption><span>Vue</span><span class="tag">第一輪</span></figcaption></figure>
+<figure><img src="img/ios-scratch-3-revealed.jpg"><figcaption><span>SwiftUI</span><span class="tag">第一輪</span></figcaption></figure></div>
+</main></body></html>

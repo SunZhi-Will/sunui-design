@@ -1,0 +1,316 @@
+{
+ "web": {
+  "confirmArmWidth": [
+   [
+    0,
+    63.4
+   ],
+   [
+    164,
+    72
+   ],
+   [
+    180,
+    74.4
+   ],
+   [
+    196,
+    80.6
+   ],
+   [
+    212,
+    86.8
+   ],
+   [
+    229,
+    92.5
+   ],
+   [
+    247,
+    97
+   ],
+   [
+    262,
+    100.8
+   ],
+   [
+    279,
+    102.5
+   ],
+   [
+    295,
+    104
+   ],
+   [
+    312,
+    104.9
+   ],
+   [
+    329,
+    105.3
+   ],
+   [
+    346,
+    105.4
+   ],
+   [
+    379,
+    105.2
+   ],
+   [
+    396,
+    105
+   ],
+   [
+    413,
+    104.8
+   ],
+   [
+    429,
+    104.6
+   ],
+   [
+    445,
+    104.5
+   ],
+   [
+    463,
+    104.4
+   ],
+   [
+    479,
+    104.3
+   ],
+   [
+    496,
+    104.2
+   ]
+  ],
+  "confirmArmed": {
+   "text": "Remove signup",
+   "notice": "Press again to remove signup"
+  },
+  "confirmPending": {
+   "disabled": true,
+   "busy": "true",
+   "spinner": true
+  },
+  "confirmDone": {
+   "text": "Remove",
+   "notice": "Signup removed",
+   "disabled": true
+  },
+  "confirmAfter": "",
+  "confirmDisarmMs": 2595,
+  "confirmEscape": {
+   "text": "Remove",
+   "notice": ""
+  },
+  "sliderDragging": {
+   "now": "145",
+   "bubble": "$145",
+   "transform": "matrix(1.15, 0, 0, 1.15, 0, 0)",
+   "z": "20"
+  },
+  "sliderAfterDrag": [
+   "20",
+   "145",
+   "4"
+  ],
+  "sliderJump": [
+   [
+    0,
+    263.5
+   ],
+   [
+    18,
+    147.3
+   ]
+  ],
+  "sliderAfterClick": [
+   "20",
+   "145",
+   "2.5"
+  ],
+  "sliderKeys": [
+   "135",
+   "145",
+   "2.5"
+  ],
+  "sliderHidden": [
+   "price-min=135",
+   "price-max=145"
+  ],
+  "scratchMid": "22% scratched",
+  "scratchDone": {
+   "live": "Card revealed. You won 20% off your next order with code LUCKY20.",
+   "canvas": 1,
+   "buttons": [
+    "Reveal all"
+   ]
+  },
+  "errors": []
+ },
+ "vue": {
+  "confirmArmWidth": [
+   [
+    0,
+    63.8
+   ],
+   [
+    90,
+    63.9
+   ],
+   [
+    106,
+    66.7
+   ],
+   [
+    123,
+    72.8
+   ],
+   [
+    139,
+    79.5
+   ],
+   [
+    156,
+    86.5
+   ],
+   [
+    173,
+    92.9
+   ],
+   [
+    189,
+    97.3
+   ],
+   [
+    206,
+    101.1
+   ],
+   [
+    223,
+    103.7
+   ],
+   [
+    240,
+    105.5
+   ],
+   [
+    256,
+    106.5
+   ],
+   [
+    272,
+    107
+   ],
+   [
+    289,
+    107.2
+   ],
+   [
+    322,
+    107.1
+   ],
+   [
+    339,
+    106.9
+   ],
+   [
+    356,
+    106.6
+   ],
+   [
+    372,
+    106.5
+   ],
+   [
+    389,
+    106.3
+   ],
+   [
+    405,
+    106.2
+   ],
+   [
+    422,
+    106.1
+   ],
+   [
+    439,
+    106
+   ],
+   [
+    489,
+    105.9
+   ],
+   [
+    522,
+    106
+   ]
+  ],
+  "confirmArmed": {
+   "text": "Remove signup",
+   "notice": "Press again to remove signup"
+  },
+  "confirmPending": {
+   "disabled": true,
+   "busy": "true",
+   "spinner": true
+  },
+  "confirmDone": {
+   "text": "Remove",
+   "notice": "Signup removed",
+   "disabled": true
+  },
+  "confirmAfter": "",
+  "confirmDisarmMs": 2624,
+  "confirmEscape": {
+   "text": "Remove",
+   "notice": ""
+  },
+  "sliderDragging": {
+   "now": "150",
+   "bubble": "$150",
+   "transform": "matrix(1.15, 0, 0, 1.15, 0, 0)",
+   "z": "20"
+  },
+  "sliderAfterDrag": [
+   "20",
+   "150",
+   "4"
+  ],
+  "sliderJump": [
+   [
+    0,
+    263
+   ],
+   [
+    25,
+    119
+   ]
+  ],
+  "sliderAfterClick": [
+   "20",
+   "150",
+   "2"
+  ],
+  "sliderKeys": [
+   "140",
+   "150",
+   "2"
+  ],
+  "sliderHidden": [
+   "price-min=140",
+   "price-max=150"
+  ],
+  "scratchMid": "35% scratched",
+  "scratchDone": {
+   "live": "Card revealed. You won 20% off your next order with code LUCKY20.",
+   "canvas": 0,
+   "buttons": []
+  },
+  "errors": []
+ }
+}
