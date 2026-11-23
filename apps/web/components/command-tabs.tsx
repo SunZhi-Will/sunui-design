@@ -22,7 +22,7 @@ export function CommandTabs({ label, tabs, children }: { label: string; tabs: st
             onClick={() => setIndex(i)}
             className={cn(
               "shrink-0 rounded-[4px] px-2.5 py-1 whitespace-nowrap transition-colors",
-              index === i ? "bg-card font-medium text-accent shadow-e1" : "text-subtle hover:text-accent",
+              index === i ? "bg-card font-medium text-fg shadow-e1" : "text-subtle hover:text-fg",
             )}
           >
             {tab}
