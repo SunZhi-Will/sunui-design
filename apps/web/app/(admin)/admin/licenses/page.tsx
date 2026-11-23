@@ -49,6 +49,14 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
     .map((name) => ({ name, installs: events?.pro.byBlock[name] ?? 0, intent: events?.intent.byBlock[name] ?? 0 }))
     .sort((a, b) => b.intent + b.installs - (a.intent + a.installs));
 
+  // 移植指南：鍵是 <platform>:<tier>:<block>
+  const ports = Object.entries(events?.port.byKey ?? {})
+    .map(([key, count]) => {
+      const [platform, tier, ...rest] = key.split(":");
+      return { platform, tier, name: rest.join(":"), count };
+    })
+    .sort((a, b) => b.count - a.count);
+
   return (
     <>
       {header}
@@ -108,6 +116,27 @@ export default async function AdminLicenses({ searchParams }: { searchParams: Pr
             pct(b.intent, b.intent + b.installs),
           ])}
           empty={{ title: "還沒有 Pro 安裝紀錄", icon: "block" }}
+        />
+      </Section>
+
+      <Section
+        className="mt-4"
+        id="port-guides"
+        title="移植指南"
+        description={`近 ${days} 天，共 ${events?.port.total ?? 0} 次。把區塊帶到其他平台的指南被取用的次數，不算進 Pro 安裝。看哪個平台有人要。`}
+        flush
+      >
+        <DataTable
+          columns={[{ label: "Block" }, { label: "平台" }, { label: "方案" }, { label: "取用", num: true }]}
+          rows={ports.map((p) => [
+            <code key="n" className="font-mono text-xs">
+              {p.name}
+            </code>,
+            p.platform,
+            p.tier === "pro" ? "Pro" : "免費",
+            p.count,
+          ])}
+          empty={{ title: "還沒有人取用移植指南", icon: "block" }}
         />
       </Section>
 

@@ -14,6 +14,7 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 | `apps/web/content/registry-i18n/<name>.json` | zh-TW, zh-CN, ja copy for each free block |
 | `apps/web/registry/lab/` | Blocks moved out of the catalog (off-strategy). Not served |
 | `apps/web/lib/agent/` | Everything AI-facing: search, install plans, design rules for agents, the SunUI skill |
+| `apps/web/lib/agent/port.ts`, `lib/agent/port/*.md`, `app/r/port/` | Port guides (added 2026-11-23): carry a block to Vue or SwiftUI. One adapter file per platform plus the block's source; the source is the spec, so there is no per-block prose spec. Pilot and method: `reports/可攜式Prompt跨平台深度分析-2026-11-23.md` |
 | `apps/web/app/mcp/route.ts` | SunUI MCP server (Streamable HTTP, read-only) |
 | `apps/web/app/llms.txt`, `llms-full.txt`, `r/`, `skills/` | Plain-text and registry endpoints |
 | `packages/*`, `src/`, `.cursorrules/` | Legacy npm packages and their old docs. Do not add new work there |
@@ -25,7 +26,8 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 - **Adding or editing a block**: follow `apps/web/README.md` (steps) and the design doc for its series: `apps/web/DESIGN.md` (craft, default), `DESIGN-product.md`, `DESIGN-story.md`. Ported blocks follow `apps/web/PORTING.md`. Add `meta.usage` (`whenToUse`, `watchOut`, `aliases`): agents search on it.
 - **Site chrome motion** (header, catalog, panels, home hero, docs pages, not blocks): follow `apps/web/SITE-MOTION.md`. Durations and the easing curve come from `lib/motion.ts` and the `@theme` block in `app/globals.css`.
 - **Changing a design doc**: update `apps/web/lib/agent/guidelines.ts` too. It is the English copy that the MCP server, the skill and `llms-full.txt` serve.
-- **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check.
+- **Pro code**: never copy Pro source into the public repo, a page, the MCP server or `llms-full.txt`. Only `/r/pro/*` serves it, behind a license check. A Pro port guide contains Pro source too: only `/r/port/<platform>/<name>.md` builds it, after the same license check; pages and the MCP server get `proPortInstructions()`.
+- **Port guides**: positioning stays "React gets code, other platforms get a port guide" (not a prompt library). Add a block to the `verified` list in `lib/agent/port.ts` only after running its guide with a fresh agent and comparing the result with the original. Add a platform only with an adapter that has been through the same test.
 - **Keep shadcn coupling thin (2026-11-22)**: shadcn is only the delivery format and CLI. Blocks must not depend on shadcn/ui components, Radix, Base UI or `shadcn/tailwind.css`; import `cn` from `@/lib/utils`, not the `cn` package; `registryDependencies` may only be `utils` and SunUI's own items. Colour classes stay on the standard shadcn token names; `apps/web/public/sunui-theme.css` supplies them for projects without shadcn, so keep it in step when a block needs a new token. If the shadcn CLI or format ever turns against us, the fallback is a small `npx sunui add` that reads the same `/r/*.json`; do not build it before then. Reasoning: `reports/shadcn綁定與非shadcn用戶最佳方案-2026-11-22.md`.
 - **Copy**: user-facing copy lives in `apps/web/lib/messages.ts` in four locales (en, zh-TW, zh-CN, ja). Change all four.
 - Do not use em dashes in any copy or docs.

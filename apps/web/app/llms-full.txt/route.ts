@@ -1,5 +1,6 @@
 import { describeBlock } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
+import { portOverview } from "@/lib/agent/port";
 import { getItems } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
 
@@ -17,6 +18,8 @@ export function GET() {
 > Every SunUI block with when-to-use notes, plus the design rules. Short index: ${base}/llms.txt. MCP server: ${base}/mcp. Agent skill: \`npx shadcn@latest add ${base}/r/sunui-skill.json\`.
 
 ${designRules().replace(/^# .*\n/, "")}
+
+${portOverview()}
 
 # Blocks
 

@@ -42,6 +42,14 @@ export default async function AiAgentsPage() {
         ))}
       </ul>
 
+      <h2>{t.portTitle}</h2>
+      <p>
+        <RichText text={t.portBody} />
+      </p>
+      <div className="block-gap">
+        <Command value={`curl -fsS ${base}/r/port/swiftui/range-slider.md`} />
+      </div>
+
       <h2>{t.skillTitle}</h2>
       <p>
         <RichText text={t.skillBody} />

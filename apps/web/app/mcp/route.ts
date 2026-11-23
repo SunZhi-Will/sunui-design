@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { blockLine, catalogMarkdown, describeBlock, planInstall, proSetup, searchBlocks, suggestNames } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
+import { parsePortPlatform, portPlatforms, portPrompt, proPortInstructions } from "@/lib/agent/port";
 import { findIcon, iconLibraryUsage, iconSetsSummary, proIconUsage, renderIcon, searchIcons, suggestIcons } from "@/lib/agent/icons";
 import { skillMarkdown } from "@/lib/agent/skill";
 import { buildRegistryItem, fileLang, getItem, getItems } from "@/lib/registry";
@@ -144,6 +145,30 @@ const handler = createMcpHandler(
     );
 
     server.registerTool(
+      "get_port_prompt",
+      {
+        title: "Port a SunUI block to another platform",
+        description:
+          "For projects that are NOT React: a port guide that carries one SunUI block to Vue or SwiftUI. It holds the platform's adapter rules (how springs, colours, hover, touch targets and accessibility map across) plus the block's source and demo, and states whether SunUI has verified that port. Follow the guide to write the component in the user's project. In a React project use plan_install instead. Pro blocks return how to fetch the guide with the user's license key.",
+        inputSchema: z.object({
+          name: z.string().describe("Block name from search_blocks, e.g. 'range-slider'."),
+          platform: z.enum(portPlatforms).describe("vue: Vue 3.5 + Tailwind v4 + motion-v. swiftui: SwiftUI on iOS 17+."),
+        }),
+        annotations: readOnly,
+      },
+      async ({ name, platform: rawPlatform }) => {
+        const platform = parsePortPlatform(rawPlatform)!;
+        const item = getItem(name.replace(/^@sunui(-pro)?\//, "").replace(/\.(json|md)$/, ""));
+        if (!item) {
+          const close = suggestNames(name);
+          return { ...text(`No SunUI block named "${name}".${close.length ? ` Closest: ${close.join(", ")}.` : ""}`), isError: true };
+        }
+        // Pro 的移植指南含 Pro 原始碼，這個公開的 MCP 不給：只說明怎麼帶授權去 /r/port 拿
+        return text(item.meta.tier === "pro" ? proPortInstructions(item, platform) : await portPrompt(item, platform));
+      },
+    );
+
+    server.registerTool(
       "search_icons",
       {
         title: "Search SunUI icons",
@@ -271,7 +296,7 @@ const handler = createMcpHandler(
   },
   {
     serverInfo: { name: "sunui", version: "1.0.0" },
-    instructions: `SunUI: ${getItems().length} refined animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
+    instructions: `SunUI: ${getItems().length} refined animated React + Tailwind blocks, installed with the shadcn CLI. Deepest for stores and campaign pages; also heroes, navigation, charts, theme switches and motion effects for any product page. Workflow: search_blocks, then get_block, then plan_install, then get_design_rules before editing. For icons use search_icons then get_icon instead of drawing new SVG. If the project is not React (Vue, SwiftUI), use get_port_prompt instead of plan_install. Free blocks are MIT; Pro blocks need SUNUI_LICENSE_KEY. Never invent block names. Docs: ${siteUrl()}/docs/ai-agents`,
   },
 );
 

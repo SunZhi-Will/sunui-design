@@ -1,5 +1,6 @@
 import { catalogMarkdown } from "@/lib/agent/catalog";
 import { designRules } from "@/lib/agent/guidelines";
+import { portPlatformLabels, portPlatforms } from "@/lib/agent/port";
 import { licenseSummary, siteUrl } from "@/lib/site";
 
 // SunUI 的 Agent Skill（agentskills.io 格式）。用 shadcn CLI 裝進使用者專案，
@@ -35,6 +36,17 @@ SunUI is a shadcn registry of production-ready, refined animated blocks. The dee
 5. **Wire it up.** Import from the path the CLI printed, pass real data and copy in the user's language, and connect callbacks to the user's actual state or API. Keep network calls independent from animations.
 6. **Keep the rules** in the block's series when you edit (see below, or \`get_design_rules\`).
 7. **Verify** in light and dark mode and at 375px. Turn on reduced motion and check nothing is lost.
+
+## Projects that are not React
+
+SunUI blocks are React code, so the shadcn install only works in a React project. For ${portPlatforms.map((p) => portPlatformLabels[p]).join(" or ")}, port the block instead:
+
+1. Get the block's port guide: \`get_port_prompt\` (MCP), or \`${base}/r/port/<platform>/<name>.md\` with platform \`${portPlatforms.join("` or `")}\`. A Pro guide needs \`Authorization: Bearer $SUNUI_LICENSE_KEY\`.
+2. Follow it: it carries the adapter rules for that platform and the block's source, which is the specification. Keep every state and every number (springs, durations, sizes).
+3. Read the port status at the top of the guide and tell the user what it says: verified, untested, needs manual work or web only.
+4. Say plainly that a port is your rewrite and can differ from the original; ask the user to compare it with the block's preview.
+
+Other platforms have no guide yet. Do not improvise one from memory and call it a SunUI port.
 
 ## Pro blocks
 

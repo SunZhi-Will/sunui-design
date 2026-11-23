@@ -39,6 +39,19 @@ export function recordProInstall(block: string, licenseId: string, now = new Dat
   ]);
 }
 
+/**
+ * 移植指南被取用時呼叫（/r/port）。欄位是 `<platform>:<tier>:<block>`，和 Pro 安裝數分開算，
+ * 才看得出哪個平台有人要。Pro 的另外更新該授權的使用紀錄，但不算進安裝次數。
+ */
+export function recordPort(block: string, platform: string, tier: "free" | "pro", licenseId?: string, now = new Date()) {
+  const iso = now.toISOString();
+  const lic = `lic:${licenseId}`;
+  return run([
+    ...hincr(`port:${dayKey(now)}`, `${platform}:${tier}:${block}`),
+    ...(licenseId ? ([["HSETNX", lic, "first", iso], ["HSET", lic, "last", iso], ["SADD", "lic:all", licenseId]] as RedisCommand[]) : []),
+  ]);
+}
+
 /** 沒帶 key（401）或授權失敗（403 / 429 / 503）時呼叫。401 依 block 記，是最直接的購買意圖。 */
 export function recordProDenied(block: string, status: number, now = new Date()) {
   const day = dayKey(now);
@@ -69,7 +82,7 @@ async function readDaily(prefixes: string[], days: number, now = new Date()) {
 }
 
 export async function eventStats(days: number, now = new Date()) {
-  const data = await readDaily(["pro", "pro401", "prodeny", "funnel"], days, now);
+  const data = await readDaily(["pro", "pro401", "prodeny", "funnel", "port"], days, now);
   if (!data) return null;
   const sum = (record: Record<string, number>) => Object.values(record).reduce((s, n) => s + n, 0);
   const funnel = data.funnel.total;
@@ -80,6 +93,8 @@ export async function eventStats(days: number, now = new Date()) {
     days,
     pro: { total: sum(data.pro.total), byBlock: data.pro.total, perDay: data.pro.daily.map((d) => ({ day: d.day, value: sum(d.values) })) },
     intent: { total: sum(data.pro401.total), byBlock: data.pro401.total, perDay: data.pro401.daily.map((d) => ({ day: d.day, value: sum(d.values) })) },
+    // 移植指南取用次數，鍵是 `<platform>:<tier>:<block>`
+    port: { total: sum(data.port.total), byKey: data.port.total },
     denied: data.prodeny.total,
     deniedByDay: data.prodeny.daily,
     funnel: { pricingViews: funnel.pricing_view ?? 0, checkoutClicks, byField: funnel, byDay: data.funnel.daily },
