@@ -49,7 +49,7 @@ export const iconIndex: IconEntry[] = [
     return { name, style: "pixel" as const, group: group?.id ?? "pixel-other", groupTitle: group?.title ?? "Other", keywords: keywordsOf(name), tier: "free" as const };
   }),
   ...proIconSets.flatMap((set) =>
-    (["line", "pixel"] as const).flatMap((style) =>
+    (["line", "twotone", "pixel"] as const).flatMap((style) =>
       set.icons.map((icon) => ({
         name: icon.name,
         style,
@@ -75,8 +75,10 @@ export function proIconUsage(entry: IconEntry) {
   if (!set) return "";
   const item = set.items.find((i) => i.style === entry.style && !i.animated);
   const animated = set.items.find((i) => i.style === entry.style && i.animated);
-  const motion = set.icons.find((i) => i.name === entry.name)?.[entry.style === "pixel" ? "pixelMotion" : "motion"];
-  const component = entry.style === "pixel" ? "LunarPixelIcon" : "LunarIcon";
+  const motion = set.icons.find((i) => i.name === entry.name)?.[
+    entry.style === "pixel" ? "pixelMotion" : entry.style === "twotone" ? "twotoneMotion" : "motion"
+  ];
+  const component = entry.style === "pixel" ? "LunarPixelIcon" : entry.style === "twotone" ? "LunarTwoToneIcon" : "LunarIcon";
   return [
     `"${entry.name}" is a SunUI Pro icon (${set.title} pack), included with every Pro license. Its source is not served here.`,
     `Install with a license key: \`npx shadcn@latest add @sunui-pro/${item?.name}\` (setup: ${siteUrl()}/docs/pro)`,
@@ -320,7 +322,7 @@ export function iconSetsSummary() {
     .filter(({ names }) => names.length)
     .map(({ g, names }) => `- twotone/${g.id} (${names.length}): ${names.join(", ")}`);
   const pro = proIconSets.map(
-    (set) => `- pro-${set.id} (${set.icons.length}, line + pixel): ${set.title}. Needs a Pro license; get_icon returns install steps, not code.`,
+    (set) => `- pro-${set.id} (${set.icons.length}, pixel + two-tone + line, every icon animated): ${set.title}. Needs a Pro license; get_icon returns install steps, not code.`,
   );
   return [
     `SunUI icons: ${Object.keys(icons).length} line icons (24px grid, 1.5 stroke), ${Object.keys(twoToneIcons).length} two-tone icons (same grid and names as line: solid light body plus details, every one animated) and ${Object.keys(pixelIcons).length} pixel sprites (16px grid). Use one style per screen; blocks use line.`,

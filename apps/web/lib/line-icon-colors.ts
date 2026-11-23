@@ -120,7 +120,11 @@ export function lineIconColor(name: string): string {
  * 回傳 CSS 屬性，直接放在圖示或外層的 style 上。
  */
 export function lineIconTone(name: string): Record<string, string> {
-  const ink = lineIconColor(name);
+  return toneFromColor(lineIconColor(name));
+}
+
+/** 由一個本色（oklch）推出雙色的整組 CSS 變數；Pro 圖示組的展示也用這個 */
+export function toneFromColor(ink: string): Record<string, string> {
   const hue = ink.match(/oklch\([\d.]+ [\d.]+ ([\d.]+)\)/)?.[1] ?? "250";
   const body = `oklch(0.86 0.085 ${hue})`;
   return {

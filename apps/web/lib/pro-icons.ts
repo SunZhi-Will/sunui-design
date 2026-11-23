@@ -4,6 +4,7 @@
 // 規劃與分層理由：reports/Pro 圖示包規劃-2026-11-08.md。新增或改名圖示時，scripts/check-icons.mjs 會比對這裡與 Pro 原始碼。
 
 export type ProIconKind = "hover" | "toggle" | "loop";
+export type ProIconStyle = "pixel" | "twotone" | "line";
 
 export type ProIconEntry = {
   name: string;
@@ -12,13 +13,15 @@ export type ProIconEntry = {
   motion?: ProIconKind;
   /** 像素動態版的動作類型 */
   pixelMotion?: ProIconKind;
+  /** 雙色動態版的動作類型 */
+  twotoneMotion?: ProIconKind;
 };
 
 export type ProIconItem = {
   name: string;
   title: string;
   description: string;
-  style: "line" | "pixel";
+  style: ProIconStyle;
   animated: boolean;
   source: string;
   target: string;
@@ -44,18 +47,18 @@ export const proIconSets: ProIconSet[] = [
     scenes: ["lunar-new-year", "festival-banner"],
     addedAt: "2026-11-09",
     icons: [
-      { name: "fu", keywords: "fortune luck blessing diamond upside down 福 倒福 斗方 春節 福字", motion: "toggle", pixelMotion: "toggle" },
-      { name: "firecracker", keywords: "firecrackers fireworks celebrate bang 鞭炮 爆竹 炮竹 花火", motion: "hover", pixelMotion: "hover" },
-      { name: "gold-ingot", keywords: "yuanbao sycee wealth treasure money 元寶 金元寶 招財 元宝 金塊", motion: "hover", pixelMotion: "hover" },
-      { name: "mandarin", keywords: "orange tangerine citrus fruit luck 橘子 柑橘 大吉 みかん", motion: "hover" },
-      { name: "koi", keywords: "fish carp surplus abundance 錦鯉 年年有餘 鯉魚 锦鲤 鯉", motion: "hover", pixelMotion: "hover" },
-      { name: "dumpling", keywords: "jiaozi food reunion dinner 餃子 水餃 年夜飯 饺子 ぎょうざ" },
-      { name: "plum-blossom", keywords: "flower plum spring bloom 梅花 春天 梅 花" },
-      { name: "couplet", keywords: "spring couplets banner door scroll 春聯 對聯 揮春 春联 対聯" },
-      { name: "goat", keywords: "zodiac year of the goat sheep ram 2027 羊 生肖 羊年 ひつじ 干支" },
-      { name: "coin-string", keywords: "coins cash money luck string 銅錢 古錢 錢串 铜钱 小判" },
-      { name: "tea", keywords: "tea cup gaiwan visit family 蓋碗 茶 奉茶 盖碗 お茶", motion: "hover" },
-      { name: "knot", keywords: "chinese knot tassel decoration luck 中國結 中国结 吉祥 結び", motion: "hover", pixelMotion: "hover" },
+      { name: "fu", keywords: "fortune luck blessing diamond upside down 福 倒福 斗方 春節 福字", motion: "toggle", pixelMotion: "toggle", twotoneMotion: "toggle" },
+      { name: "firecracker", keywords: "firecrackers fireworks celebrate bang 鞭炮 爆竹 炮竹 花火", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "gold-ingot", keywords: "yuanbao sycee wealth treasure money 元寶 金元寶 招財 元宝 金塊", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "mandarin", keywords: "orange tangerine citrus fruit luck 橘子 柑橘 大吉 みかん", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "koi", keywords: "fish carp surplus abundance 錦鯉 年年有餘 鯉魚 锦鲤 鯉", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "dumpling", keywords: "jiaozi food reunion dinner 餃子 水餃 年夜飯 饺子 ぎょうざ", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "plum-blossom", keywords: "flower plum spring bloom 梅花 春天 梅 花", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "couplet", keywords: "spring couplets banner door scroll 春聯 對聯 揮春 春联 対聯", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "goat", keywords: "zodiac year of the goat sheep ram 2027 羊 生肖 羊年 ひつじ 干支", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "coin-string", keywords: "coins cash money luck string 銅錢 古錢 錢串 铜钱 小判", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "tea", keywords: "tea cup gaiwan visit family 蓋碗 茶 奉茶 盖碗 お茶", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "knot", keywords: "chinese knot tassel decoration luck 中國結 中国结 吉祥 結び", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
     ],
     items: [
       {
@@ -74,13 +77,37 @@ export const proIconSets: ProIconSet[] = [
         name: "sunui-animated-lunar-icons",
         title: "Animated Lunar New Year Icons",
         description:
-          "Animated Lunar New Year line icons on the same geometry: the fu diamond flips upside down with an active prop, firecrackers shake, the ingot hops, the koi swims and the knot's tassel swings when their button is hovered or focused. Respects reduced motion.",
+          "Every Lunar New Year line icon animated on the same geometry: the fu diamond flips upside down with an active prop; firecrackers shake, the ingot hops, the koi swims, the coin spins, the goat nods and the knot's tassel swings when their button is hovered or focused. Respects reduced motion.",
         style: "line",
         animated: true,
         source: "registry/pro/icons/sunui-animated-lunar-icons.tsx",
         target: "components/ui/sunui-animated-lunar-icons.tsx",
         dependencies: ["framer-motion"],
         registryDependencies: ["sunui-animated-icons", "@sunui-pro/sunui-lunar-icons"],
+      },
+      {
+        name: "sunui-lunar-twotone-icons",
+        title: "Lunar New Year Two-tone Icons",
+        description:
+          "Lunar New Year two-tone icons on the same 24px grid and names as the line set: a solid light body plus currentColor details, like the free sunui-twotone-icons. Mono by default; set color and --sunui-icon-body to paint each object (red fu, orange koi, blue-and-white gaiwan).",
+        style: "twotone",
+        animated: false,
+        source: "registry/pro/icons/sunui-lunar-twotone-icons.tsx",
+        target: "components/ui/sunui-lunar-twotone-icons.tsx",
+        dependencies: [],
+        registryDependencies: ["sunui-icons"],
+      },
+      {
+        name: "sunui-animated-lunar-twotone-icons",
+        title: "Animated Lunar New Year Two-tone Icons",
+        description:
+          "Every Lunar New Year two-tone icon animated: the fu diamond flips with an active prop; firecrackers shake, the coin spins, the gaiwan lid lifts, the dumpling steams, the plum blossom turns and the knot's tassel swings on hover or focus. Respects reduced motion.",
+        style: "twotone",
+        animated: true,
+        source: "registry/pro/icons/sunui-animated-lunar-twotone-icons.tsx",
+        target: "components/ui/sunui-animated-lunar-twotone-icons.tsx",
+        dependencies: ["framer-motion"],
+        registryDependencies: ["sunui-animated-icons", "@sunui-pro/sunui-lunar-twotone-icons"],
       },
       {
         name: "sunui-lunar-pixel-icons",
@@ -98,7 +125,7 @@ export const proIconSets: ProIconSet[] = [
         name: "sunui-animated-lunar-pixel-icons",
         title: "Animated Lunar New Year Pixel Icons",
         description:
-          "Frame-by-frame Lunar New Year pixel icons: the fu diamond flips, firecrackers shake, the ingot hops, the koi swims and the knot sways. Frames are derived from the static sprites. No animation library; respects reduced motion.",
+          "Every Lunar New Year pixel icon animated frame by frame: the fu diamond flips, firecrackers shake, the ingot hops, the koi swims, the coin turns, the gaiwan lid lifts and the knot sways. Frames are derived from the static sprites. No animation library; respects reduced motion.",
         style: "pixel",
         animated: true,
         source: "registry/pro/icons/sunui-animated-lunar-pixel-icons.tsx",
@@ -116,8 +143,8 @@ export function getProIconItem(name: string) {
   return proIconItems.find((item) => item.name === name);
 }
 
-/** 安裝這組圖示的指令（線條或像素，含動態版） */
-export function proIconInstall(set: ProIconSet, style: "line" | "pixel", animated = false) {
+/** 安裝這組圖示的指令（像素、雙色或線條，含動態版） */
+export function proIconInstall(set: ProIconSet, style: ProIconStyle, animated = false) {
   const item = set.items.find((i) => i.style === style && i.animated === animated);
   return item ? `npx shadcn@latest add @sunui-pro/${item.name}` : null;
 }
@@ -127,6 +154,7 @@ export function proIconInstall(set: ProIconSet, style: "line" | "pixel", animate
  * 由 scripts/generate-previews.mjs 產生的 loadProIconRenderers 動態載入；公開 clone 沒有它時是 null，頁面只列名稱與安裝方式。
  */
 export type ProIconRenderer = {
-  line: (name: string, opts: { size: number; strokeWidth: number; animated: boolean; active?: boolean }) => import("react").ReactNode;
+  line: (name: string, opts: { size: number; strokeWidth: number; animated: boolean; active?: boolean; colored?: boolean }) => import("react").ReactNode;
+  twotone: (name: string, opts: { size: number; animated: boolean; active?: boolean; colored?: boolean }) => import("react").ReactNode;
   pixel: (name: string, opts: { size: number; tone: "ink" | "pigment"; animated: boolean; active?: boolean }) => import("react").ReactNode;
 };

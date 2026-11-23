@@ -201,8 +201,8 @@ Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block �
 2026-11-08 決定、11-09 實作，規劃與理由見 `reports/Pro 圖示包規劃-2026-11-08.md`。
 
 1. **分層**：上面四套永遠免費（已用 MIT 推出，收不回來）。Pro 只收**檔期限定**的物件，一個檔期一組，跟著季節包與 Pro 場景上架。**所有 Pro 授權都包含所有圖示組**，季節包賣的是整頁與素材組裝，不是圖示。
-2. **規格不另開**：線條、像素、本色、動態規則全部沿用本文件。免費庫已有的物件（紅包、燈籠、煙火、禮物、鈴鐺）不重畫；某個物件只有一種風格在免費庫時，把另一種補進免費庫，不放 Pro（`tests/pro-icons.test.ts` 會擋同名）。
-3. **每組四個 registry 項目**：線條、線條動態、像素、像素動態，例如 `sunui-lunar-icons`、`sunui-animated-lunar-icons`、`sunui-lunar-pixel-icons`、`sunui-animated-lunar-pixel-icons`。不寫進 Pro 的 `registry.json`（那份是 block 型錄），而是寫在公開的 `lib/pro-icons.ts`，`/r/pro/[name]` 找不到 block 時改找這裡，原始碼仍從私有 repo 讀、要授權。
+2. **規格不另開，做法也跟免費庫一樣**（2026-11-23 起）：像素、雙色、線條三種風格都要有，每個圖示在三種風格都要有動態版，/icons 預設像素、彩色、動態開。線條、雙色、像素、本色、動態規則全部沿用本文件。免費庫已有的物件（紅包、燈籠、煙火、禮物、鈴鐺）不重畫；某個物件只有一種風格在免費庫時，把另一種補進免費庫，不放 Pro（`tests/pro-icons.test.ts` 會擋同名）。
+3. **每組六個 registry 項目**：線條、雙色、像素與各自的動態版，例如 `sunui-lunar-icons`、`sunui-lunar-twotone-icons`、`sunui-lunar-pixel-icons` 與 `sunui-animated-lunar-*`。不寫進 Pro 的 `registry.json`（那份是 block 型錄），而是寫在公開的 `lib/pro-icons.ts`，`/r/pro/[name]` 找不到 block 時改找這裡，原始碼仍從私有 repo 讀、要授權。
 4. **共用免費的渲染元件**：免費庫匯出 `Glyph`、`AnimatedGlyph`、`AnimatedPixelSprite` 與 `PixelPathsGroup`，Pro 檔只放幾何、動作配方與一層薄元件（`LunarIcon` 等），從 `@/components/ui/sunui-*` 匯入（repo 內由 `components/ui/sunui-*.tsx` 轉接）。像素動態的影格由靜態點陣推出（位移、翻轉、壓扁），不手畫。
 5. **公開索引**：`lib/pro-icons.ts` 只有名稱、關鍵字、動作類型與安裝資訊，沒有幾何。公開 clone 沒有 Pro 目錄也能建置。新增或改名時同步改這裡，`npm test` 會比對索引與 Pro 原始碼。
 6. **展示**：`/icons` 頁下方的 Pro 區塊由 `components/pro-icon-showcase.tsx` 畫；圖示本身由 `registry/pro/icons/showcase.tsx` 渲染，經 `generate-previews.mjs` 產生的 `loadProIconRenderers` 動態載入，沒有 Pro 目錄時改畫鎖頭。只給 JSX 與安裝指令，**不給複製或下載 SVG**。
@@ -211,6 +211,6 @@ Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block �
 
 | 檔期 | 圖示組 | 圖示 | 用在 |
 |---|---|---|---|
-| 農曆新年（2027 羊年） | lunar-new-year | fu（倒福 toggle）、firecracker、gold-ingot、mandarin、koi、dumpling、plum-blossom、couplet、goat、coin-string、tea、knot | `lunar-new-year` 各區塊標題、`festival-banner` 農曆新年的小尺寸裝飾 |
+| 農曆新年（2027 羊年） | lunar-new-year | 像素、雙色、線條，12 個全部會動：fu（倒福 toggle）、firecracker、gold-ingot、mandarin、koi、dumpling、plum-blossom、couplet、goat、coin-string、tea、knot | `lunar-new-year` 各區塊標題、`festival-banner` 農曆新年的小尺寸裝飾 |
 
 生肖每年換：2028 年只補一隻猴，其他物件沿用。

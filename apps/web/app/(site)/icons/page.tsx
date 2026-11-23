@@ -61,10 +61,12 @@ export default async function IconsPage() {
           set={set}
           messages={m.proIcons}
           installs={{
-            line: <Command value={proIconInstall(set, "line") ?? ""} />,
             pixel: <Command value={proIconInstall(set, "pixel") ?? ""} />,
-            "line-animated": <Command value={proIconInstall(set, "line", true) ?? ""} />,
+            twotone: <Command value={proIconInstall(set, "twotone") ?? ""} />,
+            line: <Command value={proIconInstall(set, "line") ?? ""} />,
             "pixel-animated": <Command value={proIconInstall(set, "pixel", true) ?? ""} />,
+            "twotone-animated": <Command value={proIconInstall(set, "twotone", true) ?? ""} />,
+            "line-animated": <Command value={proIconInstall(set, "line", true) ?? ""} />,
           }}
         />
       ))}

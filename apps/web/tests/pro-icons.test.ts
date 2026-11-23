@@ -23,7 +23,7 @@ test("pro icon index: unique names, keywords, items for every style", () => {
     const names = set.icons.map((i) => i.name);
     assert.equal(new Set(names).size, names.length, `${set.id}: duplicate names`);
     for (const icon of set.icons) assert.ok(icon.keywords.trim().length > 0, `${set.id}/${icon.name}: no keywords`);
-    for (const style of ["line", "pixel"] as const) {
+    for (const style of ["line", "twotone", "pixel"] as const) {
       for (const animated of [false, true]) {
         assert.ok(set.items.some((i) => i.style === style && i.animated === animated), `${set.id}: no ${style}${animated ? " animated" : ""} item`);
       }
@@ -34,9 +34,11 @@ test("pro icon index: unique names, keywords, items for every style", () => {
 test("pro icons do not shadow free icons", () => {
   const line = keysOf(free("sunui-icons.tsx"), "icons");
   const pixel = keysOf(free("sunui-pixel-icons.tsx"), "pixelIcons");
+  const twoTone = keysOf(free("sunui-twotone-icons.tsx"), "twoToneIcons");
   for (const set of proIconSets) {
     for (const { name } of set.icons) {
       assert.ok(!line.includes(name), `${name} is already a free line icon`);
+      assert.ok(!twoTone.includes(name), `${name} is already a free two-tone icon`);
       assert.ok(!pixel.includes(name), `${name} is already a free pixel icon`);
     }
   }
@@ -51,10 +53,17 @@ test("pro icon index matches the Pro source", { skip: !sources && "registry/pro/
   const names = set.icons.map((i) => i.name).sort();
   assert.deepEqual(keysOf(read("sunui-lunar-icons.tsx"), "lunarIcons").sort(), names, "line icons");
   assert.deepEqual(keysOf(read("sunui-lunar-pixel-icons.tsx"), "lunarPixelIcons").sort(), names, "pixel icons");
+  assert.deepEqual(keysOf(read("sunui-lunar-twotone-icons.tsx"), "lunarTwoToneIcons").sort(), names, "two-tone icons");
   const motion = set.icons.filter((i) => i.motion).map((i) => i.name).sort();
   const pixelMotion = set.icons.filter((i) => i.pixelMotion).map((i) => i.name).sort();
   assert.deepEqual(keysOf(read("sunui-animated-lunar-icons.tsx"), "lunarRecipes").sort(), motion, "animated line icons");
   assert.deepEqual(keysOf(read("sunui-animated-lunar-pixel-icons.tsx"), "lunarPixelRecipes").sort(), pixelMotion, "animated pixel icons");
+  const twotoneMotion = set.icons.filter((i) => i.twotoneMotion).map((i) => i.name).sort();
+  assert.deepEqual(keysOf(read("sunui-animated-lunar-twotone-icons.tsx"), "lunarTwoToneRecipes").sort(), twotoneMotion, "animated two-tone icons");
+  // 和免費庫一樣：每個圖示在每種風格都會動
+  assert.deepEqual(motion, names, "every line icon animated");
+  assert.deepEqual(pixelMotion, names, "every pixel icon animated");
+  assert.deepEqual(twotoneMotion, names, "every two-tone icon animated");
   for (const item of set.items) assert.ok(existsSync(`${root}${item.source}`), `${item.source} missing`);
 });
 

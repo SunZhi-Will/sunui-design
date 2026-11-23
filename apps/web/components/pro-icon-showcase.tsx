@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
 import type { Messages } from "@/lib/messages";
-import type { ProIconRenderer, ProIconSet } from "@/lib/pro-icons";
+import type { ProIconRenderer, ProIconSet, ProIconStyle } from "@/lib/pro-icons";
 import { cn } from "@/lib/utils";
 import { loadProIconRenderers } from "@/registry/__generated__/previews";
 import { Icon } from "@/registry/icons/sunui-icons";
 
-type Style = "line" | "pixel";
+type Style = ProIconStyle;
+
+// 與免費圖示庫同順序、同預設：像素在前，彩色、動態預設開
+const styles: Style[] = ["pixel", "twotone", "line"];
 
 /**
  * /icons 頁的 Pro 檔期圖示組。清單與關鍵字來自公開索引（lib/pro-icons.ts），
@@ -23,12 +26,12 @@ export function ProIconShowcase({
 }: {
   set: ProIconSet;
   messages: Messages["proIcons"];
-  /** 伺服器端渲染好的安裝指令：線條、像素與各自的動態版 */
+  /** 伺服器端渲染好的安裝指令：像素、雙色、線條與各自的動態版 */
   installs: Record<Style | `${Style}-animated`, ReactNode>;
 }) {
   const [renderers, setRenderers] = useState<Record<string, ProIconRenderer> | null>(null);
-  const [style, setStyle] = useState<Style>("line");
-  const [animated, setAnimated] = useState(false);
+  const [style, setStyle] = useState<Style>("pixel");
+  const [animated, setAnimated] = useState(true);
   const [pigment, setPigment] = useState(true);
   const [selected, setSelected] = useState(set.icons[0]?.name ?? "");
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
@@ -44,11 +47,10 @@ export function ProIconShowcase({
   const renderer = renderers?.[set.id];
   const copy = t.sets[set.id] ?? { title: set.title, note: "" };
   const isPixel = style === "pixel";
-  const kindOf = (name: string) => {
-    const entry = set.icons.find((i) => i.name === name);
-    return animated ? (isPixel ? entry?.pixelMotion : entry?.motion) : undefined;
-  };
-  const visible = set.icons.filter((i) => !animated || (isPixel ? i.pixelMotion : i.motion));
+  const motionOf = (entry: ProIconSet["icons"][number] | undefined) =>
+    style === "pixel" ? entry?.pixelMotion : style === "twotone" ? entry?.twotoneMotion : entry?.motion;
+  const kindOf = (name: string) => (animated ? motionOf(set.icons.find((i) => i.name === name)) : undefined);
+  const visible = set.icons.filter((i) => !animated || motionOf(i));
   useEffect(() => {
     if (visible.length && !visible.some((i) => i.name === selected)) setSelected(visible[0].name);
   }, [visible, selected]);
@@ -57,13 +59,13 @@ export function ProIconShowcase({
     const kind = kindOf(name);
     if (!renderer) return <Icon name="lock" size={Math.min(size, 24)} className="text-subtle" />;
     const active = kind && kind !== "hover" ? Boolean(toggled[name]) : undefined;
-    return isPixel
-      ? renderer.pixel(name, { size, tone: pigment ? "pigment" : "ink", animated: Boolean(kind), active })
-      : renderer.line(name, { size, strokeWidth: 1.5, animated: Boolean(kind), active });
+    if (isPixel) return renderer.pixel(name, { size, tone: pigment ? "pigment" : "ink", animated: Boolean(kind), active });
+    if (style === "twotone") return renderer.twotone(name, { size, animated: Boolean(kind), active, colored: pigment });
+    return renderer.line(name, { size, strokeWidth: 1.5, animated: Boolean(kind), active, colored: pigment });
   }
 
   const selectedKind = kindOf(selected);
-  const component = `${selectedKind ? "Animated" : ""}Lunar${isPixel ? "Pixel" : ""}Icon`;
+  const component = `${selectedKind ? "Animated" : ""}Lunar${isPixel ? "Pixel" : style === "twotone" ? "TwoTone" : ""}Icon`;
   const props = `${selectedKind && selectedKind !== "hover" ? " active={on}" : ""}${isPixel ? ` size={32}${pigment ? ` tone="pigment"` : ""}` : ""}`;
   const jsx = `<${component} name="${selected}"${props} />`;
   const pixelSize = 32;
@@ -87,7 +89,7 @@ export function ProIconShowcase({
 
           <div className="mt-4 flex flex-wrap gap-2">
             <div role="tablist" aria-label={t.styleLabel} className="inline-flex rounded-md border border-line bg-card p-0.5">
-              {(["line", "pixel"] as const).map((s) => (
+              {styles.map((s) => (
                 <button
                   key={s}
                   type="button"
@@ -99,18 +101,16 @@ export function ProIconShowcase({
                     style === s ? "bg-stage text-fg" : "text-subtle hover:text-fg",
                   )}
                 >
-                  {s === "line" ? t.line : t.pixel}
+                  {s === "line" ? t.line : s === "twotone" ? t.twotone : t.pixel}
                 </button>
               ))}
             </div>
             <Toggle on={animated} onClick={() => setAnimated((v) => !v)}>
               {t.animated}
             </Toggle>
-            {isPixel && (
-              <Toggle on={pigment} onClick={() => setPigment((v) => !v)}>
-                {t.pigment}
-              </Toggle>
-            )}
+            <Toggle on={pigment} onClick={() => setPigment((v) => !v)}>
+              {t.pigment}
+            </Toggle>
           </div>
 
           {!renderer && <p className="mt-4 text-xs text-subtle">{t.locked}</p>}
