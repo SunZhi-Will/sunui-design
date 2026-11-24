@@ -9,6 +9,7 @@
 //
 // --only 只截這些 block；--missing 只截還沒有圖的；--jobs 同時開幾個瀏覽器。
 // --theme light|dark 指定預覽主題（寫進 localStorage 的 sunui-theme）；省略時照網站預設。
+// --spot ink 拍黑白版（專色換成墨色），其他值見 lib/spot.ts。
 // 型錄縮圖要整批同一個主題，只重截一部分時記得指定，免得和舊圖混色。
 // --out <資料夾> 存到別處（相對 apps/web），例如試另一種主題時不要蓋掉正式的分享圖。
 // Pro block 也截（registry/pro 存在時）：分享圖只有畫面，沒有原始碼。
@@ -40,6 +41,8 @@ const jobs = Math.max(1, Number(opt("--jobs", 4)) || 4);
 const theme = opt("--theme", "");
 if (theme && theme !== "light" && theme !== "dark") fail("--theme 只能是 light 或 dark");
 const out = path.resolve(root, opt("--out", path.join("public", "og", "blocks")));
+// --spot ink|wine|… 換示範專色（同 /preview 的 ?spot=，見 lib/spot.ts）。ink 就是黑白版：專色退回主題的墨色
+const spot = opt("--spot", "");
 
 const VIEWPORT = { width: 1280, height: 900 };
 const ASPECT = 640 / 550; // OG 右側畫框
@@ -246,7 +249,7 @@ function clipFor(box) {
 
 async function capture(browser, name) {
   const loaded = browser.waitEvent("Page.loadEventFired", TIMEOUT);
-  await browser.page("Page.navigate", { url: `${base}/preview/${name}` });
+  await browser.page("Page.navigate", { url: `${base}/preview/${name}${spot ? `?spot=${encodeURIComponent(spot)}` : ""}` });
   await loaded;
   // demo 是 ssr: false 的動態載入，dev server 第一次還要編譯，等它真的掛上
   const deadline = Date.now() + TIMEOUT;
