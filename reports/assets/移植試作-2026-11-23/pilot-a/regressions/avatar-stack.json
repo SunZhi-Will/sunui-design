@@ -1,0 +1,62 @@
+{
+ "block": "avatar-stack",
+ "note": "Defects earlier judges and challengers found in ports of this block. The acceptance script must have a compared check that fails on a port with each one; list those keys in checks.",
+ "defects": [
+  {
+   "id": "p2-svelte-1",
+   "round": "p2",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "hover-lift-and-tooltip: on pointer leave the disc first jumps about 1.2px FURTHER up before returning, and takes about 60% longer to settle. Leo, per-frame y after leave: svelte 5ms -3.02, 20ms -3.93, 36ms -4.24, 53ms -3.92, 70ms -3.33 ... overshoot +0.13, settled 286 ms. Original: 12ms -3, 29ms -3, 45ms -2.83, 62ms -2.45 ... overshoot +0.09, settled 178 ms (vue 155 ms). The original never goes above -3. Reproduced on every run (two full runs, 5 discs each: min y -4.21 to -4.24, settle 285 to 292 ms).",
+   "checks": []
+  },
+  {
+   "id": "p2-svelte-2",
+   "round": "p2",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "focus-lift-and-tooltip: the same wrong-direction kick on keyboard focus and blur. Focusing Leo after it had been animated once: svelte y goes DOWN first, 17ms +0.89, 32ms +1.24, 51ms +0.95, 66ms +0.37, then up to -3.13 peak; original 15ms -0.1, 32ms -0.44, 48ms -0.93, monotonic to -3.09. On blur svelte 5ms -3.26, 22ms -4.15, 38ms -4.16 before returning; original stays at or below -3 in magnitude. Final rest positions (-3 and 0) are correct.",
+   "checks": []
+  },
+  {
+   "id": "p2-svelte-3",
+   "round": "p2",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "overflow-lift-and-tooltip: same return-leg defect on the overflow discs (+1.3K leave: 3ms -3.02, 19ms -3.99, 36ms -4.21, settled 285 ms vs original 168 ms; +410 and +94 min y -4.21/-4.22, settle 289 ms). Likely cause: the lift action calls controls.stop() then motion animate(node,{y}) again, which starts the new spring with a wrong initial velocity; only the first animation of each disc is clean (first hover-in matches the original: peak -3.09, settled about 155 ms).",
+   "checks": []
+  },
+  {
+   "id": "p3-svelte-4",
+   "round": "p3",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "hover-lift-and-tooltip: the lift spring first moves the WRONG way on every lift except the very first one after page load. Per-frame disc top, relative to start, hover-in cycle 2 and 3 on Leo C. (target -3px): port 0 -> +1.00 (17ms) -> +1.21 (33ms) -> +0.87 -> +0.25 -> -0.46 (83ms) ... -3.13 -> -3; original 0 -> -0.17 -> -0.55 -> -1.05 -> -1.52 ... -3.09 -> -3, never positive. Pointer-leave return (target +3px), all 3 cycles: port 0 -> -0.98 (33ms) -> -1.22 (50ms) -> -0.88 -> -0.27 -> +0.43 (100ms) ... +3.13 -> +3; original 0 -> +0.17 -> +0.55 -> +1.05 ..., min 0. So the disc jumps about 1.2px (40 percent of the travel) in the opposite direction for about 70ms first. Time to half travel is 100ms in the port vs 50ms in the original (2x, beyond the 25 percent tolerance); overshoot 0.13px vs 0.09px. Likely cause in AvatarStack.svelte liftY(): ctl?.stop() followed by a new motion animate(node,{y},spring) inherits a stale velocity from the previous animation.",
+   "checks": []
+  },
+  {
+   "id": "p3-svelte-5",
+   "round": "p3",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "focus-lift-and-tooltip: same wrong-way spring on keyboard focus. Tab onto Leo C.: port max +0.69px before going up (original max 0); Tab away: port min -1.24px before dropping back (original min 0). End states (lifted 3px, tooltip texts, Ava L. lifted after Tab) match.",
+   "checks": []
+  },
+  {
+   "id": "p3-svelte-6",
+   "round": "p3",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "overflow-lift-and-tooltip: same wrong-way spring on the overflow discs. +1.3K hover-in: port max +0.66px (original 0); +410 hover-in: port max +0.70px; return on all three overflow discs: port min -1.22px (original min 0). Tooltip texts (Sara K. / Noah W. / 94 more) and end positions match.",
+   "checks": []
+  },
+  {
+   "id": "p3-svelte-7",
+   "round": "p3",
+   "platform": "svelte",
+   "source": "judge",
+   "defect": "Missing state (hover and focus are one shared key per stack instead of per-disc state): with Noah W. keyboard-focused and the pointer hovering Leo C., the original shows two tooltips and both discs lifted (Leo y 389.25, Noah y 389.25); the port shows only Leo's tooltip and Noah drops to y 392.25 while still focused with its focus ring. After the pointer leaves Leo, the original keeps Noah's tooltip and 3px lift (still focused); the port shows no tooltip at all and Noah stays at y 0, so a focused disc has lost its tooltip and lift. Same result in the reduced-motion run (original tips [Leo, Noah] then [Noah]; port [Leo] then []). Screenshots avatar-stack-orig-10-focus-noah-after-leave.png vs avatar-stack-svelte-10-focus-noah-after-leave.png.",
+   "checks": []
+  }
+ ]
+}

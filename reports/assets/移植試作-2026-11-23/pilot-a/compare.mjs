@@ -5,7 +5,8 @@ import fs from "node:fs";
 
 const [, , mode, ...args] = process.argv;
 const read = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const norm = (v) => typeof v === "string" ? v.replace(/\s+/g, " ").trim() : Array.isArray(v) ? v.map(norm) : v;
+const same = (a, b) => JSON.stringify(norm(a)) === JSON.stringify(norm(b));
 const numeric = new Set(["px", "ratio", "ms"]);
 
 function tolerance(kind, lo, hi) {

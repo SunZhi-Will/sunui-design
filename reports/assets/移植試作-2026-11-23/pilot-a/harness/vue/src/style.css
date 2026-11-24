@@ -1,0 +1,3 @@
+@import "tailwindcss";
+@import "./sunui-theme.css";
+body { background: var(--background); color: var(--foreground); }

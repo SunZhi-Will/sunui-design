@@ -1,4 +1,4 @@
-# Acceptance script contract (pilot A)
+# Acceptance script contract (pilot A, v2)
 
 One script per block: `scripts/<block>.mjs`. The same script runs on the React original and on every port. Its output is compared by `compare.mjs`, which is plain code with no model in the loop, so the output must be measurements, not opinions.
 
@@ -9,10 +9,11 @@ node scripts/<block>.mjs --url <url> --root "<css selector>" --out <file.json> -
 ```
 
 - Original: `--url "http://localhost:3100/preview/<block>?l=en" --root "[data-preview-stage]"`
-- Ports: `--url "http://localhost:<port>/?only=<block>" --root "[data-demo]"`
+- Ports: `--url "http://localhost:<port>/?r=<round>&only=<block>" --root "[data-demo]"`
+- Locale: append `l=<locale>` to the URL (`&l=ja`) on every target. The original and the port test projects both follow it.
 
 Run with node from any folder. Import playwright-core by absolute path:
-`import { chromium } from "playwright-core";`
+`import { chromium } from "/private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/cap/node_modules/playwright-core/index.mjs";`
 Launch Chrome:
 `import { findChrome } from "/Applications/Projects/nextjs/sunui-design/apps/web/scripts/find-chrome.mjs"; const f = findChrome(); const exe = typeof f === "string" ? f : f.path ?? Object.values(f)[0]; chromium.launch({ executablePath: exe, headless: true })`
 
@@ -67,6 +68,22 @@ A curve is never stored raw as a compared value. Sample every animation frame (`
 
 Store the raw frames as `info` if they help a reader.
 
+### Fixed-time samples (v2)
+
+Do not compare a value sampled at a fixed time after the trigger (opacity at 33 percent of the duration, a fraction at 70 ms). Implementations start an animation up to one frame apart, so these samples differ by 0.05 to 0.1 even when the curve is right. Compare the time it takes to cross a threshold instead: `<name>.t50Ms` and `<name>.t90Ms` (kind `ms`, the time until the value has covered 50 and 90 percent of its change). They catch a wrong easing (ease-in-out against ease-out moves t50 by far more than one frame) and tolerate the phase.
+
+### Text (v2)
+
+Read visible text with `innerText`, and names with the accessible name (aria-label, else the visible text). Never build a name from raw `textContent`: it joins visible and screen-reader-only text and picks up template whitespace. compare.mjs collapses runs of whitespace and trims every `exact` string before comparing.
+
+### Locale (v2)
+
+Locale checks compare only strings the component itself produces (its own message table: labels, aria-labels, announcements, number formatting it does). Demo copy (product names, titles, people in the demo data) stays English in the port demos: record it as `info`.
+
+### Static offsets (v2)
+
+Never compare an absolute offset of text inside its box (a label 0.5px above centre is a font difference). For "does not animate on first render", compare the change across frames (`<name>.mountTravel`, px), not the position.
+
 ### What not to compare
 
 - Colours, font families, shadows: the ports use a neutral theme. Do not record them as compared kinds.
@@ -77,6 +94,10 @@ Store the raw frames as `info` if they help a reader.
 ### Tab order
 
 `tabOrder`: press Tab from before the root through the whole demo, record each focused element inside the root as `<tag or role>:<accessible name or text, trimmed to 30 chars>`, and stop when focus leaves the root. Ignore Next.js dev overlay nodes. compare.mjs requires the sequence to be equal to the original's.
+
+## Known defects (v2)
+
+`regressions/<block>.json` lists every defect earlier judges found in ports of this block. For each entry the script must have a compared check that would fail on a port with that defect, and the entry's `checks` field (filled by the script writer) names those keys. A defect the script cannot see is a coverage gap even if the checklist looks covered.
 
 ## Coverage
 

@@ -1,0 +1,219 @@
+<script lang="ts">
+import type { VNodeChild } from "vue";
+
+export type PageRangeItem = number | "start-ellipsis" | "end-ellipsis";
+
+/**
+ * Builds the page number sequence: always includes the first page, the last page, the current page and its siblings, with ellipses for the rest.
+ * The output length is fixed (siblings * 2 + 5 when there are enough pages), so the layout does not jump when changing pages.
+ * @example getPageRange(6, 12) // [1, "start-ellipsis", 5, 6, 7, "end-ellipsis", 12]
+ */
+export function getPageRange(current: number, total: number, siblings = 1): PageRangeItem[] {
+  const range = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  if (total <= 0) return [];
+  const slots = siblings * 2 + 5;
+  if (total <= slots) return range(1, total);
+  const page = Math.min(Math.max(current, 1), total);
+  const left = Math.max(page - siblings, 1);
+  const right = Math.min(page + siblings, total);
+  const showLeft = left > 3;
+  const showRight = right < total - 2;
+  const edgeCount = slots - 2;
+  if (!showLeft) return [...range(1, edgeCount), "end-ellipsis", total];
+  if (!showRight) return [1, "start-ellipsis", ...range(total - edgeCount + 1, total)];
+  return [1, "start-ellipsis", ...range(left, right), "end-ellipsis", total];
+}
+
+export interface PaginationLabels {
+  nav?: string;
+  previous?: VNodeChild;
+  next?: VNodeChild;
+  /** Accessible name of a page number */
+  page?: (n: number) => string;
+  /** Text in compact mode, for example "3 / 12" */
+  compact?: (page: number, total: number) => VNodeChild;
+}
+
+export interface PaginationProps {
+  total: number;
+  /** Controlled: the current page (starting at 1) */
+  page?: number;
+  defaultPage?: number;
+  /** When provided, each page renders as <a href> so search engines can crawl every page */
+  getHref?: (page: number) => string;
+  /** How many pages to show on each side of the current page */
+  siblings?: number;
+  /** Shows only "Previous 3 / 12 Next", suited to narrow columns */
+  compact?: boolean;
+  /** UI language: en, zh-TW, zh-CN, ja. Tags such as zh-Hant-HK and ja-JP are also accepted */
+  locale?: string;
+  /** Overrides the built-in strings, takes priority over locale */
+  labels?: PaginationLabels;
+  class?: string;
+}
+
+type SunLocale = "en" | "zh-TW" | "zh-CN" | "ja";
+
+/** Maps any language tag to one of the four built-in languages, falling back to English for everything else */
+function resolveLocale(tag?: string): SunLocale {
+  const t = (tag ?? "en").toLowerCase();
+  if (t.startsWith("zh")) return /hant|tw|hk|mo/.test(t) ? "zh-TW" : "zh-CN";
+  if (t.startsWith("ja")) return "ja";
+  return "en";
+}
+
+const compactText = (page: number, total: number) => `${page} / ${total}`;
+
+const MESSAGES: Record<SunLocale, Required<PaginationLabels>> = {
+  en: { nav: "Pagination", previous: "Previous", next: "Next", page: (n) => `Page ${n}`, compact: compactText },
+  "zh-TW": { nav: "分頁", previous: "上一頁", next: "下一頁", page: (n) => `第 ${n} 頁`, compact: compactText },
+  "zh-CN": { nav: "分页", previous: "上一页", next: "下一页", page: (n) => `第 ${n} 页`, compact: compactText },
+  ja: { nav: "ページ送り", previous: "前へ", next: "次へ", page: (n) => `${n} ページ目`, compact: compactText },
+};
+</script>
+
+<script setup lang="ts">
+import { computed, defineComponent, h, ref, useId } from "vue";
+import { motion, useReducedMotion } from "motion-v";
+
+import { cn } from "@/lib/utils";
+
+const props = withDefaults(defineProps<PaginationProps>(), {
+  page: undefined,
+  defaultPage: 1,
+  getHref: undefined,
+  siblings: 1,
+  compact: false,
+  locale: "en",
+  labels: undefined,
+  class: undefined,
+});
+
+const emit = defineEmits<{ "update:page": [page: number] }>();
+
+const RenderChild = defineComponent({
+  props: { content: { type: null as unknown as () => VNodeChild, default: undefined } },
+  setup(p) {
+    return () => p.content as never;
+  },
+});
+
+const Chevron = defineComponent({
+  props: { dir: { type: String as () => "left" | "right", required: true } },
+  setup(p) {
+    return () =>
+      h(
+        "svg",
+        {
+          viewBox: "0 0 24 24",
+          class: "size-4",
+          fill: "none",
+          stroke: "currentColor",
+          "stroke-width": "1.5",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round",
+          "aria-hidden": "true",
+        },
+        [h("path", { d: p.dir === "left" ? "M14.5 6l-6 6 6 6" : "M9.5 6l6 6-6 6" })],
+      );
+  },
+});
+
+const springs = {
+  snappy: { type: "spring", stiffness: 520, damping: 34 },
+} as const;
+
+const cell =
+  "relative inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2 text-sm tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
+const t = computed(() => ({ ...MESSAGES[resolveLocale(props.locale)], ...props.labels }));
+const reduce = useReducedMotion();
+const layoutId = `${useId()}-indicator`;
+const indicatorTransition = computed(() => (reduce.value ? { duration: 0 } : springs.snappy));
+const inner = ref(props.defaultPage);
+const page = computed(() => Math.min(Math.max(props.page ?? inner.value, 1), Math.max(props.total, 1)));
+
+const go = (n: number) => {
+  if (n < 1 || n > props.total || n === page.value) return;
+  if (props.page === undefined) inner.value = n;
+  emit("update:page", n);
+};
+
+const tagFor = (disabled?: boolean) => (props.getHref ? (disabled ? "span" : "a") : "button");
+
+function cellProps(o: { to: number; disabled?: boolean; current?: boolean; label?: string; extra?: string }) {
+  const cls = cn(
+    cell,
+    o.extra,
+    o.current ? "font-semibold text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+    o.disabled && "pointer-events-none opacity-40",
+  );
+  const common: Record<string, unknown> = {
+    "aria-label": o.label,
+    "aria-current": o.current ? "page" : undefined,
+    class: cls,
+  };
+  if (props.getHref) {
+    if (o.disabled) return { ...common, "aria-disabled": "true" };
+    return { ...common, href: props.getHref(o.to), onClick: () => go(o.to) };
+  }
+  return { ...common, type: "button", disabled: o.disabled || undefined, onClick: () => go(o.to) };
+}
+
+const range = computed(() => getPageRange(page.value, props.total, props.siblings));
+const rootClass = computed(() => cn("w-full", props.class));
+</script>
+
+<template>
+  <nav v-if="total > 0" :aria-label="t.nav" :class="rootClass">
+    <ul class="flex items-center justify-center gap-1">
+      <li>
+        <component
+          :is="tagFor(page <= 1)"
+          v-bind="cellProps({ to: page - 1, disabled: page <= 1, extra: 'gap-1 px-2.5' })"
+        >
+          <Chevron dir="left" />
+          <span class="max-sm:sr-only"><RenderChild :content="t.previous" /></span>
+        </component>
+      </li>
+      <li v-if="compact" class="px-3 text-sm font-medium tabular-nums" aria-live="polite">
+        <RenderChild :content="t.compact(page, total)" />
+      </li>
+      <template v-else>
+        <template v-for="n in range" :key="n">
+          <li v-if="typeof n === 'number'">
+            <component
+              :is="tagFor(false)"
+              v-bind="cellProps({ to: n, current: n === page, label: t.page(n) })"
+            >
+              {{ n }}
+              <motion.span
+                v-if="n === page"
+                :layout-id="layoutId"
+                aria-hidden="true"
+                class="absolute inset-x-2 bottom-1 h-0.5 rounded-full bg-foreground"
+                :transition="indicatorTransition"
+              />
+            </component>
+          </li>
+          <li
+            v-else
+            aria-hidden="true"
+            class="inline-flex h-9 min-w-7 items-center justify-center text-sm text-muted-foreground"
+          >
+            …
+          </li>
+        </template>
+      </template>
+      <li>
+        <component
+          :is="tagFor(page >= total)"
+          v-bind="cellProps({ to: page + 1, disabled: page >= total, extra: 'gap-1 px-2.5' })"
+        >
+          <span class="max-sm:sr-only"><RenderChild :content="t.next" /></span>
+          <Chevron dir="right" />
+        </component>
+      </li>
+    </ul>
+  </nav>
+</template>

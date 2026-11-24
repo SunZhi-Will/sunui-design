@@ -1,0 +1,1 @@
+{ "compilerOptions": { "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler", "strict": true, "verbatimModuleSyntax": true, "lib": ["ES2022", "DOM", "DOM.Iterable"], "skipLibCheck": true, "noEmit": true, "types": ["svelte"], "paths": { "@/*": ["./src/*"] } }, "include": ["src/**/*.ts", "src/**/*.svelte", "rounds/**/*.ts", "rounds/**/*.svelte"] }
