@@ -189,6 +189,21 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [range, setRange] = useState({ c0: 0, c1: -1, r0: 0, r1: -1 });
 
+  // 卡片打開時，被選的那一格浮在模糊上面，位置跟著相機
+  const spotRef = useRef<HTMLDivElement>(null);
+  const placeSpot = useCallback(() => {
+    const el = spotRef.current;
+    const s = selRef.current;
+    const vp = viewportRef.current;
+    if (!el || !s || !vp) return;
+    const rect = vp.getBoundingClientRect();
+    const k = cellRef.current;
+    el.style.left = `${rect.left + s.c * k - cam.current.x}px`;
+    el.style.top = `${rect.top + s.r * k - cam.current.y}px`;
+    el.style.width = `${k}px`;
+    el.style.height = `${k}px`;
+  }, []);
+
   const apply = useCallback(() => {
     const { x, y } = cam.current;
     const c = cellRef.current;
@@ -204,7 +219,8 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
     setRange((prev) =>
       prev.c0 === next.c0 && prev.c1 === next.c1 && prev.r0 === next.r0 && prev.r1 === next.r1 ? prev : next,
     );
-  }, []);
+    placeSpot();
+  }, [placeSpot]);
 
   const stop = useCallback(() => cancelAnimationFrame(raf.current), []);
 
@@ -236,7 +252,8 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
     (c: number, r: number, instant = false) => {
       const { w, h } = sizeRef.current;
       const k = cellRef.current;
-      const fx = w < 640 ? 0.5 : 0.38;
+      // 卡片開著時放在卡片左邊的空白中間，才不會被卡片蓋住
+      const fx = w < 640 ? 0.5 : selRef.current ? Math.max(0.08, (w - Math.min(680, w - 32)) / 4 / w) : 0.38;
       const fy = w < 640 ? 0.26 : 0.5;
       animateTo(c * k + k / 2 - w * fx, r * k + k / 2 - h * fy, instant);
     },
@@ -286,7 +303,8 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
         const sx = near.c * k - cam.current.x;
         const sy = near.r * k - cam.current.y;
         setSel(near);
-        if (sx < PAD || sy < TOOLBAR_SPACE || sx + k > w - PAD || sy + k > h - PAD) focusCell(near.c, near.r, instant);
+        // 卡片開著時中間被卡片蓋住，一律移到卡片旁邊
+        if (s || sx < PAD || sy < TOOLBAR_SPACE || sx + k > w - PAD || sy + k > h - PAD) focusCell(near.c, near.r, instant);
         return;
       }
       const far = canonical(name);
@@ -300,6 +318,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   useLayoutEffect(() => {
     selRef.current = sel;
     listRef.current = { list: visible, layout };
+    placeSpot();
   });
 
   // 縮放時讓畫面中心不動
@@ -374,7 +393,11 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
       if (first) {
         const far = canonical(wanted);
         if (far) {
+          // 從分享連結進來：先把畫布捲到畫面上（扣掉頂部選單），浮起來的那一格才會在對的位置
+          const vp = viewportRef.current;
+          if (vp) window.scrollTo({ top: vp.getBoundingClientRect().top + window.scrollY - 56, behavior: "instant" });
           setSel(far);
+          selRef.current = far;
           focusCell(far.c, far.r, true);
         }
       } else goTo(wanted);
@@ -537,6 +560,19 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
       html.style.scrollbarGutter = prev.gutter;
     };
   }, [open]);
+
+  // 換到相關圖示時，原本按的按鈕會被換掉，焦點掉到 body；拉回卡片，Esc 才會有效
+  useEffect(() => {
+    if (open && (!document.activeElement || document.activeElement === document.body)) cardRef.current?.focus({ preventScroll: true });
+  }, [open, sel?.name]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !viewportRef.current?.contains(e.target as Node)) close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, close]);
 
   // 焦點留在卡片裡
   function trapFocus(e: ReactKeyboardEvent<HTMLDivElement>) {
@@ -858,6 +894,28 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
           )}
           {sel && (
             <motion.div
+              key="spot"
+              ref={spotRef}
+              aria-hidden
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: DURATION.panelIn, ease: EASE_SITE } }}
+              exit={{ opacity: 0, transition: { duration: DURATION.panelOut, ease: EASE_SITE } }}
+              className="pointer-events-none fixed z-50 p-1"
+            >
+              <div className="grid size-full place-items-center rounded-xl bg-card text-fg/85 shadow-e2 ring-2 ring-fg">
+                <CellIcon
+                  name={sel.name}
+                  variant={style}
+                  animated={motionSet.has(sel.name)}
+                  color={pigment}
+                  on={Boolean(playing[sel.name])}
+                  size={Z[style]}
+                />
+              </div>
+            </motion.div>
+          )}
+          {sel && (
+            <motion.div
               key="card"
               ref={cardRef}
               data-canvas-ui
@@ -1082,8 +1140,6 @@ const CanvasCell = memo(function CanvasCell({
   selected: boolean;
   onSelect: (name: string, c: number, r: number, viaKeyboard: boolean, el: HTMLElement) => void;
 }) {
-  const tone = color ? "pigment" : "ink";
-  const tint = color && variant !== "pixel" ? (lineIconTone(name) as CSSProperties) : undefined;
   return (
     <div data-cell className="absolute p-1" style={{ left: c * cell, top: r * cell, width: cell, height: cell }}>
       <button
@@ -1097,27 +1153,52 @@ const CanvasCell = memo(function CanvasCell({
           selected ? "bg-card shadow-e2 ring-2 ring-fg" : "hover:bg-card hover:shadow-e1",
         )}
       >
-        {variant === "pixel" ? (
-          animated ? (
-            <AnimatedPixelIcon name={name as AnimatedPixelIconName} size={iconSize} active={on} tone={tone} />
-          ) : (
-            <PixelIcon name={name as PixelIconName} size={iconSize} tone={tone} />
-          )
-        ) : variant === "twotone" ? (
-          animated ? (
-            <AnimatedTwoToneIcon name={name as AnimatedTwoToneIconName} size={iconSize} active={on} style={tint} />
-          ) : (
-            <TwoToneIcon name={name as TwoToneIconName} size={iconSize} style={tint} />
-          )
-        ) : animated ? (
-          <AnimatedIcon name={name as AnimatedIconName} size={iconSize} active={on} style={tint} />
-        ) : (
-          <Icon name={name as IconName} size={iconSize} style={tint} />
-        )}
+        <CellIcon name={name} variant={variant} animated={animated} color={color} on={on} size={iconSize} />
       </button>
     </div>
   );
 });
+
+/** 格子裡的圖示本體；畫布格子和卡片打開時浮在模糊上面的那一格共用 */
+function CellIcon({
+  name,
+  variant,
+  animated,
+  color,
+  on,
+  size: iconSize,
+}: {
+  name: string;
+  variant: Style;
+  animated: boolean;
+  color: boolean;
+  on: boolean;
+  size: number;
+}) {
+  const tone = color ? "pigment" : "ink";
+  const tint = color && variant !== "pixel" ? (lineIconTone(name) as CSSProperties) : undefined;
+  return (
+    <>
+      {variant === "pixel" ? (
+        animated ? (
+          <AnimatedPixelIcon name={name as AnimatedPixelIconName} size={iconSize} active={on} tone={tone} />
+        ) : (
+          <PixelIcon name={name as PixelIconName} size={iconSize} tone={tone} />
+        )
+      ) : variant === "twotone" ? (
+        animated ? (
+          <AnimatedTwoToneIcon name={name as AnimatedTwoToneIconName} size={iconSize} active={on} style={tint} />
+        ) : (
+          <TwoToneIcon name={name as TwoToneIconName} size={iconSize} style={tint} />
+        )
+      ) : animated ? (
+        <AnimatedIcon name={name as AnimatedIconName} size={iconSize} active={on} style={tint} />
+      ) : (
+        <Icon name={name as IconName} size={iconSize} style={tint} />
+      )}
+    </>
+  );
+}
 
 function ToolButton({
   label,
