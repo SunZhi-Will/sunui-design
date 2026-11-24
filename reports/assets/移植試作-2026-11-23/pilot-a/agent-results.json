@@ -1,0 +1,806 @@
+[
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "Both runs end with 240 checks, 0 errors[] entries and 0 console errors. Output files are in pa/runs/pagination-original.json and pa/runs/pagination-p2-vue.json. Every checklist item has at least one compared check, tab order included, and every key exists in both files.",
+   "Elements are found by role, accessible name, aria attributes and visible text. The disabled Previous/Next is found through aria-disabled plus its text. The underline is the thin aria-hidden non-svg box inside the aria-current control. Tag names appear only in a few measurements: nav/li structure, and the live-region tag recorded as live.tag. Card borders are found by computed border width, not by class.",
+   "Autoplay: a real pointer press on the 'Home and living' title, then a wait until the row and underline positions stop changing. Reduced motion runs in its own context created with reducedMotion: 'reduce'.",
+   "Curves are sampled with requestAnimationFrame and reduced to animates, firstDir, start, peak, end, settleMs, movingFrames and passesBetween. Raw frames are not stored.",
+   "After the first run I fixed three selector problems of my own. One was goTo parsing the aria-label instead of the digit text. The other two were a weight threshold of 600 where the original renders 590, and a link-count selector based on link text. All three checks now agree between the targets.",
+   "The port differs from the original on measured values, which I did not judge. They are: spring.b.backward7to6 (the port snaps), the firstDir/start/peak of the 7 to 12 jumps, the settle times on 6 to 7, and all locale.* checks. For the locale checks the script appends l=<locale> to the URL, which the original reads and the port ignores, so they are English in the port.",
+   "Info-only values are text-width dependent: cell widths, prev width, row and card widths."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "Both runs finished with errors[] empty, consoleErrors empty, and the same 293 checks and the same keys. Output files: .../pa/runs/avatar-stack-original.json and .../pa/runs/avatar-stack-p2-vue.json. The script takes about 75 s per target.",
+   "All 17 scope all/web checklist items (first-render-main-stack, first-render-related-rows, overlap-and-stacking, no-entrance-on-first-render, group-accessible-name, avatar-accessible-names, overflow-accessible-name, tab-order, focus-ring, hover-lift-and-tooltip, focus-lift-and-tooltip, overflow-lift-and-tooltip, tooltip-hidden-from-at, reduced-motion, locale-zh-tw, locale-zh-cn-ja, photo-less-fallback) have at least 3 compared (non-info) checks. Checks per item range from 3 to 60.",
+   "Elements are found only by role and accessible name (named lists, imgs, buttons, headings), ariaSnapshot, aria-hidden and aria-label attributes, tabindex, and exact tooltip text. The tooltip is located by its visible text (person names, notes, '94 more' in all four locales), grouped under the nearest aria-hidden ancestor. No class names, no nth-child, no tag nesting.",
+   "Curves are sampled each requestAnimationFrame in the page and reduced to animates, firstDir, start, end, min, max and settleMs. Tooltip appear and gone times are in ms. The trigger time is the first real pointermove or keydown after arming. The autoplay is stopped by a real press on the first heading, then the script waits for 3 calm windows with every disc still and no tooltip.",
+   "Other measurements: tooltip geometry (gap 8, centre offset, 12px, 3px radius, line 1 heavier, line 2 opacity 0.7, pointer-events, aria-hidden, no live regions), neighbour lift, the element under each disc's left edge (stacking), focus ring extent from box-shadow or outline, the tab-order sequence with the tooltip shown at each stop, a Shift+Tab mirror check, fallback tint and gradient patterns, stability after reload, and the entrance recorder.",
+   "The locale items use the demo's l= URL parameter. The Vue port (localhost:3151) ignores l= and stays in English, so its zh-TW, zh-CN and ja checks differ from the original (about 54 of 62 differing compared keys). I did not judge this, only that both targets are measured the same way.",
+   "Other differences in the port run, shown for information: settleMs is about 20 ms shorter on hover, focus and overflow lifts; tipAppear and tipGone are about 0 ms against about 17 ms; hoverFlow.leo.out starts with a small upward move (firstDir up, min -4.23)."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "layout-narrow: the 'Previous word hidden below 640px' check is broken. prevWordVisible measures the text node's Range rect, and that rect keeps the full text size inside an sr-only (1px, clipped) span. So the original reports prevWordVisible=true at 600 and at 340, even though the word is hidden there (prevWidth info is 36). A port that never hides the words also gives true, and it passes rowWiderThanCard too (600: false either way, 340: true either way). Fix: at w600 and w340, record the Previous and Next control widths as px. They are icon-only there (about 36px), so they no longer depend on text width. Also replace prevWordVisible with a check on the word's parent element: its bounding box must be at most 1px, or its computed clip / clip-path must be set, while namesKept still holds. Keep the wide-viewport width as info.",
+   "underline-spring: no scalar would tell the real spring (stiffness 520, damping 34, damping ratio about 0.75, so it overshoots) apart from an ease-out tween. 'peak' is the largest absolute offset, and on these curves it always equals 'start' (-20 / 40 / -136), so it adds nothing. Add `<name>.overshoot` (px): the largest offset on the side opposite to start, after the first crossing of rest. For c (7 to 12) it should be about 4px (136 x 0.03), which a tween port's 0 would fail. Record it for a and b too. Store the raw u[0] frames as info so the baseline can be checked.",
+   "underline-spring: `<name>.movingFrames` is compared as kind count, which requires exact equality, on spring curves (16 / 18 / 20 frames). That number depends on frame pacing in headless Chrome, so a correct port, or even a second baseline run, will flake. Make it info for spring.a/b/c, and leave settleMs (ms) to carry the timing. Keep movingFrames as count only in reduced-motion, where '1 offset frame' is the actual spec.",
+   "reduced-motion / underline-spring / first-render-main / current-page-noop (structure coupling): __ul only finds the underline as an aria-hidden thin element inside the [aria-current=page] control. A port that draws one shared bar positioned in the list (a common Vue or Svelte way to build a shared-layout indicator) gets count 0, and every curve item fails with 'no underline curve'. Search the whole nav for an aria-hidden, non-svg element with height of 6px or less and width over 4px. Measure its offset against the current cell's rect, so the measurement does not depend on where the bar sits in the DOM.",
+   "contract ban (tag nesting / position): the helpers find items with nav.querySelectorAll('li'), li.querySelector('a, button, [aria-disabled]'), and in layout-narrow Previous is window.__ctrl(lis[0]) (first li, a positional pick). The card is found by walking parent elements until one has a border. Use role-based queries instead: [role=listitem] together with li for list items, and Previous found by its accessible name through ctl(). For the card, use the root's or the nav's container found by the card title text, or drop the card measurement in favour of comparing the row against the viewport and the root.",
+   "first-render-secondary: reviews.text compares the raw textContent 'Previous3 / 38Next' exactly. Vue and Svelte templates often put whitespace between elements, giving 'Previous 3 / 38 Next', so a correct port fails. reviews.row already covers the content. Either drop reviews.text or strip all whitespace before comparing.",
+   "locale: the locale scenarios skip the contract's settle step (a real pointer press, then waiting until the demo is at rest). They also attach no pageerror or console handlers. If the original's demo autoplays, currentName ('第 6 頁') and the header are read mid-replay. Call settle() after load. Its fallback already presses the root corner when the English title is missing, but it is better to press the localized title. Also attach the same console listeners as scenario().",
+   "tab-order-buttons: the focus ring (2px ring, 2px offset) is measured only on the second tab stop (a button in card 1). The checklist says each focused control shows the ring, and the Order history controls are links, which a port can style differently. Also measure the ring on the first link stop (1|link:Page 1) and on a Previous or Next button, with keys like tabs.focusRing.link.width and tabs.focusRing.link.offset.",
+   "link-mode: after Page 3, the script only checks that Previous has href #orders-page-2. It does not check that Previous is now an enabled link with no aria-disabled. Add exact checks: link.p3.prevIsLink (getByRole link 'Previous' count > 0) and link.p3.prevAriaDisabled (null)."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "hover-lift-and-tooltip (also focus-lift-and-tooltip, overflow-lift-and-tooltip): the lift is only pinned by px checks, and px allows 1.5px either way. in.end = -3 accepts any lift from 1.5px to 4.5px, so a 2px or 4px lift passes. in.min = -3.088 cannot see the spring's 0.088px overshoot, so a plain 130ms CSS ease-out (no spring) passes every check. Fix: add `<prefix>.in.endRounded` (exact, Math.round(end), expected \"-3\") and `<prefix>.in.overshoots` (exact boolean: min < end - 0.04, true for the 520/34 spring). Add the same overshoot boolean for .out (max > 0.04). Optionally add `<prefix>.in.travelAt50ms` (ratio, fraction of the 3px travelled 50ms after the trigger) to pin the curve shape.",
+   "hover-lift-and-tooltip / overflow-lift-and-tooltip: the tooltip is only measured as present in the DOM or not (window.__tipCount). Its visual state is never sampled. A port that mounts the tooltip at once but fades or scales it in over 200ms, or fades it out while it stays mounted, passes tipAppearMs and tipGoneMs. Fix: in __sample, record each frame's effective opacity (opacity multiplied up the ancestor chain) and its scale (from the tooltip box size). Then emit `<prefix>.in.tipOpacityAtAppear` (ratio, expected 1), `<prefix>.in.tipFullMs` (ms until opacity >= 0.99) and `<prefix>.out.tipVisibleAfterLeaveMs` (ms until the tooltip is gone or has opacity < 0.01). Also make __tipEls skip elements that are display:none or visibility:hidden. Today a correct port that toggles an always-mounted tooltip with v-show is counted as showing tips at rest: settle() then times out and tipCount fails.",
+   "hover-lift-and-tooltip / overflow-lift-and-tooltip / focus-lift-and-tooltip / locale-*: tipLines only collects leaf nodes whose text is on the hard-coded TEXTS whitelist. Extra or wrong text inside the tooltip is never seen, for example a third line or \"1280 more, including Sara K.\" next to \"Sara K.\". Fix: also emit `<prefix>.tipText` (exact): the whole tooltip container's textContent, with whitespace collapsed. Find the container as the aria-hidden element that appears on hover, or as the nearest visible element above the disc that is not in the role=img subtree. Do not find it by whitelisted leaves and parentElement: that is nesting-dependent, and it misses a tooltip that puts both lines in one text node with a <br>.",
+   "focus-ring: __ring returns max(box-shadow extent, outline extent). A port that keeps the browser's default focus outline next to its own 4px ring passes ring.extent = 4. So does a solid 4px ring with no 2px offset gap. Fix: add `ring.outlineAuto` (exact: getComputedStyle(activeElement).outlineStyle === 'auto' on every focused disc; expected false, which catches the default UA outline). Also add `ring.innerOffset` (px: the spread of the inner zero-offset box-shadow layer, or outline-offset when the ring is drawn with outline; expected 2) beside the outer extent of 4.",
+   "no-entrance-on-first-render and reduced-motion: the entrance recorder drops the overflow discs (filter !d.plus), but the checklist says all discs appear at full opacity, scale 1 and x 0. Fix: keep the overflow discs in the frames. Their own width does not drift over time, so the width, height, x and y drift checks stay valid for them.",
+   "photo-less-fallback: fallback.main.tintPattern only compares which discs share a background ([0,1,2,0]). The 12/20/28% tint strengths are never compared, so a port using one opacity at three hue shifts, or 50% tints, passes. Fix: add `fallback.main.tintAlpha` (ratio per disc: the alpha channel of the computed background, expected about 0.12/0.20/0.28 by the id hash). This is an opacity, not a hue, so it is allowed under the colour ban. Note that index modulo 3 gives the same [0,1,2,0] pattern as the id hash, so the main stack cannot tell an index-based port apart; only the gradient pattern does. Say so in an info entry.",
+   "Contract bans (group-accessible-name): group.discsInListItems uses closest('li,[role=\"listitem\"]'), a tag selector. Read it from the aria snapshot instead (each img's parent node is a listitem), so the check rests on roles only."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "Both runs finished with errors[] empty and consoleErrors empty. Each wrote 356 checks, and the keys are identical on the original and on the Vue port (0 keys missing). Every checklist item with scope all or web has at least one compared (non-info) check on both targets.",
+   "Output files: runs/loading-button-original.json and runs/loading-button-p2-vue.json, both under /private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/.",
+   "tabOrder is the same on both: input:Email for restock news, button:Subscribe, button:Pay $68.00, button:Apply code.",
+   "Elements are found by role (button or role=button, textbox with its accessible name), visible text, aria attributes and aria-live. Parts of a button are found by walking its text nodes and svgs. A spinner is an svg with an infinite animation, and any other svg counts as the check. No class names are used.",
+   "A bad selector fix came out of the port run: the rotating spinner's bounding box read as 22.6px. It now uses the CSS width and the box centre, so the spinner reads 16px and the gap 8px on both targets. Font weight read 510 on the original and 500 on the Vue port because of the font. It is now info, plus a compared boolean that it is medium weight (500 to 599).",
+   "Press-scale is measured with the vertical scale (matrix d times the scale property). The original's layout animation puts scaleX on the width, so using scaleX would mix the two. Button width is the bounding-box width divided by that scale.",
+   "Time zero is the first click event. Keyboard presses also produce a click event, so Enter and Space use the same clock. Reduced motion runs in its own context, and its keys are prefixed rm.",
+   "The no-entry-animation check uses an init-script probe that samples the first 1000ms after mount, ignoring frames where any button is busy. A real press on the hint text stops the autoplay, then the script waits until all three buttons stay idle for 2.6s.",
+   "Known keyboard quirk: the original may leave the 0.97 scale stuck after Enter or Space on an idle button. This is recorded as an info key, kbd.*.scaleAtEnd, and not compared. The scale held during a pointer press is compared.",
+   "The Vue port's values differ slightly from the original in a few places, for example the start offset of the label slide (about 5.2 against 6.0). Per the brief, this was not judged."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "shrink-loading: subscribe.expand.maxRadius and apply.expand.maxRadius cannot catch the bug they exist for. The window starts at tBusyEnd-30, so it includes the last loading frames, where the radius is 20. The original therefore records 20, and a port that stays a pill while the width grows back also records 20 and passes. Change both to use only frames with busy !== 'true' (from the first non-busy frame onward). Record the radius at the first non-busy frame and the max radius over frames where the width is still below end-2px. The original should give about 6; check that it does.",
+   "label-crossfade: the checklist pins the easing (opacity about 0.28 at +17ms and about 0.72 at +67ms, ease-out, not ease-in-out), but fade() keeps only startOp, durMs and the animates flag. A linear or ease-in-out 140ms fade passes, because durMs allows ±25%. Add in.opAt67 (and ideally in.opAt33) as ratio, interpolated between rAF samples measured from the first incoming frame. Add the matching out.opAt67 for the outgoing label.",
+   "label-crossfade: nothing proves the outgoing content is taken out of layout. The button is a fixed 40px with overflow hidden, so maxHeight stays 40 even if old and new content stack, and old and new side by side in the inline-flex row only move x, which is not recorded. Add in.dxFromCenterMax (px): the largest distance between the incoming part's centre and the button's centre during the fade. The original gives about 0 regardless of text width. A port that keeps both in flow is pushed off-centre by half the other label.",
+   "repeat-press-result: payAgain.resultTextMs is 7 on the original. derive() looks for the result label from load.t, so it finds the outgoing 'Paid' that is still fading out after the second click, not the new result. Search for the result from tBusyEnd (in derive generally, at least when the result label can already be on screen). As written, a port without an exit fade fails, and the check never measures the second Paid.",
+   "repeat-press-result: the Apply code check for 'pending reset is cancelled' is close to vacuous. A broken port goes idle at about +900ms, when the stale timer fires. derive() then takes tBusyEnd as about 900, so neverIdleWhileLoading only looks at busy frames and passes. busyEndMs 900 is still inside 1007±25%. Only the flaky applyAgain.sequence would catch it. Add an exact check that the first non-busy frame after the second click shows 'Code expired' (live text 'Code expired', not empty). Add applyAgain.busyDurationOk (exact: tBusyEnd within 950..1100ms) or applyAgain.idleAfterErrorMs (ms, about 2000, measured from the second error).",
+   "repeat-press-loading / repeat-press-result: the stateSeq sequences are frame-level crossfade artefacts, not states. On the original, payAgain.sequence ['Paid','loading','Pay $68.00','Paid','Pay $68.00','Paid'] flips back and forth even though Pay is sticky, and repeat.loading/applyAgain flicker the same way. They depend on which frame crosses opacity 0.5, so they will disagree across baselines or fail correct ports with slightly different fades. Build the sequences from discrete signals instead: aria-busy plus the live region text ('', 'Working', 'Subscribed'/'Paid'/'Code expired'), collapsing repeats. Expected values then read like ['', 'Working', 'Subscribed', ''].",
+   "live-announcements: nothing checks that the live region is visually hidden. walk() skips the live node, so a port that shows 'Working' or 'Subscribed' as visible extra text passes. Add, for each state, live.<btn>.visuallyHidden (exact: bounding rect width and height <= 1px, or clipped). Or add live region width and height as px; the original is 1x1.",
+   "inline-loading: the spinner inside the Pay button is never checked for rotation (spinRot runs only on buttons 0 and 2). Add pay.loading.spinnerRotates (exact) by calling spinRot(1) about 300ms after the Pay click. Do the same in reduced motion (rm.pay.spinnerRotates), since the item says the spinner still rotates.",
+   "shrink-loading: spinRot only checks that the transform changed within 120ms, so a spinner turning at any speed passes. Measure the rotation period: read the rotation angle from the matrix at two times about 250ms apart, convert to ms per turn, and record it as ms (the original animate-spin is 1000ms). Also add subscribe.loading.bgSameAsIdle (exact, relative equality like the Apply code one) so the primary button keeps its colour while it is a circle.",
+   "first-render: no border is checked at rest. Apply code must have a 1px border, and Subscribe and Pay none, but borderWidth is recorded only in Apply's loading and error states. Add first.<subscribe|pay|apply>.borderWidth (px). Optionally add first.apply.bgDiffersFromSubscribe (exact boolean) to cover the outlined variant without comparing colours.",
+   "first-render: first.noEntryAnimation multiplies opacity only up to the button and measures dy relative to the button centre. A port that fades in or slides the whole button, row or card on mount passes. In the mount probe, also record each button's opacity product up to the root, and each button's top relative to the root over the mount frames. Compare an exact 'button opacity always >=0.99 and top constant within 0.5px'.",
+   "first-render / inline-loading: first.pay.fullWidthRatio, first.subscribe.notFullWidth and pay.loading.fullWidthRatio divide by b.parentElement width. That depends on DOM nesting and the card's padding (the original gives 0.888 because the parent is the padded card), which the contract bans. A port that wraps the button in a div gets 1.0 and fails falsely. Compare the Pay width to the email row instead: pay.w minus (Subscribe right edge minus input left edge) as px, about 0. For Subscribe, use the same row span with an exact 'w < 0.5 * row span'.",
+   "success-subscribe / success-sticky: the checklist says the check draws over 0.28s with ease-out, but emitCheckDraw records only start, end, animates and drawMs, so a linear 0.28s draw passes. Add check.fracAt70 (ratio, interpolated about 70ms after the first check frame). The original's ease-out gives about 0.6, linear 0.25.",
+   "repeat-press-loading: whether the extra Enter and Space presses reached the loading button is recorded only as info (clickEvents) and mid.focused is never emitted, so the 'keyboard presses while loading are ignored' part could pass vacuously. Emit repeat.loading.clickCount (count, 5 on the original) and repeat.loading.focusedDuringLoad (exact)."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "Both runs completed with 265 checks, 0 errors, 0 console errors. Outputs: runs/pagination-original.json and runs/pagination-p2-vue.json. The previous script is saved as t/pagination.before-gaps.mjs.",
+   "layout-narrow: Previous and Next widths are now px checks at 600 and 340 (original 36 and 36, p2-vue also 36). prevWordVisible is replaced by prevWordHidden and nextWordHidden. These test the word's parent element: box at most 1px in both directions, or clip / clip-path set. Both are true at 600 and 340 on the original and on p2-vue. Wide widths stay as info, with a wide-viewport word-visible check (true on both). The gap now uses the Page 5 and Page 6 list items. The card is the nearest ancestor of the nav that also holds the 'Home and living' text. Li and the control use [role=listitem] / role=link / role=button too. Previous is found by name through ctl().",
+   "underline-spring: added `.overshoot` (px) for a, b and c, plus `.rawOffsets` (info, [t, offset] pairs). Original: a 0.59, b 1.18, c 4.05, so c matches the roughly 4px expected. p2-vue c is 3.41. The a and b overshoots are small (about 1px or less) but still non-zero on the original. movingFrames is info for spring.a/b/c and stays a count in reduced-motion.",
+   "underline finding: __ul now searches the whole nav for an aria-hidden, non-svg element at most 6px high and more than 4px wide, and still requires an aria-current cell. Start, peak, end, overshoot and settle are measured against the current cell's left edge, so the DOM position of the bar no longer matters. firstDir and passesBetween still use absolute left, because they describe the bar's real travel. Original and p2-vue both find 1 underline per card.",
+   "first-render-secondary: reviews.text now strips all whitespace before comparing ('Previous3/38Next').",
+   "locale: the scenarios now go through scenario(), so they do the settle step (a real press on the localized title) and attach the pageerror and console listeners.",
+   "tab-order-buttons: the ring is measured on the first Previous stop (prev.), the second stop (existing keys), the first link stop 1|link:Page 1 (tabs.focusRing.link.width and .offset) and the reviews Next button (next.). All are 2 and 2 on the original and on p2-vue.",
+   "link-mode: added link.p3.prevIsLink (true) and link.p3.prevAriaDisabled (null). Both match on the original and on p2-vue.",
+   "Real differences found on p2-vue, not script faults: spring.b backward 7 to 6 does not animate (start 0, original 40); spring.c start is -110.97 against -136, with firstDir right against left; reduced 7 to 12 starts at 0 against -136, with firstDir right against left; spring.a settleMs is 314 against 257. The locale checks on p2-vue stay English because the port ignores the ?l= parameter. That is a harness or port difference, so decide whether ports need another way to switch locale. Card width differs at narrow viewports (558 / 298 against 536 / 276), but that is info only."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "Both runs finished: 382 checks each, no errors, no console errors. Outputs: runs/avatar-stack-original.json and runs/avatar-stack-p2-vue.json under the pa folder. The pre-fix script is saved as t/avatar-stack.before.mjs. No port or project file was touched.",
+   "Lift and spring: every in/out curve (hover, focus, overflow, reduced motion) now emits .endRounded (exact string, '-3' for in, '0' for out), .overshoots (in: min < end-0.04; out: max > end+0.04) and, for .in, .travelAt50ms. Original and Vue port agree: endRounded -3/0, overshoots true on both.",
+   "travelAt50ms is measured 50ms after the curve crosses 10% of the travel (interpolated), not 50ms after the trigger. The first version, measured from the trigger, gave 0.19 on the original and 0.35 on the port, because the original starts about one frame late. That is start latency, not curve shape. With the onset anchor the values are about 0.565 on both. A single original run gave overflow.main 0.573 against a port value of 0.691 (one noisy sample); the three baseline runs will set the range.",
+   "Tooltip visual state: each frame now records the tooltip's effective opacity (multiplied up the ancestor chain) and its box width. New checks: .in.tipOpacityAtAppear (1 on both), .in.tipFullMs, .in.tipScaleAtAppear (1 on both) and .out.tipVisibleAfterLeaveMs. The original's tipFullMs is 16 to 54ms, the port's is about 0, which is frame-latency noise inside the 40ms floor. __tipEls now skips elements that are display:none or visibility:hidden (checkVisibility, with a manual fallback), so an always-mounted tooltip toggled with v-show no longer counts as showing at rest.",
+   "tipText is new for hover, overflow, focus (after the first and second Tab), reduced-motion focus and the locale hover. It is the whole tooltip container's text, whitespace collapsed. The container is the visible aria-hidden element with text that is outside every role=img and has no aria-hidden ancestor. If none is found it falls back to the largest visible text element that sits just above the hovered or focused disc, and it never uses the TEXTS whitelist. It reads innerText, not textContent, so a <br> and a block-level split both give 'Leo C. Osaka, 5 hours ago'. The one limit: two inline spans with no whitespace between them would run together. Both targets read 'Leo C. Osaka, 5 hours ago', 'Ava L. Seoul, yesterday', 'Sara K.', 'Noah W.' and '94 more'.",
+   "focus-ring: new ring.outlineAuto (false on both, so no default UA outline) and ring.innerOffset, with .max beside it. innerOffset is the spread of the smallest zero-offset, zero-blur shadow layer when there are at least two layers, or outline-offset when a non-auto outline is drawn. Both targets give 2.",
+   "no-entrance-on-first-render and reduced-motion: the overflow discs are no longer filtered out of the entrance frames. entrance.minOpacity is 1 and the drift checks are unchanged on both targets.",
+   "photo-less-fallback: new fallback.main.tintAlpha.0 to .3 (ratio, alpha of the computed background). Both give 0.20, 0.278, 0.122 and 0.20. An info entry, fallback.main.tintAlpha.note, says the index-modulo-3 pattern is identical to the id-hash pattern for these four people. Only fallback.related.gradientPattern can tell an index-based port apart.",
+   "group.discsInListItems is now read from the aria snapshot: the parser tracks each img's parent node role and requires every img to sit directly under a listitem. No tag selector is used. Both targets give true.",
+   "Not changed: the Vue port ignores the l= parameter, so its locale-* hover tipText and tipLines come back in English while the original's are in zh-TW, zh-CN and ja. That was already the case, and the script comment says a target that ignores l= shows English. The new tipText checks do not change it."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "reduced-motion: on reduced.orders.1to3 and reduced.card1.7to12 the script compares start, peak, firstDir and movingFrames, but on the original these numbers come from one leftover frame. For orders, peak -80 is a frame where aria-current has already moved and the bar still sits at the old cell. For 7to12, peak -136 is 20px left of the old position. The checklist asks for neither frame: it only says the bar lands in a single frame with no intermediate position. A correct port that snaps in the same frame gets peak 0, movingFrames 0 and start/firstDir that differ, so it fails. Fix: for these two transitions make start, peak, firstDir and movingFrames info. Compare animates=false, end, settleMs, and a new exact boolean that is true when no post-trigger frame sits strictly between the old and new positions (lo+1 < left < hi-1). Keep the compared one-frame -20 offset only on card1.6to7, where the checklist asks for it.",
+   "underline-spring: each frame records only the bar's left edge (u[0] and rel). Width, top and height are sampled but never reduced. A port whose bar stretches, shrinks or moves vertically while it springs (for example by animating width or translateY) passes every compared check. Fix: add spring.<a|b|c>.widthMin/widthMax as ratio of rest width and topOffsetPeak as px against the resting top, computed from the u[1] and u[2] already in each frame. Compare them for a, b and c. On the original they should be about 1.0 and 0.",
+   "link-mode: on page 4 the script checks that the disabled Next is not a link, has aria-disabled and has no href, but not that it is unfocusable. A port that renders it as <span aria-disabled tabindex=0> passes, and tab-order-buttons only runs on initial render, where the disabled control is Previous. Fix: add an exact check link.p4.nextFocusable (tabIndex >= 0 or focusable via Tab), expected false. Better: also record the Tab order through the Order history nav on page 4 and compare it (expected Previous, Page 1 to Page 4, with no Next).",
+   "layout-narrow: at 600 and 340 the script checks that the Previous/Next word is hidden and the control is 36px wide, but not that a chevron is still drawn. A port that hides the word and the icon together, leaving an empty 36px button, passes. The wide case does not check the chevron either. Fix: inside each of Previous and Next, record whether a visible graphic is present (an svg or other aria-hidden element at least 8px tall and wide, not display:none, opacity > 0) as an exact boolean, at the wide size and at both narrow sizes."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "no-entrance-on-first-render (and the reduced-motion entrance checks rm.entrance.*): the recorder in pageFns measures each disc's x/y against `e.closest('[aria-label]:not([role=\"img\"])')`, which is the list itself. A port that slides the whole stack (translateY or translateX on the ul) on mount gives zero drift and passes; opacity and scale are caught, a slide is not. Measure x/y against the ROOT element (document.querySelector(ROOT).getBoundingClientRect()) or against a static sibling such as the caption text, and add compared px keys entrance.xDriftVsRoot and entrance.yDriftVsRoot (same for rm.entrance.drift).",
+   "hover-lift-and-tooltip: 'appears instantly' is only checked for opacity (tipOpacityAtAppear) and width-based scale (tipScaleAtAppear). The tooltip's position is never sampled per frame; tip.gap is read once, 150ms after the hover. A port whose tooltip slides in (for example y 4px to 0 over 120ms) at full opacity passes. In __sample, also record the tooltip box's bottom minus the disc's top every frame, and emit `hoverFlow.leo.in.tipGapAtAppear` (px, first frame with a tooltip) plus `hoverFlow.leo.in.tipMoves` (exact boolean: did the gap change by more than 0.3px while the tooltip was visible). Emit the same for overflow.* and rm.hover.*.",
+   "first-render-main-stack / first-render-related-rows: 'round discs' has no compared check. discInfo never reads border-radius, and the overlap/coverage checks pass for square discs too (elementFromPoint at x+3, centre line). Add an exact boolean `main.discsRound`, `mug.discsRound`, `tote.discsRound`: parseFloat(borderTopLeftRadius) >= min(w,h)/2 - 0.5 for every disc, overflow included (also covers the focus-ring item's 'around the round disc').",
+   "photo-less-fallback (contract ban on compared colours): fallback.main.tintAlpha.0..3 are ratios read from the alpha channel of the computed background colour. That is a compared colour value, and it fails a correct port that renders the 12/20/28% tint as an opaque color-mix (alpha 1). Replace them with a relative check that keeps the hash-vs-index signal without absolute colour: an exact `fallback.main.tintRank` (rank order of the four tints by luminance distance from the card colour, or by alpha when alpha < 1), and move the raw alphas to info. borderIsCardColour and tip.darkOnLight are relative booleans and can stay."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "I fixed all 12 reported gaps and ran the script once on the original and once on p2-vue. Both runs wrote 423 checks, 0 errors and an empty consoleErrors list. No port or project file was changed.",
+   "shrink-loading: subscribe.expand and apply.expand now use only frames with busy !== 'true' from the first non-busy frame on. They record radiusAtFirst and maxRadius over frames where width < end-2. The original gives 6 for both, as expected, and p2-vue matches.",
+   "shrink-loading: the spinner period now comes from rotation matrices read every 50ms over about 300ms (250ms for Apply, which loads for only 1000ms), timed with document.timeline.currentTime. Keys: subscribe.loading.spinPeriodMs, apply.loading.spinPeriodMs, plus the inline-loading and reduced-motion ones below. Original is 1000ms everywhere. Added subscribe.loading.bgSameAsIdle (true).",
+   "label-crossfade: fade() now interpolates opacity from the first incoming frame. New keys per crossfade: in.opAt33, in.opAt67, out.opAt67 and in.dxFromCenterMax. The dx check uses the centre of the whole incoming group (text plus check for success states). On the original, dxFromCenterMax is about 0 (0.005), or 2.77 for the Subscribed fade. Original opAt67 is 0.65 to 0.73 and opAt33 is 0.34 to 0.46. These vary between runs by up to about 0.1 on the apply.toIdle fade (p2-vue differs there by about 0.08), so the baseline range from three runs matters.",
+   "repeat-press-result: derive() now searches for the result label from tBusyEnd. payAgain.resultTextMs went from 7 to 1804 on the original. payAgain.sequence, applyAgain.sequence and repeat.loading.sequence are now built from the live-region text only, repeats collapsed. They read [Paid,Working,Paid], [Code expired,Working,Code expired,''] and ['',Working,Subscribed,'']. Matching busySequence keys come from aria-busy. Added applyAgain.firstNonBusyLive ('Code expired'), applyAgain.busyDurationOk (true) and applyAgain.idleAfterErrorMs (2016).",
+   "live-announcements: added live.<btn>.<state>.visuallyHidden for every state of all three buttons. It is true when the live region is 1px or smaller or clipped, and not display:none or visibility:hidden. It is true everywhere on the original and on p2-vue.",
+   "inline-loading: added pay.loading.spinnerRotates, pay.loading.spinPeriodMs, rm.pay.spinnerRotates and rm.pay.spinPeriodMs. Replaced the parent-width ratios (first.pay.fullWidthRatio, first.subscribe.notFullWidth, pay.loading.fullWidthRatio) with row-span checks. The row span runs from the input's left edge to Subscribe's right edge, so DOM nesting no longer matters. pay.widthMinusRowSpan is 0, and Subscribe is under half the row span.",
+   "first-render: added first.<subscribe|pay|apply>.borderWidth (0, 0, 1) and first.apply.bgDiffersFromSubscribe (true). Added first.noButtonMountMotion, which needs the opacity product from each button up to the root to stay at or above 0.99 and each button's top within 0.5px over the mount frames. The original passes with a top range of 0. first.noEntryAnimation is kept.",
+   "success-subscribe and success-sticky: added check.fracAt70 to emitCheckDraw. The original gives about 0.30 to 0.32, which is the ease-out draw (a linear draw would give about 0.25). In reduced motion it reads 1.",
+   "repeat-press-loading: added repeat.loading.clickCount (5 on the original and on p2-vue) and repeat.loading.focusedDuringLoad.",
+   "The new checks surface one real port difference: repeat.loading.focusedDuringLoad is true on the original and false on p2-vue. p2-vue loses focus on the loading button. The other new fracAt70, opAt* and dx differences come from jitter or small port differences; compare.mjs decides them against the three-run baseline.",
+   "I added opAt33 and fracAt70 beyond the required keys. The checklist's 0.28 at +17ms and 0.72 at +67ms is measured from the animation start, while the script measures from the first frame that has the incoming part. Those references can differ by up to one frame, so opAt67 is only comparable against the original's own baseline, which is how compare.mjs uses it."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "shrink-loading / success-subscribe / error-state: the width spring (stiffness 240, damping 30) is only reduced to firstDir, animates, end, min, overshoot and settleMs. A port that uses a 440ms linear or ease-in-out width tween instead of the spring passes all of them. The original's settleMs is about 442ms, and a tween with the same duration lands inside the 25% band. Fix: in widthSeg, add normalised progress (w - start)/(end - start) at fixed times after the trigger, for example +60ms, +120ms and +200ms, as `ratio`. Record them as subscribe.shrink.progAt60/120/200, subscribe.expand.progAt*, apply.shrink.progAt* and apply.expand.progAt*. This is the same pattern the script already uses for fades (opAt33/opAt67) and the check (fracAt70). The near-critical spring rises fast early, which a tween does not do.",
+   "first-render: the three-row layout is never compared. Nothing checks that Subscribe sits on the same row as the email input, that Pay is a separate row below, that the SUMMER24 chip sits left of Apply code on one row, or that the hint is below. A port that stacks the chip above Apply code, or right-aligns Subscribe under the input (rowSpan then equals the full width, so widthMinusRowSpan still passes), gets through. Fix: emit element-to-element offsets as `px`, never root-relative: Subscribe top minus input top (0); Pay top minus Subscribe bottom (24); chip vertical centre minus Apply vertical centre (0); Apply top minus Pay bottom; hint top minus Apply bottom. Also emit `exact` booleans chipRight <= applyLeft and inputRight <= subscribeLeft.",
+   "shrink-loading: the spinner's look ('a faint full ring at 25% opacity with a solid quarter arc') is not measured. Any rotating 16px svg passes, including a solid full circle or a dots spinner. Fix: inside the spinner, count the stroked shapes (count, expect 2) and record the smaller of each shape's stroke-opacity times opacity as `ratio` (0.25). Opacity is not a colour, so the contract allows it.",
+   "label-crossfade (false-fail risk, also near the text-width ban): xfade.subscribe.toSuccess.in.dxFromCenterMax is 2.77px on the original. The cause is that the label group's x offset during the width spring depends on how wide 'Subscribed' is and on Motion's layout scale. A correct port that keeps content centred during expansion reads about 0 and fails, because the band is [1.27, 4.27]. Fix: record dxFromCenterMax as `info` for crossfades that run during a width change (subscribe.toSuccess, subscribe.toIdle, apply.toError, apply.toIdle). Keep it compared only for xfade.pay.toSuccess, which already catches outgoing content that was not popped out of layout.",
+   "tab-order: the checklist says spinners and icons never take focus, but focus is only walked at idle. Fix: click Subscribe, and during loading (about +300ms) press Tab and Shift+Tab. Record as `exact` that focus moves straight to Pay $68.00 and back to Subscribe, with no stop on the spinner. Also do this in the success state for the check icon.",
+   "live-announcements / first-render (minor): idle and loading names are read as aria-label || textContent. That is not the accessible name, and it includes the live region text. Only the loading Subscribe name is checked through getByRole. Fix: for each button in idle, plus Apply code while loading, add a getByRole('button', { name, exact: true }).count() check (count = 1), the same way live.subscribe.name.role.working is done.",
+   "Contract (finding elements, false-fail risk): icons are only recognised as direct `svg` tags inside the button. A port whose spinner is an aria-hidden element with an infinite CSS animation (a border-spinner div) reports spinnerCount 0 and fails. Fix: treat any aria-hidden descendant with an infinite animation as k='spin', whatever its tag."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "All four gaps fixed. Both runs finished with 399 checks, no errors and no console errors (original 76s, p2-vue 59s). Output files: runs/avatar-stack-original.json and runs/avatar-stack-p2-vue.json under the pa folder.",
+   "Gap 1, entrance slide: the recorder now takes the ROOT selector (addInitScript(pageFns, ROOT)) and records each disc's x and y against the ROOT box as well. New compared px keys: entrance.xDriftVsRoot, entrance.yDriftVsRoot and rm.entrance.driftVsRoot. The old list-relative drift keys are kept. Original and Vue both give 0.",
+   "Gap 2, tooltip slide: __sample now records tooltip bottom minus disc top every frame (the disc is els[0]). Each .in curve with tooltip appear now emits tipGapAtAppear (px) and tipMoves (exact boolean, gap range over 0.3px while the tooltip shows). This covers hoverFlow.leo, overflow.main, overflow.mug, overflow.tote, rm.hover.leo and rm.hover.mainOverflow. All of them give 8 and false on both targets.",
+   "Gap 3, round discs: discInfo now computes a round flag from border-radius: at least min(w,h)/2 - 0.5 px, or at least 50 when the value is a percentage. New exact keys main.discsRound, mug.discsRound and tote.discsRound cover every disc including overflow. All true on both targets.",
+   "Gap 4, tint colour: fallback.main.tintAlpha.0..3 are removed. The new exact key fallback.main.tintRank ranks the four tints by luminance distance from the card colour, with the background composited over the first opaque ancestor so alpha and opaque color-mix both work. Distances within 1.5 luma units tie. Original and Vue both give [1,2,0,1]. Raw tintAlpha and tintDist arrays are now info only.",
+   "Not changed: the tintRank.note text still says the [0,1,2,0] pattern. That is the equality pattern of the background strings, not the rank values, and it is info only. I did not touch any port or project file."
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "All seven gaps fixed. Both runs gave 456 checks, 0 errors, 0 console errors, tabOrder 4. The old script is saved as pa/t/loading-button.before-gaps2.mjs.",
+   "Width progress: widthSeg now returns normalised progress at +60, +120 and +200ms, emitted as ratio progAt60/120/200 for subscribe.shrink, subscribe.expand, apply.shrink and apply.expand. The shrink progress starts at the busy flip (tLoad) and the expand progress at tBusyEnd. Original: 0.16, 0.495, 0.796 on the shrink and 0.155, 0.486, 0.793 on the Subscribe expand, which is spring-like. Vue port matches within 0.03 on every one except apply.expand (0.214, 0.544, 0.82 against 0.166, 0.50, 0.798), which is a likely real difference in the Apply expansion.",
+   "First-render layout: element-to-element px offsets and two exact booleans, plus getByRole count=1 for the three idle buttons. Original and Vue give 0, 24, 0, 24, 24, true, true.",
+   "Spinner look: spinnerShapes (count 2) and spinnerFaintRatio (ratio 0.25) for Subscribe and Apply loading. Both targets give 2 and 0.25. The shape count only looks at svg shape elements inside the spinner, so a non-svg border spinner would read 0 shapes and fail this one check.",
+   "xfade dxFromCenterMax is now info for subscribe.toSuccess, subscribe.toIdle, apply.toError and apply.toIdle. It stays compared for the toLoading fades and for pay.toSuccess.",
+   "Tab order while busy: new scenario S8 clicks Subscribe, presses Tab and Shift+Tab at about +220ms of loading and again in the success state. It records exact forward and back targets plus a count of tabbable elements inside buttons (0). Original and Vue: forward goes to Pay $68.00, back returns to the Subscribe button (named Working in loading and SubscribedSubscribed in success, because the live text is included in the name).",
+   "Apply code loading accessible name is now checked through getByRole (count 1), using the name read from the page at that moment.",
+   "Contract: icons and spinners are recognised as an svg or as any aria-hidden element with an infinite animation, whatever its tag. This is in the in-page walk, in spinRot and in svgHidden, which is now computed from the icon parts. I added one sentence to pa/CONTRACT.md.",
+   "No port or project file was changed."
+  ]
+ },
+ {
+  "runsOk": true,
+  "keys": 399,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 70.3
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "All four gaps fixed in pagination.mjs. Original: 282 checks, 0 errors, 0 console errors. p2-vue: 282 checks, 0 errors, 0 console errors. No port or project files changed.",
+   "reduced-motion: on reduced.card1.7to12 and reduced.orders.1to3, start, peak, firstDir and movingFrames are now info. Compared: animates, end, settleMs, and new exact noIntermediate (no post-trigger frame with lo+1 < left < hi-1); passesBetween is dropped for those two. reduced.card1.6to7 keeps the compared one-frame -20 offset. Original: animates=false, end=8, noIntermediate=true on both; port gives the same values.",
+   "underline-spring: new ratio checks widthMin and widthMax (vs rest width) and px check topOffsetPeak (vs resting top) for spring.a, spring.b and spring.c. Original gives 1, 1 and 0 for all three; port gives the same.",
+   "link-mode: new exact link.p4.nextFocusable (button: not disabled; other: tabIndex >= 0), expected false. New exact link.p4.tabOrder, recorded by clicking the Order history title and pressing Tab inside that nav on page 4. Original: [link:Previous, link:Page 1..Page 4], no Next. Port matches.",
+   "layout-narrow: new exact prevGraphic and nextGraphic (svg or aria-hidden descendant at least 8x8, no display:none, visibility:hidden or opacity 0 on the path up to the control) at wide, 600 and 340. Original and port are true in all six.",
+   "Exact-check diffs original vs port, all outside the four fixed gaps: spring.b.backward7to6.animates, and locale.zh-TW, zh-CN and ja navNames, card1Names, currentName, titlesPresent and header. The locale diffs probably mean the Vue demo ignores ?l=, since the script appends it to the port URL. Neither was investigated, and neither is new to this change."
+  ]
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p2-vue.json"
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p2-svelte.json"
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p3-svelte.json"
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p3-svelte-fixed.json"
+   }
+  ]
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": true,
+    "defects": [],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja (every locale.* key, for example locale.zh-TW.listNames got [\"Recent buyers (1284)\", ...] and discTexts got MP/LC/AL/NW/+1.3K): the script switches locale only through the page's l= parameter, and the port demo page ignores it. src/demos/AvatarStackDemo.vue hard-codes `const locale = \"en\"` along with English demo people and copy. The component itself has the same four MESSAGES tables as the original (labels, more(), separator, resolveLocale). Fix: the port demo app must read `l` and pass it to the demo, including the localized demo people, caption, button and heading the original's demo uses. Until then the script should record the locale items under errors as not measurable on this target, not as failed checks.",
+     "overflow-lift-and-tooltip overflow.main.in (settleMs 110.4 against 181.9..198.9, travelAt50ms 0.715 against 0.564..0.575, tipAppearMs and tipFullMs 0 against 49.9..60.4): this is the only curve measured as the very first interaction on a fresh page. The hover scenario does a warm-up measure first, and the focus scenario tabs to Mina before measuring. The original carries a cold-start lag of about 55ms in exactly this measurement: its tooltip appears at 50 to 60ms here and at about 17ms in every warm case, and its settle time grows by the same amount. Every port shows its own cold-start artifact on this key (travelAt50ms 0.715 to 0.729), while the same port's warm curves match the spring (overflow.mug.in 0.565, overflow.tote.in 0.564, focus.leo.in 0.558, settle about 115ms). Fix: before the first measured overflow curve, hover and leave a disc once and wait, as the hover scenario does."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip, focus-lift-and-tooltip, overflow-lift-and-tooltip, tooltip-hidden-from-at: the lift spring starts the wrong way whenever a disc has animated before. On the way out: focus.mina.out.firstDir is up (original down) and min is -4.203 (original -3.0); focus.leo.out min is -4.244; overflow.main/mug/tote.out firstDir is up with min about -4.22. The disc rises another 1.2px before dropping back. On the way in: hoverFlow.leo.in.firstDir is down with max 1.221 (original 0), so the disc dips 1.2px before lifting, and travelAt50ms is 0.695 (original 0.554..0.571). Also hoverFlow.leo.ontoTip.firstDir is up with min -4.223, and tipAT.ontoTip.firstDir is up. Cause, in AvatarStack.svelte's `lift` action: it calls motion's `animate(node, { y }, springs.snappy)` again after `controls.stop()`, and the new spring inherits a stale velocity. The p3-svelte-fixed variant adds `velocity: 0` to exactly this call, and these directions then match the original. This is a visible animation that starts the wrong way."
+    ],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja (all locale.* keys read the English strings): src/demos/AvatarStackDemo.svelte passes `locale=\"en\"` and English data, and the demo page ignores the script's l= parameter. The component's MESSAGES tables match the original. Fix: make the port demo read `l` and supply localized demo data and copy, or have the script list these items under errors as not measurable.",
+     "overflow.main.in settleMs, travelAt50ms, tipAppearMs and tipFullMs (113.2, 0.718, 0.1, 0.1): this is the cold first interaction on the overflow page, and the original also lags about 55ms there (same reasoning as for p2-vue). Fix: add a warm-up hover before the first measured overflow curve."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip, focus-lift-and-tooltip, overflow-lift-and-tooltip: the lift spring starts the wrong way on repeat animations. focus.mina.out.firstDir is up with min -4.228 (original down, -3.0); focus.leo.out is up with min -4.162; overflow.main/mug/tote.out are up with min about -4.2; hoverFlow.leo.in.firstDir is down with max 0.748.",
+     "Same root cause, worse symptoms. hoverFlow.leo.in settles in 1530.2ms (original 132.5..133.1), with travelAt50ms 0.141 and no overshoot: a lift crawling for 1.5s. hoverFlow.leo.ontoTip.animates is false with settleMs 0, and tipAT.ontoTip.animates is false: the disc snaps down where the original springs. overflow.tote.in.animates is false with settleMs 0 and travelAt50ms 1: the lift snaps. overflow.mug.in.overshoots is false (original true). The liftY action re-runs `animate(node, { y }, springs.snappy)` without `velocity: 0`. AvatarStackFixed.svelte differs only by adding `velocity: 0` on that line (line 190), and every one of these curves then matches."
+    ],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja: the demo hard-codes `locale=\"en\"` and English data and ignores l=. The component strings match the original. Fix the demo or mark these items as not measurable.",
+     "overflow.main.in settleMs, travelAt50ms, tipAppearMs and tipFullMs (114.4, 0.729, 0.1, 0.1): cold first-interaction measurement, as for the other targets. Add a warm-up hover."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "pass": true,
+    "defects": [],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja: src/demos/AvatarStackFixedDemo.svelte hard-codes `locale=\"en\"` and English demo data and ignores the script's l= parameter. The component's MESSAGES tables match the original. Fix: the port demo must read `l` and supply the localized demo data and copy, or the script must record these items as not measurable.",
+     "overflow.main.in (animates false, overshoots false, settleMs 331.9, travelAt50ms 0.999, min -3.008, tipAppearMs 0): reduce() gives these values when the disc stays at y 0 for about 315ms after the pointer enters and then reaches -3 within one frame. The tooltip shows at 0ms. This happens only in the one curve that is measured as the first interaction on a fresh page; the original also deviates there (tooltip at 50 to 60ms instead of about 17ms). Every warm curve on this target matches the original's spring: overflow.mug.in and overflow.tote.in (settle about 115 to 117ms, overshoot, travelAt50ms about 0.563), hoverFlow.leo.in (0.561), hoverFlow.leo.ontoTip, all focus curves with correct directions, and Leo's first spring animation in the focus scenario. So it is a page cold-start artifact, not the disc's behaviour. Fix: add a warm-up hover and leave before the first measured overflow curve, then re-run to confirm the hold-then-snap does not come back."
+    ],
+    "baselineProblems": []
+   }
+  ]
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "itemsWithoutCheck": [
+   "locale-zh-tw: not measurable on p2-vue, p2-svelte, p3-svelte, p3-svelte-fixed (demo ignores l=); recorded under errors, not as failed checks",
+   "locale-zh-cn-ja: same as locale-zh-tw on those four ports"
+  ],
+  "notes": [
+   "Two edits. (1) Overflow scenario: before the first measured curve, hover the first main disc 600ms, leave, wait 900ms (warm-up). (2) Locale scenarios: if the root text has no CJK character after loading with l=, the script throws 'target ignores the l= parameter ... not measurable on this target', so it lands in errors and emits no locale.* checks. A port that localizes but gets strings wrong still produces checks and fails normally.",
+   "Results: original 399 checks, 0 errors. Each of the four ports 366 checks, errors only the three locale not-measurable entries (zh-TW, zh-CN, ja).",
+   "overflow.main.in is now warm everywhere: original settleMs 133.1, travelAt50ms 0.561, tip 16.8ms. Ports settle 115.6-116.6, travelAt50ms 0.56-0.565, tipAppearMs 0-0.1. p3-svelte-fixed hold-then-snap is gone (animates true, settle 115.9, travel 0.56).",
+   "The original's settleMs dropped from the old 182-199 range to 133 because the cold lag is gone, so the three baseline original runs must be re-recorded before compare.mjs runs.",
+   "Ports' demos still need to read l= and supply localized data for locale items to be compared. Run outputs are in the pa/runs folder as avatar-stack-<label>.json. No port or project files changed."
+  ]
+ },
+ {
+  "runsOk": true,
+  "keys": 456,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [
+   "0"
+  ],
+  "secondsPerRun": 108.35
+ },
+ {
+  "runsOk": true,
+  "keys": 282,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 108.44
+ },
+ {
+  "runsOk": true,
+  "keys": 399,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 72.7
+ },
+ {
+  "script": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": false,
+  "itemsWithoutCheck": [],
+  "notes": [
+   "No script change was needed, so the script is unchanged. Unstable keys is an empty list: compare.mjs baseline reports 0 unstable keys over the 3 original runs (456 keys, all present in every run). The numeric keys that drift (settleMs, progAt*, xfade opAt*/durMs, busyEndMs) vary within the ms/ratio/px tolerances, not beyond 4x tolerance.",
+   "Run errors ['0'] is a misread. In baseline/loading-button.json runErrors is [[],[],[]]; the compare.mjs console line prints per-run error counts, so '0' means zero errors in a run. All three runs have errors: [] and consoleErrors: [].",
+   "Tab order is stable: input:Email for restock news, button:Subscribe, button:Pay $68.00, button:Apply code in every run.",
+   "Verification: ran the script on the original twice (runs/lb-verify-1.json, runs/lb-verify-2.json). Both gave 456 checks, 0 errors, same tab order. All exact/count/dir values are identical between the two runs, and compare.mjs baseline on these two runs gives unstable: [], tabStable: true, runErrors [0,0].",
+   "The timing-dependent info keys (first.mountFrames, repeat.loading.clickEvents) already have kind info, so they are not compared. The second verify run was first killed by my own pkill, then rerun cleanly. I did not touch any port or project file; runs/lb-verify-*.json are leftover scratch files."
+  ]
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 3,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p2-vue.json"
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 3,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p2-svelte.json"
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 3,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p3-svelte.json"
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "locale-zh-tw",
+     "locale-zh-cn-ja"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 3,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/avatar-stack-p3-svelte-fixed.json"
+   }
+  ]
+ },
+ {
+  "runsOk": true,
+  "keys": 456,
+  "unstable": [
+   "xfade.subscribe.toSuccess.in.opAt33: spread 0.12 across runs (item label-crossfade, kind ratio, min 0.325, max 0.449)",
+   "xfade.pay.toSuccess.in.opAt33: spread 0.16 across runs (item label-crossfade, kind ratio, min 0.327, max 0.485)",
+   "xfade.pay.toSuccess.in.opAt67: spread 0.13 across runs (item label-crossfade, kind ratio, min 0.631, max 0.759)",
+   "xfade.apply.toError.in.opAt33: spread 0.15 across runs (item label-crossfade, kind ratio, min 0.333, max 0.487)",
+   "xfade.apply.toError.in.opAt67: spread 0.12 across runs (item label-crossfade, kind ratio, min 0.64, max 0.761)"
+  ],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 102
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip / hoverFlow.leo.out.firstDir: the original is 'down' in all 3 runs, the port is 'up'. On the second hover cycle (re-hover after the onto-tooltip step, then leave) Leo C. first rises to min -4.221px (base min -3.000) before it springs down to 0. That is a 1.22px kick the wrong way, with max 0.126 against the original's 0.088. The structure matches the original (Lift is a motion.div with animate {y} and springs.snappy), so this comes from motion-v carrying a stale velocity into the new spring. It is the same 1.22px signature as the Svelte ports. It happened on only one of the curves (ontoTip, focus and overflow outs are 'down'), but it is a measured wrong-direction start the original never shows. Likely fix: start the lift spring from velocity 0, as AvatarStackFixed.svelte does, then rerun."
+    ],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja: all 30 locale.* keys are missing. scriptErrors say the target ignores the l= parameter. The component supports the locale prop (MESSAGES for en, zh-TW, zh-CN, ja), so the port demo page must read l= from the URL and pass it to locale and to the demo copy and data. Otherwise the script needs another way to switch the port demo's locale. Until then the locale items are unmeasured, not passed."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip / hoverFlow.leo.in.firstDir: original 'up', port 'down'. Max reaches 1.22px (original 0) before the disc lifts to -3, so on hover the disc first dips 1.2px down. hoverFlow.leo.in.travelAt50ms is 0.697 against 0.561..0.568 (±0.03): the spring shape differs.",
+     "hoverFlow.leo.ontoTip.firstDir, tipAT.ontoTip.firstDir, focus.mina.out.firstDir, focus.leo.out.firstDir, overflow.main/mug/tote.out.firstDir: original 'down', port 'up'. On leave or blur the disc first rises to about -4.2px (min -4.221, -4.225, -4.205, -4.233 against the original's -3.000) before it falls to 0. Settle times are 148-160ms against about 115-136ms. The cause is in the source: the lift action calls motion's animate() again on every update and stops the previous control, so each new spring inherits a stale velocity. AvatarStackFixed.svelte adds velocity: 0 and passes all of these checks, which confirms it."
+    ],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja: all 30 locale.* keys are missing because the port demo ignores the l= parameter (scriptErrors). The component has a locale prop with all four locales. The demo page must read l= and pass it to locale and to the demo copy and data, or the script needs another way to switch locale. Unmeasured, not passed."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip / hoverFlow.leo.in.firstDir: original 'up', port 'down'. Max reaches 1.22px before the lift to -3, so the disc dips about 1.2px down first. hoverFlow.leo.in.travelAt50ms is 0.701 against 0.561..0.568 (±0.03).",
+     "hoverFlow.leo.ontoTip.firstDir, tipAT.ontoTip.firstDir, focus.mina.out.firstDir, focus.leo.out.firstDir, overflow.main/mug/tote.out.firstDir: original 'down', port 'up'. The disc overshoots upward to about -4.2px (for example focus.mina.out.min -4.236, overflow.main.out.min -4.23, against the original's -3.000) before it returns to 0. The cause is in the source: liftY re-calls animate(node, {y}, springs.snappy) after ctl.stop(), so the new spring inherits a stale velocity. The only difference in AvatarStackFixed.svelte is velocity: 0 on that spring, and that version passes every motion check."
+    ],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja: 30 locale.* keys are missing because the port demo ignores l= (scriptErrors). The component supports the locale prop. The demo page must read l= and pass it through, or the script needs another way to switch locale. Unmeasured."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "pass": true,
+    "defects": [],
+    "harnessProblems": [
+     "locale-zh-tw and locale-zh-cn-ja are the only failing items: all 30 locale.* keys are missing because the port demo page ignores the l= parameter (scriptErrors: 'target ignores the l= parameter'). The component has a locale prop with en, zh-TW, zh-CN and ja strings. The port demo must read l= and pass it to locale and to the demo copy and data, or the script needs another way to switch locale. The pass is subject to those locale checks, which are still unmeasured. Everything else matches: tab order, no console errors, and all lift curves 'up'/'down' as in the original (for example hoverFlow.leo.in.travelAt50ms 0.56, out.min -3)."
+    ],
+    "baselineProblems": []
+   }
+  ]
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "locale"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/pagination-p2-vue.json"
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "reduced-motion",
+     "locale"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/pagination-p2-svelte.json"
+   },
+   {
+    "label": "p3-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "locale"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/pagination-p3-vue.json"
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "reduced-motion",
+     "locale"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/pagination-p3-vue.json"
+   }
+  ]
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "first-render",
+     "success-subscribe",
+     "label-crossfade",
+     "repeat-press-loading"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/loading-button-p2-vue.json"
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "first-render",
+     "shrink-loading",
+     "success-subscribe",
+     "label-crossfade",
+     "success-sticky",
+     "press-scale",
+     "tab-order"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/loading-button-p2-svelte.json"
+   },
+   {
+    "label": "p3-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "first-render",
+     "label-crossfade",
+     "keyboard-activate",
+     "tab-order"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 1,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/loading-button-p3-vue.json"
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "first-render",
+     "shrink-loading",
+     "success-subscribe",
+     "label-crossfade",
+     "error-state",
+     "tab-order"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/loading-button-p3-svelte.json"
+   },
+   {
+    "label": "p3-vue-fixed",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "first-render",
+     "success-subscribe",
+     "label-crossfade"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0,
+    "diffFile": "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa/diffs/loading-button-p3-vue-fixed.json"
+   }
+  ]
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": false,
+    "defects": [
+     "underline-spring spring.b.backward7to6: the port snaps on the backward 7 to 6 move. animates false (original true), firstDir none (original right), start/peak 0px (original 40px), settleMs 0 (original 304..315ms). rawOffsets are all 0. The checklist says explicitly that backward should jump about 40px right and spring back in about 300ms, and that a port which snaps on a backward move fails. The motion-v layoutId bar in Pagination.vue gets no layout delta here, while forward 6 to 7 does reproduce the -20px start (settles in 315ms)."
+    ],
+    "harnessProblems": [
+     "locale (all 15 keys for zh-TW, zh-CN, ja): src/demos/PaginationDemo.vue hardcodes locale=\"en\" plus the English titles and range header, and App.vue only reads ?only=, never ?l=. The script adds &l=<locale>, which the demo ignores. The component has the same MESSAGES table as the original (分頁/上一頁/第 n 頁 and so on), so this is not a component defect. Fix: give the port demo apps an ?l= switch that feeds the locale prop and translated demo copy (titles, range header). Or, for ports, mount with the locale prop and compare only the block strings (navNames, card1Names, currentName). compactText already passes."
+    ],
+    "baselineProblems": [
+     "underline-spring spring.c.jump7to12.firstDir/start/peak: the original's first frame sits 20px beyond the old bar (-136 against restFrom -116), a framer-motion projection artefact. That artefact also flips firstDir to left. The port starts exactly at the old bar (-116, then -115.29), which makes firstDir right. The checklist's (c) expectation asks only for intermediate positions and a rest under page 12 well under 1s, and the port meets both: passesBetween true, end 8, settleMs 341 (in range), overshoot 3.45. Record c.start, c.peak and c.firstDir as info, or widen start to cover restFrom +/-25px."
+    ]
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "underline-spring spring.a.forward6to7: snaps. animates false (original true), firstDir none (original left), start/peak 0 (original -20px), settleMs 0 (original 262..266ms). Pagination.svelte runs a hand-written FLIP (indicator action: dx = prevRect.left - r.left, animates only if |dx| > 0.5). The old and new current cells sit at the same screen position, so dx is 0 and no animation runs. The checklist explicitly expects about -20px and a spring back of about 240ms.",
+     "underline-spring spring.b.backward7to6: snaps. animates false, firstDir none, start/peak 0 (original +40px), settleMs 0 (original 304..315ms). Same cause. The checklist says a port that snaps on a backward move fails.",
+     "reduced-motion reduced.card1.6to7: no offset frame. movingFrames 0 (original 1), start/peak 0 (original -20px), firstDir none (original left). The port skips all animation under reduced motion (prefersReducedMotion.current). The checklist explicitly expects one frame at -20px before landing. Low severity, since this is a framer artefact copied into the spec. It follows from the same missing offset as the snap above."
+    ],
+    "harnessProblems": [
+     "locale (all 15 keys): src/demos/PaginationDemo.svelte hardcodes locale=\"en\" and an English range formatter and titles, and App.svelte reads only ?only=. The component's MESSAGES match the original. Fix: give the demo app an ?l= switch with translated demo copy, or compare only block strings with the locale prop set directly."
+    ],
+    "baselineProblems": [
+     "underline-spring spring.c.jump7to12.firstDir/start/peak: the original starts at -136 (20px beyond the old bar at restFrom -116, a framer artefact). The port starts at the old bar (-114.32 at the first moved frame), so firstDir is right. The checklist (c) needs only intermediate positions and settling under 1s, and the port meets both: passesBetween true, settleMs 326, end 8. Make these info or widen them."
+    ]
+   },
+   {
+    "label": "p3-vue",
+    "pass": false,
+    "defects": [
+     "underline-spring spring.b.backward7to6: snaps on backward. animates false (original true), firstDir none (original right), start/peak 0 (original 40px), settleMs 0 (original 304..315ms), rawOffsets all 0. The motion-v layoutId bar (Pagination.vue line 192) gets no delta on 7 to 6, although forward 6 to 7 matches (start -20, settle 316ms). The checklist explicitly fails a port that snaps on a backward move."
+    ],
+    "harnessProblems": [
+     "locale (all 15 keys): src/demos/PaginationDemo.vue hardcodes locale=\"en\" plus English titles and header, and App.vue reads only ?only=, so the script's &l= is ignored. The component's MESSAGES match the original. Fix: give the port demos an ?l= switch with translated demo copy, or compare only block strings with the locale prop set."
+    ],
+    "baselineProblems": [
+     "underline-spring spring.c.jump7to12.firstDir/start/peak: the original's -136 start (20px beyond the old bar at -116) is a framer artefact. The port starts at the old bar (-116, then -110.97), so firstDir is right. The checklist (c) requires only intermediate positions and settling under 1s, and the port meets both: passesBetween true, settleMs 349, end 8. Make these info or widen them."
+    ]
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "underline-spring spring.a.forward6to7: snaps. animates false, firstDir none, start/peak 0 (original -20px), settleMs 0 (original 262..266ms). The FLIP in Pagination.svelte (lines 109-127) animates only when dx !== 0, and on 6 to 7 the old and new cells share a screen position. The checklist explicitly expects the -20px start and spring.",
+     "underline-spring spring.b.backward7to6: snaps. animates false, firstDir none, start/peak 0 (original +40px), settleMs 0 (original 304..315ms). Same cause. The checklist fails a backward snap explicitly.",
+     "reduced-motion reduced.card1.6to7: movingFrames 0 (original 1), start/peak 0 (original -20px), firstDir none (original left). The checklist expects one offset frame before landing. Low severity: a framer artefact written into the spec, with the same root cause as the snaps."
+    ],
+    "harnessProblems": [
+     "locale (all 15 keys): src/demos/PaginationDemo.svelte hardcodes locale=\"en\" and English copy, and App.svelte reads only ?only=. The component's MESSAGES match the original. Fix: give the demo an ?l= switch with translated copy, or compare only block strings with the locale prop set."
+    ],
+    "baselineProblems": [
+     "underline-spring spring.c.jump7to12.firstDir/start/peak: the original's -136 start is 20px beyond the old bar (restFrom -116), a framer artefact. The port starts at the old bar (-115.9, then -107.77), so firstDir is right. The checklist (c) needs only intermediate positions and settling under 1s, and the port meets both: passesBetween true, settleMs 337, end 8. Make these info or widen them."
+    ]
+   }
+  ]
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": false,
+    "defects": [
+     "repeat-press-loading / repeat.loading.focusedDuringLoad: got false, expected true (p3-vue, built the same way but without the attribute, gives true). Cause: the keyed motion.span that wraps the label has tabindex=\"-1\". That makes it focusable by mouse, so clicking the button puts focus on the inner span instead of the button. The span is replaced on every state change (key spin to success to idle), and when it unmounts focus drops to body, so later Enter, Space or Tab no longer start from the button. The original keeps focus on the button. Fix: remove tabindex=\"-1\" from the motion.span. Keep tabindex=\"-1\" on the check path only, and add pointer-events=\"none\" as LoadingButtonFixed.vue does."
+    ],
+    "harnessProblems": [
+     "first-render / first.noEntryAnimation false: mountFrames minOp is 1 and mountTopRange is 0, so nothing fades or moves. The check fails only because it needs absolute |dy| < 0.5. In the ports the label sits at a static -0.5px from the button centre (rm.xfade.toSuccess.startDy -0.5, resting endDy about -0.45) because of font metrics. The script should compare how much dy changes across mount frames (max minus min for each part) instead of absolute dy."
+    ],
+    "baselineProblems": [
+     "label-crossfade in.startOp, in.opAt33, in.opAt67 and out.opAt67 (for example toSuccess.in.startOp 0.176 vs 0, toIdle.in.opAt33 0.494 vs at most 0.45): motion-v starts the fade in the same frame the node mounts, so the first sampled frame is already about one frame into the fade. Because opAt33 and opAt67 are read relative to that first frame, the whole curve shifts by under one frame. durMs (127, 117, 122) and the curve shape are inside the baseline. A 0.03 ratio tolerance equals about 3ms on this slope. Read times from the trigger (or extrapolate to where opacity is 0) and allow one frame (about 17ms), or compare the time to reach opacity 0.5 as an ms check.",
+     "success-subscribe / subscribe.check.fracAt70 0.381 vs at most 0.378: the same frame-phase effect (startFrac 0.018). drawMs is 250, inside tolerance. The 0.03 tolerance on a fixed-time sample is under 6ms."
+    ]
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "label-crossfade: the fade uses cubicBezier(0.42,0,0.58,1) (ease-in-out, commented 'easeInOut' in the source). The original's curve is ease-out-like. Measured in.opAt33 0.123 vs 0.364..0.378 and in.opAt67 0.465 vs 0.666..0.682; out.opAt67 is about 0.53 vs about 0.32 (same on toLoading, toSuccess, toIdle, pay.toSuccess, apply.toError and apply.toIdle). These values are exactly ease-in-out, and the checklist says outright that the fade is not ease-in-out.",
+     "shrink-loading: the corner radius is animated with the gentle spring instead of jumping. subscribe.shrink.firstRadius is 6 vs 20. subscribe.expand.radiusAtFirst and maxRadius are 20 vs 6, and the same on apply. So the button stays a pill while it grows back, which the checklist explicitly rules out.",
+     "success-subscribe / success-sticky: the check mark never draws. subscribe.check.endFrac and pay.check.endFrac are 0 vs 1, animates false, drawMs 900 (never complete). The path has inline style stroke-dasharray '0 1', and motion's animate(node,{pathLength}) writes SVG attributes, which an inline style overrides. The computed dash stays at 0 for the whole 900ms window.",
+     "press-scale / press.idle.releaseSettleMs 242 vs 164 (tolerance up to 205): measured beyond tolerance. The source uses the same gentle spring for press and release, so the cause is not visible and this may be one slow run. Re-measure. It does not change the verdict."
+    ],
+    "harnessProblems": [
+     "first-render / first.noEntryAnimation false: minOp 1 and topRange 0. This is the same static -0.5px text dy offset as the other ports. Compare the change in dy across mount frames, not absolute dy.",
+     "tab-order / tab.success.back 'button:Subscribed Subscribed' vs 'button:SubscribedSubscribed': the label is built from raw textContent, and the space is template whitespace between the visible label and the sr-only live span. Focus is on the right button. Collapse or strip whitespace, or use the accessible name."
+    ],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-vue",
+    "pass": false,
+    "defects": [
+     "tab-order / keyboard-activate: the check icon's motion.path takes a Tab stop. kbd.tab.afterPay is 'path:' vs 'button:Apply code', and tab.success.forward is 'path:' vs 'button:Pay $68.00'. Whenever a check is showing (Paid, Subscribed), Tab lands on the SVG path inside the button before reaching the next control. The checklist says icons never take focus. LoadingButtonFixed.vue adds tabindex=\"-1\" pointer-events=\"none\" to the path and passes both checks."
+    ],
+    "harnessProblems": [
+     "keyboard-activate: kbd.enter.apply.{busy, ariaDisabled, busyEndMs, resultText, clickCount} are missing, with scriptError 'no click event #0 on button 2'. This follows from the defect above: focus was on the path, so Enter did not reach Apply code. After recording kbd.tab.afterPay, the script should focus Apply code directly (button.focus()), so the Enter flow is still measured when an extra Tab stop exists.",
+     "tab-order / tab.success.tabbableInsideButtons reports 0, yet Tab really landed on the path. Its query (descendant tabIndex >= 0) misses this SVG focus target. Detect tabbable descendants with a real Tab walk, or check SVG elements too.",
+     "first-render / first.noEntryAnimation false: minOp 1 and topRange 0. Same static -0.5px text dy offset. Compare the change in dy across mount frames instead."
+    ],
+    "baselineProblems": [
+     "label-crossfade startOp, opAt33, opAt67 and out.opAt67 (for example pay.toSuccess.in.startOp 0.134, apply.toIdle.in.opAt33 0.497 vs at most 0.46): motion-v starts the fade one frame ahead of the first sample, the same frame-phase shift as p2-vue. durMs is inside tolerance. Read times from the trigger, allow one frame, or compare the time to reach opacity 0.5 as ms."
+    ]
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "shrink-loading / success-subscribe / error-state: the width does not spring smoothly. Normalised progress is not monotonic: subscribe.shrink.progAt60 0.835, progAt120 0.506, progAt200 0.378 (original 0.16, 0.50, 0.80). The expansion does the same (progAt60 0.776, progAt200 0.175), and apply matches. The button snaps to near its new width, jumps back, then springs. That pushes settleMs to 565 vs 433..451 (expand 566 vs 450..463). In the hand-built layout code in $effect.pre, the new width shows before tick().then pins width=from and starts the spring.",
+     "success-subscribe / error-state: subscribe.idle.widthRestored and apply.idle.widthRestored are false vs true. After the cycle returns to idle, the button's final width is not its starting idle width (both measured in the same port, so text width is not the reason)."
+    ],
+    "harnessProblems": [
+     "first-render / first.noEntryAnimation false: minOp 1 and topRange 0. Static -0.5px text dy offset. Compare the change in dy across mount frames instead.",
+     "tab-order / tab.success.back 'button:Subscribed Subscribed' vs 'button:SubscribedSubscribed': a whitespace difference in raw textContent (Svelte template whitespace before the sr-only span). Collapse whitespace or use the accessible name."
+    ],
+    "baselineProblems": [
+     "label-crossfade opAt33, opAt67 and out.opAt67 (for example toLoading.in.opAt33 0.249 vs 0.364..0.378, opAt67 0.578 vs 0.666..0.682, out 0.422 vs 0.318..0.334): the easing is cubicBezier(0,0,0.58,1). That predicts about 0.35 at 24% and 0.68 at 48% of 140ms, which matches the original's shape. The gap is a start lag of about one frame (Svelte CSS transitions begin the frame after the node is inserted). durMs is inside tolerance (143, 139). Read times from the trigger and allow one frame, or compare the time to reach opacity 0.5."
+    ]
+   },
+   {
+    "label": "p3-vue-fixed",
+    "pass": true,
+    "defects": [],
+    "harnessProblems": [
+     "first-render / first.noEntryAnimation false: minOp 1 and mountTopRange 0, so nothing moves or fades. The ports' label rests at a static -0.5px dy (rm.xfade.toSuccess.startDy -0.5), which fails the absolute |dy| < 0.5 test. Compare the change in dy across mount frames instead."
+    ],
+    "baselineProblems": [
+     "label-crossfade startOp 0.048..0.089 vs 0, toLoading.in.opAt33 0.434 vs at most 0.408, opAt67 0.718 vs at most 0.712, out.opAt67 0.282 vs at least 0.288: motion-v's fade is one frame ahead of the first sampled frame. The offsets are tiny and the durations are within range (118..138ms). Read times from the trigger and allow one frame, or compare the time to reach opacity 0.5 as ms.",
+     "success-subscribe / subscribe.check.startFrac 0.042 vs 0: the same one-frame phase effect. drawMs 266 matches the baseline 266..280. Allow one frame of progress at the start, about 0.06 for a 280ms ease-out."
+    ]
+   }
+  ]
+ }
+]

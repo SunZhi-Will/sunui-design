@@ -1,0 +1,11 @@
+role (model)               n open     out      in    cache  avg min tools
+adjudicate (opus-5-5)      5    1    102k    992k    8652k      2.3    61
+baseline (haiku-5-5)       8    3     38k    665k    2942k      4.2    38
+fix-harness (sonnet-5-5)   5    3     83k   1078k   12494k     12.9   139
+ports (haiku-5-5)          6    2     41k    681k    2834k      6.9    33
+review (opus-5-5)          6    0    139k    699k    3847k      2.3    39
+revise (sonnet-5-5)        6    0    195k    930k    7293k      6.0    67
+stabilise (sonnet-5-5)     1    0      5k     51k    1059k      4.5    11
+write (sonnet-5-5)         3    0    272k    799k    4636k     11.8    43
+total                      40     877k   5897k   43756k
+still open: ports:pagination 5.9m, adjudicate:avatar-stack 0.3m, ports:avatar-stack 3.0m, baseline:pagination 2.2m, baseline:loading-button 4.8m, fix-harness:harness 8.3m, fix-harness:harness 25.3m, fix-harness:harness 20.7m, baseline:loading-button 1.4m
