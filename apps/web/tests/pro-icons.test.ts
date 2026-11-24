@@ -97,3 +97,21 @@ for (const set of proIconSets) {
     }
   });
 }
+
+test("quest sprite kit: 32 × 32 with a 1px margin", { skip: !existsSync(`${root}registry/pro/icons/sunui-quest-sprites.tsx`) && "Pro sprites not present" }, () => {
+  const src = readFileSync(`${root}registry/pro/icons/sunui-quest-sprites.tsx`, "utf8");
+  const body = src.slice(src.indexOf("export const questSprites = {"), src.indexOf("\n} satisfies"));
+  const names = keysOf(src, "questSprites");
+  assert.ok(names.length >= 12, `only ${names.length} sprites`);
+  for (const block of body.split(/\n {2}(?=\/\/|"?[a-z])/).filter((b) => b.includes("["))) {
+    const name = block.match(/"?([a-z0-9-]+)"?: \[/)?.[1];
+    const rows = [...block.matchAll(/^ {4}"([^"]*)",$/gm)].map((m) => m[1]);
+    assert.equal(rows.length, 32, `${name}: ${rows.length} rows`);
+    rows.forEach((row, y) => {
+      assert.equal(row.length, 32, `${name} row ${y}`);
+      assert.ok(row[0] === "." && row[31] === ".", `${name} row ${y} touches the edge`);
+    });
+    assert.equal(rows[0].replace(/\./g, ""), "", `${name}: first row must stay empty`);
+    assert.equal(rows[31].replace(/\./g, ""), "", `${name}: last row must stay empty`);
+  }
+});

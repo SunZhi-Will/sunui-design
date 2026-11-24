@@ -235,7 +235,26 @@ export const proIconSets: ProIconSet[] = [
   },
 ];
 
-export const proIconItems = proIconSets.flatMap((set) => set.items);
+/**
+ * 場景精靈包（2026-11-25）：給像素 Pro 場景共用的 32 × 32 多影格精靈，不是 16/24px 圖示，所以只有像素一種風格、
+ * 不進 /icons 的檔期切換。規則見 ICONS.md「Pro 檔期圖示組」第 10 條。
+ */
+export const proSpriteItems: ProIconItem[] = [
+  {
+    name: "sunui-quest-sprites",
+    title: "Quest Sprite Kit",
+    description:
+      "32px pixel sprites for game-style campaign scenes: a chest that opens, gacha capsule, slime king, tag golem, coupon scroll, gold pile, gem shard, voucher card, sapling that grows into a tree, market stall and quest board. Object colors with one shared outline and light; chests, capsules, gems and vouchers recolor by rarity (common steel, rare blue, legendary gold). Every sprite animates frame by frame; respects reduced motion.",
+    style: "pixel",
+    animated: true,
+    source: "registry/pro/icons/sunui-quest-sprites.tsx",
+    target: "components/ui/sunui-quest-sprites.tsx",
+    dependencies: ["framer-motion"],
+    registryDependencies: ["sunui-pixel-icons"],
+  },
+];
+
+export const proIconItems = [...proIconSets.flatMap((set) => set.items), ...proSpriteItems];
 
 export function getProIconItem(name: string) {
   return proIconItems.find((item) => item.name === name);
