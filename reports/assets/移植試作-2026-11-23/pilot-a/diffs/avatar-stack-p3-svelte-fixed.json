@@ -1,0 +1,121 @@
+{
+ "block": "avatar-stack",
+ "label": "p3-svelte-fixed",
+ "compared": 670,
+ "failingItems": {
+  "focus-lift-and-tooltip": [
+   {
+    "key": "combo.both.tips",
+    "kind": "exact",
+    "expected": [
+     "Leo C. / Osaka, 5 hours ago",
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": [
+     "Leo C. / Osaka, 5 hours ago"
+    ]
+   },
+   {
+    "key": "combo.both.tipCount",
+    "kind": "count",
+    "expected": 2,
+    "got": 1
+   },
+   {
+    "key": "combo.both.noahLift",
+    "kind": "px",
+    "expected": "-3..-3 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "combo.afterLeave.tips",
+    "kind": "exact",
+    "expected": [
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": []
+   },
+   {
+    "key": "combo.afterLeave.tipCount",
+    "kind": "count",
+    "expected": 1,
+    "got": 0
+   },
+   {
+    "key": "combo.afterLeave.noahLift",
+    "kind": "px",
+    "expected": "-3..-3 (±1.5)",
+    "got": 0
+   }
+  ],
+  "reduced-motion": [
+   {
+    "key": "rm.combo.both.tips",
+    "kind": "exact",
+    "expected": [
+     "Leo C. / Osaka, 5 hours ago",
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": [
+     "Leo C. / Osaka, 5 hours ago"
+    ]
+   },
+   {
+    "key": "rm.combo.both.tipCount",
+    "kind": "count",
+    "expected": 2,
+    "got": 1
+   },
+   {
+    "key": "rm.combo.afterLeave.tips",
+    "kind": "exact",
+    "expected": [
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": []
+   },
+   {
+    "key": "rm.combo.afterLeave.tipCount",
+    "kind": "count",
+    "expected": 1,
+    "got": 0
+   }
+  ]
+ },
+ "failingCount": 2,
+ "missingKeys": [],
+ "tabOrderEqual": true,
+ "tabOrderBase": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "tabOrderPort": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "consoleErrors": [],
+ "scriptErrors": [],
+ "itemsCovered": "17/17",
+ "uncoveredItems": [],
+ "pass": false
+}

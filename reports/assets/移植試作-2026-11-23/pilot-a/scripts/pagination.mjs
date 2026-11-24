@@ -1,6 +1,6 @@
-// Acceptance script for the SunUI "pagination" block. One script, any target (see pa/CONTRACT.md).
+// Acceptance script for the SunUI "pagination" block. One script, any target (see CONTRACT.md, v2).
 //   node pagination.mjs --url <url> --root "<css selector>" --out <file.json> --label <name>
-import { chromium } from "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pilot/cap/node_modules/playwright-core/index.mjs";
+import { chromium } from "/private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/cap/node_modules/playwright-core/index.mjs";
 import { findChrome } from "/Applications/Projects/nextjs/sunui-design/apps/web/scripts/find-chrome.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,7 +11,7 @@ const URL_ = arg("url");
 const ROOT = arg("root");
 const OUT = arg("out");
 const LABEL = arg("label") ?? "run";
-const PILOT = "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa";
+const PILOT = "/private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2";
 if (!URL_ || !ROOT || !OUT) { console.error("usage: --url --root --out --label"); process.exit(2); }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -43,27 +43,38 @@ const initHelpers = (rootSel) => {
   w.__navs = () => [...w.__root().querySelectorAll("nav, [role=navigation]")];
   const norm = (s) => (s ?? "").replace(/\s+/g, " ").trim();
   const insideSvg = (e) => !!e.closest("svg");
-  // the underline: an aria-hidden, non-svg, thin box inside the current page control
+  // the underline: an aria-hidden, non-svg, thin box anywhere in the nav whose horizontal centre lies within the
+  // current control's column (nested in the control, or a sibling inside the same list item: both are fine)
   w.__ul = (nav) => {
     const cur = nav.querySelector('[aria-current="page"]');
     if (!cur) return [];
-    return [...cur.querySelectorAll('[aria-hidden="true"]')].filter((e) => {
-      if (e.tagName.toLowerCase() === "svg" || insideSvg(e)) return false;
+    const cr = cur.getBoundingClientRect();
+    return [...nav.querySelectorAll('[aria-hidden="true"]')].filter((e) => {
+      if (e.tagName.toLowerCase() === "svg" || insideSvg(e) || e === cur || e.contains(cur)) return false;
       const r = e.getBoundingClientRect();
-      return r.height <= 6 && r.width > 4;
+      if (!(r.height <= 6 && r.width > 4)) return false;
+      const cx = r.left + r.width / 2;
+      return cx >= cr.left - 0.5 && cx <= cr.right + 0.5;
     });
   };
-  w.__lis = (nav) => [...nav.querySelectorAll("li")];
-  w.__isEllipsis = (li) => norm(li.textContent) === "…" || norm(li.textContent) === "..." || li.getAttribute("aria-hidden") === "true";
-  w.__ctrl = (li) => li.querySelector("a, button, [aria-disabled]");
+  // while sampling the bar is followed wherever it is drawn (framer draws it inside the NEW cell and offsets it with a
+  // transform, so its centre can be outside the column): any aria-hidden, non-svg, thin box in the nav
+  w.__ulAny = (nav) => [...nav.querySelectorAll('[aria-hidden="true"]')].filter((e) => {
+    if (e.tagName.toLowerCase() === "svg" || insideSvg(e) || e.contains(nav.querySelector('[aria-current="page"]'))) return false;
+    const r = e.getBoundingClientRect();
+    return r.height <= 6 && r.width > 4;
+  });
+  w.__lis = (nav) => [...nav.querySelectorAll("li, [role=listitem]")];
+  w.__isEllipsis = (li) => norm(li.innerText) === "…" || norm(li.innerText) === "..." || li.getAttribute("aria-hidden") === "true";
+  w.__ctrl = (li) => li.querySelector("a, button, [role=button], [role=link], [aria-disabled]");
   w.__row = (nav) => w.__lis(nav).map((li) => {
-    if (li.matches("[aria-live]") || li.querySelector("[aria-live]")) return norm(li.textContent);
+    if (li.matches("[aria-live]") || li.querySelector("[aria-live]")) return norm(li.innerText);
     if (w.__isEllipsis(li)) return "…";
     const c = w.__ctrl(li) ?? li;
-    const t = norm(c.textContent);
+    const t = norm(c.innerText);
     return c.getAttribute("aria-current") === "page" ? "[" + t + "]" : t;
   });
-  w.__name = (e) => norm(e.getAttribute("aria-label") ?? e.textContent);
+  w.__name = (e) => norm(e.getAttribute("aria-label") ?? e.innerText);
   w.__role = (e) => { const t = e.tagName.toLowerCase(); return e.getAttribute("role") ?? (t === "a" ? "link" : t === "button" ? "button" : t); };
   w.__focusDesc = () => {
     const e = document.activeElement;
@@ -72,6 +83,26 @@ const initHelpers = (rootSel) => {
     const ni = w.__navs().findIndex((n) => n.contains(e));
     return `${ni}|${w.__role(e)}:${w.__name(e).slice(0, 30)}`;
   };
+  // mountTravel: how far the underline moves inside its own cell across frames after it first appears (does not animate on first render)
+  w.__mt = { first: null, min: {}, max: {}, done: false };
+  const mtick = () => {
+    const r = w.__root && w.__root();
+    if (r && !w.__mt.done) {
+      const now = performance.now();
+      for (const [i, nv] of w.__navs().entries()) {
+        const cur = nv.querySelector('[aria-current="page"]');
+        const u = cur && w.__ul(nv)[0];
+        if (!u) continue;
+        if (w.__mt.first == null) w.__mt.first = now;
+        if (now - w.__mt.first > 700) continue;
+        const v = u.getBoundingClientRect().left - cur.getBoundingClientRect().left;
+        w.__mt.min[i] = Math.min(w.__mt.min[i] ?? v, v);
+        w.__mt.max[i] = Math.max(w.__mt.max[i] ?? v, v);
+      }
+    }
+    if (!w.__mt.done) requestAnimationFrame(mtick);
+  };
+  requestAnimationFrame(mtick);
   w.__evT = null;
   const mark = () => { w.__evT = performance.now(); };
   document.addEventListener("click", mark, true);
@@ -88,10 +119,10 @@ const initHelpers = (rootSel) => {
           t: now,
           n: w.__navs().map((nav) => {
             const cur = nav.querySelector('[aria-current="page"]');
-            const us = w.__ul(nav);
+            const us = w.__ulAny(nav);
             const r = us[0]?.getBoundingClientRect();
             return {
-              cur: cur ? norm(cur.textContent) : null,
+              cur: cur ? norm(cur.innerText) : null,
               cellL: cur ? cur.getBoundingClientRect().left : null,
               u: r ? [r.left, r.width, r.top, r.height] : null,
               count: us.length,
@@ -128,35 +159,47 @@ function curve(frames, i = 0, others = []) {
   const lo = Math.min(preLeft, rest), hi = Math.max(preLeft, rest);
   const passesBetween = hi - lo > 2 && post.some((fr) => fr.n[i].u[0] > lo + 1 && fr.n[i].u[0] < hi - 1);
   const end = rest - (last.n[i].cellL ?? rest);
+  const amp = Math.abs(start);
+  const crossed = (frac) => { if (!firstChanged || amp < 0.3) return 0; const fr = post.find((f2) => f2.t >= (firstChanged.t ?? 0) && Math.abs(off(f2)) <= frac * amp); return fr ? fr.t : 0; };
+  const t50Ms = crossed(0.5), t90Ms = crossed(0.1);
   const otherPositions = {};
   for (const o of others) otherPositions[o] = new Set(frames.map((fr) => JSON.stringify(fr.n[o]?.u))).size;
   return {
-    animates: movers.length > 1, firstDir, start, peak, end, settleMs, movingFrames: movers.length,
+    animates: movers.length > 1, firstDir, start, peak, end, settleMs, t50Ms, t90Ms, movingFrames: movers.length,
     from: preLeft - rest, passesBetween, otherPositions,
     maxCount: Math.max(...frames.map((fr) => fr.n[i].count)),
   };
 }
-function curveChecks(id, name, c, { withBetween = false } = {}) {
+// startKind "px" compares the first-frame offset, its peak and direction; "info" records them only (on a jump the
+// original's first frame sits 20px beyond the old bar, a framer artefact). timing: add threshold times t50/t90.
+function curveChecks(id, name, c, { withBetween = false, startKind = "px", timing = true } = {}) {
   if (!c) throw new Error(`no underline curve for ${name}`);
   chk(id, `${name}.animates`, "exact", c.animates);
-  chk(id, `${name}.firstDir`, "dir", c.firstDir);
-  chk(id, `${name}.start`, "px", +c.start.toFixed(2));
-  chk(id, `${name}.peak`, "px", +c.peak.toFixed(2));
+  chk(id, `${name}.firstDir`, startKind === "px" ? "dir" : "info", c.firstDir);
+  chk(id, `${name}.start`, startKind, +c.start.toFixed(2));
+  chk(id, `${name}.peak`, startKind, +c.peak.toFixed(2));
   chk(id, `${name}.end`, "px", +c.end.toFixed(2));
   chk(id, `${name}.settleMs`, "ms", +c.settleMs.toFixed(0));
-  chk(id, `${name}.movingFrames`, "count", c.movingFrames);
+  if (timing) {
+    chk(id, `${name}.t50Ms`, "ms", +c.t50Ms.toFixed(0));
+    chk(id, `${name}.t90Ms`, "ms", +c.t90Ms.toFixed(0));
+  }
+  chk(id, `${name}.movingFrames`, "info", c.movingFrames);
   if (withBetween) chk(id, `${name}.passesBetween`, "exact", c.passesBetween);
   chk(id, `${name}.restFrom`, "info", +c.from.toFixed(2));
 }
 
 // ---------------------------------------------------------------- scenario + page helpers
+function watch(page) {
+  page.on("pageerror", (e) => consoleErrors.push("pageerror: " + String(e).slice(0, 200)));
+  page.on("console", (m) => { if (m.type() === "error" && !/favicon|Failed to load resource/.test(m.text())) consoleErrors.push("console: " + m.text().slice(0, 200)); });
+}
 async function scenario(opts, fn, url = URL_) {
   const ctx = await browser.newContext({ viewport: { width: 1100, height: 900 }, deviceScaleFactor: 1, locale: "en-US", colorScheme: "light", ...opts });
   await ctx.addInitScript(() => { try { localStorage.setItem("sunui-theme", "light"); } catch (e) {} });
   await ctx.addInitScript(initHelpers, ROOT);
   const page = await ctx.newPage();
-  page.on("pageerror", (e) => consoleErrors.push("pageerror: " + String(e).slice(0, 200)));
-  page.on("console", (m) => { if (m.type() === "error" && !/favicon|Failed to load resource/.test(m.text())) consoleErrors.push("console: " + m.text().slice(0, 200)); });
+  watch(page);
   try {
     try { await page.goto(url, { waitUntil: "networkidle", timeout: 30000 }); } catch { /* dev servers keep sockets open */ }
     await page.locator(ROOT).getByRole("navigation").first().waitFor({ timeout: 15000 });
@@ -198,7 +241,7 @@ async function sampledKey(page, key, ms = 1000) {
 const row = (page, i) => page.evaluate((i) => window.__row(window.__navs()[i]), i);
 const hash = (page) => page.evaluate(() => location.hash);
 const header = async (page) => {
-  const t = await R(page).getByText(/\d+ to \d+ of \d+ items|286/).first().textContent();
+  const t = await R(page).getByText(/\d+ to \d+ of \d+ items|286/).first().innerText();
   return norm(t);
 };
 const current = (page, i) => page.evaluate((i) => { const c = window.__navs()[i].querySelector('[aria-current="page"]'); return c ? window.__name(c) : null; }, i);
@@ -223,7 +266,7 @@ async function settle(page) {
   await sleep(500);
   let prev = "";
   for (let k = 0; k < 12; k++) {
-    const sig = JSON.stringify(await page.evaluate(() => window.__navs().map((n) => [window.__row(n), (window.__ul(n)[0]?.getBoundingClientRect().left ?? null)])));
+    const sig = JSON.stringify(await page.evaluate(() => window.__navs().map((n) => [window.__row(n), (window.__ulAny(n)[0]?.getBoundingClientRect().left ?? null)])));
     if (sig === prev) break;
     prev = sig;
     await sleep(350);
@@ -232,12 +275,12 @@ async function settle(page) {
 async function goTo(page, n, i = 0) {
   for (let k = 0; k < 20; k++) {
     if (await has(page, i, `Page ${n}`)) { await click(page, i, `Page ${n}`, 650); return; }
-    const cur = parseInt(norm(await page.evaluate((i) => window.__navs()[i].querySelector('[aria-current="page"]')?.textContent, i)), 10);
+    const cur = parseInt(norm(await page.evaluate((i) => window.__navs()[i].querySelector('[aria-current="page"]')?.innerText, i)), 10);
     await click(page, i, n > cur ? "Next" : "Previous", 450);
   }
   throw new Error(`cannot reach page ${n}`);
 }
-const pageNames = (page, i) => page.evaluate((i) => [...window.__navs()[i].querySelectorAll("a[aria-label], button[aria-label], a, button")].map((e) => window.__name(e)), i);
+const pageNames = (page, i) => page.evaluate((i) => [...window.__navs()[i].querySelectorAll("a[aria-label], button[aria-label], a, button, [role=button], [role=link]")].map((e) => window.__name(e)), i);
 
 // ---------------------------------------------------------------- items
 await item("first-render-main", () => scenario({}, async (page) => {
@@ -269,6 +312,9 @@ await item("first-render-main", () => scenario({}, async (page) => {
   chk(id, "main.underline.ariaHidden", "exact", ul.hidden);
   const others = await page.evaluate(() => window.__navs().map((n) => window.__ul(n).length));
   chk(id, "main.underline.perInstance", "exact", others);
+  const mt = await page.evaluate(() => { window.__mt.done = true; return Object.keys(window.__mt.max).map((i) => window.__mt.max[i] - window.__mt.min[i]); });
+  chk(id, "main.underline.mountTravel", "px", Math.max(0, ...mt));
+  chk(id, "main.underline.mountTravelInstances", "count", mt.length);
   await page.screenshot({ path: `${PILOT}/shots/pagination-${LABEL}-00-initial.png` }).catch(() => {});
 }));
 
@@ -283,7 +329,7 @@ await item("first-render-secondary", () => scenario({}, async (page) => {
   chk(id1, "orders.prevOpacity", "ratio", p.opacity);
   chk(id1, "orders.currentLabel", "exact", await current(page, 1));
   chk(id1, "reviews.row", "exact", r2);
-  chk(id1, "reviews.text", "exact", norm(await nav(page, 2).textContent()));
+  chk(id1, "reviews.text", "exact", norm(await nav(page, 2).innerText()));
   chk(id1, "reviews.pageButtons", "count", await nav(page, 2).locator('[aria-label^="Page"]').count());
   const a = await info(page, 2, "Previous"), b = await info(page, 2, "Next");
   chk(id1, "reviews.bothEnabled", "exact", !isDisabled(a) && !isDisabled(b));
@@ -352,12 +398,12 @@ await item("limits-disabled", async () => {
   await scenario({}, async (page) => {
     for (let k = 0; k < 4; k++) await click(page, 2, "Previous", 120);
     await sleep(250);
-    chk(id, "limits.compact.first.text", "exact", norm(await nav(page, 2).locator("[aria-live]").first().textContent()));
+    chk(id, "limits.compact.first.text", "exact", norm(await nav(page, 2).locator("[aria-live]").first().innerText()));
     chk(id, "limits.compact.first.prevDisabled", "exact", isDisabled(await info(page, 2, "Previous")));
     chk(id, "limits.compact.first.nextEnabled", "exact", !isDisabled(await info(page, 2, "Next")));
     for (let k = 0; k < 40; k++) await click(page, 2, "Next", 50);
     await sleep(300);
-    chk(id, "limits.compact.last.text", "exact", norm(await nav(page, 2).locator("[aria-live]").first().textContent()));
+    chk(id, "limits.compact.last.text", "exact", norm(await nav(page, 2).locator("[aria-live]").first().innerText()));
     chk(id, "limits.compact.last.nextDisabled", "exact", isDisabled(await info(page, 2, "Next")));
     chk(id, "limits.compact.last.prevEnabled", "exact", !isDisabled(await info(page, 2, "Previous")));
   });
@@ -389,26 +435,48 @@ await item("underline-spring", () => scenario({}, async (page) => {
   chk(id, "spring.a.otherUnderlinesStill", "exact", [1, 2].map((o) => a.otherPositions[o]));
   chk(id, "spring.a.underlineCount", "count", a.maxCount);
   fr = await sampledClick(page, 0, "Previous");
-  curveChecks(id, "spring.b.backward7to6", curve(fr, 0, [1, 2]), { withBetween: true });
+  const b = curve(fr, 0, [1, 2]);
+  curveChecks(id, "spring.b.backward7to6", b, { withBetween: true });
+  chk(id, "spring.ab.backwardLarger", "exact", Math.abs(b.start) > 1.5 * Math.abs(a.start));
   await sampledClick(page, 0, "Page 7");
   fr = await sampledClick(page, 0, "Page 12", 1400);
   const c = curve(fr, 0, [1, 2]);
-  curveChecks(id, "spring.c.jump7to12", c, { withBetween: true });
+  curveChecks(id, "spring.c.jump7to12", c, { withBetween: true, startKind: "info" });
   chk(id, "spring.c.otherUnderlinesStill", "exact", [1, 2].map((o) => c.otherPositions[o]));
   chk(id, "spring.c.settleUnder1s", "exact", c.settleMs < 1000);
+}));
+
+// more springs: backward moves inside the sliding window, and moves where the row switches between the centred and the edge layout
+await item("underline-spring", () => scenario({}, async (page) => {
+  const id = "underline-spring";
+  const go = async (name) => curve(await sampledClick(page, 0, name), 0);
+  curveChecks(id, "spring.d.prev6to5", await go("Previous"));
+  curveChecks(id, "spring.e.prev5to4", await go("Previous"));
+  curveChecks(id, "spring.e.next4to5", await go("Next"));
+  await click(page, 0, "Previous", 700);
+  curveChecks(id, "spring.e.page5from4", await go("Page 5"));
+  await click(page, 0, "Page 6", 700);
+  await click(page, 0, "Page 7", 700);
+  curveChecks(id, "spring.d.page6from7", await go("Page 6"));
+  curveChecks(id, "spring.d.page5from6", await go("Page 5"));
 }));
 
 await item("reduced-motion", () => scenario({ reducedMotion: "reduce" }, async (page) => {
   const id = "reduced-motion";
   chk(id, "reduced.mediaMatches", "exact", await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches));
   let fr = await sampledClick(page, 0, "Page 7", 800);
-  curveChecks(id, "reduced.card1.6to7", curve(fr, 0), { withBetween: true });
+  const r67 = curve(fr, 0);
+  // Under reduced motion the source jumps straight to the new cell. A single offset frame on a zero-travel move is a
+  // framer duration-0 artefact, so first-frame direction/start/peak and the offset frame are recorded as info only;
+  // the requirement is no intermediate positions and no animation.
+  curveChecks(id, "reduced.card1.6to7", r67, { withBetween: true, startKind: "info", timing: false });
+  chk(id, "reduced.card1.6to7.offsetFrame", "info", r67.movingFrames >= 1);
   chk(id, "reduced.card1.afterRow", "exact", await row(page, 0));
   fr = await sampledClick(page, 0, "Page 12", 800);
-  curveChecks(id, "reduced.card1.7to12", curve(fr, 0), { withBetween: true });
+  curveChecks(id, "reduced.card1.7to12", curve(fr, 0), { withBetween: true, startKind: "info", timing: false });
   chk(id, "reduced.card1.header", "exact", await header(page));
   fr = await sampledClick(page, 1, "Page 3", 800);
-  curveChecks(id, "reduced.orders.1to3", curve(fr, 1), { withBetween: true });
+  curveChecks(id, "reduced.orders.1to3", curve(fr, 1), { withBetween: true, startKind: "info", timing: false });
   chk(id, "reduced.orders.current", "exact", await current(page, 1));
 }));
 
@@ -542,7 +610,7 @@ await item("accessible-names", () => scenario({}, async (page) => {
     for (const n of window.__navs()) {
       for (const s of n.querySelectorAll("svg")) if (!s.closest('[aria-hidden="true"]')) out.svgExposed++;
       for (const li of window.__lis(n)) {
-        if (li.textContent.trim() === "…") { out.ellipsisTotal++; if (li.closest('[aria-hidden="true"]')) out.ellipsisHidden++; }
+        if (li.innerText.trim() === "…") { out.ellipsisTotal++; if (li.closest('[aria-hidden="true"]')) out.ellipsisHidden++; }
       }
       for (const u of window.__ul(n)) if (u.getAttribute("aria-hidden") !== "true") out.ulHidden = false;
     }
@@ -551,16 +619,21 @@ await item("accessible-names", () => scenario({}, async (page) => {
   chk(id, "a11y.svgExposed", "count", hid.svgExposed);
   chk(id, "a11y.ellipsisAllHidden", "exact", hid.ellipsisTotal > 0 && hid.ellipsisTotal === hid.ellipsisHidden);
   chk(id, "a11y.underlineHidden", "exact", hid.ulHidden);
+  chk(id, "a11y.underlineTabindex", "exact", await page.evaluate(() => window.__navs().map((n) => window.__ul(n).map((u) => u.getAttribute("tabindex")))));
+  const uc = await page.evaluate(() => { const r = window.__ul(window.__navs()[0])[0].getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+  await page.mouse.click(uc.x, uc.y); await sleep(200);
+  chk(id, "a11y.underlineClickFocus", "exact", await active(page));
+  chk(id, "a11y.underlineClickCurrent", "exact", await current(page, 0));
 }));
 
 await item("compact-live", () => scenario({}, async (page) => {
   const id = "compact-live";
   const live = nav(page, 2).locator("[aria-live]").first();
-  chk(id, "live.before", "exact", norm(await live.textContent()));
+  chk(id, "live.before", "exact", norm(await live.innerText()));
   chk(id, "live.ariaLive", "exact", await live.getAttribute("aria-live"));
-  chk(id, "live.tag", "exact", await live.evaluate((e) => e.tagName.toLowerCase()));
+  chk(id, "live.role", "exact", await live.evaluate((e) => e.getAttribute("role") ?? (e.tagName.toLowerCase() === "li" ? "listitem" : e.tagName.toLowerCase())));
   await click(page, 2, "Next", 400);
-  chk(id, "live.after", "exact", norm(await live.textContent()));
+  chk(id, "live.after", "exact", norm(await live.innerText()));
 }));
 
 await item("locale", async () => {
@@ -578,21 +651,27 @@ await item("locale", async () => {
       await ctx.addInitScript(() => { try { localStorage.setItem("sunui-theme", "light"); } catch (e) {} });
       await ctx.addInitScript(initHelpers, ROOT);
       const page = await ctx.newPage();
+      watch(page);
       try {
         try { await page.goto(u, { waitUntil: "networkidle", timeout: 30000 }); } catch {}
         await page.locator(ROOT).getByRole("navigation").first().waitFor({ timeout: 15000 });
         await sleep(900);
+        await settle(page);
         const k = `locale.${l}`;
         const nm = [];
         for (let i = 0; i < 3; i++) nm.push(await nav(page, i).getAttribute("aria-label"));
+        // compared: only strings the component itself produces (nav name, Previous/Next, page names, compact text)
         chk(id, `${k}.navNames`, "exact", nm);
         chk(id, `${k}.card1Names`, "exact", await pageNames(page, 0));
+        chk(id, `${k}.ordersNames`, "exact", await pageNames(page, 1));
+        chk(id, `${k}.reviewsNames`, "exact", await pageNames(page, 2));
         chk(id, `${k}.currentName`, "exact", await current(page, 0));
+        chk(id, `${k}.compactText`, "exact", norm(await nav(page, 2).locator("[aria-live]").first().innerText()));
+        // demo copy (titles, range header) is not component-owned: info only
         const titles = [];
         for (const t of expect[l]) titles.push((await R(page).getByText(t, { exact: true }).count()) > 0);
-        chk(id, `${k}.titlesPresent`, "exact", titles);
-        chk(id, `${k}.header`, "exact", await header(page));
-        chk(id, `${k}.compactText`, "exact", norm(await nav(page, 2).locator("[aria-live]").first().textContent()));
+        chk(id, `${k}.demoTitlesPresent`, "info", titles);
+        chk(id, `${k}.demoHeader`, "info", await header(page));
       } finally { await ctx.close(); }
     });
   }
@@ -607,17 +686,18 @@ await item("layout-narrow", async () => {
     const cr = card.getBoundingClientRect();
     const lis = window.__lis(n);
     const rects = lis.map((li) => li.getBoundingClientRect());
-    const pageCells = lis.filter((li) => !window.__isEllipsis(li) && /^\d+$/.test(li.textContent.trim())).map((li) => window.__ctrl(li).getBoundingClientRect());
-    const ell = lis.filter((li) => li.textContent.trim() === "…").map((li) => li.getBoundingClientRect());
+    const pageCells = lis.filter((li) => !window.__isEllipsis(li) && /^\d+$/.test(li.innerText.trim())).map((li) => window.__ctrl(li).getBoundingClientRect());
+    const ell = lis.filter((li) => li.innerText.trim() === "…").map((li) => li.getBoundingClientRect());
     const prev = window.__ctrl(lis[0]);
-    const word = [...prev.querySelectorAll("*")].concat([prev]).flatMap((e) => [...e.childNodes].filter((c) => c.nodeType === 3 && c.textContent.trim())).map((tn) => { const r = document.createRange(); r.selectNodeContents(tn); const b = r.getBoundingClientRect(); return { w: b.width, h: b.height, clip: getComputedStyle(tn.parentElement).clip }; });
+    const word = [...prev.querySelectorAll("*")].concat([prev]).flatMap((e) => [...e.childNodes].filter((c) => c.nodeType === 3 && c.textContent.trim())).map((tn) => { const pe = tn.parentElement; const b = pe.getBoundingClientRect(); const st = getComputedStyle(pe); const clipped = /^rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)$/.test(st.clip.trim()) || /inset\(50%\)/.test(st.clipPath) || st.visibility === "hidden" || st.display === "none"; return { w: b.width, h: b.height, clipped }; });
     const pr = prev.getBoundingClientRect();
+    const nr = window.__ctrl(lis[lis.length - 1]).getBoundingClientRect();
     const left = Math.min(...rects.map((r) => r.left)), right = Math.max(...rects.map((r) => r.right));
     return {
       cardW: cr.width, cardL: cr.left, rowW: right - left, rowL: left, rowR: right,
       cellH: pageCells.map((r) => r.height), cellW: pageCells.map((r) => r.width), ellH: ell.map((r) => r.height), ellW: ell.map((r) => r.width),
       gap: rects[1].left - rects[0].right, centerOff: (left + right) / 2 - (cr.left + cr.width / 2),
-      prevW: pr.width, prevWordVisible: word.some((x) => x.w > 4 && x.h > 4), prevName: window.__name(prev),
+      prevW: pr.width, nextW: nr.width, prevWordVisible: word.some((x) => x.w > 4 && x.h > 4 && !x.clipped), prevName: window.__name(prev),
       chevronOutside: pr.left < cr.left || pr.right > cr.right || rects[rects.length - 1].right > cr.right,
     };
   });
@@ -634,6 +714,7 @@ await item("layout-narrow", async () => {
     chk(id, "layout.wide.rowFitsCard", "exact", m.rowW <= m.cardW);
     chk(id, "layout.wide.cellWidths", "info", m.cellW);
     chk(id, "layout.wide.prevWidth", "info", m.prevW);
+    chk(id, "layout.wide.nextWidth", "info", m.nextW);
   });
   for (const w of [600, 340]) {
     await scenario({ viewport: { width: w, height: 800 } }, async (page) => {
@@ -647,7 +728,8 @@ await item("layout-narrow", async () => {
       chk(id, `layout.w${w}.chevronsOutsideCard`, "exact", m.chevronOutside);
       chk(id, `layout.w${w}.rowWidth`, "info", m.rowW);
       chk(id, `layout.w${w}.cardWidth`, "info", m.cardW);
-      chk(id, `layout.w${w}.prevWidth`, "info", m.prevW);
+      chk(id, `layout.w${w}.prevWidth`, "px", m.prevW);
+      chk(id, `layout.w${w}.nextWidth`, "px", m.nextW);
       await page.screenshot({ path: `${PILOT}/shots/pagination-${LABEL}-narrow-${w}.png` }).catch(() => {});
     });
   }

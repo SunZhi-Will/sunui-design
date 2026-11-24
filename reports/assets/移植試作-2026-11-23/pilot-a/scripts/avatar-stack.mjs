@@ -1,7 +1,7 @@
 // Acceptance script for the SunUI block "avatar-stack". One script, any target (React original or a port).
 //   node avatar-stack.mjs --url <url> --root "<css selector>" --out <file.json> --label <name>
 // Elements are found by role, accessible name, aria attributes or visible text only.
-import { chromium } from "/private/tmp/claude-501/-Users-sun--claude-spares-spare-pTIojw/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pilot/cap/node_modules/playwright-core/index.mjs";
+import { chromium } from "/private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/cap/node_modules/playwright-core/index.mjs";
 import { findChrome } from "/Applications/Projects/nextjs/sunui-design/apps/web/scripts/find-chrome.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -12,6 +12,8 @@ if (!URL0 || !ROOT || !OUT || !LABEL) { console.error("usage: --url --root --out
 
 const BLOCK = "avatar-stack";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const SHOTS = path.join(path.dirname(path.resolve(OUT)), "..", "shots");
+const shot = async (page, step) => { try { fs.mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: path.join(SHOTS, `avatar-stack-${LABEL}-${step}.png`) }); } catch (e) {} };
 const checks = [];
 const keys = new Set();
 const errors = [];
@@ -43,7 +45,9 @@ function pageFns() {
     "林美娜", "陳立歐", "陈立欧", "李艾娃", "王諾亞", "王诺亚", "柯莎拉", "台北，2 小時前", "台北，2 小时前", "大阪，5 小時前", "大阪，5 小时前", "首爾，昨天", "首尔，昨天", "台中，昨天", "新加坡，2 天前", "還有 94 人", "还有 94 人",
     "佐藤美奈", "中村玲央", "鈴木彩", "渡辺直人", "加藤沙羅", "台北、2 時間前", "大阪、5 時間前", "ソウル、昨日", "台中、昨日", "シンガポール、2 日前", "ほか 94 人",
   ]);
-  const nameOf = (e) => (e ? e.getAttribute("aria-label") || (e.textContent || "").trim() : null);
+  const txt = (e) => ((e && (e.innerText ?? "")) || "").replace(/\s+/g, " ").trim();
+  window.__txt = txt;
+  const nameOf = (e) => (e ? e.getAttribute("aria-label") || txt(e) : null);
   window.__nameOf = nameOf;
   window.__rgba = (css) => {
     const c = document.createElement("canvas"); c.width = c.height = 1;
@@ -54,9 +58,16 @@ function pageFns() {
   const luma = (c) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   const isVisible = (e) => { if (e.checkVisibility) return e.checkVisibility({ checkVisibilityCSS: true }); for (let n = e; n && n.nodeType === 1; n = n.parentElement) if (getComputedStyle(n).display === "none") return false; return getComputedStyle(e).visibility !== "hidden"; };
   const effOpacity = (from, upTo) => { let op = 1, n = from; while (n && n.nodeType === 1) { op *= parseFloat(getComputedStyle(n).opacity); if (n === upTo) break; n = n.parentElement; } return op; };
+  // text inside a role=img counts only when it sits above the disc (a tooltip nested in the disc span); the disc's own initials, "+N" text and any sr-only text sit inside its box
+  const outsideImg = (e) => {
+    const img = e.closest('[role="img"]'); if (!img) return true;
+    const r = e.getBoundingClientRect();
+    return r.width > 1 && r.height > 1 && r.bottom <= img.getBoundingClientRect().top + 2;
+  };
   window.__tipEls = (rootSel) => {
     const root = document.querySelector(rootSel) || document.body;
-    const leaves = [...root.querySelectorAll("*")].filter((e) => e.children.length === 0 && TEXTS.has((e.textContent || "").trim()) && !e.closest('[role="img"]') && isVisible(e));
+    // present = visible by CSS AND effective opacity above 0.01 (a port may keep every tooltip mounted and hide it with opacity 0)
+    const leaves = [...root.querySelectorAll("*")].filter((e) => e.children.length === 0 && TEXTS.has(txt(e)) && isVisible(e) && effOpacity(e) > 0.01 && outsideImg(e));
     const m = new Map();
     for (const l of leaves) { const c = l.closest('[aria-hidden="true"]') || l.parentElement; if (!m.has(c)) m.set(c, []); m.get(c).push(l); }
     return [...m];
@@ -64,21 +75,27 @@ function pageFns() {
   // the whole tooltip container, found without the text whitelist: the visible aria-hidden element with text that is outside every role=img
   window.__tipBox = (rootSel) => {
     const root = document.querySelector(rootSel) || document.body;
-    const hid = [...root.querySelectorAll('[aria-hidden="true"]')].filter((e) => !e.closest('[role="img"]') && !(e.parentElement && e.parentElement.closest('[aria-hidden="true"]')) && (e.textContent || "").trim() && isVisible(e));
+    const hid = [...root.querySelectorAll('[aria-hidden="true"]')].filter((e) => outsideImg(e) && !(e.parentElement && e.parentElement.closest('[aria-hidden="true"]')) && txt(e) && isVisible(e) && effOpacity(e) > 0.01);
     if (hid.length) return hid[0];
     const disc = root.querySelector('[role="img"]:hover') || (document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute("role") === "img" ? document.activeElement : null);
     if (!disc) return null;
     const d = disc.getBoundingClientRect(); const cx = d.left + d.width / 2;
     const c = [...root.querySelectorAll("*")].filter((e) => {
-      if (e.closest('[role="img"]') || e.querySelector('[role="img"]') || !(e.textContent || "").trim() || !isVisible(e)) return false;
+      if (!outsideImg(e) || e.querySelector('[role="img"]') || !txt(e) || !isVisible(e) || effOpacity(e) <= 0.01) return false;
       const r = e.getBoundingClientRect();
       return r.width > 0 && r.bottom <= d.top + 2 && r.bottom >= d.top - 40 && Math.abs(r.left + r.width / 2 - cx) < 80;
     });
     c.sort((a, b) => { const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(); return rb.width * rb.height - ra.width * ra.height; });
     return c[0] || null;
   };
-  window.__tipText = (rootSel) => { const b = window.__tipBox(rootSel); if (!b) return ""; return ((b.innerText || b.textContent || "")).replace(/\s+/g, " ").trim(); };
-  window.__tipVis = (rootSel) => { const els = window.__tipEls(rootSel); if (!els.length) return { n: 0, op: 0, w: 0 }; const c = els[0][0]; return { n: els.length, op: effOpacity(c), w: c.getBoundingClientRect().width }; };
+  window.__tipText = (rootSel) => { const b = window.__tipBox(rootSel); if (!b) return ""; return ((b.innerText || "")).replace(/\s+/g, " ").trim(); };
+  // leaf-based tooltip measure: opacity is the max over the text leaves of the effective opacity walked up to the document (a nested inner element may fade or scale inside a static aria-hidden wrapper; max because line 2 is dimmed on purpose), box is the union of the leaves' rects (they include every ancestor transform)
+  window.__leafMeasure = (leaves) => {
+    let op = 0, L = Infinity, R = -Infinity, B = -Infinity;
+    for (const l of leaves) { op = Math.max(op, effOpacity(l)); const r = l.getBoundingClientRect(); L = Math.min(L, r.left); R = Math.max(R, r.right); B = Math.max(B, r.bottom); }
+    return { op, w: R - L, bottom: B };
+  };
+  window.__tipVis = (rootSel) => { const els = window.__tipEls(rootSel); if (!els.length) return { n: 0, op: 0, w: 0 }; const m = window.__leafMeasure(els[0][1]); return { n: els.length, op: m.op, w: m.w }; };
   window.__tipCount = (rootSel) => window.__tipEls(rootSel).length;
   window.__tipInfo = (rootSel) => window.__tipEls(rootSel).map(([c, leaves]) => {
     leaves.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
@@ -86,7 +103,7 @@ function pageFns() {
     const l1 = leaves[0], l2 = leaves[1];
     const bg = window.__rgba(cs.backgroundColor), fg = window.__rgba(getComputedStyle(l1).color);
     return {
-      lines: leaves.map((l) => l.textContent.trim()),
+      lines: leaves.map((l) => txt(l)),
       rect: [r.x, r.y, r.width, r.height],
       pe: cs.pointerEvents, ah: c.getAttribute("aria-hidden"),
       fs: parseFloat(getComputedStyle(l1).fontSize), radius: parseFloat(cs.borderTopLeftRadius),
@@ -106,8 +123,11 @@ function pageFns() {
     const t0 = performance.now(); const frames = [];
     const tick = () => {
       const now = performance.now();
-      const tv = window.__tipVis(rootSel);
-      frames.push({ t: now, y: els.map((e, i) => e.getBoundingClientRect().top - bases[i]), tips: tv.n, op: tv.op, w: tv.w });
+      const te = window.__tipEls(rootSel);
+      let op = 0, w = 0, tbot = null;
+      if (te.length) { const m = window.__leafMeasure(te[0][1]); op = m.op; w = m.w; tbot = m.bottom; }
+      // tb: tooltip bottom relative to each sampled disc's top, while a tooltip is visible (catches a slide-in at full opacity)
+      frames.push({ t: now, y: els.map((e, i) => e.getBoundingClientRect().top - bases[i]), tips: te.length, op, w, tb: tbot == null ? null : els.map((e) => tbot - e.getBoundingClientRect().top) });
       if (now - t0 < ms) requestAnimationFrame(tick); else res({ trig: window.__trig, frames });
     };
     requestAnimationFrame(tick);
@@ -141,7 +161,7 @@ function pageFns() {
         window.__ent.frames.push(imgs.map((e) => {
           let op = 1, n = e; while (n && n.nodeType === 1) { op *= parseFloat(getComputedStyle(n).opacity); n = n.parentElement; }
           const r = e.getBoundingClientRect(); const lr = (e.closest('[aria-label]:not([role="img"])') || document.body).getBoundingClientRect();
-          return { op, w: r.width, h: r.height, x: r.left - lr.left, y: r.top - lr.top, plus: (e.textContent || "").trim().startsWith("+") };
+          return { op, w: r.width, h: r.height, x: r.left - lr.left, y: r.top - lr.top, plus: txt(e).startsWith("+") };
         }));
       }
     }
@@ -210,7 +230,7 @@ const discInfo = (el) => {
   let bgAnc = null, n = el.parentElement;
   while (n) { const c = window.__rgba(getComputedStyle(n).backgroundColor); if (c[3] === 255) { bgAnc = c; break; } n = n.parentElement; }
   const bc = window.__rgba(cs.borderTopColor);
-  return { x: r.left, y: r.top, w: r.width, h: r.height, text: (el.textContent || "").trim(), bg: cs.backgroundColor, bgAlpha: window.__rgba(cs.backgroundColor)[3] / 255, bgImg: cs.backgroundImage, border: parseFloat(cs.borderTopWidth), borderIsCard: !!bgAnc && bgAnc.join() === bc.join(), color: cs.color, name: el.getAttribute("aria-label") };
+  return { x: r.left, y: r.top, w: r.width, h: r.height, text: (el.innerText || "").replace(/\s+/g, " ").trim(), bg: cs.backgroundColor, bgAlpha: window.__rgba(cs.backgroundColor)[3] / 255, bgImg: cs.backgroundImage, border: parseFloat(cs.borderTopWidth), borderIsCard: !!bgAnc && bgAnc.join() === bc.join(), color: cs.color, name: el.getAttribute("aria-label") };
 };
 async function discs(page, listName) {
   return listLoc(page, listName).getByRole("img").evaluateAll((els, fnSrc) => { const fn = eval("(" + fnSrc + ")"); return els.map(fn); }, discInfo.toString());
@@ -228,7 +248,7 @@ async function measure(page, handles, bases, ms, action) {
 }
 function reduce(r, i) {
   const trig = r.trig ?? r.frames[Math.min(1, r.frames.length - 1)].t;
-  const fs2 = r.frames.map((fr) => ({ t: fr.t - trig, y: fr.y[i], tips: fr.tips, op: fr.op, w: fr.w }));
+  const fs2 = r.frames.map((fr) => ({ t: fr.t - trig, y: fr.y[i], tips: fr.tips, op: fr.op, w: fr.w, tb: fr.tb ? fr.tb[i] : null }));
   const pre = fs2.filter((x) => x.t < 0), post = fs2.filter((x) => x.t >= 0);
   const start = pre.length ? pre[pre.length - 1].y : fs2[0].y;
   const end = fs2[fs2.length - 1].y;
@@ -239,24 +259,35 @@ function reduce(r, i) {
   const firstDir = mv ? (mv.y < start ? "up" : "down") : "none";
   let settleMs = 0;
   if (mv) for (let k = post.length - 1; k >= 0; k--) if (Math.abs(post[k].y - end) > 0.5) { settleMs = (post[k + 1] ?? post[k]).t; break; }
+  // settle to a 0.1px band: a bouncier spring keeps ringing well after it is inside 0.5px
+  let settle01Ms = 0;
+  if (mv) for (let k = post.length - 1; k >= 0; k--) if (Math.abs(post[k].y - end) > 0.1) { settle01Ms = (post[k + 1] ?? post[k]).t; break; }
+  // excursion past the end value in the direction of travel, as a fraction of the travel (about 0.03 in the original)
+  const travel = end - start;
+  const overshootRatio = Math.abs(travel) >= 1 ? Math.max(0, ...post.map((x) => (x.y - end) * Math.sign(travel))) / Math.abs(travel) : 0;
+  const tbs = fs2.filter((x) => x.tb != null).map((x) => x.tb);
+  const tipTravel = tbs.length ? Math.max(...tbs) - Math.min(...tbs) : 0;
   const tipsBefore = pre.length ? pre[pre.length - 1].tips : 0;
   const firstTip = post.find((x) => x.tips > 0);
   const tipOpacityAtAppear = tipsBefore > 0 ? pre[pre.length - 1].op : (firstTip ? firstTip.op : 0);
   const tipFullMs = tipsBefore > 0 && pre[pre.length - 1].op >= 0.99 ? 0 : (post.find((x) => x.tips > 0 && x.op >= 0.99)?.t ?? -1);
   const tipVisibleAfterLeaveMs = post.find((x) => x.tips === 0 || x.op < 0.01)?.t ?? -1;
+  const tipPartialFrames = post.some((x) => x.tips > 0 && x.op > 0.01 && x.op < 0.99);
+  const overshootPx = Math.abs(travel) >= 1 ? Math.max(0, ...post.map((x) => (x.y - end) * Math.sign(travel))) : 0;
   const wMax = Math.max(0, ...post.filter((x) => x.tips > 0).map((x) => x.w));
   const tipScaleAtAppear = tipsBefore > 0 || !firstTip || !wMax ? 1 : firstTip.w / wMax;
-  // curve shape without start latency: fraction of the travel done 50ms after the curve crosses 10% of it (interpolated)
-  let travelAt50 = 0;
+  // threshold crossing times from the trigger (interpolated between frames): time until 50 and 90 percent of the change is covered
+  let t50Ms = 0, t90Ms = 0, counterRatio = 0;
   if (Math.abs(end - start) >= 1) {
     const frac = (x) => (x.y - start) / (end - start);
-    const at = (t) => { const a = post.filter((x) => x.t <= t).pop(), b = post.find((x) => x.t > t); if (!a) return 0; if (!b) return frac(a); return frac(a) + (frac(b) - frac(a)) * ((t - a.t) / (b.t - a.t)); };
-    const k = post.findIndex((x) => frac(x) >= 0.1);
-    if (k >= 0) { const p0 = k > 0 ? post[k - 1] : null; const t10 = p0 ? p0.t + (post[k].t - p0.t) * ((0.1 - frac(p0)) / (frac(post[k]) - frac(p0))) : post[k].t; travelAt50 = at(t10 + 50); }
+    const cross = (th) => { const k = post.findIndex((x) => frac(x) >= th); if (k < 0) return -1; if (k === 0) return post[0].t; const a = post[k - 1], b = post[k]; return a.t + (b.t - a.t) * ((th - frac(a)) / (frac(b) - frac(a))); };
+    t50Ms = cross(0.5); t90Ms = cross(0.9);
+    // largest excursion against the direction of travel, as a fraction of the travel (a spring that starts the wrong way)
+    counterRatio = Math.max(0, ...post.map((x) => -frac(x)));
   }
   const on = tipsBefore > 0 ? 0 : (post.find((x) => x.tips > 0)?.t ?? -1);
   const off = post.find((x) => x.tips === 0)?.t ?? -1;
-  return { start, end, min, max, animates, firstDir, settleMs: Math.max(0, settleMs), tipAppearMs: on, tipGoneMs: off, tipsEnd: fs2[fs2.length - 1].tips, tipOpacityAtAppear, tipFullMs, tipVisibleAfterLeaveMs, tipScaleAtAppear, travelAt50, maxAbs: Math.max(...fs2.map((x) => Math.abs(x.y))) };
+  return { start, end, min, max, animates, firstDir, settleMs: Math.max(0, settleMs), settle01Ms: Math.max(0, settle01Ms), overshootRatio, overshootPx, tipPartialFrames, tipTravel, tipAppearMs: on, tipGoneMs: off, tipsEnd: fs2[fs2.length - 1].tips, tipOpacityAtAppear, tipFullMs, tipVisibleAfterLeaveMs, tipScaleAtAppear, t50Ms, t90Ms, counterRatio, maxAbs: Math.max(...fs2.map((x) => Math.abs(x.y))) };
 }
 function emitCurve(item, prefix, c, tip) {
   add(item, `${prefix}.animates`, "exact", c.animates);
@@ -266,14 +297,25 @@ function emitCurve(item, prefix, c, tip) {
   add(item, `${prefix}.min`, "px", c.min);
   add(item, `${prefix}.max`, "px", c.max);
   add(item, `${prefix}.settleMs`, "ms", c.settleMs);
+  add(item, `${prefix}.settle01Ms`, "ms", c.settle01Ms);
   // exact lift and spring shape: px checks alone allow 1.5px either way and cannot see a 0.09px overshoot
   add(item, `${prefix}.endRounded`, "exact", String(Math.round(c.end) + 0));
-  if (prefix.endsWith(".in")) { add(item, `${prefix}.overshoots`, "exact", c.min < c.end - 0.04); add(item, `${prefix}.travelAt50ms`, "ratio", c.travelAt50); }
-  else add(item, `${prefix}.overshoots`, "exact", c.max > c.end + 0.04);
-  if (tip === "appear") { add(item, `${prefix}.tipOpacityAtAppear`, "ratio", c.tipOpacityAtAppear); add(item, `${prefix}.tipFullMs`, "ms", c.tipFullMs); add(item, `${prefix}.tipScaleAtAppear`, "ratio", c.tipScaleAtAppear); }
-  if (tip === "gone" && prefix.endsWith(".out")) add(item, `${prefix}.tipVisibleAfterLeaveMs`, "ms", c.tipVisibleAfterLeaveMs);
-  if (tip === "appear") add(item, `${prefix}.tipAppearMs`, "ms", c.tipAppearMs);
-  if (tip === "gone") add(item, `${prefix}.tipGoneMs`, "ms", c.tipGoneMs);
+  add(item, `${prefix}.t50Ms`, "ms", c.t50Ms);
+  add(item, `${prefix}.t90Ms`, "ms", c.t90Ms);
+  // wrong-way start: largest excursion against the travel, as a fraction of the travel (0 in the original, about 0.4 in a spring that inherits a stale velocity)
+  add(item, `${prefix}.counterTravel`, "ratio", c.counterRatio);
+  // overshoot past the end value, as a fraction of the travel (compared) and in px with the travel's sign (info)
+  add(item, `${prefix}.overshoot`, "ratio", c.overshootRatio);
+  // exact: the original overshoots by about 0.088 px, a port with no overshoot (ease-out tween, overdamped spring) reads false
+  if (/^(hoverFlow\.leo|focus\.leo|overflow\.(main|mug|tote))\.(in|out|in2|out2)$/.test(prefix)) add(item, `${prefix}.overshoots`, "exact", c.overshootPx > 0.03);
+  add(item, `${prefix}.overshootsInfo`, "info", c.end - c.start < 0 ? c.min - c.end : c.max - c.end);
+  // phase-tolerant: any frame after the trigger with a tooltip present at a partial opacity (a short fade, in or out); false in the original
+  if (tip) add(item, `${prefix}.tipPartialFrames`, "exact", c.tipPartialFrames);
+  if (tip === "appear") { add(item, `${prefix}.tipOpacityAtAppear`, "info", c.tipOpacityAtAppear); add(item, `${prefix}.tipFullMs`, "info", c.tipFullMs); add(item, `${prefix}.tipInstant`, "exact", c.tipFullMs >= 0 && c.tipFullMs <= 100); add(item, `${prefix}.tipScaleAtAppear`, "ratio", c.tipScaleAtAppear); add(item, `${prefix}.tipTravel`, "px", c.tipTravel); }
+  // first-frame times jitter by a frame or two, so the compared form is "within 100 ms" (no fade of 150 ms or more)
+  if (tip === "gone" && prefix.endsWith(".out")) add(item, `${prefix}.tipVisibleAfterLeaveMs`, "info", c.tipVisibleAfterLeaveMs);
+  if (tip === "appear") { add(item, `${prefix}.tipAppearMs`, "info", c.tipAppearMs); add(item, `${prefix}.tipAppearsWithin100ms`, "exact", c.tipAppearMs >= 0 && c.tipAppearMs <= 100); }
+  if (tip === "gone") { add(item, `${prefix}.tipGoneMs`, "info", c.tipGoneMs); add(item, `${prefix}.tipGoneWithin100ms`, "exact", c.tipGoneMs >= 0 && c.tipGoneMs <= 100); }
 }
 const topOf = (e) => e.getBoundingClientRect().top;
 
@@ -306,7 +348,7 @@ async function hoverFlow(page, item, prefix, disc, o = {}) {
     add(item, `${prefix}.tip.pointerEvents`, "exact", t.pe);
     add(item, `${prefix}.tip.ariaHidden`, "exact", t.ah);
     add(item, `${prefix}.tip.liveRegions`, "count", await page.evaluate((r2) => window.__live(r2), ROOT));
-    add(item, `${prefix}.tip.height`, "px", t.rect[3]);
+    add(item, `${prefix}.tip.height`, "info", t.rect[3]);
   }
   if (o.at && tips[0]) {
     const t = tips[0];
@@ -322,6 +364,13 @@ async function hoverFlow(page, item, prefix, disc, o = {}) {
   const cl = reduce(rl, 0);
   emitCurve(item, `${prefix}.out`, cl, "gone");
   add(item, `${prefix}.out.tipsLeft`, "count", cl.tipsEnd);
+  // second and third lift of the same disc: a spring restarted from a stale velocity only shows up after the first animation
+  await sleep(300);
+  const r3 = await measure(page, [handle], [base], 800, () => page.mouse.move(px, py));
+  emitCurve(item, `${prefix}.in2`, reduce(r3, 0));
+  await sleep(300);
+  const r4 = await measure(page, [handle], [base], 800, () => page.mouse.move(2, 2));
+  emitCurve(item, `${prefix}.out2`, reduce(r4, 0));
   return c;
 }
 
@@ -366,11 +415,11 @@ await guard("first-render-main-stack", async () => {
       add(i0, "entrance.minOpacity", "ratio", minOp);
       add(i0, "entrance.widthDrift", "px", wd);
       add(i0, "entrance.heightDrift", "px", hd);
-      add(i0, "entrance.xDrift", "px", xd);
-      add(i0, "entrance.yDrift", "px", yd);
+      add(i0, "entrance.mountTravel", "px", Math.max(xd, yd));
       add(i0, "entrance.frames", "info", frames.length);
     });
 
+    await shot(page, "initial");
     const snap = await snapshotLists(page);
     const main = await discs(page, LISTS[0]);
     const mug = await discs(page, LISTS[1]);
@@ -441,7 +490,7 @@ await guard("first-render-main-stack", async () => {
       add(i3, "avatar.names.mug", "exact", (byName[LISTS[1]] ?? []).slice(0, 2));
       add(i3, "avatar.names.tote", "exact", (byName[LISTS[2]] ?? []).slice(0, 2));
       const hidden = await listLoc(page, LISTS[0]).getByRole("img").evaluateAll((els) => els.slice(0, 4).map((e) => {
-        const leaves = [...e.querySelectorAll("*")].filter((x) => x.children.length === 0 && (x.textContent || "").trim());
+        const leaves = [...e.querySelectorAll("*")].filter((x) => x.children.length === 0 && (x.innerText || "").trim());
         return leaves.length > 0 && leaves.every((x) => x.closest('[aria-hidden="true"]'));
       }));
       add(i3, "avatar.initialsAriaHidden", "exact", hidden);
@@ -483,7 +532,11 @@ await guard("first-render-main-stack", async () => {
 await guard("tab-order", async () => {
   const { ctx, page } = await openPage(URL0, false, "tab");
   try {
-    const seq = [], rings = [], tips = [], ringInfos = [];
+    const seq = [], rings = [], tips = [], ringInfos = [], focusLift = [], prevLift = [];
+    // rest top of every focusable disc and button, recorded with the pointer away and nothing focused
+    await page.mouse.move(2, 2); await sleep(300);
+    await page.evaluate((sel) => { const m = new Map(); window.__rest = m; window.__prevEl = null; for (const e of document.querySelector(sel).querySelectorAll('[role="img"],button,[tabindex]')) m.set(e, e.getBoundingClientRect().top); }, ROOT);
+    const liftNow = () => page.evaluate(() => { const m = window.__rest; const d = (e) => (e && m.has(e) ? Math.round(e.getBoundingClientRect().top - m.get(e)) + 0 : null); return [d(document.activeElement), d(window.__prevEl)]; });
     await startBeforeRoot(page);
     let left = false;
     for (let i = 0; i < 30; i++) {
@@ -495,12 +548,21 @@ await guard("tab-order", async () => {
       ringInfos.push(await page.evaluate(() => window.__ringInfo(document.activeElement)));
       const t = await page.evaluate((r) => window.__tipInfo(r), ROOT);
       tips.push(`${t.length}|${(t[0]?.lines ?? []).join(" / ")}`);
+      // lift of this stop and of the previous one once both have settled (poll until two reads agree)
+      await sleep(250);
+      let a = await liftNow();
+      for (let k = 0; k < 8; k++) { await sleep(150); const b = await liftNow(); if (JSON.stringify(a) === JSON.stringify(b)) break; a = b; }
+      focusLift.push(a[0]); prevLift.push(i === 0 ? null : a[1]);
+      await page.evaluate(() => { window.__prevEl = document.activeElement; });
     }
     tabOrder = seq;
     await guard("tab-order", async () => {
       add("tab-order", "tab.order", "exact", seq);
       add("tab-order", "tab.stopCount", "count", seq.length);
       add("tab-order", "tab.leftRoot", "exact", left);
+      // y of each stop relative to its rest top after it settles (expected -3 on every img stop, 0 on the button), and the previous stop's lift (expected 0: it returned)
+      add("tab-order", "tab.focusLift", "exact", focusLift);
+      add("tab-order", "tab.prevStopLift", "exact", prevLift);
       // reverse
       let back = [];
       for (let i = 0; i < 40; i++) {
@@ -590,13 +652,62 @@ await guard("focus-lift-and-tooltip", async () => {
     t = await page.evaluate((r2) => window.__tipInfo(r2), ROOT);
     add(item, "focus.afterSecondTab.tips", "exact", t.map((x) => x.lines));
     add(item, "focus.afterSecondTab.tipText", "exact", await page.evaluate((r2) => window.__tipText(r2), ROOT));
+    // back onto Leo and away again: repeated lifts of the same disc by keyboard
+    await sleep(500);
+    r = await measure(page, hs, bases, 900, () => page.keyboard.press("Shift+Tab"));
+    emitCurve(item, "focus.leo.in2", reduce(r, 1));
+    emitCurve(item, "focus.ava.out", reduce(r, 2));
+    await sleep(500);
+    r = await measure(page, hs, bases, 900, () => page.keyboard.press("Tab"));
+    emitCurve(item, "focus.leo.out2", reduce(r, 1));
   } finally { await ctx.close(); }
+});
+
+// ---- hover and focus are independent per disc: Noah focused by keyboard, pointer on Leo
+async function comboFlow(page, item, pre) {
+  const imgs = listLoc(page, LISTS[0]).getByRole("img");
+  const leo = imgs.nth(1), noah = imgs.nth(3);
+  const hLeo = await leo.elementHandle(), hNoah = await noah.elementHandle();
+  await page.mouse.move(2, 2); await sleep(400);
+  const bLeo = await hLeo.evaluate(topOf), bNoah = await hNoah.evaluate(topOf);
+  await startBeforeRoot(page);
+  for (let i = 0; i < 20; i++) { await page.keyboard.press("Tab"); await sleep(150); const fi = await page.evaluate(focusInfo); if (fi && fi.name.startsWith("Noah W.")) break; }
+  await sleep(700);
+  const lines = async () => (await page.evaluate((r2) => window.__tipInfo(r2), ROOT)).map((x) => x.lines.join(" / ")).sort();
+  add(item, `${pre}.noahFocusedOnly.tips`, "exact", await lines());
+  add(item, `${pre}.noahFocusedOnly.noahLift`, "px", (await hNoah.evaluate(topOf)) - bNoah);
+  const lb = await leo.boundingBox();
+  await page.mouse.move(lb.x + lb.width * 0.65, lb.y + lb.height / 2); await sleep(700);
+  await shot(page, `${pre}-both`);
+  add(item, `${pre}.both.tips`, "exact", await lines());
+  add(item, `${pre}.both.tipCount`, "count", (await lines()).length);
+  add(item, `${pre}.both.leoLift`, "px", (await hLeo.evaluate(topOf)) - bLeo);
+  add(item, `${pre}.both.noahLift`, "px", (await hNoah.evaluate(topOf)) - bNoah);
+  add(item, `${pre}.both.focusStillOnNoah`, "exact", await page.evaluate(() => window.__nameOf(document.activeElement)));
+  await page.mouse.move(2, 2); await sleep(700);
+  await shot(page, `${pre}-afterLeave`);
+  add(item, `${pre}.afterLeave.tips`, "exact", await lines());
+  add(item, `${pre}.afterLeave.tipCount`, "count", (await lines()).length);
+  add(item, `${pre}.afterLeave.leoLift`, "px", (await hLeo.evaluate(topOf)) - bLeo);
+  add(item, `${pre}.afterLeave.noahLift`, "px", (await hNoah.evaluate(topOf)) - bNoah);
+  // pointer on the focused disc itself, then away: it keeps its focus lift and tooltip
+  const nb = await noah.boundingBox();
+  await page.mouse.move(nb.x + nb.width * 0.65, nb.y + nb.height / 2); await sleep(500);
+  await page.mouse.move(2, 2); await sleep(700);
+  add(item, `${pre}.hoverFocusedThenLeave.tips`, "exact", await lines());
+  add(item, `${pre}.hoverFocusedThenLeave.noahLift`, "px", (await hNoah.evaluate(topOf)) - bNoah);
+}
+await guard("focus-lift-and-tooltip", async () => {
+  const { ctx, page } = await openPage(URL0, false, "combo");
+  try { await comboFlow(page, "focus-lift-and-tooltip", "combo"); } finally { await ctx.close(); }
 });
 
 // ---- overflow discs
 await guard("overflow-lift-and-tooltip", async () => {
   const { ctx, page } = await openPage(URL0, false, "overflow");
   try {
+    // warm-up on a disc that this scenario does not measure: the very first tooltip of a page is slower in some implementations (cold start), which is not a property of the component
+    { const w = await listLoc(page, LISTS[0]).getByRole("img").first().boundingBox(); await page.mouse.move(w.x + w.width * 0.5, w.y + w.height / 2); await sleep(600); await page.mouse.move(2, 2); await sleep(600); }
     for (const [k, ln] of [["main", LISTS[0]], ["mug", LISTS[1]], ["tote", LISTS[2]]]) {
       await guard("overflow-lift-and-tooltip", async () => {
         await hoverFlow(page, "overflow-lift-and-tooltip", `overflow.${k}`, listLoc(page, ln).getByRole("img").last());
@@ -621,10 +732,11 @@ await guard("reduced-motion", async () => {
         for (const k of ["w", "x", "y"]) drift = Math.max(drift, Math.max(...col.map((d) => d[k])) - Math.min(...col.map((d) => d[k])));
       }
       add(item, "rm.entrance.minOpacity", "ratio", minOp);
-      add(item, "rm.entrance.drift", "px", drift);
+      add(item, "rm.entrance.mountTravel", "px", drift);
     });
     await guard(item, async () => { await hoverFlow(page, item, "rm.hover.leo", listLoc(page, LISTS[0]).getByRole("img", { name: LEO, exact: true }).first()); });
     await guard(item, async () => { await hoverFlow(page, item, "rm.hover.mainOverflow", listLoc(page, LISTS[0]).getByRole("img").last()); });
+    await guard(item, async () => { await comboFlow(page, item, "rm.combo"); });
     await guard(item, async () => {
       const imgs = listLoc(page, LISTS[0]).getByRole("img");
       const hs = [await imgs.nth(0).elementHandle(), await imgs.nth(1).elementHandle()];
@@ -643,41 +755,55 @@ await guard("reduced-motion", async () => {
   } finally { await ctx.close(); }
 });
 
-// ---- locales (the demo locale comes from the l= parameter of the page; a target that ignores it will show English)
+// ---- locales: l=<locale> in the URL. Only strings the component itself produces are compared (its label, "more" template,
+// "(count)" suffix, the "name, note" join, the overflow text). Demo copy and demo people stay English in the port demos: recorded as info.
 function withLocale(url, l) {
   if (/([?&])l=/.test(url)) return url.replace(/([?&])l=[^&]*/, `$1l=${encodeURIComponent(l)}`);
   return url + (url.includes("?") ? "&" : "?") + "l=" + encodeURIComponent(l);
 }
-const EXPECT = {
-  "zh-TW": { caption: "1,284 人在過去 30 天購買", button: "加入購物車", heading: "經常一起購買" },
-  "zh-CN": { caption: "1,284 人在过去 30 天购买", button: "加入购物车", heading: "经常一起购买" },
-  ja: { caption: "1,284 人が過去 30 日間に購入", button: "カートに入れる", heading: "よく一緒に購入されている商品" },
+const DEMO_NAMES = ["Mina P.", "Leo C.", "Ava L.", "Noah W.", "Sara K.", "林美娜", "陳立歐", "陈立欧", "李艾娃", "王諾亞", "王诺亚", "柯莎拉", "佐藤美奈", "中村玲央", "鈴木彩", "渡辺直人", "加藤沙羅"];
+const DEMO_NOTES = ["Taipei, 2 hours ago", "Osaka, 5 hours ago", "Seoul, yesterday", "Taichung, yesterday", "Singapore, 2 days ago", "台北，2 小時前", "台北，2 小时前", "大阪，5 小時前", "大阪，5 小时前", "首爾，昨天", "首尔，昨天", "台中，昨天", "新加坡，2 天前", "台北、2 時間前", "大阪、5 時間前", "ソウル、昨日", "台中、昨日", "シンガポール、2 日前"];
+// replace demo people and notes by placeholders so only the component's own template and separators remain
+const tpl = (str) => {
+  let o = String(str);
+  for (const n of [...DEMO_NOTES].sort((a, b) => b.length - a.length)) o = o.split(n).join("{note}");
+  for (const n of [...DEMO_NAMES].sort((a, b) => b.length - a.length)) o = o.split(n).join("{name}");
+  return o;
 };
+const countOf = (name) => (String(name).match(/\((\d+)\)\s*$/) || [])[1] ?? null;
 for (const l of ["zh-TW", "zh-CN", "ja"]) {
   const item = l === "zh-TW" ? "locale-zh-tw" : "locale-zh-cn-ja";
   await guard(item, async () => {
     const { ctx, page } = await openPage(withLocale(URL0, l), false, "locale-" + l);
     try {
       const snap = await snapshotLists(page);
-      add(item, `locale.${l}.listNames`, "exact", snap.map((s) => s.name));
-      add(item, `locale.${l}.discNames.main`, "exact", snap[0]?.imgs ?? []);
-      add(item, `locale.${l}.discNames.mug`, "exact", snap[1]?.imgs ?? []);
-      add(item, `locale.${l}.discNames.tote`, "exact", snap[2]?.imgs ?? []);
-      const texts = [];
-      for (const s of snap) texts.push((await listLoc(page, s.name).getByRole("img").evaluateAll((els) => els.map((e) => (e.textContent || "").trim()))));
-      add(item, `locale.${l}.discTexts`, "exact", texts);
+      if (snap.length !== 3) throw new Error(`expected 3 named lists, found ${snap.length}: ${JSON.stringify(snap.map((s) => s.name))}`);
+      // component-owned
+      add(item, `locale.${l}.mainListName`, "exact", snap[0].name);
+      add(item, `locale.${l}.listCounts`, "exact", snap.map((s) => countOf(s.name)));
+      add(item, `locale.${l}.avatarNameTemplates`, "exact", snap.map((s) => s.imgs.slice(0, -1).map(tpl)));
+      add(item, `locale.${l}.overflowNameTemplates`, "exact", snap.map((s) => tpl(s.imgs[s.imgs.length - 1] ?? "")));
+      const overflowTexts = [];
+      for (const s of snap) overflowTexts.push(await listLoc(page, s.name).getByRole("img").last().evaluate((e) => (e.innerText || "").replace(/\s+/g, " ").trim()));
+      add(item, `locale.${l}.overflowTexts`, "exact", overflowTexts);
+      // the tote overflow has nobody hidden: its tooltip is the component's own "N more" text
+      const tote = listLoc(page, snap[2].name).getByRole("img").last();
+      const tb = await tote.boundingBox();
+      await page.mouse.move(tb.x + tb.width * 0.5, tb.y + tb.height / 2); await sleep(500);
+      add(item, `locale.${l}.toteOverflow.tipText`, "exact", await page.evaluate((r2) => window.__tipText(r2), ROOT));
+      await page.mouse.move(2, 2); await sleep(300);
+      // demo copy and people: not compared
       const text = (await root(page).innerText()).replace(/\s+/g, " ");
-      add(item, `locale.${l}.caption`, "exact", text.includes(EXPECT[l].caption));
-      add(item, `locale.${l}.buttonName`, "exact", (await root(page).getByRole("button", { name: EXPECT[l].button, exact: true }).count()) === 1);
-      add(item, `locale.${l}.headingName`, "exact", (await root(page).getByRole("heading", { name: EXPECT[l].heading, exact: true }).count()) === 1);
       add(item, `locale.${l}.rootText`, "info", text);
-      // hover the first disc: tooltip lines
+      add(item, `locale.${l}.listNames`, "info", snap.map((s) => s.name));
+      add(item, `locale.${l}.avatarNames`, "info", snap.map((s) => s.imgs));
+      const texts = [];
+      for (const s of snap) texts.push(await listLoc(page, s.name).getByRole("img").evaluateAll((els) => els.map((e) => (e.innerText || "").replace(/\s+/g, " ").trim())));
+      add(item, `locale.${l}.discTexts`, "info", texts);
       const first = listLoc(page, snap[0].name).getByRole("img").first();
       const box = await first.boundingBox();
       await page.mouse.move(box.x + box.width * 0.5, box.y + box.height / 2); await sleep(400);
-      const t = await page.evaluate((r2) => window.__tipInfo(r2), ROOT);
-      add(item, `locale.${l}.hoverFirst.tipLines`, "exact", t.map((x) => x.lines));
-      add(item, `locale.${l}.hoverFirst.tipText`, "exact", await page.evaluate((r2) => window.__tipText(r2), ROOT));
+      add(item, `locale.${l}.hoverFirst.tipText`, "info", await page.evaluate((r2) => window.__tipText(r2), ROOT));
     } finally { await ctx.close(); }
   });
 }

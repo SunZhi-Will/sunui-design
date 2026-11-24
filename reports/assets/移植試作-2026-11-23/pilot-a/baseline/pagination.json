@@ -1,0 +1,2222 @@
+{
+ "block": "pagination",
+ "runs": 3,
+ "checks": {
+  "main.header": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": "121 to 144 of 286 items"
+  },
+  "main.row": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "5",
+    "[6]",
+    "7",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "main.slots": {
+   "item": "first-render-main",
+   "kind": "count",
+   "value": 7
+  },
+  "main.prevEnabled": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": true
+  },
+  "main.nextEnabled": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": true
+  },
+  "main.prevOpacity": {
+   "item": "first-render-main",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "main.currentAria": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": "page"
+  },
+  "main.currentBolder": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": true
+  },
+  "main.currentWeight": {
+   "item": "first-render-main",
+   "kind": "info",
+   "values": [
+    590,
+    590,
+    590
+   ]
+  },
+  "main.underline.count": {
+   "item": "first-render-main",
+   "kind": "count",
+   "value": 1
+  },
+  "main.underline.height": {
+   "item": "first-render-main",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "main.underline.insetLeft": {
+   "item": "first-render-main",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "main.underline.insetRight": {
+   "item": "first-render-main",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "main.underline.insetBottom": {
+   "item": "first-render-main",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "main.underline.rounded": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": true
+  },
+  "main.underline.ariaHidden": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": "true"
+  },
+  "main.underline.perInstance": {
+   "item": "first-render-main",
+   "kind": "exact",
+   "value": [
+    1,
+    1,
+    0
+   ]
+  },
+  "main.underline.mountTravel": {
+   "item": "first-render-main",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "main.underline.mountTravelInstances": {
+   "item": "first-render-main",
+   "kind": "count",
+   "value": 2
+  },
+  "orders.row": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "[1]",
+    "2",
+    "3",
+    "4",
+    "Next"
+   ]
+  },
+  "orders.ellipsisCount": {
+   "item": "first-render-secondary",
+   "kind": "count",
+   "value": 0
+  },
+  "orders.prevDisabled": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": true
+  },
+  "orders.prevOpacity": {
+   "item": "first-render-secondary",
+   "kind": "ratio",
+   "min": 0.4,
+   "max": 0.4
+  },
+  "orders.currentLabel": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": "Page 1"
+  },
+  "reviews.row": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "3 / 38",
+    "Next"
+   ]
+  },
+  "reviews.text": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": "Previous 3 / 38 Next"
+  },
+  "reviews.pageButtons": {
+   "item": "first-render-secondary",
+   "kind": "count",
+   "value": 0
+  },
+  "reviews.bothEnabled": {
+   "item": "first-render-secondary",
+   "kind": "exact",
+   "value": true
+  },
+  "range.page1.row": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "[1]",
+    "2",
+    "3",
+    "4",
+    "5",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "range.page1.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 7
+  },
+  "range.page4.row": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "2",
+    "3",
+    "[4]",
+    "5",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "range.page4.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 7
+  },
+  "range.page5.row": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "4",
+    "[5]",
+    "6",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "range.page5.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 7
+  },
+  "range.page9.row": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "8",
+    "[9]",
+    "10",
+    "11",
+    "12",
+    "Next"
+   ]
+  },
+  "range.page9.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 7
+  },
+  "range.page12.row": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "8",
+    "9",
+    "10",
+    "11",
+    "[12]",
+    "Next"
+   ]
+  },
+  "range.page12.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 7
+  },
+  "range.orders.slots": {
+   "item": "range-fixed-length",
+   "kind": "count",
+   "value": 4
+  },
+  "range.orders.noEllipsis": {
+   "item": "range-fixed-length",
+   "kind": "exact",
+   "value": true
+  },
+  "select7.current": {
+   "item": "select-page",
+   "kind": "exact",
+   "value": "Page 7"
+  },
+  "select7.row": {
+   "item": "select-page",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "6",
+    "[7]",
+    "8",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "select7.header": {
+   "item": "select-page",
+   "kind": "exact",
+   "value": "145 to 168 of 286 items"
+  },
+  "select7.bolder": {
+   "item": "select-page",
+   "kind": "exact",
+   "value": true
+  },
+  "prevnext.sequence": {
+   "item": "prev-next",
+   "kind": "exact",
+   "value": [
+    "Page 7",
+    "Page 6",
+    "Page 5"
+   ]
+  },
+  "prevnext.header": {
+   "item": "prev-next",
+   "kind": "exact",
+   "value": "97 to 120 of 286 items"
+  },
+  "prevnext.row": {
+   "item": "prev-next",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "4",
+    "[5]",
+    "6",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "ends.page1.header": {
+   "item": "range-text-ends",
+   "kind": "exact",
+   "value": "1 to 24 of 286 items"
+  },
+  "ends.page12.header": {
+   "item": "range-text-ends",
+   "kind": "exact",
+   "value": "265 to 286 of 286 items"
+  },
+  "limits.first.disabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.first.opacity": {
+   "item": "limits-disabled",
+   "kind": "ratio",
+   "min": 0.4,
+   "max": 0.4
+  },
+  "limits.first.noHoverBg": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.first.pageAfterPresses": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": "Page 1"
+  },
+  "limits.first.focusable": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": false
+  },
+  "limits.last.disabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.last.opacity": {
+   "item": "limits-disabled",
+   "kind": "ratio",
+   "min": 0.4,
+   "max": 0.4
+  },
+  "limits.last.noHoverBg": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.last.pageAfterPresses": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": "Page 12"
+  },
+  "limits.last.focusable": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": false
+  },
+  "limits.compact.first.text": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": "1 / 38"
+  },
+  "limits.compact.first.prevDisabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.compact.first.nextEnabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.compact.last.text": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": "38 / 38"
+  },
+  "limits.compact.last.nextDisabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "limits.compact.last.prevEnabled": {
+   "item": "limits-disabled",
+   "kind": "exact",
+   "value": true
+  },
+  "noop.unchanged": {
+   "item": "current-page-noop",
+   "kind": "exact",
+   "value": true
+  },
+  "noop.current": {
+   "item": "current-page-noop",
+   "kind": "exact",
+   "value": "Page 6"
+  },
+  "noop.row": {
+   "item": "current-page-noop",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "5",
+    "[6]",
+    "7",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "noop.header": {
+   "item": "current-page-noop",
+   "kind": "exact",
+   "value": "121 to 144 of 286 items"
+  },
+  "noop.underlinePositions": {
+   "item": "current-page-noop",
+   "kind": "count",
+   "value": 1
+  },
+  "noop.otherUnderlinePositions": {
+   "item": "current-page-noop",
+   "kind": "exact",
+   "value": [
+    1,
+    1
+   ]
+  },
+  "spring.a.forward6to7.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.a.forward6to7.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "left"
+  },
+  "spring.a.forward6to7.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.a.forward6to7.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.a.forward6to7.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.a.forward6to7.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 260,
+   "max": 266
+  },
+  "spring.a.forward6to7.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 94,
+   "max": 100
+  },
+  "spring.a.forward6to7.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 143,
+   "max": 150
+  },
+  "spring.a.forward6to7.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    15,
+    15,
+    16
+   ]
+  },
+  "spring.a.forward6to7.passesBetween": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": false
+  },
+  "spring.a.forward6to7.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "spring.a.otherUnderlinesStill": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": [
+    1,
+    1
+   ]
+  },
+  "spring.a.underlineCount": {
+   "item": "underline-spring",
+   "kind": "count",
+   "value": 1
+  },
+  "spring.b.backward7to6.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.b.backward7to6.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "right"
+  },
+  "spring.b.backward7to6.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.b.backward7to6.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.b.backward7to6.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.b.backward7to6.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 299,
+   "max": 311
+  },
+  "spring.b.backward7to6.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 84,
+   "max": 99
+  },
+  "spring.b.backward7to6.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 145,
+   "max": 151
+  },
+  "spring.b.backward7to6.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    18,
+    20,
+    18
+   ]
+  },
+  "spring.b.backward7to6.passesBetween": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": false
+  },
+  "spring.b.backward7to6.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "spring.ab.backwardLarger": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.c.jump7to12.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.c.jump7to12.firstDir": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    "left",
+    "left",
+    "left"
+   ]
+  },
+  "spring.c.jump7to12.start": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    -136,
+    -136,
+    -136
+   ]
+  },
+  "spring.c.jump7to12.peak": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    -136,
+    -136,
+    -136
+   ]
+  },
+  "spring.c.jump7to12.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.c.jump7to12.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 349,
+   "max": 350
+  },
+  "spring.c.jump7to12.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 99,
+   "max": 100
+  },
+  "spring.c.jump7to12.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 149,
+   "max": 150
+  },
+  "spring.c.jump7to12.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    21,
+    22,
+    21
+   ]
+  },
+  "spring.c.jump7to12.passesBetween": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.c.jump7to12.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    -116,
+    -116,
+    -116
+   ]
+  },
+  "spring.c.otherUnderlinesStill": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": [
+    1,
+    1
+   ]
+  },
+  "spring.c.settleUnder1s": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.d.prev6to5.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.d.prev6to5.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "right"
+  },
+  "spring.d.prev6to5.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.prev6to5.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.prev6to5.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.d.prev6to5.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 301,
+   "max": 317
+  },
+  "spring.d.prev6to5.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 98,
+   "max": 101
+  },
+  "spring.d.prev6to5.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 148,
+   "max": 152
+  },
+  "spring.d.prev6to5.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    19,
+    18,
+    19
+   ]
+  },
+  "spring.d.prev6to5.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "spring.e.prev5to4.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.e.prev5to4.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "right"
+  },
+  "spring.e.prev5to4.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.e.prev5to4.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.e.prev5to4.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.e.prev5to4.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 313,
+   "max": 316
+  },
+  "spring.e.prev5to4.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 96,
+   "max": 99
+  },
+  "spring.e.prev5to4.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 146,
+   "max": 150
+  },
+  "spring.e.prev5to4.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    18,
+    18,
+    18
+   ]
+  },
+  "spring.e.prev5to4.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    -4,
+    -4,
+    -4
+   ]
+  },
+  "spring.e.next4to5.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.e.next4to5.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "left"
+  },
+  "spring.e.next4to5.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.e.next4to5.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.e.next4to5.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.e.next4to5.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 263,
+   "max": 267
+  },
+  "spring.e.next4to5.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 97,
+   "max": 100
+  },
+  "spring.e.next4to5.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 147,
+   "max": 150
+  },
+  "spring.e.next4to5.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    16,
+    16,
+    17
+   ]
+  },
+  "spring.e.next4to5.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    4,
+    4,
+    4
+   ]
+  },
+  "spring.e.page5from4.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.e.page5from4.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "left"
+  },
+  "spring.e.page5from4.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.e.page5from4.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "spring.e.page5from4.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.e.page5from4.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 263,
+   "max": 266
+  },
+  "spring.e.page5from4.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 96,
+   "max": 100
+  },
+  "spring.e.page5from4.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 146,
+   "max": 150
+  },
+  "spring.e.page5from4.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    16,
+    17,
+    16
+   ]
+  },
+  "spring.e.page5from4.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    4,
+    4,
+    4
+   ]
+  },
+  "spring.d.page6from7.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.d.page6from7.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "right"
+  },
+  "spring.d.page6from7.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.page6from7.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.page6from7.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.d.page6from7.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 299,
+   "max": 315
+  },
+  "spring.d.page6from7.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 99,
+   "max": 100
+  },
+  "spring.d.page6from7.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 149,
+   "max": 150
+  },
+  "spring.d.page6from7.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    18,
+    20,
+    18
+   ]
+  },
+  "spring.d.page6from7.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "spring.d.page5from6.animates": {
+   "item": "underline-spring",
+   "kind": "exact",
+   "value": true
+  },
+  "spring.d.page5from6.firstDir": {
+   "item": "underline-spring",
+   "kind": "dir",
+   "value": "right"
+  },
+  "spring.d.page5from6.start": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.page5from6.peak": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 40,
+   "max": 40
+  },
+  "spring.d.page5from6.end": {
+   "item": "underline-spring",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "spring.d.page5from6.settleMs": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 299,
+   "max": 299
+  },
+  "spring.d.page5from6.t50Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 99,
+   "max": 100
+  },
+  "spring.d.page5from6.t90Ms": {
+   "item": "underline-spring",
+   "kind": "ms",
+   "min": 149,
+   "max": 150
+  },
+  "spring.d.page5from6.movingFrames": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    18,
+    18,
+    18
+   ]
+  },
+  "spring.d.page5from6.restFrom": {
+   "item": "underline-spring",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "reduced.mediaMatches": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "reduced.card1.6to7.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.card1.6to7.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "left"
+  },
+  "reduced.card1.6to7.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "reduced.card1.6to7.peak": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": -20,
+   "max": -20
+  },
+  "reduced.card1.6to7.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "reduced.card1.6to7.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 37,
+   "max": 42
+  },
+  "reduced.card1.6to7.movingFrames": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "reduced.card1.6to7.passesBetween": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.card1.6to7.restFrom": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "reduced.card1.6to7.offsetFrame": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "reduced.card1.afterRow": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "1",
+    "…",
+    "6",
+    "[7]",
+    "8",
+    "…",
+    "12",
+    "Next"
+   ]
+  },
+  "reduced.card1.7to12.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.card1.7to12.firstDir": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    "left",
+    "left",
+    "left"
+   ]
+  },
+  "reduced.card1.7to12.start": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    -136,
+    -136,
+    -136
+   ]
+  },
+  "reduced.card1.7to12.peak": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    -136,
+    -136,
+    -136
+   ]
+  },
+  "reduced.card1.7to12.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "reduced.card1.7to12.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 32,
+   "max": 32
+  },
+  "reduced.card1.7to12.movingFrames": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "reduced.card1.7to12.passesBetween": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.card1.7to12.restFrom": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    -116,
+    -116,
+    -116
+   ]
+  },
+  "reduced.card1.header": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "265 to 286 of 286 items"
+  },
+  "reduced.orders.1to3.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.orders.1to3.firstDir": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    "right",
+    "right",
+    "right"
+   ]
+  },
+  "reduced.orders.1to3.start": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "reduced.orders.1to3.peak": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    -80,
+    -80,
+    -80
+   ]
+  },
+  "reduced.orders.1to3.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "reduced.orders.1to3.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 32,
+   "max": 33
+  },
+  "reduced.orders.1to3.movingFrames": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "reduced.orders.1to3.passesBetween": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "reduced.orders.1to3.restFrom": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    -80,
+    -80,
+    -80
+   ]
+  },
+  "reduced.orders.current": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Page 3"
+  },
+  "tabs.card1": {
+   "item": "tab-order-buttons",
+   "kind": "exact",
+   "value": [
+    "button:Previous",
+    "button:Page 1",
+    "button:Page 5",
+    "button:Page 6",
+    "button:Page 7",
+    "button:Page 12",
+    "button:Next"
+   ]
+  },
+  "tabs.orders": {
+   "item": "tab-order-buttons",
+   "kind": "exact",
+   "value": [
+    "link:Page 1",
+    "link:Page 2",
+    "link:Page 3",
+    "link:Page 4",
+    "link:Next"
+   ]
+  },
+  "tabs.reviews": {
+   "item": "tab-order-buttons",
+   "kind": "exact",
+   "value": [
+    "button:Previous",
+    "button:Next"
+   ]
+  },
+  "tabs.total": {
+   "item": "tab-order-buttons",
+   "kind": "count",
+   "value": 14
+  },
+  "tabs.focusRing.width": {
+   "item": "tab-order-buttons",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "tabs.focusRing.offset": {
+   "item": "tab-order-buttons",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "kb.reached7": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": true
+  },
+  "kb.enter.current": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": "Page 7"
+  },
+  "kb.enter.focus": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": "0|button:Page 7"
+  },
+  "kb.reachedNext": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": true
+  },
+  "kb.space.current": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": "Page 8"
+  },
+  "kb.space.focus": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": "0|button:Next"
+  },
+  "kb.space.header": {
+   "item": "keyboard-activate",
+   "kind": "exact",
+   "value": "169 to 192 of 286 items"
+  },
+  "link.hrefs": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": [
+    "#orders-page-1",
+    "#orders-page-2",
+    "#orders-page-3",
+    "#orders-page-4"
+   ]
+  },
+  "link.pagesAreLinks": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": true
+  },
+  "link.prev.isLink": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": false
+  },
+  "link.prev.ariaDisabled": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "true"
+  },
+  "link.prev.hasHref": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": false
+  },
+  "link.next.href": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "#orders-page-2"
+  },
+  "link.p3.hash": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "#orders-page-3"
+  },
+  "link.p3.current": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "Page 3"
+  },
+  "link.p3.prevHref": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "#orders-page-2"
+  },
+  "link.p4.hash": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "#orders-page-4"
+  },
+  "link.p4.nextAriaDisabled": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": "true"
+  },
+  "link.p4.nextIsLink": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": false
+  },
+  "link.p4.nextHasHref": {
+   "item": "link-mode",
+   "kind": "exact",
+   "value": false
+  },
+  "lag.prev.current": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "Page 3"
+  },
+  "lag.prev.hash": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "#orders-page-2"
+  },
+  "lag.p2.hash": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "#orders-page-2"
+  },
+  "lag.next.current": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "Page 3"
+  },
+  "lag.next.hash": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "#orders-page-4"
+  },
+  "lag.numbered.current": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "Page 3"
+  },
+  "lag.numbered.hash": {
+   "item": "link-href-lag",
+   "kind": "exact",
+   "value": "#orders-page-3"
+  },
+  "lkb.reached": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": true
+  },
+  "lkb.space.current": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "Page 1"
+  },
+  "lkb.space.hash": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": ""
+  },
+  "lkb.enter.current": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "Page 2"
+  },
+  "lkb.enter.hash": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "#orders-page-2"
+  },
+  "lkb.shiftTab.focus": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "1|link:Page 1"
+  },
+  "lkb.page1.current": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "Page 1"
+  },
+  "lkb.page1.hash": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "#orders-page-1"
+  },
+  "lkb.page1again.hash": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "#orders-page-1"
+  },
+  "lkb.page1again.current": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "Page 1"
+  },
+  "lkb.page1again.unchanged": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": true
+  },
+  "lkb.page1.hrefKept": {
+   "item": "link-keyboard-and-current",
+   "kind": "exact",
+   "value": "#orders-page-1"
+  },
+  "a11y.navCount": {
+   "item": "accessible-names",
+   "kind": "count",
+   "value": 3
+  },
+  "a11y.navNames": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    "Pagination",
+    "Pagination",
+    "Pagination"
+   ]
+  },
+  "a11y.listCount": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    1,
+    1,
+    1
+   ]
+  },
+  "a11y.card1.names": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "Page 1",
+    "Page 5",
+    "Page 6",
+    "Page 7",
+    "Page 12",
+    "Next"
+   ]
+  },
+  "a11y.orders.names": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    "Page 1",
+    "Page 2",
+    "Page 3",
+    "Page 4",
+    "Next"
+   ]
+  },
+  "a11y.reviews.names": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    "Previous",
+    "Next"
+   ]
+  },
+  "a11y.currentCount": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    1,
+    1,
+    0
+   ]
+  },
+  "a11y.currentValue": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    "page",
+    "page",
+    null
+   ]
+  },
+  "a11y.svgExposed": {
+   "item": "accessible-names",
+   "kind": "count",
+   "value": 0
+  },
+  "a11y.ellipsisAllHidden": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": true
+  },
+  "a11y.underlineHidden": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": true
+  },
+  "a11y.underlineTabindex": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": [
+    [
+     null
+    ],
+    [
+     null
+    ],
+    []
+   ]
+  },
+  "a11y.underlineClickFocus": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": "0|button:Page 6"
+  },
+  "a11y.underlineClickCurrent": {
+   "item": "accessible-names",
+   "kind": "exact",
+   "value": "Page 6"
+  },
+  "live.before": {
+   "item": "compact-live",
+   "kind": "exact",
+   "value": "3 / 38"
+  },
+  "live.ariaLive": {
+   "item": "compact-live",
+   "kind": "exact",
+   "value": "polite"
+  },
+  "live.role": {
+   "item": "compact-live",
+   "kind": "exact",
+   "value": "listitem"
+  },
+  "live.after": {
+   "item": "compact-live",
+   "kind": "exact",
+   "value": "4 / 38"
+  },
+  "locale.zh-TW.navNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "分頁",
+    "分頁",
+    "分頁"
+   ]
+  },
+  "locale.zh-TW.card1Names": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "上一頁",
+    "第 1 頁",
+    "第 5 頁",
+    "第 6 頁",
+    "第 7 頁",
+    "第 12 頁",
+    "下一頁"
+   ]
+  },
+  "locale.zh-TW.ordersNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "第 1 頁",
+    "第 2 頁",
+    "第 3 頁",
+    "第 4 頁",
+    "下一頁"
+   ]
+  },
+  "locale.zh-TW.reviewsNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "上一頁",
+    "下一頁"
+   ]
+  },
+  "locale.zh-TW.currentName": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "第 6 頁"
+  },
+  "locale.zh-TW.compactText": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "3 / 38"
+  },
+  "locale.zh-TW.demoTitlesPresent": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ]
+   ]
+  },
+  "locale.zh-TW.demoHeader": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    "第 121 至 144 項，共 286 項",
+    "第 121 至 144 項，共 286 項",
+    "第 121 至 144 項，共 286 項"
+   ]
+  },
+  "locale.zh-CN.navNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "分页",
+    "分页",
+    "分页"
+   ]
+  },
+  "locale.zh-CN.card1Names": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "上一页",
+    "第 1 页",
+    "第 5 页",
+    "第 6 页",
+    "第 7 页",
+    "第 12 页",
+    "下一页"
+   ]
+  },
+  "locale.zh-CN.ordersNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "第 1 页",
+    "第 2 页",
+    "第 3 页",
+    "第 4 页",
+    "下一页"
+   ]
+  },
+  "locale.zh-CN.reviewsNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "上一页",
+    "下一页"
+   ]
+  },
+  "locale.zh-CN.currentName": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "第 6 页"
+  },
+  "locale.zh-CN.compactText": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "3 / 38"
+  },
+  "locale.zh-CN.demoTitlesPresent": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ]
+   ]
+  },
+  "locale.zh-CN.demoHeader": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    "第 121 至 144 项，共 286 项",
+    "第 121 至 144 项，共 286 项",
+    "第 121 至 144 项，共 286 项"
+   ]
+  },
+  "locale.ja.navNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "ページ送り",
+    "ページ送り",
+    "ページ送り"
+   ]
+  },
+  "locale.ja.card1Names": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "前へ",
+    "1 ページ目",
+    "5 ページ目",
+    "6 ページ目",
+    "7 ページ目",
+    "12 ページ目",
+    "次へ"
+   ]
+  },
+  "locale.ja.ordersNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "1 ページ目",
+    "2 ページ目",
+    "3 ページ目",
+    "4 ページ目",
+    "次へ"
+   ]
+  },
+  "locale.ja.reviewsNames": {
+   "item": "locale",
+   "kind": "exact",
+   "value": [
+    "前へ",
+    "次へ"
+   ]
+  },
+  "locale.ja.currentName": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "6 ページ目"
+  },
+  "locale.ja.compactText": {
+   "item": "locale",
+   "kind": "exact",
+   "value": "3 / 38"
+  },
+  "locale.ja.demoTitlesPresent": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ],
+    [
+     true,
+     true,
+     true
+    ]
+   ]
+  },
+  "locale.ja.demoHeader": {
+   "item": "locale",
+   "kind": "info",
+   "values": [
+    "全 286 件中 121〜144 件",
+    "全 286 件中 121〜144 件",
+    "全 286 件中 121〜144 件"
+   ]
+  },
+  "layout.wide.cellHeight": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.wide.cellHeightsAll36": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.cellMinWidth36": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.ellipsisHeight": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.wide.ellipsisMinWidth28": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.gap": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "layout.wide.centered": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.prevWordVisible": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.rowFitsCard": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.wide.cellWidths": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    [
+     36,
+     36,
+     36,
+     36,
+     36
+    ],
+    [
+     36,
+     36,
+     36,
+     36,
+     36
+    ],
+    [
+     36,
+     36,
+     36,
+     36,
+     36
+    ]
+   ]
+  },
+  "layout.wide.prevWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    94.9375,
+    94.9375,
+    94.9375
+   ]
+  },
+  "layout.wide.nextWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    70.359375,
+    70.359375,
+    70.359375
+   ]
+  },
+  "layout.w600.prevWordVisible": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": false
+  },
+  "layout.w600.prevName": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": "Previous"
+  },
+  "layout.w600.namesKept": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.w600.cellHeight": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.w600.gap": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "layout.w600.rowWiderThanCard": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": false
+  },
+  "layout.w600.chevronsOutsideCard": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": false
+  },
+  "layout.w600.rowWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    340,
+    340,
+    340
+   ]
+  },
+  "layout.w600.cardWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    558,
+    558,
+    558
+   ]
+  },
+  "layout.w600.prevWidth": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.w600.nextWidth": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.w340.prevWordVisible": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": false
+  },
+  "layout.w340.prevName": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": "Previous"
+  },
+  "layout.w340.namesKept": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.w340.cellHeight": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.w340.gap": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "layout.w340.rowWiderThanCard": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.w340.chevronsOutsideCard": {
+   "item": "layout-narrow",
+   "kind": "exact",
+   "value": true
+  },
+  "layout.w340.rowWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    340,
+    340,
+    340
+   ]
+  },
+  "layout.w340.cardWidth": {
+   "item": "layout-narrow",
+   "kind": "info",
+   "values": [
+    298,
+    298,
+    298
+   ]
+  },
+  "layout.w340.prevWidth": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "layout.w340.nextWidth": {
+   "item": "layout-narrow",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  }
+ },
+ "tabOrder": [
+  "button:Previous",
+  "button:Page 1",
+  "button:Page 5",
+  "button:Page 6",
+  "button:Page 7",
+  "button:Page 12",
+  "button:Next",
+  "link:Page 1",
+  "link:Page 2",
+  "link:Page 3",
+  "link:Page 4",
+  "link:Next",
+  "button:Previous",
+  "button:Next"
+ ],
+ "tabStable": true,
+ "unstable": [],
+ "runErrors": [
+  [],
+  [],
+  []
+ ],
+ "consoleErrors": [
+  [],
+  [],
+  []
+ ]
+}

@@ -8,7 +8,16 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "hover-lift-and-tooltip: on pointer leave the disc first jumps about 1.2px FURTHER up before returning, and takes about 60% longer to settle. Leo, per-frame y after leave: svelte 5ms -3.02, 20ms -3.93, 36ms -4.24, 53ms -3.92, 70ms -3.33 ... overshoot +0.13, settled 286 ms. Original: 12ms -3, 29ms -3, 45ms -2.83, 62ms -2.45 ... overshoot +0.09, settled 178 ms (vue 155 ms). The original never goes above -3. Reproduced on every run (two full runs, 5 discs each: min y -4.21 to -4.24, settle 285 to 292 ms).",
-   "checks": []
+   "checks": [
+    "hoverFlow.leo.out.counterTravel",
+    "hoverFlow.leo.out.firstDir",
+    "hoverFlow.leo.out.t50Ms",
+    "hoverFlow.leo.out.settleMs",
+    "hoverFlow.leo.out2.counterTravel",
+    "hoverFlow.leo.out2.settleMs",
+    "hoverFlow.leo.out.settle01Ms",
+    "hoverFlow.leo.out2.settle01Ms"
+   ]
   },
   {
    "id": "p2-svelte-2",
@@ -16,7 +25,13 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "focus-lift-and-tooltip: the same wrong-direction kick on keyboard focus and blur. Focusing Leo after it had been animated once: svelte y goes DOWN first, 17ms +0.89, 32ms +1.24, 51ms +0.95, 66ms +0.37, then up to -3.13 peak; original 15ms -0.1, 32ms -0.44, 48ms -0.93, monotonic to -3.09. On blur svelte 5ms -3.26, 22ms -4.15, 38ms -4.16 before returning; original stays at or below -3 in magnitude. Final rest positions (-3 and 0) are correct.",
-   "checks": []
+   "checks": [
+    "focus.leo.in2.counterTravel",
+    "focus.leo.in2.firstDir",
+    "focus.leo.out.counterTravel",
+    "focus.mina.out.counterTravel",
+    "focus.leo.out2.counterTravel"
+   ]
   },
   {
    "id": "p2-svelte-3",
@@ -24,7 +39,20 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "overflow-lift-and-tooltip: same return-leg defect on the overflow discs (+1.3K leave: 3ms -3.02, 19ms -3.99, 36ms -4.21, settled 285 ms vs original 168 ms; +410 and +94 min y -4.21/-4.22, settle 289 ms). Likely cause: the lift action calls controls.stop() then motion animate(node,{y}) again, which starts the new spring with a wrong initial velocity; only the first animation of each disc is clean (first hover-in matches the original: peak -3.09, settled about 155 ms).",
-   "checks": []
+   "checks": [
+    "overflow.main.out.counterTravel",
+    "overflow.mug.out.counterTravel",
+    "overflow.tote.out.counterTravel",
+    "overflow.main.out.settleMs",
+    "overflow.mug.out.settleMs",
+    "overflow.tote.out.settleMs",
+    "overflow.main.in2.counterTravel",
+    "overflow.mug.in2.counterTravel",
+    "overflow.tote.in2.counterTravel",
+    "overflow.main.out.settle01Ms",
+    "overflow.mug.out.settle01Ms",
+    "overflow.tote.out.settle01Ms"
+   ]
   },
   {
    "id": "p3-svelte-4",
@@ -32,7 +60,14 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "hover-lift-and-tooltip: the lift spring first moves the WRONG way on every lift except the very first one after page load. Per-frame disc top, relative to start, hover-in cycle 2 and 3 on Leo C. (target -3px): port 0 -> +1.00 (17ms) -> +1.21 (33ms) -> +0.87 -> +0.25 -> -0.46 (83ms) ... -3.13 -> -3; original 0 -> -0.17 -> -0.55 -> -1.05 -> -1.52 ... -3.09 -> -3, never positive. Pointer-leave return (target +3px), all 3 cycles: port 0 -> -0.98 (33ms) -> -1.22 (50ms) -> -0.88 -> -0.27 -> +0.43 (100ms) ... +3.13 -> +3; original 0 -> +0.17 -> +0.55 -> +1.05 ..., min 0. So the disc jumps about 1.2px (40 percent of the travel) in the opposite direction for about 70ms first. Time to half travel is 100ms in the port vs 50ms in the original (2x, beyond the 25 percent tolerance); overshoot 0.13px vs 0.09px. Likely cause in AvatarStack.svelte liftY(): ctl?.stop() followed by a new motion animate(node,{y},spring) inherits a stale velocity from the previous animation.",
-   "checks": []
+   "checks": [
+    "hoverFlow.leo.in2.counterTravel",
+    "hoverFlow.leo.in2.firstDir",
+    "hoverFlow.leo.in2.t50Ms",
+    "hoverFlow.leo.out.counterTravel",
+    "hoverFlow.leo.out.t50Ms",
+    "hoverFlow.leo.out2.counterTravel"
+   ]
   },
   {
    "id": "p3-svelte-5",
@@ -40,7 +75,12 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "focus-lift-and-tooltip: same wrong-way spring on keyboard focus. Tab onto Leo C.: port max +0.69px before going up (original max 0); Tab away: port min -1.24px before dropping back (original min 0). End states (lifted 3px, tooltip texts, Ava L. lifted after Tab) match.",
-   "checks": []
+   "checks": [
+    "focus.leo.in2.counterTravel",
+    "focus.leo.in2.firstDir",
+    "focus.leo.out.counterTravel",
+    "focus.mina.out.counterTravel"
+   ]
   },
   {
    "id": "p3-svelte-6",
@@ -48,7 +88,17 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "overflow-lift-and-tooltip: same wrong-way spring on the overflow discs. +1.3K hover-in: port max +0.66px (original 0); +410 hover-in: port max +0.70px; return on all three overflow discs: port min -1.22px (original min 0). Tooltip texts (Sara K. / Noah W. / 94 more) and end positions match.",
-   "checks": []
+   "checks": [
+    "overflow.main.in2.counterTravel",
+    "overflow.mug.in2.counterTravel",
+    "overflow.tote.in2.counterTravel",
+    "overflow.main.out.counterTravel",
+    "overflow.mug.out.counterTravel",
+    "overflow.tote.out.counterTravel",
+    "overflow.main.out2.counterTravel",
+    "overflow.mug.out2.counterTravel",
+    "overflow.tote.out2.counterTravel"
+   ]
   },
   {
    "id": "p3-svelte-7",
@@ -56,7 +106,151 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "Missing state (hover and focus are one shared key per stack instead of per-disc state): with Noah W. keyboard-focused and the pointer hovering Leo C., the original shows two tooltips and both discs lifted (Leo y 389.25, Noah y 389.25); the port shows only Leo's tooltip and Noah drops to y 392.25 while still focused with its focus ring. After the pointer leaves Leo, the original keeps Noah's tooltip and 3px lift (still focused); the port shows no tooltip at all and Noah stays at y 0, so a focused disc has lost its tooltip and lift. Same result in the reduced-motion run (original tips [Leo, Noah] then [Noah]; port [Leo] then []). Screenshots avatar-stack-orig-10-focus-noah-after-leave.png vs avatar-stack-svelte-10-focus-noah-after-leave.png.",
-   "checks": []
+   "checks": [
+    "combo.both.tipCount",
+    "combo.both.tips",
+    "combo.both.noahLift",
+    "combo.afterLeave.tipCount",
+    "combo.afterLeave.tips",
+    "combo.afterLeave.noahLift",
+    "rm.combo.both.tips",
+    "rm.combo.afterLeave.tips"
+   ]
+  },
+  {
+   "id": "review-bouncy-spring",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Lift spring with lower damping (about 25 instead of 34): overshoot 0.3 to 0.45px against 0.088px, t50/t90 within 25 percent so the old checks passed.",
+   "checks": [
+    "hoverFlow.leo.in.overshoot",
+    "hoverFlow.leo.in2.overshoot",
+    "overflow.main.in.overshoot",
+    "overflow.main.in2.overshoot",
+    "overflow.mug.in.overshoot",
+    "overflow.mug.in2.overshoot",
+    "overflow.tote.in.overshoot",
+    "overflow.tote.in2.overshoot",
+    "hoverFlow.leo.in.settle01Ms",
+    "hoverFlow.leo.out.settle01Ms",
+    "overflow.main.in.settle01Ms",
+    "overflow.main.out.settle01Ms",
+    "focus.leo.in.overshoot",
+    "focus.leo.in2.overshoot",
+    "focus.leo.out.overshoot"
+   ]
+  },
+  {
+   "id": "review-tooltip-entrance",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Tooltip scales in (0.9 to 1) or slides up a few px over 100 to 200ms at full opacity instead of appearing instantly. Also when the animated element is an inner child of a static aria-hidden wrapper (Vue Transition, Svelte transition:scale/fly): measured from the text leaves (max effective opacity up to the document, union rect), so a child's scale, translate or opacity shows.",
+   "checks": [
+    "hoverFlow.leo.in.tipScaleAtAppear",
+    "hoverFlow.leo.in.tipTravel",
+    "overflow.main.in.tipScaleAtAppear",
+    "overflow.main.in.tipTravel",
+    "overflow.mug.in.tipScaleAtAppear",
+    "overflow.mug.in.tipTravel",
+    "overflow.tote.in.tipScaleAtAppear",
+    "overflow.tote.in.tipTravel",
+    "rm.hover.leo.in.tipScaleAtAppear",
+    "rm.hover.leo.in.tipTravel",
+    "rm.hover.mainOverflow.in.tipScaleAtAppear",
+    "rm.hover.mainOverflow.in.tipTravel",
+    "hoverFlow.leo.in.tipPartialFrames",
+    "rm.hover.leo.in.tipPartialFrames",
+    "rm.hover.mainOverflow.in.tipPartialFrames",
+    "overflow.main.in.tipPartialFrames",
+    "overflow.mug.in.tipPartialFrames",
+    "overflow.tote.in.tipPartialFrames",
+    "hoverFlow.leo.in.tipInstant",
+    "overflow.main.in.tipInstant",
+    "overflow.mug.in.tipInstant",
+    "overflow.tote.in.tipInstant"
+   ]
+  },
+  {
+   "id": "review-harness-tooltip-detection",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Harness robustness, not a port defect: a correct port that keeps every tooltip mounted at opacity 0, or nests the aria-hidden tooltip in the img span, must read the same tipCount, combo tips and tipGoneWithin100ms as the original (tooltip presence now requires effective opacity above 0.01; text inside a role=img counts only above the disc).",
+   "checks": [
+    "hoverFlow.leo.tipCount",
+    "hoverFlow.leo.out.tipGoneWithin100ms",
+    "tipAT.countWhileHovered",
+    "combo.both.tipCount",
+    "combo.afterLeave.tipCount",
+    "rm.combo.both.tips"
+   ]
+  },
+  {
+   "id": "review-tooltip-short-fade",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Tooltip fades in over 60 to 90 ms (or out over up to about 85 ms) instead of appearing and disappearing at once: tipInstant and the within-100ms checks pass, so a phase-tolerant frame check is needed.",
+   "checks": [
+    "hoverFlow.leo.in.tipPartialFrames",
+    "rm.hover.leo.in.tipPartialFrames",
+    "rm.hover.mainOverflow.in.tipPartialFrames",
+    "overflow.main.in.tipPartialFrames",
+    "overflow.mug.in.tipPartialFrames",
+    "overflow.tote.in.tipPartialFrames",
+    "hoverFlow.leo.out.tipPartialFrames",
+    "hoverFlow.leo.ontoTip.tipPartialFrames",
+    "rm.hover.leo.out.tipPartialFrames",
+    "rm.hover.mainOverflow.out.tipPartialFrames",
+    "overflow.main.out.tipPartialFrames",
+    "overflow.mug.out.tipPartialFrames",
+    "overflow.tote.out.tipPartialFrames",
+    "hoverFlow.leo.in.tipInstant",
+    "hoverFlow.leo.in.tipAppearsWithin100ms",
+    "hoverFlow.leo.out.tipGoneWithin100ms"
+   ]
+  },
+  {
+   "id": "review-spring-no-overshoot",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Lift is a 150 to 200 ms ease-out tween or an overdamped spring: zero overshoot sits inside the ratio tolerance (original 0.088 px, ratio 0.029) and inside the 40 ms timing tolerance.",
+   "checks": [
+    "hoverFlow.leo.in.overshoots",
+    "hoverFlow.leo.out.overshoots",
+    "hoverFlow.leo.in2.overshoots",
+    "hoverFlow.leo.out2.overshoots",
+    "focus.leo.in.overshoots",
+    "focus.leo.out.overshoots",
+    "focus.leo.in2.overshoots",
+    "focus.leo.out2.overshoots",
+    "overflow.main.in.overshoots",
+    "overflow.main.out.overshoots",
+    "overflow.main.in2.overshoots",
+    "overflow.main.out2.overshoots",
+    "overflow.mug.in.overshoots",
+    "overflow.mug.out.overshoots",
+    "overflow.mug.in2.overshoots",
+    "overflow.mug.out2.overshoots",
+    "overflow.tote.in.overshoots",
+    "overflow.tote.out.overshoots",
+    "overflow.tote.in2.overshoots",
+    "overflow.tote.out2.overshoots"
+   ]
+  },
+  {
+   "id": "review-overflow-focus-no-lift",
+   "round": "review",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "Overflow disc (+1.3K, +410, +94) or a related-row avatar shows the tooltip on keyboard focus but never lifts (separate branch or component), or a previous stop does not return to rest. Tab walk records each stop's settled lift.",
+   "checks": [
+    "tab.focusLift",
+    "tab.prevStopLift"
+   ]
   }
  ]
 }

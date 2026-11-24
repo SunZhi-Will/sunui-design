@@ -1,0 +1,457 @@
+{
+ "block": "avatar-stack",
+ "label": "p2-svelte",
+ "compared": 670,
+ "failingItems": {
+  "hover-lift-and-tooltip": [
+   {
+    "key": "hoverFlow.leo.in.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "hoverFlow.leo.in.settle01Ms",
+    "kind": "ms",
+    "expected": "165.9..166.7 (±41.58)",
+    "got": 282.6
+   },
+   {
+    "key": "hoverFlow.leo.in.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   },
+   {
+    "key": "hoverFlow.leo.ontoTip.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "hoverFlow.leo.ontoTip.settle01Ms",
+    "kind": "ms",
+    "expected": "166.5..167.3 (±41.73)",
+    "got": 282.7
+   },
+   {
+    "key": "hoverFlow.leo.ontoTip.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   },
+   {
+    "key": "hoverFlow.leo.in2.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "hoverFlow.leo.in2.settle01Ms",
+    "kind": "ms",
+    "expected": "165.8..167.2 (±41.63)",
+    "got": 282.6
+   },
+   {
+    "key": "hoverFlow.leo.in2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   },
+   {
+    "key": "hoverFlow.leo.out2.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "hoverFlow.leo.out2.settle01Ms",
+    "kind": "ms",
+    "expected": "165.8..166.4 (±41.53)",
+    "got": 282.9
+   },
+   {
+    "key": "hoverFlow.leo.out2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   }
+  ],
+  "tooltip-hidden-from-at": [
+   {
+    "key": "tipAT.ontoTip.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   }
+  ],
+  "focus-lift-and-tooltip": [
+   {
+    "key": "focus.mina.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "focus.mina.out.settle01Ms",
+    "kind": "ms",
+    "expected": "174.1..175.2 (±43.66)",
+    "got": 271.3
+   },
+   {
+    "key": "focus.mina.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.387
+   },
+   {
+    "key": "focus.leo.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "focus.leo.out.settle01Ms",
+    "kind": "ms",
+    "expected": "163.2..166.5 (±41.21)",
+    "got": 278.7
+   },
+   {
+    "key": "focus.leo.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.408
+   },
+   {
+    "key": "focus.leo.in2.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "focus.leo.in2.settle01Ms",
+    "kind": "ms",
+    "expected": "162..165.1 (±40.89)",
+    "got": 278.4
+   },
+   {
+    "key": "focus.leo.in2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   },
+   {
+    "key": "focus.ava.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "focus.ava.out.settle01Ms",
+    "kind": "ms",
+    "expected": "162..165.1 (±40.89)",
+    "got": 278.4
+   },
+   {
+    "key": "focus.ava.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.407
+   },
+   {
+    "key": "focus.leo.out2.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "focus.leo.out2.settle01Ms",
+    "kind": "ms",
+    "expected": "166.1..167.9 (±41.75)",
+    "got": 283.6
+   },
+   {
+    "key": "focus.leo.out2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.406
+   },
+   {
+    "key": "combo.both.tips",
+    "kind": "exact",
+    "expected": [
+     "Leo C. / Osaka, 5 hours ago",
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": [
+     "Leo C. / Osaka, 5 hours ago"
+    ]
+   },
+   {
+    "key": "combo.both.tipCount",
+    "kind": "count",
+    "expected": 2,
+    "got": 1
+   },
+   {
+    "key": "combo.both.noahLift",
+    "kind": "px",
+    "expected": "-3..-3 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "combo.afterLeave.tips",
+    "kind": "exact",
+    "expected": [
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": []
+   },
+   {
+    "key": "combo.afterLeave.tipCount",
+    "kind": "count",
+    "expected": 1,
+    "got": 0
+   },
+   {
+    "key": "combo.afterLeave.noahLift",
+    "kind": "px",
+    "expected": "-3..-3 (±1.5)",
+    "got": 0
+   }
+  ],
+  "overflow-lift-and-tooltip": [
+   {
+    "key": "overflow.main.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.main.out.settle01Ms",
+    "kind": "ms",
+    "expected": "165.7..167.2 (±41.61)",
+    "got": 281.7
+   },
+   {
+    "key": "overflow.main.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.41
+   },
+   {
+    "key": "overflow.main.in2.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "overflow.main.in2.settle01Ms",
+    "kind": "ms",
+    "expected": "166..167 (±41.63)",
+    "got": 283.3
+   },
+   {
+    "key": "overflow.main.in2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.404
+   },
+   {
+    "key": "overflow.main.out2.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.main.out2.settle01Ms",
+    "kind": "ms",
+    "expected": "166.2..166.9 (±41.64)",
+    "got": 282.7
+   },
+   {
+    "key": "overflow.main.out2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.408
+   },
+   {
+    "key": "overflow.mug.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.mug.out.settle01Ms",
+    "kind": "ms",
+    "expected": "165.6..166.2 (±41.47)",
+    "got": 282
+   },
+   {
+    "key": "overflow.mug.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.407
+   },
+   {
+    "key": "overflow.mug.in2.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "overflow.mug.in2.settle01Ms",
+    "kind": "ms",
+    "expected": "165.8..167.4 (±41.65)",
+    "got": 282.1
+   },
+   {
+    "key": "overflow.mug.in2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.407
+   },
+   {
+    "key": "overflow.mug.out2.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.mug.out2.settle01Ms",
+    "kind": "ms",
+    "expected": "166.1..166.9 (±41.63)",
+    "got": 282.6
+   },
+   {
+    "key": "overflow.mug.out2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.405
+   },
+   {
+    "key": "overflow.tote.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.tote.out.settle01Ms",
+    "kind": "ms",
+    "expected": "165.7..166.9 (±41.58)",
+    "got": 282.4
+   },
+   {
+    "key": "overflow.tote.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.408
+   },
+   {
+    "key": "overflow.tote.in2.firstDir",
+    "kind": "dir",
+    "expected": "up",
+    "got": "down"
+   },
+   {
+    "key": "overflow.tote.in2.settle01Ms",
+    "kind": "ms",
+    "expected": "165.6..166.3 (±41.49)",
+    "got": 282.3
+   },
+   {
+    "key": "overflow.tote.in2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.407
+   },
+   {
+    "key": "overflow.tote.out2.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "overflow.tote.out2.settle01Ms",
+    "kind": "ms",
+    "expected": "166.3..166.4 (±41.59)",
+    "got": 283.1
+   },
+   {
+    "key": "overflow.tote.out2.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.406
+   }
+  ],
+  "reduced-motion": [
+   {
+    "key": "rm.combo.both.tips",
+    "kind": "exact",
+    "expected": [
+     "Leo C. / Osaka, 5 hours ago",
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": [
+     "Leo C. / Osaka, 5 hours ago"
+    ]
+   },
+   {
+    "key": "rm.combo.both.tipCount",
+    "kind": "count",
+    "expected": 2,
+    "got": 1
+   },
+   {
+    "key": "rm.combo.afterLeave.tips",
+    "kind": "exact",
+    "expected": [
+     "Noah W. / Taichung, yesterday"
+    ],
+    "got": []
+   },
+   {
+    "key": "rm.combo.afterLeave.tipCount",
+    "kind": "count",
+    "expected": 1,
+    "got": 0
+   }
+  ]
+ },
+ "failingCount": 5,
+ "missingKeys": [],
+ "tabOrderEqual": true,
+ "tabOrderBase": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "tabOrderPort": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "consoleErrors": [],
+ "scriptErrors": [],
+ "itemsCovered": "17/17",
+ "uncoveredItems": [],
+ "pass": false
+}

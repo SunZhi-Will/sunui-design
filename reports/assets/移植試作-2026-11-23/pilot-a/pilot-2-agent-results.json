@@ -1,0 +1,423 @@
+[
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [
+   "p3-vue-7: minor, judges did not count it on its own. On 7 to 12 the original's first frame sits 20px beyond the old bar (a framer artefact) while the port starts at the old bar. The harness notes say to record c.start, c.peak and c.firstDir as info, so spring.c.jump7to12.start/peak/firstDir are info. Settle time, t50, t90, passesBetween and end are compared, and they match on the port.",
+   "p3-svelte-11: same 7 to 12 start offset difference (-136 vs the old bar). Not compared, for the same reason. Settle (332ms vs 349ms) is within tolerance."
+  ],
+  "notes": [
+   "Both runs finished with 318 checks, 0 errors and 0 console errors. Output files: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/pagination-original.json and pagination-p2-vue.json. Screenshots went to pa2/shots/.",
+   "Playwright import and the PILOT path now point at the scratchpad cap/ and pa2/ folders of this session. The script header refers to contract v2.",
+   "Text: row, name, header, compact text and page-number reads use innerText, with the accessible name as aria-label else innerText. Locator textContent calls are gone. The only textContent left reads text nodes for the visible-word test in layout-narrow.",
+   "Fixed-time samples: curveChecks now adds t50Ms and t90Ms threshold times (ms kind). movingFrames is info, not a count. Added mountTravel (px): underline movement inside its own cell over the first 700ms after it appears. It is 0 on both runs.",
+   "Notes applied: c.start, c.peak and c.firstDir on 7 to 12 are info, in the normal and reduced scenarios. Orders 1 to 3 reduced start/peak are info too. Reduced 6 to 7 keeps start and peak as px and adds the compared reduced.card1.6to7.offsetFrame.",
+   "Locale: the l= parameter is passed in the URL. Compared keys are nav names, card1, orders and reviews control names, current name and compact text. Demo titles and range header are now info (locale.<l>.demoTitlesPresent and demoHeader). Both runs matched on the ja keys, but zh-TW and zh-CN were not diffed key by key. The port demo copy stays English, as the contract allows.",
+   "New scenarios: a second underline-spring item for backward moves (d: Previous 6 to 5, click Page 6 from 7, click Page 5 from 6) and for centred/edge layout switches (e: Previous 5 to 4, Next 4 to 5, click Page 5 from 4). In the accessible-names item, an underline tabindex check and an underline mouse-click focus check were added.",
+   "On the p2-vue port the new checks fail where expected: spring.b and spring.d show 0 movement against the original's 40px (defect p2-vue-1), spring.e starts at -20/-36 against the original's 40/-20 (p2-vue-2), and the underline carries tabindex -1 and takes focus as a SPAN (p2-vue-3). Everything else in the sampled keys matched within tolerance. I did not judge the port.",
+   "regressions/pagination.json: every defect has its checks filled except p3-vue-7 and p3-svelte-11. All listed keys exist in the original's output.",
+   "No port, demo or project file was changed. Existing baseline files in baseline/ were not regenerated, so compare.mjs needs new baselines for the new and changed keys."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "layout-narrow: the narrow-viewport label check is broken and matches any port. measure() decides prevWordVisible from Range.getBoundingClientRect() on the Previous text node. That returns the text's layout box even when the span is visually hidden by max-sm:sr-only (clip plus a 1px box). So the original itself records layout.w600.prevWordVisible=true and layout.w340.prevWordVisible=true, although its prevWidth is 36 (chevron only). A port that keeps 'Previous'/'Next' visible below 640px would match on every compared key: rowWiderThanCard is false at 600 and true at 340 either way, and chevronsOutsideCard is true either way. Fix: (1) Decide visibility from the text's parent element instead: getBoundingClientRect() width and height > 4, and computed clip/clip-path not rect(0px, 0px, 0px, 0px) / inset(50%), or use checkVisibility() on a box that is not clipped. Then check that the original gives true at 1100 and false at 600 and 340. (2) Also compare the Previous and Next control widths at w600 and w340 as kind px (layout.w600.prevWidth, layout.w340.prevWidth, plus nextWidth). At those sizes they are a fixed 36px square that does not depend on text width. Keep the 1100px width as info.",
+   "contract v2 (no nesting selectors) / underline-spring, reduced-motion, current-page-noop, accessible-names (p2-vue-3): window.__ul only looks for the underline among descendants of the [aria-current=page] control, so it assumes the bar is nested inside the button or link. A correct port that renders the bar as a sibling inside the same list item finds no underline. Every spring and reduced curve then throws, and a11y.underlineTabindex reads [[],[],[]]. This produces false failures, not false passes, but it breaks the contract rule. Fix: look for the aria-hidden, non-svg, thin (height <= 6) element anywhere in the nav whose horizontal centre lies within the current control's column, for example inside the current control's closest role=listitem, instead of only among its descendants."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Script now emits 651 keys. Original (3 baseline runs) and p2-vue both finish with errors [] and consoleErrors []. compare.mjs baseline over the 3 original runs has no unstable keys and tab order is stable. compare.mjs check on p2-vue reports 17/17 items covered, tab order equal, pass in the final run.",
+   "Outputs are in /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/ (avatar-stack-original.json, avatar-stack-p2-vue.json, plus b2, b3, base.json, chk.json); screenshots are in the sibling shots/ folder.",
+   "Contract v2 changes: playwright-core import path updated. All fixed-time samples removed (travelAt50ms, first-frame tooltip opacity and scale now info). Every lift curve now has t50Ms and t90Ms from the trigger, plus counterTravel (ratio: largest excursion against the direction of travel divided by the travel). First-frame tooltip appear and gone times are info, and the compared forms are the booleans tipInstant, tipAppearsWithin100ms and tipGoneWithin100ms. overshoots became overshootsInfo (info) because a 0.09px peak is too phase dependent. Tooltip height is info. Entrance x and y drift became entrance.mountTravel and rm.entrance.mountTravel.",
+   "Text is read with innerText (txt helper) and accessible names (aria-label, else innerText). textContent is no longer used anywhere.",
+   "Locale: l= goes in the URL via withLocale. Compared are only component-owned strings: main list name (label plus count), the (count) suffix of all three lists, avatar names as {name}, {note} templates, overflow name templates with demo people replaced by {name}, overflow disc texts (+1280, +410, +94), and the tote overflow tooltip (the component's own N more text). Demo copy, people, captions, buttons, headings, initials and avatar tooltips are info. The scenario throws a clear error if fewer than 3 named lists are found.",
+   "New scenarios for the known defects: hoverFlow now does a second lift cycle (in2, out2) on every disc, because the stale-velocity spring only misbehaves after the first animation. The focus scenario adds Shift+Tab back onto Leo (focus.leo.in2, focus.ava.out, focus.leo.out2). A new comboFlow scenario (combo.* and rm.combo.*) focuses Noah by keyboard, hovers Leo, leaves, and hovers the focused Noah, recording tooltip lists, tooltip counts and lifts. Original behaviour recorded there: both tooltips and both lifts while hovering Leo; only Noah's after Leo is left; after hovering Noah himself and leaving, the tooltip and lift drop even though focus stays.",
+   "The regressions file now lists checks for all 7 defects (p2-svelte-1..3, p3-svelte-4..7). Every listed key exists in the baseline and none is unstable. I did not run a svelte port, so the keys are chosen from the measurable symptoms in the defect text (counterTravel about 0.4 against 0 in the original, firstDir, t50Ms, settleMs, combo tips and lifts) and have not been confirmed against a real svelte run.",
+   "A warm-up hover on an unmeasured disc was added to the overflow scenario. Without it the original's first tooltip on a fresh page appeared 47 to 114 ms late and the first overflow lift was slow, which made overflow.main.in.* unstable and falsely failed the port.",
+   "Observation, not a judgement: p2-vue failed hoverFlow.leo.out.firstDir (up against down) and counterTravel (0.405 against 0) in two earlier runs, then passed in the final run. That check is intermittent on the port while the original was stable in all runs. I did not look into the cause."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Both runs finished with 0 selector errors and 488 checks each, identical key sets, empty consoleErrors. Outputs: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/loading-button-original.json and loading-button-p2-vue.json. The script takes no screenshots, so the shots folder is empty.",
+   "Contract v2 applied. Playwright import path moved to scratchpad/cap. l=en is appended to the URL when missing. Fixed-time samples (opAt33, opAt67, out.opAt67, fracAt70, startOp, startFrac, absolute startDy and endDy) are removed from the compared set. They are replaced by t50Ms and t90Ms for incoming opacity, outgoing opacity, the 6px slide and the check draw, plus the existing durMs and out.minDy. Absolute text dy is replaced by first.mountTravel (change across mount frames) and rm.xfade.*.dyRange. Text is read with innerText, and names are aria-label, else visible text outside the live region, else live text. This fixes the 'Subscribed Subscribed' whitespace note. Outside l=en, string-valued checks drop to info, because this block owns no visible string (all labels are demo copy).",
+   "Harness notes applied: the Enter flow on Apply code now follows kbd.tab.afterPay with a direct focus() on Apply code, so it is still measured when an extra Tab stop exists. Tab stops are found by a real Tab walk, including in the Paid and Subscribed result states, instead of a tabIndex query.",
+   "New scenarios and checks: width reversal and monotonic checks on every shrink, expand and reset window (for p3-svelte-9 to 12). Release-scale monotonic and firstDir checks (p2-svelte-6). Focus retention after a real click, in loading, result and idle (p2-vue-1). Space after a mouse cycle (p2-vue-2). Tab walks in success states (p3-vue-7). Tab then Enter landing on Apply code (p3-vue-8). The new keys are written into the checks arrays of regressions/loading-button.json, and every key exists in the original's output.",
+   "Only the Vue defects p2-vue-1 and p2-vue-2 could be seen live. Against the p2-vue port the focus.* and kbd.afterMouse.space.* checks differ from the original (focus False vs True, Space does nothing). The Svelte and p3 defects (check never drawn, radius spring, release dip, width curve) were not run against a defective port. They are covered by reasoning on the metrics, e.g. a width that snaps and then regrows gives a reversal of about 37px against a tolerance of 1.5px.",
+   "Several compared ms checks differ between the original and p2-vue but sit inside the 25 percent / 40ms tolerance. Examples: slideT50Ms 66 vs 50, xfade.toLoading.in.durMs 139 vs 122. I did not judge them. The Subscribe tab-walk label is now 'button:Subscribe' in both runs.",
+   "regressions/avatar-stack.json, regressions/pagination.json and their scripts show as modified in git, but those edits come from other runs in the same folder, not from this task. The only files I changed are scripts/loading-button.mjs and regressions/loading-button.json."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Fix 1 (layout-narrow): prevWordVisible now reads the Previous text's parent element (width and height > 4, and not clipped by clip rect(0,0,0,0), clip-path inset(50%), visibility hidden or display none). Original now records true at 1100 and false at 600 and 340. The Previous and Next widths at w600 and w340 are now compared as kind px (layout.w600.prevWidth, layout.w600.nextWidth, layout.w340.prevWidth, layout.w340.nextWidth, all 36 on the original). The 1100px widths stay info, and layout.wide.nextWidth was added as info. A port that keeps the words visible below 640px now fails on prevWordVisible and the width checks.",
+   "Fix 2 (contract v2): window.__ul now searches the whole nav for aria-hidden, non-svg boxes with height <= 6 and width > 4 whose horizontal centre lies within the current control's column, so a sibling bar in the same list item is found. The check no longer assumes the bar is nested in the control. Both runs finished with 0 errors, so the spring and reduced curves resolve, and a11y.underlineTabindex now reads [[null],[null],[]] on the original and [[-1],[-1],[]] on p2-vue.",
+   "Regressions: added defect script-layout-narrow to regressions/pagination.json with the six layout.w600 and layout.w340 check keys. The existing defects' keys are unchanged and all still exist.",
+   "Both runs produced 321 checks, 0 errors and 0 console errors. Output files: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/pagination-original.json and /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/pagination-p2-vue.json.",
+   "p2-vue matches the original on every layout.w600 and layout.w340 key, which is expected because that port is correct there. The only differences in the keys read are the already known p2-vue-3 defect: underlineTabindex [-1] against null, and underlineClickFocus on a span against the Page 6 button. No port, demo or project file was changed."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "hover-lift-and-tooltip / overflow-lift-and-tooltip / focus-lift-and-tooltip (the 520/34 spring): overshoot is never compared. emitCurve stores it only as overshootsInfo (info), min/max are px with a 1.5px tolerance on a 3px travel, and settleMs uses a 0.5px band, so an overshoot up to about 0.45px is invisible to it. t50/t90 move by less than 25 percent between damping 34 and about 25, so a visibly bouncier spring (overshoot 0.3 to 0.45px against the original 0.088px) passes every check. Fix: add `${prefix}.overshoot` as kind ratio, computed as the excursion past `end` in the travel direction divided by |end-start| (original about 0.03). Also tighten settleMs to a 0.1px band, or add `${prefix}.settle01Ms`. While doing that, fix the overshootsInfo sign test: `prefix.endsWith(\".in\")` is false for `.in2`, so in2 currently reports 3 instead of -0.088. Use the sign of (end-start) instead.",
+   "hover-lift-and-tooltip (the tooltip \"appears instantly\", no entrance): only opacity is compared (tipInstant = opacity >= 0.99 within 100ms). tipScaleAtAppear is info, and the tooltip position is read once, 150ms after the sample window. A port whose tooltip scales in (0.9 to 1) or slides up a few px over 100 to 200ms at full opacity therefore passes. Fix: make tipScaleAtAppear compared (exact boolean >= 0.97, or ratio). In __sample, also record each frame's tooltip bottom relative to the disc top while a tooltip is visible, and emit `${prefix}.tipTravel` (px, max minus min across frames) as a compared check. The same applies to the overflow and reduced-motion hoverFlow calls, which share emitCurve.",
+   "Robustness, contract rule 'same script must fit all implementations' (affects hover/focus/overflow-lift-and-tooltip, tooltip-hidden-from-at, reduced-motion and the p3-svelte-7 combo keys): __tipEls counts a tooltip as present whenever checkVisibility({checkVisibilityCSS:true}) passes, and that ignores opacity. It also skips any tooltip placed inside the role=img element. A correct port that keeps every tooltip mounted and hides it with opacity 0, or nests the aria-hidden tooltip inside the img span, gets wrong tipCount, combo.*.tips and tipGoneWithin100ms results (a false fail, not a false pass), so the rerun cannot tell a real failure from a harness artefact. Fix: filter leaves by effective opacity > 0.01 (or checkVisibility({opacityProperty:true})). Exclude only text inside the img's own accessible content (for example, skip leaves under the img unless they are inside an aria-hidden subtree that is not the initials span), or find the tooltip as the aria-hidden visible text nearest above the active disc, as __tipBox does."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "underline-spring / reduced-motion (root cause, pagination.mjs line 48-58 `__ul`): the underline is only found when its horizontal centre lies inside the current cell's column (+-0.5px). Framer draws the bar inside the NEW cell with a transform, so in its offset frames (-20px forward, +40px backward, -136px on 7 to 12) the centre is outside the column and the bar is dropped (u=null), and `curve()` skips those frames. The baseline shows this: forward start -15.38 and backward start +14.34, where the checklist and the judges measured -20 and +40; reduced.card1.6to7 shows 0 moving frames, where the checklist says one frame at -20. Fix: during sampling, find the bar without the column filter: the aria-hidden, non-svg element in the nav with height <= 6 and width > 4 (ellipses are 36px tall and drop out), or the element picked at rest and followed while it stays connected. Keep the column rule only for the static first-render inset checks. Then rerun the three original baselines and confirm start is about -20 (a), +40 (b), +44 (prev5to4), -24 (next4to5) and that reduced.card1.6to7.offsetFrame is true with start about -20.",
+   "p3-svelte-10: not caught. The original baseline has reduced.card1.6to7.offsetFrame=false, start=0, peak=0, movingFrames=0 (the single offset frame is filtered out, see `__ul` above). A Svelte port with no offset frame gives the same values and passes every named check. After the `__ul` fix, the original must read offsetFrame=true and start/peak about -20, or the defect cannot fail.",
+   "underline-spring checklist (a) vs (b), 'backward is larger and slightly slower than forward': cannot be told apart. Because of the clipping, start/peak read about 15px both ways (-15.38 and +14.34). A port with a symmetric +20px backward offset would first be seen at about +15 (inside the 1.5px band), settle in about 265ms against 299 (inside 25%), and t50 98ms against 133 (inside the 40ms floor). It passes. The `__ul` fix restores real amplitudes. Also add a compared check on the asymmetry itself, for example spring.ab.backwardLarger (exact: |b.start| > 1.5*|a.start|).",
+   "p2-vue-2 (part 2: next4to5 and page5from4, Vue offset 40px against the original's 24px, 283 to 285ms against 250ms): not caught. Both offsets are clipped at the column edge, so start/peak read about -16.7 on both. firstDir is left on both. settleMs 285 against a 267 baseline is inside 25%. Only the prev5to4 wrong-side part fails, through firstDir and the start sign. A port with only the larger 4 to 5 offset would pass. The `__ul` fix makes spring.e.next4to5.start and .peak (and page5from4) compare the real -24 against -40.",
+   "contract v2 selectors (lines 60-62, 64, 672-677, 598, 619): rows, ellipses and controls are found by tag and nesting: `querySelectorAll(\"li\")`, `li.querySelector(\"a, button, [aria-disabled]\")`, and live.tag compared exact to \"li\". A port that builds the list from role=list/listitem, or controls from role=button/link, gets empty rows and fails for no real reason. Use `li, [role=listitem]` and `a, button, [role=button], [role=link], [aria-disabled]`, and compare the live region's role (listitem) instead of the tag name.",
+   "locale (lines 631-659): the locale contexts skip settle(), the pointer press and the wait for rest that the contract requires on every target, so any original autoplay can move the page before locale.*.currentName is read. These contexts also do not register the console and pageerror listeners. Call the same settle(page) after waitFor, and attach the console handlers."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "tab-order / p3-vue-7 (keys tab.success.pay.order, tab.success.subscribe.order): tabWalk() does not start before the root when a button has focus. blur() plus a selection range does not move Chrome's focus-navigation starting point off the clicked button. The original's own baseline shows this: tab.success.pay.order = [\"button:Apply code\"] and tab.success.subscribe.order = [\"button:Paid\",\"button:Apply code\"], when the full walk should be input > Subscribe > Paid > Apply code. The path defect is still caught today, but only because the walk happens to start right after the clicked button. The checks never confirm that the success-state button is itself a Tab stop or that the input and Subscribe come first, and the result depends on where each port leaves focus after a click (the p2 Vue run gives the same values as the original). Fix: give the walk a fixed start. Either insert a temporary tabindex=0 sentinel just before the root, focus it, then Tab; or focus the email textbox with getByRole and record it as the first stop. Then regenerate the baseline and check it reads [input, Subscribe, Paid, Apply code] for Pay and [input, Subscribed, Paid, Apply code] for Subscribe.",
+   "contract v2 locale (affects every item): the script hard-codes English demo copy to detect state and to wait for rest: IDLE (Subscribe / Pay $68.00 / Apply code), the derive() labels Subscribed / Paid / Code expired, the textbox name 'Email for restock news' and /fails on purpose/. With l=ja the original demo switches to Japanese (useDemoText), so open() throws 'demo never came to rest' in every scenario and the original's output has no checks at all. The port demos keep English (no locale in the LoadingButtonDemo ports), so tabOrder labels differ as well. Fix: make state detection independent of labels (aria-busy and live-region transitions, with idle and result labels read from each run's own first snapshot or result frame, and tab labels reduced to role only outside en). Or, since the component owns no visible string, have the script write one errors entry and skip when LOCALE !== 'en', and document that this block is checked in en only.",
+   "shrink-loading / success-subscribe / error-state (spring stiffness 240, damping 30): the width curves (subscribe.shrink, apply.shrink, subscribe.expand, apply.expand, subscribe.reset, apply.reset) only emit firstDir, animates, monotonic, reversalPx, end/min, overshoot and settleMs. A linear or ease-in-out width tween of about 430ms passes every one of them, so the spring easing the checklist requires is never verified. Fix: in widthSeg, add <name>.t50Ms and <name>.t90Ms (kind ms: time from the trigger until the width has covered 50% and 90% of start to end) and emit them in emitWidth for all six segments. Consider the same for press.idle (time to 50% of the 1 to 0.97 change).",
+   "label-crossfade (contract v2, static offsets): xfade.*.in.dxFromCenterMax is compared as px, but it is the horizontal offset of text inside its box. The original's xfade.subscribe.toSuccess value of 2.77px comes from Framer's layout scale correction while the button grows. A correct port that keeps the content centred reads about 0 and fails the 1.27..4.27 window. Fix: record it as info, or compare a boolean such as dxFromCenterMax < 4.",
+   "shrink-loading (minor): the spinner's shape from the checklist (a full ring at 25% opacity plus a solid quarter arc) is not measured. A port with a plain single arc or a full solid ring passes spinnerCount, spinnerSize and spinnerRotates. Fix: inside the spinner svg, add a compared count of stroked shapes and an exact boolean for whether one of them has a computed stroke-opacity or opacity of about 0.25 (an opacity, not a colour)."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Both runs finished with 723 checks, no errors and no console errors. Outputs: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/avatar-stack-original.json and avatar-stack-p2-vue.json.",
+   "Overshoot: new `${prefix}.overshoot` (ratio), the excursion past `end` in the travel direction divided by |end-start|. It reads 0.029 or 0.030 in the original and 0.029 or 0.030 in p2-vue. Anything above about 0.06 (0.18px on the 3px travel) now fails, so the 0.3 to 0.45px bouncy spring (ratio 0.1 to 0.15) is caught.",
+   "Settling: added `${prefix}.settle01Ms` (0.1px band, kind ms). settleMs is kept as it was, so the existing regression keys still apply. Original is about 166ms and p2-vue about 149ms on lifts, inside the 25 percent band.",
+   "overshootsInfo: the sign now comes from (end-start), so in2 reports -0.088 instead of 3. Verified in the output.",
+   "Tooltip entrance: tipScaleAtAppear changed from info to ratio. __sample now records the tooltip bottom relative to the disc top on every frame, and `${prefix}.tipTravel` (px, max minus min) is emitted for every call that goes through emitCurve with 'appear'. That covers hover, overflow and reduced-motion hoverFlow. Original and port both read scale 1 and travel 0. The tooltip is a child of the disc's list item and moves with it, so tipTravel does not pick up the lift.",
+   "Robustness: __tipEls and __tipBox now require effective opacity above 0.01 on top of checkVisibility. Text inside a role=img counts only if it is at least 1px wide and tall and its bottom is above the disc top (geometry rule, instead of the blanket role=img exclusion). That keeps initials, +N text and sr-only text inside the disc out, and lets a tooltip nested in the img span count. I did not test the keep-mounted-at-opacity-0 and nested-tooltip port variants, since no such port exists here. The checks that depend on this (tipCount, combo.*.tipCount, tipAT.countWhileHovered, tipGoneWithin100ms) read the same on original and p2-vue (1, 2, 1, 1, true).",
+   "Regressions: /Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/regressions/avatar-stack.json now has settle01Ms keys on p2-svelte-1 and p2-svelte-3. It also has three new reviewer entries: review-bouncy-spring (overshoot and settle01Ms), review-tooltip-entrance (tipScaleAtAppear and tipTravel) and review-harness-tooltip-detection. Every listed key exists in the output.",
+   "Side finding: in the p2-vue run, hoverFlow.leo.out has settle01Ms 282 and overshoot 0.042 against 150 and 0.029 in the original. The same-prefix out2 and the overflow outs are normal (about 149), so this looks like a one-off first-leave outlier (it follows the ontoTip step) rather than a systematic difference. It may show up as a settle01Ms fail for p2-vue against the baseline. I did not investigate or change the port. If it repeats across reruns, check it.",
+   "No port, demo or project file was changed. Only the script and the regressions JSON were edited."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/pagination.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Fixes: (1) New __ulAny finds the bar during sampling and settle without the column filter (aria-hidden, non-svg, height<=6, width>4). __ul keeps the column rule for the static first-render and mountTravel checks. (2) Selectors now use `li, [role=listitem]` and `a, button, [role=button], [role=link], [aria-disabled]`; pageNames includes role button/link. live.tag became live.role (explicit role, else listitem for li). (3) The locale contexts now call settle(page) after waitFor and attach the console/pageerror listeners through a shared watch(page). (4) New compared check spring.ab.backwardLarger (exact: |b.start| > 1.5*|a.start|). I added it to the checks arrays of p2-vue-1, p3-vue-6 and p3-svelte-9 in regressions/pagination.json (the backward-snap defects). No existing key was renamed.",
+   "Original baseline (322 checks, 0 errors, 0 console errors): forward 6to7 start/peak -20, settle 266ms; backward 7to6 start/peak +40, settle 300ms; spring.ab.backwardLarger true; 7to12 -136; prev5to4 +40 (settle 316); next4to5 and page5from4 -20 (settle 266, 265); reduced.card1.6to7 offsetFrame true, start/peak -20, 1 moving frame; live.role listitem.",
+   "The brief's expected prev5to4 +44 and next4to5 -24 did not reproduce. The measured values are +40 and -20, a stable frame-sampling result. The baseline compares against itself, so this does not affect the checks, but the checklist and judge numbers (44, 24) are a little off.",
+   "p2-vue (322 checks, 0 errors, 0 console errors), now caught by compared values: backward 7to6 start 0, 0 moving frames, backwardLarger false (p2-vue-1); prev5to4 firstDir left, start -20 against +40 (wrong side, p2-vue-2); next4to5 and page5from4 start/peak -36 against -20 (larger offset, settle 303/304 against 266, p2-vue-2); jump 7to12 start -107 against -136, informational only (p3-vue-7).",
+   "p3-svelte-10 can now fail: the original reads reduced.card1.6to7.offsetFrame true with start/peak -20, so a port with no offset frame would give false and 0.",
+   "Only the script and regressions/pagination.json were changed. No port, demo or project file was touched. Runs wrote to scratchpad pa2/runs/pagination-original.json and pagination-p2-vue.json. A p3-svelte run was not available, so the svelte defects were checked by value reasoning, not by running a port."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "review-tooltip-entrance (also hover-lift-and-tooltip 'appears instantly'): window.__sample reads opacity, width and bottom from the tooltip container c = te[0][0], which is the closest [aria-hidden=\"true\"] ancestor of the text leaves. If a port puts aria-hidden on a static outer wrapper and animates an inner element (for example a Vue <Transition> or Svelte transition:scale/fly inside <span aria-hidden>), a child's scale or translate does not change c's getBoundingClientRect, and a child's opacity is not in effOpacity(c), which only walks upward from c. So tipScaleAtAppear, tipTravel, tipFullMs and tipInstant all read 1, 0 and instant, and the entrance passes. Fix: in __sample, take op = min over the leaves of effOpacity(leaf) (leaf up to the document) and take w and tbot from the union of the leaves' rects, which do include ancestor transforms. Do the same in the rm.hover and overflow runs, since they share the helper.",
+   "hover-lift-and-tooltip / overflow-lift-and-tooltip / review-tooltip-entrance: short fades pass. hoverFlow.*.in.tipOpacityAtAppear is info, and tipInstant and tipAppearsWithin100ms only require full opacity within 100 ms, so a 60 to 90 ms opacity fade-in passes. On leave, tipGoneWithin100ms lets a fade-out of up to about 85 ms pass (the original is gone on the first frame, about 16 ms). That breaks the checklist's 'appears instantly' and 'disappears at once with no exit animation'. Fix: add phase-tolerant compared booleans from the frames, using the leaf-based opacity: <prefix>.in.tipPartialFrames = any post-trigger frame with tips>0 and 0.01<op<0.99 (exact; false in the original), and the same for .out and .ontoTip. Or compare tipOpacityAtAppear as ratio.",
+   "hover-lift-and-tooltip (spring 520/34): an ease-out tween can pass for the spring. The original overshoots by only 0.088 px (overshoot ratio 0.029), and the ratio tolerance is 0.03, so a port with no overshoot at all (a 150 to 200 ms ease-out tween, or an overdamped spring) gets 0 and falls inside 0..0.059. Its t50, t90, settleMs and settle01Ms also fall inside the 40 ms ms tolerance. Fix: add an exact boolean <prefix>.overshoots = (overshoot past end in px) > 0.03 for hoverFlow.leo.in/out/in2/out2, focus.leo.*, and overflow.*.in/out (true in the original, stable at 0.088 to 0.089 px across runs). review-bouncy-spring stays covered by the existing ratio.",
+   "overflow-lift-and-tooltip and focus-lift-and-tooltip: the lift on keyboard focus is measured only for Mina, Leo and Ava in the main stack. The overflow discs (+1.3K, +410, +94) and the related-row avatars are lifted only by hover. The tab walk records tooltips per stop but not position, so a port whose overflow disc (often a separate branch or component) shows the tooltip on focus but never lifts passes. Fix: in the tab-order scenario, record each stop's y relative to its rest top after it settles (wait about 400 ms, or poll until stable), rounded to an integer, as an exact array tab.focusLift (expected -3 on every img stop and 0 on the button). Also record the lift of the previous stop, to check it returned to 0."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/avatar-stack.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Both runs finished with 758 checks, no errors and no console errors. Outputs: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/avatar-stack-original.json and avatar-stack-p2-vue.json.",
+   "Gap 1, nested tooltip animation: __sample now measures from the text leaves through a shared helper, window.__leafMeasure. Opacity is the max over the leaves of effOpacity(leaf) walked up to the document. The width and bottom come from the union of the leaf rects. I used max, not the min you suggested, because line 2 of the tooltip is dimmed on purpose (op2), so min would stay below 0.99 in the original and tipPartialFrames would read true there. __tipVis uses the same helper. The rm.hover and overflow runs share __sample, so they are covered.",
+   "Gap 2, short fades: new exact check <prefix>.tipPartialFrames. It is true if any frame after the trigger has a tooltip present with 0.01 < op < 0.99. It is emitted for .in, .out and .ontoTip in hoverFlow.leo, overflow.main/mug/tote and rm.hover.leo/mainOverflow. It is false in the original and in p2-vue.",
+   "Gap 3, spring with no overshoot: new exact check <prefix>.overshoots = overshoot past end > 0.03 px, from a new overshootPx value in reduce(). It covers hoverFlow.leo.{in,out,in2,out2}, focus.leo.{in,out,in2,out2} and overflow.{main,mug,tote}.{in,out,in2,out2}. It is true on all of these in both the original and p2-vue. I did not repeat the runs to check the 0.088 px figure is stable, and I did not try it against a tween port.",
+   "Gap 4, focus lift on overflow discs: the tab-walk scenario records the rest top of every [role=img], button and [tabindex] element before tabbing. At each stop it waits 250 ms, then polls until two reads agree. It emits tab.focusLift and tab.prevStopLift, both exact arrays of integers. Original and p2-vue both give focusLift [-3,-3,-3,-3,-3,0,-3,-3,-3,-3,-3,-3] (-3 on the 11 img stops, 0 on the button) and prevStopLift [null,0,...,0]. This adds roughly 0.5 s per tab stop to the run.",
+   "The regressions file avatar-stack.json now has new checks in review-tooltip-entrance (tipPartialFrames and tipInstant keys). It also has three new defect entries: review-tooltip-short-fade, review-spring-no-overshoot and review-overflow-focus-no-lift. review-bouncy-spring is unchanged, as you said it stays on the existing ratio.",
+   "No port, demo or project file was changed. The script and the regressions JSON are the only files edited."
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "Tab walk fixed start: tabWalk now inserts a temporary fixed tabindex=0 sentinel before the root, focuses it, then Tabs, and removes it in a finally. Baselines now read tab.success.pay.order = [input, Subscribe, Paid, Apply code] and tab.success.subscribe.order = [input, Subscribed, Paid, Apply code], on both original and p2-vue, and the walk no longer depends on where a click left focus.",
+   "Locale: chose the skip option. With l other than en the script writes one errors entry (item 'all') and exits before launching a browser. The reason is documented in a header comment above findChrome (the component owns no visible string; demo copy differs by locale and port demos stay English). This block is checked in en only.",
+   "Width spring: widthSeg now computes t50 and t90 (time from the trigger ref until the width covers 50% and 90% of start to end). Emitted as <name>.t50Ms and <name>.t90Ms (kind ms) for all six segments (subscribe and apply shrink, expand, reset); skipped for rm.* segments. Original values: shrink t50 about 129 and t90 about 262, expand t50 about 116 and t90 about 250, reset t50 about 133 and t90 about 266. A linear or ease-in-out 430ms tween would move these well outside the ms window. Also added press.idle.downT50Ms (original 130).",
+   "Crossfade dx: xfade.*.in.dxFromCenterMax is now kind info; a new compared exact boolean xfade.*.in.centredWithin4px (dxMax < 4) replaces it. Original toSuccess 2.77 and p2-vue 2.78 both give true.",
+   "Spinner shape: the spinner svg now yields stroked-shape count, faint count (effective opacity = stroke-opacity times ancestor opacity within the svg, about 0.25 within 0.07) and solid count (>= 0.9). Emitted for subscribe, apply and pay loading as spinnerShapes (count), spinnerFaintRing (exact, faint === 1) and spinnerSolidArc (exact, solid === 1). Original and p2-vue read 2, true, true.",
+   "Regressions: loading-button.json checks arrays extended with the new t50Ms and t90Ms keys for p3-svelte-9, 10, 11 and 12 (shrink, expand, reset). p3-vue-7 already lists tab.success.pay.order and tab.success.subscribe.order, which now include the success-state button as a stop, so no change was needed there.",
+   "Runs: original gave 517 checks, 0 errors, tabOrder 4; p2-vue gave 517 checks, 0 errors, tabOrder 4. Outputs are /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/loading-button-original.json and loading-button-p2-vue.json. Two earlier original runs hit transient dev-server load (a goto networkidle timeout, then an empty mount probe) when run in parallel with the port; running it alone gave a clean result. I did not run compare.mjs (it is not at the path I tried), so the new keys are not yet compared against the p3 Svelte or Vue defect ports.",
+   "No port, demo or project file was changed; only the script and regressions/loading-button.json."
+  ]
+ },
+ {
+  "ok": false,
+  "gaps": [
+   "label-crossfade: the direction of the incoming slide is never compared. xfade.*.in.startDy is info, slideT50Ms/slideT90Ms only measure |dy - endDy|, and dyRange is emitted only under reduced motion. A port whose new label enters from 6px ABOVE (y:-6 instead of +6) passes. Fix: in emitFade, add `${name}.in.firstDir` (kind dir: direction of the first movement larger than 0.3px; the original gives up) or `${name}.in.startDyRel` = startDy - endDy (kind px, relative to the rest position, about +6). Do it for every xfade, including xfade.pay.toSuccess.",
+   "label-crossfade (easing): the checklist asks for ease-out, not ease-in-out, but the timing keys cannot tell them apart. The original's in.t50Ms is about 50 to 55 and t90 about 100 to 116. compare.mjs allows at least 40ms, and a 140ms ease-in-out fade lands near t50=70 and t90=111, so it passes. Fix: interpolate the crossing times between frames inside crossT (no frame rounding) and add a shape ratio such as `${name}.in.t50OverT90` (kind ratio, about 0.42 for the original, about 0.63 for ease-in-out). The same gap exists for the check draw in success-subscribe and success-sticky ('0.28s with ease-out'): subscribe/pay.check.t50Ms of about 116 against about 140 for ease-in-out or linear is inside the 40ms tolerance. Add `subscribe.check.t50OverT90` and `pay.check.t50OverT90` as ratio.",
+   "label-crossfade (coverage): only Pay's loading to success crossfade is measured. The checklist says 'any state change'. Nothing measures Pay idle to inline loading, Paid to loading (repeat press), or Subscribe/Apply loading to idle under the inline style. A port that keeps 'Pay $68.00' static and only inserts or fades in the spinner passes. Fix: in S3, add xfade.pay.toLoading. Measure the incoming spinner opacity t50/t90, check that two 'Pay $68.00' text parts overlap for at least 2 frames (count), and check that the outgoing text reaches minDy of about -6 (px) with out.animates (exact). Find the outgoing part as the 'Pay $68.00' part whose opacity falls.",
+   "tab-order: 'spinners and icons never take focus' is checked only at idle (S1) and while a success check is showing (S8). No Tab walk runs while a spinner is on screen, so a port whose spinner svg or motion element becomes focusable during loading passes (the Vue motion-v focus-listener cause behind p3-vue-7 applies to spinners too). Fix: in S8 (or a new step), click Pay, start tabWalk about 300ms later (loading lasts 1800ms) and emit `tab.loading.pay.order` (exact). Do the same for Subscribe in its 1400ms loading window (`tab.loading.subscribe.order`).",
+   "first-render: the mount probe records for 1000ms from document start, not from the moment the three buttons appear. On a port whose app mounts late (Vite dev first load, slow hydration), the probe sees only a few frames or none. With one frame, mountTravel is 0 and a slide-only entry animation passes first.noEntryAnimation and first.mountTravel. Fix: start the 1000ms window at the first frame where btns().length >= 3. Also emit `first.mountFrameCount` (count, or an exact boolean >= 20) so a short capture fails instead of passing.",
+   "contract v2 static offsets (label-crossfade): `${name}.in.centredWithin4px` (exact) is derived from the absolute horizontal offset of the content group from the button centre. The original already reads 2.77px on xfade.subscribe.toSuccess, close to the 4px threshold, so the baseline will flake and the key will be dropped as unstable. Fix: make it a relative measure (the change of that offset across the fade frames, as px) or keep it as info and rely on maxHeight plus a width-stacking check. Otherwise the side-by-side stacking it guards against loses its compared check.",
+   "contract coverage / locale: for l != en the script writes no checks and a single error with item 'all', which is not a checklist id. A locale run then passes trivially, and the coverage rule (each all/web item has a compared check or an errors entry saying why) is not met per item. Fix: write one errors entry per checklist id with the reason, or better, still run the locale-independent checks (widths, timings, aria-busy, focus, tab count, reduced motion) with the state labels read from the first render instead of the hard-coded English IDLE list."
+  ]
+ },
+ {
+  "runsOk": true,
+  "keys": 758,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 107.7
+ },
+ {
+  "runsOk": true,
+  "keys": 322,
+  "unstable": [],
+  "tabStable": true,
+  "runErrors": [],
+  "secondsPerRun": 223.5
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "reduced-motion"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "hover-lift-and-tooltip",
+     "tooltip-hidden-from-at",
+     "focus-lift-and-tooltip",
+     "overflow-lift-and-tooltip",
+     "reduced-motion"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "focus-lift-and-tooltip",
+     "reduced-motion"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   }
+  ]
+ },
+ {
+  "targets": [
+   {
+    "label": "p2-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "accessible-names"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p2-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "reduced-motion"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p3-vue",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   },
+   {
+    "label": "p3-svelte",
+    "ran": true,
+    "pass": false,
+    "failingItems": [
+     "underline-spring",
+     "reduced-motion"
+    ],
+    "tabOrderEqual": true,
+    "consoleErrors": 0,
+    "scriptErrors": 0
+   }
+  ]
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": false,
+    "defects": [
+     "hover-lift-and-tooltip: on the first pointer leave from Leo C. (hoverFlow.leo.out, measured after the onto-tooltip leave and a re-hover) the disc first rises past its lifted rest before dropping: firstDir up (original down), min -4.224px from a start of -3 (counterTravel 0.408 against 0 in all three baseline runs), and settle01Ms 282.3 against 149.8..165.8. The script did the same moves on the original, which never moves the wrong way. The port starts the spring with a leftover upward velocity (motion-v animate on the Lift div). in2/out2 for the same disc are clean, so it shows up only after that history, but it is a real wrong-way jump of 1.2px that users can see. Everything else matches: 670 compared keys, tab order equal, combo (independent hover and focus state per Lift) passes."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "Lift spring starts with a stale velocity on every lift and drop after the first: every in/out/in2/out2/ontoTip curve for hover Leo, focus Mina/Leo/Ava and all three overflow discs has firstDir reversed (for example hoverFlow.leo.in up expected, down got), counterTravel about 0.39 to 0.41 (original 0), and settle01Ms about 271 to 284 against about 162 to 175. tipAT.ontoTip.firstDir up vs down comes from the same cause. Source: lift() calls controls?.stop() and then animate(node,{y},springs.snappy) with no velocity reset, so motion carries the previous velocity into the next spring.",
+     "Hover and focus share one state per stack: activeKey is a single $state ('only one tooltip at a time'), so hovering Leo C. while Noah W. has keyboard focus takes away Noah's lift and tooltip. combo.both.tips got only Leo (expected Leo and Noah), tipCount 1 vs 2, noahLift 0 vs -3; after the pointer leaves, afterLeave.tips is [] vs Noah, tipCount 0 vs 1, noahLift 0 vs -3, although focus stays on Noah. The original gives each Lift its own useState, so both stay active. The same thing fails under reduced motion (rm.combo.both/afterLeave tips and tipCount)."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "Same stale-velocity spring as p2-svelte: liftY calls animate(node,{y},springs.snappy) after ctl.stop() without velocity 0. Every hover, focus and overflow in/out/in2/out2/ontoTip curve starts the wrong way (firstDir reversed, counterTravel about 0.39 to 0.41 vs 0) and settles in about 278 to 287ms against about 162 to 175. tipAT.ontoTip.firstDir up vs down comes from the same cause.",
+     "A single activeKey per stack ties hover and focus together: with Noah W. focused, hovering Leo C. drops Noah's tooltip and lift (combo.both.tips [Leo] vs [Leo, Noah], tipCount 1 vs 2, noahLift 0 vs -3; afterLeave tips [] vs [Noah], tipCount 0 vs 1, noahLift 0 vs -3). The original keeps separate state in each Lift. Also fails under reduced motion (rm.combo.*)."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte-fixed",
+    "pass": false,
+    "defects": [
+     "The velocity fix ({...springs.snappy, velocity: 0}) clears every curve failure, but the single shared activeKey is still there. Hovering Leo C. while Noah W. keeps keyboard focus removes Noah's tooltip and lift: combo.both.tips [Leo C. / Osaka, 5 hours ago] vs both Leo and Noah, combo.both.tipCount 1 vs 2, combo.both.noahLift 0 vs -3. After the pointer leaves: combo.afterLeave.tips [] vs [Noah W. / Taichung, yesterday], tipCount 0 vs 1, noahLift 0 vs -3, with focus still on Noah. The reduced-motion run shows the same (rm.combo.both.tips/tipCount, rm.combo.afterLeave.tips/tipCount). Fix: give each lift box its own active flag (or a set of active keys) instead of one activeKey."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   }
+  ]
+ },
+ {
+  "verdicts": [
+   {
+    "label": "p2-vue",
+    "pass": false,
+    "defects": [
+     "underline-spring, backward moves snap: on every move where the old and new current cell sit at the same x (restFrom 0 in both), the original springs back from +40px and the port does not move at all. spring.b.backward7to6 animates false (base true), start/peak 0 (base 40), movingFrames 0 (base 18-20), settleMs 0 (base 299-311); same for spring.d.prev6to5 (base start 40, settle 301-317), spring.d.page6from7 (base 40, 299-315) and spring.d.page5from6 (base 40, 299). spring.ab.backwardLarger false. The checklist says a port that snaps straight to rest on a backward move fails. Forward 6to7 matches (-20, settle 264). Cause: motion-v layoutId does not reproduce framer's backward offset; the port needs an explicit fallback that starts the new underline offset like the original when its measured travel is zero.",
+     "underline-spring, spring.e.prev5to4 springs the wrong way: firstDir left, start/peak -20 (base right, +40), settleMs 266 (base 313-316, inside tolerance).",
+     "underline-spring, spring.e.next4to5 and spring.e.page5from4 start from -36px instead of -20px (direction left matches, settle 300 inside tolerance): the bar travels 16px further than the original.",
+     "accessible-names: the underline span carries tabindex=\"-1\" (a11y.underlineTabindex [[\"-1\"],[\"-1\"],[]], base [[null],[null],[]]), so a pointer press on the underline focuses the span instead of the button: a11y.underlineClickFocus \"0|span:\" vs base \"0|button:Page 6\". After that click Enter/Space no longer act on the page button and the focus ring is lost. This is the untested tabindex adapter rule; remove tabindex=\"-1\" from the motion.span (p3-vue already did and passes)."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   },
+   {
+    "label": "p2-svelte",
+    "pass": false,
+    "defects": [
+     "underline-spring: the hand-written FLIP animates only real geometric travel (dx from the old box), so every move with zero travel snaps where the original springs. spring.a.forward6to7 animates false, start/peak 0, settle 0 (base -20px, settle 260-266, 15-16 moving frames); spring.b.backward7to6, spring.d.prev6to5, spring.d.page6from7, spring.d.page5from6 all animates false, start 0 (base +40px, settle about 300ms). spring.ab.backwardLarger false. Checklist items (a) and (b) require both springs.",
+     "underline-spring, row-layout switches use the true few-pixel travel instead of the original's offsets: spring.e.prev5to4 start -3.28 / peak -3.79 (base +40), spring.e.next4to5 start 3.26 / peak 4 (base -20), spring.e.page5from4 start 3.3 / peak 3.8 (base -20). The settleMs failures (133 vs base 263-316) follow from that smaller amplitude with the same 520/34 spring, not a separate timing defect. Spring parameters themselves look right: spring.c.jump7to12 settle 332, t50 83, t90 133 are inside tolerance."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": [
+     "reduced-motion: reduced.card1.6to7 firstDir/start/peak/offsetFrame expect one rendered frame with the bar 20px left (base movingFrames 1, settle 37-42ms). That frame is a framer duration-0 artefact on a zero-travel move (restFrom 0); the source's own doc comment says the underline 'jumps straight there under reduced motion', which is what this port does (0 moving frames, lands immediately, row and header correct). Change these four keys to info, and keep only 'no intermediate positions, lands within one frame' (passesBetween false, animates false) as the reduced-motion requirement."
+    ]
+   },
+   {
+    "label": "p3-vue",
+    "pass": false,
+    "defects": [
+     "underline-spring, backward moves snap: spring.b.backward7to6, spring.d.prev6to5, spring.d.page6from7 and spring.d.page5from6 all animates false, start/peak 0, settleMs 0, movingFrames 0, while the original springs back from +40px over about 300ms (18-20 moving frames). spring.ab.backwardLarger false. The checklist explicitly fails a port that snaps on a backward move. Forward 6to7 matches (-20, settle 263). motion-v layoutId does not reproduce framer's backward offset; needs an explicit offset start when measured travel is zero.",
+     "underline-spring, spring.e.prev5to4 goes the wrong way: firstDir left, start/peak -20 vs base right, +40.",
+     "underline-spring, spring.e.next4to5 and spring.e.page5from4 start at -36px vs base -20px (direction and settle inside tolerance)."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": []
+   },
+   {
+    "label": "p3-svelte",
+    "pass": false,
+    "defects": [
+     "underline-spring: same FLIP-from-real-geometry approach as p2-svelte, so zero-travel moves snap. spring.a.forward6to7 animates false, start 0, settle 0 (base -20px, 260-266ms); spring.b.backward7to6, spring.d.prev6to5, spring.d.page6from7, spring.d.page5from6 animates false, start 0 (base +40px, about 300ms). spring.ab.backwardLarger false.",
+     "underline-spring, row-layout switches animate only the few real pixels: spring.e.prev5to4 start -3.28 / peak -4 (base +40), spring.e.next4to5 start 3.3 / peak 3.8 (base -20), spring.e.page5from4 start 3.29 / peak 3.8 (base -20); settleMs 132-134 (base 263-316) is a consequence of the small amplitude. spring.c.jump7to12 (settle 334, t50 84, t90 134) is inside tolerance, so the spring constants are right."
+    ],
+    "harnessProblems": [],
+    "baselineProblems": [
+     "reduced-motion: reduced.card1.6to7 firstDir/start/peak/offsetFrame require framer's single offset frame on a zero-travel move under reduced motion. The source says the underline jumps straight there under reduced motion, which this port does (0 moving frames, correct row and header). Make these keys info and keep only passesBetween false / animates false."
+    ]
+   }
+  ]
+ },
+ {
+  "script": "/Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/scripts/loading-button.mjs",
+  "ranOnOriginal": true,
+  "ranOnPort": true,
+  "uncoveredDefects": [],
+  "notes": [
+   "All seven gaps are fixed in the script. Both required runs finished with 603 checks and 0 errors. Outputs: /private/tmp/claude-501/-Applications-Projects-nextjs-sunui-design/5465df63-0c9d-404d-8b8d-8414c00fa179/scratchpad/pa2/runs/loading-button-original.json (a copy of the last of three baseline runs, o1.json) and .../loading-button-p2-vue.json. I changed no port, demo or project file.",
+   "Slide direction: every xfade now emits in.firstDir (dir, the original reads 'up') and in.startDyRel (px, about +5.5 to +6), including xfade.pay.toSuccess.",
+   "Easing shape: crossT now interpolates between frames. Added in.t50OverT90 for every xfade, and subscribe.check.t50OverT90 and pay.check.t50OverT90. The ratios read about 0.44 to 0.46 for the fast toLoading fades and 0.38 to 0.46 for the timer-driven ones; the check draw reads about 0.47 to 0.50. Ease-in-out would read about 0.63 and linear about 0.56. The ratio estimates the animation start by extending the first rising segment back to zero. Timer-driven fades still vary by about 0.05 between runs, so the compare range needs several baseline runs.",
+   "Coverage: added xfade.pay.toLoading (spinner t50/t90/shape, firstDir, startDyRel, textOverlaps >= 2 frames, out.minDy about -6, out.animates). Also added xfade.pay.again.toLoading (Paid to loading) and xfade.apply.again.toLoading (error to loading). Subscribe and Apply loading to idle under the inline style does not exist in the demo, since only Pay is inline and it goes loading to success.",
+   "Tab walks while loading: added tab.loading.pay.order and tab.loading.subscribe.order, each walked about 300ms after the click. Added walkedInWindow booleans, so a walk that outlasts the loading window shows up. The original and p2-vue both give input, Subscribe (or Working), Pay or Paid, Apply code.",
+   "First render: the 1000ms mount window now starts at the first frame with three buttons. Added first.mountFrameCount (exact, >= 20 frames; the original gives about 61). first.noEntryAnimation and first.noButtonMountMotion also require at least 20 frames.",
+   "Static offsets: removed centredWithin4px. dxFromCenterMax stays as info. Replaced the check with in.notStacked (exact), which is true when the union of the outgoing and incoming content is no more than 8px wider than the wider group. in.stackExtra is info. The original reads true on every fade except xfade.pay.again.toLoading, which read false in all three runs before I gave that call the right incoming group (spinner plus label). The final runs read true in every one.",
+   "Locale: the script no longer skips l != en. IDLE labels come from the first render, result labels from pressing each button once, and the email box is found by role. Tab labels become tag:#index. Copy values are downgraded to info only when they are strings (LOCTEXT pattern). I ran the original and p2-vue with l=ja: 603 checks each, 0 errors, tabOrder input:, button:#0, #1, #2. I did not run ja against the original's baseline range.",
+   "Regressions: added six reviewer defects (rev-1 to rev-6) to /Applications/Projects/nextjs/sunui-design/reports/assets/移植試作-2026-11-23/pilot-a/regressions/loading-button.json, each with a checks array. Every key in the file, including the earlier defects, exists in the original output.",
+   "Original against p2-vue (single-run comparison): the known p2-vue defects still show up as differences (focus.*, repeat.loading.focusedDuringLoad, kbd.afterMouse.space.*). I also saw two t50OverT90 values outside the single-run range: xfade.subscribe.toLoading and xfade.pay.toLoading. That comparison ran before I added the start-time correction, and I did not repeat it after the correction. After it, p2-vue read 0.439 and 0.446 against 0.444 to 0.460 for the original's three runs.",
+   "I have not run compare.mjs. The tolerance checks above were my own approximation of its rules."
+  ]
+ }
+]

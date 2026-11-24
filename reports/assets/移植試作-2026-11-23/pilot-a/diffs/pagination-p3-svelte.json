@@ -1,0 +1,345 @@
+{
+ "block": "pagination",
+ "label": "p3-svelte",
+ "compared": 275,
+ "failingItems": {
+  "underline-spring": [
+   {
+    "key": "spring.a.forward6to7.animates",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.a.forward6to7.firstDir",
+    "kind": "dir",
+    "expected": "left",
+    "got": "none"
+   },
+   {
+    "key": "spring.a.forward6to7.start",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.a.forward6to7.peak",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.a.forward6to7.settleMs",
+    "kind": "ms",
+    "expected": "260..266 (±65.75)",
+    "got": 0
+   },
+   {
+    "key": "spring.a.forward6to7.t50Ms",
+    "kind": "ms",
+    "expected": "94..100 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.a.forward6to7.t90Ms",
+    "kind": "ms",
+    "expected": "143..150 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.b.backward7to6.animates",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.b.backward7to6.firstDir",
+    "kind": "dir",
+    "expected": "right",
+    "got": "none"
+   },
+   {
+    "key": "spring.b.backward7to6.start",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.b.backward7to6.peak",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.b.backward7to6.settleMs",
+    "kind": "ms",
+    "expected": "299..311 (±76.25)",
+    "got": 0
+   },
+   {
+    "key": "spring.b.backward7to6.t50Ms",
+    "kind": "ms",
+    "expected": "84..99 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.b.backward7to6.t90Ms",
+    "kind": "ms",
+    "expected": "145..151 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.ab.backwardLarger",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.d.prev6to5.animates",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.d.prev6to5.firstDir",
+    "kind": "dir",
+    "expected": "right",
+    "got": "none"
+   },
+   {
+    "key": "spring.d.prev6to5.start",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.prev6to5.peak",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.prev6to5.settleMs",
+    "kind": "ms",
+    "expected": "301..317 (±77.25)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.prev6to5.t50Ms",
+    "kind": "ms",
+    "expected": "98..101 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.prev6to5.t90Ms",
+    "kind": "ms",
+    "expected": "148..152 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.e.prev5to4.start",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": -3.28
+   },
+   {
+    "key": "spring.e.prev5to4.peak",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": -4
+   },
+   {
+    "key": "spring.e.prev5to4.settleMs",
+    "kind": "ms",
+    "expected": "313..316 (±78.63)",
+    "got": 134
+   },
+   {
+    "key": "spring.e.next4to5.start",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 3.3
+   },
+   {
+    "key": "spring.e.next4to5.peak",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 3.8
+   },
+   {
+    "key": "spring.e.next4to5.settleMs",
+    "kind": "ms",
+    "expected": "263..267 (±66.25)",
+    "got": 133
+   },
+   {
+    "key": "spring.e.page5from4.start",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 3.29
+   },
+   {
+    "key": "spring.e.page5from4.peak",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 3.8
+   },
+   {
+    "key": "spring.e.page5from4.settleMs",
+    "kind": "ms",
+    "expected": "263..266 (±66.13)",
+    "got": 132
+   },
+   {
+    "key": "spring.d.page6from7.animates",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.d.page6from7.firstDir",
+    "kind": "dir",
+    "expected": "right",
+    "got": "none"
+   },
+   {
+    "key": "spring.d.page6from7.start",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page6from7.peak",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page6from7.settleMs",
+    "kind": "ms",
+    "expected": "299..315 (±76.75)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page6from7.t50Ms",
+    "kind": "ms",
+    "expected": "99..100 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page6from7.t90Ms",
+    "kind": "ms",
+    "expected": "149..150 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page5from6.animates",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   },
+   {
+    "key": "spring.d.page5from6.firstDir",
+    "kind": "dir",
+    "expected": "right",
+    "got": "none"
+   },
+   {
+    "key": "spring.d.page5from6.start",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page5from6.peak",
+    "kind": "px",
+    "expected": "40..40 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page5from6.settleMs",
+    "kind": "ms",
+    "expected": "299..299 (±74.75)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page5from6.t50Ms",
+    "kind": "ms",
+    "expected": "99..100 (±40)",
+    "got": 0
+   },
+   {
+    "key": "spring.d.page5from6.t90Ms",
+    "kind": "ms",
+    "expected": "149..150 (±40)",
+    "got": 0
+   }
+  ],
+  "reduced-motion": [
+   {
+    "key": "reduced.card1.6to7.firstDir",
+    "kind": "dir",
+    "expected": "left",
+    "got": "none"
+   },
+   {
+    "key": "reduced.card1.6to7.start",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "reduced.card1.6to7.peak",
+    "kind": "px",
+    "expected": "-20..-20 (±1.5)",
+    "got": 0
+   },
+   {
+    "key": "reduced.card1.6to7.offsetFrame",
+    "kind": "exact",
+    "expected": true,
+    "got": false
+   }
+  ]
+ },
+ "failingCount": 2,
+ "missingKeys": [],
+ "tabOrderEqual": true,
+ "tabOrderBase": [
+  "button:Previous",
+  "button:Page 1",
+  "button:Page 5",
+  "button:Page 6",
+  "button:Page 7",
+  "button:Page 12",
+  "button:Next",
+  "link:Page 1",
+  "link:Page 2",
+  "link:Page 3",
+  "link:Page 4",
+  "link:Next",
+  "button:Previous",
+  "button:Next"
+ ],
+ "tabOrderPort": [
+  "button:Previous",
+  "button:Page 1",
+  "button:Page 5",
+  "button:Page 6",
+  "button:Page 7",
+  "button:Page 12",
+  "button:Next",
+  "link:Page 1",
+  "link:Page 2",
+  "link:Page 3",
+  "link:Page 4",
+  "link:Next",
+  "button:Previous",
+  "button:Next"
+ ],
+ "consoleErrors": [],
+ "scriptErrors": [],
+ "itemsCovered": "19/19",
+ "uncoveredItems": [],
+ "pass": false
+}

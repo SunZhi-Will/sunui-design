@@ -1,0 +1,63 @@
+{
+ "block": "avatar-stack",
+ "label": "p2-vue",
+ "compared": 670,
+ "failingItems": {
+  "hover-lift-and-tooltip": [
+   {
+    "key": "hoverFlow.leo.out.firstDir",
+    "kind": "dir",
+    "expected": "down",
+    "got": "up"
+   },
+   {
+    "key": "hoverFlow.leo.out.settle01Ms",
+    "kind": "ms",
+    "expected": "149.8..165.8 (±40)",
+    "got": 282.3
+   },
+   {
+    "key": "hoverFlow.leo.out.counterTravel",
+    "kind": "ratio",
+    "expected": "0..0 (±0.03)",
+    "got": 0.408
+   }
+  ]
+ },
+ "failingCount": 1,
+ "missingKeys": [],
+ "tabOrderEqual": true,
+ "tabOrderBase": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "tabOrderPort": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "consoleErrors": [],
+ "scriptErrors": [],
+ "itemsCovered": "17/17",
+ "uncoveredItems": [],
+ "pass": false
+}

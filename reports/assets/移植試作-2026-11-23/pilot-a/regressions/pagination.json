@@ -8,7 +8,24 @@
    "platform": "vue",
    "source": "judge",
    "defect": "underline-spring: the underline snaps on every backward page change inside the sliding window, where the original moves. Motion matrix (per-frame sampling, first card): Previous 7 to 6: original bar starts 40px right of rest (447.3 > 487.3) and springs back over 299ms with 12 intermediate frames; vue 0ms, 0 intermediate frames. Same for clicking Page 5 from 6 (original 276ms, 13 frames; vue 0), clicking Page 6 from 7 (original 300ms; vue 0), Previous 6 to 5 (original 299ms; vue 0). Reproduced in two separate runs (steps prev-6 and prev-5 of the main run: original 301ms and 299ms, vue 0ms).",
-   "checks": []
+   "checks": [
+    "spring.b.backward7to6.animates",
+    "spring.b.backward7to6.start",
+    "spring.b.backward7to6.peak",
+    "spring.b.backward7to6.settleMs",
+    "spring.b.backward7to6.t50Ms",
+    "spring.b.backward7to6.t90Ms",
+    "spring.d.prev6to5.animates",
+    "spring.d.prev6to5.start",
+    "spring.d.prev6to5.settleMs",
+    "spring.d.page6from7.animates",
+    "spring.d.page6from7.start",
+    "spring.d.page6from7.settleMs",
+    "spring.d.page5from6.animates",
+    "spring.d.page5from6.start",
+    "spring.d.page5from6.settleMs",
+    "spring.ab.backwardLarger"
+   ]
   },
   {
    "id": "p2-vue-2",
@@ -16,7 +33,18 @@
    "platform": "vue",
    "source": "judge",
    "defect": "underline-spring: Previous 5 to 4 (row changes from '1 … 4 5 6 … 12' to '1 2 3 4 5 … 12') slides in from the wrong side: original starts 44px to the right (447.3 > 491.3, 300ms), vue starts 16px to the left (452.8 > 436.8, 249ms). Clicking Page 5 from 4 and Next 4 to 5: vue offset is 40px (456.8 > 416.8, 283 to 285ms) against the original's 24px (451.3 > 427.3, 250ms).",
-   "checks": []
+   "checks": [
+    "spring.e.prev5to4.start",
+    "spring.e.prev5to4.peak",
+    "spring.e.prev5to4.settleMs",
+    "spring.e.next4to5.start",
+    "spring.e.next4to5.peak",
+    "spring.e.next4to5.settleMs",
+    "spring.e.page5from4.start",
+    "spring.e.page5from4.peak",
+    "spring.e.page5from4.settleMs",
+    "spring.e.prev5to4.firstDir"
+   ]
   },
   {
    "id": "p2-vue-3",
@@ -24,7 +52,10 @@
    "platform": "vue",
    "source": "judge",
    "defect": "accessible-names / attribute: the underline span carries tabindex=\"-1\", which the original does not have (original attrs: aria-hidden only). Effect measured: a mouse click on the underline of the current page moves focus to the aria-hidden SPAN in vue (document.activeElement = SPAN.absolute), while the original and svelte focus the BUTTON 'Page 6'. It is not a Tab stop, so Tab order is unaffected.",
-   "checks": []
+   "checks": [
+    "a11y.underlineTabindex",
+    "a11y.underlineClickFocus"
+   ]
   },
   {
    "id": "p2-svelte-4",
@@ -32,7 +63,29 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "underline-spring: the underline does not animate at all when the row re-centres, which is every change between middle pages, including the checklist's own trigger 6 to 7. Original 6 to 7: bar jumps 20px left (447.3 > 427.3) and springs back over 229 to 250ms with 8 to 18 intermediate frames; svelte: 0ms, 0 intermediate frames, bar rect constant at left 452.8. Same for Next 5 to 6, Next 6 to 7, clicking Page 7 (original about 250ms, svelte 0) and for Previous 7 to 6, clicking Page 5 or 6, Previous 6 to 5 (original 276 to 300ms from a 40px offset, svelte 0). Cause visible in the source: the action only animates when the old and new screen rects differ by more than 0.5px, and in the centred window the new current cell lands on the same screen position.",
-   "checks": []
+   "checks": [
+    "spring.a.forward6to7.animates",
+    "spring.a.forward6to7.start",
+    "spring.a.forward6to7.peak",
+    "spring.a.forward6to7.settleMs",
+    "spring.a.forward6to7.t50Ms",
+    "spring.a.forward6to7.t90Ms",
+    "spring.b.backward7to6.animates",
+    "spring.b.backward7to6.start",
+    "spring.b.backward7to6.peak",
+    "spring.b.backward7to6.settleMs",
+    "spring.b.backward7to6.t50Ms",
+    "spring.b.backward7to6.t90Ms",
+    "spring.d.prev6to5.animates",
+    "spring.d.prev6to5.start",
+    "spring.d.prev6to5.settleMs",
+    "spring.d.page6from7.animates",
+    "spring.d.page6from7.start",
+    "spring.d.page6from7.settleMs",
+    "spring.d.page5from6.animates",
+    "spring.d.page5from6.start",
+    "spring.d.page5from6.settleMs"
+   ]
   },
   {
    "id": "p2-svelte-5",
@@ -40,7 +93,18 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "underline-spring: where the row switches between the centred and the edge layout the movement is much smaller and shorter than the original: Page 4 to 5 and Next 4 to 5: original 24px over 250ms, svelte 4px over 116 to 117ms; Previous 5 to 4: original 44px over 300ms, svelte 4px over 116ms (timing off by more than 50 percent).",
-   "checks": []
+   "checks": [
+    "spring.e.prev5to4.start",
+    "spring.e.prev5to4.peak",
+    "spring.e.prev5to4.settleMs",
+    "spring.e.next4to5.start",
+    "spring.e.next4to5.peak",
+    "spring.e.next4to5.settleMs",
+    "spring.e.page5from4.start",
+    "spring.e.page5from4.peak",
+    "spring.e.page5from4.settleMs",
+    "spring.e.prev5to4.firstDir"
+   ]
   },
   {
    "id": "p3-vue-6",
@@ -48,7 +112,16 @@
    "platform": "vue",
    "source": "judge",
    "defect": "underline-spring (b): the backward move 7 to 6 snaps where the original springs. Original: after clicking Previous on page 7 the bar's first frame is +40px right of rest and it springs back, last moving frame at 291ms, settled by 307ms (16 moving frames); repeated via the left neighbour Page 6: +40px, settled 311ms. Vue: offset 0.00px on every sampled frame in both runs (0 moving frames), so the bar never moves. The checklist states that a port that snaps on a backward move fails. Forward 6 to 7 does match (-20px, settled 268ms vs 270ms).",
-   "checks": []
+   "checks": [
+    "spring.b.backward7to6.animates",
+    "spring.b.backward7to6.start",
+    "spring.b.backward7to6.peak",
+    "spring.b.backward7to6.settleMs",
+    "spring.b.backward7to6.t50Ms",
+    "spring.b.backward7to6.t90Ms",
+    "spring.d.page6from7.animates",
+    "spring.ab.backwardLarger"
+   ]
   },
   {
    "id": "p3-vue-7",
@@ -64,7 +137,14 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "underline-spring (a): forward 6 to 7 snaps where the original moves. Original: first frame -20px left of rest, springs back, settled by 261 to 270ms in three runs (12 to 13 moving frames); same on keyboard Enter (-20px, 257ms). Svelte: offset 0.00px on every frame in all three mouse runs and in the keyboard run. Cause visible in the source: the indicator action animates from the old bar's screen box, and the row re-centres so old and new boxes coincide (dx = 0).",
-   "checks": []
+   "checks": [
+    "spring.a.forward6to7.animates",
+    "spring.a.forward6to7.start",
+    "spring.a.forward6to7.peak",
+    "spring.a.forward6to7.settleMs",
+    "spring.a.forward6to7.t50Ms",
+    "spring.a.forward6to7.t90Ms"
+   ]
   },
   {
    "id": "p3-svelte-9",
@@ -72,7 +152,15 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "underline-spring (b): backward 7 to 6 snaps. Original: +40px right of rest, settled by 307ms (Previous) and 311ms (left neighbour). Svelte: 0.00px on every frame in both runs. The checklist states that a port that snaps on a backward move fails.",
-   "checks": []
+   "checks": [
+    "spring.b.backward7to6.animates",
+    "spring.b.backward7to6.start",
+    "spring.b.backward7to6.peak",
+    "spring.b.backward7to6.settleMs",
+    "spring.b.backward7to6.t50Ms",
+    "spring.b.backward7to6.t90Ms",
+    "spring.ab.backwardLarger"
+   ]
   },
   {
    "id": "p3-svelte-10",
@@ -80,7 +168,11 @@
    "platform": "svelte",
    "source": "judge",
    "defect": "reduced-motion: the original renders one sampled frame with the bar offset before it lands (6 to 7: -20px; 7 to 12: -136px; 12 to 11: +40px; link 1 to 2: -40px). Svelte shows no offset frame on any of these (0 moving frames). Low visual weight (a single frame), but it differs from the original and from the checklist's expectation for 6 to 7.",
-   "checks": []
+   "checks": [
+    "reduced.card1.6to7.offsetFrame",
+    "reduced.card1.6to7.start",
+    "reduced.card1.6to7.peak"
+   ]
   },
   {
    "id": "p3-svelte-11",
@@ -89,6 +181,21 @@
    "source": "judge",
    "defect": "underline-spring (c), minor, not counted on its own: 7 to 12 starts from the old cell (first sampled frame -110px, already moving) where the original starts at -136px; settle 332ms vs 349ms, within tolerance.",
    "checks": []
+  },
+  {
+   "id": "script-layout-narrow",
+   "round": "p2",
+   "platform": "any",
+   "source": "reviewer",
+   "defect": "layout-narrow: a port that keeps the Previous/Next words visible below 640px (instead of chevron only) must fail. Visibility is decided from the text's parent element (size and clip), and the 36px square Previous and Next widths are compared at 600 and 340.",
+   "checks": [
+    "layout.w600.prevWordVisible",
+    "layout.w340.prevWordVisible",
+    "layout.w600.prevWidth",
+    "layout.w600.nextWidth",
+    "layout.w340.prevWidth",
+    "layout.w340.nextWidth"
+   ]
   }
  ]
 }

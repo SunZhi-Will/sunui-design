@@ -1,0 +1,5228 @@
+{
+ "block": "avatar-stack",
+ "runs": 3,
+ "checks": {
+  "entrance.minOpacity": {
+   "item": "no-entrance-on-first-render",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "entrance.widthDrift": {
+   "item": "no-entrance-on-first-render",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "entrance.heightDrift": {
+   "item": "no-entrance-on-first-render",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "entrance.mountTravel": {
+   "item": "no-entrance-on-first-render",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "entrance.frames": {
+   "item": "no-entrance-on-first-render",
+   "kind": "info",
+   "values": [
+    72,
+    73,
+    73
+   ]
+  },
+  "main.discCount": {
+   "item": "first-render-main-stack",
+   "kind": "count",
+   "value": 5
+  },
+  "main.discTexts": {
+   "item": "first-render-main-stack",
+   "kind": "exact",
+   "value": [
+    "MP",
+    "LC",
+    "AL",
+    "NW",
+    "+1.3K"
+   ]
+  },
+  "main.initialDisc.width.min": {
+   "item": "first-render-main-stack",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "main.initialDisc.width.max": {
+   "item": "first-render-main-stack",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "main.initialDisc.height.min": {
+   "item": "first-render-main-stack",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "main.initialDisc.height.max": {
+   "item": "first-render-main-stack",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "main.overflow.height": {
+   "item": "first-render-main-stack",
+   "kind": "px",
+   "min": 36,
+   "max": 36
+  },
+  "main.overflow.atLeast36": {
+   "item": "first-render-main-stack",
+   "kind": "exact",
+   "value": true
+  },
+  "main.overflow.width": {
+   "item": "first-render-main-stack",
+   "kind": "info",
+   "values": [
+    45.938,
+    45.938,
+    45.938
+   ]
+  },
+  "main.caption": {
+   "item": "first-render-main-stack",
+   "kind": "exact",
+   "value": true
+  },
+  "main.rootText": {
+   "item": "first-render-main-stack",
+   "kind": "info",
+   "values": [
+    "Steel Bottle 500 ml Double-wall steel, keeps drinks cold for 24 hours. $32 MP LC AL NW +1.3K 1,284 bought in the last 30 days Add to cart Often bought together Stoneware Mug $24 +410 Market Tote $36 +94",
+    "Steel Bottle 500 ml Double-wall steel, keeps drinks cold for 24 hours. $32 MP LC AL NW +1.3K 1,284 bought in the last 30 days Add to cart Often bought together Stoneware Mug $24 +410 Market Tote $36 +94",
+    "Steel Bottle 500 ml Double-wall steel, keeps drinks cold for 24 hours. $32 MP LC AL NW +1.3K 1,284 bought in the last 30 days Add to cart Often bought together Stoneware Mug $24 +410 Market Tote $36 +94"
+   ]
+  },
+  "main.tintColours": {
+   "item": "first-render-main-stack",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.28)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.12)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ]
+    ],
+    [
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.28)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.12)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ]
+    ],
+    [
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.28)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.12)",
+      "rgb(47, 107, 255)"
+     ],
+     [
+      "oklch(0.580538 0.22893 263.867 / 0.2)",
+      "rgb(47, 107, 255)"
+     ]
+    ]
+   ]
+  },
+  "main.overflow.bgInfo": {
+   "item": "first-render-main-stack",
+   "kind": "info",
+   "values": [
+    [
+     "rgb(255, 255, 255)",
+     "rgb(10, 10, 10)"
+    ],
+    [
+     "rgb(255, 255, 255)",
+     "rgb(10, 10, 10)"
+    ],
+    [
+     "rgb(255, 255, 255)",
+     "rgb(10, 10, 10)"
+    ]
+   ]
+  },
+  "mug.discCount": {
+   "item": "first-render-related-rows",
+   "kind": "count",
+   "value": 3
+  },
+  "mug.discTexts": {
+   "item": "first-render-related-rows",
+   "kind": "exact",
+   "value": [
+    "",
+    "",
+    "+410"
+   ]
+  },
+  "mug.gradientDisc.width.min": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "mug.gradientDisc.width.max": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "mug.gradientDisc.height.min": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "mug.gradientDisc.height.max": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "mug.gradientDisc.border": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "mug.gradientDisc.borderIsCardColour": {
+   "item": "first-render-related-rows",
+   "kind": "exact",
+   "value": true
+  },
+  "mug.overflow.height": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "mug.overflow.width": {
+   "item": "first-render-related-rows",
+   "kind": "info",
+   "values": [
+    38.031,
+    38.031,
+    38.031
+   ]
+  },
+  "tote.discCount": {
+   "item": "first-render-related-rows",
+   "kind": "count",
+   "value": 3
+  },
+  "tote.discTexts": {
+   "item": "first-render-related-rows",
+   "kind": "exact",
+   "value": [
+    "",
+    "",
+    "+94"
+   ]
+  },
+  "tote.gradientDisc.width.min": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "tote.gradientDisc.width.max": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "tote.gradientDisc.height.min": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "tote.gradientDisc.height.max": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "tote.gradientDisc.border": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "tote.gradientDisc.borderIsCardColour": {
+   "item": "first-render-related-rows",
+   "kind": "exact",
+   "value": true
+  },
+  "tote.overflow.height": {
+   "item": "first-render-related-rows",
+   "kind": "px",
+   "min": 28,
+   "max": 28
+  },
+  "tote.overflow.width": {
+   "item": "first-render-related-rows",
+   "kind": "info",
+   "values": [
+    31.891,
+    31.891,
+    31.891
+   ]
+  },
+  "overlap.main.min": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 9,
+   "max": 9
+  },
+  "overlap.main.max": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 9,
+   "max": 9
+  },
+  "overlap.main.leftEdgeCoveredBy": {
+   "item": "overlap-and-stacking",
+   "kind": "exact",
+   "value": [
+    "Mina P., Taipei, 2 hours ago",
+    "Leo C., Osaka, 5 hours ago",
+    "Ava L., Seoul, yesterday",
+    "Noah W., Taichung, yesterday"
+   ]
+  },
+  "overlap.mug.min": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 7,
+   "max": 7
+  },
+  "overlap.mug.max": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 7,
+   "max": 7
+  },
+  "overlap.mug.leftEdgeCoveredBy": {
+   "item": "overlap-and-stacking",
+   "kind": "exact",
+   "value": [
+    "Leo C., Osaka, 5 hours ago",
+    "Ava L., Seoul, yesterday"
+   ]
+  },
+  "overlap.tote.min": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 7,
+   "max": 7
+  },
+  "overlap.tote.max": {
+   "item": "overlap-and-stacking",
+   "kind": "px",
+   "min": 7,
+   "max": 7
+  },
+  "overlap.tote.leftEdgeCoveredBy": {
+   "item": "overlap-and-stacking",
+   "kind": "exact",
+   "value": [
+    "Noah W., Taichung, yesterday",
+    "Sara K., Singapore, 2 days ago"
+   ]
+  },
+  "group.names": {
+   "item": "group-accessible-name",
+   "kind": "exact",
+   "value": [
+    "Recent buyers (1284)",
+    "Buyers of Stoneware Mug (412)",
+    "Buyers of Market Tote (96)"
+   ]
+  },
+  "group.count": {
+   "item": "group-accessible-name",
+   "kind": "count",
+   "value": 3
+  },
+  "group.discsInListItems": {
+   "item": "group-accessible-name",
+   "kind": "exact",
+   "value": true
+  },
+  "avatar.names.main": {
+   "item": "avatar-accessible-names",
+   "kind": "exact",
+   "value": [
+    "Mina P., Taipei, 2 hours ago",
+    "Leo C., Osaka, 5 hours ago",
+    "Ava L., Seoul, yesterday",
+    "Noah W., Taichung, yesterday"
+   ]
+  },
+  "avatar.names.mug": {
+   "item": "avatar-accessible-names",
+   "kind": "exact",
+   "value": [
+    "Leo C., Osaka, 5 hours ago",
+    "Ava L., Seoul, yesterday"
+   ]
+  },
+  "avatar.names.tote": {
+   "item": "avatar-accessible-names",
+   "kind": "exact",
+   "value": [
+    "Noah W., Taichung, yesterday",
+    "Sara K., Singapore, 2 days ago"
+   ]
+  },
+  "avatar.initialsAriaHidden": {
+   "item": "avatar-accessible-names",
+   "kind": "exact",
+   "value": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  "overflow.names": {
+   "item": "overflow-accessible-name",
+   "kind": "exact",
+   "value": [
+    "1280 more, including Sara K.",
+    "410 more, including Noah W.",
+    "94 more"
+   ]
+  },
+  "overflow.buttonCount": {
+   "item": "overflow-accessible-name",
+   "kind": "count",
+   "value": 0
+  },
+  "overflow.allDiscsFocusable": {
+   "item": "overflow-accessible-name",
+   "kind": "exact",
+   "value": true
+  },
+  "fallback.main.tintPattern": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": [
+    0,
+    1,
+    2,
+    0
+   ]
+  },
+  "fallback.main.tintAlpha.0": {
+   "item": "photo-less-fallback",
+   "kind": "ratio",
+   "min": 0.2,
+   "max": 0.2
+  },
+  "fallback.main.tintAlpha.1": {
+   "item": "photo-less-fallback",
+   "kind": "ratio",
+   "min": 0.278,
+   "max": 0.278
+  },
+  "fallback.main.tintAlpha.2": {
+   "item": "photo-less-fallback",
+   "kind": "ratio",
+   "min": 0.122,
+   "max": 0.122
+  },
+  "fallback.main.tintAlpha.3": {
+   "item": "photo-less-fallback",
+   "kind": "ratio",
+   "min": 0.2,
+   "max": 0.2
+  },
+  "fallback.main.tintAlpha.note": {
+   "item": "photo-less-fallback",
+   "kind": "info",
+   "values": [
+    "Alpha of the computed background (opacity, not hue), expected about 0.12, 0.20, 0.28 by the id hash. Index modulo 3 gives the same [0,1,2,0] pattern as the id hash for these four people, so the main stack cannot tell an index-based port apart; only fallback.related.gradientPattern (ids 2,3,4,5) can.",
+    "Alpha of the computed background (opacity, not hue), expected about 0.12, 0.20, 0.28 by the id hash. Index modulo 3 gives the same [0,1,2,0] pattern as the id hash for these four people, so the main stack cannot tell an index-based port apart; only fallback.related.gradientPattern (ids 2,3,4,5) can.",
+    "Alpha of the computed background (opacity, not hue), expected about 0.12, 0.20, 0.28 by the id hash. Index modulo 3 gives the same [0,1,2,0] pattern as the id hash for these four people, so the main stack cannot tell an index-based port apart; only fallback.related.gradientPattern (ids 2,3,4,5) can."
+   ]
+  },
+  "fallback.main.hasGradient": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": false
+  },
+  "fallback.related.allGradient": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": true
+  },
+  "fallback.related.angle135": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": true
+  },
+  "fallback.related.noLetters": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": true
+  },
+  "fallback.related.gradientPattern": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "fallback.stableAfterReload": {
+   "item": "photo-less-fallback",
+   "kind": "exact",
+   "value": true
+  },
+  "tab.order": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": [
+    "img:Mina P., Taipei, 2 hours ago",
+    "img:Leo C., Osaka, 5 hours ago",
+    "img:Ava L., Seoul, yesterday",
+    "img:Noah W., Taichung, yesterday",
+    "img:1280 more, including Sara K.",
+    "button:Add to cart",
+    "img:Leo C., Osaka, 5 hours ago",
+    "img:Ava L., Seoul, yesterday",
+    "img:410 more, including Noah W.",
+    "img:Noah W., Taichung, yesterday",
+    "img:Sara K., Singapore, 2 days ago",
+    "img:94 more"
+   ]
+  },
+  "tab.stopCount": {
+   "item": "tab-order",
+   "kind": "count",
+   "value": 12
+  },
+  "tab.leftRoot": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": true
+  },
+  "tab.focusLift": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": [
+    -3,
+    -3,
+    -3,
+    -3,
+    -3,
+    0,
+    -3,
+    -3,
+    -3,
+    -3,
+    -3,
+    -3
+   ]
+  },
+  "tab.prevStopLift": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": [
+    null,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "tab.reverseIsMirror": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": true
+  },
+  "ring.discCount": {
+   "item": "focus-ring",
+   "kind": "count",
+   "value": 11
+  },
+  "ring.extent.min": {
+   "item": "focus-ring",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "ring.extent.max": {
+   "item": "focus-ring",
+   "kind": "px",
+   "min": 4,
+   "max": 4
+  },
+  "ring.extent.unfocused": {
+   "item": "focus-ring",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "ring.outlineAuto": {
+   "item": "focus-ring",
+   "kind": "exact",
+   "value": false
+  },
+  "ring.innerOffset": {
+   "item": "focus-ring",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "ring.innerOffset.max": {
+   "item": "focus-ring",
+   "kind": "px",
+   "min": 2,
+   "max": 2
+  },
+  "tab.focusTooltips": {
+   "item": "tab-order",
+   "kind": "exact",
+   "value": [
+    "1|Mina P. / Taipei, 2 hours ago",
+    "1|Leo C. / Osaka, 5 hours ago",
+    "1|Ava L. / Seoul, yesterday",
+    "1|Noah W. / Taichung, yesterday",
+    "1|Sara K.",
+    "0|",
+    "1|Leo C. / Osaka, 5 hours ago",
+    "1|Ava L. / Seoul, yesterday",
+    "1|Noah W.",
+    "1|Noah W. / Taichung, yesterday",
+    "1|Sara K. / Singapore, 2 days ago",
+    "1|94 more"
+   ]
+  },
+  "hover.leo.neighbourMoveMax": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "tipAT.countWhileHovered": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "count",
+   "value": 1
+  },
+  "hoverFlow.leo.in.animates": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.in.firstDir": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "hoverFlow.leo.in.start": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in.end": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.in.min": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "hoverFlow.leo.in.max": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in.settleMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133.1,
+   "max": 133.6
+  },
+  "hoverFlow.leo.in.settle01Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.9,
+   "max": 166.7
+  },
+  "hoverFlow.leo.in.endRounded": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "hoverFlow.leo.in.t50Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.318,
+   "max": 81.565
+  },
+  "hoverFlow.leo.in.t90Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.989,
+   "max": 140.167
+  },
+  "hoverFlow.leo.in.counterTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in.overshoot": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "hoverFlow.leo.in.overshoots": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.in.overshootsInfo": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "hoverFlow.leo.in.tipPartialFrames": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "hoverFlow.leo.in.tipOpacityAtAppear": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "hoverFlow.leo.in.tipFullMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.8,
+    16.9,
+    16.5
+   ]
+  },
+  "hoverFlow.leo.in.tipInstant": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.in.tipScaleAtAppear": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "hoverFlow.leo.in.tipTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in.tipAppearMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.8,
+    16.9,
+    16.5
+   ]
+  },
+  "hoverFlow.leo.in.tipAppearsWithin100ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.tipCount": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "count",
+   "value": 1
+  },
+  "hoverFlow.leo.tipLines": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Leo C.",
+    "Osaka, 5 hours ago"
+   ]
+  },
+  "hoverFlow.leo.tipText": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Leo C. Osaka, 5 hours ago"
+  },
+  "hoverFlow.leo.leftEdgeCoveredBy": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Mina P., Taipei, 2 hours ago"
+  },
+  "hoverFlow.leo.tip.gap": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 8,
+   "max": 8
+  },
+  "hoverFlow.leo.tip.centreOffset": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.tip.fontSize": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 12,
+   "max": 12
+  },
+  "hoverFlow.leo.tip.radius": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 3,
+   "max": 3
+  },
+  "hoverFlow.leo.tip.line1Heavier": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.tip.line2Opacity": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.7,
+   "max": 0.7
+  },
+  "hoverFlow.leo.tip.darkOnLight": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.tip.pointerEvents": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "none"
+  },
+  "hoverFlow.leo.tip.ariaHidden": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "true"
+  },
+  "hoverFlow.leo.tip.liveRegions": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "hoverFlow.leo.tip.height": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    40,
+    40,
+    40
+   ]
+  },
+  "hoverFlow.leo.ontoTip.animates": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.ontoTip.firstDir": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "hoverFlow.leo.ontoTip.start": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.ontoTip.end": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.ontoTip.min": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.ontoTip.max": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "hoverFlow.leo.ontoTip.settleMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133,
+   "max": 133.1
+  },
+  "hoverFlow.leo.ontoTip.settle01Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.5,
+   "max": 167.3
+  },
+  "hoverFlow.leo.ontoTip.endRounded": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "hoverFlow.leo.ontoTip.t50Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.915,
+   "max": 82.474
+  },
+  "hoverFlow.leo.ontoTip.t90Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 138.881,
+   "max": 140.293
+  },
+  "hoverFlow.leo.ontoTip.counterTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.ontoTip.overshoot": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "hoverFlow.leo.ontoTip.overshootsInfo": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "hoverFlow.leo.ontoTip.tipPartialFrames": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "hoverFlow.leo.ontoTip.tipGoneMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    17.7,
+    17.4,
+    16.9
+   ]
+  },
+  "hoverFlow.leo.ontoTip.tipGoneWithin100ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.ontoTip.tipsLeft": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "hoverFlow.leo.out.animates": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.out.firstDir": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "hoverFlow.leo.out.start": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.out.end": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.out.min": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.out.max": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "hoverFlow.leo.out.settleMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 116.5,
+   "max": 133
+  },
+  "hoverFlow.leo.out.settle01Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 149.8,
+   "max": 165.8
+  },
+  "hoverFlow.leo.out.endRounded": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "hoverFlow.leo.out.t50Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 64.64,
+   "max": 81.784
+  },
+  "hoverFlow.leo.out.t90Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 123.338,
+   "max": 139.75
+  },
+  "hoverFlow.leo.out.counterTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.out.overshoot": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "hoverFlow.leo.out.overshoots": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.out.overshootsInfo": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "hoverFlow.leo.out.tipPartialFrames": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "hoverFlow.leo.out.tipVisibleAfterLeaveMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.5,
+    16.9,
+    16.2
+   ]
+  },
+  "hoverFlow.leo.out.tipGoneMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.5,
+    16.9,
+    16.2
+   ]
+  },
+  "hoverFlow.leo.out.tipGoneWithin100ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.out.tipsLeft": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "hoverFlow.leo.in2.animates": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.in2.firstDir": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "hoverFlow.leo.in2.start": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in2.end": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.in2.min": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "hoverFlow.leo.in2.max": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in2.settleMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.7,
+   "max": 133.7
+  },
+  "hoverFlow.leo.in2.settle01Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.8,
+   "max": 167.2
+  },
+  "hoverFlow.leo.in2.endRounded": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "hoverFlow.leo.in2.t50Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.702,
+   "max": 82.863
+  },
+  "hoverFlow.leo.in2.t90Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.864,
+   "max": 141.484
+  },
+  "hoverFlow.leo.in2.counterTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.in2.overshoot": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "hoverFlow.leo.in2.overshoots": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.in2.overshootsInfo": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "hoverFlow.leo.out2.animates": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.out2.firstDir": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "hoverFlow.leo.out2.start": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.out2.end": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.out2.min": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "hoverFlow.leo.out2.max": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "hoverFlow.leo.out2.settleMs": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133.1,
+   "max": 133.4
+  },
+  "hoverFlow.leo.out2.settle01Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.8,
+   "max": 166.4
+  },
+  "hoverFlow.leo.out2.endRounded": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "hoverFlow.leo.out2.t50Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.993,
+   "max": 81.418
+  },
+  "hoverFlow.leo.out2.t90Ms": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.535,
+   "max": 140.494
+  },
+  "hoverFlow.leo.out2.counterTravel": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "hoverFlow.leo.out2.overshoot": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "hoverFlow.leo.out2.overshoots": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "hoverFlow.leo.out2.overshootsInfo": {
+   "item": "hover-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "tipAT.tip.pointerEvents": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "exact",
+   "value": "none"
+  },
+  "tipAT.tip.ariaHidden": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "exact",
+   "value": "true"
+  },
+  "tipAT.tip.liveRegions": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "count",
+   "value": 0
+  },
+  "tipAT.ontoTip.tipsLeft": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "count",
+   "value": 0
+  },
+  "tipAT.ontoTip.end": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "tipAT.ontoTip.animates": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "exact",
+   "value": true
+  },
+  "tipAT.ontoTip.firstDir": {
+   "item": "tooltip-hidden-from-at",
+   "kind": "dir",
+   "value": "down"
+  },
+  "focus.leo.in.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.in.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "focus.leo.in.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.in.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.089,
+   "max": -3.089
+  },
+  "focus.leo.in.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.8,
+   "max": 142.5
+  },
+  "focus.leo.in.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 174.1,
+   "max": 175.2
+  },
+  "focus.leo.in.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "focus.leo.in.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 82.606,
+   "max": 84.299
+  },
+  "focus.leo.in.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.767,
+   "max": 142.46
+  },
+  "focus.leo.in.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.03,
+   "max": 0.03
+  },
+  "focus.leo.in.overshoots": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.in.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.089,
+    -0.089,
+    -0.089
+   ]
+  },
+  "focus.mina.out.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.mina.out.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "focus.mina.out.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.mina.out.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.mina.out.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.mina.out.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.089,
+   "max": 0.089
+  },
+  "focus.mina.out.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 124.1,
+   "max": 142.5
+  },
+  "focus.mina.out.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 174.1,
+   "max": 175.2
+  },
+  "focus.mina.out.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "focus.mina.out.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.603,
+   "max": 82.165
+  },
+  "focus.mina.out.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 138.978,
+   "max": 141.517
+  },
+  "focus.mina.out.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.mina.out.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.03,
+   "max": 0.03
+  },
+  "focus.mina.out.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.089,
+    0.089,
+    0.089
+   ]
+  },
+  "focus.afterFirstTab.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    [
+     "Leo C.",
+     "Osaka, 5 hours ago"
+    ]
+   ]
+  },
+  "focus.afterFirstTab.tipText": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Leo C. Osaka, 5 hours ago"
+  },
+  "focus.leo.out.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.out.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "focus.leo.out.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.out.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.out.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.out.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "focus.leo.out.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 129.9,
+   "max": 133.2
+  },
+  "focus.leo.out.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 163.2,
+   "max": 166.5
+  },
+  "focus.leo.out.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "focus.leo.out.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.82,
+   "max": 82.415
+  },
+  "focus.leo.out.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.15,
+   "max": 140.121
+  },
+  "focus.leo.out.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.out.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "focus.leo.out.overshoots": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.out.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "focus.ava.in.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.ava.in.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "focus.ava.in.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.ava.in.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.ava.in.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.089,
+   "max": -3.088
+  },
+  "focus.ava.in.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.ava.in.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 129.9,
+   "max": 133.2
+  },
+  "focus.ava.in.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 163.2,
+   "max": 166.5
+  },
+  "focus.ava.in.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "focus.ava.in.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.75,
+   "max": 83.404
+  },
+  "focus.ava.in.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 140.269,
+   "max": 141.162
+  },
+  "focus.ava.in.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.ava.in.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.03
+  },
+  "focus.ava.in.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.089,
+    -0.088
+   ]
+  },
+  "focus.afterSecondTab.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    [
+     "Ava L.",
+     "Seoul, yesterday"
+    ]
+   ]
+  },
+  "focus.afterSecondTab.tipText": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Ava L. Seoul, yesterday"
+  },
+  "focus.leo.in2.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.in2.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "focus.leo.in2.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in2.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.in2.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.089,
+   "max": -3.088
+  },
+  "focus.leo.in2.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in2.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 129.1,
+   "max": 131.6
+  },
+  "focus.leo.in2.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 162,
+   "max": 165.1
+  },
+  "focus.leo.in2.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "focus.leo.in2.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.923,
+   "max": 83.479
+  },
+  "focus.leo.in2.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 140.533,
+   "max": 140.891
+  },
+  "focus.leo.in2.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.in2.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.03
+  },
+  "focus.leo.in2.overshoots": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.in2.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.089,
+    -0.088,
+    -0.088
+   ]
+  },
+  "focus.ava.out.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.ava.out.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "focus.ava.out.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.ava.out.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.ava.out.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.ava.out.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.089
+  },
+  "focus.ava.out.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 129.1,
+   "max": 131.6
+  },
+  "focus.ava.out.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 162,
+   "max": 165.1
+  },
+  "focus.ava.out.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "focus.ava.out.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.984,
+   "max": 82.561
+  },
+  "focus.ava.out.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.811,
+   "max": 140.365
+  },
+  "focus.ava.out.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.ava.out.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.03
+  },
+  "focus.ava.out.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.089,
+    0.088,
+    0.088
+   ]
+  },
+  "focus.leo.out2.animates": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.out2.firstDir": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "focus.leo.out2.start": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.out2.end": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.out2.min": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "focus.leo.out2.max": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "focus.leo.out2.settleMs": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.7,
+   "max": 134.1
+  },
+  "focus.leo.out2.settle01Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.1,
+   "max": 167.9
+  },
+  "focus.leo.out2.endRounded": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "focus.leo.out2.t50Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.618,
+   "max": 81.816
+  },
+  "focus.leo.out2.t90Ms": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.771,
+   "max": 140.237
+  },
+  "focus.leo.out2.counterTravel": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "focus.leo.out2.overshoot": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "focus.leo.out2.overshoots": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "focus.leo.out2.overshootsInfo": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "combo.noahFocusedOnly.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "combo.noahFocusedOnly.noahLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "combo.both.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Leo C. / Osaka, 5 hours ago",
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "combo.both.tipCount": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "count",
+   "value": 2
+  },
+  "combo.both.leoLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "combo.both.noahLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "combo.both.focusStillOnNoah": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Noah W., Taichung, yesterday"
+  },
+  "combo.afterLeave.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "combo.afterLeave.tipCount": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "count",
+   "value": 1
+  },
+  "combo.afterLeave.leoLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "combo.afterLeave.noahLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "combo.hoverFocusedThenLeave.tips": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "exact",
+   "value": []
+  },
+  "combo.hoverFocusedThenLeave.noahLift": {
+   "item": "focus-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.in.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.main.in.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.in.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.main.in.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.7,
+   "max": 133.3
+  },
+  "overflow.main.in.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.2,
+   "max": 166.8
+  },
+  "overflow.main.in.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.main.in.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.172,
+   "max": 82.622
+  },
+  "overflow.main.in.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.655,
+   "max": 140.673
+  },
+  "overflow.main.in.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.main.in.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.in.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.main.in.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.main.in.tipOpacityAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "overflow.main.in.tipFullMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.2,
+    17.3,
+    16.9
+   ]
+  },
+  "overflow.main.in.tipInstant": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.in.tipScaleAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "overflow.main.in.tipTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in.tipAppearMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.2,
+    17.3,
+    16.9
+   ]
+  },
+  "overflow.main.in.tipAppearsWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.tipCount": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 1
+  },
+  "overflow.main.tipLines": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Sara K."
+   ]
+  },
+  "overflow.main.tipText": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Sara K."
+  },
+  "overflow.main.leftEdgeCoveredBy": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Noah W., Taichung, yesterday"
+  },
+  "overflow.main.out.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.out.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.main.out.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.out.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.out.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.out.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.main.out.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.4,
+   "max": 133.8
+  },
+  "overflow.main.out.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.7,
+   "max": 167.2
+  },
+  "overflow.main.out.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.main.out.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.69,
+   "max": 82.435
+  },
+  "overflow.main.out.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.611,
+   "max": 141.689
+  },
+  "overflow.main.out.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.out.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.main.out.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.out.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "overflow.main.out.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.main.out.tipVisibleAfterLeaveMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.6,
+    17.4,
+    17.4
+   ]
+  },
+  "overflow.main.out.tipGoneMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.6,
+    17.4,
+    17.4
+   ]
+  },
+  "overflow.main.out.tipGoneWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.out.tipsLeft": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "overflow.main.in2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.in2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.main.in2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.in2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.main.in2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.7,
+   "max": 133.7
+  },
+  "overflow.main.in2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166,
+   "max": 167
+  },
+  "overflow.main.in2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.main.in2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.784,
+   "max": 82.106
+  },
+  "overflow.main.in2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 140.086,
+   "max": 140.562
+  },
+  "overflow.main.in2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.in2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.main.in2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.in2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.main.out2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.out2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.main.out2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.out2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.out2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.main.out2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.main.out2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.3,
+   "max": 134.1
+  },
+  "overflow.main.out2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.2,
+   "max": 166.9
+  },
+  "overflow.main.out2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.main.out2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.249,
+   "max": 82.068
+  },
+  "overflow.main.out2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.33,
+   "max": 140.151
+  },
+  "overflow.main.out2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.main.out2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.main.out2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.main.out2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "overflow.mug.in.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.in.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.mug.in.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.in.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.mug.in.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.8,
+   "max": 133.6
+  },
+  "overflow.mug.in.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.2,
+   "max": 166.7
+  },
+  "overflow.mug.in.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.mug.in.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.493,
+   "max": 82.263
+  },
+  "overflow.mug.in.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.042,
+   "max": 139.931
+  },
+  "overflow.mug.in.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.mug.in.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.in.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.mug.in.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.mug.in.tipOpacityAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "overflow.mug.in.tipFullMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.9,
+    17,
+    16.8
+   ]
+  },
+  "overflow.mug.in.tipInstant": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.in.tipScaleAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "overflow.mug.in.tipTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in.tipAppearMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.9,
+    17,
+    16.8
+   ]
+  },
+  "overflow.mug.in.tipAppearsWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.tipCount": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 1
+  },
+  "overflow.mug.tipLines": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "Noah W."
+   ]
+  },
+  "overflow.mug.tipText": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Noah W."
+  },
+  "overflow.mug.leftEdgeCoveredBy": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Ava L., Seoul, yesterday"
+  },
+  "overflow.mug.out.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.out.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.mug.out.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.out.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.out.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.out.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.mug.out.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133,
+   "max": 133.4
+  },
+  "overflow.mug.out.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.6,
+   "max": 166.2
+  },
+  "overflow.mug.out.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.mug.out.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.682,
+   "max": 81.718
+  },
+  "overflow.mug.out.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.549,
+   "max": 140.219
+  },
+  "overflow.mug.out.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.out.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.mug.out.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.out.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "overflow.mug.out.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.mug.out.tipVisibleAfterLeaveMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.6,
+    17.1,
+    16.3
+   ]
+  },
+  "overflow.mug.out.tipGoneMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    16.6,
+    17.1,
+    16.3
+   ]
+  },
+  "overflow.mug.out.tipGoneWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.out.tipsLeft": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "overflow.mug.in2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.in2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.mug.in2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.in2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.mug.in2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133.1,
+   "max": 133.9
+  },
+  "overflow.mug.in2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.8,
+   "max": 167.4
+  },
+  "overflow.mug.in2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.mug.in2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.387,
+   "max": 82.204
+  },
+  "overflow.mug.in2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.433,
+   "max": 140.475
+  },
+  "overflow.mug.in2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.in2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.mug.in2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.in2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.mug.out2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.out2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.mug.out2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.out2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.out2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.mug.out2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.mug.out2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.5,
+   "max": 133
+  },
+  "overflow.mug.out2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.1,
+   "max": 166.9
+  },
+  "overflow.mug.out2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.mug.out2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.84,
+   "max": 81.316
+  },
+  "overflow.mug.out2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.527,
+   "max": 140.264
+  },
+  "overflow.mug.out2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.mug.out2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.mug.out2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.mug.out2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "overflow.tote.in.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.in.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.tote.in.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.in.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.tote.in.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.6,
+   "max": 133.4
+  },
+  "overflow.tote.in.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.4,
+   "max": 166.7
+  },
+  "overflow.tote.in.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.tote.in.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 81.093,
+   "max": 81.744
+  },
+  "overflow.tote.in.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.669,
+   "max": 140.334
+  },
+  "overflow.tote.in.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.tote.in.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.in.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.tote.in.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.tote.in.tipOpacityAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "overflow.tote.in.tipFullMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    17,
+    17.4,
+    17
+   ]
+  },
+  "overflow.tote.in.tipInstant": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.in.tipScaleAtAppear": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "overflow.tote.in.tipTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in.tipAppearMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    17,
+    17.4,
+    17
+   ]
+  },
+  "overflow.tote.in.tipAppearsWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.tipCount": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 1
+  },
+  "overflow.tote.tipLines": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": [
+    "94 more"
+   ]
+  },
+  "overflow.tote.tipText": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "94 more"
+  },
+  "overflow.tote.leftEdgeCoveredBy": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "Sara K., Singapore, 2 days ago"
+  },
+  "overflow.tote.out.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.out.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.tote.out.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.out.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.out.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.out.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.tote.out.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.6,
+   "max": 133.1
+  },
+  "overflow.tote.out.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.7,
+   "max": 166.9
+  },
+  "overflow.tote.out.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.tote.out.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.84,
+   "max": 81.559
+  },
+  "overflow.tote.out.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.562,
+   "max": 139.917
+  },
+  "overflow.tote.out.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.out.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.tote.out.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.out.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "overflow.tote.out.tipPartialFrames": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": false
+  },
+  "overflow.tote.out.tipVisibleAfterLeaveMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    17,
+    16,
+    16.4
+   ]
+  },
+  "overflow.tote.out.tipGoneMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    17,
+    16,
+    16.4
+   ]
+  },
+  "overflow.tote.out.tipGoneWithin100ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.out.tipsLeft": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "count",
+   "value": 0
+  },
+  "overflow.tote.in2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.in2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "up"
+  },
+  "overflow.tote.in2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.in2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3.088,
+   "max": -3.088
+  },
+  "overflow.tote.in2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 133.1,
+   "max": 133.1
+  },
+  "overflow.tote.in2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 165.6,
+   "max": 166.3
+  },
+  "overflow.tote.in2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "-3"
+  },
+  "overflow.tote.in2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.961,
+   "max": 81.408
+  },
+  "overflow.tote.in2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.313,
+   "max": 140.337
+  },
+  "overflow.tote.in2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.in2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.tote.in2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.in2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    -0.088,
+    -0.088,
+    -0.088
+   ]
+  },
+  "overflow.tote.out2.animates": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.out2.firstDir": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "dir",
+   "value": "down"
+  },
+  "overflow.tote.out2.start": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.out2.end": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.out2.min": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": -3,
+   "max": -3
+  },
+  "overflow.tote.out2.max": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "px",
+   "min": 0.088,
+   "max": 0.088
+  },
+  "overflow.tote.out2.settleMs": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 132.8,
+   "max": 133.3
+  },
+  "overflow.tote.out2.settle01Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 166.3,
+   "max": 166.4
+  },
+  "overflow.tote.out2.endRounded": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": "0"
+  },
+  "overflow.tote.out2.t50Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 80.7,
+   "max": 81.865
+  },
+  "overflow.tote.out2.t90Ms": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ms",
+   "min": 139.528,
+   "max": 139.828
+  },
+  "overflow.tote.out2.counterTravel": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "overflow.tote.out2.overshoot": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "ratio",
+   "min": 0.029,
+   "max": 0.029
+  },
+  "overflow.tote.out2.overshoots": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "exact",
+   "value": true
+  },
+  "overflow.tote.out2.overshootsInfo": {
+   "item": "overflow-lift-and-tooltip",
+   "kind": "info",
+   "values": [
+    0.088,
+    0.088,
+    0.088
+   ]
+  },
+  "rm.entrance.minOpacity": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "rm.entrance.mountTravel": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.in.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.leo.in.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.leo.in.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.leo.in.tipPartialFrames": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.in.tipOpacityAtAppear": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rm.hover.leo.in.tipFullMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    38.9,
+    41.9,
+    45
+   ]
+  },
+  "rm.hover.leo.in.tipInstant": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.leo.in.tipScaleAtAppear": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "rm.hover.leo.in.tipTravel": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in.tipAppearMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    38.9,
+    41.9,
+    45
+   ]
+  },
+  "rm.hover.leo.in.tipAppearsWithin100ms": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.leo.tipCount": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 1
+  },
+  "rm.hover.leo.tipLines": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Leo C.",
+    "Osaka, 5 hours ago"
+   ]
+  },
+  "rm.hover.leo.tipText": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Leo C. Osaka, 5 hours ago"
+  },
+  "rm.hover.leo.leftEdgeCoveredBy": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Mina P., Taipei, 2 hours ago"
+  },
+  "rm.hover.leo.out.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.out.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.leo.out.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.leo.out.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.leo.out.tipPartialFrames": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.out.tipVisibleAfterLeaveMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    16,
+    16.7,
+    17.2
+   ]
+  },
+  "rm.hover.leo.out.tipGoneMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    16,
+    16.7,
+    17.2
+   ]
+  },
+  "rm.hover.leo.out.tipGoneWithin100ms": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.leo.out.tipsLeft": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 0
+  },
+  "rm.hover.leo.in2.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.in2.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.leo.in2.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.leo.in2.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.in2.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.leo.out2.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.leo.out2.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.leo.out2.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.leo.out2.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.leo.out2.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.mainOverflow.in.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.in.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.mainOverflow.in.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.mainOverflow.in.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.mainOverflow.in.tipPartialFrames": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.in.tipOpacityAtAppear": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    1,
+    1,
+    1
+   ]
+  },
+  "rm.hover.mainOverflow.in.tipFullMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    17,
+    17,
+    17
+   ]
+  },
+  "rm.hover.mainOverflow.in.tipInstant": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.mainOverflow.in.tipScaleAtAppear": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 1,
+   "max": 1
+  },
+  "rm.hover.mainOverflow.in.tipTravel": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in.tipAppearMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    17,
+    17,
+    17
+   ]
+  },
+  "rm.hover.mainOverflow.in.tipAppearsWithin100ms": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.mainOverflow.tipCount": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 1
+  },
+  "rm.hover.mainOverflow.tipLines": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Sara K."
+   ]
+  },
+  "rm.hover.mainOverflow.tipText": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Sara K."
+  },
+  "rm.hover.mainOverflow.leftEdgeCoveredBy": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Noah W., Taichung, yesterday"
+  },
+  "rm.hover.mainOverflow.out.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.out.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.mainOverflow.out.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.mainOverflow.out.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.mainOverflow.out.tipPartialFrames": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.out.tipVisibleAfterLeaveMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    16.4,
+    17,
+    17.6
+   ]
+  },
+  "rm.hover.mainOverflow.out.tipGoneMs": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    16.4,
+    17,
+    17.6
+   ]
+  },
+  "rm.hover.mainOverflow.out.tipGoneWithin100ms": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": true
+  },
+  "rm.hover.mainOverflow.out.tipsLeft": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 0
+  },
+  "rm.hover.mainOverflow.in2.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.in2.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.mainOverflow.in2.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.mainOverflow.in2.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.in2.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.hover.mainOverflow.out2.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.hover.mainOverflow.out2.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.hover.mainOverflow.out2.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.hover.mainOverflow.out2.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.hover.mainOverflow.out2.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.combo.noahFocusedOnly.tips": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "rm.combo.noahFocusedOnly.noahLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.combo.both.tips": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Leo C. / Osaka, 5 hours ago",
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "rm.combo.both.tipCount": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 2
+  },
+  "rm.combo.both.leoLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.combo.both.noahLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.combo.both.focusStillOnNoah": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Noah W., Taichung, yesterday"
+  },
+  "rm.combo.afterLeave.tips": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    "Noah W. / Taichung, yesterday"
+   ]
+  },
+  "rm.combo.afterLeave.tipCount": {
+   "item": "reduced-motion",
+   "kind": "count",
+   "value": 1
+  },
+  "rm.combo.afterLeave.leoLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.combo.afterLeave.noahLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.combo.hoverFocusedThenLeave.tips": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": []
+  },
+  "rm.combo.hoverFocusedThenLeave.noahLift": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.animates": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": false
+  },
+  "rm.focus.leo.in.firstDir": {
+   "item": "reduced-motion",
+   "kind": "dir",
+   "value": "none"
+  },
+  "rm.focus.leo.in.start": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.end": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.min": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.max": {
+   "item": "reduced-motion",
+   "kind": "px",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.settleMs": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.settle01Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.endRounded": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "0"
+  },
+  "rm.focus.leo.in.t50Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.t90Ms": {
+   "item": "reduced-motion",
+   "kind": "ms",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.counterTravel": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.overshoot": {
+   "item": "reduced-motion",
+   "kind": "ratio",
+   "min": 0,
+   "max": 0
+  },
+  "rm.focus.leo.in.overshootsInfo": {
+   "item": "reduced-motion",
+   "kind": "info",
+   "values": [
+    0,
+    0,
+    0
+   ]
+  },
+  "rm.focus.tips": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": [
+    [
+     "Leo C.",
+     "Osaka, 5 hours ago"
+    ]
+   ]
+  },
+  "rm.focus.tipText": {
+   "item": "reduced-motion",
+   "kind": "exact",
+   "value": "Leo C. Osaka, 5 hours ago"
+  },
+  "locale.zh-TW.mainListName": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": "最近購買 (1284)"
+  },
+  "locale.zh-TW.listCounts": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": [
+    "1284",
+    "412",
+    "96"
+   ]
+  },
+  "locale.zh-TW.avatarNameTemplates": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": [
+    [
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ]
+   ]
+  },
+  "locale.zh-TW.overflowNameTemplates": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": [
+    "還有 1280 人，包括 {name}",
+    "還有 410 人，包括 {name}",
+    "還有 94 人"
+   ]
+  },
+  "locale.zh-TW.overflowTexts": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": [
+    "+1280",
+    "+410",
+    "+94"
+   ]
+  },
+  "locale.zh-TW.toteOverflow.tipText": {
+   "item": "locale-zh-tw",
+   "kind": "exact",
+   "value": "還有 94 人"
+  },
+  "locale.zh-TW.rootText": {
+   "item": "locale-zh-tw",
+   "kind": "info",
+   "values": [
+    "不鏽鋼水壺 500 ml 雙層不鏽鋼，飲料保冰 24 小時。 $32 林 陳 李 王 +1280 1,284 人在過去 30 天購買 加入購物車 經常一起購買 石陶馬克杯 $24 +410 市場托特包 $36 +94",
+    "不鏽鋼水壺 500 ml 雙層不鏽鋼，飲料保冰 24 小時。 $32 林 陳 李 王 +1280 1,284 人在過去 30 天購買 加入購物車 經常一起購買 石陶馬克杯 $24 +410 市場托特包 $36 +94",
+    "不鏽鋼水壺 500 ml 雙層不鏽鋼，飲料保冰 24 小時。 $32 林 陳 李 王 +1280 1,284 人在過去 30 天購買 加入購物車 經常一起購買 石陶馬克杯 $24 +410 市場托特包 $36 +94"
+   ]
+  },
+  "locale.zh-TW.listNames": {
+   "item": "locale-zh-tw",
+   "kind": "info",
+   "values": [
+    [
+     "最近購買 (1284)",
+     "石陶馬克杯的買家 (412)",
+     "市場托特包的買家 (96)"
+    ],
+    [
+     "最近購買 (1284)",
+     "石陶馬克杯的買家 (412)",
+     "市場托特包的買家 (96)"
+    ],
+    [
+     "最近購買 (1284)",
+     "石陶馬克杯的買家 (412)",
+     "市場托特包的買家 (96)"
+    ]
+   ]
+  },
+  "locale.zh-TW.avatarNames": {
+   "item": "locale-zh-tw",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "林美娜, 台北，2 小時前",
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "王諾亞, 台中，昨天",
+      "還有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "還有 410 人，包括 王諾亞"
+     ],
+     [
+      "王諾亞, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "還有 94 人"
+     ]
+    ],
+    [
+     [
+      "林美娜, 台北，2 小時前",
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "王諾亞, 台中，昨天",
+      "還有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "還有 410 人，包括 王諾亞"
+     ],
+     [
+      "王諾亞, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "還有 94 人"
+     ]
+    ],
+    [
+     [
+      "林美娜, 台北，2 小時前",
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "王諾亞, 台中，昨天",
+      "還有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陳立歐, 大阪，5 小時前",
+      "李艾娃, 首爾，昨天",
+      "還有 410 人，包括 王諾亞"
+     ],
+     [
+      "王諾亞, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "還有 94 人"
+     ]
+    ]
+   ]
+  },
+  "locale.zh-TW.discTexts": {
+   "item": "locale-zh-tw",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "林",
+      "陳",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "林",
+      "陳",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "林",
+      "陳",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ]
+   ]
+  },
+  "locale.zh-TW.hoverFirst.tipText": {
+   "item": "locale-zh-tw",
+   "kind": "info",
+   "values": [
+    "林美娜 台北，2 小時前",
+    "林美娜 台北，2 小時前",
+    "林美娜 台北，2 小時前"
+   ]
+  },
+  "locale.zh-CN.mainListName": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": "最近购买 (1284)"
+  },
+  "locale.zh-CN.listCounts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "1284",
+    "412",
+    "96"
+   ]
+  },
+  "locale.zh-CN.avatarNameTemplates": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    [
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ]
+   ]
+  },
+  "locale.zh-CN.overflowNameTemplates": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "还有 1280 人，包括 {name}",
+    "还有 410 人，包括 {name}",
+    "还有 94 人"
+   ]
+  },
+  "locale.zh-CN.overflowTexts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "+1280",
+    "+410",
+    "+94"
+   ]
+  },
+  "locale.zh-CN.toteOverflow.tipText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": "还有 94 人"
+  },
+  "locale.zh-CN.rootText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    "不锈钢水壶 500 ml 双层不锈钢，饮品保冷 24 小时。 $32 林 陈 李 王 +1280 1,284 人在过去 30 天购买 加入购物车 经常一起购买 石陶马克杯 $24 +410 市集托特包 $36 +94",
+    "不锈钢水壶 500 ml 双层不锈钢，饮品保冷 24 小时。 $32 林 陈 李 王 +1280 1,284 人在过去 30 天购买 加入购物车 经常一起购买 石陶马克杯 $24 +410 市集托特包 $36 +94",
+    "不锈钢水壶 500 ml 双层不锈钢，饮品保冷 24 小时。 $32 林 陈 李 王 +1280 1,284 人在过去 30 天购买 加入购物车 经常一起购买 石陶马克杯 $24 +410 市集托特包 $36 +94"
+   ]
+  },
+  "locale.zh-CN.listNames": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     "最近购买 (1284)",
+     "石陶马克杯的买家 (412)",
+     "市集托特包的买家 (96)"
+    ],
+    [
+     "最近购买 (1284)",
+     "石陶马克杯的买家 (412)",
+     "市集托特包的买家 (96)"
+    ],
+    [
+     "最近购买 (1284)",
+     "石陶马克杯的买家 (412)",
+     "市集托特包的买家 (96)"
+    ]
+   ]
+  },
+  "locale.zh-CN.avatarNames": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "林美娜, 台北，2 小时前",
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "王诺亚, 台中，昨天",
+      "还有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "还有 410 人，包括 王诺亚"
+     ],
+     [
+      "王诺亚, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "还有 94 人"
+     ]
+    ],
+    [
+     [
+      "林美娜, 台北，2 小时前",
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "王诺亚, 台中，昨天",
+      "还有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "还有 410 人，包括 王诺亚"
+     ],
+     [
+      "王诺亚, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "还有 94 人"
+     ]
+    ],
+    [
+     [
+      "林美娜, 台北，2 小时前",
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "王诺亚, 台中，昨天",
+      "还有 1280 人，包括 柯莎拉"
+     ],
+     [
+      "陈立欧, 大阪，5 小时前",
+      "李艾娃, 首尔，昨天",
+      "还有 410 人，包括 王诺亚"
+     ],
+     [
+      "王诺亚, 台中，昨天",
+      "柯莎拉, 新加坡，2 天前",
+      "还有 94 人"
+     ]
+    ]
+   ]
+  },
+  "locale.zh-CN.discTexts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "林",
+      "陈",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "林",
+      "陈",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "林",
+      "陈",
+      "李",
+      "王",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ]
+   ]
+  },
+  "locale.zh-CN.hoverFirst.tipText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    "林美娜 台北，2 小时前",
+    "林美娜 台北，2 小时前",
+    "林美娜 台北，2 小时前"
+   ]
+  },
+  "locale.ja.mainListName": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": "最近の購入者 (1284)"
+  },
+  "locale.ja.listCounts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "1284",
+    "412",
+    "96"
+   ]
+  },
+  "locale.ja.avatarNameTemplates": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    [
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ],
+    [
+     "{name}, {note}",
+     "{name}, {note}"
+    ]
+   ]
+  },
+  "locale.ja.overflowNameTemplates": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "ほか 1280 人（{name} など）",
+    "ほか 410 人（{name} など）",
+    "ほか 94 人"
+   ]
+  },
+  "locale.ja.overflowTexts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": [
+    "+1280",
+    "+410",
+    "+94"
+   ]
+  },
+  "locale.ja.toteOverflow.tipText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "exact",
+   "value": "ほか 94 人"
+  },
+  "locale.ja.rootText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    "スチールボトル 500 ml 二重構造のステンレスで、飲み物を 24 時間冷たく保ちます。 $32 佐 中 鈴 渡 +1280 1,284 人が過去 30 日間に購入 カートに入れる よく一緒に購入されている商品 ストーンウェアマグ $24 +410 マーケットトート $36 +94",
+    "スチールボトル 500 ml 二重構造のステンレスで、飲み物を 24 時間冷たく保ちます。 $32 佐 中 鈴 渡 +1280 1,284 人が過去 30 日間に購入 カートに入れる よく一緒に購入されている商品 ストーンウェアマグ $24 +410 マーケットトート $36 +94",
+    "スチールボトル 500 ml 二重構造のステンレスで、飲み物を 24 時間冷たく保ちます。 $32 佐 中 鈴 渡 +1280 1,284 人が過去 30 日間に購入 カートに入れる よく一緒に購入されている商品 ストーンウェアマグ $24 +410 マーケットトート $36 +94"
+   ]
+  },
+  "locale.ja.listNames": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     "最近の購入者 (1284)",
+     "ストーンウェアマグの購入者 (412)",
+     "マーケットトートの購入者 (96)"
+    ],
+    [
+     "最近の購入者 (1284)",
+     "ストーンウェアマグの購入者 (412)",
+     "マーケットトートの購入者 (96)"
+    ],
+    [
+     "最近の購入者 (1284)",
+     "ストーンウェアマグの購入者 (412)",
+     "マーケットトートの購入者 (96)"
+    ]
+   ]
+  },
+  "locale.ja.avatarNames": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "佐藤美奈, 台北、2 時間前",
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "渡辺直人, 台中、昨日",
+      "ほか 1280 人（加藤沙羅 など）"
+     ],
+     [
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "ほか 410 人（渡辺直人 など）"
+     ],
+     [
+      "渡辺直人, 台中、昨日",
+      "加藤沙羅, シンガポール、2 日前",
+      "ほか 94 人"
+     ]
+    ],
+    [
+     [
+      "佐藤美奈, 台北、2 時間前",
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "渡辺直人, 台中、昨日",
+      "ほか 1280 人（加藤沙羅 など）"
+     ],
+     [
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "ほか 410 人（渡辺直人 など）"
+     ],
+     [
+      "渡辺直人, 台中、昨日",
+      "加藤沙羅, シンガポール、2 日前",
+      "ほか 94 人"
+     ]
+    ],
+    [
+     [
+      "佐藤美奈, 台北、2 時間前",
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "渡辺直人, 台中、昨日",
+      "ほか 1280 人（加藤沙羅 など）"
+     ],
+     [
+      "中村玲央, 大阪、5 時間前",
+      "鈴木彩, ソウル、昨日",
+      "ほか 410 人（渡辺直人 など）"
+     ],
+     [
+      "渡辺直人, 台中、昨日",
+      "加藤沙羅, シンガポール、2 日前",
+      "ほか 94 人"
+     ]
+    ]
+   ]
+  },
+  "locale.ja.discTexts": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    [
+     [
+      "佐",
+      "中",
+      "鈴",
+      "渡",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "佐",
+      "中",
+      "鈴",
+      "渡",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ],
+    [
+     [
+      "佐",
+      "中",
+      "鈴",
+      "渡",
+      "+1280"
+     ],
+     [
+      "",
+      "",
+      "+410"
+     ],
+     [
+      "",
+      "",
+      "+94"
+     ]
+    ]
+   ]
+  },
+  "locale.ja.hoverFirst.tipText": {
+   "item": "locale-zh-cn-ja",
+   "kind": "info",
+   "values": [
+    "佐藤美奈 台北、2 時間前",
+    "佐藤美奈 台北、2 時間前",
+    "佐藤美奈 台北、2 時間前"
+   ]
+  }
+ },
+ "tabOrder": [
+  "img:Mina P., Taipei, 2 hours ago",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:Noah W., Taichung, yesterday",
+  "img:1280 more, including Sara K.",
+  "button:Add to cart",
+  "img:Leo C., Osaka, 5 hours ago",
+  "img:Ava L., Seoul, yesterday",
+  "img:410 more, including Noah W.",
+  "img:Noah W., Taichung, yesterday",
+  "img:Sara K., Singapore, 2 days ago",
+  "img:94 more"
+ ],
+ "tabStable": true,
+ "unstable": [],
+ "runErrors": [
+  [],
+  [],
+  []
+ ],
+ "consoleErrors": [
+  [],
+  [],
+  []
+ ]
+}

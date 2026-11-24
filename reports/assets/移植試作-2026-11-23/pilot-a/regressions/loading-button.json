@@ -1,102 +1,324 @@
 {
- "block": "loading-button",
- "note": "Defects earlier judges and challengers found in ports of this block. The acceptance script must have a compared check that fails on a port with each one; list those keys in checks.",
- "defects": [
-  {
-   "id": "p2-vue-1",
-   "round": "p2",
-   "platform": "vue",
-   "source": "judge",
-   "defect": "repeat-press-loading / focus retention: a mouse click never leaves focus on the button. The inner motion.span carries tabindex=\"-1\" (LoadingButton.vue line ~145, also on the check motion.path), so the click focuses that span, and when the span is swapped out focus drops to BODY. Measured after a real mouse click on Subscribe: document.activeElement = BODY during loading, success and idle (original and Svelte: BUTTON in all three). The sampler shows focus=false on the Vue button in every mouse run (subscribe, pay, apply, hold-press), focus=true in the original.",
-   "checks": []
-  },
-  {
-   "id": "p2-vue-2",
-   "round": "p2",
-   "platform": "vue",
-   "source": "judge",
-   "defect": "keyboard-activate: consequence of the above. After clicking Subscribe with the mouse and waiting for idle, pressing Space starts a new cycle in the original (aria-busy at +18ms, Subscribed at +1418ms) and in Svelte, but does nothing in Vue (no state change over 4s). Keyboard activation works in Vue only when focus arrived by Tab.",
-   "checks": []
-  },
-  {
-   "id": "p2-svelte-3",
-   "round": "p2",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "success-subscribe: the check mark is never drawn with motion enabled. The check path's computed stroke-dasharray stays '0px, 1px' for the whole 2000ms success state (original and Vue go 0 > 1px in about 285ms). Screenshots loading-button-svelte-x-3-success.png and loading-button-svelte-4-subscribe-success.png show only a dot left of 'Subscribed'. Under reduced motion the check is drawn (dasharray '1px, 1px').",
-   "checks": []
-  },
-  {
-   "id": "p2-svelte-4",
-   "round": "p2",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "success-sticky: same bug on Pay. 'Paid' is shown with a dot instead of a check and it stays that way indefinitely (loading-button-svelte-8-pay-paid.png, loading-button-svelte-12-end.png, taken many seconds after success).",
-   "checks": []
-  },
-  {
-   "id": "p2-svelte-5",
-   "round": "p2",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "shrink-loading (expand back): the port springs border-radius in px from 999 to 6, so the button stays a full pill for about 400ms after success/error (radius 330px at +150ms, 64px at +283ms, below the 20px clamp only at about +380ms, 6px at +530ms). The original sets the radius immediately: 6px vertical ('15%') from the first frame of the expansion. Visible in loading-button-svelte-x-3-success.png (pill) versus loading-button-orig-x-3-success.png (6px corners) at the same moment. Note the checklist text asks for an animated radius; the original does not do that.",
-   "checks": []
-  },
-  {
-   "id": "p2-svelte-6",
-   "round": "p2",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "press-scale (release): on release the scale first moves the wrong way, 0.970 > 0.954 (about 50ms after release) before returning to 1; original and Vue return monotonically 0.970 > 1. Same thing on a quick click: a brief 1.003 to 1.004 blip. Small (about 6px on the full-width Pay button) but measured on every release (hold on idle Subscribe, idle Pay and Paid).",
-   "checks": []
-  },
-  {
-   "id": "p3-vue-7",
-   "round": "p3",
-   "platform": "vue",
-   "source": "judge",
-   "defect": "tab-order: extra Tab stop on the decorative check-mark <path> whenever a success state is showing. With Pay on 'Paid' (sticky), Tab from the email input gives input > Subscribe > Paid button > path > Apply code > body; the original gives input > Subscribe > Paid button > Apply code. Reproduced in three separate runs (S6 focusBefore 'path:', S8 tabInSuccess and tabInLoading). The path has no tabindex attribute (outerHTML identical to the original's, tabIndex -1), so the likely cause is motion-v attaching focus listeners to motion.path, which makes an SVG element focusable in Chrome. Screenshot loading-button-vue-21-tab-in-success.png shows a focus ring drawn around the check icon.",
-   "checks": []
-  },
-  {
-   "id": "p3-vue-8",
-   "round": "p3",
-   "platform": "vue",
-   "source": "judge",
-   "defect": "keyboard consequence of the same defect: after activating Pay with Enter, Tab then Enter does not reach Apply code. Focus is on the path, Enter produces a click on button index 1 (Pay) which re-runs Pay, and focus then drops to BODY when the path unmounts (kbEnterApply: events keydown/click on btn 1, focusAfter 'BODY'). In the original the same keys land on Apply code and run its error cycle (busy at +14ms, 'Code expired' at +1013ms, idle at +3013ms).",
-   "checks": []
-  },
-  {
-   "id": "p3-svelte-9",
-   "round": "p3",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "shrink-loading: the width animation first moves the wrong way. On click the button snaps from 98.3px to 39.6px within one frame (+21ms), then GROWS to about 77px at +170ms and only then shrinks back to 40px, settling at about +505ms. The original shrinks monotonically 97.7 > 40 (67.5px at +129ms, settled +395ms). Same on Apply code (108 > 39.8 at +22ms > 82.7 at +172ms > 40 at +505ms) and on keyboard activation.",
-   "checks": []
-  },
-  {
-   "id": "p3-svelte-10",
-   "round": "p3",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "success-subscribe: the expansion runs backwards. At success (+1404ms) the button jumps to 128px, then shrinks to 40px over about 500ms while showing 'Subscribed' (label clipped), and snaps to the final 131px at about +1971ms. The original grows 40 > 130 monotonically, settled by +1812ms. Screenshot loading-button-svelte-05-subscribe-success.png (taken +1900ms) shows a 40px button with the text cut to 'Subscr'; the original at the same moment shows the full 'Subscribed' button.",
-   "checks": []
-  },
-  {
-   "id": "p3-svelte-11",
-   "round": "p3",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "success-subscribe / return to idle: after the reset the button does not come back to its idle width. Width goes 131 > 169 > 122 > ... > 32px and is still 32px at the end of the recording (+4300ms, 880ms after the reset); the next cycle 3.9s later starts from 40px and again ends at 32.2px. Original ends at 97.75px. Screenshot loading-button-svelte-06-subscribe-idle.png shows a 32px-wide Subscribe button with clipped text 'ubscri'.",
-   "checks": []
-  },
-  {
-   "id": "p3-svelte-12",
-   "round": "p3",
-   "platform": "svelte",
-   "source": "judge",
-   "defect": "error-state: same broken width curve on Apply code. At the error (+1005ms) the button jumps to 119px, shrinks to 40px by about +1540ms with 'Code expired' clipped, then snaps to 121.6px at about +1590ms; after the reset it collapses to 34.3px (wEnd 34.27 at +3700ms; original 107.3px). In the re-click run it only snapped back to 108px about 570ms after the reset.",
-   "checks": []
-  }
- ]
+  "block": "loading-button",
+  "note": "Defects earlier judges and challengers found in ports of this block. The acceptance script must have a compared check that fails on a port with each one; list those keys in checks.",
+  "defects": [
+    {
+      "id": "p2-vue-1",
+      "round": "p2",
+      "platform": "vue",
+      "source": "judge",
+      "defect": "repeat-press-loading / focus retention: a mouse click never leaves focus on the button. The inner motion.span carries tabindex=\"-1\" (LoadingButton.vue line ~145, also on the check motion.path), so the click focuses that span, and when the span is swapped out focus drops to BODY. Measured after a real mouse click on Subscribe: document.activeElement = BODY during loading, success and idle (original and Svelte: BUTTON in all three). The sampler shows focus=false on the Vue button in every mouse run (subscribe, pay, apply, hold-press), focus=true in the original.",
+      "checks": [
+        "focus.subscribe.loading",
+        "focus.subscribe.result",
+        "focus.subscribe.back",
+        "focus.pay.loading",
+        "focus.pay.result",
+        "focus.apply.loading",
+        "focus.apply.result",
+        "repeat.loading.focusedDuringLoad"
+      ]
+    },
+    {
+      "id": "p2-vue-2",
+      "round": "p2",
+      "platform": "vue",
+      "source": "judge",
+      "defect": "keyboard-activate: consequence of the above. After clicking Subscribe with the mouse and waiting for idle, pressing Space starts a new cycle in the original (aria-busy at +18ms, Subscribed at +1418ms) and in Svelte, but does nothing in Vue (no state change over 4s). Keyboard activation works in Vue only when focus arrived by Tab.",
+      "checks": [
+        "kbd.afterMouse.space.busy",
+        "kbd.afterMouse.space.clickCount",
+        "kbd.afterMouse.space.resultText"
+      ]
+    },
+    {
+      "id": "p2-svelte-3",
+      "round": "p2",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "success-subscribe: the check mark is never drawn with motion enabled. The check path's computed stroke-dasharray stays '0px, 1px' for the whole 2000ms success state (original and Vue go 0 > 1px in about 285ms). Screenshots loading-button-svelte-x-3-success.png and loading-button-svelte-4-subscribe-success.png show only a dot left of 'Subscribed'. Under reduced motion the check is drawn (dasharray '1px, 1px').",
+      "checks": [
+        "subscribe.check.endFrac",
+        "subscribe.check.animates",
+        "subscribe.check.t90Ms"
+      ]
+    },
+    {
+      "id": "p2-svelte-4",
+      "round": "p2",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "success-sticky: same bug on Pay. 'Paid' is shown with a dot instead of a check and it stays that way indefinitely (loading-button-svelte-8-pay-paid.png, loading-button-svelte-12-end.png, taken many seconds after success).",
+      "checks": [
+        "pay.check.endFrac",
+        "pay.check.animates",
+        "pay.check.t90Ms"
+      ]
+    },
+    {
+      "id": "p2-svelte-5",
+      "round": "p2",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "shrink-loading (expand back): the port springs border-radius in px from 999 to 6, so the button stays a full pill for about 400ms after success/error (radius 330px at +150ms, 64px at +283ms, below the 20px clamp only at about +380ms, 6px at +530ms). The original sets the radius immediately: 6px vertical ('15%') from the first frame of the expansion. Visible in loading-button-svelte-x-3-success.png (pill) versus loading-button-orig-x-3-success.png (6px corners) at the same moment. Note the checklist text asks for an animated radius; the original does not do that.",
+      "checks": [
+        "subscribe.expand.radiusAtFirst",
+        "subscribe.expand.maxRadius",
+        "apply.expand.radiusAtFirst",
+        "apply.expand.maxRadius"
+      ]
+    },
+    {
+      "id": "p2-svelte-6",
+      "round": "p2",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "press-scale (release): on release the scale first moves the wrong way, 0.970 > 0.954 (about 50ms after release) before returning to 1; original and Vue return monotonically 0.970 > 1. Same thing on a quick click: a brief 1.003 to 1.004 blip. Small (about 6px on the full-width Pay button) but measured on every release (hold on idle Subscribe, idle Pay and Paid).",
+      "checks": [
+        "press.idle.releaseMonotonic",
+        "press.idle.releaseFirstDir",
+        "press.success.releaseMonotonic",
+        "press.success.releaseFirstDir"
+      ]
+    },
+    {
+      "id": "p3-vue-7",
+      "round": "p3",
+      "platform": "vue",
+      "source": "judge",
+      "defect": "tab-order: extra Tab stop on the decorative check-mark <path> whenever a success state is showing. With Pay on 'Paid' (sticky), Tab from the email input gives input > Subscribe > Paid button > path > Apply code > body; the original gives input > Subscribe > Paid button > Apply code. Reproduced in three separate runs (S6 focusBefore 'path:', S8 tabInSuccess and tabInLoading). The path has no tabindex attribute (outerHTML identical to the original's, tabIndex -1), so the likely cause is motion-v attaching focus listeners to motion.path, which makes an SVG element focusable in Chrome. Screenshot loading-button-vue-21-tab-in-success.png shows a focus ring drawn around the check icon.",
+      "checks": [
+        "tab.success.pay.order",
+        "tab.success.subscribe.order",
+        "kbd.tab.afterPay"
+      ]
+    },
+    {
+      "id": "p3-vue-8",
+      "round": "p3",
+      "platform": "vue",
+      "source": "judge",
+      "defect": "keyboard consequence of the same defect: after activating Pay with Enter, Tab then Enter does not reach Apply code. Focus is on the path, Enter produces a click on button index 1 (Pay) which re-runs Pay, and focus then drops to BODY when the path unmounts (kbEnterApply: events keydown/click on btn 1, focusAfter 'BODY'). In the original the same keys land on Apply code and run its error cycle (busy at +14ms, 'Code expired' at +1013ms, idle at +3013ms).",
+      "checks": [
+        "kbd.tabEnter.clickedButton",
+        "kbd.tabEnter.applyBusy",
+        "kbd.tab.afterPay"
+      ]
+    },
+    {
+      "id": "p3-svelte-9",
+      "round": "p3",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "shrink-loading: the width animation first moves the wrong way. On click the button snaps from 98.3px to 39.6px within one frame (+21ms), then GROWS to about 77px at +170ms and only then shrinks back to 40px, settling at about +505ms. The original shrinks monotonically 97.7 > 40 (67.5px at +129ms, settled +395ms). Same on Apply code (108 > 39.8 at +22ms > 82.7 at +172ms > 40 at +505ms) and on keyboard activation.",
+      "checks": [
+        "subscribe.shrink.monotonic",
+        "subscribe.shrink.reversalPx",
+        "apply.shrink.monotonic",
+        "apply.shrink.reversalPx",
+        "subscribe.shrink.t50Ms",
+        "subscribe.shrink.t90Ms",
+        "apply.shrink.t50Ms",
+        "apply.shrink.t90Ms"
+      ]
+    },
+    {
+      "id": "p3-svelte-10",
+      "round": "p3",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "success-subscribe: the expansion runs backwards. At success (+1404ms) the button jumps to 128px, then shrinks to 40px over about 500ms while showing 'Subscribed' (label clipped), and snaps to the final 131px at about +1971ms. The original grows 40 > 130 monotonically, settled by +1812ms. Screenshot loading-button-svelte-05-subscribe-success.png (taken +1900ms) shows a 40px button with the text cut to 'Subscr'; the original at the same moment shows the full 'Subscribed' button.",
+      "checks": [
+        "subscribe.expand.monotonic",
+        "subscribe.expand.reversalPx",
+        "subscribe.expand.t50Ms",
+        "subscribe.expand.t90Ms"
+      ]
+    },
+    {
+      "id": "p3-svelte-11",
+      "round": "p3",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "success-subscribe / return to idle: after the reset the button does not come back to its idle width. Width goes 131 > 169 > 122 > ... > 32px and is still 32px at the end of the recording (+4300ms, 880ms after the reset); the next cycle 3.9s later starts from 40px and again ends at 32.2px. Original ends at 97.75px. Screenshot loading-button-svelte-06-subscribe-idle.png shows a 32px-wide Subscribe button with clipped text 'ubscri'.",
+      "checks": [
+        "subscribe.reset.monotonic",
+        "subscribe.reset.reversalPx",
+        "subscribe.reset.endMinusIdle",
+        "subscribe.idle.widthRestored",
+        "subscribe.reset.t50Ms",
+        "subscribe.reset.t90Ms"
+      ]
+    },
+    {
+      "id": "p3-svelte-12",
+      "round": "p3",
+      "platform": "svelte",
+      "source": "judge",
+      "defect": "error-state: same broken width curve on Apply code. At the error (+1005ms) the button jumps to 119px, shrinks to 40px by about +1540ms with 'Code expired' clipped, then snaps to 121.6px at about +1590ms; after the reset it collapses to 34.3px (wEnd 34.27 at +3700ms; original 107.3px). In the re-click run it only snapped back to 108px about 570ms after the reset.",
+      "checks": [
+        "apply.expand.monotonic",
+        "apply.expand.reversalPx",
+        "apply.reset.endMinusIdle",
+        "apply.idle.widthRestored",
+        "apply.expand.t50Ms",
+        "apply.expand.t90Ms",
+        "apply.reset.t50Ms",
+        "apply.reset.t90Ms"
+      ]
+    },
+    {
+      "id": "rev-1",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "label-crossfade: incoming label slides in from the wrong side. A port whose new label enters from 6px above (y:-6 instead of +6) passed, because only |dy - endDy| timings were compared.",
+      "checks": [
+        "xfade.subscribe.toLoading.in.firstDir",
+        "xfade.subscribe.toLoading.in.startDyRel",
+        "xfade.subscribe.toSuccess.in.firstDir",
+        "xfade.subscribe.toSuccess.in.startDyRel",
+        "xfade.subscribe.toIdle.in.firstDir",
+        "xfade.subscribe.toIdle.in.startDyRel",
+        "xfade.pay.toSuccess.in.firstDir",
+        "xfade.pay.toSuccess.in.startDyRel",
+        "xfade.pay.toLoading.in.firstDir",
+        "xfade.pay.toLoading.in.startDyRel",
+        "xfade.pay.again.toLoading.in.firstDir",
+        "xfade.pay.again.toLoading.in.startDyRel",
+        "xfade.apply.toLoading.in.firstDir",
+        "xfade.apply.toLoading.in.startDyRel",
+        "xfade.apply.toError.in.firstDir",
+        "xfade.apply.toError.in.startDyRel",
+        "xfade.apply.toIdle.in.firstDir",
+        "xfade.apply.toIdle.in.startDyRel",
+        "xfade.apply.again.toLoading.in.firstDir",
+        "xfade.apply.again.toLoading.in.startDyRel"
+      ]
+    },
+    {
+      "id": "rev-2",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "label-crossfade (easing): a fade or check draw that is ease-in-out or linear instead of ease-out (t50 about 70ms and t90 about 111ms for a 140ms ease-in-out fade) stayed inside the 40ms timing tolerance. The shape ratio t50 over t90 (about 0.45 for ease-out, 0.56 linear, 0.63 ease-in-out) tells them apart.",
+      "checks": [
+        "subscribe.check.t50OverT90",
+        "xfade.subscribe.toLoading.in.t50OverT90",
+        "xfade.subscribe.toSuccess.in.t50OverT90",
+        "xfade.subscribe.toIdle.in.t50OverT90",
+        "pay.check.t50OverT90",
+        "xfade.pay.toSuccess.in.t50OverT90",
+        "xfade.pay.toLoading.in.t50OverT90",
+        "xfade.pay.again.toLoading.in.t50OverT90",
+        "xfade.apply.toLoading.in.t50OverT90",
+        "xfade.apply.toError.in.t50OverT90",
+        "xfade.apply.toIdle.in.t50OverT90",
+        "xfade.apply.again.toLoading.in.t50OverT90"
+      ]
+    },
+    {
+      "id": "rev-3",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "label-crossfade (coverage): a port that keeps 'Pay $68.00' static and only inserts or fades in the spinner, or that does not slide the old label out when Paid or Code expired is pressed again, passed because only loading to success was measured for Pay.",
+      "checks": [
+        "xfade.pay.toLoading.in.t50Ms",
+        "xfade.pay.toLoading.in.t90Ms",
+        "xfade.pay.toLoading.in.t50OverT90",
+        "xfade.pay.toLoading.in.firstDir",
+        "xfade.pay.toLoading.in.startDyRel",
+        "xfade.pay.toLoading.in.animates",
+        "xfade.pay.toLoading.in.durMs",
+        "xfade.pay.toLoading.textOverlapFrames",
+        "xfade.pay.toLoading.textOverlaps",
+        "xfade.pay.toLoading.out.minDy",
+        "xfade.pay.toLoading.out.animates",
+        "xfade.pay.toLoading.maxHeight",
+        "xfade.pay.again.toLoading.in.t50Ms",
+        "xfade.pay.again.toLoading.in.t90Ms",
+        "xfade.pay.again.toLoading.in.t50OverT90",
+        "xfade.pay.again.toLoading.out.t50Ms",
+        "xfade.pay.again.toLoading.out.t90Ms",
+        "xfade.pay.again.toLoading.in.slideT50Ms",
+        "xfade.pay.again.toLoading.in.slideT90Ms",
+        "xfade.pay.again.toLoading.in.firstDir",
+        "xfade.pay.again.toLoading.in.startDyRel",
+        "xfade.pay.again.toLoading.in.dxFromCenterMax",
+        "xfade.pay.again.toLoading.in.stackExtra",
+        "xfade.pay.again.toLoading.in.notStacked",
+        "xfade.pay.again.toLoading.in.startOp",
+        "xfade.pay.again.toLoading.in.startDy",
+        "xfade.pay.again.toLoading.in.animates",
+        "xfade.pay.again.toLoading.in.durMs",
+        "xfade.pay.again.toLoading.out.minDy",
+        "xfade.pay.again.toLoading.out.animates",
+        "xfade.pay.again.toLoading.maxHeight",
+        "xfade.apply.again.toLoading.in.t50Ms",
+        "xfade.apply.again.toLoading.in.t90Ms",
+        "xfade.apply.again.toLoading.in.t50OverT90",
+        "xfade.apply.again.toLoading.out.t50Ms",
+        "xfade.apply.again.toLoading.out.t90Ms",
+        "xfade.apply.again.toLoading.in.slideT50Ms",
+        "xfade.apply.again.toLoading.in.slideT90Ms",
+        "xfade.apply.again.toLoading.in.firstDir",
+        "xfade.apply.again.toLoading.in.startDyRel",
+        "xfade.apply.again.toLoading.in.dxFromCenterMax",
+        "xfade.apply.again.toLoading.in.stackExtra",
+        "xfade.apply.again.toLoading.in.notStacked",
+        "xfade.apply.again.toLoading.in.startOp",
+        "xfade.apply.again.toLoading.in.startDy",
+        "xfade.apply.again.toLoading.in.animates",
+        "xfade.apply.again.toLoading.in.durMs",
+        "xfade.apply.again.toLoading.out.minDy",
+        "xfade.apply.again.toLoading.out.animates",
+        "xfade.apply.again.toLoading.maxHeight"
+      ]
+    },
+    {
+      "id": "rev-4",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "label-crossfade: outgoing content not popped out of layout, so old and new content sit side by side (content wider than the incoming group alone).",
+      "checks": [
+        "xfade.subscribe.toLoading.in.notStacked",
+        "xfade.subscribe.toSuccess.in.notStacked",
+        "xfade.subscribe.toIdle.in.notStacked",
+        "xfade.pay.toSuccess.in.notStacked",
+        "xfade.pay.again.toLoading.in.notStacked",
+        "xfade.apply.toLoading.in.notStacked",
+        "xfade.apply.toError.in.notStacked",
+        "xfade.apply.toIdle.in.notStacked",
+        "xfade.apply.again.toLoading.in.notStacked"
+      ]
+    },
+    {
+      "id": "rev-5",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "tab-order: a spinner svg or motion element that becomes focusable only while loading (the motion-v focus listener cause behind p3-vue-7) added a Tab stop that was only checked at idle and in the success state.",
+      "checks": [
+        "tab.loading.pay.order",
+        "tab.loading.subscribe.order",
+        "tab.loading.pay.walkedInWindow",
+        "tab.loading.subscribe.walkedInWindow"
+      ]
+    },
+    {
+      "id": "rev-6",
+      "round": "p2-review",
+      "platform": "any",
+      "source": "reviewer",
+      "defect": "first-render: an entry animation that slides labels in on mount passed when the app mounts late (Vite dev first load, slow hydration), because the mount probe window started at document start and saw one frame or none. The window now starts at the first frame with three buttons and a capture shorter than 20 frames fails.",
+      "checks": [
+        "first.mountFrameCount",
+        "first.mountTravel",
+        "first.noEntryAnimation",
+        "first.noButtonMountMotion"
+      ]
+    }
+  ]
 }
