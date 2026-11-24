@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
 import {
   memo,
   useCallback,
@@ -22,7 +23,9 @@ import { iconGroups, iconKeywords, pixelIconGroups } from "@/lib/icon-groups";
 import { lineIconTone } from "@/lib/line-icon-colors";
 import type { Messages } from "@/lib/messages";
 import { DURATION, EASE_SITE } from "@/lib/motion";
+import { proIconSets, type ProIconEntry, type ProIconRenderer, type ProIconSet } from "@/lib/pro-icons";
 import { cn } from "@/lib/utils";
+import { loadProIconRenderers } from "@/registry/__generated__/previews";
 import {
   AnimatedPixelIcon,
   animatedPixelIconNames,
@@ -78,6 +81,35 @@ const counts: Record<Style, number> = {
   pixel: pixelIconNames.length,
 };
 
+// 2026-11-25：Pro 檔期圖示也放進同一張畫布（使用者：「Pro 也要合併進去」）。
+// 名稱寫成 pro/<圖示組>/<圖示>，跟免費圖示不會撞名；圖示由私有 repo 的渲染器畫，公開 clone 沒有時畫鎖頭。
+// Pro 圖示沒有複製 SVG 與下載，只給授權安裝指令（規則見 AGENTS.md「Pro code」）。
+type ProRef = { set: ProIconSet; entry: ProIconEntry };
+type Renderers = Record<string, ProIconRenderer> | null;
+type ProInstalls = Record<string, Record<Style | `${Style}-animated`, ReactNode>>;
+const proById = new Map<string, ProRef>(
+  proIconSets.flatMap((set) => set.icons.map((entry) => [`pro/${set.id}/${entry.name}`, { set, entry }] as const)),
+);
+const proTotal = proById.size;
+const proMotion = (ref: ProRef, style: Style) =>
+  style === "pixel" ? ref.entry.pixelMotion : style === "twotone" ? ref.entry.twotoneMotion : ref.entry.motion;
+const shortName = (id: string) => proById.get(id)?.entry.name ?? id;
+
+function drawPro(
+  renderers: Renderers,
+  id: string,
+  style: Style,
+  o: { size: number; color: boolean; animated: boolean; active?: boolean },
+): ReactNode {
+  const ref = proById.get(id);
+  const r = ref && renderers?.[ref.set.id];
+  if (!ref || !r) return <Icon name="lock" size={Math.min(o.size, 24)} className="text-subtle" />;
+  const name = ref.entry.name;
+  if (style === "pixel") return r.pixel(name, { size: o.size, tone: o.color ? "pigment" : "ink", animated: o.animated, active: o.active });
+  if (style === "twotone") return r.twotone(name, { size: o.size, animated: o.animated, active: o.active, colored: o.color });
+  return r.line(name, { size: o.size, strokeWidth: 1.5, animated: o.animated, active: o.active, colored: o.color });
+}
+
 const mod = (a: number, n: number) => ((a % n) + n) % n;
 const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
 
@@ -119,7 +151,16 @@ function nameAt(list: readonly string[], L: Layout, c: number, r: number): strin
   return i < L.n ? list[i] : null;
 }
 
-export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] }) {
+export function IconCanvas({
+  messages: t,
+  proMessages: pt,
+  proInstalls,
+}: {
+  messages: Messages["iconGallery"];
+  proMessages: Messages["proIcons"];
+  /** 伺服器端渲染好的 Pro 安裝指令，依圖示組 id 與風格 */
+  proInstalls: ProInstalls;
+}) {
   const kindLabel: Record<MotionKind, string> = t.kindLabel;
   const kindHint: Record<MotionKind, string> = t.kindHint;
   const reduce = useReducedMotion() ?? false;
@@ -145,6 +186,22 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   const isPixel = style === "pixel";
   const isTwoTone = style === "twotone";
   const motionSet = isPixel ? animatedPixelSet : isTwoTone ? animatedTwoToneSet : animatedSet;
+  const hasMotion = useCallback(
+    (id: string) => {
+      const ref = proById.get(id);
+      return ref ? Boolean(proMotion(ref, style)) : motionSet.has(id);
+    },
+    [style, motionSet],
+  );
+
+  const [renderers, setRenderers] = useState<Renderers>(null);
+  useEffect(() => {
+    let alive = true;
+    loadProIconRenderers?.().then((r) => alive && setRenderers(r));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -163,8 +220,18 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
             )
           : group.icons,
       }))
+      .concat(
+        proIconSets.map((set) => ({
+          id: `pro-${set.id}`,
+          title: `${pt.sets[set.id]?.title ?? set.title} · ${pt.badge}`,
+          note: pt.sets[set.id]?.note ?? "",
+          icons: set.icons
+            .filter((e) => !q || `${e.name} ${e.keywords} pro ${set.title} ${pt.sets[set.id]?.title ?? ""}`.toLowerCase().includes(q))
+            .map((e) => `pro/${set.id}/${e.name}`),
+        })),
+      )
       .filter((group) => group.icons.length > 0);
-  }, [query, isPixel, isTwoTone, t]);
+  }, [query, isPixel, isTwoTone, t, pt]);
 
   const shown = category === "all" ? groups : groups.filter((group) => group.id === category);
   const visible = useMemo(() => [...new Set(shown.flatMap((group) => group.icons))], [shown]);
@@ -376,7 +443,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
     const name = params.get("icon");
     const st: Style = s === "line" || s === "twotone" ? s : "pixel";
     if (s === "line" || s === "twotone") setStyle(s);
-    if (name && name in sources[st]) pending.current = name;
+    if (name && (name in sources[st] || proById.has(name))) pending.current = name;
     setLinked(true);
   }, []);
 
@@ -529,10 +596,20 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   const onSelect = useCallback(
     (name: string, c: number, r: number, _viaKeyboard: boolean, el: HTMLElement) => {
       opener.current = el;
-      setOrigin(originOf(el.getBoundingClientRect()));
-      setSel({ name, c, r });
+      const rect = el.getBoundingClientRect();
+      setOrigin(originOf(rect));
+      const next = { name, c, r };
+      setSel(next);
+      // 被點的那一格在卡片底下時，移到卡片旁邊的空白，才看得到它浮在模糊上面
+      const vw = window.innerWidth;
+      const cw = Math.min(680, vw - 32);
+      const cx = rect.left + rect.width / 2;
+      if (vw >= 640 && cx > (vw - cw) / 2 - rect.width / 2 && cx < (vw + cw) / 2 + rect.width / 2) {
+        selRef.current = next;
+        focusCell(c, r);
+      }
     },
-    [originOf],
+    [originOf, focusCell],
   );
   const close = useCallback(() => {
     // 飛回那一格現在的位置（開著卡片時畫布可能已經移過）
@@ -609,7 +686,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
 
   // ---- 自動播放：同名的格子一起播 ----
   const playing = useStaggerPlay(
-    useMemo(() => visible.filter((name) => motionSet.has(name)), [visible, motionSet]),
+    useMemo(() => visible.filter(hasMotion), [visible, hasMotion]),
     style,
     viewportRef,
     paused,
@@ -618,8 +695,11 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   // ---- 卡片內容（沿用舊面板的邏輯） ----
   const selected = sel?.name ?? "";
   const previewRef = useRef<HTMLDivElement>(null);
+  const selPro = proById.get(selected) ?? null;
   const kindOf = (name: string): MotionKind | null =>
-    !animatedOn || !motionSet.has(name)
+    proById.has(name)
+      ? (animatedOn && proMotion(proById.get(name)!, style)) || null
+      : !animatedOn || !motionSet.has(name)
       ? null
       : isPixel
         ? pixelMotionKindOf(name as AnimatedPixelIconName)
@@ -639,16 +719,24 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
     : isTwoTone
       ? isAnimated ? "AnimatedTwoToneIcon" : "TwoToneIcon"
       : isAnimated ? "AnimatedIcon" : "Icon";
-  const jsx = `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
+  const jsx = selPro
+    ? `<${isAnimated ? "Animated" : ""}${selPro.set.component}${isPixel ? "Pixel" : isTwoTone ? "TwoTone" : ""}Icon name="${selPro.entry.name}"${activeProp}${isPixel ? ` size={${pixelSize}}${pigment ? ` tone="pigment"` : ""}` : ""} />`
+    : `<${component} name="${selected}"${activeProp}${isPixel ? pixelProps : lineProps} />`;
   const tone = pigment ? "pigment" : "ink";
-  const tags = `${iconKeywords[selected as IconName | PixelIconName] ?? ""}`.split(/\s+/).filter(Boolean);
+  const tags = `${selPro ? selPro.entry.keywords : (iconKeywords[selected as IconName | PixelIconName] ?? "")}`
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 12);
   const related = (groups.find((group) => group.icons.includes(selected))?.icons ?? []).filter((name) => name !== selected).slice(0, 8);
   const lineTint = (name: string) => (pigment ? (lineIconTone(name) as CSSProperties) : undefined);
 
   function renderIcon(name: string, px: number) {
-    if (!(name in sources[style]) && !motionSet.has(name)) return null;
     const k = kindOf(name);
     const active = k && k !== "hover" ? Boolean(toggled[name]) : undefined;
+    if (proById.has(name)) {
+      return <span key={`${name}-${style}-${tone}-${Boolean(k)}`} className="contents">{drawPro(renderers, name, style, { size: px, color: pigment, animated: Boolean(k), active })}</span>;
+    }
+    if (!(name in sources[style]) && !motionSet.has(name)) return null;
     if (isPixel) {
       return k ? (
         <AnimatedPixelIcon key={name} name={name as AnimatedPixelIconName} size={px} active={active} tone={tone} />
@@ -726,9 +814,11 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
             cell={cell}
             iconSize={Z[style]}
             variant={style}
-            animated={motionSet.has(name)}
+            animated={hasMotion(name)}
             color={pigment}
             on={Boolean(playing[name])}
+            renderers={renderers}
+            proLabel={pt.badge}
             selected={sel?.c === c && sel?.r === r}
             onSelect={onSelect}
           />,
@@ -738,9 +828,11 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
   }
 
   return (
+    // id 給 /r/pro 回應裡的「Icon sets: /icons#pro-icons」連結用：Pro 圖示組現在就在這張畫布上
     <section
+      id="pro-icons"
       aria-label={t.canvasLabel}
-      className="relative mx-[calc(50%-50vw)] [--sunui-icon-accent:currentColor]"
+      className="relative mx-[calc(50%-50vw)] scroll-mt-14 [--sunui-icon-accent:currentColor]"
     >
       {/* 可拖曳、可用方向鍵移動的畫布；格子本身是按鈕 */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
@@ -796,7 +888,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={format(t.searchPlaceholder, { n: counts[style] })}
+              placeholder={format(t.searchPlaceholder, { n: counts[style] + proTotal })}
               className="h-9 w-full rounded-md bg-card pr-3 pl-9 text-sm shadow-e1 outline-none placeholder:text-subtle focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
@@ -812,7 +904,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
               <>
                 {styleIcon[s]}
                 <span className="hidden sm:inline">{s === "line" ? t.line : s === "twotone" ? t.twoTone : t.pixel}</span>
-                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s]}</span>
+                <span className="font-mono text-[11px] tabular-nums text-subtle">{counts[s] + proTotal}</span>
               </>
             )}
           />
@@ -906,9 +998,10 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
                 <CellIcon
                   name={sel.name}
                   variant={style}
-                  animated={motionSet.has(sel.name)}
+                  animated={hasMotion(sel.name)}
                   color={pigment}
                   on={Boolean(playing[sel.name])}
+                  renderers={renderers}
                   size={Z[style]}
                 />
               </div>
@@ -921,7 +1014,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
               data-canvas-ui
               role="dialog"
               aria-modal="true"
-              aria-label={selected}
+              aria-label={shortName(selected)}
               tabIndex={-1}
               custom={origin}
               variants={cardVariants}
@@ -933,7 +1026,14 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate font-mono text-sm tracking-[0.04em]">{selected}</p>
+                  <p className="flex items-center gap-2 font-mono text-sm tracking-[0.04em]">
+                    <span className="truncate">{shortName(selected)}</span>
+                    {selPro && (
+                      <span className="shrink-0 rounded-[4px] bg-fg px-1.5 py-px font-sans text-[10px] font-semibold tracking-wide text-bg">
+                        {pt.badge} · {pt.sets[selPro.set.id]?.title ?? selPro.set.title}
+                      </span>
+                    )}
+                  </p>
                   <p className="mt-0.5 text-[11px] font-medium tracking-[0.14em] text-subtle uppercase">
                     {isAnimated ? format(t.animatedKind, { kind: kindLabel[kind!] }) : isPixel ? t.pixelSelected : t.selected}
                   </p>
@@ -1005,7 +1105,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
                   render={(v) => <span className="font-mono text-[11px] tabular-nums">{v}</span>}
                   compact
                 />
-                {style === "line" && (
+                {style === "line" && !selPro && (
                   <Segment
                     label={t.stroke}
                     prefix={t.stroke}
@@ -1016,7 +1116,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
                     compact
                   />
                 )}
-                {motionSet.has(selected) && (
+                {hasMotion(selected) && (
                   <button
                     type="button"
                     aria-pressed={animatedOn}
@@ -1033,6 +1133,24 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
               </div>
 
               <pre className="mt-3 overflow-x-auto rounded-md bg-stage/60 px-3 py-2 font-mono text-[12px]">{jsx}</pre>
+              {selPro ? (
+                <div className="mt-3">
+                  {!renderers && <p className="mb-2 text-xs text-pretty text-subtle">{pt.locked}</p>}
+                  <p className="text-xs font-medium text-subtle">{pt.install}</p>
+                  <div className="mt-1.5">{proInstalls[selPro.set.id]?.[isAnimated ? (`${style}-animated` as const) : style]}</div>
+                  <p className="mt-2 text-xs text-pretty text-subtle">{pt.included}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link href="/pricing" className="btn-primary flex h-9 items-center rounded-md px-3 text-xs font-medium">
+                      {pt.getPro}
+                    </Link>
+                    {selPro.set.scenes[0] && pt.sets[selPro.set.id]?.scene && (
+                      <Link href={`/blocks/${selPro.set.scenes[0]}`} className="btn-secondary flex h-9 items-center rounded-md px-3 text-xs font-medium">
+                        {pt.sets[selPro.set.id]?.scene}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ) : (
               <div className={cn("mt-2 grid gap-2", isAnimated ? "grid-cols-1" : "grid-cols-3")}>
                 <button
                   type="button"
@@ -1065,6 +1183,7 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
                   </>
                 )}
               </div>
+              )}
 
               {tags.length > 0 && (
                 <div className="mt-4">
@@ -1092,8 +1211,8 @@ export function IconCanvas({ messages: t }: { messages: Messages["iconGallery"] 
                       <li key={name}>
                         <button
                           type="button"
-                          title={name}
-                          aria-label={name}
+                          title={shortName(name)}
+                          aria-label={shortName(name)}
                           onClick={() => goTo(name)}
                           className="grid aspect-square w-full place-items-center rounded-[5px] transition-colors hover:bg-stage"
                         >
@@ -1125,6 +1244,8 @@ const CanvasCell = memo(function CanvasCell({
   animated,
   color,
   on,
+  renderers,
+  proLabel,
   selected,
   onSelect,
 }: {
@@ -1137,23 +1258,32 @@ const CanvasCell = memo(function CanvasCell({
   animated: boolean;
   color: boolean;
   on: boolean;
+  renderers: Renderers;
+  proLabel: string;
   selected: boolean;
   onSelect: (name: string, c: number, r: number, viaKeyboard: boolean, el: HTMLElement) => void;
 }) {
+  const pro = proById.has(name);
   return (
     <div data-cell className="absolute p-1" style={{ left: c * cell, top: r * cell, width: cell, height: cell }}>
       <button
         type="button"
-        title={name}
-        aria-label={name}
+        title={pro ? `${shortName(name)} · ${proLabel}` : name}
+        aria-label={pro ? `${shortName(name)}, ${proLabel}` : name}
         aria-pressed={selected}
         onClick={(e) => onSelect(name, c, r, e.detail === 0, e.currentTarget)}
         className={cn(
-          "grid size-full cursor-pointer place-items-center rounded-xl text-fg/85 transition-[background-color,box-shadow,scale] duration-150 ease-site active:scale-95",
+          "relative grid size-full cursor-pointer place-items-center rounded-xl text-fg/85 transition-[background-color,box-shadow,scale] duration-150 ease-site active:scale-95",
           selected ? "bg-card shadow-e2 ring-2 ring-fg" : "hover:bg-card hover:shadow-e1",
         )}
       >
-        <CellIcon name={name} variant={variant} animated={animated} color={color} on={on} size={iconSize} />
+        <CellIcon name={name} variant={variant} animated={animated} color={color} on={on} size={iconSize} renderers={renderers} />
+        {/* Pro 的小記號：格子夠大時才出現 */}
+        {pro && cell >= 96 && (
+          <span aria-hidden className="absolute top-1.5 right-1.5 rounded-[3px] bg-fg/10 px-1 font-mono text-[9px] leading-[14px] font-semibold tracking-wide text-subtle">
+            {proLabel.toUpperCase()}
+          </span>
+        )}
       </button>
     </div>
   );
@@ -1167,6 +1297,7 @@ function CellIcon({
   color,
   on,
   size: iconSize,
+  renderers,
 }: {
   name: string;
   variant: Style;
@@ -1174,7 +1305,9 @@ function CellIcon({
   color: boolean;
   on: boolean;
   size: number;
+  renderers: Renderers;
 }) {
+  if (proById.has(name)) return <>{drawPro(renderers, name, variant, { size: iconSize, color, animated, active: animated ? on : undefined })}</>;
   const tone = color ? "pigment" : "ink";
   const tint = color && variant !== "pixel" ? (lineIconTone(name) as CSSProperties) : undefined;
   return (

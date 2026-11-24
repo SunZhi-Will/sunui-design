@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { CommandTabs } from "@/components/command-tabs";
-import { IconGallery } from "@/components/icon-gallery";
-import { ProIconShowcase } from "@/components/pro-icon-showcase";
+import { IconCanvas } from "@/components/icon-canvas";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
 import { proIconInstall, proIconSets } from "@/lib/pro-icons";
@@ -43,22 +42,10 @@ export default async function IconsPage() {
         </div>
       </section>
 
-      <IconGallery messages={m.iconGallery} />
-
-      <ul className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {rules.map((rule) => (
-          <li key={rule.title} className="rounded-md border border-line bg-card p-4">
-            <Icon name={rule.icon} size={20} className="text-accent" />
-            <h2 className="mt-3 text-sm font-medium">{rule.title}</h2>
-            <p className="mt-1 text-xs text-pretty text-subtle">{rule.body}</p>
-          </li>
-        ))}
-      </ul>
-
-      <ProIconShowcase
-        sets={proIconSets}
-        messages={m.proIcons}
-        installs={Object.fromEntries(
+      <IconCanvas
+        messages={m.iconGallery}
+        proMessages={m.proIcons}
+        proInstalls={Object.fromEntries(
           proIconSets.map((set) => [
             set.id,
             {
@@ -72,6 +59,17 @@ export default async function IconsPage() {
           ]),
         )}
       />
+
+      <ul className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {rules.map((rule) => (
+          <li key={rule.title} className="rounded-md border border-line bg-card p-4">
+            <Icon name={rule.icon} size={20} className="text-accent" />
+            <h2 className="mt-3 text-sm font-medium">{rule.title}</h2>
+            <p className="mt-1 text-xs text-pretty text-subtle">{rule.body}</p>
+          </li>
+        ))}
+      </ul>
+
 
       <section aria-labelledby="usage-title" className="docs mt-20 max-w-3xl">
         <h2 id="usage-title">{t.usageTitle}</h2>

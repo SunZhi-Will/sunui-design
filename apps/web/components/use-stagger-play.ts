@@ -15,6 +15,8 @@ export type PlayStyle = "line" | "pixel" | "twotone";
 
 // 每格播放多久（毫秒）：hover 播完一次，toggle 留時間看到兩種狀態，loop 轉幾圈
 function playMs(style: PlayStyle, name: string): number {
+  // Pro 檔期圖示（名稱是 pro/<set>/<name>）不在免費的動作表裡，給一個中間值
+  if (name.startsWith("pro/")) return 1400;
   if (style !== "pixel") {
     const kind = style === "twotone" ? twoToneMotionKindOf(name as AnimatedTwoToneIconName) : motionKindOf(name as AnimatedIconName);
     return kind === "toggle" ? 1400 : kind === "loop" ? 2200 : 900;
