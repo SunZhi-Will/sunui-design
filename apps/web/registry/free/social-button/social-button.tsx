@@ -65,10 +65,10 @@ export const socialPlatforms: Record<SocialPlatform, { name: string; color: stri
 
 const snappy = { type: "spring", stiffness: 520, damping: 34 } as const;
 
-const sizes: Record<SocialButtonSize, { box: string; glyph: string }> = {
-  sm: { box: "size-9", glyph: "size-4" },
-  md: { box: "size-10", glyph: "size-[18px]" },
-  lg: { box: "size-12", glyph: "size-5" },
+const sizes: Record<SocialButtonSize, { box: string; glyph: string; rim: string }> = {
+  sm: { box: "size-9", glyph: "size-4", rim: "inset-[2.5px]" },
+  md: { box: "size-10", glyph: "size-[18px]", rim: "inset-[3px]" },
+  lg: { box: "size-12", glyph: "size-5", rim: "inset-[3.5px]" },
 };
 
 const sides: Record<TitleSide, { tip: string; arrow: string }> = {
@@ -98,7 +98,7 @@ export interface SocialButtonProps {
   style?: CSSProperties;
 }
 
-/** A solid, platform-coloured round button with a titled tooltip on any side. */
+/** A platform-coloured lacquer disc in a metal bezel, with a titled tooltip on any side. */
 export function SocialButton({
   platform = "link",
   href,
@@ -123,6 +123,15 @@ export function SocialButton({
 
   const body = (
     <>
+      {/* The lacquer disc, set into the metal bezel that the button itself paints */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "absolute rounded-full bg-[color:var(--sb-fill)] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),inset_0_-2px_0_rgb(0_0_0/0.3)]",
+          s.rim,
+        )}
+        style={{ backgroundImage: "linear-gradient(180deg, color-mix(in oklch, var(--sb-fill) 74%, white), var(--sb-fill) 52%, color-mix(in oklch, var(--sb-fill) 80%, black))" }}
+      />
       <span aria-hidden="true" className={cn("relative flex drop-shadow-[0_-1px_0_rgb(0_0_0/0.22)]", s.glyph)}>
         {icon ?? (
           <svg viewBox="0 0 24 24" fill="currentColor" className="size-full">
@@ -157,22 +166,22 @@ export function SocialButton({
   );
 
   const shared = {
-    // Lacquer over the platform colour: a lighter top and darker base of the same hue, so the disc reads as a thick glossy key
+    // Material (DESIGN.md section 7): a lacquer disc in the platform colour (lighter top, darker base of the same hue) set in a
+    // metal bezel (foreground mixed into the surface, 8% at the top to 42% at the bottom, white hairline on top). The bezel was
+    // added on 2026-11-25: glossy discs alone read as any icon set at catalog size
     style: {
       ...style,
       "--sb-fill": fill,
-      backgroundImage:
-        "linear-gradient(180deg, color-mix(in oklch, var(--sb-fill) 74%, white), var(--sb-fill) 52%, color-mix(in oklch, var(--sb-fill) 80%, black))",
+      backgroundImage: "linear-gradient(180deg, color-mix(in oklch, var(--foreground) 8%, var(--card)), color-mix(in oklch, var(--foreground) 42%, var(--card)))",
     } as CSSProperties,
     whileHover: reduce ? undefined : { y: -2 },
     whileTap: reduce ? undefined : { scale: 0.97, y: 0 },
     transition: snappy,
     className: cn(
-      "group/sb relative grid shrink-0 place-items-center rounded-full bg-[color:var(--sb-fill)] text-white outline-none",
-      // Thickness: top highlight, a dark lower lip inside the rim, and a crisp neutral contact shadow below.
-      // Near-black fills get a hairline in dark mode so they read on dark backgrounds
-      "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_1px_0_rgb(0_0_0/0.1),0_3px_6px_-2px_rgb(0_0_0/0.18)]",
-      "dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),inset_0_-2px_0_rgb(0_0_0/0.3),0_0_0_1px_rgb(255_255_255/0.12)]",
+      "group/sb relative grid shrink-0 place-items-center rounded-full text-white outline-none",
+      // Bezel: white hairline on top and a crisp neutral contact shadow below; in dark mode a faint ring keeps it on dark backgrounds
+      "shadow-[inset_0_1px_0_rgb(255_255_255/0.6),0_1px_0_rgb(0_0_0/0.1),0_3px_6px_-2px_rgb(0_0_0/0.22)]",
+      "dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_0_0_1px_rgb(255_255_255/0.1)]",
       "transition-[filter] duration-150 hover:brightness-110 hover:duration-0",
       "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       s.box,

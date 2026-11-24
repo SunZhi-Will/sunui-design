@@ -19,7 +19,7 @@ export default function ScrollTiltStageDemo() {
 
   return (
     <div ref={scroller} className="h-[520px] w-full max-w-4xl overflow-y-auto rounded-xl bg-[#0a0a0a] text-[#f5f5f5]">
-      <header className="flex min-h-[420px] flex-col justify-center px-6 md:px-10">
+      <header className="flex min-h-[300px] flex-col justify-center px-6 md:px-10">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#7aa2ff]">{t.eyebrow}</p>
         <h2 className="mt-3 max-w-[16em] font-serif text-3xl font-normal tracking-tight text-balance">{t.heading}</h2>
         <p className="mt-3 text-sm text-[#a3a3a3]">{t.hint}</p>

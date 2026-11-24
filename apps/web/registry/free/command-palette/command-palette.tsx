@@ -96,13 +96,22 @@ const springs = {
 const E3 =
   "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_32px_-8px_rgb(0_0_0/0.10),0_32px_64px_-16px_rgb(0_0_0/0.10)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.08)]";
 // Material (DESIGN.md section 7): key caps are small steel keys, lit from straight above, with a darker 2px bottom edge for
-// thickness, so the palette reads as a keyboard instrument at rest. The active row's caps take the brand colour as lacquer
+// thickness, so the palette reads as a keyboard instrument at rest. The active row is a brand foil plate (2026-11-25):
+// it is the one object you can still pick out at catalog size, and its caps turn into frosted keys set into the foil
 const KEYCAP =
   "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_1%,var(--card)),color-mix(in_oklch,var(--foreground)_9%,var(--card)))] dark:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_18%,var(--card)),color-mix(in_oklch,var(--foreground)_8%,var(--card)))] " +
   "shadow-[inset_0_1px_0_rgb(255_255_255/0.85),inset_0_-2px_0_rgb(0_0_0/0.1),0_0_0_1px_rgb(0_0_0/0.13),0_1px_1px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-2px_0_rgb(0_0_0/0.45),0_0_0_1px_rgb(255_255_255/0.1)]";
 const KEYCAP_LIT =
-  "bg-[color:var(--sunui-spot,var(--primary))] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--sunui-spot,var(--primary))_74%,white),var(--sunui-spot,var(--primary))_52%,color-mix(in_oklch,var(--sunui-spot,var(--primary))_82%,black))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] " +
-  "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.1)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.3)]";
+  "bg-[linear-gradient(180deg,rgb(255_255_255/0.32),rgb(255_255_255/0.14))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.45),inset_0_-2px_0_rgb(0_0_0/0.18),0_0_0_1px_rgb(0_0_0/0.12)]";
+/** Foil recipe from DESIGN.md section 7: light from above, a diagonal sheen and fine brushing */
+const FOIL = {
+  backgroundColor: "var(--sunui-spot, var(--primary))",
+  backgroundImage:
+    "linear-gradient(180deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 45%, rgb(0 0 0 / 0.16)), linear-gradient(115deg, transparent 34%, rgb(255 255 255 / 0.3) 47%, transparent 60%), repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px)",
+};
+const FOIL_SHADOW = "shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-1px_0_rgb(0_0_0/0.18),0_1px_2px_rgb(0_0_0/0.12),0_4px_10px_-6px_rgb(0_0_0/0.25)]";
+const ON_FOIL = "text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
 
 // Approximate fuzzy match: find each character in order, with bonuses for consecutive and word-start hits
 export function fuzzyMatch(text: string, query: string): Match | null {
@@ -156,14 +165,14 @@ type Row = {
 
 type Section = { key: string; heading: string; rows: Row[] };
 
-function Highlight({ text, indices }: { text: string; indices: number[] }) {
+function Highlight({ text, indices, onFoil = false }: { text: string; indices: number[]; onFoil?: boolean }) {
   if (!indices.length) return <>{text}</>;
   const set = new Set(indices);
   return (
     <>
       {Array.from(text).map((ch, i) =>
         set.has(i) ? (
-          <mark key={i} className="bg-transparent font-semibold text-[color:var(--sunui-spot,var(--primary))]">
+          <mark key={i} className={cn("bg-transparent font-semibold", onFoil ? "text-inherit underline decoration-current/50 underline-offset-2" : "text-[color:var(--sunui-spot,var(--primary))]")}>
             {ch}
           </mark>
         ) : (
@@ -500,7 +509,8 @@ export function CommandPalette({
                     onClick={() => select(row)}
                     className={cn(
                       // Rows are large surfaces, so 0.99 on press; the highlight background slides with the pointer and arrow keys via layoutId
-                      "relative flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-foreground transition-[scale] duration-150 select-none",
+                      "relative flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-[scale] duration-150 select-none",
+                      active ? ON_FOIL : "text-foreground",
                       off ? "cursor-not-allowed opacity-50" : "cursor-pointer motion-safe:active:scale-[0.99]",
                     )}
                   >
@@ -508,7 +518,8 @@ export function CommandPalette({
                       <motion.span
                         layoutId={reduce ? undefined : `${baseId}-active`}
                         aria-hidden="true"
-                        className="absolute inset-0 rounded-lg bg-foreground/[0.06] dark:bg-foreground/[0.08]"
+                        className={cn("absolute inset-0 rounded-lg", FOIL_SHADOW)}
+                        style={FOIL}
                         transition={springs.snappy}
                       />
                     )}
@@ -517,14 +528,14 @@ export function CommandPalette({
                         aria-hidden="true"
                         className={cn(
                           "relative flex size-5 shrink-0 items-center justify-center transition-colors duration-150 [&>svg]:size-4",
-                          active ? "text-[color:var(--sunui-spot,var(--primary))] duration-0" : "text-muted-foreground",
+                          active ? "text-current duration-0" : "text-muted-foreground",
                         )}
                       >
                         {row.item.icon}
                       </span>
                     )}
                     <span className="relative min-w-0 flex-1 truncate">
-                      <Highlight text={row.item.label} indices={row.indices} />
+                      <Highlight text={row.item.label} indices={row.indices} onFoil={active} />
                     </span>
                     {row.item.shortcut && (
                       <span className="relative flex shrink-0 gap-1" aria-hidden="true">

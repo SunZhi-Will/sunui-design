@@ -66,7 +66,8 @@ const MESSAGES: Record<SunLocale, Required<ConfirmButtonLabels>> = {
 const base =
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-// Material (DESIGN.md section 7): outline is a steel keycap and default is a lacquered key in the brand colour.
+// Material (DESIGN.md section 7): outline is a steel keycap, default is a lacquered key in the brand colour and
+// destructive (the armed state) is a red lacquer key.
 // Both are lit from straight above and have a darker bottom edge; on press the key travels 1px and the edge shrinks
 const variants: Record<ConfirmButtonVariant, string> = {
   default:
@@ -81,8 +82,9 @@ const variants: Record<ConfirmButtonVariant, string> = {
   ),
   secondary: "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]",
   ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
+  // Armed state: the steel key turns into a red lacquer key (semantic red, not the brand colour), same light and edge
   destructive:
-    "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+    "bg-destructive bg-[linear-gradient(180deg,color-mix(in_oklch,var(--destructive)_72%,white),var(--destructive)_52%,color-mix(in_oklch,var(--destructive)_80%,black))] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.12),0_1px_2px_rgb(0_0_0/0.16),0_4px_10px_-4px_color-mix(in_oklch,var(--destructive)_55%,transparent)] hover:brightness-105 active:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),inset_0_-1px_0_rgb(0_0_0/0.22),0_0_0_1px_rgb(0_0_0/0.12)] focus-visible:ring-destructive/30",
   link: "text-primary underline-offset-4 hover:underline",
 };
 

@@ -73,22 +73,23 @@ export function ScrollTiltStage({ children, accent = "var(--sunui-spot, var(--pr
         className="pointer-events-none absolute inset-x-[6%] -bottom-12 h-20"
         style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,0.55), transparent 100%)" }}
       />
-      {/* Plinth: a lit top edge in the accent colour, a pale top face, then a brushed-metal front face that darkens downward; faded at both ends */}
+      {/* Plinth: a lit top edge in the accent colour, a pale top face, then a brushed-metal front face with one fixed sheen that darkens downward; faded at both ends.
+          Made one notch heavier on 2026-11-25 so it still reads at catalog size */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-[4%] -bottom-9 flex h-[18px] flex-col"
+        className="pointer-events-none absolute inset-x-[4%] -bottom-10 flex h-[24px] flex-col"
         style={{
           maskImage: "linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent)",
           WebkitMaskImage: "linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent)",
         }}
       >
-        <div className="h-px shrink-0" style={{ background: `color-mix(in srgb, ${accent} 80%, transparent)` }} />
-        <div className="h-[3px] shrink-0" style={{ background: "color-mix(in srgb, currentColor 34%, transparent)" }} />
+        <div className="h-[2px] shrink-0" style={{ background: accent, boxShadow: `0 0 0 0.5px color-mix(in srgb, ${accent} 60%, transparent)` }} />
+        <div className="h-[4px] shrink-0" style={{ background: "linear-gradient(180deg, color-mix(in srgb, currentColor 48%, transparent), color-mix(in srgb, currentColor 30%, transparent))" }} />
         <div
           className="flex-1"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(90deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 3px), linear-gradient(180deg, color-mix(in srgb, currentColor 24%, transparent), color-mix(in srgb, currentColor 6%, transparent))",
+              "linear-gradient(115deg, transparent 38%, color-mix(in srgb, currentColor 14%, transparent) 50%, transparent 62%), repeating-linear-gradient(90deg, color-mix(in srgb, currentColor 9%, transparent) 0 1px, transparent 1px 3px), linear-gradient(180deg, color-mix(in srgb, currentColor 28%, transparent), color-mix(in srgb, currentColor 6%, transparent))",
             boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.25)",
           }}
         />

@@ -102,16 +102,21 @@ const MESSAGES: Record<SunLocale, AddToCartLabels> = {
 
 // Design language (DESIGN.md, craft quality): what flies out is a floating mini product card
 // Material (DESIGN.md section 7): the button is a lacquered key in the brand colour, lit from straight above, with a darker
-// bottom edge for thickness. On press it travels 1px down and the edge shrinks, like a real key bottoming out
+// bottom edge for thickness. On press it travels 1px down and the edge shrinks, like a real key bottoming out.
+// 2026-11-25, one notch heavier: a fixed diagonal sheen and fine brushing over the lacquer, and the cart is a steel key,
+// so the pair still reads as objects at catalog size
 const lacquer: CSSProperties = {
   backgroundColor: "var(--sunui-spot, var(--primary))",
   backgroundImage:
-    "linear-gradient(180deg, color-mix(in oklch, var(--sunui-spot, var(--primary)) 74%, white), var(--sunui-spot, var(--primary)) 52%, color-mix(in oklch, var(--sunui-spot, var(--primary)) 82%, black))",
+    "linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.3) 44%, transparent 58%), repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px), linear-gradient(180deg, color-mix(in oklch, var(--sunui-spot, var(--primary)) 74%, white), var(--sunui-spot, var(--primary)) 52%, color-mix(in oklch, var(--sunui-spot, var(--primary)) 82%, black))",
 };
+/** Steel keycap for the cart: foreground mixed into the surface, lit from above, darker 2px bottom edge */
+const steel =
+  "bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_2%,var(--card)),color-mix(in_oklch,var(--foreground)_14%,var(--card)))] dark:bg-[linear-gradient(180deg,color-mix(in_oklch,var(--foreground)_16%,var(--card)),color-mix(in_oklch,var(--foreground)_7%,var(--card)))] " +
+  "shadow-[inset_0_1px_0_rgb(255_255_255/0.8),inset_0_-2px_0_rgb(0_0_0/0.12),0_0_0_1px_rgb(0_0_0/0.14),0_1px_2px_rgb(0_0_0/0.1)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-2px_0_rgb(0_0_0/0.4),0_0_0_1px_rgb(255_255_255/0.1)]";
 const raised =
   "shadow-[inset_0_1px_0_rgb(255_255_255/0.35),inset_0_-2px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_1px_1px_rgb(0_0_0/0.1),0_4px_8px_-4px_rgb(0_0_0/0.3)] " +
   "enabled:active:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),inset_0_-1px_0_rgb(0_0_0/0.2),0_0_0_1px_rgb(0_0_0/0.1),0_0_0_rgb(0_0_0/0),0_1px_2px_-1px_rgb(0_0_0/0.2)]";
-const e1 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.05)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.08)]";
 const e2 = "shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_4px_8px_-4px_rgb(0_0_0/0.06),0_12px_20px_-8px_rgb(0_0_0/0.08)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.08),0_0_0_1px_rgb(255_255_255/0.10)]";
 /** Brand accent: follows the theme's --primary by default; buyers set --sunui-spot to use their own brand colour. Used only on the primary button and the count badge */
 const spotFill = "bg-[color:var(--sunui-spot,var(--primary))] text-[color:var(--sunui-spot-foreground,var(--primary-foreground))]";
@@ -455,8 +460,8 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, 
       whileTap={reduceMotion ? undefined : { scale: 0.97 }}
       transition={springs.snappy}
       className={cn(
-        "relative grid size-10 place-items-center rounded-md bg-card text-foreground transition-colors duration-150 hover:bg-muted hover:duration-0",
-        e1,
+        "relative grid size-10 place-items-center rounded-md text-foreground transition-[filter] duration-150 hover:brightness-[1.03] hover:duration-0",
+        steel,
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
         className,
       )}
@@ -472,7 +477,7 @@ export function CartIcon({ count, max = 99, label, locale = "en", labels, icon, 
             aria-hidden="true"
             className={cn(
               "absolute -top-1.5 -right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 font-mono text-[10px] leading-none font-semibold tabular-nums",
-              "shadow-[inset_0_1px_0_rgb(255_255_255/0.16),0_0_0_2px_var(--background)]",
+              "shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-1px_0_rgb(0_0_0/0.2),0_0_0_2px_var(--background)]",
               spotFill,
             )}
             initial={reduceMotion ? false : { scale: 0.6, y: 3, opacity: 0 }}
