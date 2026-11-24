@@ -33,6 +33,8 @@ export type ProIconItem = {
 export type ProIconSet = {
   id: string;
   title: string;
+  /** 元件名稱的前綴：Lunar → LunarIcon、LunarPixelIcon、AnimatedLunarTwoToneIcon */
+  component: string;
   /** 對應的季節包與 Pro 場景，用來在 /icons 與 MCP 導向 */
   scenes: string[];
   addedAt: string;
@@ -44,6 +46,7 @@ export const proIconSets: ProIconSet[] = [
   {
     id: "lunar-new-year",
     title: "Lunar New Year",
+    component: "Lunar",
     scenes: ["lunar-new-year", "festival-banner"],
     addedAt: "2026-11-09",
     icons: [
@@ -132,6 +135,101 @@ export const proIconSets: ProIconSet[] = [
         target: "components/ui/sunui-animated-lunar-pixel-icons.tsx",
         dependencies: [],
         registryDependencies: ["sunui-animated-pixel-icons", "@sunui-pro/sunui-lunar-pixel-icons"],
+      },
+    ],
+  },
+  {
+    id: "valentines-day",
+    title: "Valentine's Day",
+    component: "Valentine",
+    scenes: [],
+    addedAt: "2026-11-25",
+    icons: [
+      { name: "rose", keywords: "flower red rose romance love bloom 玫瑰 紅玫瑰 花 バラ 薔薇", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "bouquet", keywords: "flowers bunch gift florist bouquet 花束 捧花 送花 花たば ブーケ", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "ring-box", keywords: "engagement ring proposal diamond jewelry box 戒指 婚戒 求婚 鑽戒 指輪 プロポーズ", motion: "toggle", pixelMotion: "toggle", twotoneMotion: "toggle" },
+      { name: "wax-seal", keywords: "seal stamp letter wax envelope sealed 封蠟 火漆 蠟封 封印 シーリングワックス", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "cupid-arrow", keywords: "cupid arrow heart pierced crush love 邱比特 愛神之箭 一箭穿心 キューピッド 矢", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "love-lock", keywords: "padlock heart lock forever couple bridge 愛心鎖 同心鎖 愛情鎖 鎖 南京錠", motion: "toggle", pixelMotion: "toggle", twotoneMotion: "toggle" },
+      { name: "perfume", keywords: "perfume fragrance scent bottle gift 香水 香氛 香水瓶 フレグランス", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "teddy", keywords: "teddy bear plush toy gift cute 小熊 泰迪熊 玩偶 熊 くま ぬいぐるみ", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "macaron", keywords: "macaron dessert sweet pastry cookie 馬卡龍 甜點 马卡龙 マカロン", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "champagne", keywords: "champagne toast cheers celebrate glasses date 香檳 乾杯 碰杯 慶祝 シャンパン 乾杯", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "candle", keywords: "candle candlelight dinner romantic flame 蠟燭 燭光晚餐 燭台 蜡烛 キャンドル", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+      { name: "key-heart", keywords: "key heart key to my heart unlock love 心形鑰匙 鑰匙 钥匙 鍵 ハートの鍵", motion: "hover", pixelMotion: "hover", twotoneMotion: "hover" },
+    ],
+    items: [
+      {
+        name: "sunui-valentine-icons",
+        title: "Valentine's Day Icons",
+        description:
+          "Valentine's Day line icons on SunUI's 24px grid with a 1.5 stroke: rose, bouquet, ring box, wax seal, cupid arrow, love lock, perfume, teddy, macaron, champagne, candles and a heart key. One accent part each via --sunui-icon-accent. Heart, chocolate, love letter and balloon are in the free set.",
+        style: "line",
+        animated: false,
+        source: "registry/pro/icons/sunui-valentine-icons.tsx",
+        target: "components/ui/sunui-valentine-icons.tsx",
+        dependencies: [],
+        registryDependencies: ["sunui-icons"],
+      },
+      {
+        name: "sunui-animated-valentine-icons",
+        title: "Animated Valentine's Day Icons",
+        description:
+          "Every Valentine's Day line icon animated on the same geometry: the ring box closes and the love lock springs open with an active prop; the arrow flies into the heart, the glasses clink, the seal presses, the candles flicker and the teddy tilts its head when their button is hovered or focused. Respects reduced motion.",
+        style: "line",
+        animated: true,
+        source: "registry/pro/icons/sunui-animated-valentine-icons.tsx",
+        target: "components/ui/sunui-animated-valentine-icons.tsx",
+        dependencies: ["framer-motion"],
+        registryDependencies: ["sunui-animated-icons", "@sunui-pro/sunui-valentine-icons"],
+      },
+      {
+        name: "sunui-valentine-twotone-icons",
+        title: "Valentine's Day Two-tone Icons",
+        description:
+          "Valentine's Day two-tone icons on the same 24px grid and names as the line set: a solid light body plus currentColor details, like the free sunui-twotone-icons. Mono by default; set color and --sunui-icon-body to paint each object (red rose, pink macaron, gold lock).",
+        style: "twotone",
+        animated: false,
+        source: "registry/pro/icons/sunui-valentine-twotone-icons.tsx",
+        target: "components/ui/sunui-valentine-twotone-icons.tsx",
+        dependencies: [],
+        registryDependencies: ["sunui-icons"],
+      },
+      {
+        name: "sunui-animated-valentine-twotone-icons",
+        title: "Animated Valentine's Day Two-tone Icons",
+        description:
+          "Every Valentine's Day two-tone icon animated: the ring box closes and the love lock opens with an active prop; the arrow flies in, the glasses clink, the macaron lifts its top shell and the candles flicker on hover or focus. Respects reduced motion.",
+        style: "twotone",
+        animated: true,
+        source: "registry/pro/icons/sunui-animated-valentine-twotone-icons.tsx",
+        target: "components/ui/sunui-animated-valentine-twotone-icons.tsx",
+        dependencies: ["framer-motion"],
+        registryDependencies: ["sunui-animated-icons", "@sunui-pro/sunui-valentine-twotone-icons"],
+      },
+      {
+        name: "sunui-valentine-pixel-icons",
+        title: "Valentine's Day Pixel Icons",
+        description:
+          "Valentine's Day pixel sprites on SunUI's 16px grid with outline, fill, shade and a white shine. Ink by default; tone=\"pigment\" paints each object in its own colors (red rose with green leaves, gold heart on a red wax seal, pink perfume with a gold cap).",
+        style: "pixel",
+        animated: false,
+        source: "registry/pro/icons/sunui-valentine-pixel-icons.tsx",
+        target: "components/ui/sunui-valentine-pixel-icons.tsx",
+        dependencies: [],
+        registryDependencies: ["sunui-pixel-icons"],
+      },
+      {
+        name: "sunui-animated-valentine-pixel-icons",
+        title: "Animated Valentine's Day Pixel Icons",
+        description:
+          "Every Valentine's Day pixel icon animated frame by frame: the ring box closes, the lock's shackle pops open, the arrow flies, the glasses clink, the macaron opens and the candle flames sway. Frames are derived from the static sprites. No animation library; respects reduced motion.",
+        style: "pixel",
+        animated: true,
+        source: "registry/pro/icons/sunui-animated-valentine-pixel-icons.tsx",
+        target: "components/ui/sunui-animated-valentine-pixel-icons.tsx",
+        dependencies: [],
+        registryDependencies: ["sunui-animated-pixel-icons", "@sunui-pro/sunui-valentine-pixel-icons"],
       },
     ],
   },

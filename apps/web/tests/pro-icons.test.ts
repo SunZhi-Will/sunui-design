@@ -46,38 +46,54 @@ test("pro icons do not shadow free icons", () => {
 
 const sources = existsSync(`${root}registry/pro/icons`);
 
-test("pro icon index matches the Pro source", { skip: !sources && "registry/pro/icons not present" }, () => {
-  const set = proIconSets.find((s) => s.id === "lunar-new-year");
-  assert.ok(set);
-  const read = (file: string) => readFileSync(`${root}registry/pro/icons/${file}`, "utf8");
-  const names = set.icons.map((i) => i.name).sort();
-  assert.deepEqual(keysOf(read("sunui-lunar-icons.tsx"), "lunarIcons").sort(), names, "line icons");
-  assert.deepEqual(keysOf(read("sunui-lunar-pixel-icons.tsx"), "lunarPixelIcons").sort(), names, "pixel icons");
-  assert.deepEqual(keysOf(read("sunui-lunar-twotone-icons.tsx"), "lunarTwoToneIcons").sort(), names, "two-tone icons");
-  const motion = set.icons.filter((i) => i.motion).map((i) => i.name).sort();
-  const pixelMotion = set.icons.filter((i) => i.pixelMotion).map((i) => i.name).sort();
-  assert.deepEqual(keysOf(read("sunui-animated-lunar-icons.tsx"), "lunarRecipes").sort(), motion, "animated line icons");
-  assert.deepEqual(keysOf(read("sunui-animated-lunar-pixel-icons.tsx"), "lunarPixelRecipes").sort(), pixelMotion, "animated pixel icons");
-  const twotoneMotion = set.icons.filter((i) => i.twotoneMotion).map((i) => i.name).sort();
-  assert.deepEqual(keysOf(read("sunui-animated-lunar-twotone-icons.tsx"), "lunarTwoToneRecipes").sort(), twotoneMotion, "animated two-tone icons");
-  // 和免費庫一樣：每個圖示在每種風格都會動
-  assert.deepEqual(motion, names, "every line icon animated");
-  assert.deepEqual(pixelMotion, names, "every pixel icon animated");
-  assert.deepEqual(twotoneMotion, names, "every two-tone icon animated");
-  for (const item of set.items) assert.ok(existsSync(`${root}${item.source}`), `${item.source} missing`);
-});
+const lower = (component: string) => component[0].toLowerCase() + component.slice(1);
+const slug = (component: string) => component.toLowerCase();
 
-test("pro icon sprites are 16 × 16 with a 1px margin", { skip: !sources && "registry/pro/icons not present" }, () => {
-  const src = readFileSync(`${root}registry/pro/icons/sunui-lunar-pixel-icons.tsx`, "utf8");
-  const body = src.slice(src.indexOf("export const lunarPixelIcons = {"), src.indexOf("\n} satisfies"));
-  for (const block of body.split(/\n {2}(?=\/\/|"?[a-z])/).filter((b) => b.includes("["))) {
-    const name = block.match(/"?([a-z0-9-]+)"?: \[/)?.[1];
-    const rows = [...block.matchAll(/^ {4}"([^"]*)",$/gm)].map((m) => m[1]);
-    assert.equal(rows.length, 16, `${name}: ${rows.length} rows`);
-    rows.forEach((row, y) => {
-      assert.equal(row.length, 16, `${name} row ${y}`);
-      assert.ok(row[0] === "." && row[15] === ".", `${name} row ${y} touches the edge`);
-    });
-    assert.equal(rows[15].replace(/\./g, ""), "", `${name}: last row must stay empty`);
+test("pro icon sets do not share names with each other", () => {
+  const seen = new Map<string, string>();
+  for (const set of proIconSets) {
+    for (const { name } of set.icons) {
+      assert.ok(!seen.has(name), `${name} is in both ${seen.get(name)} and ${set.id}`);
+      seen.set(name, set.id);
+    }
   }
 });
+
+for (const set of proIconSets) {
+  const c = set.component;
+  const file = (kind: string) => `registry/pro/icons/sunui-${kind.replace("*", slug(c))}.tsx`;
+
+  test(`pro icon index matches the Pro source: ${set.id}`, { skip: !sources && "registry/pro/icons not present" }, () => {
+    const read = (kind: string) => readFileSync(`${root}${file(kind)}`, "utf8");
+    const names = set.icons.map((i) => i.name).sort();
+    assert.deepEqual(keysOf(read("*-icons"), `${lower(c)}Icons`).sort(), names, "line icons");
+    assert.deepEqual(keysOf(read("*-pixel-icons"), `${lower(c)}PixelIcons`).sort(), names, "pixel icons");
+    assert.deepEqual(keysOf(read("*-twotone-icons"), `${lower(c)}TwoToneIcons`).sort(), names, "two-tone icons");
+    const motion = set.icons.filter((i) => i.motion).map((i) => i.name).sort();
+    const pixelMotion = set.icons.filter((i) => i.pixelMotion).map((i) => i.name).sort();
+    const twotoneMotion = set.icons.filter((i) => i.twotoneMotion).map((i) => i.name).sort();
+    assert.deepEqual(keysOf(read("animated-*-icons"), `${lower(c)}Recipes`).sort(), motion, "animated line icons");
+    assert.deepEqual(keysOf(read("animated-*-pixel-icons"), `${lower(c)}PixelRecipes`).sort(), pixelMotion, "animated pixel icons");
+    assert.deepEqual(keysOf(read("animated-*-twotone-icons"), `${lower(c)}TwoToneRecipes`).sort(), twotoneMotion, "animated two-tone icons");
+    // 和免費庫一樣：每個圖示在每種風格都會動
+    assert.deepEqual(motion, names, "every line icon animated");
+    assert.deepEqual(pixelMotion, names, "every pixel icon animated");
+    assert.deepEqual(twotoneMotion, names, "every two-tone icon animated");
+    for (const item of set.items) assert.ok(existsSync(`${root}${item.source}`), `${item.source} missing`);
+  });
+
+  test(`pro icon sprites are 16 × 16 with a 1px margin: ${set.id}`, { skip: !sources && "registry/pro/icons not present" }, () => {
+    const src = readFileSync(`${root}${file("*-pixel-icons")}`, "utf8");
+    const body = src.slice(src.indexOf(`export const ${lower(c)}PixelIcons = {`), src.indexOf("\n} satisfies"));
+    for (const block of body.split(/\n {2}(?=\/\/|"?[a-z])/).filter((b) => b.includes("["))) {
+      const name = block.match(/"?([a-z0-9-]+)"?: \[/)?.[1];
+      const rows = [...block.matchAll(/^ {4}"([^"]*)",$/gm)].map((m) => m[1]);
+      assert.equal(rows.length, 16, `${name}: ${rows.length} rows`);
+      rows.forEach((row, y) => {
+        assert.equal(row.length, 16, `${name} row ${y}`);
+        assert.ok(row[0] === "." && row[15] === ".", `${name} row ${y} touches the edge`);
+      });
+      assert.equal(rows[15].replace(/\./g, ""), "", `${name}: last row must stay empty`);
+    }
+  });
+}

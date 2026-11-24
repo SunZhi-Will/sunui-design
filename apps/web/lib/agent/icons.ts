@@ -78,7 +78,7 @@ export function proIconUsage(entry: IconEntry) {
   const motion = set.icons.find((i) => i.name === entry.name)?.[
     entry.style === "pixel" ? "pixelMotion" : entry.style === "twotone" ? "twotoneMotion" : "motion"
   ];
-  const component = entry.style === "pixel" ? "LunarPixelIcon" : entry.style === "twotone" ? "LunarTwoToneIcon" : "LunarIcon";
+  const component = `${set.component}${entry.style === "pixel" ? "Pixel" : entry.style === "twotone" ? "TwoTone" : ""}Icon`;
   return [
     `"${entry.name}" is a SunUI Pro icon (${set.title} pack), included with every Pro license. Its source is not served here.`,
     `Install with a license key: \`npx shadcn@latest add @sunui-pro/${item?.name}\` (setup: ${siteUrl()}/docs/pro)`,

@@ -208,6 +208,8 @@ Block 仍維持「單一檔案、只依賴 framer-motion 與 cn」。新 block �
 6. **展示**：`/icons` 頁下方的 Pro 區塊由 `components/pro-icon-showcase.tsx` 畫；圖示本身由 `registry/pro/icons/showcase.tsx` 渲染，經 `generate-previews.mjs` 產生的 `loadProIconRenderers` 動態載入，沒有 Pro 目錄時改畫鎖頭。只給 JSX 與安裝指令，**不給複製或下載 SVG**。
 7. **Pro 場景的 preview 可以 import `@/registry/pro/icons/sunui-*`**：這是 `generate-previews.mjs` 對「preview 不可 import Pro 原始碼」的唯一例外。圖示一畫到畫面上幾何就看得到，不必在每個 preview 抄一份。完整場景元件仍不能 import。
 8. **MCP**：`search_icons` 會列出 Pro 圖示並標 `[Pro]`，同分時免費排前面，`tier: "free"` 可只看免費。`get_icon` 對 Pro 圖示只回安裝步驟，不回 SVG 或 TSX。
+9. **已上架的組**：農曆新年（`Lunar`，11-09）、情人節（`Valentine`，11-25）。新增一組的步驟：在 `lib/pro-icons.ts` 加一筆（`component` 是元件前綴，檔名用它的小寫），在私有 repo 加六個檔（`sunui-<前綴>-icons`、`-twotone-icons`、`-pixel-icons` 與三個 `sunui-animated-<前綴>-*`），在 `showcase.tsx` 註冊渲染器，在 `messages.ts` 四語的 `proIcons.sets` 加標題與說明。`npm test` 會檢查索引與原始碼、跨組不重名、與免費庫不重名、點陣尺寸。最後用 256px 同屏看三種風格。
+10. **場景精靈包（2026-11-25 決定）**：除了檔期組，Pro 圖示多一個品類：給像素 Pro 場景共用的 32px 多影格精靈（寶箱、角色、獲得物、場景物件）與一份共用的稀有度色階。它不是 16/24px 通用圖示，所以不違反第 1 條；免費庫已有的同名物件（例如 `chest`）不另做免費版。規劃見 `reports/做更多Pro圖案深度分析-2026-11-25.md` 第 5 節。
 
 | 檔期 | 圖示組 | 圖示 | 用在 |
 |---|---|---|---|

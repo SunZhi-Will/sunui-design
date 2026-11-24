@@ -20,20 +20,22 @@ const styles: Style[] = ["pixel", "twotone", "line"];
  * 不提供「複製 SVG」：Pro 圖示只經由授權的 registry 安裝。
  */
 export function ProIconShowcase({
-  set,
+  sets,
   messages: t,
   installs,
 }: {
-  set: ProIconSet;
+  sets: ProIconSet[];
   messages: Messages["proIcons"];
-  /** 伺服器端渲染好的安裝指令：像素、雙色、線條與各自的動態版 */
-  installs: Record<Style | `${Style}-animated`, ReactNode>;
+  /** 伺服器端渲染好的安裝指令，依圖示組 id：像素、雙色、線條與各自的動態版 */
+  installs: Record<string, Record<Style | `${Style}-animated`, ReactNode>>;
 }) {
+  const [setId, setSetId] = useState(sets[0]?.id ?? "");
+  const set = sets.find((s) => s.id === setId) ?? sets[0];
   const [renderers, setRenderers] = useState<Record<string, ProIconRenderer> | null>(null);
   const [style, setStyle] = useState<Style>("pixel");
   const [animated, setAnimated] = useState(true);
   const [pigment, setPigment] = useState(true);
-  const [selected, setSelected] = useState(set.icons[0]?.name ?? "");
+  const [selected, setSelected] = useState(set?.icons[0]?.name ?? "");
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export function ProIconShowcase({
   }
 
   const selectedKind = kindOf(selected);
-  const component = `${selectedKind ? "Animated" : ""}Lunar${isPixel ? "Pixel" : style === "twotone" ? "TwoTone" : ""}Icon`;
+  const component = `${selectedKind ? "Animated" : ""}${set.component}${isPixel ? "Pixel" : style === "twotone" ? "TwoTone" : ""}Icon`;
   const props = `${selectedKind && selectedKind !== "hover" ? " active={on}" : ""}${isPixel ? ` size={32}${pigment ? ` tone="pigment"` : ""}` : ""}`;
   const jsx = `<${component} name="${selected}"${props} />`;
   const pixelSize = 32;
@@ -82,6 +84,29 @@ export function ProIconShowcase({
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start">
         <div className="min-w-0">
+          {sets.length > 1 && (
+            <div role="tablist" aria-label={t.setLabel} className="mb-4 flex flex-wrap gap-2">
+              {sets.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={s.id === set.id}
+                  onClick={() => {
+                    setSetId(s.id);
+                    setSelected(s.icons[0]?.name ?? "");
+                    setToggled({});
+                  }}
+                  className={cn(
+                    "flex h-9 items-center rounded-full border px-4 text-sm font-medium transition-colors",
+                    s.id === set.id ? "border-fg bg-fg text-bg" : "border-line bg-card text-subtle hover:text-fg",
+                  )}
+                >
+                  {t.sets[s.id]?.title ?? s.title}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 className="text-sm font-semibold">{copy.title}</h3>
             <p className="text-xs text-subtle">{copy.note}</p>
@@ -153,15 +178,15 @@ export function ProIconShowcase({
           <p className="mt-5 font-mono text-sm tracking-[0.04em]">{selected}</p>
           <pre className="mt-2 overflow-x-auto rounded-sm bg-stage px-3 py-2 font-mono text-[12px]">{jsx}</pre>
           <p className="mt-4 text-xs font-medium text-subtle">{t.install}</p>
-          <div className="mt-1.5">{installs[selectedKind ? (`${style}-animated` as const) : style]}</div>
+          <div className="mt-1.5">{installs[set.id]?.[selectedKind ? (`${style}-animated` as const) : style]}</div>
           <p className="mt-3 text-xs text-pretty text-subtle">{t.included}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/pricing" className="flex h-9 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground">
               {t.getPro}
             </Link>
-            {set.scenes[0] && (
+            {set.scenes[0] && copy.scene && (
               <Link href={`/blocks/${set.scenes[0]}`} className="flex h-9 items-center rounded-md border border-line px-3 text-xs font-medium">
-                {t.scene}
+                {copy.scene}
               </Link>
             )}
           </div>

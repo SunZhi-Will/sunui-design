@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { CommandTabs } from "@/components/command-tabs";
-import { IconCanvas } from "@/components/icon-canvas";
+import { IconGallery } from "@/components/icon-gallery";
 import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
@@ -43,7 +43,7 @@ export default async function IconsPage() {
         </div>
       </section>
 
-      <IconCanvas messages={m.iconGallery} />
+      <IconGallery messages={m.iconGallery} />
 
       <ul className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {rules.map((rule) => (
@@ -55,21 +55,23 @@ export default async function IconsPage() {
         ))}
       </ul>
 
-      {proIconSets.map((set) => (
-        <ProIconShowcase
-          key={set.id}
-          set={set}
-          messages={m.proIcons}
-          installs={{
-            pixel: <Command value={proIconInstall(set, "pixel") ?? ""} />,
-            twotone: <Command value={proIconInstall(set, "twotone") ?? ""} />,
-            line: <Command value={proIconInstall(set, "line") ?? ""} />,
-            "pixel-animated": <Command value={proIconInstall(set, "pixel", true) ?? ""} />,
-            "twotone-animated": <Command value={proIconInstall(set, "twotone", true) ?? ""} />,
-            "line-animated": <Command value={proIconInstall(set, "line", true) ?? ""} />,
-          }}
-        />
-      ))}
+      <ProIconShowcase
+        sets={proIconSets}
+        messages={m.proIcons}
+        installs={Object.fromEntries(
+          proIconSets.map((set) => [
+            set.id,
+            {
+              pixel: <Command value={proIconInstall(set, "pixel") ?? ""} />,
+              twotone: <Command value={proIconInstall(set, "twotone") ?? ""} />,
+              line: <Command value={proIconInstall(set, "line") ?? ""} />,
+              "pixel-animated": <Command value={proIconInstall(set, "pixel", true) ?? ""} />,
+              "twotone-animated": <Command value={proIconInstall(set, "twotone", true) ?? ""} />,
+              "line-animated": <Command value={proIconInstall(set, "line", true) ?? ""} />,
+            },
+          ]),
+        )}
+      />
 
       <section aria-labelledby="usage-title" className="docs mt-20 max-w-3xl">
         <h2 id="usage-title">{t.usageTitle}</h2>

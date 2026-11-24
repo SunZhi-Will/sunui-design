@@ -698,13 +698,6 @@ const en = {
     keylines: "Keylines",
     tags: "Tags",
     related: "Related",
-    canvasLabel: "Icon canvas",
-    dragHint: "Drag to explore · click an icon",
-    countLabel: "{n} icons",
-    zoomIn: "Zoom in",
-    zoomOut: "Zoom out",
-    recenter: "Back to center",
-    close: "Close",
     kindLabel: { hover: "hover", toggle: "toggle", loop: "loading" },
     kindHint: {
       hover: "Plays when its button is hovered or focused.",
@@ -745,13 +738,18 @@ const en = {
     install: "Install with your license key",
     included: "Included with every Pro license, no separate purchase. Pro icons install through the licensed registry, so there is no copy SVG here.",
     getPro: "Get Pro",
-    scene: "See it in the Lunar New Year scene",
+    setLabel: "Season",
     sets: {
       "lunar-new-year": {
         title: "Lunar New Year",
         note: "Fu diamond, firecrackers, gold ingot, koi, couplets, zodiac goat and more. Red envelope, lantern and firework are free.",
+        scene: "See it in the Lunar New Year scene",
       },
-    } as Record<string, { title: string; note: string }>,
+      "valentines-day": {
+        title: "Valentine's Day",
+        note: "Rose, ring box, wax seal, love lock, champagne, teddy and more. Heart, chocolate and love letter are free.",
+      },
+    } as Record<string, { title: string; note: string; scene?: string }>,
   },
 };
 
@@ -1411,13 +1409,6 @@ const zhTW: Messages = {
     keylines: "網格線",
     tags: "標籤",
     related: "相關圖示",
-    canvasLabel: "圖示畫布",
-    dragHint: "拖曳瀏覽 · 點圖示看細節",
-    countLabel: "{n} 個圖示",
-    zoomIn: "放大",
-    zoomOut: "縮小",
-    recenter: "回到中央",
-    close: "關閉",
     kindLabel: { hover: "懸停", toggle: "切換", loop: "載入" },
     kindHint: {
       hover: "外層按鈕被懸停或聚焦時播放。",
@@ -1458,11 +1449,16 @@ const zhTW: Messages = {
     install: "用授權碼安裝",
     included: "所有 Pro 授權都包含，不必另外購買。Pro 圖示透過授權的 registry 安裝，所以這裡沒有複製 SVG。",
     getPro: "取得 Pro",
-    scene: "看它在農曆新年場景裡的樣子",
+    setLabel: "檔期",
     sets: {
       "lunar-new-year": {
         title: "農曆新年",
         note: "福字斗方、鞭炮、元寶、錦鯉、春聯、生肖羊等。紅包、燈籠、煙火在免費圖示裡。",
+        scene: "看它在農曆新年場景裡的樣子",
+      },
+      "valentines-day": {
+        title: "情人節",
+        note: "玫瑰、戒指盒、封蠟、愛心鎖、香檳、小熊等。愛心、巧克力、情書在免費圖示裡。",
       },
     },
   },
@@ -2114,13 +2110,6 @@ const zhCN: Messages = {
     keylines: "网格线",
     tags: "标签",
     related: "相关图标",
-    canvasLabel: "图标画布",
-    dragHint: "拖动浏览 · 点图标看详情",
-    countLabel: "{n} 个图标",
-    zoomIn: "放大",
-    zoomOut: "缩小",
-    recenter: "回到中央",
-    close: "关闭",
     kindLabel: { hover: "悬停", toggle: "切换", loop: "加载" },
     kindHint: {
       hover: "外层按钮被悬停或聚焦时播放。",
@@ -2161,11 +2150,16 @@ const zhCN: Messages = {
     install: "用授权码安装",
     included: "所有 Pro 授权都包含，无需另外购买。Pro 图标通过授权的 registry 安装，所以这里没有复制 SVG。",
     getPro: "获取 Pro",
-    scene: "看它在农历新年场景里的样子",
+    setLabel: "档期",
     sets: {
       "lunar-new-year": {
         title: "农历新年",
         note: "福字斗方、鞭炮、元宝、锦鲤、春联、生肖羊等。红包、灯笼、烟花在免费图标里。",
+        scene: "看它在农历新年场景里的样子",
+      },
+      "valentines-day": {
+        title: "情人节",
+        note: "玫瑰、戒指盒、封蜡、爱心锁、香槟、小熊等。爱心、巧克力、情书在免费图标里。",
       },
     },
   },
@@ -2833,13 +2827,6 @@ const ja: Messages = {
     keylines: "グリッド",
     tags: "タグ",
     related: "関連アイコン",
-    canvasLabel: "アイコンキャンバス",
-    dragHint: "ドラッグで移動 · アイコンをクリックで詳細",
-    countLabel: "{n} 個のアイコン",
-    zoomIn: "拡大",
-    zoomOut: "縮小",
-    recenter: "中央に戻る",
-    close: "閉じる",
     kindLabel: { hover: "ホバー", toggle: "トグル", loop: "ローディング" },
     kindHint: {
       hover: "ボタンがホバーまたはフォーカスされると再生されます。",
@@ -2880,11 +2867,16 @@ const ja: Messages = {
     install: "ライセンスキーでインストール",
     included: "すべての Pro ライセンスに含まれ、追加購入は不要です。Pro アイコンはライセンス付きのレジストリからインストールするため、SVG のコピーはありません。",
     getPro: "Pro を入手",
-    scene: "旧正月シーンでの使用例を見る",
+    setLabel: "シーズン",
     sets: {
       "lunar-new-year": {
         title: "旧正月",
         note: "福の菱形、爆竹、元宝、鯉、春聯、干支のひつじなど。紅包、ちょうちん、花火は無料セットにあります。",
+        scene: "旧正月シーンでの使用例を見る",
+      },
+      "valentines-day": {
+        title: "バレンタイン",
+        note: "バラ、指輪ケース、シーリングワックス、南京錠、シャンパン、くまなど。ハート、チョコ、ラブレターは無料セットにあります。",
       },
     },
   },
