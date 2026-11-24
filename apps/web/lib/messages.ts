@@ -764,6 +764,10 @@ const en = {
         title: "Halloween",
         note: "Witch hat, cauldron, spiderweb, haunted house, mummy, crystal ball and more. Pumpkin, bat, ghost and skull are free.",
       },
+      "commerce-ops": {
+        title: "Commerce operations",
+        note: "Returns, refunds, inventory, barcode, shipping label, member tier, reviews, support, invoice, installments, store pickup and restock alerts. Cart, bag, truck and receipt are free.",
+      },
     } as Record<string, { title: string; note: string; scene?: string }>,
   },
 };
@@ -1490,6 +1494,10 @@ const zhTW: Messages = {
         title: "萬聖節",
         note: "巫師帽、大鍋、蜘蛛網、鬼屋、木乃伊、水晶球等。南瓜、蝙蝠、幽靈、骷髏在免費圖示裡。",
       },
+      "commerce-ops": {
+        title: "電商營運",
+        note: "退貨、退款、庫存、條碼、出貨單、會員等級、評價、客服、發票、分期、門市取貨、到貨通知。購物車、購物袋、貨車、收據在免費圖示裡。",
+      },
     },
   },
 };
@@ -2205,6 +2213,10 @@ const zhCN: Messages = {
       halloween: {
         title: "万圣节",
         note: "巫师帽、大锅、蜘蛛网、鬼屋、木乃伊、水晶球等。南瓜、蝙蝠、幽灵、骷髅在免费图标里。",
+      },
+      "commerce-ops": {
+        title: "电商运营",
+        note: "退货、退款、库存、条码、出货单、会员等级、评价、客服、发票、分期、门店取货、到货通知。购物车、购物袋、货车、收据在免费图标里。",
       },
     },
   },
@@ -2937,6 +2949,10 @@ const ja: Messages = {
       halloween: {
         title: "ハロウィン",
         note: "魔女の帽子、大釜、クモの巣、お化け屋敷、ミイラ、水晶玉など。かぼちゃ、こうもり、おばけ、ドクロは無料セットにあります。",
+      },
+      "commerce-ops": {
+        title: "EC オペレーション",
+        note: "返品、返金、在庫、バーコード、送り状、会員ランク、レビュー、サポート、請求書、分割払い、店舗受取、再入荷通知。カート、バッグ、トラック、レシートは無料セットにあります。",
       },
     },
   },
