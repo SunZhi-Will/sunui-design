@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { Command } from "@/components/command";
 import { CommandTabs } from "@/components/command-tabs";
-import { IconGallery } from "@/components/icon-gallery";
+import { IconCanvas } from "@/components/icon-canvas";
 import { ProIconShowcase } from "@/components/pro-icon-showcase";
 import { RichText } from "@/components/rich-text";
 import { getI18n } from "@/lib/i18n-server";
@@ -43,7 +43,7 @@ export default async function IconsPage() {
         </div>
       </section>
 
-      <IconGallery messages={m.iconGallery} />
+      <IconCanvas messages={m.iconGallery} />
 
       <ul className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {rules.map((rule) => (
