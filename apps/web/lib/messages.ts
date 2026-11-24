@@ -760,6 +760,10 @@ const en = {
         title: "Christmas",
         note: "Stocking, gingerbread man, wreath, reindeer, snow globe, fireplace and more. Tree, snowman, candy cane and bell are free.",
       },
+      halloween: {
+        title: "Halloween",
+        note: "Witch hat, cauldron, spiderweb, haunted house, mummy, crystal ball and more. Pumpkin, bat, ghost and skull are free.",
+      },
     } as Record<string, { title: string; note: string; scene?: string }>,
   },
 };
@@ -1482,6 +1486,10 @@ const zhTW: Messages = {
         title: "聖誕節",
         note: "聖誕襪、薑餅人、花圈、馴鹿、雪花球、壁爐等。聖誕樹、雪人、拐杖糖、鈴鐺在免費圖示裡。",
       },
+      halloween: {
+        title: "萬聖節",
+        note: "巫師帽、大鍋、蜘蛛網、鬼屋、木乃伊、水晶球等。南瓜、蝙蝠、幽靈、骷髏在免費圖示裡。",
+      },
     },
   },
 };
@@ -2193,6 +2201,10 @@ const zhCN: Messages = {
       christmas: {
         title: "圣诞节",
         note: "圣诞袜、姜饼人、花环、驯鹿、雪花球、壁炉等。圣诞树、雪人、拐杖糖、铃铛在免费图标里。",
+      },
+      halloween: {
+        title: "万圣节",
+        note: "巫师帽、大锅、蜘蛛网、鬼屋、木乃伊、水晶球等。南瓜、蝙蝠、幽灵、骷髅在免费图标里。",
       },
     },
   },
@@ -2921,6 +2933,10 @@ const ja: Messages = {
       christmas: {
         title: "クリスマス",
         note: "靴下、ジンジャーブレッド、リース、トナカイ、スノードーム、暖炉など。ツリー、雪だるま、キャンディケイン、ベルは無料セットにあります。",
+      },
+      halloween: {
+        title: "ハロウィン",
+        note: "魔女の帽子、大釜、クモの巣、お化け屋敷、ミイラ、水晶玉など。かぼちゃ、こうもり、おばけ、ドクロは無料セットにあります。",
       },
     },
   },
