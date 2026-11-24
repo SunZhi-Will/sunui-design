@@ -756,6 +756,10 @@ const en = {
         title: "Valentine's Day",
         note: "Rose, ring box, wax seal, love lock, champagne, teddy and more. Heart, chocolate and love letter are free.",
       },
+      christmas: {
+        title: "Christmas",
+        note: "Stocking, gingerbread man, wreath, reindeer, snow globe, fireplace and more. Tree, snowman, candy cane and bell are free.",
+      },
     } as Record<string, { title: string; note: string; scene?: string }>,
   },
 };
@@ -1474,6 +1478,10 @@ const zhTW: Messages = {
         title: "情人節",
         note: "玫瑰、戒指盒、封蠟、愛心鎖、香檳、小熊等。愛心、巧克力、情書在免費圖示裡。",
       },
+      christmas: {
+        title: "聖誕節",
+        note: "聖誕襪、薑餅人、花圈、馴鹿、雪花球、壁爐等。聖誕樹、雪人、拐杖糖、鈴鐺在免費圖示裡。",
+      },
     },
   },
 };
@@ -2181,6 +2189,10 @@ const zhCN: Messages = {
       "valentines-day": {
         title: "情人节",
         note: "玫瑰、戒指盒、封蜡、爱心锁、香槟、小熊等。爱心、巧克力、情书在免费图标里。",
+      },
+      christmas: {
+        title: "圣诞节",
+        note: "圣诞袜、姜饼人、花环、驯鹿、雪花球、壁炉等。圣诞树、雪人、拐杖糖、铃铛在免费图标里。",
       },
     },
   },
@@ -2905,6 +2917,10 @@ const ja: Messages = {
       "valentines-day": {
         title: "バレンタイン",
         note: "バラ、指輪ケース、シーリングワックス、南京錠、シャンパン、くまなど。ハート、チョコ、ラブレターは無料セットにあります。",
+      },
+      christmas: {
+        title: "クリスマス",
+        note: "靴下、ジンジャーブレッド、リース、トナカイ、スノードーム、暖炉など。ツリー、雪だるま、キャンディケイン、ベルは無料セットにあります。",
       },
     },
   },
