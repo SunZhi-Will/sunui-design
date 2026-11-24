@@ -768,6 +768,10 @@ const en = {
         title: "Commerce operations",
         note: "Returns, refunds, inventory, barcode, shipping label, member tier, reviews, support, invoice, installments, store pickup and restock alerts. Cart, bag, truck and receipt are free.",
       },
+      saas: {
+        title: "SaaS product UI",
+        note: "Team, invite, permissions, API, webhook, integrations, database, audit log, export, schedule, versions and command palette. Status, gauge, terminal and key are free.",
+      },
     } as Record<string, { title: string; note: string; scene?: string }>,
   },
 };
@@ -1498,6 +1502,10 @@ const zhTW: Messages = {
         title: "電商營運",
         note: "退貨、退款、庫存、條碼、出貨單、會員等級、評價、客服、發票、分期、門市取貨、到貨通知。購物車、購物袋、貨車、收據在免費圖示裡。",
       },
+      saas: {
+        title: "SaaS 產品介面",
+        note: "團隊、邀請、權限、API、Webhook、整合、資料庫、稽核紀錄、匯出、排程、版本、指令面板。狀態、儀表、終端機、金鑰在免費圖示裡。",
+      },
     },
   },
 };
@@ -2217,6 +2225,10 @@ const zhCN: Messages = {
       "commerce-ops": {
         title: "电商运营",
         note: "退货、退款、库存、条码、出货单、会员等级、评价、客服、发票、分期、门店取货、到货通知。购物车、购物袋、货车、收据在免费图标里。",
+      },
+      saas: {
+        title: "SaaS 产品界面",
+        note: "团队、邀请、权限、API、Webhook、集成、数据库、审计记录、导出、排程、版本、命令面板。状态、仪表、终端、密钥在免费图标里。",
       },
     },
   },
@@ -2953,6 +2965,10 @@ const ja: Messages = {
       "commerce-ops": {
         title: "EC オペレーション",
         note: "返品、返金、在庫、バーコード、送り状、会員ランク、レビュー、サポート、請求書、分割払い、店舗受取、再入荷通知。カート、バッグ、トラック、レシートは無料セットにあります。",
+      },
+      saas: {
+        title: "SaaS プロダクト UI",
+        note: "チーム、招待、権限、API、Webhook、連携、データベース、監査ログ、エクスポート、スケジュール、バージョン、コマンドパレット。ステータス、ゲージ、ターミナル、キーは無料セットにあります。",
       },
     },
   },
