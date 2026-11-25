@@ -6,7 +6,21 @@ import { useDemoText } from "@/lib/demo-locale";
 
 import {
   AnimatedCheckbox,
+  ClearInput,
   ConfettiBurst,
+  CropFrame,
+  FaceScan,
+  FocusLock,
+  FolderDrop,
+  ListToGrid,
+  MuteSwitch,
+  PermissionGate,
+  PinToggle,
+  QuickReply,
+  RadioSelect,
+  ReactionTray,
+  ResizeFrame,
+  SortHandle,
   CopyFeedback,
   FloatingLabelInput,
   HoldToConfirm,
@@ -47,6 +61,36 @@ export const copy = {
     password: "Password",
     show: "Show password",
     hide: "Hide password",
+    fieldName: "Name",
+    fieldValue: "Alex",
+    clearField: "Clear name",
+    digest: "Order digest",
+    daily: "Daily",
+    weekly: "Weekly",
+    saveFolder: "Save to folder",
+    savedFolder: "Saved to Receipts",
+    replies: ["On my way", "Thanks!", "Call you later"],
+    replyPlaceholder: "Reply…",
+    mute: "Mute microphone",
+    react: "React",
+    reactions: ["Love", "Like", "Smile", "Brilliant"],
+    lock: "Lock",
+    unlock: "Unlock",
+    pin: "Pin to top",
+    layoutItems: ["Inbox", "Drafts", "Sent", "Archive"],
+    list: "List",
+    grid: "Grid",
+    layout: "Layout",
+    allow: "Allow camera",
+    allowed: "Camera allowed",
+    scanFace: "Scan face",
+    scanning: "Scanning",
+    verified: "Verified",
+    ratio: "Aspect ratio",
+    ratioFree: "Free",
+    sortItems: ["Shipping address", "Payment", "Review order"],
+    move: "Move",
+    resize: "Resize",
   },
   "zh-TW": {
     replay: "重播",
@@ -73,6 +117,36 @@ export const copy = {
     password: "密碼",
     show: "顯示密碼",
     hide: "隱藏密碼",
+    fieldName: "名字",
+    fieldValue: "小安",
+    clearField: "清除名字",
+    digest: "訂單摘要",
+    daily: "每天",
+    weekly: "每週",
+    saveFolder: "存到資料夾",
+    savedFolder: "已存到收據",
+    replies: ["在路上了", "謝謝！", "晚點打給你"],
+    replyPlaceholder: "回覆…",
+    mute: "麥克風靜音",
+    react: "回應",
+    reactions: ["愛心", "讚", "微笑", "太棒了"],
+    lock: "鎖定",
+    unlock: "解鎖",
+    pin: "置頂",
+    layoutItems: ["收件匣", "草稿", "已寄出", "封存"],
+    list: "清單",
+    grid: "格狀",
+    layout: "版面",
+    allow: "允許相機",
+    allowed: "已允許相機",
+    scanFace: "掃描臉部",
+    scanning: "掃描中",
+    verified: "已驗證",
+    ratio: "比例",
+    ratioFree: "自由",
+    sortItems: ["收件地址", "付款方式", "確認訂單"],
+    move: "移動",
+    resize: "調整大小",
   },
   "zh-CN": {
     replay: "重播",
@@ -99,6 +173,36 @@ export const copy = {
     password: "密码",
     show: "显示密码",
     hide: "隐藏密码",
+    fieldName: "名字",
+    fieldValue: "小安",
+    clearField: "清除名字",
+    digest: "订单摘要",
+    daily: "每天",
+    weekly: "每周",
+    saveFolder: "存到文件夹",
+    savedFolder: "已存到收据",
+    replies: ["在路上了", "谢谢！", "晚点打给你"],
+    replyPlaceholder: "回复…",
+    mute: "麦克风静音",
+    react: "回应",
+    reactions: ["爱心", "赞", "微笑", "太棒了"],
+    lock: "锁定",
+    unlock: "解锁",
+    pin: "置顶",
+    layoutItems: ["收件箱", "草稿", "已发送", "归档"],
+    list: "列表",
+    grid: "网格",
+    layout: "布局",
+    allow: "允许相机",
+    allowed: "已允许相机",
+    scanFace: "扫描面部",
+    scanning: "扫描中",
+    verified: "已验证",
+    ratio: "比例",
+    ratioFree: "自由",
+    sortItems: ["收货地址", "付款方式", "确认订单"],
+    move: "移动",
+    resize: "调整大小",
   },
   ja: {
     replay: "再生",
@@ -125,8 +229,96 @@ export const copy = {
     password: "パスワード",
     show: "パスワードを表示",
     hide: "パスワードを隠す",
+    fieldName: "名前",
+    fieldValue: "アレックス",
+    clearField: "名前をクリア",
+    digest: "注文のまとめ",
+    daily: "毎日",
+    weekly: "毎週",
+    saveFolder: "フォルダに保存",
+    savedFolder: "領収書に保存しました",
+    replies: ["向かってます", "ありがとう！", "あとで電話します"],
+    replyPlaceholder: "返信…",
+    mute: "マイクをミュート",
+    react: "リアクション",
+    reactions: ["ラブ", "いいね", "スマイル", "すごい"],
+    lock: "ロック",
+    unlock: "ロック解除",
+    pin: "ピン留め",
+    layoutItems: ["受信箱", "下書き", "送信済み", "アーカイブ"],
+    list: "リスト",
+    grid: "グリッド",
+    layout: "レイアウト",
+    allow: "カメラを許可",
+    allowed: "カメラを許可しました",
+    scanFace: "顔をスキャン",
+    scanning: "スキャン中",
+    verified: "確認しました",
+    ratio: "縦横比",
+    ratioFree: "フリー",
+    sortItems: ["お届け先", "お支払い", "注文の確認"],
+    move: "移動",
+    resize: "サイズ変更",
   },
 };
+
+/** The everyday moments added 2026-11-26, shared by the demo grid and the catalog cards */
+export const moments = [
+  "clear-input",
+  "radio-select",
+  "folder-drop",
+  "quick-reply",
+  "mute-switch",
+  "reaction-tray",
+  "focus-lock",
+  "pin-toggle",
+  "list-to-grid",
+  "permission-gate",
+  "face-scan",
+  "crop-frame",
+  "sort-handle",
+  "resize-frame",
+] as const satisfies readonly MicroInteractionId[];
+
+export type MomentId = (typeof moments)[number];
+
+export function Moment({ id, t }: { id: MomentId; t: (typeof copy)["en"] }): ReactNode {
+  switch (id) {
+    case "clear-input":
+      return <ClearInput label={t.fieldName} defaultValue={t.fieldValue} clearLabel={t.clearField} />;
+    case "radio-select":
+      return <RadioSelect label={t.digest} defaultValue="weekly" options={[{ value: "daily", label: t.daily }, { value: "weekly", label: t.weekly }]} />;
+    case "folder-drop":
+      return <FolderDrop label={t.saveFolder} doneLabel={t.savedFolder} />;
+    case "quick-reply":
+      return <QuickReply suggestions={t.replies} placeholder={t.replyPlaceholder} sendLabel={t.send} />;
+    case "mute-switch":
+      return <MuteSwitch label={t.mute} />;
+    case "reaction-tray":
+      return (
+        <ReactionTray
+          label={t.react}
+          reactions={(["heart", "like", "smile", "spark"] as const).map((r, i) => ({ id: r, label: t.reactions[i] }))}
+        />
+      );
+    case "focus-lock":
+      return <FocusLock lockLabel={t.lock} unlockLabel={t.unlock} />;
+    case "pin-toggle":
+      return <PinToggle label={t.pin} />;
+    case "list-to-grid":
+      return <ListToGrid items={t.layoutItems} listLabel={t.list} gridLabel={t.grid} label={t.layout} />;
+    case "permission-gate":
+      return <PermissionGate label={t.allow} grantedLabel={t.allowed} />;
+    case "face-scan":
+      return <FaceScan label={t.scanFace} scanningLabel={t.scanning} doneLabel={t.verified} />;
+    case "crop-frame":
+      return <CropFrame label={t.ratio} ratios={[{ label: t.ratioFree, value: null }, { label: "1:1", value: 1 }, { label: "4:5", value: 4 / 5 }, { label: "16:9", value: 16 / 9 }]} />;
+    case "sort-handle":
+      return <SortHandle items={t.sortItems} moveLabel={t.move} />;
+    case "resize-frame":
+      return <ResizeFrame label={t.resize} />;
+  }
+}
 
 function Tile({ name, children, onReplay, replayLabel }: { name: MicroInteractionId; children: ReactNode; onReplay?: () => void; replayLabel: string }) {
   return (
@@ -240,6 +432,12 @@ export default function MicroInteractionsDemo() {
       <Tile name="password-reveal" replayLabel={t.replay}>
         <PasswordToggle label={t.password} showLabel={t.show} hideLabel={t.hide} defaultValue="sunui-demo" className="max-w-60" />
       </Tile>
+
+      {moments.map((id) => (
+        <Tile key={id} name={id} replayLabel={t.replay}>
+          <Moment id={id} t={t} />
+        </Tile>
+      ))}
     </div>
   );
 }

@@ -2231,7 +2231,7 @@
       "name": "loading-effects",
       "type": "registry:block",
       "title": "Loading Effects",
-      "description": "Fifteen loading indicators: a Loader with eleven variants (bouncing dots, equalizer, ring spinner, spinner to check, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill) switched by the variant prop, plus TopLoadingBar, MultiStepLoader, Skeleton and DotMatrixLoader. DotMatrixLoader is a 7 by 7 dot grid with six patterns (wave, spiral, rain, ripple, snake, scan) and four states: loading loops the pattern, progress fills dots by value in the order of that pattern, success and error light every dot once and then keep only a check or a cross. The palette prop picks the colour: spot (the brand spot colour, default), status (green on success), or a drifting oklch gradient (aurora, sunset, lagoon, prism); error is always red. shape (dot, square, diamond, ring, bar), glow (LED glow for dark surfaces) and emphasis (fade or scale) change the look; the demo shows eight combinations. The spinner-check variant closes its arc when done is true, then a disc settles once and a check is drawn. Loader, TopLoadingBar and MultiStepLoader take the same palette prop as DotMatrixLoader (spot by default, now reading --sunui-spot with a --primary fallback; status turns green when finished; gradients colour each dot, bar or step along the hue range). Skeleton stays neutral. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
+      "description": "Twenty-six loading indicators: a Loader with twenty-three variants (bouncing dots, equalizer, ring spinner, spinner to check, orbit, pulse dot, progress ring, bar, indeterminate bar, typing indicator, liquid fill, eight dot orbit, center dots, six dot scale, half ring, twin pulse, wave scanner, split diamond, type sweep, step relay, scale fade, signal trace, loop track) switched by the variant prop, plus TopLoadingBar, MultiStepLoader, Skeleton and DotMatrixLoader. DotMatrixLoader is a 7 by 7 dot grid with six patterns (wave, spiral, rain, ripple, snake, scan) and four states: loading loops the pattern, progress fills dots by value in the order of that pattern, success and error light every dot once and then keep only a check or a cross. The palette prop picks the colour: spot (the brand spot colour, default), status (green on success), or a drifting oklch gradient (aurora, sunset, lagoon, prism); error is always red. shape (dot, square, diamond, ring, bar), glow (LED glow for dark surfaces) and emphasis (fade or scale) change the look; the demo shows eight combinations. The spinner-check variant closes its arc when done is true, then a disc settles once and a check is drawn. Loader, TopLoadingBar and MultiStepLoader take the same palette prop as DotMatrixLoader (spot by default, now reading --sunui-spot with a --primary fallback; status turns green when finished; gradients colour each dot, bar or step along the hue range). Skeleton stays neutral. Every loader has role status with a hidden label, and under reduced motion loops stop while progress values stay visible.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2341,7 +2341,7 @@
       "name": "micro-interactions",
       "type": "registry:block",
       "title": "Micro Interactions",
-      "description": "Thirteen small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button and password reveal. The toggle's knob squashes and stretches toward its target while pressed and settles with a spring on release. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain. Accent parts read --sunui-spot like the other blocks, falling back to --primary.",
+      "description": "Twenty-seven small, self-contained interaction components: like burst, confetti button, success check, drawn checkbox, stretchy toggle, copy feedback, notification badge, floating label, slide to confirm, hold to confirm, swipe to delete, paper plane send button, password reveal, clear input, radio select with a travelling dot, folder drop, quick reply chips, mute switch, reaction tray, padlock toggle, pin toggle, list to grid, permission gate, face scan, crop frame with aspect ratios, sort handle with keyboard reordering and resize frame that snaps to a grid. The toggle's knob squashes and stretches toward its target while pressed and settles with a spring on release. Import each by name or switch with the effect prop on MicroInteraction; with reduced motion, bursts and flights are skipped and only the state and color change remain. Accent parts read --sunui-spot like the other blocks, falling back to --primary.",
       "dependencies": [
         "framer-motion"
       ],
@@ -2378,7 +2378,21 @@
             "slide to confirm",
             "hold to confirm",
             "swipe to delete",
-            "password toggle"
+            "password toggle",
+            "clear button",
+            "radio group",
+            "save to folder",
+            "suggested replies",
+            "mute toggle",
+            "emoji reactions",
+            "lock toggle",
+            "pin button",
+            "view switcher",
+            "permission prompt",
+            "face id",
+            "image cropper",
+            "drag to reorder",
+            "resizable box"
           ]
         }
       },

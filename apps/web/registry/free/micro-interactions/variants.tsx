@@ -21,7 +21,7 @@ import {
   ToggleSwitch,
   type MicroInteractionId,
 } from "./micro-interactions";
-import { copy } from "./demo";
+import { copy, Moment, moments, type MomentId } from "./demo";
 
 export const variants = microInteractions;
 
@@ -30,10 +30,10 @@ export const featured = "slide-to-confirm";
 
 // Operation hints below the card (the demo has no such copy, all four languages are here); the button text of swipe and long press is itself the hint, so it is not labeled separately
 const hintCopy = {
-  en: { click: "Click", type: "Click and type", swipe: "Swipe a row left" },
-  "zh-TW": { click: "點一下", type: "點進去輸入", swipe: "把一列往左滑" },
-  "zh-CN": { click: "点一下", type: "点进去输入", swipe: "把一行向左滑" },
-  ja: { click: "クリック", type: "クリックして入力", swipe: "行を左にスワイプ" },
+  en: { click: "Click", type: "Click and type", swipe: "Swipe a row left", drag: "Drag the handle" },
+  "zh-TW": { click: "點一下", type: "點進去輸入", swipe: "把一列往左滑", drag: "拖曳把手" },
+  "zh-CN": { click: "点一下", type: "点进去输入", swipe: "把一行向左滑", drag: "拖动把手" },
+  ja: { click: "クリック", type: "クリックして入力", swipe: "行を左にスワイプ", drag: "ハンドルをドラッグ" },
 };
 
 type Hint = keyof (typeof hintCopy)["en"];
@@ -52,6 +52,20 @@ const hints: Record<MicroInteractionId, Hint | null> = {
   "swipe-to-delete": "swipe",
   "send-plane": "click",
   "password-reveal": "click",
+  "clear-input": "click",
+  "radio-select": "click",
+  "folder-drop": "click",
+  "quick-reply": "click",
+  "mute-switch": "click",
+  "reaction-tray": "click",
+  "focus-lock": "click",
+  "pin-toggle": "click",
+  "list-to-grid": "click",
+  "permission-gate": "click",
+  "face-scan": "click",
+  "crop-frame": "click",
+  "sort-handle": "drag",
+  "resize-frame": "drag",
 };
 
 /** Home catalog: one card per micro-interaction, with the same content as that cell in the demo. */
@@ -71,6 +85,7 @@ export default function MicroInteractionsVariant({ variant }: { variant: string 
 type Copy = (typeof copy)["en"];
 
 function Interaction({ id, t }: { id: MicroInteractionId; t: Copy }): ReactNode {
+  if ((moments as readonly string[]).includes(id)) return <Moment id={id as MomentId} t={t} />;
   switch (id) {
     case "like-burst":
       return <LikeBurst label={t.like} />;

@@ -28,6 +28,18 @@ export const loadingEffects = [
   "indeterminate-bar",
   "typing-indicator",
   "liquid",
+  "eight-dot-orbit",
+  "center-dots",
+  "six-dot-scale",
+  "half-ring",
+  "twin-pulse",
+  "wave-scanner",
+  "split-diamond",
+  "type-sweep",
+  "step-relay",
+  "scale-fade",
+  "signal-trace",
+  "loop-track",
   "top-loading-bar",
   "multi-step",
   "skeleton-shimmer",
@@ -48,6 +60,18 @@ export const loaderVariants = [
   "indeterminate-bar",
   "typing-indicator",
   "liquid",
+  "eight-dot-orbit",
+  "center-dots",
+  "six-dot-scale",
+  "half-ring",
+  "twin-pulse",
+  "wave-scanner",
+  "split-diamond",
+  "type-sweep",
+  "step-relay",
+  "scale-fade",
+  "signal-trace",
+  "loop-track",
 ] as const;
 export type LoaderVariant = (typeof loaderVariants)[number];
 
@@ -187,6 +211,18 @@ export function Loader({
         {variant === "indeterminate-bar" && <IndeterminateBar s={s} active={active} ink={ink} />}
         {variant === "typing-indicator" && <TypingIndicator s={s} active={active} ink={palette === "spot" && !color ? null : ink} />}
         {variant === "liquid" && <Liquid s={s} pct={pct} active={active} reduce={reduce} ink={ink} />}
+        {variant === "eight-dot-orbit" && <EightDotOrbit s={s} active={active} ink={ink} />}
+        {variant === "center-dots" && <CenterDots s={s} active={active} ink={ink} />}
+        {variant === "six-dot-scale" && <SixDotScale s={s} active={active} ink={ink} />}
+        {variant === "half-ring" && <HalfRing s={s} active={active} ink={ink} />}
+        {variant === "twin-pulse" && <TwinPulse s={s} active={active} ink={ink} />}
+        {variant === "wave-scanner" && <WaveScanner s={s} active={active} ink={ink} />}
+        {variant === "split-diamond" && <SplitDiamond s={s} active={active} ink={ink} />}
+        {variant === "type-sweep" && <TypeSweep s={s} active={active} ink={ink} text={label} />}
+        {variant === "step-relay" && <StepRelay s={s} active={active} ink={ink} />}
+        {variant === "scale-fade" && <ScaleFade s={s} active={active} ink={ink} />}
+        {variant === "signal-trace" && <SignalTrace s={s} active={active} ink={ink} />}
+        {variant === "loop-track" && <LoopTrack s={s} active={active} ink={ink} />}
       </span>
     </span>
   );
@@ -392,6 +428,379 @@ function TypingIndicator({ s, active, ink }: { s: number; active: boolean; ink: 
         />
       ))}
     </span>
+  );
+}
+
+/* ---- Moments: small monochrome-first loops, each one idea ---- */
+
+const still = { duration: 0.2 } as const;
+
+/** Eight dots on a ring, graded from a bright head to a faint tail; the ring turns in eight steps so the head chases round */
+function EightDotOrbit({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const d = Math.max(3, s * 0.15);
+  const r = s / 2 - d / 2;
+  return (
+    <motion.span
+      className="relative inline-block"
+      style={{ width: s, height: s }}
+      animate={{ rotate: active ? 360 : 0 }}
+      transition={active ? { repeat: Infinity, duration: 1, ease: (t: number) => Math.floor(t * 8) / 8 } : { duration: 0 }}
+    >
+      {Array.from({ length: 8 }, (_, i) => {
+        const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        const k = 1 - i / 8;
+        return (
+          <span
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: d,
+              height: d,
+              left: s / 2 + Math.cos(a) * r - d / 2,
+              top: s / 2 + Math.sin(a) * r - d / 2,
+              background: ink.at(i / 7),
+              opacity: 0.25 + k * 0.75,
+              transform: `scale(${0.55 + k * 0.45})`,
+            }}
+          />
+        );
+      })}
+    </motion.span>
+  );
+}
+
+/** Three dots: the middle one swells while the outer two shrink, then they trade */
+function CenterDots({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const d = Math.max(4, s * 0.2);
+  return (
+    <span className="inline-flex items-center" style={{ gap: d * 0.55, height: s }}>
+      {[0, 1, 2].map((i) => {
+        const mid = i === 1;
+        return (
+          <motion.span
+            key={i}
+            className="rounded-full"
+            style={{ width: d, height: d, background: ink.at(i / 2) }}
+            animate={active ? { scale: mid ? [1.45, 0.75, 1.45] : [0.75, 1.2, 0.75], opacity: mid ? [1, 0.55, 1] : [0.55, 1, 0.55] } : { scale: mid ? 1.35 : 0.8, opacity: mid ? 1 : 0.6 }}
+            transition={active ? loop({ duration: 1.2 }) : still}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/** Six dots along an open arc grow and settle in turn, like a comet passing */
+function SixDotScale({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const d = Math.max(3, s * 0.18);
+  const r = s / 2 - d / 2;
+  return (
+    <span className="relative inline-block" style={{ width: s, height: s }}>
+      {Array.from({ length: 6 }, (_, i) => {
+        // 0 to 225 degrees clockwise from the top, leaving a gap at the lower left
+        const a = (i / 5) * Math.PI * 1.25 - Math.PI / 2;
+        return (
+          <motion.span
+            key={i}
+            className="absolute rounded-full"
+            style={{ width: d, height: d, left: s / 2 + Math.cos(a) * r - d / 2, top: s / 2 + Math.sin(a) * r - d / 2, background: ink.at(i / 5) }}
+            animate={active ? { scale: [0.3, 1.15, 0.3], opacity: [0.35, 1, 0.35] } : { scale: 0.4 + (i / 5) * 0.7, opacity: 0.4 + (i / 5) * 0.6 }}
+            transition={active ? loop({ duration: 1.1, delay: i * 0.11, repeatDelay: 0.35 }) : still}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/** A thick track with an arc that grows from half to almost full and back while it turns */
+function HalfRing({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const sw = Math.max(3, s * 0.16);
+  const r = (s - sw) / 2;
+  const stroke = useStroke(ink);
+  return (
+    <motion.svg
+      width={s}
+      height={s}
+      viewBox={`0 0 ${s} ${s}`}
+      fill="none"
+      animate={{ rotate: active ? 360 : 0 }}
+      transition={active ? { repeat: Infinity, ease: "linear", duration: 1.6 } : { duration: 0 }}
+    >
+      {stroke.defs}
+      <circle cx={s / 2} cy={s / 2} r={r} stroke={track} strokeWidth={sw} />
+      <motion.circle
+        cx={s / 2}
+        cy={s / 2}
+        r={r}
+        stroke={stroke.paint}
+        strokeWidth={sw}
+        strokeLinecap="round"
+        initial={{ pathLength: 0.5 }}
+        animate={{ pathLength: active ? [0.5, 0.82, 0.5] : 0.62 }}
+        transition={active ? loop({ duration: 1.6 }) : still}
+      />
+    </motion.svg>
+  );
+}
+
+/** Two rings: the outer one breathes out and fades while the inner one draws in */
+function TwinPulse({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const sw = Math.max(2, s * 0.08);
+  const ring = (k: number): CSSProperties => ({ width: s * k, height: s * k, borderWidth: sw, borderStyle: "solid" });
+  return (
+    <span className="relative inline-grid place-items-center" style={{ width: s, height: s }}>
+      <motion.span
+        className="absolute rounded-full"
+        style={{ ...ring(0.78), borderColor: ink.at(1) }}
+        animate={active ? { scale: [1, 1.28], opacity: [0.7, 0] } : { scale: 1.12, opacity: 0.35 }}
+        transition={active ? { repeat: Infinity, duration: 1.4, ease: "easeOut" } : still}
+      />
+      <motion.span
+        className="absolute rounded-full"
+        style={{ ...ring(0.52), borderColor: ink.at(0) }}
+        animate={active ? { scale: [1, 0.8, 1] } : { scale: 1 }}
+        transition={active ? loop({ duration: 1.4 }) : still}
+      />
+    </span>
+  );
+}
+
+/** A row of thin bars with one bump of height sweeping across, like a scanner */
+function WaveScanner({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const n = 11;
+  const w = Math.max(2, s * 0.075);
+  const step = 0.07;
+  const period = 1.5;
+  return (
+    <span className="inline-flex items-center" style={{ height: s, gap: w * 0.7 }}>
+      {Array.from({ length: n }, (_, i) => {
+        // Still frame: a soft bell centred on the row
+        const bell = 0.25 + 0.75 * Math.exp(-((i - (n - 1) / 2) ** 2) / 6);
+        return (
+          <motion.span
+            key={i}
+            className="h-full rounded-full"
+            style={{ width: w, background: ink.at(i / (n - 1)) }}
+            initial={{ scaleY: active ? 0.25 : bell }}
+            animate={active ? { scaleY: [0.25, 1, 0.25] } : { scaleY: bell }}
+            transition={active ? { repeat: Infinity, duration: 0.5, ease: "easeInOut", delay: i * step, repeatDelay: period - 0.5 } : still}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/** Four rounded squares in a diamond push outward one after another and fall back together */
+function SplitDiamond({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const q = s * 0.26;
+  const near = s * 0.19;
+  const far = s * 0.29;
+  const dirs = [
+    [0, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+  ];
+  return (
+    <span className="relative inline-block" style={{ width: s, height: s }}>
+      {dirs.map(([dx, dy], i) => (
+        <motion.span
+          key={i}
+          className="absolute rounded-[22%]"
+          style={{ width: q, height: q, left: s / 2 - q / 2, top: s / 2 - q / 2, rotate: 45, background: ink.at(i / 3) }}
+          initial={{ x: dx * near, y: dy * near }}
+          animate={
+            active
+              ? { x: [dx * near, dx * far, dx * near], y: [dy * near, dy * far, dy * near], opacity: [0.6, 1, 0.6] }
+              : { x: dx * near, y: dy * near, opacity: i === 0 ? 1 : 0.7 }
+          }
+          transition={active ? loop({ duration: 0.9, delay: i * 0.15, repeatDelay: 0.45 }) : still}
+        />
+      ))}
+    </span>
+  );
+}
+
+/** The label's letters in spaced small caps; a highlight steps across lifting each one while a row of blocks fills beneath */
+function TypeSweep({ s, active, ink, text }: { s: number; active: boolean; ink: Ink; text: string }) {
+  const letters = Array.from(text.trim().toUpperCase()).slice(0, 10);
+  const n = Math.max(1, letters.length);
+  const fs = Math.max(9, s * 0.26);
+  const step = 0.11;
+  const period = n * step + 0.6;
+  const blocks = 5;
+  return (
+    <span className="inline-flex flex-col items-center font-mono" style={{ gap: fs * 0.45 }}>
+      <span className="inline-flex" style={{ fontSize: fs, letterSpacing: fs * 0.32, lineHeight: 1 }}>
+        {letters.map((ch, i) => (
+          <motion.span
+            key={i}
+            style={{ color: ink.at(i / Math.max(1, n - 1)), whiteSpace: "pre" }}
+            animate={active ? { y: [0, -fs * 0.28, 0], opacity: [0.4, 1, 0.4] } : { y: 0, opacity: 0.85 }}
+            transition={active ? { repeat: Infinity, duration: 0.32, ease: "easeOut", delay: i * step, repeatDelay: period - 0.32 } : still}
+          >
+            {ch}
+          </motion.span>
+        ))}
+      </span>
+      <span className="inline-flex" style={{ gap: fs * 0.22 }}>
+        {Array.from({ length: blocks }, (_, i) => (
+          <motion.span
+            key={i}
+            className="rounded-[2px]"
+            style={{ width: fs * 0.42, height: fs * 0.42, background: ink.at(i / (blocks - 1)) }}
+            animate={active ? { opacity: [0.18, 0.18, 1, 1, 0.18] } : { opacity: i < 2 ? 1 : 0.18 }}
+            transition={
+              active
+                ? { repeat: Infinity, duration: period, ease: "linear", times: [0, (i / blocks) * 0.85, (i / blocks) * 0.85 + 0.02, 0.92, 1] }
+                : still
+            }
+          />
+        ))}
+      </span>
+    </span>
+  );
+}
+
+/** Three nodes on a triangle; a dot runs node to node and each node pops as it arrives */
+function StepRelay({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const sw = Math.max(1.5, s * 0.045);
+  const rn = Math.max(2.5, s * 0.1);
+  const pts = [
+    [s / 2, s * 0.17],
+    [s * 0.86, s * 0.8],
+    [s * 0.14, s * 0.8],
+  ];
+  const stroke = useStroke(ink);
+  const cx = [pts[0][0], pts[1][0], pts[2][0], pts[0][0]];
+  const cy = [pts[0][1], pts[1][1], pts[2][1], pts[0][1]];
+  const times = [0, 1 / 3, 2 / 3, 1];
+  const dur = 2.4;
+  return (
+    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} fill="none">
+      {stroke.defs}
+      <polygon points={pts.map((p) => p.join(",")).join(" ")} stroke={track} strokeWidth={sw} strokeLinejoin="round" />
+      {pts.map(([x, y], i) => (
+        <motion.circle
+          key={i}
+          cx={x}
+          cy={y}
+          stroke={stroke.paint}
+          strokeWidth={sw}
+          fill="var(--card, var(--background))"
+          initial={{ r: rn }}
+          animate={active ? { r: [0, 1, 2, 3].map((k) => (k % 3 === i ? rn * 1.35 : rn)) } : { r: rn }}
+          transition={active ? { repeat: Infinity, duration: dur, times, ease: "easeOut" } : still}
+        />
+      ))}
+      <motion.circle
+        r={rn * 0.62}
+        fill={stroke.paint}
+        initial={{ cx: cx[0], cy: cy[0] }}
+        animate={active ? { cx, cy } : { cx: cx[0], cy: cy[0] }}
+        transition={active ? { repeat: Infinity, duration: dur, times, ease: "easeInOut" } : { duration: 0 }}
+      />
+    </svg>
+  );
+}
+
+/** Three bars hand height to each other: one grows tall and bright while the other two shrink and fade */
+function ScaleFade({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const w = Math.max(4, s * 0.2);
+  const lo = 0.45;
+  return (
+    <span className="inline-flex items-center" style={{ height: s, gap: w * 0.45 }}>
+      {[0, 1, 2].map((i) => {
+        const frames = [0, 1, 2, 3].map((k) => (k % 3 === i ? 1 : lo));
+        return (
+          <motion.span
+            key={i}
+            className="h-full rounded-[3px]"
+            style={{ width: w, background: ink.at(i / 2) }}
+            initial={{ scaleY: [1, 0.7, 0.85][i] }}
+            animate={active ? { scaleY: frames, opacity: frames.map((f) => (f === 1 ? 1 : 0.45)) } : { scaleY: [0.7, 1, 0.85][i], opacity: 1 }}
+            transition={active ? { repeat: Infinity, duration: 1.8, times: [0, 1 / 3, 2 / 3, 1], ease: "easeInOut" } : still}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/** A wave line draws in with a dot riding its tip, then the tail follows it out */
+function SignalTrace({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const w = s * 1.7;
+  const h = s;
+  const pad = s * 0.1;
+  const sw = Math.max(1.5, s * 0.06);
+  const stroke = useStroke(ink);
+  // Sample a sine that rises in amplitude, then flattens into a short tail
+  const N = 28;
+  const pts = Array.from({ length: N + 1 }, (_, i) => {
+    const t = i / N;
+    const amp = (h / 2 - pad) * Math.sin(Math.PI * Math.min(1, t * 1.15));
+    return [pad + t * (w - pad * 2), h / 2 - Math.sin(t * Math.PI * 3) * amp] as const;
+  });
+  const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+  // Times for the dot follow arc length, so it stays on the tip of the drawn line
+  const seg = pts.slice(1).map(([x, y], i) => Math.hypot(x - pts[i][0], y - pts[i][1]));
+  const total = seg.reduce((a, b) => a + b, 0);
+  let acc = 0;
+  const half = [0, ...seg.map((l) => (acc += l) / total / 2)];
+  const times = [...half, 1];
+  const cx = [...pts.map((p) => p[0]), pts[N][0]];
+  const cy = [...pts.map((p) => p[1]), pts[N][1]];
+  const dur = 2.4;
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none">
+      {stroke.defs}
+      <path d={d} stroke={track} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <motion.path
+        d={d}
+        stroke={stroke.paint}
+        strokeWidth={sw}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: active ? 0 : 0.6, pathOffset: 0 }}
+        animate={active ? { pathLength: [0, 1, 0], pathOffset: [0, 0, 1] } : { pathLength: 0.6, pathOffset: 0 }}
+        transition={active ? { repeat: Infinity, duration: dur, ease: "linear", times: [0, 0.5, 1] } : { duration: 0 }}
+      />
+      <motion.circle
+        r={sw * 1.4}
+        fill={stroke.paint}
+        initial={{ cx: active ? cx[0] : pts[Math.round(N * 0.6)][0], cy: active ? cy[0] : pts[Math.round(N * 0.6)][1] }}
+        animate={active ? { cx, cy } : { cx: pts[Math.round(N * 0.6)][0], cy: pts[Math.round(N * 0.6)][1] }}
+        transition={active ? { repeat: Infinity, duration: dur, ease: "linear", times } : { duration: 0 }}
+      />
+    </svg>
+  );
+}
+
+/** A pill outline with a short bright segment running round its edge */
+function LoopTrack({ s, active, ink }: { s: number; active: boolean; ink: Ink }) {
+  const sw = Math.max(2, s * 0.08);
+  const w = s * 1.6;
+  const h = s * 0.62;
+  const stroke = useStroke(ink);
+  const rect = { x: sw / 2, y: sw / 2, width: w - sw, height: h - sw, rx: (h - sw) / 2 };
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none">
+      {stroke.defs}
+      <rect {...rect} stroke={track} strokeWidth={sw} />
+      <motion.rect
+        {...rect}
+        stroke={stroke.paint}
+        strokeWidth={sw}
+        strokeLinecap="round"
+        pathLength={100}
+        strokeDasharray="20 80"
+        initial={{ strokeDashoffset: 0 }}
+        animate={{ strokeDashoffset: active ? -100 : 0 }}
+        transition={active ? { repeat: Infinity, duration: 1.8, ease: "linear" } : { duration: 0 }}
+      />
+    </svg>
   );
 }
 
