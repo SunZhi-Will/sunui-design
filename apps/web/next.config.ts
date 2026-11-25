@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": ["./registry/**/*", "./content/**/*", "./lib/**/*", "./registry.json"],
   },
+  // 不走 Vercel 圖片優化：Hobby 每月 5,000 次轉換，超過就整個團隊停權（2026-11-25 已因 CPU 停過一次）。
+  // 用到 next/image 的都是 public/ 裡預先截好、尺寸固定的海報與卡片圖，直接送原檔即可。
+  // 見 reports/部署平台流量爆量與是否換平台深度分析-2026-11-26.md 第 7 節
+  images: { unoptimized: true },
   // public/blocks/<block>/<檔名> 的示範照片給一週快取：預設的 max-age=0 會讓每個新掛上的 <img> 先回伺服器確認，
   // 翻頁、換系列這類動態會先畫出空白再補圖。只比對兩層的圖片路徑，/blocks/<slug> 區塊頁本身不受影響
   async headers() {
