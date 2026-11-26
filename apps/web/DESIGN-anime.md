@@ -1,7 +1,7 @@
 # SunUI 動漫作畫系列（anime）
 
-> **狀態：樣式已定（2026-11-26，使用者在 `/preview/anime-study` 選了 A 墨線硬影）。** 系列還沒有任何上架的 block。
-> `lib/agent/guidelines.ts` 與 `lib/registry.ts` 的 `Series` 在第一個 anime block 上架時一起加：現在加會讓型錄與 MCP 多出一個空的系列篩選。
+> **狀態：生效（2026-11-26）。** 樣式是使用者在 `/preview/anime-study` 選的 A 墨線硬影。已上架：免費 `anime-fx` 與十二個控制項、Pro `anime-preregister`。
+> 改這份文件時，`lib/agent/guidelines.ts` 的 anime 段落要一起改。
 > 規劃與理由：`reports/動漫作畫特效元件深度分析與完整規劃-2026-11-26.md`。
 > 方法參考 Sakuga VFX（MIT）的規則；程式、字與樣式都自己做，不移植。
 > `meta.series: "anime"` 的 block 遵守這份文件；沒寫到的地方照 `DESIGN.md`（craft）。

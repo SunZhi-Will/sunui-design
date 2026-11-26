@@ -19,9 +19,10 @@ export type Interaction =
 
 /**
  * 設計語言系列：craft 見 DESIGN.md（預設），product 與 story 見各自的 DESIGN 文件；product、story、showcase 依 PORTING.md 從原始專案移植。
+ * anime 見 DESIGN-anime.md（2026-11-26 起：動漫作畫特效，免費的 anime-fx 引擎與十二個控制項，加 Pro 場景）。
  * 2026-11-19 起 paper 改名 craft（紙感是誤讀，見 reports/拋棄紙感全面改質感深度分析-2026-11-18.md）；舊值 paper 一律讀成 craft。
  */
-export type Series = "craft" | "product" | "story" | "showcase" | "motion";
+export type Series = "craft" | "product" | "story" | "showcase" | "motion" | "anime";
 
 export type RegistryFile = {
   path: string;

@@ -17,7 +17,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // paper 是 craft 的舊名，舊的 agent 設定仍可能傳 paper
-const series = z.enum(["craft", "paper", "product", "story", "showcase", "motion"]).transform((value) => parseSeries(value)!);
+const series = z.enum(["craft", "paper", "product", "story", "showcase", "motion", "anime"]).transform((value) => parseSeries(value)!);
 const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
 
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }] });
@@ -33,7 +33,7 @@ const handler = createMcpHandler(
         inputSchema: z.object({
           query: z.string().optional().describe("What the UI should do or be called. Omit to list blocks."),
           tier: z.enum(["free", "pro"]).optional().describe("Only free (MIT) or only Pro blocks."),
-          series: series.optional().describe("Design series: craft (default: stores, campaigns and everyday UI), product (tool UI), story (narrative game UI), showcase (landing visuals), motion (effect libraries)."),
+          series: series.optional().describe("Design series: craft (default: stores, campaigns and everyday UI), product (tool UI), story (narrative game UI), showcase (landing visuals), motion (effect libraries), anime (controls with anime-style drawn effects)."),
           category: z.string().optional().describe("Registry category, e.g. checkout, coupon, cart, marketing, feedback."),
           limit: z.number().int().min(1).max(30).default(8),
         }),

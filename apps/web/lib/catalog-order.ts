@@ -198,7 +198,7 @@ const freeTail = [
   "micro-interactions",
 ];
 
-const seriesRank = { craft: 0, story: 1, showcase: 2, product: 3, motion: 4 } as const;
+const seriesRank = { craft: 0, story: 1, anime: 1.5, showcase: 2, product: 3, motion: 4 } as const;
 
 /** lead 依序在前，不在名單上的排中間，tail 在最後。同名只看第一次出現的位置 */
 function rankBy(lead: string[], tail: string[] = []) {

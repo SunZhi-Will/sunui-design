@@ -5711,6 +5711,607 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "anime-fx",
+      "type": "registry:ui",
+      "title": "Anime FX",
+      "description": "The engine behind the anime series: springs, one shared clock, one canvas over the page that ignores the pointer, and drawn effects in flat lit, shadow and outline tones (impact star, smoke puff, crystal chips, accent wedges, speed lines, wobble marks, glint, splash) plus manga sound-effect lettering stored as glyph outlines (Japanese, traditional and simplified Chinese), picked from <html lang>. Colours follow the brand spot. Hooks for a press that squashes and overshoots and for a canvas behind a control. With reduced motion nothing is drawn.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "categories": [
+        "animation",
+        "effects",
+        "canvas"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Building your own control in the anime series that needs the same drawn effects and lettering",
+            "Adding one anime-style reaction (an impact on a confirm, dust on a landing) to an existing component"
+          ],
+          "watchOut": [
+            "The effects canvas sits on top of the page, so effects can fly over a modal or a sticky header",
+            "Keep every state change independent of the effect clock: it pauses in a hidden tab",
+            "One sound-effect word per reaction, placed off any label; effects leave by shrinking, never by fading",
+            "The lettering glyphs come from SIL OFL fonts (Dela Gothic One, Noto Sans TC and SC); the notice ships in anime-fx-glyphs.ts"
+          ],
+          "aliases": [
+            "anime effects",
+            "sakuga",
+            "impact effect",
+            "manga sound effects",
+            "onomatopoeia",
+            "comic effects",
+            "canvas effects engine",
+            "squash and stretch"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-fx/anime-fx.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/free/anime-fx/anime-fx-core.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/free/anime-fx/anime-fx-glyphs.ts",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "anime-button",
+      "type": "registry:block",
+      "title": "Anime Button",
+      "description": "A real button that is plain at rest and lands like an anime hit: it squashes while held, inverts for a frame on release, an impact star goes off behind it, smoke rolls off the corners, chips fly from its edge and a sound-effect word lands above it. status=\"done\" draws a check with a glint; the secondary variant is a small squash and three wedges; hit={false} keeps a press that will not go through quiet. Type, disabled and every button attribute work as usual.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "buttons",
+        "feedback",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "press",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "The one action on a screen that deserves a big moment: confirm, publish, claim, join",
+            "Game, anime and fan-community pages where the UI should feel like the show"
+          ],
+          "watchOut": [
+            "Use the full hit on one button per view; give other buttons the secondary variant",
+            "Set status from your request result; the hit itself fires on click",
+            "Pass hit={false} while the form would fail validation, so a click that goes nowhere is not celebrated",
+            "The word lands above the button and can briefly cover text right above it; leave some room"
+          ],
+          "aliases": [
+            "anime button",
+            "impact button",
+            "confirm button",
+            "manga button",
+            "sakuga button",
+            "comic button"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-button/anime-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-checkbox",
+      "type": "registry:block",
+      "title": "Anime Checkbox",
+      "description": "A real checkbox (forms and Space work) that ticks like an anime cut: the box pops, crystal chips fly, the tick draws itself, a wisp of smoke rolls off and a screentone word lands past the label. Unticking only wobbles. Controlled or uncontrolled.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "input",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Consents, settings and checklists on game or anime pages",
+            "A single opt-in that should feel like a commitment"
+          ],
+          "watchOut": [
+            "Many checkboxes ticked fast stack many words; keep lettering for short lists or turn it off",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime checkbox",
+            "tick box",
+            "manga checkbox",
+            "consent checkbox"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-checkbox/anime-checkbox.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-progress",
+      "type": "registry:block",
+      "title": "Anime Progress",
+      "description": "A progress bar that charges like a power-up: a rumble word when it starts, the fill surges on a spring with dust at its leading edge, and at the end an impact star, chips and a hit word, settling on a check and a done label. The number and aria-valuenow always show the real value; only the fill is sprung; the first render shows the current value without effects.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "loading",
+        "feedback",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "loading",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Uploads, downloads and multi-step jobs whose progress arrives in steps",
+            "Goal and milestone bars on game or campaign pages"
+          ],
+          "watchOut": [
+            "Feed it real progress in steps; a smooth stream of tiny increments makes constant dust",
+            "Turn lettering off when another element lands the word for the same moment",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime progress bar",
+            "power up bar",
+            "charging bar",
+            "upload progress",
+            "manga progress"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-progress/anime-progress.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-toggle",
+      "type": "registry:block",
+      "title": "Anime Toggle",
+      "description": "A switch that flips like a drawn cut: the knob smears across on a spring, longer and thinner the faster it moves, slams into the end and throws a splash while the track floods with the brand colour, plus a click word. role=\"switch\" so Space and Enter work, with an optional hidden input so it submits in a form.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "settings",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Settings and notification switches on game or anime pages",
+            "A feature flag that should feel like turning something on"
+          ],
+          "watchOut": [
+            "Give it a short visible label; the word lands past the end of the label",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime switch",
+            "toggle switch",
+            "on off switch",
+            "manga toggle"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-toggle/anime-toggle.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-radio",
+      "type": "registry:block",
+      "title": "Anime Radio Group",
+      "description": "Native radio buttons in a fieldset (arrow keys and forms work as usual) where a pick lands like a pop: the dot springs in past full size, a fan of accent wedges flies off, two small puffs roll away and a hollow word pops beside the label.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "input",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Picking one of a few options: a class, a platform, a difficulty, a plan",
+            "Short single-choice questions on game or anime pages"
+          ],
+          "watchOut": [
+            "Two to five options with short labels read best",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime radio",
+            "radio group",
+            "single choice",
+            "option picker",
+            "manga radio"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-radio/anime-radio.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-rating",
+      "type": "registry:block",
+      "title": "Anime Rating",
+      "description": "Star rating in the semantic rating amber where the stars pop in one after another up to the chosen score, each on its own spring; a full score ends with an amber impact star behind the row and a hit word. A radiogroup with arrow keys, Home and End, and an optional hidden input for forms.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "feedback",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Rating an episode, a chapter, a match or a reward",
+            "Quick feedback prompts on game or anime pages"
+          ],
+          "watchOut": [
+            "Pass starLabel in the page language for screen readers",
+            "Only a full score gets the impact; lower scores stay modest",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime star rating",
+            "stars",
+            "review stars",
+            "score picker",
+            "manga rating"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-rating/anime-rating.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-slider",
+      "type": "registry:block",
+      "title": "Anime Slider",
+      "description": "A native range input drawn with a thumb that lags on a spring and stretches into a leaning teardrop with speed. A slow drag stays quiet; a fast one rolls smoke up behind the thumb, and letting go of a fast drag fires speed lines ahead of it. Keys, forms and screen readers work as usual; format sets the value text.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "input",
+        "settings"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "drag",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Volume, brightness and other settings on game or anime pages",
+            "Any single value where a fast flick should feel physical"
+          ],
+          "watchOut": [
+            "Lettering is off by default because the label row sits right above the track; turn it on only with room above",
+            "Pass format for units so the visible value and aria-valuetext match",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime slider",
+            "range slider",
+            "volume slider",
+            "manga slider"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-slider/anime-slider.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-input",
+      "type": "registry:block",
+      "title": "Anime Input",
+      "description": "A text field where every key kicks up a little dust where the caret is and a deletion leaves two short speed lines. Nothing fires while an input method is composing Chinese or Japanese, only when the text is committed. A plain input with label, hint and error underneath; every input attribute passes through.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "forms",
+        "input",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "type",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Name, nickname and short text fields on game or anime pages",
+            "Sign-up forms where typing should feel alive without getting in the way"
+          ],
+          "watchOut": [
+            "Keep it for short fields; on a long text area dust on every key gets tiring",
+            "Error text replaces the hint and marks the field invalid",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime text field",
+            "text input",
+            "name field",
+            "manga input"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-input/anime-input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-tabs",
+      "type": "registry:block",
+      "title": "Anime Tabs",
+      "description": "Tabs where the raised tab slides to the new one on a spring, stretching with speed, and lands with accent wedges, wobble marks and dust below the list. Follows the tabs pattern: arrow keys, Home and End move and select, panels are labelled.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "navigation",
+        "layout",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Switching between a few views: profile, skills, gear; details, reviews, specs",
+            "Character and item pages on game or anime sites"
+          ],
+          "watchOut": [
+            "Two to five short tab labels fit; it does not scroll",
+            "No sound-effect word: tabs change often, so the landing stays small",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime tabs",
+            "segmented tabs",
+            "tab bar",
+            "manga tabs"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-tabs/anime-tabs.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-toast",
+      "type": "registry:block",
+      "title": "Anime Toast",
+      "description": "A notification that streaks in from the side as a smear, skids to a stop in a puff of dust with a skid word, and leaves by shrinking away. The live region is always on the page so the message is announced; the timer pauses on hover, focus and hidden tabs; Escape and the close button dismiss it; an optional action button.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "notification",
+        "feedback",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "click",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Confirming an action on game or anime pages: saved, sent, unlocked",
+            "Short messages with one optional action such as Undo"
+          ],
+          "watchOut": [
+            "One toast at a time; it is controlled with open and onOpenChange, not a queue",
+            "Keep titles short; the word lands above the card's top edge",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime toast",
+            "notification",
+            "snackbar",
+            "manga toast",
+            "alert popup"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-toast/anime-toast.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-tooltip",
+      "type": "registry:block",
+      "title": "Anime Tooltip",
+      "description": "A hint that springs out of its trigger like a speech bubble: it grows past full size from its tail, two puffs roll off its sides and a small click word lands past its corner. Opens on hover, focus or tap and closes on leave, blur, a second tap or Escape; the trigger gets aria-describedby.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "overlay",
+        "popover",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "hover",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Explaining an icon, a stat or a rule on game or anime pages",
+            "Short hints next to numbers such as stamina, cooldowns or rates"
+          ],
+          "watchOut": [
+            "Wrap one focusable element such as a button",
+            "Keep hints to a sentence; the bubble is at most 16rem wide and opens above",
+            "With reduced motion no effect is drawn and the state still changes, so it reads the same without effects"
+          ],
+          "aliases": [
+            "anime tooltip",
+            "speech bubble",
+            "hint bubble",
+            "manga tooltip"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-tooltip/anime-tooltip.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "anime-loader",
+      "type": "registry:block",
+      "title": "Anime Loader",
+      "description": "A waiting indicator for when there is no number to show: an ink slug charges back and forth inside a track on a spring, stretching with speed, and kicks up dust with wobble marks at each end. role=\"status\" with a label; with reduced motion it is a still half bar.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@sunui/anime-fx"
+      ],
+      "categories": [
+        "loading",
+        "feedback",
+        "game-ui"
+      ],
+      "meta": {
+        "tier": "free",
+        "series": "anime",
+        "interaction": "loading",
+        "addedAt": "2026-11-26",
+        "usage": {
+          "whenToUse": [
+            "Matchmaking, loading a level or any wait without a known length",
+            "Short waits on game or anime pages"
+          ],
+          "watchOut": [
+            "Use anime-progress instead when you know how far along it is",
+            "It animates for as long as it is mounted; remove it when the wait ends"
+          ],
+          "aliases": [
+            "anime loader",
+            "loading indicator",
+            "spinner",
+            "waiting bar",
+            "manga loader"
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "registry/free/anime-loader/anime-loader.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

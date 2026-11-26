@@ -3,7 +3,7 @@ import { motionLibName } from "@/lib/motion-lib";
 import type { Series } from "@/lib/registry";
 import { siteUrl } from "@/lib/site";
 
-// 給 AI 代理看的設計規則（英文精簡版）。來源是 DESIGN.md（質感，craft 系列）、DESIGN-product.md、DESIGN-story.md；
+// 給 AI 代理看的設計規則（英文精簡版）。來源是 DESIGN.md（質感，craft 系列）、DESIGN-product.md、DESIGN-story.md、DESIGN-anime.md；
 // 改了那幾份文件，這裡要一起改。MCP、SKILL.md、llms-full.txt 都從這裡取，保持單一來源。
 
 export const seriesSummary: Record<Series, string> = {
@@ -11,6 +11,7 @@ export const seriesSummary: Record<Series, string> = {
   product: "Quiet tool UI: neutral shadcn tokens, one accent color, status shown only as small dots, the reason written on screen.",
   story: "Ink and lamp: near-black panels, warm white serif text, one gold accent, all colors through --story-* CSS variables.",
   showcase: "Landing-page signature visuals in a quiet editorial dark, ported from real launch pages.",
+  anime: "Anime cut: ordinary controls that are plain at rest and react like a key animator's hit when used. Ink outline with a hard shadow in a pale tint of the brand spot; squash and overshoot on springs; drawn impact stars, smoke, chips and sound-effect lettering (Japanese, or Chinese on Chinese pages) from the free anime-fx engine.",
   motion: "Motion effect libraries: one block per family (text, entrances, buttons, cards, backgrounds, scroll, cursor, loaders), each switching between many effects with an `effect` or `preset` prop.",
 };
 
@@ -123,7 +124,21 @@ ${seriesSummary.motion}
 - Reduced motion shows the final state, stops loops and keeps every word readable. Loops pause off screen and on hidden tabs.
 - Do not put motion blocks inside craft or product blocks; use them on landing pages, heroes and marketing sections.`;
 
-const bySeries: Record<Series, string> = { craft, product, story, showcase, motion };
+const anime = `## Series: anime
+
+${seriesSummary.anime}
+
+- Build on \`anime-fx\` (\`@sunui/anime-fx\`): \`paletteOf(el)\`, the effects (\`burst\`, \`puff\`, \`shards\`, \`ticks\`, \`lines\`, \`wob\`, \`kira\`, \`splash\`), \`sfx(P, slot, x, y)\`, \`useSquash\` and \`useBackLayer\`. Never copy the twelve anime blocks' effect code into another block; compose the blocks instead.
+- Resting look: \`border-[3px] border-foreground bg-card\` with \`shadow-[4px_5px_0_color-mix(in_oklch,var(--sunui-spot,var(--primary))_38%,var(--card))]\`. That hard tinted shadow is the only coloured shadow allowed; labels on the control are italic 800.
+- Colours: effect lit faces are white in both themes, shadow faces are the brand spot mixed into white, outlines are the brand spot, accent wedges are the semantic red. Rating effects use the rating amber (\`paletteOf(el, "var(--sunui-rating)")\`). No new hues, no purple or pink.
+- Write each reaction as beats: anticipation (the press), the hit (the moment state changes), follow-through, settle. One or two effects per beat, at most one sound-effect word per reaction, on the hit.
+- State changes at once; effects only decorate it. Nothing a person must read may depend on an effect, and no state may wait on the effect clock (it pauses in hidden tabs).
+- Effects leave by shrinking or thinning, never by fading. Squash keeps volume. Anything the hand moves follows a spring, and stretch comes from its speed, so a slow drag stays quiet.
+- Effects never cover a label: launch chips from a control's edge, put words above the control or past the end of its label, and turn lettering off where there is no room (anime-slider does by default).
+- The control is plain at rest: no idle animation. With reduced motion no effect is drawn and every state still changes.
+- Native semantics underneath: a real button, checkbox, radio or range input, role="switch" for toggles, the tabs and radiogroup keyboard patterns; value controls work in forms.`;
+
+const bySeries: Record<Series, string> = { craft, product, story, showcase, motion, anime };
 
 /** 共用規則加上一個系列的規則，不含動效名稱對照表。給區塊頁的「複製給 agent」prompt 用，保持短。 */
 export function seriesRules(series: Series) {
@@ -132,6 +147,6 @@ export function seriesRules(series: Series) {
 
 /** 單一系列或全部系列的設計規則（Markdown）。 */
 export function designRules(series?: Series) {
-  const sections = series ? [bySeries[series]] : [craft, product, story, showcase, motion];
+  const sections = series ? [bySeries[series]] : [craft, product, story, showcase, motion, anime];
   return [`# SunUI design rules`, shared, motionRequests(), ...sections].join("\n\n");
 }
