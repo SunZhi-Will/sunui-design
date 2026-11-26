@@ -640,5 +640,8 @@
   },
   "agent-toasts": {
     "av1": false
+  },
+  "morph-tab-bar": {
+    "av1": true
   }
 }
