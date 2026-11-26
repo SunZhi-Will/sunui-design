@@ -637,5 +637,8 @@
   },
   "launch-reel-bento": {
     "av1": true
+  },
+  "agent-toasts": {
+    "av1": false
   }
 }
