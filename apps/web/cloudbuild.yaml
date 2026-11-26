@@ -1,0 +1,15 @@
+# 在 Cloud Build 建 SunUI 映像並推到 Artifact Registry（從 repo 根目錄執行）：
+#   gcloud builds submit --project sunkoro --config apps/web/cloudbuild.yaml
+# 部署到 Cloud Run 的指令見 apps/web/DEPLOY.md
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "apps/web/Dockerfile", "-t", "${_IMAGE}:${BUILD_ID}", "-t", "${_IMAGE}:latest", "."]
+images:
+  - "${_IMAGE}:${BUILD_ID}"
+  - "${_IMAGE}:latest"
+substitutions:
+  _IMAGE: us-east4-docker.pkg.dev/sunkoro/sunui/web
+options:
+  # next build 要排 212 個區塊的預覽，預設機器記憶體不夠
+  machineType: E2_HIGHCPU_8
+timeout: 1800s

@@ -1,7 +1,13 @@
+import path from "node:path";
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Cloud Run 用自帶 Node 伺服器的 standalone 輸出（apps/web/Dockerfile 設 NEXT_OUTPUT_STANDALONE=1）。
+  // 這是 monorepo，相依套件裝在 repo 根目錄，追蹤要從根目錄算起，否則 node_modules 會缺檔。
+  // 其他環境（本機、Vercel）不設，行為不變。見 reports/SunUI部署平台CP值與用戶規模預估-2026-11-26.md
+  ...(process.env.NEXT_OUTPUT_STANDALONE ? { output: "standalone" as const, outputFileTracingRoot: path.resolve(process.cwd(), "../..") } : {}),
   // 同一個資料夾同時開多個 dev server 時，各自指定輸出目錄，避免互相覆寫 .next
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // block 頁、MCP、registry 端點與四語文案都在執行期用 fs 讀原始碼（Pro 還要先驗授權），

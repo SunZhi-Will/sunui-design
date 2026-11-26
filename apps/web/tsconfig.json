@@ -35,14 +35,16 @@
     ".next-admin/types/**/*.ts",
     ".next-alt/types/**/*.ts",
     ".next-checkout/types/**/*.ts",
+    ".next-colour/types/**/*.ts",
     ".next-deploycheck/types/**/*.ts",
+    ".next-media/types/**/*.ts",
     ".next-motion/types/**/*.ts",
     ".next-mp/types/**/*.ts",
     ".next-prod/types/**/*.ts",
     ".next-protest/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-colour/types/**/*.ts"
+    ".next-standalone/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

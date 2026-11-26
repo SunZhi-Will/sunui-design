@@ -17,6 +17,7 @@ SunUI is a shadcn registry of refined animated React + Tailwind blocks. Position
 | `apps/web/lib/agent/port.ts`, `lib/agent/port/*.md`, `app/r/port/` | Port guides (added 2026-11-23): carry a block to Vue, Svelte, SwiftUI, Flutter or React Native. One adapter file per platform plus the block's source; the source is the spec, so there is no per-block prose spec. Verified ports live in `content/port-verified.json`, pinned to a fingerprint of the block's main file (a source change makes them untested again). Per-block acceptance checklists live in `content/port-checklists/` and are appended to the guide. Pilot and method: `reports/可攜式Prompt跨平台深度分析-2026-11-23.md`; scale-up plan and model roles: `reports/移植指南擴大規模全面規劃-2026-11-23.md` |
 | `apps/web/app/mcp/route.ts` | SunUI MCP server (Streamable HTTP, read-only) |
 | `apps/web/app/llms.txt`, `llms-full.txt`, `r/`, `skills/` | Plain-text and registry endpoints |
+| `apps/web/DEPLOY.md`, `apps/web/Dockerfile`, `apps/web/cloudbuild.yaml` | Deploy (moved off Vercel 2026-11-26): Google Cloud Run service `sunui` in project `sunkoro`, `us-east4`. Card videos, card images and posters are served from Cloudflare R2 (`media.synvize.com`, `lib/media.ts`); run `scripts/sync-media.mjs` after re-recording them |
 | `packages/*`, `src/`, `.cursorrules/` | Legacy npm packages and their old docs. Do not add new work there |
 | `reports/` | Strategy and design analyses (Chinese). Context, not specs |
 

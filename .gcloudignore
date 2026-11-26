@@ -1,0 +1,26 @@
+# gcloud builds submit 上傳的建置來源（apps/web/cloudbuild.yaml）。
+# 有這個檔，gcloud 就不讀 .gitignore：registry/pro（私有 Pro 原始碼）要上傳才能建出含 Pro 的網站，
+# 它只存在建置階段，不會進最後的映像。
+.git
+.gcloudignore
+**/node_modules
+**/.next
+**/.next-*
+**/tsconfig.tsbuildinfo
+**/.env*
+!apps/web/.env.example
+**/.DS_Store
+/.backup
+/.compare
+/.claude
+/storybook-static
+/reports
+/research_notes
+/docs
+/src
+/public
+apps/web/check-out
+apps/web/x
+apps/web/tests
+apps/web/public/card-compare
+apps/web/.data

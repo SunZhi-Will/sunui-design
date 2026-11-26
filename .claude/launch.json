@@ -240,6 +240,21 @@
         "NEXT_DIST_DIR": ".next-media",
         "NEXT_PUBLIC_MEDIA_URL": "https://media.synvize.com"
       }
+    },
+    {
+      "name": "web-standalone",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "npm run build -w @sunui-design/web && cd apps/web/.next-standalone && rm -f standalone/apps/web/.env* && cp -R static standalone/apps/web/.next-standalone/static && cp -R ../public standalone/apps/web/public && cd standalone && PORT=3118 HOSTNAME=127.0.0.1 node apps/web/server.js"
+      ],
+      "port": 3118,
+      "autoPort": false,
+      "env": {
+        "NEXT_DIST_DIR": ".next-standalone",
+        "NEXT_OUTPUT_STANDALONE": "1",
+        "NEXT_PUBLIC_MEDIA_URL": "https://media.synvize.com"
+      }
     }
   ]
 }
