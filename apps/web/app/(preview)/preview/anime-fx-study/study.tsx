@@ -24,7 +24,15 @@ import {
   type SfxStyle,
 } from "@/registry/free/anime-fx/anime-fx";
 
-import { Button, Checkbox, Progress, Toggle } from "./controls";
+import { DemoLocaleProvider } from "@/lib/demo-locale";
+import AnimeButtonDemo from "@/registry/free/anime-button/demo";
+import AnimeCheckboxDemo from "@/registry/free/anime-checkbox/demo";
+import AnimeProgressDemo from "@/registry/free/anime-progress/demo";
+
+import { Toggle } from "./controls";
+import { AnimeButton } from "@/registry/free/anime-button/anime-button";
+import { AnimeCheckbox } from "@/registry/free/anime-checkbox/anime-checkbox";
+import { AnimeProgress } from "@/registry/free/anime-progress/anime-progress";
 
 const LANGS: { key: SfxLang; label: string }[] = [
   { key: "ja", label: "日本語" },
@@ -98,6 +106,20 @@ function WordCell({ text, lang, style }: { text: string; lang: SfxLang; style: S
 
 export function AnimeFxStudy() {
   const [lang, setLang] = useState<SfxLang>("zh-TW");
+  const [done, setDone] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const confirm = () => {
+    timers.current.forEach(clearTimeout);
+    setDone(false);
+    timers.current = [window.setTimeout(() => setDone(true), 650), window.setTimeout(() => setDone(false), 2600)];
+  };
+  const upload = () => {
+    timers.current.forEach(clearTimeout);
+    setProgress(0);
+    timers.current = [18, 34, 52, 71, 86, 100].map((v, i) => window.setTimeout(() => setProgress(v), 380 + i * 420));
+  };
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 text-foreground">
       <header className="mb-10">
@@ -124,18 +146,37 @@ export function AnimeFxStudy() {
           </div>
         </Section>
 
-        <Section n="02" title="A 墨線硬影控制項" note="同樣的四個控制項，改用正式引擎。階段 2 會把按鈕、勾選框、進度條做成 block。">
+        <Section n="02" title="A 墨線硬影控制項" note="按鈕、勾選框、進度條已經是 registry/free 的 block（階段 2）；開關還是樣張，階段 4 再做。">
           <div id="controls" className="flex flex-col items-start gap-8 rounded-2xl border border-border px-8 py-14">
             <div className="flex flex-wrap items-center gap-4">
-              <Button lang={lang}>確認</Button>
-              <Button lang={lang} primary={false}>
+              <AnimeButton lang={lang} status={done ? "done" : "idle"} onClick={confirm}>
+                確認
+              </AnimeButton>
+              <AnimeButton lang={lang} variant="secondary">
                 取消
-              </Button>
+              </AnimeButton>
             </div>
-            <Checkbox lang={lang}>記住我</Checkbox>
+            <AnimeCheckbox lang={lang}>記住我</AnimeCheckbox>
             <Toggle lang={lang} label="通知" />
-            <Progress lang={lang} />
+            <div className="w-full max-w-[260px]">
+              <AnimeProgress lang={lang} value={progress} label="上傳" doneLabel="完成" />
+              <button type="button" onClick={upload} className="mt-3 text-[13px] font-medium text-muted-foreground underline underline-offset-4 hover:text-foreground">
+                {progress === 0 ? "開始上傳" : "再跑一次"}
+              </button>
+            </div>
           </div>
+        </Section>
+
+        <Section n="04" title="階段 2 的三個 block（demo）" note="registry/free 的 anime-button、anime-checkbox、anime-progress 各自的 demo.tsx。語言跟著網址的 ?l=（en、zh-TW、zh-CN、ja），擬聲字跟著 <html lang>。還沒進 registry.json。">
+          <DemoLocaleProvider>
+            <div id="demos" className="grid gap-5 md:grid-cols-3">
+              {[AnimeButtonDemo, AnimeCheckboxDemo, AnimeProgressDemo].map((Demo, i) => (
+                <div key={i} className="flex justify-center rounded-2xl border border-border">
+                  <Demo />
+                </div>
+              ))}
+            </div>
+          </DemoLocaleProvider>
         </Section>
 
         <Section n="03" title="擬聲字（路徑版）" note="字形取自 SIL OFL 授權的 Dela Gothic One、Noto Sans TC／SC 900，只取了用到的 19 個字，全部約 12KB。粗框是各槽位的預設字樣。">
