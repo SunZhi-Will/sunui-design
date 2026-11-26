@@ -57,7 +57,7 @@ export class Spring {
 
 export type Draw = (g: CanvasRenderingContext2D, k: number, t: number) => void;
 type Fx = { t: number; life: number; draw: Draw };
-export type Layer = { c: HTMLCanvasElement | null; live: Fx[] };
+export type Layer = { c: HTMLCanvasElement | null; live: Fx[]; spread?: number };
 
 /** The front layer: one canvas over the whole viewport that ignores the pointer, created on the first effect. */
 const front: Layer = { c: null, live: [] };
@@ -81,9 +81,13 @@ function ensureFront() {
   front.c = c;
 }
 
-/** Register a canvas inside a component, behind its control (the impact star sits behind a button). Returns the layer and a function that unregisters it. */
-export function addLayer(c: HTMLCanvasElement) {
-  const L: Layer = { c, live: [] };
+/**
+ * Register a canvas inside a component, behind its control (the impact star sits behind a button). Returns the layer and a function
+ * that unregisters it. The canvas is position: fixed and is fitted to its parent plus spread on every frame it draws, so it never
+ * adds to the page's scrollable area the way an oversized absolute canvas would.
+ */
+export function addLayer(c: HTMLCanvasElement, spread = 110) {
+  const L: Layer = { c, live: [], spread };
   layers.push(L);
   return {
     layer: L,
@@ -123,6 +127,7 @@ function paint(dt: number) {
   for (const L of layers) {
     const c = L.c;
     if (!c || !c.isConnected) continue;
+    if (L !== front && L.live.length) fit(c, L.spread ?? 110);
     const r = c.getBoundingClientRect();
     const w = Math.round(r.width * dpr);
     const h = Math.round(r.height * dpr);
@@ -145,6 +150,21 @@ function paint(dt: number) {
     }
     L.live = L.live.filter((p) => p.t < p.life);
   }
+}
+
+/** Fit a fixed back canvas over its parent plus spread. A transformed ancestor turns fixed into absolute, so correct by what was measured. */
+function fit(c: HTMLCanvasElement, spread: number) {
+  const host = c.parentElement;
+  if (!host) return;
+  const h = host.getBoundingClientRect();
+  const want = { left: h.left - spread, top: h.top - spread };
+  c.style.width = `${h.width + spread * 2}px`;
+  c.style.height = `${h.height + spread * 2}px`;
+  c.style.left = `${want.left}px`;
+  c.style.top = `${want.top}px`;
+  const got = c.getBoundingClientRect();
+  if (Math.abs(got.left - want.left) > 0.5) c.style.left = `${want.left - (got.left - want.left)}px`;
+  if (Math.abs(got.top - want.top) > 0.5) c.style.top = `${want.top - (got.top - want.top)}px`;
 }
 
 function advance(dt: number) {
@@ -208,13 +228,14 @@ const SPOT = "var(--sunui-spot, var(--primary))";
 /**
  * Colours from the element's theme: the lit face is always white (drawn effects are white, and read better on a dark page too),
  * the shadow face is the brand spot mixed into white, the outline is the brand spot, accents are the semantic red.
- * Read on every trigger, so theme and brand colour changes apply.
+ * Read on every trigger, so theme and brand colour changes apply. Pass another CSS colour as hue for an effect that belongs
+ * to a semantic colour (the rating amber), so the effect matches what it decorates.
  */
-export function paletteOf(el: Element): Palette {
+export function paletteOf(el: Element, hue = SPOT): Palette {
   return {
     fill: "#ffffff",
-    shade: resolve(el, `color-mix(in oklch, ${SPOT} 24%, #fff)`),
-    line: resolve(el, SPOT),
+    shade: resolve(el, `color-mix(in oklch, ${hue} 24%, #fff)`),
+    line: resolve(el, hue),
     accent: resolve(el, "var(--sunui-like, #dc3d43)"),
     ink: "#141414",
   };

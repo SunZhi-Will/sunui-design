@@ -202,20 +202,21 @@ export function useSquash(ref: RefObject<HTMLElement | null>, { low = 0.6, wide 
 
 /**
  * A canvas behind a control, for effects that belong behind it such as the impact star.
- * Spread props onto a <canvas> inside the control's wrapper (the wrapper needs relative and isolate), and keep overflow: hidden off its ancestors.
+ * Spread props onto a <canvas> inside the control's wrapper (the wrapper needs isolate). The canvas covers the wrapper plus spread
+ * while it draws, and being fixed it never makes the page scroll sideways.
  */
 export function useBackLayer(spread = 110) {
   const ref = useRef<HTMLCanvasElement>(null);
   const layer = useRef<Layer | null>(null);
   useEffect(() => {
     if (!ref.current) return;
-    const { layer: L, remove } = addLayer(ref.current);
+    const { layer: L, remove } = addLayer(ref.current, spread);
     layer.current = L;
     return () => {
       remove();
       layer.current = null;
     };
-  }, []);
+  }, [spread]);
   // Stable across renders, so it is safe in effect dependencies
   return useMemo(
     () => ({
@@ -223,10 +224,10 @@ export function useBackLayer(spread = 110) {
       props: {
         ref,
         "aria-hidden": true,
-        className: "pointer-events-none absolute -z-10",
-        style: { inset: -spread, width: `calc(100% + ${spread * 2}px)`, height: `calc(100% + ${spread * 2}px)` },
+        className: "pointer-events-none fixed -z-10",
+        style: { left: 0, top: 0, width: 0, height: 0 },
       },
     }),
-    [spread],
+    [],
   );
 }

@@ -29,6 +29,15 @@ import { DemoLocaleProvider } from "@/lib/demo-locale";
 import AnimeButtonDemo from "@/registry/free/anime-button/demo";
 import AnimeCheckboxDemo from "@/registry/free/anime-checkbox/demo";
 import AnimeProgressDemo from "@/registry/free/anime-progress/demo";
+import AnimeToggleDemo from "@/registry/free/anime-toggle/demo";
+import AnimeRadioDemo from "@/registry/free/anime-radio/demo";
+import AnimeRatingDemo from "@/registry/free/anime-rating/demo";
+import AnimeSliderDemo from "@/registry/free/anime-slider/demo";
+import AnimeInputDemo from "@/registry/free/anime-input/demo";
+import AnimeTabsDemo from "@/registry/free/anime-tabs/demo";
+import AnimeToastDemo from "@/registry/free/anime-toast/demo";
+import AnimeTooltipDemo from "@/registry/free/anime-tooltip/demo";
+import AnimeLoaderDemo from "@/registry/free/anime-loader/demo";
 
 import { Toggle } from "./controls";
 import { AnimeButton } from "@/registry/free/anime-button/anime-button";
@@ -168,11 +177,11 @@ export function AnimeFxStudy() {
           </div>
         </Section>
 
-        <Section n="04" title="階段 2 的三個 block（demo）" note="registry/free 的 anime-button、anime-checkbox、anime-progress 各自的 demo.tsx。語言跟著網址的 ?l=（en、zh-TW、zh-CN、ja），擬聲字跟著 <html lang>。還沒進 registry.json。">
+        <Section n="04" title="十二個控制項 block（demo）" note="registry/free 的 anime-* 各自的 demo.tsx（階段 2 三個、階段 4 九個）。語言跟著網址的 ?l=（en、zh-TW、zh-CN、ja），擬聲字跟著 <html lang>。還沒進 registry.json。">
           <DemoLocaleProvider>
             <div id="demos" className="grid gap-5 md:grid-cols-3">
-              {[AnimeButtonDemo, AnimeCheckboxDemo, AnimeProgressDemo].map((Demo, i) => (
-                <div key={i} className="flex justify-center rounded-2xl border border-border">
+              {[AnimeButtonDemo, AnimeCheckboxDemo, AnimeProgressDemo, AnimeToggleDemo, AnimeRadioDemo, AnimeRatingDemo, AnimeSliderDemo, AnimeInputDemo, AnimeTabsDemo, AnimeToastDemo, AnimeTooltipDemo, AnimeLoaderDemo].map((Demo, i) => (
+                <div key={i} data-demo={i} className="flex justify-center rounded-2xl border border-border">
                   <Demo />
                 </div>
               ))}
