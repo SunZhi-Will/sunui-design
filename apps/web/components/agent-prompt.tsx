@@ -37,7 +37,8 @@ export type AgentPromptLabels = {
   portLevelNotes: Record<Level, string>;
 };
 
-const primary = "bg-accent px-4 py-2.5 text-sm text-accent-fg hover:text-accent-fg hover:opacity-90";
+// 墨色主按鈕：淺色是黑底白字，深色反過來
+const primary = "bg-fg px-4 py-2.5 text-sm text-bg shadow-btn hover:bg-fg hover:text-bg hover:opacity-90";
 
 /**
  * 區塊頁的「交給 agent」：React 是安裝用的 prompt；其他平台是移植指南。
