@@ -19,7 +19,7 @@ const DIRS: { dir: Dir; title: string; tag?: string; notes: string[] }[] = [
   {
     dir: "ink",
     title: "A. 墨線硬影",
-    tag: "報告建議",
+    tag: "已選定 2026-11-26",
     notes: ["3px 墨線加品牌色淡色硬投影，靜止時就認得出來", "特效全量：衝擊星、碎片、煙、實心擬聲字", "打擊那一格整顆反白"],
   },
   {
@@ -226,7 +226,7 @@ export function AnimeStudy({ fam, fontClass }: { fam: Families; fontClass: strin
           <Lettering fam={fam} ready={ready} />
         </Section>
 
-        <Section n="04" title="要你決定的" note="看完上面三段後回答即可。">
+        <Section n="04" title="要你決定的" note="2026-11-26 已選 A；第 2 到 5 題先用 DESIGN-anime.md 的預設（全量、依槽位混用字樣、Dela Gothic One、中文介面用中文字），想改再說。">
           <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed">
             <li>外殼選 A、B、C，或混合（例如 A 的外殼加 C 的網點陰影）。</li>
             <li>特效份量：A、C 的全量，還是 B 的六成。</li>
