@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { useDemoText } from "@/lib/demo-locale";
 
@@ -65,7 +65,7 @@ export const copy = {
     style: "Style",
     styles: { classic: "Classic", pixel: "Pixel", diamond: "Diamond", ring: "Ring", neon: "Neon LED", grain: "Grain", bars: "Bars", amber: "Amber panel" } satisfies Record<StyleKey, string>,
     colour: "Colour",
-    palettes: { spot: "Theme", status: "Status", aurora: "Aurora", sunset: "Sunset", lagoon: "Lagoon", prism: "Prism" } satisfies Record<DotMatrixPalette, string>,
+    palettes: { spot: "Theme", status: "Status", mono: "Mono", aurora: "Aurora", sunset: "Sunset", lagoon: "Lagoon", prism: "Prism" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "Wave", spiral: "Spiral", rain: "Rain", ripple: "Ripple", snake: "Snake", scan: "Scan" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-TW": {
@@ -112,7 +112,7 @@ export const copy = {
     style: "樣式",
     styles: { classic: "原版", pixel: "像素方格", diamond: "菱形", ring: "空心環", neon: "霓虹 LED", grain: "縮放顆粒", bars: "直條", amber: "琥珀面板" } satisfies Record<StyleKey, string>,
     colour: "顏色",
-    palettes: { spot: "主題色", status: "狀態色", aurora: "極光", sunset: "夕陽", lagoon: "潟湖", prism: "稜鏡" } satisfies Record<DotMatrixPalette, string>,
+    palettes: { spot: "主題色", status: "狀態色", mono: "黑白", aurora: "極光", sunset: "夕陽", lagoon: "潟湖", prism: "稜鏡" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "漣漪", snake: "蛇行", scan: "掃描" } satisfies Record<DotMatrixPattern, string>,
   },
   "zh-CN": {
@@ -159,7 +159,7 @@ export const copy = {
     style: "样式",
     styles: { classic: "原版", pixel: "像素方格", diamond: "菱形", ring: "空心环", neon: "霓虹 LED", grain: "缩放颗粒", bars: "直条", amber: "琥珀面板" } satisfies Record<StyleKey, string>,
     colour: "颜色",
-    palettes: { spot: "主题色", status: "状态色", aurora: "极光", sunset: "夕阳", lagoon: "潟湖", prism: "棱镜" } satisfies Record<DotMatrixPalette, string>,
+    palettes: { spot: "主题色", status: "状态色", mono: "黑白", aurora: "极光", sunset: "夕阳", lagoon: "潟湖", prism: "棱镜" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "波浪", spiral: "螺旋", rain: "雨滴", ripple: "涟漪", snake: "蛇行", scan: "扫描" } satisfies Record<DotMatrixPattern, string>,
   },
   ja: {
@@ -206,7 +206,7 @@ export const copy = {
     style: "スタイル",
     styles: { classic: "クラシック", pixel: "ピクセル", diamond: "ダイヤ", ring: "リング", neon: "ネオン LED", grain: "グレイン", bars: "バー", amber: "アンバーパネル" } satisfies Record<StyleKey, string>,
     colour: "カラー",
-    palettes: { spot: "テーマ", status: "ステータス", aurora: "オーロラ", sunset: "サンセット", lagoon: "ラグーン", prism: "プリズム" } satisfies Record<DotMatrixPalette, string>,
+    palettes: { spot: "テーマ", status: "ステータス", mono: "モノクロ", aurora: "オーロラ", sunset: "サンセット", lagoon: "ラグーン", prism: "プリズム" } satisfies Record<DotMatrixPalette, string>,
     patterns: { wave: "ウェーブ", spiral: "スパイラル", rain: "レイン", ripple: "リップル", snake: "スネーク", scan: "スキャン" } satisfies Record<DotMatrixPattern, string>,
   },
 };
@@ -233,6 +233,8 @@ const STATES: DotMatrixState[] = ["loading", "progress", "success", "error"];
 const SWATCH: Record<DotMatrixPalette, string> = {
   spot: "var(--sunui-spot, var(--primary))",
   status: "linear-gradient(135deg, var(--sunui-spot, var(--primary)) 50%, oklch(0.7 0.16 155) 50%)",
+  // Half text colour, half surface, with a hairline so the light half still reads on a light card
+  mono: "linear-gradient(135deg, var(--foreground) 50%, var(--background) 50%)",
   aurora: "linear-gradient(135deg, oklch(0.72 0.15 165), oklch(0.72 0.15 130), oklch(0.72 0.15 95))",
   sunset: "linear-gradient(135deg, oklch(0.72 0.17 75), oklch(0.72 0.17 30), oklch(0.72 0.17 345))",
   lagoon: "linear-gradient(135deg, oklch(0.7 0.14 150), oklch(0.7 0.14 245))",
@@ -257,7 +259,7 @@ export function PaletteSwatches({ value, onChange, label }: { value: DotMatrixPa
             (value === p ? "ring-2 ring-foreground ring-offset-2 ring-offset-card" : "hover:ring-1 hover:ring-border")
           }
         >
-          <span className="size-4 rounded-full" style={{ background: SWATCH[p] }} />
+          <span className="size-4 rounded-full ring-1 ring-inset ring-border" style={{ background: SWATCH[p] }} />
         </button>
       ))}
     </div>
@@ -408,6 +410,8 @@ export function DotMatrixShowcase({
           " rounded-xl transition-colors duration-300 " +
           (look.dark ? "bg-neutral-950 p-4 text-neutral-400" : "p-4")
         }
+        // The dark looks sit on a fixed near-black panel: point the theme text colour at white there so mono stays visible
+        style={look.dark ? ({ "--foreground": "oklch(0.96 0 0)", "--background": "oklch(0.15 0 0)" } as CSSProperties) : undefined}
       >
         {patterns.map((p) => (
           <div key={p} className="flex flex-col items-center gap-2">

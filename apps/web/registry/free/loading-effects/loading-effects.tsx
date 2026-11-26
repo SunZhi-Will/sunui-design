@@ -116,6 +116,7 @@ function makeInk(palette: LoaderPalette, color: string | undefined, success = fa
       on: "#ffffff",
     };
   }
+  if (palette === "mono") return { solid: MONO, at: () => MONO, css: () => MONO, gradient: false, on: MONO_ON };
   const solid = palette === "status" && success ? SUCCESS : (color ?? SPOT);
   const on = palette === "status" && success ? "#ffffff" : color ? "#ffffff" : SPOT_ON;
   return { solid, at: () => solid, css: () => solid, gradient: false, on };
@@ -160,7 +161,7 @@ export interface LoaderProps {
   label?: string;
   /** 0 to 100, used by progress-ring, bar and liquid */
   value?: number;
-  /** Colour scheme shared with DotMatrixLoader: spot (default), status, aurora, sunset, lagoon, prism */
+  /** Colour scheme shared with DotMatrixLoader: spot (default), status, mono, aurora, sunset, lagoon, prism */
   palette?: LoaderPalette;
   /** Main colour for the spot palette, default the brand spot colour (falls back to --primary) */
   color?: string;
@@ -1240,10 +1241,11 @@ function resultFrame(shape: number[], i: number, s: number) {
 /**
  * spot: one colour, the brand spot colour (default).
  * status: spot while waiting, green on success, red on error.
+ * mono: the theme text colour only, black on light and white on dark; success stays mono.
  * aurora, sunset, lagoon, prism: a gradient across the grid that drifts slowly while loading.
  * Error is always red, whatever the palette, so failure never reads as decoration.
  */
-export const dotMatrixPalettes = ["spot", "status", "aurora", "sunset", "lagoon", "prism"] as const;
+export const dotMatrixPalettes = ["spot", "status", "mono", "aurora", "sunset", "lagoon", "prism"] as const;
 export type DotMatrixPalette = (typeof dotMatrixPalettes)[number];
 /** Every loader in this file takes the same palettes */
 export const loaderPalettes = dotMatrixPalettes;
@@ -1257,6 +1259,9 @@ const GRADIENTS: Partial<Record<DotMatrixPalette, { from: number; to: number; l:
   prism: { from: 0, to: 330, l: 0.7, c: 0.17 },
 };
 const SUCCESS = "var(--sunui-success, oklch(0.7 0.16 155))";
+/** The mono palette follows the theme text colour, so it is black on light surfaces and white on dark ones */
+const MONO = "var(--foreground)";
+const MONO_ON = "var(--background)";
 const ERROR = "var(--destructive)";
 
 /**
@@ -1404,7 +1409,9 @@ export function DotMatrixLoader({
             ? ERROR
             : palette === "status" && state === "success"
               ? SUCCESS
-              : (color ?? "var(--sunui-spot, var(--primary))"),
+              : palette === "mono"
+                ? MONO
+                : (color ?? "var(--sunui-spot, var(--primary))"),
       }}
     >
       <SrOnly>{text}</SrOnly>
