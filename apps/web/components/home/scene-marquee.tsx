@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 export type MarqueeItem = { name: string; title: string; pro: boolean };
@@ -23,7 +24,7 @@ export function SceneMarquee({ items, reverse, proLabel, className }: { items: M
           <Link href={`/blocks/${item.name}`} tabIndex={hidden ? -1 : undefined} className="group/card block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
             <span className="relative block aspect-[5/4] overflow-hidden rounded-xl bg-[#0e0e0e] shadow-e1 transition-shadow duration-200 group-hover/card:shadow-e2">
               <Image
-                src={`/og/blocks/${item.name}.jpg`}
+                src={mediaUrl(`/og/blocks/${item.name}.jpg`)}
                 alt=""
                 fill
                 sizes="(min-width: 640px) 380px, 280px"

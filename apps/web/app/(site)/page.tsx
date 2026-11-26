@@ -20,6 +20,7 @@ import { format, type Locale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/messages";
 import { getItems, installCommand } from "@/lib/registry";
 import { foundingState, foundingWindow } from "@/lib/site";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 /*
@@ -371,7 +372,7 @@ function Tile({
   return (
     <li className={className}>
       <div className={cn("relative overflow-hidden rounded-2xl bg-[#f4f4f4] shadow-e1 dark:bg-[#131313]", frame)}>
-        <LivePreview name={name} mode={mode} poster={poster ? `/og/blocks/${name}.jpg` : undefined} title={previewLabel} locale={locale} />
+        <LivePreview name={name} mode={mode} poster={poster ? mediaUrl(`/og/blocks/${name}.jpg`) : undefined} title={previewLabel} locale={locale} />
       </div>
       <div className="mt-3.5 flex items-center justify-between gap-4 text-sm">
         <Link href={`/blocks/${name}`} className="truncate font-medium underline-offset-4 hover:underline">

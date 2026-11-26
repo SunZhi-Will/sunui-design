@@ -3,6 +3,7 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,7 +22,7 @@ export function CardVideo({ name, av1, className }: { name: string; av1?: boolea
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
     const small = saveData || window.matchMedia("(max-width: 639px)").matches;
     const useAv1 = av1 && video.canPlayType('video/mp4; codecs="av01.0.05M.08"') !== "";
-    const src = `/cards/${name}${small ? "-480" : ""}${useAv1 ? ".av1" : ""}.mp4`;
+    const src = mediaUrl(`/cards/${name}${small ? "-480" : ""}${useAv1 ? ".av1" : ""}.mp4`);
     if (video.getAttribute("src") !== src) video.setAttribute("src", src);
     let visible = false;
     let retry = 0;

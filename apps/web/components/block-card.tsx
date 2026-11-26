@@ -11,6 +11,7 @@ import { format, type Locale } from "@/lib/i18n";
 import type { Tier } from "@/lib/registry";
 import { useSaved } from "@/lib/saved";
 import type { SpotKey } from "@/lib/spot";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 /** save 有給才顯示書籤，例如「收藏 {title}」 */
@@ -66,7 +67,7 @@ export function BlockCard({
           // 影片只是畫面，鍵盤使用者用下面標題的連結：這裡不重複進 tab 順序
           <Link href={href} scroll={false} aria-hidden="true" tabIndex={-1} className="absolute inset-0 block">
             <Image
-              src={`/cards/${name}.jpg`}
+              src={mediaUrl(`/cards/${name}.jpg`)}
               alt=""
               fill
               sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"
@@ -79,7 +80,7 @@ export function BlockCard({
             name={name}
             variant={variant ?? preview}
             spot={spot}
-            poster={poster ? `/og/blocks/${name}.jpg` : undefined}
+            poster={poster ? mediaUrl(`/og/blocks/${name}.jpg`) : undefined}
             title={format(labels.livePreview, { title })}
             locale={locale}
             onExpand={() => router.push(href, { scroll: false })}

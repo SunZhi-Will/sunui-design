@@ -7,6 +7,7 @@ import { Fragment, useState, type ReactNode } from "react";
 
 import { CardVideo } from "@/components/card-video";
 import { EASE_SITE } from "@/lib/motion";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 /*
@@ -113,7 +114,7 @@ function Card({ card, kindLabel, copy }: { card: BandCard; kindLabel?: string; c
     <Link href={`/blocks/${card.name}`} className="group/card block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
       <span className="relative block aspect-[16/10] overflow-hidden rounded-xl bg-card shadow-e1 transition-shadow duration-200 group-hover/card:shadow-e2">
         <Image
-          src={`/cards/${card.name}.jpg`}
+          src={mediaUrl(`/cards/${card.name}.jpg`)}
           alt=""
           fill
           sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"

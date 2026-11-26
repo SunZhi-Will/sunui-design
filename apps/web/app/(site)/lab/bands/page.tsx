@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getItems } from "@/lib/registry";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 /*
@@ -105,7 +106,7 @@ function BlockCard({ card, pro, dir }: { card: Card; pro: boolean; dir: string }
     <Link href={`/blocks/${card.name}`} className="group/card block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
       <span className="relative block aspect-[16/10] overflow-hidden rounded-xl bg-[#0e0e0e] shadow-e1 transition-shadow duration-200 group-hover/card:shadow-e2">
         <Image
-          src={`/og/${dir}/${card.name}.jpg`}
+          src={mediaUrl(`/og/${dir}/${card.name}.jpg`)}
           alt=""
           fill
           sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"

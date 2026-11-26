@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { TierBadge } from "@/components/tier-badge";
 import { getI18n } from "@/lib/i18n-server";
+import { mediaUrl } from "@/lib/media";
 import { intlLocale } from "@/lib/messages";
 import { getItems } from "@/lib/registry";
 import { localizeItem } from "@/lib/registry-i18n";
@@ -46,7 +47,7 @@ export default async function ChangelogPage() {
                 <Link href={`/blocks/${item.name}`} className="group block !no-underline">
                   <span className="relative block aspect-[5/4] overflow-hidden rounded-lg bg-[#0e0e0e] shadow-e1 transition-shadow group-hover:shadow-e2">
                     {hasPoster(item.name) && (
-                      <Image src={`/og/blocks/${item.name}.jpg`} alt="" fill sizes="(min-width: 640px) 220px, 45vw" className="object-cover" />
+                      <Image src={mediaUrl(`/og/blocks/${item.name}.jpg`)} alt="" fill sizes="(min-width: 640px) 220px, 45vw" className="object-cover" />
                     )}
                   </span>
                   <span className="mt-2 flex items-center justify-between gap-2">

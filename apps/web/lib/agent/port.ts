@@ -6,6 +6,7 @@ import path from "node:path";
 import verifiedData from "@/content/port-verified.json";
 import { motionLibName } from "@/lib/motion-lib";
 import { getItem, readRegistryFile, type RegistryItem } from "@/lib/registry";
+import { absoluteMediaUrl } from "@/lib/media";
 import { licenseSummary, siteUrl } from "@/lib/site";
 
 // 移植指南：把一個 block 帶到 React 以外的平台。內容 = 通用規則 + 平台轉接規則 + block 說明 + 原始碼 + demo。
@@ -230,7 +231,7 @@ export async function portPrompt(item: RegistryItem, platform: PortPlatform, lic
     [
       `You are porting a SunUI block from React + Tailwind + framer-motion to ${label}. The React source below is the specification. Port its behaviour exactly; do not redesign it.`,
       `**Port status.** ${levelSentence(item, platform, main[0]?.code)}`,
-      `**Reference.** Live original: ${base}/blocks/${item.name} (preview only: ${base}/preview/${item.name}). Recording: ${base}/cards/${item.name}.mp4.`,
+      `**Reference.** Live original: ${base}/blocks/${item.name} (preview only: ${base}/preview/${item.name}). Recording: ${absoluteMediaUrl(`/cards/${item.name}.mp4`)}.`,
       licensed
         ? `**License.** SunUI Pro, licensed copy (${licensed.displayKey}). The ported code may ship in the license holder's own and client projects. Do not publish or redistribute this document or the ported source. Terms: ${base}/license`
         : null,
