@@ -216,13 +216,17 @@ export function useBackLayer(spread = 110) {
       layer.current = null;
     };
   }, []);
-  return {
-    layer: () => layer.current,
-    props: {
-      ref,
-      "aria-hidden": true,
-      className: "pointer-events-none absolute -z-10",
-      style: { inset: -spread, width: `calc(100% + ${spread * 2}px)`, height: `calc(100% + ${spread * 2}px)` },
-    },
-  };
+  // Stable across renders, so it is safe in effect dependencies
+  return useMemo(
+    () => ({
+      layer: () => layer.current,
+      props: {
+        ref,
+        "aria-hidden": true,
+        className: "pointer-events-none absolute -z-10",
+        style: { inset: -spread, width: `calc(100% + ${spread * 2}px)`, height: `calc(100% + ${spread * 2}px)` },
+      },
+    }),
+    [spread],
+  );
 }

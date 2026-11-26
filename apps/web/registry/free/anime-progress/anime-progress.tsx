@@ -31,7 +31,7 @@ export function AnimeProgress({ value, max = 100, label, doneLabel = "Done", lan
   const bar = useRef<HTMLDivElement>(null);
   const fill = useRef<HTMLDivElement>(null);
   const spring = useRef(new Spring(0, 140, 18));
-  const prev = useRef(0);
+  const prev = useRef<number | null>(null);
   const ratio = Math.max(0, Math.min(1, max > 0 ? value / max : 0));
   const done = ratio >= 1;
   const pct = Math.round(ratio * 100);
@@ -39,6 +39,13 @@ export function AnimeProgress({ value, max = 100, label, doneLabel = "Done", lan
   useEffect(() => {
     const el = bar.current;
     const s = spring.current;
+    // First render: show the current value as it is, with no effects (a page that loads at 40% is not a surge)
+    if (prev.current === null) {
+      prev.current = ratio;
+      s.x = s.to = ratio;
+      if (fill.current) fill.current.style.width = `${ratio * 100}%`;
+      return;
+    }
     const from = prev.current;
     prev.current = ratio;
     if (!el) return;

@@ -24,6 +24,7 @@ import {
   type SfxStyle,
 } from "@/registry/free/anime-fx/anime-fx";
 
+import { BlockPreview } from "@/components/block-preview";
 import { DemoLocaleProvider } from "@/lib/demo-locale";
 import AnimeButtonDemo from "@/registry/free/anime-button/demo";
 import AnimeCheckboxDemo from "@/registry/free/anime-checkbox/demo";
@@ -175,6 +176,14 @@ export function AnimeFxStudy() {
                   <Demo />
                 </div>
               ))}
+            </div>
+          </DemoLocaleProvider>
+        </Section>
+
+        <Section n="05" title="階段 3：Pro 場景 anime-preregister" note="registry/pro 的場景，經預覽清單載入（Pro repo 不在時這格是空的）。目前 299,999 人，送出就衝破 30 萬人、召喚券解鎖。">
+          <DemoLocaleProvider>
+            <div id="scene" className="flex justify-center rounded-2xl border border-border px-4 py-8">
+              <BlockPreview name="anime-preregister" />
             </div>
           </DemoLocaleProvider>
         </Section>

@@ -15,6 +15,8 @@ export type AnimeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "ch
   lang?: SfxLang;
   /** Show the sound-effect word on the hit */
   lettering?: boolean;
+  /** Land the full hit on click. Pass false when the click will not go through (a form that fails validation): it gets only the small press. */
+  hit?: boolean;
 };
 
 /** The resting look of the anime series: ink outline and a hard shadow in a pale tint of the brand spot. */
@@ -25,7 +27,7 @@ const SHELL = "border-[3px] border-foreground bg-card text-foreground shadow-[4p
  * an impact star goes off behind it, smoke rolls off the corners, chips fly from its edge and a word lands above it.
  * Effects decorate the click; the click itself, focus, keys, type="submit" and disabled behave like any button.
  */
-export function AnimeButton({ children, variant = "primary", status = "idle", lang, lettering = true, className, onClick, disabled, type = "button", ...rest }: AnimeButtonProps) {
+export function AnimeButton({ children, variant = "primary", status = "idle", lang, lettering = true, hit: full = true, className, onClick, disabled, type = "button", ...rest }: AnimeButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const back = useBackLayer();
   const primary = variant === "primary";
@@ -38,7 +40,7 @@ export function AnimeButton({ children, variant = "primary", status = "idle", la
     if (!el) return;
     const P = paletteOf(el);
     const c = at(el);
-    if (!primary) {
+    if (!primary || !full) {
       sq.s.x = Math.min(sq.s.x, 0.8);
       sq.s.v += 4;
       sq.kick();

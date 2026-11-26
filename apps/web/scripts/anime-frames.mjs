@@ -7,7 +7,7 @@
 //     --act "document.querySelector('#controls button').click()" --times 0,0.05,0.12,0.25,0.45,0.8 --out frames.png
 //
 // --base 網站位址（預設 http://localhost:3100）；--select 要裁的元素（取第一個，四周留 --pad，預設 140）；
-// --act 觸發反應的 JS（在時鐘停住後執行）；--times 秒數；--theme light|dark；--width 視窗寬（預設 1280）。
+// --act 觸發反應的 JS（在時鐘停住後執行，可以用 await）；--times 秒數；--theme light|dark；--width 視窗寬（預設 1280）。
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
@@ -102,7 +102,8 @@ try {
   await sleep(300);
   const box = await evaluate(`(() => { const r = document.querySelector(${JSON.stringify(select)}).getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height }; })()`);
   const clip = { x: Math.max(0, box.x - pad), y: Math.max(0, box.y - pad), width: box.w + pad * 2, height: box.h + pad * 2, scale: 1 };
-  await evaluate(`window.__animeFx.pause(true); (() => { ${act} })()`);
+  // act 可以是 async（例如等一個假的網路請求）；時鐘停著，特效等 step 才前進
+  await evaluate(`window.__animeFx.pause(true); (async () => { ${act} })()`);
   const shots = [];
   let now = 0;
   for (const t of times) {
