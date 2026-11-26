@@ -634,5 +634,8 @@
   },
   "workspace-tabs": {
     "av1": false
+  },
+  "launch-reel-bento": {
+    "av1": true
   }
 }

@@ -2,6 +2,7 @@
   "_note": "/blocks 型錄卡片影片的補充設定（node apps/web/scripts/record-cards.mjs --catalog）。名單自動取自 registry，這裡只寫要人操作才會動的 block：demos.<name> 可以有 demo、seconds、crf，格式和 home-cards.json 一樣，座標是卡片畫面的比例。首頁 home-cards.json 已有的 block 共用首頁那支，不在這裡錄。",
   "_walls_note": "效果庫的型錄卡片同時秀哪幾種樣式（/preview/<name>/wall）。2026-11-23：一張卡只秀一個樣式看起來太空。",
   "demos": {
+    "launch-reel-bento": { "demo": [{ "wait": 10000 }], "seconds": 10, "crf": 30 },
     "micro-interactions": {
       "stage": "/preview/micro-interactions/wall",
       "seconds": 6
